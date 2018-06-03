@@ -1,0 +1,14 @@
+{
+  "name": "event_request",
+  "version": "1.0.0",
+  "description": "An event driven restful server with useful functionality",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Stefan Genov",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "npm": "^6.1.0"
+  }
+}
