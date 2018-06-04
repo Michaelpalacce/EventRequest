@@ -114,7 +114,6 @@ class SessionHandler
 		}
 		catch ( e )
 		{
-			console.log( e );
 			this.event.setError( 'Invalid configuration provided' );
 		}
 	}

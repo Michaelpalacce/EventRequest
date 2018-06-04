@@ -41,22 +41,6 @@ class SessionAuthenticationManager extends SecurityManager
 	}
 
 	/**
-	 * @see	SecurityManager::getId() Static
-	 */
-	static getId()
-	{
-		return MANAGER_NAME;
-	}
-
-	/**
-	 * @see	SecurityManager::getId()
-	 */
-	getId()
-	{
-		return MANAGER_NAME;
-	}
-
-	/**
 	 * @see	SecurityManager::getPath()
 	 */
 	getPath()

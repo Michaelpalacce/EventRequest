@@ -135,7 +135,7 @@ class RequestEvent
 	 *
 	 * @return	void
 	 */
-	log( ...data )
+	log( data )
 	{
 		if ( this.logger instanceof Logger )
 		{
@@ -189,8 +189,6 @@ class RequestEvent
 	 * @brief	Outputs basic data about the request
 	 *
 	 * @param	Number level
-	 *
-	 * @todo	Absolutely log this somewhere else ( same for pretty much anywhere else but i don't wanna bother for now )
 	 *
 	 * @return	void
 	 */

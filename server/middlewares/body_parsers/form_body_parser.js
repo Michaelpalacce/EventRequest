@@ -1,17 +1,19 @@
 'use strict';
 
+// Dependencies
+const BaseBodyParser	= require( './base_body_parser' );
+
 /**
  * @brief	Constants
  */
 const FORM_PARSER_SUPPORTED_TYPE	= 'application/x-www-form-urlencoded';
-const PARSER_ID						= 'FormBodyParser';
 const CONTENT_LENGTH_HEADER			= 'content-length';
 const CONTENT_TYPE_HEADER			= 'content-type';
 
 /**
  * @brief	FormBodyParser responsible for parsing application/x-www-form-urlencoded forms
  */
-class FormBodyParser
+class FormBodyParser extends BaseBodyParser
 {
 	/**
 	 * @param	BodyParser bodyParser
@@ -22,7 +24,7 @@ class FormBodyParser
 	 */
 	constructor( bodyParser, options = {} )
 	{
-		this.bodyParser			= bodyParser;
+		super( bodyParser, options = {} );
 
 		// Defaults to 10 MB
 		this.maxPayloadLength	= options.maxPayloadLength || 10 * 1048576;
@@ -40,16 +42,6 @@ class FormBodyParser
 	{
 		let contentType	= event.headers[CONTENT_TYPE_HEADER];
 		return typeof contentType === 'string' && contentType.match( FORM_PARSER_SUPPORTED_TYPE ) !== null
-	}
-
-	/**
-	 * @brief	Gets the id of the parser used to reference it by
-	 *
-	 * @return	String
-	 */
-	static getId()
-	{
-		return PARSER_ID;
 	}
 
 	/**
@@ -127,7 +119,7 @@ class FormBodyParser
 	 * @param	Buffer rawPayload
 	 * @param	Function callback
 	 *
-	 * @return	Object
+	 * @return	void
 	 */
 	parse( event, callback )
 	{

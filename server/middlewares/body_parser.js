@@ -3,6 +3,7 @@
 // Dependencies
 const MultipartFormParser	= require( './body_parsers/multipart_data_parser' );
 const FormBodyParser		= require( './body_parsers/form_body_parser' );
+const BaseBodyParser		= require( './body_parsers/base_body_parser' );
 
 /**
  * @brief	BodyParser responsible for parsing the body of the request
@@ -24,12 +25,43 @@ class BodyParser
 	{
 		this.options		= options;
 		this.dieOnError		= this.options.dieOnError || true;
+		this.baseOptions	= {};
 		this.event			= event;
 		this.rawPayload		= [];
 		this.payloadLength	= 0;
 		this.parsers		= [];
 
+		this.sanitizeConfig();
 		this.initParsers();
+	}
+
+	/**
+	 * @brief	Sanitizes the config of the session handler
+	 *
+	 * @return	void
+	 */
+	sanitizeConfig()
+	{
+		this.baseOptions		= {};
+
+		this.options.parsers	= typeof this.options.parsers === 'object' ? this.options.parsers : [];
+
+		let parsers				= this.options.parsers;
+		if (
+			parsers.constructor === Array
+			&& ( parsers.indexOf( 'default' ) !== -1 || parsers.length === 0 )
+		) {
+			let index	= parsers.indexOf( 'default' );
+			if ( index !== -1 )
+				parsers.splice( index, 1 );
+
+			let defaultParsers	= [
+				{ instance : FormBodyParser },
+				{ instance : MultipartFormParser }
+			];
+
+			this.options.parsers	= defaultParsers.concat( parsers );
+		}
 	}
 
 	/**
@@ -39,14 +71,33 @@ class BodyParser
 	 */
 	initParsers()
 	{
-		if ( typeof this.options[MultipartFormParser.getId()] === 'object' )
+		try
 		{
-			this.parsers.push( new MultipartFormParser( this, this.options[MultipartFormParser.getId()] ) );
-		}
+			if ( this.options.parsers.constructor === Array )
+			{
+				for ( let index in this.options.parsers )
+				{
+					let parserConfig	= this.options.parsers[index];
+					let parser			= typeof parserConfig.instance === 'function' ? parserConfig.instance : null;
+					let parserOptions	= typeof parserConfig.options === 'object' ? parserConfig.options : [];
 
-		if ( typeof this.options[FormBodyParser.getId()] === 'object' )
+					if ( parser === null )
+					{
+						throw new Error( 'Invalid configuration' );
+					}
+
+					parser	= parser.getInstance( this, Object.assign( this.baseOptions, parserOptions ) );
+
+					if ( parser instanceof BaseBodyParser )
+					{
+						this.parsers.push( parser );
+					}
+				}
+			}
+		}
+		catch ( e )
 		{
-			this.parsers.push( new FormBodyParser( this, this.options[FormBodyParser.getId()] ) );
+			this.event.setError( 'Invalid configuration provided' );
 		}
 	}
 
@@ -112,4 +163,9 @@ class BodyParser
 	}
 }
 
-module.exports	= BodyParser;
+module.exports	= {
+	BodyParser			: BodyParser,
+	BaseBodyParser		: BaseBodyParser,
+	MultipartFormParser	: MultipartFormParser,
+	FormBodyParser		: FormBodyParser
+};

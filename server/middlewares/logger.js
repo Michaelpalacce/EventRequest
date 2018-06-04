@@ -16,6 +16,19 @@ class Logger
 	}
 
 	/**
+	 * @brief	Gets a new instance of the logger
+	 *
+	 * @param	RequestEvent event
+	 * @param	Object options
+	 *
+	 * @return	Logger
+	 */
+	static getInstance( event, options = {} )
+	{
+		return new this( event, options );
+	}
+
+	/**
 	 * @brief	Sanitizes the options
 	 *
 	 * @return	void
@@ -43,7 +56,7 @@ class Logger
 	 *
 	 * @return	void
 	 */
-	log( ...data )
+	log( data )
 	{
 	}
 }
