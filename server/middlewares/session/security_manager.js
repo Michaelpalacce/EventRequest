@@ -36,33 +36,12 @@ class SecurityManager
 	}
 
 	/**
-	 * @brief	Get the ID of the current manager
-	 *
-	 * @return	String
-	 */
-	static getId()
-	{
-		console.log( 'NOT IMPLEMENTED' );
-	}
-
-	/**
-	 * @brief	Get the id of the current manager non statically
-	 *
-	 * @return	String
-	 */
-	getId()
-	{
-		console.log( 'NOT IMPLEMENTED' );
-	}
-
-	/**
 	 * @brief	Get the path where the manager will be added to
 	 *
 	 * @return	String|RegExp
 	 */
 	getPath()
 	{
-		console.log( 'NOT IMPLEMENTED' );
 	}
 
 	/**
@@ -72,9 +51,7 @@ class SecurityManager
 	 */
 	getMethods()
 	{
-		console.log( 'NOT IMPLEMENTED' );
 	}
-
 
 	/**
 	 * @brief	The handler of the security manager
@@ -89,7 +66,6 @@ class SecurityManager
 	 */
 	handle( event, next, terminate )
 	{
-		console.log( 'NOT IMPLEMENTED' );
 	}
 }
 

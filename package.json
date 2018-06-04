@@ -1,6 +1,6 @@
 {
   "name": "event_request",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An event driven restful server with useful functionality",
   "main": "server.js",
   "scripts": {

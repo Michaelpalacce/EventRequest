@@ -4,7 +4,6 @@
 const TokenManager		= require( './helpers/token_manager' );
 const SecurityManager	= require( './security_manager' );
 
-
 // Constants
 const MANAGER_NAME		= 'AuthenticationManager';
 const MANAGER_METHODS	= [];
@@ -38,23 +37,6 @@ class AuthenticationManager extends SecurityManager
 		{
 			throw new Error( 'Invalid Configuration provided' );
 		}
-	}
-
-
-	/**
-	 * @see	SecurityManager::getId() Static
-	 */
-	static getId()
-	{
-		return MANAGER_NAME;
-	}
-
-	/**
-	 * @see	SecurityManager::getId()
-	 */
-	getId()
-	{
-		return MANAGER_NAME;
 	}
 
 	/**

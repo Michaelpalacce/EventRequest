@@ -4,13 +4,14 @@
 const fs				= require( 'fs' );
 const path				= require( 'path' );
 const setAdvTimeout		= require( './timeout' );
-const BodyParser		= require( './middlewares/body_parser' );
+const BodyParsers		= require( './middlewares/body_parser' );
 const TemplatingEngine	= require( './middlewares/templating_engine' );
 const FileStreams		= require( './middlewares/file_stream_handler' );
 const Session			= require( './middlewares/session_handler' );
 
 const SessionHandler	= Session.SessionHandler;
 const FileStreamHandler	= FileStreams.FileStreamHandler;
+const BodyParser		= BodyParsers.BodyParser;
 
 // Define the object
 let middlewaresContainer	= {};
@@ -199,7 +200,7 @@ middlewaresContainer.timeout	= ( options ) =>
 
 	return [( event ) => {
 		event.internalTimeout	= setAdvTimeout( () => {
-				console.log( 'Request timed out', event.path );
+				event.log( 'Request timed out', event.path );
 				if ( ! event.isFinished() )
 				{
 					event.serverError( 'TIMEOUT' );

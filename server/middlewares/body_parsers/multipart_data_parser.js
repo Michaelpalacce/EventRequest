@@ -1,9 +1,10 @@
 'use strict';
 
 // Dependencies
-const os	= require( 'os' );
-const path	= require( 'path' );
-const fs	= require( 'fs' );
+const os				= require( 'os' );
+const path				= require( 'path' );
+const fs				= require( 'fs' );
+const BaseBodyParser	= require( './base_body_parser' );
 
 /**
  * @brief	Constants
@@ -23,14 +24,13 @@ const DEFAULT_BUFFER_ENCODING				= 'ascii';
 const DEFAULT_BOUNDARY_PREFIX				= '--';
 const DEFAULT_BUFFER_SIZE					= 5242880; // 5 MB
 const MULTIPART_PARSER_SUPPORTED_TYPE		= 'multipart/form-data';
-const PARSER_ID								= 'MultipartFormParser';
 
 /**
  * @brief	FormParser used to parse multipart data
  *
  * @TODO	Figure out how to get the offset of the buffer value without regex
  */
-class MultipartFormParser
+class MultipartFormParser extends BaseBodyParser
 {
 	/**
 	 * @param	BodyParser bodyParser
@@ -48,23 +48,13 @@ class MultipartFormParser
 	 */
 	constructor( bodyParser, options = {} )
 	{
-		this.bodyParser				= bodyParser;
+		super( bodyParser, options );
 		this.bufferSize				= options.BufferSize || DEFAULT_BUFFER_SIZE;
 		this.extendedTimeout		= options.extendedTimeout == undefined ? false : options.extendedTimeout;
 		this.extendedMilliseconds	= options.extendedMilliseconds || 10;
 		this.maxPayload				= options.maxPayload || 0;
 		this.tempDir				= options.tempDir || os.tmpdir();
 		this.saveFiles				= options.saveFiles || false;
-	}
-
-	/**
-	 * @brief	Gets the id of the parser used to reference it by
-	 *
-	 * @return	String
-	 */
-	static getId()
-	{
-		return PARSER_ID;
 	}
 
 	/**
