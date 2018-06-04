@@ -1,14 +1,38 @@
 {
-  "name": "event_request",
-  "version": "1.0.1",
+  "_from": "github:Michaelpalacce/EventRequest#logging",
+  "_id": "event_request@1.0.1",
+  "_inBundle": false,
+  "_location": "/event_request",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "github:Michaelpalacce/EventRequest#logging",
+    "rawSpec": "github:Michaelpalacce/EventRequest#logging",
+    "saveSpec": "github:Michaelpalacce/EventRequest#logging",
+    "fetchSpec": null,
+    "gitCommittish": "logging"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "github:Michaelpalacce/EventRequest#a54116f02ba38ce523cbb5e2830f95632a825e4b",
+  "_spec": "github:Michaelpalacce/EventRequest#logging",
+  "_where": "E:\\Coding\\FileSystem",
+  "author": {
+    "name": "Stefan Genov"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "npm": "^6.1.0"
+  },
+  "deprecated": false,
   "description": "An event driven restful server with useful functionality",
+  "license": "GPL-3.0",
   "main": "server.js",
+  "name": "event_request",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Stefan Genov",
-  "license": "GPL-3.0",
-  "dependencies": {
-    "npm": "^6.1.0"
-  }
+  "version": "1.0.1"
 }

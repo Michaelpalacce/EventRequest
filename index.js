@@ -6,9 +6,9 @@ const middlewaresContainer	= require( './server/middleware_container' );
 const Router				= require( './server/router' );
 const RequestEvent			= require( './server/event' );
 const TemplatingEngine		= require( './server/middlewares/templating_engine' );
-const BaseTemplatingEngine	= require( './server/middlewares/templating_engines/base_templating_engine' );
 const SessionHandler		= require( './server/middlewares/session_handler' );
 const BodyParser			= require( './server/middlewares/body_parser' );
+const Logger				= require( './server/middlewares/logger' );
 
 /**
  * @brief	Server class responsible for receiving requests and sending responses
@@ -119,7 +119,7 @@ module.exports	= {
 	Server					: Index,
 	Router					: Router,
 	TemplatingEngine		: TemplatingEngine,
-	BaseTemplatingEngine	: BaseTemplatingEngine,
 	SessionHandler			: SessionHandler,
-	BodyParser				: BodyParser
+	BodyParser				: BodyParser,
+	Logger					: Logger
 };

@@ -25,7 +25,6 @@ class FormBodyParser extends BaseBodyParser
 	constructor( bodyParser, options = {} )
 	{
 		super( bodyParser, options = {} );
-		this.bodyParser			= bodyParser;
 
 		// Defaults to 10 MB
 		this.maxPayloadLength	= options.maxPayloadLength || 10 * 1048576;
@@ -120,7 +119,7 @@ class FormBodyParser extends BaseBodyParser
 	 * @param	Buffer rawPayload
 	 * @param	Function callback
 	 *
-	 * @return	Object
+	 * @return	void
 	 */
 	parse( event, callback )
 	{

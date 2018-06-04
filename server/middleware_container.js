@@ -1,17 +1,20 @@
 'use strict';
 
 // Dependencies
-const fs				= require( 'fs' );
-const path				= require( 'path' );
-const setAdvTimeout		= require( './timeout' );
-const BodyParsers		= require( './middlewares/body_parser' );
-const TemplatingEngine	= require( './middlewares/templating_engine' );
-const FileStreams		= require( './middlewares/file_stream_handler' );
-const Session			= require( './middlewares/session_handler' );
+const fs					= require( 'fs' );
+const path					= require( 'path' );
+const setAdvTimeout			= require( './timeout' );
+const BodyParsers			= require( './middlewares/body_parser' );
+const TemplatingEngine		= require( './middlewares/templating_engine' );
+const BaseTemplatingEngine	= require( './middlewares/templating_engines/base_templating_engine' );
+const FileStreams			= require( './middlewares/file_stream_handler' );
+const Session				= require( './middlewares/session_handler' );
+const Logger				= require( './middlewares/logger' );
+const ConsoleLogger			= require( './middlewares/loggers/console_logger' );
 
-const SessionHandler	= Session.SessionHandler;
-const FileStreamHandler	= FileStreams.FileStreamHandler;
-const BodyParser		= BodyParsers.BodyParser;
+const SessionHandler		= Session.SessionHandler;
+const FileStreamHandler		= FileStreams.FileStreamHandler;
+const BodyParser			= BodyParsers.BodyParser;
 
 // Define the object
 let middlewaresContainer	= {};
@@ -36,29 +39,29 @@ middlewaresContainer.setFileStream		= ( options ) =>{
  *
  * @param	Object options
  * 			Accepted options:
- * 			- engine - TemplatingEngine - Instance of TemplatingEngine
+ * 			- engine - TemplatingEngine - Instance of TemplatingEngine. Defaults to BaseTemplatingEngine
  * 			- options - Object - options to be passed to the engine
  *
  * @return	Array
  */
 middlewaresContainer.templatingEngine	= ( options ) =>{
 	return [( event ) =>{
-		if (
-			typeof options !== 'undefined'
-			&& typeof options.engine === 'function'
-		) {
-			let engineOptions		= typeof options.options === 'object' ? options.options : {};
-			let engine				= new options.engine( engineOptions );
+		let engineOptions	= typeof options.options === 'object' ? options.options : {};
 
-			if ( engine instanceof TemplatingEngine )
+		if ( typeof options !== 'undefined' )
+		{
+			let templatingEngine	= typeof options.engine === 'function'
+			&& typeof options.engine.getInstance === 'function'
+				? options.engine.getInstance( engineOptions )
+				: null;
+
+			if ( ! templatingEngine instanceof TemplatingEngine || templatingEngine === null )
 			{
-				event.templatingEngine	= engine;
-				event.next();
+				templatingEngine	= BaseTemplatingEngine.getInstance( engineOptions );
 			}
-			else
-			{
-				event.setError( 'Invalid templating engine provided' );
-			}
+
+			event.templatingEngine	= templatingEngine;
+			event.next();
 		}
 		else
 		{
@@ -144,6 +147,8 @@ middlewaresContainer.parseCookies	= ( options ) =>
  *
  * @details	This should ideally be used after the static path middleware.
  * 			Accepts options:
+ * 			- logger - Logger - The logger to use. Defaults to ConsoleLogger
+ * 			- options - Object - Any options to be passed to the logger
  * 			- level - log level
  *
  * @param	Object options
@@ -152,8 +157,27 @@ middlewaresContainer.parseCookies	= ( options ) =>
  */
 middlewaresContainer.logger	= ( options ) => {
 	return [( event ) => {
-		event.logData( options.level );
-		event.next();
+		if ( typeof options !== 'undefined' )
+		{
+			let logger	= typeof options.logger === 'function'
+			&& typeof options.logger.getInstance === 'function'
+				? options.logger.getInstance( event, options.options )
+				: null;
+
+			if ( ! logger instanceof Logger || logger === null )
+			{
+				logger	= ConsoleLogger.getInstance( event, options.options );
+			}
+
+			event.logger	= logger;
+
+			event.logData( options.level );
+			event.next();
+		}
+		else
+		{
+			event.setError( 'Invalid logger provided' );
+		}
 	}];
 };
 

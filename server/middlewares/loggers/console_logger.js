@@ -35,7 +35,7 @@ class ConsoleLogger extends Logger
 	/**
 	 * @see	Logger::log()
 	 */
-	log( ...data )
+	log( data )
 	{
 		console.log( data );
 	}

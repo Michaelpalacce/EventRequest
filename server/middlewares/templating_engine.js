@@ -15,6 +15,18 @@ class TemplatingEngine
 	}
 
 	/**
+	 * @brief	Gets an instance of the templating engine
+	 *
+	 * @param	Object options
+	 *
+	 * @return	TemplatingEngine
+	 */
+	static getInstance( options = {} )
+	{
+		return new this( options );
+	}
+	
+	/**
 	 * @brief	Renders the given template
 	 *
 	 * @param	String templateName

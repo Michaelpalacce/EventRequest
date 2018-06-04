@@ -31,7 +31,37 @@ class BodyParser
 		this.payloadLength	= 0;
 		this.parsers		= [];
 
+		this.sanitizeConfig();
 		this.initParsers();
+	}
+
+	/**
+	 * @brief	Sanitizes the config of the session handler
+	 *
+	 * @return	void
+	 */
+	sanitizeConfig()
+	{
+		this.baseOptions		= {};
+
+		this.options.parsers	= typeof this.options.parsers === 'object' ? this.options.parsers : [];
+
+		let parsers				= this.options.parsers;
+		if (
+			parsers.constructor === Array
+			&& ( parsers.indexOf( 'default' ) !== -1 || parsers.length === 0 )
+		) {
+			let index	= parsers.indexOf( 'default' );
+			if ( index !== -1 )
+				parsers.splice( index, 1 );
+
+			let defaultParsers	= [
+				{ instance : FormBodyParser },
+				{ instance : MultipartFormParser }
+			];
+
+			this.options.parsers	= defaultParsers.concat( parsers );
+		}
 	}
 
 	/**
@@ -43,11 +73,11 @@ class BodyParser
 	{
 		try
 		{
-			if ( this.parsers.constructor === Array )
+			if ( this.options.parsers.constructor === Array )
 			{
-				for ( let index in this.parsers )
+				for ( let index in this.options.parsers )
 				{
-					let parserConfig	= this.parsers[index];
+					let parserConfig	= this.options.parsers[index];
 					let parser			= typeof parserConfig.instance === 'function' ? parserConfig.instance : null;
 					let parserOptions	= typeof parserConfig.options === 'object' ? parserConfig.options : [];
 
@@ -56,7 +86,7 @@ class BodyParser
 						throw new Error( 'Invalid configuration' );
 					}
 
-					parser	= parser.getInstance( Object.assign( this.baseOptions, parserOptions ) );
+					parser	= parser.getInstance( this, Object.assign( this.baseOptions, parserOptions ) );
 
 					if ( parser instanceof BaseBodyParser )
 					{
