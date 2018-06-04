@@ -27,6 +27,10 @@ class Logger
 
 	/**
 	 * @brief	Attaches logs to different events emitted from the RequestEvent
+	 *
+	 * @todo	IMPLEMENT THIS
+	 *
+	 * @return	void
 	 */
 	attachToEvents()
 	{
@@ -39,7 +43,7 @@ class Logger
 	 *
 	 * @return	void
 	 */
-	log( data )
+	log( ...data )
 	{
 	}
 }

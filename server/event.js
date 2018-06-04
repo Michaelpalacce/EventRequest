@@ -4,7 +4,9 @@
 const url				= require( 'url' );
 const events			= require( 'events' );
 const FileStream		= require( './middlewares/file_streams/file_stream' );
-const TemplatingEngine	= require( './middlewares/templating_engines/base_templating_engine' );
+const TemplatingEngine	= require( './middlewares/templating_engine' );
+const Logger			= require( './middlewares/logger' );
+
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
  */
@@ -58,6 +60,7 @@ class RequestEvent
 		this.body				= {};
 		this.templatingEngine	= null;
 		this.fileStreamHandler	= null;
+		this.logger				= null;
 	}
 
 	/**
@@ -126,6 +129,21 @@ class RequestEvent
 	}
 
 	/**
+	 * @brief	Logs Data if a logger is defined
+	 *
+	 * @param	mixed data
+	 *
+	 * @return	void
+	 */
+	log( ...data )
+	{
+		if ( this.logger instanceof Logger )
+		{
+			this.logger.log( data );
+		}
+	}
+
+	/**
 	 * @brief	Sends the response to the user
 	 *
 	 * @param	mixed response
@@ -178,37 +196,38 @@ class RequestEvent
 	 */
 	logData( level )
 	{
-		level	= typeof level === 'number' ? level : 1;
+		level		= typeof level === 'number' ? level : 1;
+		let data	= {};
 
 		if ( level >= 1 )
 		{
-			let data	= {
+			data	= {
 				method				: this.method,
 				path				: this.path,
 				queryStringObject	: this.queryStringObject,
 			};
 
-			console.log( data );
+			this.log( data );
 		}
 
 		if ( level >= 2 )
 		{
-			let data	= {
+			data	= {
 				headers				: this.headers,
 				cookies				: this.cookies,
 				extra				: this.extra
 			};
 
-			console.log( data );
+			this.log( data );
 		}
 
 		if ( level >= 3 )
 		{
-			let data	= {
+			data	= {
 				supportedFilesToStream	: this.getFileStreamHandler().getSupportedTypes()
 			};
 
-			console.log( data );
+			this.log( data );
 		}
 	}
 
@@ -226,7 +245,7 @@ class RequestEvent
 		{
 			error	= JSON.stringify( error );
 		}
-		console.log( error );
+		this.log( error );
 
 		this.serverError( error, code );
 	}
@@ -247,7 +266,8 @@ class RequestEvent
 		{
 			this.response.setHeader( key, value );
 		}
-		else {
+		else
+		{
 			this.setError( 'Trying to set headers when response is already sent' );
 		}
 	}
@@ -394,7 +414,7 @@ class RequestEvent
 	{
 		if ( message instanceof Error )
 		{
-			console.log( message );
+			this.log( message );
 			message	= message.toString();
 		}
 		
@@ -402,8 +422,9 @@ class RequestEvent
 		{
 			this.send( message, code );
 		}
-		else {
-			console.log( 'Server error: ', message );
+		else
+		{
+			this.log( 'Server error: ', message );
 		}
 	}
 

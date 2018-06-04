@@ -45,7 +45,7 @@ class FileStream
 	 */
 	support( file )
 	{
-		console.log( 'NOT IMPLEMENTED' );
+		this.event.log( 'NOT IMPLEMENTED' );
 		return false;
 	}
 
