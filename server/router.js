@@ -19,77 +19,41 @@ class Router
 	/**
 	 * @brief	Function that adds a middleware to the block chain of the router
 	 *
-	 * @details	If only one argument is provided then that is set as a global middleware and should always be called
-	 * 			If two arguments are provided then the first is expected to be the path and the second callback
-	 * 			If three are provided then the first one is path, second method and third one is callback
-	 * 			If another router is found then the middleware from that router will be concatenated to th
-	 * 			This method will throw an error if invalid parameters are provided
+	 * @details	Accepts an object with 3 arguments:
+	 * 			- method - String|Array - The methods(s) to be matched for the route - optional
+	 * 			- route - String|RegExp - The route to match - optional
+	 * 			- handler - Function - Handler to be called - ! REQUIRED
 	 *
-	 * @param	..args
+	 * @param	Object route
 	 *
 	 * @returns	void
 	 */
-	add()
+	add( route )
 	{
-		let route	= {};
-
-		if ( arguments.length === 1 )
+		if ( typeof route !== 'object' )
 		{
-			const callback	= arguments[0];
-
-			if ( callback instanceof Router )
-			{
-				this.middleware	= this.middleware.concat( callback.middleware );
-				return;
-			}
-
-			if ( typeof callback !== 'function' )
-			{
-				throw new Error( 'Invalid middleware added!!' );
-			}
-
-			route	= {
-				callback	: callback,
-				method		: '',
-				path		: ''
-			};
+			throw new Error( 'Invalid middleware added!!' );
 		}
-		else if( arguments.length === 2 )
+
+		if ( route instanceof Router )
 		{
-			const path		= arguments[0];
-			const callback	= arguments[1];
-
-			if (
-				typeof callback !== 'function'
-				|| ( typeof path !== 'string' && ! path instanceof RegExp )
-		 	) {
-				throw new Error( 'Invalid middleware added!!' );
-			}
-
-			route	= {
-				callback	: callback,
-				method		: '',
-				path		: path
-			};
+			this.middleware	= this.middleware.concat( route.middleware );
+			return;
 		}
-		else if( arguments.length === 3 )
-		{
-			const path		= arguments[0];
-			const method	= arguments[1].toUpperCase();
-			const callback	= arguments[2];
 
-			if ( typeof callback !== 'function' || typeof path !== 'string' || typeof method !== 'string' )
-			{
-				throw new Error( 'Invalid middleware added!!' );
-			}
+		route.route		= typeof route.route === 'string' || route.route instanceof RegExp
+						? route.route
+						: '';
 
-			route	= {
-				callback	: callback,
-				method		: method,
-				path		: path
-			};
-		}
-		else
+		route.method	= typeof route.method === 'string' || route.method instanceof Array
+						? route.method
+						: '';
+
+		route.handler	= route.handler instanceof Function
+						? route.handler
+						: null;
+
+		if ( route.handler === null )
 		{
 			throw new Error( 'Invalid middleware added!!' );
 		}
@@ -116,20 +80,20 @@ class Router
 		for ( let index in this.middleware )
 		{
 			let value				= this.middleware[index];
-			if ( value.path === '' )
+			if ( value.route === '' )
 			{
-				block.push( value.callback );
+				block.push( value.handler );
 				continue;
 			}
 
-			let match	= Router.matchRoute( event.path, value.path );
+			let match	= Router.matchRoute( event.path, value.route );
 
 			if ( match !== false )
 			{
 				if ( Router.matchMethod( event.method, value.method ) )
 				{
 					event.params	= Object.assign( event.params, match );
-					block.push( value.callback );
+					block.push( value.handler );
 				}
 			}
 		}

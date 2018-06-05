@@ -24,14 +24,13 @@ class Index
 	/**
 	 * @brief	Function that adds a middleware to the block chain of the router
 	 *
-	 * @param	..args
+	 * @param	Object|Router route
 	 *
 	 * @returns	void
 	 */
-	add()
+	add( route )
 	{
-		const args	= Array.from( arguments );
-		this.router.add.apply( this.router, args );
+		this.router.add( route );
 	};
 
 	/**
@@ -46,7 +45,7 @@ class Index
 	{
 		if ( typeof name === 'string' && typeof middlewaresContainer[name] === 'function' )
 		{
-			this.add.apply( this, middlewaresContainer[name]( options ) );
+			this.add( middlewaresContainer[name]( options ) );
 		}
 	};
 
