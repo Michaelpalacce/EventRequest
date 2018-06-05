@@ -7,7 +7,7 @@ const Router				= require( './server/router' );
 const RequestEvent			= require( './server/event' );
 const TemplatingEngine		= require( './server/middlewares/templating_engine' );
 const SessionHandler		= require( './server/middlewares/session_handler' );
-const BodyParser			= require( './server/middlewares/body_parser' );
+const BodyParserHandler		= require( './server/middlewares/body_parser_handler' );
 const Logger				= require( './server/middlewares/logger' );
 
 /**
@@ -119,6 +119,6 @@ module.exports	= {
 	Router					: Router,
 	TemplatingEngine		: TemplatingEngine,
 	SessionHandler			: SessionHandler,
-	BodyParser				: BodyParser,
+	BodyParserHandler		: BodyParserHandler,
 	Logger					: Logger
 };

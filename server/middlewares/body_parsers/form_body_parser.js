@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const BaseBodyParser	= require( './base_body_parser' );
+const BodyParser	= require( './body_parser' );
 
 /**
  * @brief	Constants
@@ -13,22 +13,23 @@ const CONTENT_TYPE_HEADER			= 'content-type';
 /**
  * @brief	FormBodyParser responsible for parsing application/x-www-form-urlencoded forms
  */
-class FormBodyParser extends BaseBodyParser
+class FormBodyParser extends BodyParser
 {
 	/**
-	 * @param	BodyParser bodyParser
 	 * @param	Object options
 	 * 			Accepts options:
 	 * 			- maxPayloadLength - Number - The max size of the body to be parsed
 	 * 			- strict - Boolean - Whether the received payload must match the content-length
 	 */
-	constructor( bodyParser, options = {} )
+	constructor( options = {} )
 	{
-		super( bodyParser, options = {} );
+		super( options = {} );
 
 		// Defaults to 10 MB
 		this.maxPayloadLength	= options.maxPayloadLength || 10 * 1048576;
 		this.strict				= options.strict || true;
+		this.rawPayload			= [];
+		this.payloadLength		= 0;
 	}
 
 	/**
@@ -42,17 +43,6 @@ class FormBodyParser extends BaseBodyParser
 	{
 		let contentType	= event.headers[CONTENT_TYPE_HEADER];
 		return typeof contentType === 'string' && contentType.match( FORM_PARSER_SUPPORTED_TYPE ) !== null
-	}
-
-	/**
-	 * @brief	Called when new data is received
-	 *
-	 * @param	Buffer chunk
-	 *
-	 * @return	void
-	 */
-	onDataCallback( chunk )
-	{
 	}
 
 	/**
@@ -123,18 +113,31 @@ class FormBodyParser extends BaseBodyParser
 	 */
 	parse( event, callback )
 	{
-		this.bodyParser.attachEvents( this.onDataCallback, ( rawPayload )=>{
-			this.onEndCallback( rawPayload, event.headers, ( err, body )=>{
-				if ( ! err )
-				{
-					event.body	= body;
-					callback( false );
-				}
-				else
-				{
-					callback( 'Could not parse the body' );
-				}
-			});
+		event.request.on( 'data', ( data ) =>
+		{
+			if ( ! event.isFinished() )
+			{
+				this.rawPayload.push( data );
+				this.payloadLength	+= data.length;
+			}
+		});
+
+		event.request.on( 'end', () => {
+			if ( ! event.isFinished() )
+			{
+				this.rawPayload	= Buffer.concat( this.rawPayload, this.payloadLength );
+				this.onEndCallback( this.rawPayload, event.headers, ( err, body )=>{
+					if ( ! err )
+					{
+						event.body	= body;
+						callback( false );
+					}
+					else
+					{
+						callback( 'Could not parse the body' );
+					}
+				});
+			}
 		});
 	}
 }

@@ -4,7 +4,7 @@
 const os				= require( 'os' );
 const path				= require( 'path' );
 const fs				= require( 'fs' );
-const BaseBodyParser	= require( './base_body_parser' );
+const BodyParser		= require( './body_parser' );
 
 /**
  * @brief	Constants
@@ -30,7 +30,7 @@ const MULTIPART_PARSER_SUPPORTED_TYPE		= 'multipart/form-data';
  *
  * @TODO	Figure out how to get the offset of the buffer value without regex
  */
-class MultipartFormParser extends BaseBodyParser
+class MultipartFormParser extends BodyParser
 {
 	/**
 	 * @param	BodyParser bodyParser
@@ -55,6 +55,9 @@ class MultipartFormParser extends BaseBodyParser
 		this.maxPayload				= options.maxPayload || 0;
 		this.tempDir				= options.tempDir || os.tmpdir();
 		this.saveFiles				= options.saveFiles || false;
+
+		this.rawPayload				= [];
+		this.payloadLength			= 0;
 	}
 
 	/**
@@ -273,22 +276,6 @@ class MultipartFormParser extends BaseBodyParser
 	}
 
 	/**
-	 * @brief	Called when a chunk of data is received
-	 *
-	 * @param	Array chunks - all the currently received chunks
-	 * @param	RequestEvent event
-	 *
-	 * @return	void
-	 */
-	onDataCallback( chunks, event )
-	{
-		if ( this.extendedTimeout )
-		{
-			event.extendTimeout( this.extendedMilliseconds );
-		}
-	}
-
-	/**
 	 * @brief	Called when the body has been fully received
 	 *
 	 * @param	Buffer rawPayload
@@ -342,25 +329,40 @@ class MultipartFormParser extends BaseBodyParser
 			return;
 		}
 
-		let onDataCallbackCallback	= ( chunk ) =>{
-			this.onDataCallback( chunk, event );
-		};
+		event.request.on( 'data', ( data ) =>
+		{
+			if ( ! event.isFinished() )
+			{
+				this.rawPayload.push( data );
+				this.payloadLength	+= data.length;
 
-		this.bodyParser.attachEvents( onDataCallbackCallback, ( rawPayload ) =>{
-			this.onEndCallback( rawPayload, headerData, ( err, bodyData, files ) =>{
-				if ( err )
+				if ( this.extendedTimeout )
 				{
-					callback( 'Could not parse data' );
+					event.extendTimeout( this.extendedMilliseconds );
 				}
-				else
-				{
-					event.extra.files	= files;
-					event.body			= bodyData;
-					files				= null;
-					bodyData			= null;
-					callback( false );
-				}
-			});
+			}
+		});
+
+		event.request.on( 'end', () => {
+			if ( ! event.isFinished() )
+			{
+				this.rawPayload	= Buffer.concat( this.rawPayload, this.payloadLength );
+
+				this.onEndCallback( this.rawPayload, headerData, ( err, bodyData, files ) =>{
+					if ( err )
+					{
+						callback( 'Could not parse data' );
+					}
+					else
+					{
+						event.extra.files	= files;
+						event.body			= bodyData;
+						files				= null;
+						bodyData			= null;
+						callback( false );
+					}
+				});
+			}
 		});
 	}
 }

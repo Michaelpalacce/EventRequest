@@ -3,12 +3,12 @@
 // Dependencies
 const MultipartFormParser	= require( './body_parsers/multipart_data_parser' );
 const FormBodyParser		= require( './body_parsers/form_body_parser' );
-const BaseBodyParser		= require( './body_parsers/base_body_parser' );
+const BodyParser			= require( './body_parsers/body_parser' );
 
 /**
- * @brief	BodyParser responsible for parsing the body of the request
+ * @brief	BodyParserHandler responsible for parsing the body of the request
  */
-class BodyParser
+class BodyParserHandler
 {
 	/**
 	 * @brief	Initializes the parsers
@@ -27,8 +27,6 @@ class BodyParser
 		this.dieOnError		= this.options.dieOnError || true;
 		this.baseOptions	= {};
 		this.event			= event;
-		this.rawPayload		= [];
-		this.payloadLength	= 0;
 		this.parsers		= [];
 
 		this.sanitizeConfig();
@@ -43,7 +41,6 @@ class BodyParser
 	sanitizeConfig()
 	{
 		this.baseOptions		= {};
-
 		this.options.parsers	= typeof this.options.parsers === 'object' ? this.options.parsers : [];
 
 		let parsers				= this.options.parsers;
@@ -86,9 +83,9 @@ class BodyParser
 						throw new Error( 'Invalid configuration' );
 					}
 
-					parser	= parser.getInstance( this, Object.assign( this.baseOptions, parserOptions ) );
+					parser	= parser.getInstance( Object.assign( this.baseOptions, parserOptions ) );
 
-					if ( parser instanceof BaseBodyParser )
+					if ( parser instanceof BodyParser )
 					{
 						this.parsers.push( parser );
 					}
@@ -99,35 +96,6 @@ class BodyParser
 		{
 			this.event.setError( 'Invalid configuration provided' );
 		}
-	}
-
-	/**
-	 * @brief	Attaches events to receive the request body
-	 *
-	 * @param	Function onDataCallback
-	 * @param	Function onEndCallback
-	 *
-	 * @return	void
-	 */
-	attachEvents( onDataCallback, onEndCallback )
-	{
-		this.event.request.on( 'data', ( data ) =>
-		{
-			if ( ! this.event.isFinished() )
-			{
-				this.rawPayload.push( data );
-				this.payloadLength	+= data.length;
-				onDataCallback( data );
-			}
-		});
-
-		this.event.request.on( 'end', () => {
-			if ( ! this.event.isFinished() )
-			{
-				this.rawPayload	= Buffer.concat( this.rawPayload, this.payloadLength );
-				onEndCallback( this.rawPayload );
-			}
-		});
 	}
 
 	/**
@@ -164,8 +132,8 @@ class BodyParser
 }
 
 module.exports	= {
+	BodyParserHandler	: BodyParserHandler,
 	BodyParser			: BodyParser,
-	BaseBodyParser		: BaseBodyParser,
 	MultipartFormParser	: MultipartFormParser,
 	FormBodyParser		: FormBodyParser
 };

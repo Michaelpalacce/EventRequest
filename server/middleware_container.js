@@ -4,7 +4,7 @@
 const fs					= require( 'fs' );
 const path					= require( 'path' );
 const setAdvTimeout			= require( './timeout' );
-const BodyParsers			= require( './middlewares/body_parser' );
+const BodyParsers			= require( './middlewares/body_parser_handler' );
 const TemplatingEngine		= require( './middlewares/templating_engine' );
 const BaseTemplatingEngine	= require( './middlewares/templating_engines/base_templating_engine' );
 const FileStreams			= require( './middlewares/file_stream_handler' );
@@ -14,7 +14,7 @@ const ConsoleLogger			= require( './middlewares/loggers/console_logger' );
 
 const SessionHandler		= Session.SessionHandler;
 const FileStreamHandler		= FileStreams.FileStreamHandler;
-const BodyParser			= BodyParsers.BodyParser;
+const BodyParserHandler		= BodyParsers.BodyParserHandler;
 
 // Define the object
 let middlewaresContainer	= {};
@@ -110,8 +110,8 @@ middlewaresContainer.bodyParser	= ( options ) =>{
 	return {
 		handler	: ( event ) =>
 		{
-			let bodyParser	= new BodyParser( event, options );
-			bodyParser.parseBody( ( err ) =>{
+			let bodyParserHandler	= new BodyParserHandler( event, options );
+			bodyParserHandler.parseBody( ( err ) =>{
 				if ( ! err )
 				{
 					event.next();

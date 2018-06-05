@@ -1,17 +1,15 @@
 'use strict';
 
 /**
- * @brief	BaseBodyParser extended by all body parsers
+ * @brief	BodyParser extended by all body parsers
  */
-class BaseBodyParser
+class BodyParser
 {
 	/**
-	 * @param	BodyParser bodyParser
 	 * @param	Object options
 	 */
-	constructor( bodyParser, options = {} )
+	constructor( options = {} )
 	{
-		this.bodyParser	= bodyParser;
 		this.options	= options;
 	}
 
@@ -49,4 +47,4 @@ class BaseBodyParser
 	}
 }
 
-module.exports	= BaseBodyParser;
+module.exports	= BodyParser;
