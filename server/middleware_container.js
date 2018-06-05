@@ -25,13 +25,15 @@ const PROJECT_ROOT			= path.parse( require.main.filename ).dir;
  *
  * @param	Object options
  *
- * @return	Array
+ * @return	Object
  */
 middlewaresContainer.setFileStream		= ( options ) =>{
-	return [( event ) =>{
-		event.fileStreamHandler	= new FileStreamHandler( event, options );
-		event.next();
-	}];
+	return {
+		handler	: ( event ) =>{
+			event.fileStreamHandler	= new FileStreamHandler( event, options );
+			event.next();
+		}
+	};
 };
 
 /**
@@ -42,32 +44,34 @@ middlewaresContainer.setFileStream		= ( options ) =>{
  * 			- engine - TemplatingEngine - Instance of TemplatingEngine. Defaults to BaseTemplatingEngine
  * 			- options - Object - options to be passed to the engine
  *
- * @return	Array
+ * @return	Object
  */
 middlewaresContainer.templatingEngine	= ( options ) =>{
-	return [( event ) =>{
-		let engineOptions	= typeof options.options === 'object' ? options.options : {};
+	return {
+		handler	: ( event ) =>{
+			let engineOptions	= typeof options.options === 'object' ? options.options : {};
 
-		if ( typeof options !== 'undefined' )
-		{
-			let templatingEngine	= typeof options.engine === 'function'
-			&& typeof options.engine.getInstance === 'function'
-				? options.engine.getInstance( engineOptions )
-				: null;
-
-			if ( ! templatingEngine instanceof TemplatingEngine || templatingEngine === null )
+			if ( typeof options !== 'undefined' )
 			{
-				templatingEngine	= BaseTemplatingEngine.getInstance( engineOptions );
-			}
+				let templatingEngine	= typeof options.engine === 'function'
+				&& typeof options.engine.getInstance === 'function'
+					? options.engine.getInstance( engineOptions )
+					: null;
 
-			event.templatingEngine	= templatingEngine;
-			event.next();
+				if ( ! templatingEngine instanceof TemplatingEngine || templatingEngine === null )
+				{
+					templatingEngine	= BaseTemplatingEngine.getInstance( engineOptions );
+				}
+
+				event.templatingEngine	= templatingEngine;
+				event.next();
+			}
+			else
+			{
+				event.setError( 'Invalid templating engine provided' );
+			}
 		}
-		else
-		{
-			event.setError( 'Invalid templating engine provided' );
-		}
-	}];
+	};
 };
 
 /**
@@ -75,22 +79,24 @@ middlewaresContainer.templatingEngine	= ( options ) =>{
  *
  * @param	Object options
  *
- * @return	Array
+ * @return	Object
  */
 middlewaresContainer.session	= ( options ) =>{
-	return [( event ) =>{
-		let sessionHandler	= new SessionHandler( event, options );
-		sessionHandler.handle( ( err ) =>{
-			if ( ! err )
-			{
-				event.next();
-			}
-			else
-			{
-				event.setError( err )
-			}
-		});
-	}];
+	return {
+		handler	: ( event ) =>{
+			let sessionHandler	= new SessionHandler( event, options );
+			sessionHandler.handle( ( err ) =>{
+				if ( ! err )
+				{
+					event.next();
+				}
+				else
+				{
+					event.setError( err )
+				}
+			});
+		}
+	};
 };
 
 /**
@@ -98,23 +104,25 @@ middlewaresContainer.session	= ( options ) =>{
  *
  * @param	Object options
  *
- * @return	Array
+ * @return	Object
  */
 middlewaresContainer.bodyParser	= ( options ) =>{
-	return [( event ) =>
-	{
-		let bodyParser	= new BodyParser( event, options );
-		bodyParser.parseBody( ( err ) =>{
-			if ( ! err )
-			{
-				event.next();
-			}
-			else
-			{
-				event.setError( 'Could not parse the body' );
-			}
-		});
-	}];
+	return {
+		handler	: ( event ) =>
+		{
+			let bodyParser	= new BodyParser( event, options );
+			bodyParser.parseBody( ( err ) =>{
+				if ( ! err )
+				{
+					event.next();
+				}
+				else
+				{
+					event.setError( 'Could not parse the body' );
+				}
+			});
+		}
+	};
 };
 
 /**
@@ -124,22 +132,24 @@ middlewaresContainer.bodyParser	= ( options ) =>{
  * 			Accepts options:
  * 			- NONE -
  *
- * @return	Array
+ * @return	Object
  */
 middlewaresContainer.parseCookies	= ( options ) =>
 {
-	return [( event ) =>{
-		let list = {},
-			rc = event.headers.cookie;
+	return {
+		handler	: ( event ) =>{
+			let list = {},
+				rc = event.headers.cookie;
 
-		rc && rc.split( ';' ).forEach( function( cookie ) {
-			let parts					= cookie.split( '=' );
-			list[parts.shift().trim()]	= decodeURI( parts.join( '=' ) );
-		});
+			rc && rc.split( ';' ).forEach( function( cookie ) {
+				let parts					= cookie.split( '=' );
+				list[parts.shift().trim()]	= decodeURI( parts.join( '=' ) );
+			});
 
-		event.cookies	= list;
-		event.next();
-	}];
+			event.cookies	= list;
+			event.next();
+		}
+	};
 };
 
 /**
@@ -153,32 +163,34 @@ middlewaresContainer.parseCookies	= ( options ) =>
  *
  * @param	Object options
  *
- * @return	Array
+ * @return	Object
  */
 middlewaresContainer.logger	= ( options ) => {
-	return [( event ) => {
-		if ( typeof options !== 'undefined' )
-		{
-			let logger	= typeof options.logger === 'function'
-			&& typeof options.logger.getInstance === 'function'
-				? options.logger.getInstance( event, options.options )
-				: null;
-
-			if ( ! logger instanceof Logger || logger === null )
+	return {
+		handler	: ( event ) => {
+			if ( typeof options !== 'undefined' )
 			{
-				logger	= ConsoleLogger.getInstance( event, options.options );
+				let logger	= typeof options.logger === 'function'
+				&& typeof options.logger.getInstance === 'function'
+					? options.logger.getInstance( event, options.options )
+					: null;
+
+				if ( ! logger instanceof Logger || logger === null )
+				{
+					logger	= ConsoleLogger.getInstance( event, options.options );
+				}
+
+				event.logger	= logger;
+
+				event.logData( options.level );
+				event.next();
 			}
-
-			event.logger	= logger;
-
-			event.logData( options.level );
-			event.next();
+			else
+			{
+				event.setError( 'Invalid logger provided' );
+			}
 		}
-		else
-		{
-			event.setError( 'Invalid logger provided' );
-		}
-	}];
+	};
 };
 
 /**
@@ -188,25 +200,28 @@ middlewaresContainer.logger	= ( options ) => {
  * 			Accepts options:
  * 			- path - the path to make static
  *
- * @return	Array
+ * @return	Object
  */
 middlewaresContainer.addStaticPath	= ( options ) => {
 	let regExp	= new RegExp( '^(\/' + options.path + ')' );
 
-	return [regExp, ( event ) => {
-		let item	= path.join( PROJECT_ROOT, event.path );
+	return {
+		route	: regExp,
+		handler	: ( event ) => {
+			let item	= path.join( PROJECT_ROOT, event.path );
 
-		fs.readFile( item, {}, ( err, data ) => {
-			if ( ! err && data )
-			{
-				event.send( data, 200, true );
-			}
-			else
-			{
-				event.setError( 'File not found' );
-			}
-		});
-	}];
+			fs.readFile( item, {}, ( err, data ) => {
+				if ( ! err && data )
+				{
+					event.send( data, 200, true );
+				}
+				else
+				{
+					event.setError( 'File not found' );
+				}
+			});
+		}
+	};
 };
 
 /**
@@ -216,25 +231,27 @@ middlewaresContainer.addStaticPath	= ( options ) => {
  * 			Accepts options:
  * 			- timeout - the amount in seconds to cause the timeout defaults to 60
  *
- * @return	Array
+ * @return	Object
  */
 middlewaresContainer.timeout	= ( options ) =>
 {
 	let timeout	= typeof options.timeout === 'number' ? parseInt( options.timeout ) : 60;
 
-	return [( event ) => {
-		event.internalTimeout	= setAdvTimeout( () => {
-				event.log( 'Request timed out', event.path );
-				if ( ! event.isFinished() )
-				{
-					event.serverError( 'TIMEOUT' );
-				}
-			},
-			timeout
-		);
+	return {
+		handler	: ( event ) => {
+			event.internalTimeout	= setAdvTimeout( () => {
+					event.log( 'Request timed out', event.path );
+					if ( ! event.isFinished() )
+					{
+						event.serverError( 'TIMEOUT' );
+					}
+				},
+				timeout
+			);
 
-		event.next();
-	}];
+			event.next();
+		}
+	};
 };
 
 // Export the module

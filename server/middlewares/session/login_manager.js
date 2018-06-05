@@ -4,9 +4,7 @@
 const TokenManager		= require( './helpers/token_manager' );
 const SecurityManager	= require( './security_manager' );
 
-
 // Constants
-const MANAGER_NAME		= 'LoginManager';
 const MANAGER_METHODS	= ['GET'];
 
 /**
@@ -69,7 +67,7 @@ class LoginManager extends SecurityManager
 			this.tokenManager.isExpired( sidCookie, ( err ) =>{
 				if ( err )
 				{
-					terminate();
+					terminate( false );
 				}
 				else
 				{
@@ -79,7 +77,7 @@ class LoginManager extends SecurityManager
 		}
 		else
 		{
-			terminate();
+			terminate( false );
 		}
 	}
 }
