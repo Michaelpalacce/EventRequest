@@ -74,6 +74,8 @@ class RequestEvent
 				if ( arg instanceof TemplatingEngine )
 				{
 					templatingEngine	= arg;
+
+					this.eventEmitter.emit( 'templatingEngineSet', templatingEngine );
 				}
 				else
 				{
@@ -98,6 +100,8 @@ class RequestEvent
 				if ( arg instanceof FileStreamHandler )
 				{
 					fileStreamHandler	= arg;
+
+					this.eventEmitter.emit( 'fileStreamHandlerSet', fileStreamHandler );
 				}
 				else
 				{
@@ -122,6 +126,8 @@ class RequestEvent
 				if ( arg instanceof Logger )
 				{
 					logger	= arg;
+
+					this.eventEmitter.emit( 'loggerSet', logger );
 				}
 				else
 				{
@@ -156,6 +162,7 @@ class RequestEvent
 	 */
 	cleanUp()
 	{
+		this.eventEmitter.emit( 'cleanUp' );
 		this.clearTimeout();
 		this.eventEmitter.removeAllListeners();
 		this.stop();
@@ -192,12 +199,7 @@ class RequestEvent
 	 */
 	send( response, code = 200, raw = false )
 	{
-		if ( raw === true )
-		{
-			this.response.statusCode	= code;
-			this.response.end( response );
-		}
-		else
+		if ( raw === false )
 		{
 			try
 			{
@@ -208,9 +210,13 @@ class RequestEvent
 				response	= 'Error while sending the payload';
 			}
 
-			this.response.statusCode	= typeof code === 'number' ? code : 200;
-			this.response.end( response );
+			code	= typeof code === 'number' ? code : 200;
 		}
+
+		this.response.statusCode	= code;
+		this.response.end( response );
+
+		this.eventEmitter.emit( 'send', arguments );
 
 		this.cleanUp();
 	}
@@ -222,6 +228,8 @@ class RequestEvent
 	 */
 	stop()
 	{
+		this.eventEmitter.emit( 'stop' );
+
 		this.isStopped	= true;
 	}
 
@@ -272,6 +280,8 @@ class RequestEvent
 	 */
 	setHeader( key, value )
 	{
+		this.eventEmitter.emit( 'setHeader', arguments );
+
 		if ( ! this.isFinished() )
 		{
 			this.response.setHeader( key, value );
@@ -291,6 +301,8 @@ class RequestEvent
 	 */
 	redirect( redirectUrl, statusCode = 302 )
 	{
+		this.eventEmitter.emit( 'redirect', arguments );
+
 		this.setHeader( 'Location', redirectUrl );
 		this.send( { redirectURL : redirectUrl }, statusCode );
 	}
@@ -302,6 +314,8 @@ class RequestEvent
 	 */
 	clearTimeout()
 	{
+		this.eventEmitter.emit( 'clearTimeout' );
+
 		if (
 			typeof this.internalTimeout === 'object'
 			&& this.internalTimeout !== null
@@ -320,6 +334,8 @@ class RequestEvent
 	 */
 	extendTimeout( ms )
 	{
+		this.eventEmitter.emit( 'extendTimeout', ms );
+
 		if (
 			typeof this.internalTimeout === 'object'
 			&& this.internalTimeout !== null
@@ -344,6 +360,8 @@ class RequestEvent
 	 */
 	render( templateName, variables, callback )
 	{
+		this.eventEmitter.emit( 'render', arguments );
+
 		if ( this.templatingEngine instanceof TemplatingEngine )
 		{
 			this.templatingEngine.render( templateName, variables, ( err, result ) => {
@@ -386,6 +404,8 @@ class RequestEvent
 	 */
 	next()
 	{
+		this.eventEmitter.emit( 'next', arguments );
+
 		if ( this.block.length <= 0 && ! this.isFinished() )
 		{
 			this.sendError( 'No middlewares left and response has not been sent.' );
@@ -424,6 +444,8 @@ class RequestEvent
 	 */
 	sendError( message = '', code = 500 )
 	{
+		this.eventEmitter.emit( 'sendError', arguments );
+
 		if ( message instanceof Error )
 		{
 			this.log( message );
@@ -470,6 +492,8 @@ class RequestEvent
 	 */
 	streamFile( file, options )
 	{
+		this.eventEmitter.emit( 'streamFile', arguments );
+
 		let fileStream	= this.getFileStreamHandler().getFileStreamerForType( file );
 
 		if ( fileStream !== null || fileStream instanceof FileStream )
