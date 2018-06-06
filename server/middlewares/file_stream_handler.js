@@ -13,13 +13,11 @@ class FileStreamHandler
 	/**
 	 * @param	RequestEvent event
 	 * @param	Object options
-	 *
-	 * @TODO	ADD OPTIONS like body_parser.js
 	 */
-	constructor( event, options )
+	constructor( event, options = {} )
 	{
 		this.event			= event;
-		this.options		= typeof options !== 'undefined' ? options : [];
+		this.options		= options;
 		this.fileStreams	= [];
 
 		this.sanitizeConfig();
@@ -87,7 +85,7 @@ class FileStreamHandler
 		}
 		catch ( e )
 		{
-			this.event.setError( 'Invalid configuration provided' );
+			this.event.sendError( 'Invalid configuration provided' );
 		}
 	}
 

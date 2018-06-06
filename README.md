@@ -13,9 +13,3 @@ Includes:
 - Logging
 - Static Routes
 - Request timeout
-
-UPCOMING:
-- Caching
-- Input Validation 
-- ORM + ODM
-- Testing tools

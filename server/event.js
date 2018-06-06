@@ -3,9 +3,12 @@
 // Dependencies
 const url				= require( 'url' );
 const events			= require( 'events' );
-const FileStream		= require( './middlewares/file_streams/file_stream' );
+const FileStreams		= require( './middlewares/file_stream_handler' );
 const TemplatingEngine	= require( './middlewares/templating_engine' );
 const Logger			= require( './middlewares/logger' );
+
+const FileStreamHandler	= FileStreams.FileStreamHandler;
+const FileStream		= FileStreams.FileStream;
 
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
@@ -32,7 +35,7 @@ class RequestEvent
 			writable	: false
 		});
 
-		Object.defineProperty( this, 'queryStringObject', {
+		Object.defineProperty( this, 'queryString', {
 			value		: parsedUrl.query,
 			writable	: false
 		});
@@ -44,79 +47,122 @@ class RequestEvent
 
 		Object.defineProperty( this, 'eventEmitter', {
 			value		: new events.EventEmitter(),
-			writable	: true
+			writable	: false
 		});
 
 		this.request			= request;
 		this.response			= response;
 
 		this.isStopped			= false;
-		this.error				= null;
 		this.internalTimeout	= null;
 		this.extra				= {};
 		this.cookies			= {};
 		this.params				= {};
 		this.block				= {};
 		this.body				= {};
-		this.templatingEngine	= null;
-		this.fileStreamHandler	= null;
-		this.logger				= null;
+
+		let templatingEngine	= null;
+		Object.defineProperty( this, 'templatingEngine', {
+			enumerable	: true,
+			set			: ( arg ) =>{
+				if ( arg == null )
+				{
+					templatingEngine	= arg;
+					return;
+				}
+
+				if ( arg instanceof TemplatingEngine )
+				{
+					templatingEngine	= arg;
+
+					this.eventEmitter.emit( 'templatingEngineSet', templatingEngine );
+				}
+				else
+				{
+					throw new Error( 'Templating engine must be an instance of TemplatingEngine' );
+				}
+			},
+			get			: () =>{
+				return templatingEngine;
+			}
+		});
+
+		let fileStreamHandler	= null;
+		Object.defineProperty( this, 'fileStreamHandler', {
+			enumerable	: true,
+			set			: ( arg ) =>{
+				if ( arg == null )
+				{
+					fileStreamHandler	= arg;
+					return;
+				}
+
+				if ( arg instanceof FileStreamHandler )
+				{
+					fileStreamHandler	= arg;
+
+					this.eventEmitter.emit( 'fileStreamHandlerSet', fileStreamHandler );
+				}
+				else
+				{
+					throw new Error( 'File stream handler must be an instance of FileStreamHandler' );
+				}
+			},
+			get			: () =>{
+				return fileStreamHandler;
+			}
+		});
+
+		let logger	= null;
+		Object.defineProperty( this, 'logger', {
+			enumerable	: true,
+			set			: ( arg ) =>{
+				if ( arg == null )
+				{
+					logger	= arg;
+					return;
+				}
+
+				if ( arg instanceof Logger )
+				{
+					logger	= arg;
+
+					this.eventEmitter.emit( 'loggerSet', logger );
+				}
+				else
+				{
+					throw new Error( 'File stream handler must be an instance of FileStreamHandler' );
+				}
+			},
+			get			: () =>{
+				return logger;
+			}
+		});
 	}
 
 	/**
-	 * @brief	Attaches a callback to a specific event just once after which the
-	 * 			Callback is removed from the event emitter queue
-	 *
-	 * @param	String key
-	 * @param	Function callback
-	 *
-	 * @details	This is a way for the outside objects to attach to the events emitted
-	 * 			by the eventEmitter of the RequestEvent
-	 * 			It is recommended to use once rather than ON
-	 *
-	 * @return	void
-	 */
-	once( key, callback )
-	{
-		this.eventEmitter.once( key, callback );
-	}
-
-	/**
-	 * @brief	Attaches a callback to a specific event
-	 *
-	 * @param	String key
-	 * @param	Function callback
-	 *
-	 * @details	This is a way for the outside objects to attach to the events emitted
-	 * 			by the eventEmitter of the RequestEvent
-	 *
-	 * @return	void
-	 */
-	on( key, callback )
-	{
-		this.eventEmitter.on( key, callback );
-	}
-
-	/**
-	 * @brief	Get the event emitter of the RequestEvent
-	 *
-	 * @param	String key
-	 * @param	mixed data
+	 * @brief	Returns the event emitter of the current event
 	 *
 	 * @return	EventEmitter
 	 */
-	emit( key, data )
+	getEventEmitter()
 	{
-		this.eventEmitter.emit( key, data );
+		return this.eventEmitter;
 	}
 
 	/**
 	 * @brief	Clean ups the event
 	 *
+	 * @details	Clears the timeout
+	 * 			Removes all listeners from the eventEmitter
+	 * 			Stops the event
+	 * 			Clears internal pointers
+	 *
 	 * @return	void
 	 */
 	cleanUp()
 	{
+		this.eventEmitter.emit( 'cleanUp' );
 		this.clearTimeout();
 		this.eventEmitter.removeAllListeners();
 		this.stop();
@@ -153,26 +199,26 @@ class RequestEvent
 	 */
 	send( response, code = 200, raw = false )
 	{
-		if ( raw === true )
+		if ( raw === false )
 		{
-			this.response.statusCode	= code;
-			this.response.end( response );
-			this.cleanUp();
-		}
-		else
-		{
-			try{
+			try
+			{
 				response	= typeof response === 'string' ? response : JSON.stringify( response );
 			}
 			catch ( e )
 			{
-				response	= '';
+				response	= 'Error while sending the payload';
 			}
 
-			this.response.statusCode	= typeof code === 'number' ? code : 200;
-			this.response.end( response );
-			this.cleanUp();
+			code	= typeof code === 'number' ? code : 200;
 		}
+
+		this.response.statusCode	= code;
+		this.response.end( response );
+
+		this.eventEmitter.emit( 'send', arguments );
+
+		this.cleanUp();
 	}
 
 	/**
@@ -182,6 +228,8 @@ class RequestEvent
 	 */
 	stop()
 	{
+		this.eventEmitter.emit( 'stop' );
+
 		this.isStopped	= true;
 	}
 
@@ -195,57 +243,29 @@ class RequestEvent
 	logData( level )
 	{
 		level		= typeof level === 'number' ? level : 1;
-		let data	= {};
 
 		if ( level >= 1 )
 		{
-			data	= {
+			this.log({
 				method				: this.method,
 				path				: this.path,
-				queryStringObject	: this.queryStringObject,
-			};
-
-			this.log( data );
+				queryString			: this.queryString,
+			});
 		}
 
 		if ( level >= 2 )
 		{
-			data	= {
+			this.log({
 				headers				: this.headers,
 				cookies				: this.cookies,
 				extra				: this.extra
-			};
-
-			this.log( data );
+			});
 		}
 
 		if ( level >= 3 )
 		{
-			data	= {
-				supportedFilesToStream	: this.getFileStreamHandler().getSupportedTypes()
-			};
-
-			this.log( data );
+			this.log({});
 		}
-	}
-
-	/**
-	 * @brief	Sets an error
-	 *
-	 * @param	mixed error
-	 * @param	Number code
-	 *
-	 * @return	void
-	 */
-	setError( error, code )
-	{
-		if ( typeof error !== 'string' )
-		{
-			error	= JSON.stringify( error );
-		}
-		this.log( error );
-
-		this.serverError( error, code );
 	}
 
 	/**
@@ -260,13 +280,15 @@ class RequestEvent
 	 */
 	setHeader( key, value )
 	{
+		this.eventEmitter.emit( 'setHeader', arguments );
+
 		if ( ! this.isFinished() )
 		{
 			this.response.setHeader( key, value );
 		}
 		else
 		{
-			this.setError( 'Trying to set headers when response is already sent' );
+			this.sendError( 'Trying to set headers when response is already sent' );
 		}
 	}
 
@@ -277,10 +299,12 @@ class RequestEvent
 	 *
 	 * @return	void
 	 */
-	redirect( redirectUrl )
+	redirect( redirectUrl, statusCode = 302 )
 	{
-		this.response.writeHead( 302, { 'Location': redirectUrl } );
-		this.send( { redirectURL : redirectUrl } );
+		this.eventEmitter.emit( 'redirect', arguments );
+
+		this.setHeader( 'Location', redirectUrl );
+		this.send( { redirectURL : redirectUrl }, statusCode );
 	}
 
 	/**
@@ -290,6 +314,8 @@ class RequestEvent
 	 */
 	clearTimeout()
 	{
+		this.eventEmitter.emit( 'clearTimeout' );
+
 		if (
 			typeof this.internalTimeout === 'object'
 			&& this.internalTimeout !== null
@@ -308,6 +334,8 @@ class RequestEvent
 	 */
 	extendTimeout( ms )
 	{
+		this.eventEmitter.emit( 'extendTimeout', ms );
+
 		if (
 			typeof this.internalTimeout === 'object'
 			&& this.internalTimeout !== null
@@ -332,21 +360,25 @@ class RequestEvent
 	 */
 	render( templateName, variables, callback )
 	{
+		this.eventEmitter.emit( 'render', arguments );
+
 		if ( this.templatingEngine instanceof TemplatingEngine )
 		{
 			this.templatingEngine.render( templateName, variables, ( err, result ) => {
 				if ( ! err && result && result.length > 0 )
 				{
 					this.send( result, 200, true );
+					callback( false );
+				}
+				else
+				{
 					callback( err );
 				}
-
-				callback( err );
 			});
 		}
 		else
 		{
-			event.setError( 'Templating engine not set!' );
+			event.sendError( 'Trying to render but templating engine is not set' );
 		}
 	}
 
@@ -372,9 +404,11 @@ class RequestEvent
 	 */
 	next()
 	{
+		this.eventEmitter.emit( 'next', arguments );
+
 		if ( this.block.length <= 0 && ! this.isFinished() )
 		{
-			this.serverError( 'No middlewares left and response has not been sent.' );
+			this.sendError( 'No middlewares left and response has not been sent.' );
 			return;
 		}
 
@@ -396,64 +430,79 @@ class RequestEvent
 		}
 		catch ( error )
 		{
-			this.serverError( error );
+			this.sendError( error );
 		}
 	}
 
 	/**
-	 * @brief	Will send a server error in case a response has not been send already
+	 * @brief	Will send a server error in case a response has not been already sent
 	 * 
 	 * @param	mixed message
 	 * @param	Number code
 	 *
 	 * @return	void
 	 */
-	serverError( message = '', code = 500 )
+	sendError( message = '', code = 500 )
 	{
+		this.eventEmitter.emit( 'sendError', arguments );
+
 		if ( message instanceof Error )
 		{
 			this.log( message );
 			message	= message.toString();
 		}
-		
+
+		if ( typeof message !== 'string' )
+		{
+			message	= JSON.stringify( message );
+		}
+
 		if ( ! this.isFinished() )
 		{
 			this.send( message, code );
 		}
 		else
 		{
-			this.log( 'Server error: ', message );
+			this.log( `Server error: ${message}` );
 		}
 	}
 
 	/**
-	 * @brief	Gets the file stream handler
+	 * @brief	Gets the file stream handler if one exists, creates an empty one if not
 	 *
 	 * @return	FileStreamHandler
 	 */
 	getFileStreamHandler()
 	{
+		if ( this.fileStreamHandler === null )
+		{
+			this.fileStreamHandler	= new FileStreamHandler( this );
+		}
+
 		return this.fileStreamHandler;
 	}
 
 	/**
-	 * @brief	To be used to stream files ( currently works with mp4 ONLY )
+	 * @brief	Streams files
 	 *
 	 * @param	String file
+	 * @param	Object options
 	 *
 	 * @return	void
 	 */
-	streamFile( file )
+	streamFile( file, options )
 	{
-		let fileStream	= this.fileStreamHandler.getFileStreamerForType( file );
+		this.eventEmitter.emit( 'streamFile', arguments );
+
+		let fileStream	= this.getFileStreamHandler().getFileStreamerForType( file );
 
 		if ( fileStream !== null || fileStream instanceof FileStream )
 		{
-			fileStream.stream( file );
+			fileStream.stream( file, options );
 		}
 		else
 		{
-			this.setError( 'Could not find a FileStream that supports that format' )
+			this.sendError( 'Could not find a FileStream that supports that format' )
 		}
 	}
 }

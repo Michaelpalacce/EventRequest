@@ -73,7 +73,7 @@ class AuthenticationManager extends SecurityManager
 					this.tokenManager.updateToken( sidCookie, ( err ) =>{
 						if ( err )
 						{
-							event.serverError( 'Could not update token.' );
+							event.sendError( 'Could not update token.' );
 						}
 						else
 						{

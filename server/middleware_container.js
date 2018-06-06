@@ -68,7 +68,7 @@ middlewaresContainer.templatingEngine	= ( options ) =>{
 			}
 			else
 			{
-				event.setError( 'Invalid templating engine provided' );
+				event.sendError( 'Invalid templating engine provided' );
 			}
 		}
 	};
@@ -92,7 +92,7 @@ middlewaresContainer.session	= ( options ) =>{
 				}
 				else
 				{
-					event.setError( err )
+					event.sendError( err )
 				}
 			});
 		}
@@ -118,7 +118,7 @@ middlewaresContainer.bodyParser	= ( options ) =>{
 				}
 				else
 				{
-					event.setError( 'Could not parse the body' );
+					event.sendError( 'Could not parse the body' );
 				}
 			});
 		}
@@ -187,7 +187,7 @@ middlewaresContainer.logger	= ( options ) => {
 			}
 			else
 			{
-				event.setError( 'Invalid logger provided' );
+				event.sendError( 'Invalid logger provided' );
 			}
 		}
 	};
@@ -217,7 +217,7 @@ middlewaresContainer.addStaticPath	= ( options ) => {
 				}
 				else
 				{
-					event.setError( 'File not found' );
+					event.sendError( 'File not found' );
 				}
 			});
 		}
@@ -243,7 +243,7 @@ middlewaresContainer.timeout	= ( options ) =>
 					event.log( 'Request timed out', event.path );
 					if ( ! event.isFinished() )
 					{
-						event.serverError( 'TIMEOUT' );
+						event.sendError( 'TIMEOUT' );
 					}
 				},
 				timeout
