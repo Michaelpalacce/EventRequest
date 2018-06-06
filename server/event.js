@@ -47,7 +47,7 @@ class RequestEvent
 
 		Object.defineProperty( this, 'eventEmitter', {
 			value		: new events.EventEmitter(),
-			writable	: true
+			writable	: false
 		});
 
 		this.request			= request;
@@ -60,49 +60,88 @@ class RequestEvent
 		this.params				= {};
 		this.block				= {};
 		this.body				= {};
-		this.templatingEngine	= null;
-		this.fileStreamHandler	= null;
-		this.logger				= null;
+
+		let templatingEngine	= null;
+		Object.defineProperty( this, 'templatingEngine', {
+			enumerable	: true,
+			set			: ( arg ) =>{
+				if ( arg == null )
+				{
+					templatingEngine	= arg;
+					return;
+				}
+
+				if ( arg instanceof TemplatingEngine )
+				{
+					templatingEngine	= arg;
+				}
+				else
+				{
+					throw new Error( 'Templating engine must be an instance of TemplatingEngine' );
+				}
+			},
+			get			: () =>{
+				return templatingEngine;
+			}
+		});
+
+		let fileStreamHandler	= null;
+		Object.defineProperty( this, 'fileStreamHandler', {
+			enumerable	: true,
+			set			: ( arg ) =>{
+				if ( arg == null )
+				{
+					fileStreamHandler	= arg;
+					return;
+				}
+
+				if ( arg instanceof FileStreamHandler )
+				{
+					fileStreamHandler	= arg;
+				}
+				else
+				{
+					throw new Error( 'File stream handler must be an instance of FileStreamHandler' );
+				}
+			},
+			get			: () =>{
+				return fileStreamHandler;
+			}
+		});
+
+		let logger	= null;
+		Object.defineProperty( this, 'logger', {
+			enumerable	: true,
+			set			: ( arg ) =>{
+				if ( arg == null )
+				{
+					logger	= arg;
+					return;
+				}
+
+				if ( arg instanceof Logger )
+				{
+					logger	= arg;
+				}
+				else
+				{
+					throw new Error( 'File stream handler must be an instance of FileStreamHandler' );
+				}
+			},
+			get			: () =>{
+				return logger;
+			}
+		});
 	}
 
 	/**
-	 * @brief	Attaches a callback to a specific event just once after which the
-	 * 			Callback is removed from the event emitter queue
-	 *
-	 * @param	String key
-	 * @param	Function callback
-	 *
-	 * @return	void
-	 */
-	once( key, callback )
-	{
-		this.eventEmitter.once( key, callback );
-	}
-
-	/**
-	 * @brief	Attaches a callback to a specific event
-	 *
-	 * @param	String key
-	 * @param	Function callback
-	 *
-	 * @return	void
-	 */
-	on( key, callback )
-	{
-		this.eventEmitter.on( key, callback );
-	}
-
-	/**
-	 * @brief	Get the event emitter of the RequestEvent
-	 *
-	 * @param	String key
-	 * @param	mixed data
+	 * @brief	Returns the event emitter of the current event
 	 *
 	 * @return	EventEmitter
 	 */
-	emit( key, data )
+	getEventEmitter()
 	{
-		this.eventEmitter.emit( key, data );
+		return this.eventEmitter;
 	}
 
 	/**
