@@ -53,10 +53,11 @@ class FileStream
 	 * @brief	Stream the file
 	 *
 	 * @param	String file
+	 * @param	Object options
 	 *
 	 * @return	void
 	 */
-	stream( file )
+	stream( file, options = {} )
 	{
 		return ;
 	}

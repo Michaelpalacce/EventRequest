@@ -43,11 +43,11 @@ class TextFileStream extends FileStream
 	/**
 	 * @see	FileStream::stream()
 	 */
-	stream( file )
+	stream( file, options = {} )
 	{
 		if ( ! fs.existsSync( file ) )
 		{
-			this.event.setError( 'File not found' );
+			this.event.sendError( 'File not found' );
 			return;
 		}
 

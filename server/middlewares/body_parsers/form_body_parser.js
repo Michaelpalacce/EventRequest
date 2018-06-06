@@ -58,7 +58,7 @@ class FormBodyParser extends BodyParser
 	{
 		if ( rawPayload.length > this.maxPayloadLength )
 		{
-			callback( 'Max payload length reached', {} );
+			callback( 'Max payload length reached' );
 		}
 
 		if (

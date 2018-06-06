@@ -66,7 +66,7 @@ class SessionAuthenticationManager extends SecurityManager
 			this.tokenManager.createCookie( event, this.sessionName, ( err ) =>{
 				if ( err )
 				{
-					event.setError( 'Could not create token' );
+					event.sendError( 'Could not create token' );
 				}
 				else
 				{
@@ -76,7 +76,7 @@ class SessionAuthenticationManager extends SecurityManager
 		}
 		else
 		{
-			event.setError( 'Invalid username or password' );
+			event.sendError( 'Invalid username or password' );
 		}
 	}
 }

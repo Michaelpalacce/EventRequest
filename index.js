@@ -80,7 +80,7 @@ class Index
 			});
 
 			res.on( 'error', ( error ) => {
-				requestEvent.setError( error );
+				requestEvent.sendError( error );
 				requestEvent.cleanUp();
 				requestEvent	= null;
 			});
@@ -94,7 +94,7 @@ class Index
 				}
 				catch ( e )
 				{
-					requestEvent.setError( e );
+					requestEvent.sendError( e );
 				}
 			});
 		});
