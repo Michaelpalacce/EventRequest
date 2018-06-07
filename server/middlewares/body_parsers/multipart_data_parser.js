@@ -120,15 +120,14 @@ class MultipartFormParser extends BodyParser
 
 		if ( this.extendedTimeout )
 		{
-			event.extendTimeout( this.extendedMilliseconds );
+			this.event.extendTimeout( this.extendedMilliseconds );
 		}
 
 		try {
 			this.extractChunkData( chunk );
 		}
 		catch (e) {
-			console.log( e );
-			this.handleError( 'could not end the request' );
+			this.eventEmitter.emit( 'error', e );
 		}
 	}
 
@@ -145,11 +144,8 @@ class MultipartFormParser extends BodyParser
 			switch ( part.state )
 			{
 				case STATE_START:
-					console.log( STATE_START );
 					part.state	= STATE_START_BOUNDARY;
 				case STATE_START_BOUNDARY:
-					console.log( STATE_START_BOUNDARY );
-
 					bufferLength	= part.buffer.length;
 
 					if ( bufferLength < boundary.length )
@@ -158,14 +154,14 @@ class MultipartFormParser extends BodyParser
 						{
 							this.handleError( 'Could not get the starting boundary' );
 						}
-						break;
+						return;
 					}
 
 					boundaryOffset	= part.buffer.indexOf( boundary );
 					if ( boundaryOffset === -1 )
 					{
 						this.handleError( 'Boundary data not set' );
-						break;
+						return;
 					}
 
 					part.state	= STATE_HEADER_FIELD_START;
@@ -173,8 +169,6 @@ class MultipartFormParser extends BodyParser
 					continue;
 
 				case STATE_HEADER_FIELD_START:
-					console.log( STATE_HEADER_FIELD_START );
-
 					let lineCount				= 0;
 					let contentTypeLine			= '';
 					let contentDispositionLine	= '';
@@ -210,7 +204,7 @@ class MultipartFormParser extends BodyParser
 						{
 							this.handleError( 'Content Disposition or Content Type not sent' );
 						}
-						break;
+						return;
 					}
 
 					// Should be in the beginning of the payload
@@ -234,31 +228,26 @@ class MultipartFormParser extends BodyParser
 					else
 					{
 						this.handleError( 'Could not parse Content Disposition' );
-						break;
+						return;
 					}
 
 					continue;
 				case STATE_HEADERS_DONE:
-					console.log( STATE_HEADERS_DONE );
-
 					part.state		= STATE_PART_DATA_START;
 
 				case STATE_PART_DATA_START:
-					console.log( STATE_PART_DATA_START );
-
 					if ( part.file === null )
 					{
-						part.file		= fs.createWriteStream( part.filePath, { flag : 'a' } );
+						part.file	= fs.createWriteStream( part.filePath, { flag : 'a' } );
+						part.state	= STATE_PART_DATA;
 						console.log( 'OPENED FILE TO WRITE: ', part.filePath );
 					}
 					else
 					{
 						this.handleError( 'Tried to create a new write stream' );
-						break;
+						return;
 					}
 				case STATE_PART_DATA:
-					console.log( STATE_PART_DATA );
-
 					boundaryOffset	= part.buffer.indexOf( boundary );
 
 					if ( boundaryOffset === -1 )
@@ -266,17 +255,18 @@ class MultipartFormParser extends BodyParser
 						if ( this.hasFinished() )
 						{
 							this.handleError( 'Invalid end of data' );
-							break;
+							return;
 						}
 
 						// Flush out the buffer and set it to an empty buffer so next time we set the data correctly
-						part.file.write( part.buffer );
-						part.buffer	= Buffer.alloc( 0 );
-						break;
+						let leaveBuffer	= 10;
+						part.file.write( part.buffer.slice( 0, part.buffer.length - leaveBuffer ) );
+						part.buffer	= part.buffer.slice( part.buffer.length - leaveBuffer );
+						return;
 					}
 					else
 					{
-						part.file.write( part.buffer.slice( 0, boundaryOffset - SYSTEM_EOL_LENGTH ) );
+						part.file.write( part.buffer.slice( 0, boundaryOffset ) );
 						part.file.end();
 
 						part.buffer	= part.buffer.slice( boundaryOffset );
@@ -286,7 +276,6 @@ class MultipartFormParser extends BodyParser
 					break;
 
 				case STATE_CLOSE_BOUNDARY:
-					console.log( STATE_CLOSE_BOUNDARY );
 
 					bufferLength	= part.buffer.length;
 
@@ -296,13 +285,14 @@ class MultipartFormParser extends BodyParser
 						{
 							this.handleError( 'Could not get the starting boundary' );
 						}
-						break;
+						return;
 					}
 
 					boundaryOffset	= part.buffer.indexOf( boundary );
 					if ( boundaryOffset === -1 )
 					{
 						this.handleError( 'Boundary data not set' );
+						return;
 					}
 
 					part.state	= STATE_END;
@@ -310,8 +300,6 @@ class MultipartFormParser extends BodyParser
 					continue;
 
 				case STATE_END:
-					console.log( STATE_END );
-
 					if ( part.buffer.length > 0 )
 					{
 						part.state	= STATE_START;
@@ -319,12 +307,12 @@ class MultipartFormParser extends BodyParser
 					}
 					else if ( this.hasFinished() )
 					{
-						break;
+						return;
 					}
 
 				default:
 					this.handleError( 'Invalid state' );
-					break;
+					return;
 			}
 		}
 	}
@@ -348,7 +336,7 @@ class MultipartFormParser extends BodyParser
 	 */
 	handleError( message )
 	{
-		this.eventEmitter.emit( 'error', message );
+		throw new Error( message );
 	}
 
 	/**
@@ -457,7 +445,6 @@ class MultipartFormParser extends BodyParser
 		{
 			if ( ! this.hasFinished() )
 			{
-				console.log( 'here' );
 				self.onDataReceivedCallback( chunk );
 			}
 		});
