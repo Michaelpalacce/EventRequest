@@ -3,6 +3,7 @@
 // Dependencies
 const MultipartFormParser	= require( './body_parsers/multipart_data_parser' );
 const FormBodyParser		= require( './body_parsers/form_body_parser' );
+const JsonBodyParser		= require( './body_parsers/json_body_parser' );
 const BodyParser			= require( './body_parsers/body_parser' );
 
 /**
@@ -16,6 +17,7 @@ class BodyParserHandler
 	 * @details	Possible options:
 	 * 			MultipartFormParser	: {} -> instructions to initialize the MultipartFormParser with the specified options
 	 * 			FormBodyParser		: {} -> instructions to initialize the FormBodyParser with the specified options
+	 * 			JsonBodyParser		: {} -> instructions to initialize the JsonBodyParser with the specified options
 	 * 			dieOnError			: Boolean -> if set to true will set an error in the event, if not event.next()
 	 *
 	 * @param	RequestEvent event
@@ -54,7 +56,8 @@ class BodyParserHandler
 
 			let defaultParsers	= [
 				{ instance : FormBodyParser },
-				{ instance : MultipartFormParser }
+				{ instance : MultipartFormParser },
+				{ instance : JsonBodyParser }
 			];
 
 			this.options.parsers	= defaultParsers.concat( parsers );
@@ -135,5 +138,6 @@ module.exports	= {
 	BodyParserHandler	: BodyParserHandler,
 	BodyParser			: BodyParser,
 	MultipartFormParser	: MultipartFormParser,
+	JsonBodyParser		: JsonBodyParser,
 	FormBodyParser		: FormBodyParser
 };

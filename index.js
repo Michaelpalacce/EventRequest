@@ -85,18 +85,16 @@ class Index
 				requestEvent	= null;
 			});
 
-			setTimeout( () => {
-				try
-				{
-					let block	= this.router.getExecutionBlockForCurrentEvent( requestEvent );
-					requestEvent.setBlock( block );
-					requestEvent.next();
-				}
-				catch ( e )
-				{
-					requestEvent.sendError( e );
-				}
-			});
+			try
+			{
+				let block	= this.	router.getExecutionBlockForCurrentEvent( requestEvent );
+				requestEvent.setBlock( block );
+				requestEvent.next();
+			}
+			catch ( e )
+			{
+				requestEvent.sendError( e );
+			}
 		});
 
 		this.server.listen( port, () =>
