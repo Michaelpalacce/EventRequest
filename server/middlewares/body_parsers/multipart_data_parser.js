@@ -1,10 +1,10 @@
 'use strict';
 
 // Dependencies
-const os				= require( 'os' );
-const path				= require( 'path' );
-const fs				= require( 'fs' );
-const BodyParser		= require( './body_parser' );
+const os			= require( 'os' );
+const path			= require( 'path' );
+const fs			= require( 'fs' );
+const BodyParser	= require( './body_parser' );
 
 /**
  * @brief	Constants
@@ -304,6 +304,43 @@ class MultipartFormParser extends BodyParser
 			callback( 'Provided content-length did not match payload length' );
 		}
 	}
+	
+	onDataReceivedCallback( chunk, headerData )
+	{
+		this.payloadLength	+= chunk.length;
+
+		if ( this.extendedTimeout )
+		{
+			event.extendTimeout( this.extendedMilliseconds );
+		}
+
+		let receivedPayload				= chunk;
+		let previousBufferRedundancy	= 0;
+
+		if ( this.previousBuffer !== null )
+		{
+			previousBufferRedundancy	= this.previousBuffer.length - BUFFER_REDUNDANCY;
+			if ( previousBufferRedundancy > this.previousBuffer.length )
+			{
+				previousBufferRedundancy	= this.previousBuffer.length;
+			}
+
+			receivedPayload	= Buffer.concat( this.previousBuffer.slice( previousBufferRedundancy ), receivedPayload );
+		}
+
+		let boundary		= DEFAULT_BOUNDARY_PREFIX + headerData.boundary;
+		let offset			= receivedPayload.indexOf( boundary );
+
+		/**
+		 * @brief	Not found -> flush the buffer ( after removing the previous buffer redundancy
+		 */
+		if ( offset === -1 )
+		{
+			receivedPayload	= receivedPayload.slice( previousBufferRedundancy );
+			this.flushBuffer( receivedPayload );
+		}
+
+	}
 
 	/**
 	 * @brief	Parse the payload
@@ -316,6 +353,7 @@ class MultipartFormParser extends BodyParser
 	 */
 	parse( event, callback )
 	{
+		let start	= Date.now();
 		let headerData;
 		if ( ! ( headerData = MultipartFormParser.getHeaderData( event.headers ) ) )
 		{
@@ -329,17 +367,13 @@ class MultipartFormParser extends BodyParser
 			return;
 		}
 
-		event.request.on( 'data', ( data ) =>
+		let self			= this;
+		this.previousBuffer	= null;
+		event.request.on( 'data', ( chunk ) =>
 		{
 			if ( ! event.isFinished() )
 			{
-				this.rawPayload.push( data );
-				this.payloadLength	+= data.length;
-
-				if ( this.extendedTimeout )
-				{
-					event.extendTimeout( this.extendedMilliseconds );
-				}
+				self.onDataReceivedCallback( chunk, headerData );
 			}
 		});
 
@@ -349,6 +383,7 @@ class MultipartFormParser extends BodyParser
 				this.rawPayload	= Buffer.concat( this.rawPayload, this.payloadLength );
 
 				this.onEndCallback( this.rawPayload, headerData, ( err, bodyData, files ) =>{
+					console.log( 'Time took to parse:', ( Date.now() - start ) / 1000 );
 					if ( err )
 					{
 						callback( 'Could not parse data' );
