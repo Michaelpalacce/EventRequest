@@ -1,6 +1,6 @@
 {
   "_from": "github:Michaelpalacce/EventRequest#master",
-  "_id": "event_request@1.0.1",
+  "_id": "event_request@1.0.2",
   "_inBundle": false,
   "_location": "/event_request",
   "_phantomChildren": {},
@@ -16,7 +16,7 @@
     "#USER",
     "/"
   ],
-  "_resolved": "github:Michaelpalacce/EventRequest#2a0975964e3fc9d0a2db572ab63931d1e7880481",
+  "_resolved": "github:Michaelpalacce/EventRequest#b9db85eb13627dbad856d45a68ae405397bf0378",
   "_spec": "github:Michaelpalacce/EventRequest#master",
   "_where": "E:\\Coding\\FileSystem",
   "author": {
@@ -34,5 +34,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.2"
+  "version": "1.0.3"
 }

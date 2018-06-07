@@ -6,14 +6,14 @@ const BodyParser	= require( './body_parser' );
 /**
  * @brief	Constants
  */
-const FORM_PARSER_SUPPORTED_TYPE	= 'application/x-www-form-urlencoded';
-const CONTENT_LENGTH_HEADER			= 'content-length';
-const CONTENT_TYPE_HEADER			= 'content-type';
+const JSON_BODY_PARSER_SUPPORTED_TYPE	= 'application/json';
+const CONTENT_LENGTH_HEADER				= 'content-length';
+const CONTENT_TYPE_HEADER				= 'content-type';
 
 /**
- * @brief	FormBodyParser responsible for parsing application/x-www-form-urlencoded forms
+ * @brief	JsonBodyParser responsible for parsing application/json forms
  */
-class FormBodyParser extends BodyParser
+class JsonBodyParser extends BodyParser
 {
 	/**
 	 * @param	Object options
@@ -33,12 +33,12 @@ class FormBodyParser extends BodyParser
 	}
 
 	/**
-	 * @see	BodyParser::supports
+	 * @see	BodyParser::supports()
 	 */
 	supports( event )
 	{
 		let contentType	= event.headers[CONTENT_TYPE_HEADER];
-		return typeof contentType === 'string' && contentType.match( FORM_PARSER_SUPPORTED_TYPE ) !== null
+		return typeof contentType === 'string' && contentType.match( JSON_BODY_PARSER_SUPPORTED_TYPE ) !== null
 	}
 
 	/**
@@ -69,32 +69,20 @@ class FormBodyParser extends BodyParser
 			return;
 		}
 
-		let decodedPayload	= decodeURIComponent( rawPayload.toString( 'ascii' ) );
-		let body			= {};
-		let payloadParts	= decodedPayload.split( '&' );
-
-		for ( let i = 0; i < payloadParts.length; ++ i )
+		try
 		{
-			let param	= payloadParts[i].split( '=' );
+			let decodedPayload	= decodeURIComponent( rawPayload.toString( 'ascii' ) );
 
-			if ( param.length !== 2 )
-			{
-				continue;
-			}
-
-			body[param[0]]	= param[1];
+			callback( false, JSON.parse( decodedPayload ) );
 		}
-
-		callback( false, body );
+		catch ( e )
+		{
+			callback( 'Could not parse the body' );
+		}
 	}
 
 	/**
-	 * @brief	Parser the form body if possible and returns an object
-	 *
-	 * @param	Buffer rawPayload
-	 * @param	Function callback
-	 *
-	 * @return	void
+	 * @see	BodyParser::parse()
 	 */
 	parse( event, callback )
 	{
@@ -127,4 +115,4 @@ class FormBodyParser extends BodyParser
 	}
 }
 
-module.exports	= FormBodyParser;
+module.exports	= JsonBodyParser;
