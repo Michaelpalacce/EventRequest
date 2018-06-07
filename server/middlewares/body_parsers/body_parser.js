@@ -16,11 +16,11 @@ class BodyParser
 	/**
 	 * @brief	Gets an instance of the body parser
 	 *
-	 * @return	BaseBodyParser
+	 * @return	BodyParser
 	 */
-	static getInstance( bodyParser, options = {} )
+	static getInstance( options = {} )
 	{
-		return new this(  bodyParser, options );
+		return new this( options );
 	}
 
 	/**
