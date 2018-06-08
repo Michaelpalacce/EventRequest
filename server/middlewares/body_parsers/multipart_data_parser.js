@@ -411,7 +411,6 @@ class MultipartFormParser extends BodyParser
 					break;
 				case STATE_PART_DATA:
 					boundaryOffset	= part.buffer.indexOf( this.boundary );
-					this.handleError( 'YAS' );
 					if ( boundaryOffset === -1 )
 					{
 						if ( this.hasFinished() )
