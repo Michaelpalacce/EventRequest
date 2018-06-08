@@ -62,13 +62,18 @@ class MultipartFormParser extends BodyParser
 	{
 		super( options );
 
-		this.maxPayload				= this.options.maxPayload || 0;
-		this.tempDir				= this.options.tempDir || os.tmpdir();
+		this.maxPayload		= this.options.maxPayload || 0;
+		this.tempDir		= this.options.tempDir || os.tmpdir();
 
-		this.eventEmitter			= new EventEmitter();
-		this.parsingError			= false;
-		this.ended					= false;
-		this.parts					= [];
+		this.eventEmitter	= new EventEmitter();
+		this.parts			= [];
+		this.parsingError	= false;
+		this.ended			= false;
+
+		this.event			= null;
+		this.callback		= null;
+		this.headerData		= null;
+		this.boundary		= null;
 
 		this.setUpTempDir();
 	}
@@ -155,6 +160,14 @@ class MultipartFormParser extends BodyParser
 		for ( let index in this.parts )
 		{
 			let part	= this.parts[index];
+			part.buffer	= null;
+			part.state	= null;
+
+			if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
+			{
+				part.file.end();
+			}
+
 			delete part.buffer;
 			delete part.file;
 			delete part.state;
@@ -409,12 +422,14 @@ class MultipartFormParser extends BodyParser
 						let bufferToFlush	= part.buffer.slice( 0, part.buffer.length - leaveBuffer );
 						this.flushBuffer( part, bufferToFlush );
 						part.buffer	= part.buffer.slice( part.buffer.length - leaveBuffer );
+
+						// Fetch more data
 						return;
 					}
 					else
 					{
 						this.flushBuffer( part, part.buffer.slice( 0, boundaryOffset - SYSTEM_EOL_LENGTH ) );
-						if ( part.file != null )
+						if ( part.type === DATA_TYPE_FILE )
 						{
 							part.file.end();
 						}
