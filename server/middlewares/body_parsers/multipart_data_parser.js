@@ -55,32 +55,47 @@ class MultipartFormParser extends BodyParser
 	 * @param	BodyParser bodyParser
 	 * @param	Object options
 	 * 			Accepts options:
-	 * 			- BufferSize - Number - The size of the buffer when reading
-	 * 			( smaller means slower but more memory efficient)
-	 * 			- extendedTimeout - Boolean - Sets whether the event. timeout will be extended when receiving the body
-	 * 			- extendedMilliseconds - Number - The amount of milliseconds to extend the event timeout with
 	 * 			- maxPayload - Number - Maximum payload in bytes to parse if set to 0 means infinite
 	 * 			- tempDir - String - The directory where to keep the uploaded files before moving
-	 * 			- saveFiles - Boolean - This will save the files in the specified tempDir if not it will only keep
-	 * 			them as a buffer ( This modifies the files set in event. Each file will no longer have a 'chunk' set within it
-	 * 			but a new param: path will be provided which will point to the exact spot of the file on the OS )
 	 */
 	constructor( options = {} )
 	{
 		super( options );
 
-		this.bufferSize				= this.options.BufferSize || DEFAULT_BUFFER_SIZE;
-		this.extendedTimeout		= this.options.extendedTimeout == undefined ? false : this.options.extendedTimeout;
-		this.extendedMilliseconds	= this.options.extendedMilliseconds || 1000;
 		this.maxPayload				= this.options.maxPayload || 0;
 		this.tempDir				= this.options.tempDir || os.tmpdir();
-		this.saveFiles				= this.options.saveFiles || false;
 
-		this.payloadLength			= 0;
 		this.eventEmitter			= new EventEmitter();
 		this.parsingError			= false;
 		this.ended					= false;
 		this.parts					= [];
+
+		this.setUpTempDir();
+	}
+
+	/**
+	 * @brief	Clean up
+	 *
+	 * @return	void
+	 */
+	destructor()
+	{
+		this.eventEmitter.removeAllListeners();
+		this.parts			= null;
+		this.eventEmitter	= null;
+	}
+
+	/**
+	 * @brief	Will Create the temporary directory if it does not exist already
+	 *
+	 * @return	void
+	 */
+	setUpTempDir()
+	{
+		if ( ! fs.existsSync( this.tempDir ) )
+		{
+			fs.mkdirSync( this.tempDir );
+		}
 	}
 
 	/**
@@ -91,11 +106,11 @@ class MultipartFormParser extends BodyParser
 	formPart()
 	{
 		return {
-			name				: '',
-			contentType			: '',
-			size				: 0,
-			state				: STATE_START,
-			buffer				: Buffer.alloc( 0 )
+			name		: '',
+			contentType	: '',
+			size		: 0,
+			state		: STATE_START,
+			buffer		: Buffer.alloc( 0 )
 		}
 	}
 
@@ -174,13 +189,6 @@ class MultipartFormParser extends BodyParser
 	 */
 	onDataReceivedCallback( chunk )
 	{
-		this.payloadLength	+= chunk.length;
-
-		if ( this.extendedTimeout )
-		{
-			this.event.extendTimeout( this.extendedMilliseconds );
-		}
-
 		try
 		{
 			this.extractChunkData( chunk );
@@ -201,8 +209,6 @@ class MultipartFormParser extends BodyParser
 	 */
 	flushBuffer( part, buffer )
 	{
-		console.log( part.type );
-		console.log( part.file !== null );
 		if ( part.type === DATA_TYPE_PARAMETER )
 		{
 			part.data	= Buffer.concat( [part.data, buffer] );
@@ -219,13 +225,17 @@ class MultipartFormParser extends BodyParser
 		part.size	+= buffer.length;
 	}
 
+	/**
+	 * @brief	Extracts chunk data as they come in
+	 *
+	 * @param	Buffer chunk
+	 *
+	 * @return	void
+	 */
 	extractChunkData( chunk )
 	{
-		console.log( chunk.toString('ascii') );
-		let boundary		= DEFAULT_BOUNDARY_PREFIX + this.headerData.boundary;
-		let part			= this.getPartData();
 		let boundaryOffset	= 0;
-		let bufferLength	= 0;
+		let part			= this.getPartData();
 		part.buffer			= Buffer.concat( [part.buffer, chunk] );
 
 		while ( true )
@@ -233,37 +243,27 @@ class MultipartFormParser extends BodyParser
 			switch ( part.state )
 			{
 				case STATE_START:
-					console.log( 'STATE_START' );
+					// Starting 
 					part.state	= STATE_START_BOUNDARY;
-					continue;
+					break;
 				case STATE_START_BOUNDARY:
-					console.log( 'STATE_START_BOUNDARY' );
-					bufferLength	= part.buffer.length;
-
-					console.log( bufferLength );
-					console.log( boundary.length );
-					if ( bufferLength < boundary.length )
+					// Receive chunks until we find the first boundary if the end has been finished, throw an error
+					boundaryOffset	= part.buffer.indexOf( this.boundary );
+					if ( boundaryOffset === -1 )
 					{
 						if ( this.hasFinished() )
 						{
-							this.handleError( 'Could not get the starting boundary' );
+							this.handleError( 'Boundary data not set and end of stream reached' );
 						}
+
 						return;
 					}
 
-					boundaryOffset	= part.buffer.indexOf( boundary );
-					if ( boundaryOffset === -1 )
-					{
-						this.handleError( 'Boundary data not set' );
-						return;
-					}
-
+					// Get the data after the boundary on the next line -> + SYSTEM_EOL_LENGTH
+					part.buffer	= part.buffer.slice( boundaryOffset + this.boundary.length + SYSTEM_EOL_LENGTH );
 					part.state	= STATE_HEADER_FIELD_START;
-					part.buffer	= part.buffer.slice( boundaryOffset + boundary.length + SYSTEM_EOL_LENGTH );
-					continue;
-
+					break;
 				case STATE_HEADER_FIELD_START:
-					console.log( 'STATE_HEADER_FIELD_START' );
 					let lineCount				= 0;
 					let contentTypeLine			= null;
 					let contentDispositionLine	= null;
@@ -293,9 +293,7 @@ class MultipartFormParser extends BodyParser
 						++ lineCount;
 					}
 
-					console.log( 'contentDispositionLine', contentDispositionLine );
-					console.log( 'contentTypeLine', contentTypeLine );
-
+					// Receive chunks until we read the two rows of metadata if end is reached, throw an error
 					if ( contentDispositionLine === null || contentTypeLine === null || lineCount < 2 )
 					{
 						if ( this.hasFinished() )
@@ -308,7 +306,7 @@ class MultipartFormParser extends BodyParser
 					// Should be in the beginning of the payload, so set state
 					part.state		= STATE_HEADERS_DONE;
 
-					// Get ContentDisposition data
+					// Extract data
 					let filenameCheck	= contentDispositionLine.match( CONTENT_DISPOSITION_FILENAME_CHECK_REGEX );
 					let nameCheck		= contentDispositionLine.match( CONTENT_DISPOSITION_NAME_CHECK_REGEX );
 					let filename		= null;
@@ -333,7 +331,6 @@ class MultipartFormParser extends BodyParser
 						if ( name === null )
 						{
 							this.handleError( 'Name provided is invalid' );
-							return;
 						}
 						else
 						{
@@ -343,23 +340,30 @@ class MultipartFormParser extends BodyParser
 					else
 					{
 						this.handleError( 'Name provided is invalid' );
-						return;
 					}
 
-					part.buffer		= part.buffer.slice( idxStart );
+					// Cut until after the two lines
+					part.buffer	= part.buffer.slice( idxStart );
+
+					let contentType	= contentTypeLine.match( CONTENT_TYPE_GET_TYPE_REGEX );
+					if ( contentType !== null )
+					{
+						// Cut the extra empty line in this case
+						part.buffer			= part.buffer.slice( SYSTEM_EOL_LENGTH );
+						// Set the file content type
+						part.contentType	= contentType[1];
+					}
 
 					if ( filename !== null && name !== null )
 					{
 						// File input being parsed
 						this.upgradeToFileTypePart( part );
-						part.buffer		= part.buffer.slice( SYSTEM_EOL_LENGTH );
 						part.filePath	= path.join( this.tempDir, this.getRandomFileName( RANDOM_NAME_LENGTH ) );
 						part.name		= filename;
 					}
 					else if ( name !== null )
 					{
 						// Multipart form param being parsed
-						console.log( name );
 						this.upgradeToParameterTypePart( part );
 						part.name	= name;
 					}
@@ -369,20 +373,16 @@ class MultipartFormParser extends BodyParser
 						return;
 					}
 
-					continue;
+					break;
 				case STATE_HEADERS_DONE:
-					console.log( 'STATE_HEADERS_DONE' );
 					part.state		= STATE_PART_DATA_START;
-					continue;
-
+					break;
 				case STATE_PART_DATA_START:
-					console.log( 'STATE_PART_DATA_START' );
 					if ( part.type === DATA_TYPE_FILE )
 					{
 						if ( part.file === null )
 						{
 							part.file	= fs.createWriteStream( part.filePath, { flag : 'a' } );
-							console.log( 'OPENED FILE TO WRITE: ', part.filePath );
 						}
 						else
 						{
@@ -392,19 +392,15 @@ class MultipartFormParser extends BodyParser
 					}
 
 					part.state	= STATE_PART_DATA;
-					continue;
-
+					break;
 				case STATE_PART_DATA:
-					console.log( 'STATE_PART_DATA' );
-					boundaryOffset	= part.buffer.indexOf( boundary );
+					boundaryOffset	= part.buffer.indexOf( this.boundary );
 
-					console.log( boundaryOffset );
 					if ( boundaryOffset === -1 )
 					{
 						if ( this.hasFinished() )
 						{
 							this.handleError( 'Invalid end of data' );
-							return;
 						}
 
 						// Flush out the buffer and set it to an empty buffer so next time we set the data correctly
@@ -425,46 +421,32 @@ class MultipartFormParser extends BodyParser
 
 						part.buffer	= part.buffer.slice( boundaryOffset );
 						part.state	= STATE_CLOSE_BOUNDARY;
-						continue;
 					}
 					break;
-
 				case STATE_CLOSE_BOUNDARY:
-					console.log( 'STATE_CLOSE_BOUNDARY' );
-					bufferLength	= part.buffer.length;
-
-					if ( bufferLength < boundary.length )
+					boundaryOffset	= part.buffer.indexOf( this.boundary );
+					if ( boundaryOffset === -1 )
 					{
 						if ( this.hasFinished() )
 						{
-							this.handleError( 'Could not get the starting boundary' );
+							this.handleError( 'Boundary data not set and end of stream reached' );
 						}
-						return;
-					}
 
-					boundaryOffset	= part.buffer.indexOf( boundary );
-					if ( boundaryOffset === -1 )
-					{
-						this.handleError( 'Boundary data not set' );
 						return;
 					}
 
 					part.state	= STATE_END;
 					part.buffer	= part.buffer.slice( boundaryOffset );
-					continue;
-
+					break;
 				case STATE_END:
-
 					let nextPart	= this.formPart();
 					nextPart.buffer	= part.buffer;
 					part			= nextPart;
 
 					this.parts.push( nextPart );
 					break;
-
 				default:
 					this.handleError( 'Invalid state' );
-					return;
 			}
 		}
 	}
@@ -571,18 +553,21 @@ class MultipartFormParser extends BodyParser
 	parse( event, callback )
 	{
 		this.event		= event;
+		this.callback	= callback;
 
 		this.integrityCheck( ( err, headerData ) =>{
 			if ( ! err && headerData )
 			{
 				this.headerData	= headerData;
-				this.callback	= callback;
+				this.boundary	= DEFAULT_BOUNDARY_PREFIX + this.headerData.boundary;
 
 				this.attachEvents();
+				this.absorbStream();
 			}
 			else
 			{
-				callback( err );
+				this.destructor();
+				this.callback( err );
 			}
 		});
 	}
@@ -621,6 +606,29 @@ class MultipartFormParser extends BodyParser
 	 */
 	attachEvents()
 	{
+		this.eventEmitter.on( 'error', ( err )=>{
+			this.parsingError	= true;
+			this.callback( err );
+			this.destructor();
+		});
+
+		this.eventEmitter.on( 'end', ()=>{
+			this.ended	= true;
+			this.stripDataFromParts();
+			this.callback( false, this.parts );
+			this.destructor();
+		});
+	}
+
+	/**
+	 * @brief	Absorbs the incoming payload stream
+	 *
+	 * @return	void
+	 */
+	absorbStream()
+	{
+		this.event.clearTimeout();
+
 		let self	= this;
 		this.event.request.on( 'data', ( chunk ) =>
 		{
@@ -631,19 +639,7 @@ class MultipartFormParser extends BodyParser
 		});
 
 		this.event.request.on( 'end', () => {
-			console.log( 'end' );
 			this.eventEmitter.emit( 'end' );
-		});
-
-		this.eventEmitter.on( 'error', ( err )=>{
-			this.parsingError	= true;
-			this.callback( err );
-		});
-
-		this.eventEmitter.on( 'end', ()=>{
-			this.ended	= true;
-			this.stripDataFromParts();
-			this.callback( false, this.parts );
 		});
 	}
 
