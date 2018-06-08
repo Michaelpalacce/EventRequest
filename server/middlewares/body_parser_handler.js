@@ -18,7 +18,6 @@ class BodyParserHandler
 	 * 			MultipartFormParser	: {} -> instructions to initialize the MultipartFormParser with the specified options
 	 * 			FormBodyParser		: {} -> instructions to initialize the FormBodyParser with the specified options
 	 * 			JsonBodyParser		: {} -> instructions to initialize the JsonBodyParser with the specified options
-	 * 			dieOnError			: Boolean -> if set to true will set an error in the event, if not event.next()
 	 *
 	 * @param	RequestEvent event
 	 * @param	Object options
@@ -26,7 +25,6 @@ class BodyParserHandler
 	constructor( event, options )
 	{
 		this.options		= options;
-		this.dieOnError		= this.options.dieOnError || true;
 		this.baseOptions	= {};
 		this.event			= event;
 		this.parsers		= [];
@@ -78,6 +76,7 @@ class BodyParserHandler
 				for ( let index in this.options.parsers )
 				{
 					let parserConfig	= this.options.parsers[index];
+
 					let parser			= typeof parserConfig.instance === 'function' ? parserConfig.instance : null;
 					let parserOptions	= typeof parserConfig.options === 'object' ? parserConfig.options : [];
 
@@ -113,19 +112,10 @@ class BodyParserHandler
 		for ( let index in this.parsers )
 		{
 			let parser	= this.parsers[index];
-			
+
 			if ( parser.supports( this.event ) )
 			{
-				parser.parse( this.event, ( err ) =>{
-					if ( err && this.dieOnError )
-					{
-						this.event.sendError( err );
-					}
-					else
-					{
-						callback( err );
-					}
-				});
+				parser.parse( this.event, ( err ) =>{ callback( err ); } );
 				return;
 			}
 		}
