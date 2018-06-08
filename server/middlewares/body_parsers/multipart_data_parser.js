@@ -29,6 +29,7 @@ const DEFAULT_BOUNDARY_PREFIX				= '--';
 const DEFAULT_BUFFER_SIZE					= 5242880; // 5 MB
 const MULTIPART_PARSER_SUPPORTED_TYPE		= 'multipart/form-data';
 const RANDOM_NAME_LENGTH					= 20;
+const DATA_TYPE_FILE						= 'file';
 
 let STATE_START						= 0;
 let STATE_START_BOUNDARY			= 1;
@@ -86,8 +87,9 @@ class MultipartFormParser extends BodyParser
 	formPart()
 	{
 		return {
-			type				: null,
+			type				: '',
 			filePath			: null,
+			fileName			: '',
 			file				: null,
 			size				: 0,
 			state				: STATE_START,
@@ -114,6 +116,13 @@ class MultipartFormParser extends BodyParser
 		}
 	}
 
+	/**
+	 * @brief	Callback called when data is received by the server
+	 *
+	 * @param	Buffer chunk
+	 *
+	 * @return	void
+	 */
 	onDataReceivedCallback( chunk )
 	{
 		this.payloadLength	+= chunk.length;
@@ -123,11 +132,34 @@ class MultipartFormParser extends BodyParser
 			this.event.extendTimeout( this.extendedMilliseconds );
 		}
 
-		try {
+		try
+		{
 			this.extractChunkData( chunk );
 		}
-		catch (e) {
+		catch ( e )
+		{
 			this.eventEmitter.emit( 'error', e );
+		}
+	}
+
+	/**
+	 * @brief	Flushes the given buffer to the part.file stream
+	 *
+	 * @param	Object part
+	 * @param	Buffer buffer
+	 *
+	 * @return	void
+	 */
+	flushBuffer( part, buffer )
+	{
+		if ( part.file === null )
+		{
+			this.handleError( 'Cannot flush buffer to a file stream that does not exist.' );
+		}
+		else
+		{
+			part.file.write( buffer );
+			part.size	+= buffer.length;
 		}
 	}
 
@@ -220,9 +252,12 @@ class MultipartFormParser extends BodyParser
 					{
 						// File input being parsed
 						part.filePath	= path.join( this.tempDir, this.getRandomFileName( RANDOM_NAME_LENGTH ) );
+						part.fileName	= filename;
+						part.type		= DATA_TYPE_FILE;
 					}
 					else if ( name !== null )
 					{
+						console.log( name );
 						// Multipart form param being parsed do nothing yet
 					}
 					else
@@ -236,17 +271,26 @@ class MultipartFormParser extends BodyParser
 					part.state		= STATE_PART_DATA_START;
 
 				case STATE_PART_DATA_START:
-					if ( part.file === null )
+					if ( part.type === DATA_TYPE_FILE )
 					{
-						part.file	= fs.createWriteStream( part.filePath, { flag : 'a' } );
-						part.state	= STATE_PART_DATA;
-						console.log( 'OPENED FILE TO WRITE: ', part.filePath );
+						if ( part.file === null )
+						{
+							part.file	= fs.createWriteStream( part.filePath, { flag : 'a' } );
+							part.state	= STATE_PART_DATA;
+							console.log( 'OPENED FILE TO WRITE: ', part.filePath );
+						}
+						else
+						{
+							this.handleError( 'Tried to create a new write stream' );
+							return;
+						}
 					}
 					else
 					{
-						this.handleError( 'Tried to create a new write stream' );
+						part.state	= STATE_END;
 						return;
 					}
+
 				case STATE_PART_DATA:
 					boundaryOffset	= part.buffer.indexOf( boundary );
 
@@ -260,7 +304,7 @@ class MultipartFormParser extends BodyParser
 
 						// Flush out the buffer and set it to an empty buffer so next time we set the data correctly
 						let leaveBuffer	= 10;
-						part.file.write( part.buffer.slice( 0, part.buffer.length - leaveBuffer ) );
+						this.flushBuffer( part, part.buffer.slice( 0, part.buffer.length - leaveBuffer ) );
 						part.buffer	= part.buffer.slice( part.buffer.length - leaveBuffer );
 						return;
 					}
@@ -316,7 +360,6 @@ class MultipartFormParser extends BodyParser
 
 					return;
 				default:
-					console.log( part.state );
 					this.handleError( 'Invalid state' );
 					return;
 			}
