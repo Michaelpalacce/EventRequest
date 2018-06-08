@@ -88,15 +88,52 @@ class MultipartFormParser extends BodyParser
 	formPart()
 	{
 		return {
-			type				: '',
-			filePath			: null,
 			name				: '',
-			file				: null,
 			size				: 0,
 			state				: STATE_START,
-			buffer				: Buffer.alloc( 0 ),
-			data				: Buffer.alloc( 0 )
+			buffer				: Buffer.alloc( 0 )
 		}
+	}
+
+	/**
+	 * @brief	Upgrades the given data part and adds it DATA_TYPE_FILE properties
+	 *
+	 * @param	Object part
+	 *
+	 * @return	void
+	 */
+	upgradeToFileTypePart( part )
+	{
+		part.file		= null;
+		part.filePath	= null;
+		part.type		= DATA_TYPE_FILE;
+	}
+
+	/**
+	 * @brief	Upgrades the given data part and adds it DATA_TYPE_PARAMETER properties
+	 *
+	 * @param	Object part
+	 *
+	 * @return	void
+	 */
+	upgradeToParameterTypePart( part )
+	{
+		part.type	= DATA_TYPE_PARAMETER;
+		part.data	= Buffer.alloc( 0 );
+	}
+
+	/**
+	 * @brief	Removes data part properties to prepare the part for exposure
+	 *
+	 * @param	Object part
+	 *
+	 * @return	void
+	 */
+	stripDataPartProperties( part )
+	{
+		delete part.buffer;
+		delete part.file;
+		delete part.state;
 	}
 
 	/**
@@ -154,17 +191,19 @@ class MultipartFormParser extends BodyParser
 	 */
 	flushBuffer( part, buffer )
 	{
-		if ( part.file === null && part.type === DATA_TYPE_PARAMETER )
+		console.log( part.type );
+		console.log( part.file !== null );
+		if ( part.type === DATA_TYPE_PARAMETER )
 		{
 			part.data	= Buffer.concat( [part.data, buffer] );
 		}
-		else if ( part.file === null )
+		else if ( part.type === DATA_TYPE_FILE && part.file !== null )
 		{
-			this.handleError( 'Cannot flush buffer to a file stream that does not exist.' );
+			part.file.write( buffer );
 		}
 		else
 		{
-			part.file.write( buffer );
+			this.handleError( 'Could not flush buffer!' );
 		}
 
 		part.size	+= buffer.length;
@@ -180,7 +219,6 @@ class MultipartFormParser extends BodyParser
 
 		while ( true )
 		{
-			part	= this.getPartData();
 			switch ( part.state )
 			{
 				case STATE_START:
@@ -270,17 +308,17 @@ class MultipartFormParser extends BodyParser
 					if ( filename !== null && name !== null )
 					{
 						// File input being parsed
+						this.upgradeToFileTypePart( part );
 						part.buffer		= part.buffer.slice( idxStart + SYSTEM_EOL_LENGTH );
 						part.filePath	= path.join( this.tempDir, this.getRandomFileName( RANDOM_NAME_LENGTH ) );
 						part.name		= filename;
-						part.type		= DATA_TYPE_FILE;
 					}
 					else if ( name !== null )
 					{
 						// Multipart form param being parsed
 						console.log( name );
+						this.upgradeToParameterTypePart( part );
 						part.buffer		= part.buffer.slice( idxStart );
-						part.type		= DATA_TYPE_PARAMETER;
 						part.name		= name;
 					}
 					else
@@ -328,7 +366,8 @@ class MultipartFormParser extends BodyParser
 						}
 
 						// Flush out the buffer and set it to an empty buffer so next time we set the data correctly
-						let leaveBuffer		= 10;
+						// leave buffer is used as a redundancy check
+						let leaveBuffer		= 5;
 						let bufferToFlush	= part.buffer.slice( 0, part.buffer.length - leaveBuffer );
 						this.flushBuffer( part, bufferToFlush );
 						part.buffer	= part.buffer.slice( part.buffer.length - leaveBuffer );
@@ -336,9 +375,8 @@ class MultipartFormParser extends BodyParser
 					}
 					else
 					{
-						console.log( part.buffer.toString() );
 						this.flushBuffer( part, part.buffer.slice( 0, boundaryOffset - SYSTEM_EOL_LENGTH ) );
-						if ( part.file !== null )
+						if ( part.file != null )
 						{
 							part.file.end();
 						}
@@ -385,7 +423,6 @@ class MultipartFormParser extends BodyParser
 					if ( part.buffer.length > 0 )
 					{
 						console.log( part.buffer.toString() );
-						part.data	= part.data.toString();
 
 						if ( part.buffer.length <= boundary.length + SYSTEM_EOL_LENGTH + SYSTEM_EOL_LENGTH )
 						{
@@ -397,6 +434,7 @@ class MultipartFormParser extends BodyParser
 							let nextPart	= this.formPart();
 							nextPart.buffer	= part.buffer;
 							this.parts.push( nextPart );
+							part	= nextPart;
 							continue;
 						}
 					}
