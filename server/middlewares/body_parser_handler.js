@@ -78,7 +78,7 @@ class BodyParserHandler
 				for ( let index in this.options.parsers )
 				{
 					let parserConfig	= this.options.parsers[index];
-					
+
 					let parser			= typeof parserConfig.instance === 'function' ? parserConfig.instance : null;
 					let parserOptions	= typeof parserConfig.options === 'object' ? parserConfig.options : [];
 
@@ -86,10 +86,6 @@ class BodyParserHandler
 					{
 						throw new Error( 'Invalid configuration' );
 					}
-
-					console.log( parserOptions );
-					console.log( parserConfig.options );
-					console.log( Object.assign( this.baseOptions, parserOptions ) );
 
 					parser	= parser.getInstance( Object.assign( this.baseOptions, parserOptions ) );
 
@@ -118,7 +114,7 @@ class BodyParserHandler
 		for ( let index in this.parsers )
 		{
 			let parser	= this.parsers[index];
-			
+
 			if ( parser.supports( this.event ) )
 			{
 				parser.parse( this.event, ( err ) =>{

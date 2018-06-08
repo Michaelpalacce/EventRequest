@@ -1,24 +1,24 @@
 {
-  "_from": "github:Michaelpalacce/EventRequest#master",
+  "_from": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
   "_id": "event_request@1.0.2",
   "_inBundle": false,
   "_location": "/event_request",
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "github:Michaelpalacce/EventRequest#master",
-    "rawSpec": "github:Michaelpalacce/EventRequest#master",
-    "saveSpec": "github:Michaelpalacce/EventRequest#master",
+    "raw": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
+    "rawSpec": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
+    "saveSpec": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
     "fetchSpec": null,
-    "gitCommittish": "master"
+    "gitCommittish": "#8-Multi-part-Body-parser"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "github:Michaelpalacce/EventRequest#b9db85eb13627dbad856d45a68ae405397bf0378",
-  "_spec": "github:Michaelpalacce/EventRequest#master",
-  "_where": "E:\\Coding\\FileSystem",
+  "_resolved": "github:Michaelpalacce/EventRequest#8ee757bd7160500b6a4863cb7d66630c838aa971",
+  "_spec": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
+  "_where": "D:\\Projects\\Server",
   "author": {
     "name": "Stefan Genov"
   },

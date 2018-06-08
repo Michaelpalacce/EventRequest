@@ -63,7 +63,7 @@ class MultipartFormParser extends BodyParser
 	constructor( options = {} )
 	{
 		super( options );
-		
+
 		this.bufferSize				= this.options.BufferSize || DEFAULT_BUFFER_SIZE;
 		this.extendedTimeout		= this.options.extendedTimeout == undefined ? false : this.options.extendedTimeout;
 		this.extendedMilliseconds	= this.options.extendedMilliseconds || 10;
@@ -266,7 +266,7 @@ class MultipartFormParser extends BodyParser
 					}
 					else
 					{
-						part.file.write( part.buffer.slice( 0, boundaryOffset ) );
+						part.file.write( part.buffer.slice( 0, boundaryOffset - SYSTEM_EOL_LENGTH ) );
 						part.file.end();
 
 						part.buffer	= part.buffer.slice( boundaryOffset );
@@ -296,21 +296,27 @@ class MultipartFormParser extends BodyParser
 					}
 
 					part.state	= STATE_END;
-					part.buffer	= part.buffer.slice( boundaryOffset + boundary.length + SYSTEM_EOL_LENGTH );
+					part.buffer	= part.buffer.slice( boundaryOffset + boundary.length + SYSTEM_EOL_LENGTH + SYSTEM_EOL_LENGTH );
 					continue;
 
 				case STATE_END:
+					console.log( STATE_END );
+					console.log( part.buffer.length );
 					if ( part.buffer.length > 0 )
 					{
 						part.state	= STATE_START;
-						return;
 					}
-					else if ( this.hasFinished() )
+					else
 					{
-						return;
+						// End of parsing
+						delete part.file;
+						delete part.buffer;
+						this.eventEmitter.emit( 'parsingComplete', this.getPartData() )
 					}
 
+					return;
 				default:
+					console.log( part.state );
 					this.handleError( 'Invalid state' );
 					return;
 			}
@@ -440,6 +446,15 @@ class MultipartFormParser extends BodyParser
 			this.parsingError	= true;
 		});
 
+		this.eventEmitter.on( 'end', ()=>{
+			this.ended	= true;
+		});
+
+		this.eventEmitter.on( 'parsingComplete', ( files )=>{
+			console.log( files );
+			callback( false );
+		});
+
 		let self			= this;
 		event.request.on( 'data', ( chunk ) =>
 		{
@@ -452,9 +467,7 @@ class MultipartFormParser extends BodyParser
 		event.request.on( 'end', () => {
 			if ( ! this.hasFinished() )
 			{
-				this.eventEmitter.emit( 'end', () =>{
-					this.ended	= true;
-				});
+				this.eventEmitter.emit( 'end' );
 				// Clean up
 			}
 		});
