@@ -30,6 +30,7 @@ const DEFAULT_BUFFER_SIZE					= 5242880; // 5 MB
 const MULTIPART_PARSER_SUPPORTED_TYPE		= 'multipart/form-data';
 const RANDOM_NAME_LENGTH					= 20;
 const DATA_TYPE_FILE						= 'file';
+const DATA_TYPE_PARAMETER					= 'parameter';
 
 let STATE_START						= 0;
 let STATE_START_BOUNDARY			= 1;
@@ -89,11 +90,12 @@ class MultipartFormParser extends BodyParser
 		return {
 			type				: '',
 			filePath			: null,
-			fileName			: '',
+			name				: '',
 			file				: null,
 			size				: 0,
 			state				: STATE_START,
-			buffer				: Buffer.alloc( 0 )
+			buffer				: Buffer.alloc( 0 ),
+			data				: Buffer.alloc( 0 )
 		}
 	}
 
@@ -152,15 +154,20 @@ class MultipartFormParser extends BodyParser
 	 */
 	flushBuffer( part, buffer )
 	{
-		if ( part.file === null )
+		if ( part.file === null && part.type === DATA_TYPE_PARAMETER )
+		{
+			part.data	= Buffer.concat( [part.data, buffer] );
+		}
+		else if ( part.file === null )
 		{
 			this.handleError( 'Cannot flush buffer to a file stream that does not exist.' );
 		}
 		else
 		{
 			part.file.write( buffer );
-			part.size	+= buffer.length;
 		}
+
+		part.size	+= buffer.length;
 	}
 
 	extractChunkData( chunk )
@@ -173,13 +180,19 @@ class MultipartFormParser extends BodyParser
 
 		while ( true )
 		{
+			part	= this.getPartData();
 			switch ( part.state )
 			{
 				case STATE_START:
+					console.log( 'STATE_START' );
 					part.state	= STATE_START_BOUNDARY;
+					continue;
 				case STATE_START_BOUNDARY:
+					console.log( 'STATE_START_BOUNDARY' );
 					bufferLength	= part.buffer.length;
 
+					console.log( bufferLength );
+					console.log( boundary.length );
 					if ( bufferLength < boundary.length )
 					{
 						if ( this.hasFinished() )
@@ -201,12 +214,14 @@ class MultipartFormParser extends BodyParser
 					continue;
 
 				case STATE_HEADER_FIELD_START:
+					console.log( 'STATE_HEADER_FIELD_START' );
 					let lineCount				= 0;
-					let contentTypeLine			= '';
-					let contentDispositionLine	= '';
+					let contentTypeLine			= null;
+					let contentDispositionLine	= null;
 					let read					= part.buffer.toString( 'ascii' );
 					let idxStart				= 0;
 
+					console.log( read );
 					let line, idx;
 
 					while ( ( idx = read.indexOf( SYSTEM_EOL, idxStart ) ) !== -1 )
@@ -230,7 +245,12 @@ class MultipartFormParser extends BodyParser
 						++ lineCount;
 					}
 
-					if ( contentDispositionLine === '' || contentTypeLine === '' )
+					console.log( 'contentDispositionLine', contentDispositionLine );
+					console.log( 'contentTypeLine', contentTypeLine );
+					console.log( contentTypeLine === '' );
+					console.log( contentTypeLine.length );
+
+					if ( contentDispositionLine === null || contentTypeLine === null )
 					{
 						if ( this.hasFinished() )
 						{
@@ -240,7 +260,6 @@ class MultipartFormParser extends BodyParser
 					}
 
 					// Should be in the beginning of the payload
-					part.buffer		= part.buffer.slice( idxStart + SYSTEM_EOL_LENGTH );
 					part.state		= STATE_HEADERS_DONE;
 
 					let filename	= contentDispositionLine.match( CONTENT_DISPOSITION_FILENAME_REGEX );
@@ -251,14 +270,18 @@ class MultipartFormParser extends BodyParser
 					if ( filename !== null && name !== null )
 					{
 						// File input being parsed
+						part.buffer		= part.buffer.slice( idxStart + SYSTEM_EOL_LENGTH );
 						part.filePath	= path.join( this.tempDir, this.getRandomFileName( RANDOM_NAME_LENGTH ) );
-						part.fileName	= filename;
+						part.name		= filename;
 						part.type		= DATA_TYPE_FILE;
 					}
 					else if ( name !== null )
 					{
+						// Multipart form param being parsed
 						console.log( name );
-						// Multipart form param being parsed do nothing yet
+						part.buffer		= part.buffer.slice( idxStart );
+						part.type		= DATA_TYPE_PARAMETER;
+						part.name		= name;
 					}
 					else
 					{
@@ -268,15 +291,17 @@ class MultipartFormParser extends BodyParser
 
 					continue;
 				case STATE_HEADERS_DONE:
+					console.log( 'STATE_HEADERS_DONE' );
 					part.state		= STATE_PART_DATA_START;
+					continue;
 
 				case STATE_PART_DATA_START:
+					console.log( 'STATE_PART_DATA_START' );
 					if ( part.type === DATA_TYPE_FILE )
 					{
 						if ( part.file === null )
 						{
 							part.file	= fs.createWriteStream( part.filePath, { flag : 'a' } );
-							part.state	= STATE_PART_DATA;
 							console.log( 'OPENED FILE TO WRITE: ', part.filePath );
 						}
 						else
@@ -285,15 +310,15 @@ class MultipartFormParser extends BodyParser
 							return;
 						}
 					}
-					else
-					{
-						part.state	= STATE_END;
-						return;
-					}
+
+					part.state	= STATE_PART_DATA;
+					continue;
 
 				case STATE_PART_DATA:
+					console.log( 'STATE_PART_DATA' );
 					boundaryOffset	= part.buffer.indexOf( boundary );
 
+					console.log( boundaryOffset );
 					if ( boundaryOffset === -1 )
 					{
 						if ( this.hasFinished() )
@@ -303,15 +328,20 @@ class MultipartFormParser extends BodyParser
 						}
 
 						// Flush out the buffer and set it to an empty buffer so next time we set the data correctly
-						let leaveBuffer	= 10;
-						this.flushBuffer( part, part.buffer.slice( 0, part.buffer.length - leaveBuffer ) );
+						let leaveBuffer		= 10;
+						let bufferToFlush	= part.buffer.slice( 0, part.buffer.length - leaveBuffer );
+						this.flushBuffer( part, bufferToFlush );
 						part.buffer	= part.buffer.slice( part.buffer.length - leaveBuffer );
 						return;
 					}
 					else
 					{
-						part.file.write( part.buffer.slice( 0, boundaryOffset - SYSTEM_EOL_LENGTH ) );
-						part.file.end();
+						console.log( part.buffer.toString() );
+						this.flushBuffer( part, part.buffer.slice( 0, boundaryOffset - SYSTEM_EOL_LENGTH ) );
+						if ( part.file !== null )
+						{
+							part.file.end();
+						}
 
 						part.buffer	= part.buffer.slice( boundaryOffset );
 						part.state	= STATE_CLOSE_BOUNDARY;
@@ -320,7 +350,7 @@ class MultipartFormParser extends BodyParser
 					break;
 
 				case STATE_CLOSE_BOUNDARY:
-
+					console.log( 'STATE_CLOSE_BOUNDARY' );
 					bufferLength	= part.buffer.length;
 
 					if ( bufferLength < boundary.length )
@@ -340,25 +370,45 @@ class MultipartFormParser extends BodyParser
 					}
 
 					part.state	= STATE_END;
-					part.buffer	= part.buffer.slice( boundaryOffset + boundary.length + SYSTEM_EOL_LENGTH + SYSTEM_EOL_LENGTH );
+
+					console.log( '----------------' );
+					console.log( part.buffer.toString() );
+					console.log( '----------------' );
+
+					part.buffer	= part.buffer.slice( boundaryOffset );
 					continue;
 
 				case STATE_END:
+					console.log( 'STATE_END' );
 					console.log( STATE_END );
 					console.log( part.buffer.length );
 					if ( part.buffer.length > 0 )
 					{
-						part.state	= STATE_START;
+						console.log( part.buffer.toString() );
+						part.data	= part.data.toString();
+
+						if ( part.buffer.length <= boundary.length + SYSTEM_EOL_LENGTH + SYSTEM_EOL_LENGTH )
+						{
+							this.eventEmitter.emit( 'parsingComplete' );
+							return;
+						}
+						else
+						{
+							let nextPart	= this.formPart();
+							nextPart.buffer	= part.buffer;
+							this.parts.push( nextPart );
+							continue;
+						}
 					}
 					else
 					{
 						// End of parsing
 						delete part.file;
 						delete part.buffer;
-						this.eventEmitter.emit( 'parsingComplete', this.getPartData() )
+						this.eventEmitter.emit( 'parsingComplete' );
+						return;
 					}
 
-					return;
 				default:
 					this.handleError( 'Invalid state' );
 					return;
@@ -493,8 +543,8 @@ class MultipartFormParser extends BodyParser
 			this.ended	= true;
 		});
 
-		this.eventEmitter.on( 'parsingComplete', ( files )=>{
-			console.log( files );
+		this.eventEmitter.on( 'parsingComplete', ()=>{
+			console.log( this.parts );
 			callback( false );
 		});
 
@@ -519,172 +569,3 @@ class MultipartFormParser extends BodyParser
 
 // Export the module
 module.exports	= MultipartFormParser;
-
-
-
-//
-// /**
-//  * @brief	Separate the payload given in boundary chunks
-//  *
-//  * @param	Buffer chunk
-//  * @param	Object headerData
-//  *
-//  * @return	Object
-//  */
-// separateChunks( chunk, headerData )
-// {
-// 	let boundary		= DEFAULT_BOUNDARY_PREFIX + headerData.boundary;
-// 	let currentPosition	= 0;
-// 	let parts			= [];
-// 	let sizeToSlice		= currentPosition + this.bufferSize + BUFFER_REDUNDANCY;
-// 	let read;
-//
-// 	while ( read = chunk.slice( currentPosition, currentPosition + sizeToSlice ), read.length !== 0 )
-// 	{
-// 		let offset	= read.indexOf( boundary );
-//
-// 		if ( offset > this.bufferSize || offset === -1 )
-// 		{
-// 			currentPosition	+= this.bufferSize;
-// 			continue;
-// 		}
-//
-// 		let partPosition	= currentPosition + offset;
-// 		parts.push( partPosition );
-// 		currentPosition		= partPosition + boundary.length;
-// 	}
-//
-// 	let chunks	= [];
-//
-// 	for ( let i = 0; i < parts.length; ++ i )
-// 	{
-// 		if ( ( i + 1 ) !== parts.length )
-// 		{
-// 			let currentPart		= parts[i];
-// 			let nextPart		= parts[i + 1];
-// 			chunks.push( chunk.slice(
-// 				currentPart + headerData.boundary.length + SYSTEM_EOL_LENGTH + REDUNDANT_EMPTY_LINE_LENGTH,
-// 				nextPart - REDUNDANT_EMPTY_LINE_LENGTH
-// 			));
-// 		}
-// 	}
-//
-// 	return chunks;
-// }
-
-// /**
-//  * @brief	Extracts all the data from the split chunks
-//  *
-//  * @param	Array chunks
-//  *
-//  * @return	Object
-//  */
-// extractChunkDataFromChunks( chunks )
-// {
-// 	let chunkData	= {
-// 		files		: [],
-// 		bodyData	: {}
-// 	};
-//
-// 	for ( let index in chunks )
-// 	{
-// 		let chunk					= chunks[index];
-// 		let lineCount				= 0;
-// 		let currentPosition			= 0;
-// 		let leftOver				= '';
-// 		let contentTypeLine			= '';
-// 		let contentDispositionLine	= '';
-// 		let read, line, idxStart, idx;
-//
-// 		// Loop just in case but it should not have to loop more than once
-// 		dataLoop:
-// 			while ( ( read	= chunk.slice( currentPosition, 5242880 ) ), read.length !== 0 )
-// 			{
-// 				leftOver	+= read.toString( DEFAULT_BUFFER_ENCODING );
-// 				idxStart	= 0;
-//
-// 				// Ideally should not happen
-// 				if ( idx = leftOver.indexOf( SYSTEM_EOL, idxStart ) === -1 )
-// 				{
-// 					break;
-// 				}
-//
-// 				while ( ( idx = leftOver.indexOf( SYSTEM_EOL, idxStart ) ) !== -1 )
-// 				{
-// 					line	= leftOver.substring( idxStart, idx );
-//
-// 					if ( lineCount === CONTENT_DISPOSITION_INDEX )
-// 					{
-// 						contentDispositionLine	= line;
-// 					}
-// 					else if ( lineCount === CONTENT_TYPE_INDEX )
-// 					{
-// 						contentTypeLine	= line
-// 					}
-// 					else
-// 					{
-// 						break dataLoop;
-// 					}
-//
-// 					idxStart	= idx + SYSTEM_EOL_LENGTH;
-// 					++ lineCount;
-// 				}
-//
-// 				leftOver	= leftOver.substring( idxStart );
-// 			}
-//
-// 		let metadataToRemove	= contentDispositionLine.length + SYSTEM_EOL_LENGTH;
-//
-// 		if ( contentTypeLine.length !== 0 )
-// 		{
-// 			// metadata to remove in case of a file upload
-// 			metadataToRemove	+= contentTypeLine.length + SYSTEM_EOL_LENGTH + REDUNDANT_EMPTY_LINE_LENGTH;
-// 		}
-// 		else
-// 		{
-// 			// Metadata to remove in case of a multipart form param
-// 			metadataToRemove	+= REDUNDANT_EMPTY_LINE_LENGTH;
-// 		}
-//
-// 		let filename	= contentDispositionLine.match( CONTENT_DISPOSITION_FILENAME_REGEX );
-// 		let name		= contentDispositionLine.match( CONTENT_DISPOSITION_NAME_REGEX );
-// 		filename		= filename === null ? filename : filename[1];
-// 		name			= name === null ? name : name[1];
-//
-// 		if ( filename !== null && name !== null )
-// 		{
-// 			// File input being parsed
-// 			chunk			= chunk.slice( metadataToRemove );
-// 			let filePath	= path.join( this.tempDir, filename );
-// 			let data		= {};
-//
-// 			if ( this.saveFiles )
-// 			{
-// 				if ( ! fs.writeFileSync( filePath, chunk , 'binary' ) )
-// 				{
-// 					continue;
-// 				}
-//
-// 				data	= {
-// 					filename	: filename,
-// 					path		: filePath
-// 				};
-// 			}
-// 			else
-// 			{
-// 				data	= {
-// 					filename	: filename,
-// 					chunk		: chunk
-// 				};
-// 			}
-// 			chunkData.files.push( data );
-// 		}
-// 		else if ( name !== null )
-// 		{
-// 			// Multipart form param being parsed
-// 			chunkData.bodyData[name]	= chunk.slice( metadataToRemove ).toString( DEFAULT_BUFFER_ENCODING );
-// 		}
-// 	}
-//
-// 	return chunkData;
-// }
