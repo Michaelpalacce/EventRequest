@@ -132,7 +132,7 @@ class MultipartFormParser extends BodyParser
 	upgradeToFileTypePart( part )
 	{
 		part.file		= null;
-		part.filePath	= null;
+		part.path	= null;
 		part.type		= DATA_TYPE_FILE;
 	}
 
@@ -373,7 +373,7 @@ class MultipartFormParser extends BodyParser
 					{
 						// File input being parsed
 						this.upgradeToFileTypePart( part );
-						part.filePath	= path.join( this.tempDir, this.getRandomFileName( RANDOM_NAME_LENGTH ) );
+						part.path		= path.join( this.tempDir, this.getRandomFileName( RANDOM_NAME_LENGTH ) );
 						part.name		= filename;
 					}
 					else if ( name !== null )
@@ -398,7 +398,7 @@ class MultipartFormParser extends BodyParser
 					{
 						if ( part.file === null )
 						{
-							part.file	= fs.createWriteStream( part.filePath, { flag : 'a' } );
+							part.file	= fs.createWriteStream( part.path, { flag : 'a' } );
 						}
 						else
 						{
@@ -411,7 +411,7 @@ class MultipartFormParser extends BodyParser
 					break;
 				case STATE_PART_DATA:
 					boundaryOffset	= part.buffer.indexOf( this.boundary );
-
+					this.handleError( 'YAS' );
 					if ( boundaryOffset === -1 )
 					{
 						if ( this.hasFinished() )
@@ -626,6 +626,7 @@ class MultipartFormParser extends BodyParser
 	{
 		this.eventEmitter.on( 'onError', ( err )=>{
 			this.parsingError	= true;
+			this.cleanUpItems();
 			this.terminate();
 			this.callback( err );
 		});
@@ -633,10 +634,57 @@ class MultipartFormParser extends BodyParser
 		this.eventEmitter.on( 'end', ()=>{
 			this.ended	= true;
 			this.stripDataFromParts();
+			this.separateParts();
 			this.event.body	= this.parts;
 			this.callback( false );
 			this.terminate();
 		});
+	}
+
+	/**
+	 * @brief	CLean up items in case of an error
+	 *
+	 * @return	void
+	 */
+	cleanUpItems()
+	{
+		if ( this.parsingError === true )
+		{
+			this.parts.forEach( ( part ) =>{
+				if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' )
+				{
+					fs.unlinkSync( part.path )
+				}
+			});
+		}
+	}
+
+	/**
+	 * @brief	Separates and organizes the parts into files and properties
+	 *
+	 * @return	void
+	 */
+	separateParts()
+	{
+		let parts	= {
+			'files'			: []
+		};
+		this.parts.forEach( ( part ) =>{
+			if ( part.type === DATA_TYPE_FILE )
+			{
+				parts.files.push( part );
+			}
+
+			if ( part.type === DATA_TYPE_PARAMETER )
+			{
+				if ( typeof parts[part.name] === 'undefined' )
+				{
+					parts[part.name]	= part.data.toString();
+				}
+			}
+		});
+
+		this.parts	= parts;
 	}
 
 	/**
