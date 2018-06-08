@@ -17,19 +17,15 @@ const CONTENT_TYPE_INDEX						= 1;
 const CONTENT_LENGTH_HEADER						= 'content-length';
 const CONTENT_TYPE_HEADER						= 'content-type';
 const BOUNDARY_REGEX							= /boundary=(\S+[^\s])/;
-const CONTENT_DISPOSITION						= 'content-disposition';
 const CONTENT_DISPOSITION_NAME_CHECK_REGEX		= /\b(name=)/;
 const CONTENT_DISPOSITION_FILENAME_CHECK_REGEX	= /\b(filename=)/;
 const CONTENT_DISPOSITION_NAME_REGEX			= /\bname="([^"]+)"/;
 const CONTENT_DISPOSITION_FILENAME_REGEX		= /\bfilename="([^"]+)"/;
 const CONTENT_TYPE_GET_TYPE_REGEX				= /Content-Type:\s+(.+)$/;
-const BUFFER_REDUNDANCY							= 70;
 const SYSTEM_EOL								= os.EOL;
 const SYSTEM_EOL_LENGTH							= SYSTEM_EOL.length;
-const REDUNDANT_EMPTY_LINE_LENGTH				= SYSTEM_EOL_LENGTH;
 const DEFAULT_BUFFER_ENCODING					= 'ascii';
 const DEFAULT_BOUNDARY_PREFIX					= '--';
-const DEFAULT_BUFFER_SIZE						= 5242880; // 5 MB
 const MULTIPART_PARSER_SUPPORTED_TYPE			= 'multipart/form-data';
 const RANDOM_NAME_LENGTH						= 20;
 const DATA_TYPE_FILE							= 'file';
@@ -43,6 +39,13 @@ let STATE_PART_DATA_START		= 4;
 let STATE_PART_DATA				= 5;
 let STATE_CLOSE_BOUNDARY		= 6;
 let STATE_END					= 7;
+
+const ERROR_						= 100;
+const ERROR_INVALID_STATE			= 101;
+const ERROR_INCORRECT_END_OF_STREAM	= 102;
+const ERROR_COULD_NOT_FLUSH_BUFFER	= 103;
+const ERROR_INVALID_METADATA		= 104;
+const ERROR_RESOURCE_TAKEN			= 106;
 
 /**
  * @brief	FormParser used to parse multipart data
@@ -83,7 +86,7 @@ class MultipartFormParser extends BodyParser
 	 *
 	 * @return	void
 	 */
-	destructor()
+	terminate()
 	{
 		this.eventEmitter.removeAllListeners();
 		this.parts			= null;
@@ -208,7 +211,7 @@ class MultipartFormParser extends BodyParser
 		}
 		catch ( e )
 		{
-			this.eventEmitter.emit( 'error', e );
+			this.eventEmitter.emit( 'onError', e.message );
 		}
 	}
 
@@ -232,7 +235,7 @@ class MultipartFormParser extends BodyParser
 		}
 		else
 		{
-			this.handleError( 'Could not flush buffer!' );
+			this.handleError( ERROR_COULD_NOT_FLUSH_BUFFER );
 		}
 
 		part.size	+= buffer.length;
@@ -266,7 +269,7 @@ class MultipartFormParser extends BodyParser
 					{
 						if ( this.hasFinished() )
 						{
-							this.handleError( 'Boundary data not set and end of stream reached' );
+							this.handleError( ERROR_INCORRECT_END_OF_STREAM );
 						}
 
 						return;
@@ -280,7 +283,7 @@ class MultipartFormParser extends BodyParser
 					let lineCount				= 0;
 					let contentTypeLine			= null;
 					let contentDispositionLine	= null;
-					let read					= part.buffer.toString( 'ascii' );
+					let read					= part.buffer.toString( DEFAULT_BUFFER_ENCODING );
 					let idxStart				= 0;
 
 					let line, idx;
@@ -311,13 +314,12 @@ class MultipartFormParser extends BodyParser
 					{
 						if ( this.hasFinished() )
 						{
-							this.handleError( 'Content Disposition or Content Type not sent' );
+							this.handleError( ERROR_INVALID_METADATA );
 						}
 						return;
 					}
 
 					// Should be in the beginning of the payload, so set state
-					part.state		= STATE_HEADERS_DONE;
 
 					// Extract data
 					let filenameCheck	= contentDispositionLine.match( CONTENT_DISPOSITION_FILENAME_CHECK_REGEX );
@@ -331,7 +333,7 @@ class MultipartFormParser extends BodyParser
 
 						if ( filename === null )
 						{
-							this.handleError( 'Filename provided is invalid' );
+							this.handleError( ERROR_INVALID_METADATA );
 						}
 
 						filename	= filename[1];
@@ -343,7 +345,7 @@ class MultipartFormParser extends BodyParser
 
 						if ( name === null )
 						{
-							this.handleError( 'Name provided is invalid' );
+							this.handleError( ERROR_INVALID_METADATA );
 						}
 						else
 						{
@@ -352,7 +354,7 @@ class MultipartFormParser extends BodyParser
 					}
 					else
 					{
-						this.handleError( 'Name provided is invalid' );
+						this.handleError( ERROR_INVALID_METADATA );
 					}
 
 					// Cut until after the two lines
@@ -382,10 +384,11 @@ class MultipartFormParser extends BodyParser
 					}
 					else
 					{
-						this.handleError( 'Could not parse Content Disposition' );
+						this.handleError( ERROR_INVALID_METADATA );
 						return;
 					}
 
+					part.state	= STATE_HEADERS_DONE;
 					break;
 				case STATE_HEADERS_DONE:
 					part.state		= STATE_PART_DATA_START;
@@ -399,7 +402,7 @@ class MultipartFormParser extends BodyParser
 						}
 						else
 						{
-							this.handleError( 'Tried to create a new write stream' );
+							this.handleError( ERROR_RESOURCE_TAKEN );
 							return;
 						}
 					}
@@ -413,7 +416,7 @@ class MultipartFormParser extends BodyParser
 					{
 						if ( this.hasFinished() )
 						{
-							this.handleError( 'Invalid end of data' );
+							this.handleError( ERROR_INCORRECT_END_OF_STREAM );
 						}
 
 						// Flush out the buffer and set it to an empty buffer so next time we set the data correctly
@@ -444,7 +447,7 @@ class MultipartFormParser extends BodyParser
 					{
 						if ( this.hasFinished() )
 						{
-							this.handleError( 'Boundary data not set and end of stream reached' );
+							this.handleError( ERROR_INCORRECT_END_OF_STREAM );
 						}
 
 						return;
@@ -461,7 +464,7 @@ class MultipartFormParser extends BodyParser
 					this.parts.push( nextPart );
 					break;
 				default:
-					this.handleError( 'Invalid state' );
+					this.handleError( ERROR_INVALID_STATE );
 			}
 		}
 	}
@@ -581,7 +584,7 @@ class MultipartFormParser extends BodyParser
 			}
 			else
 			{
-				this.destructor();
+				this.terminate();
 				this.callback( err );
 			}
 		});
@@ -621,17 +624,18 @@ class MultipartFormParser extends BodyParser
 	 */
 	attachEvents()
 	{
-		this.eventEmitter.on( 'error', ( err )=>{
+		this.eventEmitter.on( 'onError', ( err )=>{
 			this.parsingError	= true;
+			this.terminate();
 			this.callback( err );
-			this.destructor();
 		});
 
 		this.eventEmitter.on( 'end', ()=>{
 			this.ended	= true;
 			this.stripDataFromParts();
-			this.callback( false, this.parts );
-			this.destructor();
+			this.event.body	= this.parts;
+			this.callback( false );
+			this.terminate();
 		});
 	}
 
@@ -654,7 +658,10 @@ class MultipartFormParser extends BodyParser
 		});
 
 		this.event.request.on( 'end', () => {
-			this.eventEmitter.emit( 'end' );
+			if ( ! this.hasFinished() )
+			{
+				this.eventEmitter.emit( 'end' );
+			}
 		});
 	}
 
