@@ -114,8 +114,7 @@ class FormBodyParser extends BodyParser
 				this.onEndCallback( this.rawPayload, event.headers, ( err, body )=>{
 					if ( ! err )
 					{
-						event.body	= body;
-						callback( false );
+						callback( false, body );
 					}
 					else
 					{

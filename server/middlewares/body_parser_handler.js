@@ -115,7 +115,15 @@ class BodyParserHandler
 
 			if ( parser.supports( this.event ) )
 			{
-				parser.parse( this.event, ( err ) =>{ callback( err ); } );
+				parser.parse( this.event, ( err, data ) =>{
+					if ( ! err && data ) {
+						this.event.body	= data;
+						callback( false );
+					}
+					else {
+						callback( err );
+					}
+				});
 				return;
 			}
 		}

@@ -1,24 +1,24 @@
 {
-  "_from": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
-  "_id": "event_request@1.0.2",
+  "_from": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
+  "_id": "event_request@1.0.3",
   "_inBundle": false,
   "_location": "/event_request",
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
-    "rawSpec": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
-    "saveSpec": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
+    "raw": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
+    "rawSpec": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
+    "saveSpec": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
     "fetchSpec": null,
-    "gitCommittish": "#8-Multi-part-Body-parser"
+    "gitCommittish": "#11-Body-parsers-return"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "github:Michaelpalacce/EventRequest#3e94aaf311259f004e0b6d1580bb06dd5bb99998",
-  "_spec": "github:Michaelpalacce/EventRequest##8-Multi-part-Body-parser",
-  "_where": "D:\\JS\\Storage",
+  "_resolved": "github:Michaelpalacce/EventRequest#f314418253c007a7c5ae03804fa323299d3d6cf0",
+  "_spec": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
+  "_where": "E:\\Coding\\FileSystem",
   "author": {
     "name": "Stefan Genov"
   },
