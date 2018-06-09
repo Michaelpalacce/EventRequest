@@ -634,8 +634,7 @@ class MultipartFormParser extends BodyParser
 			this.ended	= true;
 			this.stripDataFromParts();
 			this.separateParts();
-			this.event.body	= this.parts;
-			this.callback( false );
+			this.callback( false, this.parts );
 			this.terminate();
 		});
 	}
