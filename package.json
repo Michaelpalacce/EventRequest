@@ -1,24 +1,24 @@
 {
-  "_from": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
+  "_from": "github:Michaelpalacce/EventRequest#master",
   "_id": "event_request@1.0.3",
   "_inBundle": false,
   "_location": "/event_request",
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
-    "rawSpec": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
-    "saveSpec": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
+    "raw": "github:Michaelpalacce/EventRequest#master",
+    "rawSpec": "github:Michaelpalacce/EventRequest#master",
+    "saveSpec": "github:Michaelpalacce/EventRequest#master",
     "fetchSpec": null,
-    "gitCommittish": "#11-Body-parsers-return"
+    "gitCommittish": "master"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "github:Michaelpalacce/EventRequest#f314418253c007a7c5ae03804fa323299d3d6cf0",
-  "_spec": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
-  "_where": "E:\\Coding\\FileSystem",
+  "_resolved": "github:Michaelpalacce/EventRequest#0e180fbe9c5056253ac60304d521cc946461d85f",
+  "_spec": "github:Michaelpalacce/EventRequest#master",
+  "_where": "D:\\JS\\Storage",
   "author": {
     "name": "Stefan Genov"
   },
