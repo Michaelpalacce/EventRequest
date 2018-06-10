@@ -1,9 +1,9 @@
 'use strict';
 
 /**
- * @brief	DataStore class extended by all data stores used by the session
+ * @brief	DataServer class extended by all data servers used by the EventRequest Server
  */
-class DataStore
+class DataServer
 {
 	/**
 	 * @param	Object options
@@ -11,6 +11,16 @@ class DataStore
 	constructor( options = {} )
 	{
 		this.options	= options;
+	}
+
+	/**
+	 * @brief	Gets a instance of the current DataServer
+	 *
+	 * @return	DataServer
+	 */
+	static getInstance( options = {} )
+	{
+		return new this( options );
 	}
 
 	/**
@@ -24,7 +34,9 @@ class DataStore
 	}
 
 	/**
-	 * @brief	Sets up the data store
+	 * @brief	Sets up the data server
+	 *
+	 * @details	Any connections to external sources should be done here if needed
 	 *
 	 * @param	Object options
 	 * @param	Function callback
@@ -38,26 +50,15 @@ class DataStore
 	/**
 	 * @brief	Create the namespace
 	 *
+	 * @details	If the Data Server supports namespaces ( folders on the file system, tables in CQL/SQl, etc )
+	 *
 	 * @param	String namespace
 	 * @param	String options
 	 * @param	String callback
-	 */
-	createNamespace( namespace, options = {}, callback = null )
-	{
-	}
-
-	/**
-	 * @brief	Create the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	mixed data
-	 * @param	Object options
-	 * @param	Function callback
 	 *
 	 * @return	void
 	 */
-	create( namespace, recordName, data = {}, options = {}, callback = null )
+	createNamespace( namespace, options = {}, callback = null )
 	{
 	}
 
@@ -73,6 +74,27 @@ class DataStore
 	existsNamespace( namespace, options = {}, callback = null )
 	{
 	}
+
+	/**
+	 * @brief	Create the record
+	 *
+	 * @details	If ttl ( time to leave ) is not supported by the data server then it should be left blank
+	 * 			If ttl is set to 0 then the time to leave will be set to never expire or in case of creating it, the ttl
+	 * 			will not be changed
+	 *
+	 * @param	String namespace
+	 * @param	String recordName
+	 * @param	Number ttl
+	 * @param	mixed data
+	 * @param	Object options
+	 * @param	Function callback
+	 *
+	 * @return	void
+	 */
+	create( namespace, recordName, ttl = 0, data = {}, options = {}, callback = null )
+	{
+	}
+
 	/**
 	 * @brief	Checks whether the record exists
 	 *
@@ -88,17 +110,31 @@ class DataStore
 	}
 
 	/**
+	 * @brief	Touches ( aka updates the ttl ) of the record
+	 *
+	 * @param	String namespace
+	 * @param	String recordName
+	 * @param	Number ttl
+	 * @param	Object options
+	 * @param	Function callback
+	 */
+	touch( namespace, recordName, ttl = 0, options = {}, callback = null )
+	{
+	}
+
+	/**
 	 * @brief	Update the record
 	 *
 	 * @param	String namespace
 	 * @param	String recordName
+	 * @param	Number ttl
 	 * @param	mixed data
 	 * @param	Object options
 	 * @param	Function callback
 	 *
 	 * @return	void
 	 */
-	update( namespace, recordName, data = {}, options = {}, callback = null )
+	update( namespace, recordName, ttl = 0, data = {}, options = {}, callback = null )
 	{
 	}
 
@@ -107,12 +143,13 @@ class DataStore
 	 *
 	 * @param	String namespace
 	 * @param	String recordName
+	 * @param	Number ttl
 	 * @param	Object options
 	 * @param	Function callback
 	 *
 	 * @return	void
 	 */
-	read( namespace, recordName, options = {}, callback = null )
+	read( namespace, recordName, ttl = 0, options = {}, callback = null )
 	{
 	}
 
@@ -144,4 +181,4 @@ class DataStore
 	}
 }
 
-module.exports	= DataStore;
+module.exports	= DataServer;
