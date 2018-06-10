@@ -162,7 +162,7 @@ class Index
 
 		// Add an error handler in case of an error.
 		this.server.on( 'error', ( err )=>{
-			console.log( 'Could not start the server on port: ', port );
+			console.log( 'Could not start the server on port: ', this.options[OPTIONS_PARAM_PORT] );
 			console.log( 'Error Returned was: ', err.code );
 		});
 	}
