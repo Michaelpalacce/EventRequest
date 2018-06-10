@@ -4,6 +4,7 @@
 const http					= require( 'http' );
 const https					= require( 'https' );
 const os					= require( 'os' );
+const cluster				= require( 'cluster' );
 const middlewaresContainer	= require( './server/middleware_container' );
 const Router				= require( './server/router' );
 const TemplatingEngine		= require( './server/middlewares/templating_engine' );
@@ -128,7 +129,7 @@ class Server
 						: http.createServer( serverCallback );
 
 		server.listen( this.options[OPTIONS_PARAM_PORT], () => {
-				console.log( 'Server successfully started and listening on port', this.options[OPTIONS_PARAM_PORT] );
+				console.log( `Server ${cluster.worker.id} successfully started and listening on port: ${this.options[OPTIONS_PARAM_PORT]}` );
 				successCallback();
 			}
 		);

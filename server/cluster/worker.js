@@ -8,6 +8,7 @@ const cluster		= require( 'cluster' );
  * @brief	Constants
  */
 const MASTER_COMMAND_STOP		= 'stop';
+const MASTER_COMMAND_START		= 'start';
 const MASTER_COMMAND_RESTART	= 'restart';
 const MASTER_COMMAND_DIE		= 'die';
 
@@ -26,7 +27,21 @@ class Worker
 		this.newServerCallback	= newServerCallback;
 		this.server				= null;
 
-		this.start();
+		this.setIPC();
+	}
+
+	/**
+	 * @brief	Start IPC
+	 *
+	 * @details	This will let the worker listen in for any instructions from the master process
+	 *
+	 * @return	void
+	 */
+	setIPC()
+	{
+		cluster.worker.on( 'message', ( message )=>{
+			this.masterCommand( message );
+		});
 	}
 
 	/**
@@ -42,6 +57,9 @@ class Worker
 		{
 			case MASTER_COMMAND_STOP:
 				this.stop();
+				break;
+			case MASTER_COMMAND_START:
+				this.start();
 				break;
 			case MASTER_COMMAND_RESTART:
 				this.stop();
@@ -123,26 +141,34 @@ class Worker
 	}
 
 	/**
-	 * @brief	Starts the worker and together with it the webserver
+	 * @brief	Starts the worker and together with it the web server
 	 *
 	 * @return	void
 	 */
 	start()
 	{
-		this.server	= this.newServerCallback(
-			this.serverCallback.bind( this ),
-			this.successCallback.bind( this ),
-			this.errorCallback.bind( this )
-		);
+		if ( this.server === null )
+		{
+			this.server	= this.newServerCallback(
+				this.serverCallback.bind( this ),
+				this.successCallback.bind( this ),
+				this.errorCallback.bind( this )
+			);
+		}
 	}
 
 	/**
 	 * @brief	Stops the worker
+	 *
+	 * @return	void
 	 */
 	stop()
 	{
-		this.server.close();
-		this.server	= null;
+		if ( this.server !== null )
+		{
+			this.server.close();
+			this.server	= null;
+		}
 	}
 }
 

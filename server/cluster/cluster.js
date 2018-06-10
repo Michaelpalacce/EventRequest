@@ -42,7 +42,11 @@ class Cluster
 			});
 
 			cluster.on( 'online', ( worker ) => {
-				console.log( `The worker: ${worker.id} is online!` );
+				worker.send( 'start' );
+			});
+
+			cluster.on( 'error', ( worker ) => {
+				console.log( 'error' );
 			});
 
 			let messageManager	= new MessageManager();
@@ -52,10 +56,7 @@ class Cluster
 		}
 		else
 		{
-			let worker	= new Worker( this.server.router, this.server.setUpNewServer.bind( this.server ) );
-			cluster.worker.on( 'message', ( message )=>{
-				worker.masterCommand( message );
-			});
+			new Worker( this.server.router, this.server.setUpNewServer.bind( this.server ) );
 		}
 	}
 }
