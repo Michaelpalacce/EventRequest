@@ -5,7 +5,12 @@
  */
 class CommunicationManager
 {
-	constructor()
+	constructor( options = {} )
+	{
+		this.options	= options;
+	}
+	
+	handleError( message, callback )
 	{
 	}
 
@@ -17,10 +22,8 @@ class CommunicationManager
 	 *
 	 * @return	void
 	 */
-	handleMessage( worker, message )
+	handleMessage( worker, message, callback )
 	{
-		console.log( worker.id );
-		console.log( message );
 	}
 }
 

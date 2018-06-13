@@ -15,8 +15,8 @@ class Cluster
 	 */
 	constructor( server )
 	{
-		this.server		= server;
-		this.workers	= []
+		this.server					= server;
+		this.workers				= [];
 	}
 
 	/**
@@ -33,7 +33,14 @@ class Cluster
 				this.workers.push( worker );
 			}
 
-			let communicationManager	= new CommunicationManager();
+			let communicationManager	= this.server.options['communicationManager'];
+
+			let workerCallback			= ( err, data, worker ) =>{
+				if ( err && data )
+				{
+					worker.send( data );
+				}
+			};
 
 			cluster.on( 'exit', ( worker, code, signal ) =>{
 				console.log( `The worker: ${worker.id} died!` );
@@ -47,12 +54,16 @@ class Cluster
 				worker.send( 'start' );
 			});
 
-			cluster.on( 'error', ( worker ) => {
-				console.log( 'error' );
+			cluster.on( 'error', ( workerError ) => {
+				communicationManager.handleError( workerError, ( err ) => {
+					console.log( err );
+				});
 			});
 
-			cluster.on( 'message', ( worker, message ) =>{
-				communicationManager.handleMessage( worker, message );
+			cluster.on( 'message', ( worker, message ) => {
+				communicationManager.handleMessage( worker, message, ( err, data ) => {
+					workerCallback( err, data, worker );
+				});
 			});
 		}
 		else
