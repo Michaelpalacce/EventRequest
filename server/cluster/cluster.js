@@ -1,9 +1,9 @@
 'use strict';
 
 // Dependencies
-const cluster			= require( 'cluster' );
-const Worker			= require( './worker' );
-const MessageManager	= require( './message_manager' );
+const cluster				= require( 'cluster' );
+const Worker				= require( './worker' );
+const CommunicationManager	= require( './communication_manager' );
 
 /**
  * @brief	Cluster class used to spawn workers
@@ -33,6 +33,8 @@ class Cluster
 				this.workers.push( worker );
 			}
 
+			let communicationManager	= new CommunicationManager();
+
 			cluster.on( 'exit', ( worker, code, signal ) =>{
 				console.log( `The worker: ${worker.id} died!` );
 			});
@@ -49,9 +51,8 @@ class Cluster
 				console.log( 'error' );
 			});
 
-			let messageManager	= new MessageManager();
 			cluster.on( 'message', ( worker, message ) =>{
-				messageManager.handleMessage( worker, message );
+				communicationManager.handleMessage( worker, message );
 			});
 		}
 		else

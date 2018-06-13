@@ -1,9 +1,9 @@
 'use strict';
 
 /**
- * @brief	Message manager to handle the messages send by the workers to the master
+ * @brief	Communication manager to handle the messages send by the workers to the master
  */
-class MessageManager
+class CommunicationManager
 {
 	constructor()
 	{
@@ -24,4 +24,4 @@ class MessageManager
 	}
 }
 
-module.exports	= MessageManager;
+module.exports	= CommunicationManager;

@@ -86,7 +86,7 @@ class Worker
 	};
 
 	/**
-	 * @brief	Called when teh server is successfully created
+	 * @brief	Called when the server is successfully created
 	 *
 	 * @return	void
 	 */
