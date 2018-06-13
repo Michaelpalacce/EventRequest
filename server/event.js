@@ -422,11 +422,9 @@ class RequestEvent
 			return ;
 		}
 
-		let middleware	= this.block.shift();
-
 		try
 		{
-			middleware( this );
+			this.block.shift().call( this, this );
 		}
 		catch ( error )
 		{
