@@ -2,7 +2,7 @@
 
 // Dependencies
 const url				= require( 'url' );
-const events			= require( 'events' );
+const { EventEmitter }	= require( 'events' );
 const FileStreams		= require( './middlewares/file_stream_handler' );
 const TemplatingEngine	= require( './middlewares/templating_engine' );
 const Logger			= require( './middlewares/logger' );
@@ -46,7 +46,7 @@ class RequestEvent
 		});
 
 		Object.defineProperty( this, 'eventEmitter', {
-			value		: new events.EventEmitter(),
+			value		: new EventEmitter(),
 			writable	: false
 		});
 

@@ -1,13 +1,11 @@
 'use strict';
 
 // Dependencies
-const os			= require( 'os' );
-const path			= require( 'path' );
-const fs			= require( 'fs' );
-const BodyParser	= require( './body_parser' );
-const events		= require( 'events' );
-
-const EventEmitter	= events.EventEmitter;
+const os				= require( 'os' );
+const path				= require( 'path' );
+const fs				= require( 'fs' );
+const BodyParser		= require( './body_parser' );
+const { EventEmitter }	= require( 'events' );
 
 /**
  * @brief	Constants
