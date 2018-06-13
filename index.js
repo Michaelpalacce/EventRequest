@@ -13,7 +13,6 @@ const BodyParserHandler				= require( './server/middlewares/body_parser_handler'
 const Logger						= require( './server/middlewares/logger' );
 const Cluster						= require( './server/cluster/cluster' );
 const CommunicationManager			= require( './server/cluster/communication_manager' );
-const DefaultCommunicationManager	= require( './server/cluster/default_communication_manager' );
 
 /**
  * @brief	Constants
@@ -30,7 +29,7 @@ const OPTIONS_PARAM_HTTPS_DEFAULT					= {};
 const OPTIONS_PARAM_CLUSTERS						= 'clusters';
 const OPTIONS_PARAM_CLUSTERS_DEFAULT				= CPU_NUM;
 const OPTIONS_PARAM_COMMUNICATION_MANAGER			= 'communicationManager';
-const OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT	= DefaultCommunicationManager;
+const OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT	= CommunicationManager;
 
 const POSSIBLE_PROTOCOL_OPTIONS						= {};
 POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]			= http;
@@ -49,11 +48,10 @@ class Server
 	constructor( options	= {} )
 	{
 		this.options	= options;
-		this.router		= new Router();
-
-		this.cluster	= new Cluster( this );
-
 		this.sanitizeConfig();
+
+		this.router		= new Router();
+		this.cluster	= new Cluster( this );
 	}
 
 	/**
@@ -91,6 +89,8 @@ class Server
 															&& communicationManager instanceof CommunicationManager
 															? communicationManager
 															: OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT;
+		
+		this.options[OPTIONS_PARAM_COMMUNICATION_MANAGER]	= this.options[OPTIONS_PARAM_COMMUNICATION_MANAGER].getInstance();
 	}
 
 	/**

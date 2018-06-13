@@ -40,7 +40,6 @@ let STATE_PART_DATA				= 5;
 let STATE_CLOSE_BOUNDARY		= 6;
 let STATE_END					= 7;
 
-const ERROR_						= 100;
 const ERROR_INVALID_STATE			= 101;
 const ERROR_INCORRECT_END_OF_STREAM	= 102;
 const ERROR_COULD_NOT_FLUSH_BUFFER	= 103;
@@ -89,8 +88,8 @@ class MultipartFormParser extends BodyParser
 	terminate()
 	{
 		this.eventEmitter.removeAllListeners();
-		this.parts			= null;
 		this.eventEmitter	= null;
+		this.parts			= null;
 	}
 
 	/**
@@ -625,8 +624,6 @@ class MultipartFormParser extends BodyParser
 	{
 		this.eventEmitter.on( 'onError', ( err )=>{
 			this.parsingError	= true;
-			this.cleanUpItems();
-			this.terminate();
 			this.callback( err );
 		});
 
@@ -635,26 +632,27 @@ class MultipartFormParser extends BodyParser
 			this.stripDataFromParts();
 			this.separateParts();
 			this.callback( false, this.parts );
+		});
+
+		this.event.getEventEmitter().on( 'cleanUp', () => {
+			this.cleanUpItems();
 			this.terminate();
 		});
 	}
 
 	/**
-	 * @brief	CLean up items in case of an error
+	 * @brief	CLean up items
 	 *
 	 * @return	void
 	 */
 	cleanUpItems()
 	{
-		if ( this.parsingError === true )
-		{
-			this.parts.forEach( ( part ) =>{
-				if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' )
-				{
-					fs.unlinkSync( part.path )
-				}
-			});
-		}
+		this.parts.files.forEach( ( part ) =>{
+			if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' )
+			{
+				fs.unlinkSync( part.path )
+			}
+		});
 	}
 
 	/**
