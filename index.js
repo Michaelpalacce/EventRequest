@@ -3,17 +3,20 @@
 // Dependencies
 const http					= require( 'http' );
 const https					= require( 'https' );
+const os					= require( 'os' );
+const cluster				= require( 'cluster' );
 const middlewaresContainer	= require( './server/middleware_container' );
 const Router				= require( './server/router' );
-const RequestEvent			= require( './server/event' );
 const TemplatingEngine		= require( './server/middlewares/templating_engine' );
 const SessionHandler		= require( './server/middlewares/session_handler' );
 const BodyParserHandler		= require( './server/middlewares/body_parser_handler' );
 const Logger				= require( './server/middlewares/logger' );
+const Cluster				= require( './server/cluster/cluster' );
 
 /**
  * @brief	Constants
  */
+const CPU_NUM								= os.cpus().length;
 const PROTOCOL_HTTP							= 'http';
 const PROTOCOL_HTTPS						= 'https';
 const OPTIONS_PARAM_PORT					= 'port';
@@ -22,6 +25,8 @@ const OPTIONS_PARAM_PROTOCOL				= 'protocol';
 const OPTIONS_PARAM_PROTOCOL_DEFAULT		= PROTOCOL_HTTP;
 const OPTIONS_PARAM_HTTPS					= 'httpsOptions';
 const OPTIONS_PARAM_HTTPS_DEFAULT			= {};
+const OPTIONS_PARAM_CLUSTERS				= 'clusters';
+const OPTIONS_PARAM_CLUSTERS_DEFAULT		= CPU_NUM;
 
 const POSSIBLE_PROTOCOL_OPTIONS				= {};
 POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]	= http;
@@ -30,7 +35,7 @@ POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTPS]	= https;
 /**
  * @brief	Server class responsible for receiving requests and sending responses
  */
-class Index
+class Server
 {
 	/**
 	 * @brief	Passes options for server configuration
@@ -40,9 +45,9 @@ class Index
 	constructor( options	= {} )
 	{
 		this.options	= options;
-
-		this.server		= {};
 		this.router		= new Router();
+
+		this.cluster	= new Cluster( this );
 
 		this.sanitizeConfig();
 	}
@@ -71,6 +76,11 @@ class Index
 		this.options[OPTIONS_PARAM_PORT]		= typeof port === 'number'
 												? port
 												: OPTIONS_PARAM_PORT_DEFAULT;
+
+		let clusters							= options[OPTIONS_PARAM_CLUSTERS];
+		this.options[OPTIONS_PARAM_CLUSTERS]	= typeof clusters === 'number' && clusters <= CPU_NUM
+												? clusters
+												: OPTIONS_PARAM_CLUSTERS_DEFAULT;
 	}
 
 	/**
@@ -102,16 +112,37 @@ class Index
 	};
 
 	/**
-	 * @brief	Resolves the given request and response
+	 * @brief	Starts a new server
 	 *
-	 * @details	Creates a RequestEvent used by the Server with helpful methods
+	 * @param	Function serverCallback
+	 * @param	Function successCallback
+	 * @param	Function errorCallback
 	 *
-	 * @return	RequestEvent
+	 * @return	Server
 	 */
-	static resolve ( request, response )
+	setUpNewServer( serverCallback, successCallback, errorCallback )
 	{
-		return new RequestEvent( request, response );
-	};
+		// Create the server
+		let protocol	= this.options[OPTIONS_PARAM_PROTOCOL];
+		let server		= protocol === PROTOCOL_HTTPS
+						? https.createServer( this.options[OPTIONS_PARAM_HTTPS], serverCallback )
+						: http.createServer( serverCallback );
+
+		server.listen( this.options[OPTIONS_PARAM_PORT], () => {
+				console.log( `Server ${cluster.worker.id} successfully started and listening on port: ${this.options[OPTIONS_PARAM_PORT]}` );
+				successCallback();
+			}
+		);
+
+		// Add an error handler in case of an error.
+		server.on( 'error', ( err )=>{
+			console.log( 'Could not start the server on port: ', this.options[OPTIONS_PARAM_PORT] );
+			console.log( 'Error Returned was: ', err.code );
+			errorCallback( err );
+		});
+
+		return server;
+	}
 
 	/**
 	 * @brief	Starts the server on a given port
@@ -122,55 +153,13 @@ class Index
 	 */
 	start ()
 	{
-		let unifiedServerCallback	= ( req, res ) =>{
-			let requestEvent	= Index.resolve( req, res );
-
-			res.on( 'finish', () => {
-				requestEvent.cleanUp();
-				requestEvent	= null;
-			});
-
-			res.on( 'error', ( error ) => {
-				requestEvent.sendError( error );
-				requestEvent.cleanUp();
-				requestEvent	= null;
-			});
-
-			try
-			{
-				let block	= this.router.getExecutionBlockForCurrentEvent( requestEvent );
-				requestEvent.setBlock( block );
-				requestEvent.next();
-			}
-			catch ( e )
-			{
-				requestEvent.sendError( e );
-			}
-		};
-
-		// Create the server
-		let protocol		= this.options[OPTIONS_PARAM_PROTOCOL];
-		this.server			= protocol === PROTOCOL_HTTPS
-							? https.createServer( this.options[OPTIONS_PARAM_HTTPS], unifiedServerCallback )
-							: http.createServer( unifiedServerCallback );
-
-		this.server.listen( this.options[OPTIONS_PARAM_PORT], () =>
-			{
-				console.log( 'Server successfully started and listening on port', this.options[OPTIONS_PARAM_PORT] );
-			}
-		);
-
-		// Add an error handler in case of an error.
-		this.server.on( 'error', ( err )=>{
-			console.log( 'Could not start the server on port: ', this.options[OPTIONS_PARAM_PORT] );
-			console.log( 'Error Returned was: ', err.code );
-		});
+		this.cluster.startCluster( this.options[OPTIONS_PARAM_CLUSTERS] );
 	}
 }
 
 // Export the server module
 module.exports	= {
-	Server					: Index,
+	Server					: Server,
 	Router					: Router,
 	TemplatingEngine		: TemplatingEngine,
 	SessionHandler			: SessionHandler,

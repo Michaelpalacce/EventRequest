@@ -1,24 +1,25 @@
 {
-  "_from": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
+  "_from": "github:Michaelpalacce/EventRequest##17-Implement-clusters",
   "_id": "event_request@1.0.3",
   "_inBundle": false,
   "_location": "/event_request",
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
-    "rawSpec": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
-    "saveSpec": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
+    "raw": "event_request@github:Michaelpalacce/EventRequest##17-Implement-clusters",
+    "name": "event_request",
+    "escapedName": "event_request",
+    "rawSpec": "github:Michaelpalacce/EventRequest##17-Implement-clusters",
+    "saveSpec": "github:Michaelpalacce/EventRequest##17-Implement-clusters",
     "fetchSpec": null,
-    "gitCommittish": "#11-Body-parsers-return"
+    "gitCommittish": "#17-Implement-clusters"
   },
   "_requiredBy": [
-    "#USER",
     "/"
   ],
-  "_resolved": "github:Michaelpalacce/EventRequest#f314418253c007a7c5ae03804fa323299d3d6cf0",
-  "_spec": "github:Michaelpalacce/EventRequest##11-Body-parsers-return",
-  "_where": "E:\\Coding\\FileSystem",
+  "_resolved": "github:Michaelpalacce/EventRequest#8f3cb7db1890754d7572d33bf875c7c6193455b4",
+  "_spec": "event_request@github:Michaelpalacce/EventRequest##17-Implement-clusters",
+  "_where": "D:\\JS\\Storage",
   "author": {
     "name": "Stefan Genov"
   },
@@ -34,5 +35,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.3"
+  "version": "1.0.4"
 }
