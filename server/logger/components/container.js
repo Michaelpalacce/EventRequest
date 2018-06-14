@@ -22,7 +22,7 @@ class Container
 	 *
 	 * @return	void
 	 */
-	addLog( logConfig )
+	addLogger( logConfig )
 	{
 	}
 

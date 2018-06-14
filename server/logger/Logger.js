@@ -3,6 +3,7 @@
 // Dependencies
 const Container			= require( './components/container' );
 const { EventEmitter }	= require( 'events' );
+
 /**
  * @brief	Logger class that is used to create different loggers and log information to them when called
  *
@@ -10,16 +11,47 @@ const { EventEmitter }	= require( 'events' );
  */
 class Logger
 {
-	/**
-	 * @param	Object options
-	 */
-	constructor( options = {} )
+	constructor()
 	{
-		this.options		= options;
-		this.sanitizeConfig();
+		Object.defineProperty( this, 'eventEmitter', {
+			value		: new EventEmitter(),
+			writable	: false
+		});
 
-		this.eventEmitter	= new EventEmitter();
-		this.container		= new Container();
+		Object.defineProperty( this, 'container', {
+			value		: new Container(),
+			writable	: false
+		});
+	}
+
+	/**
+	 * @brief	Ease of use method to add a listener
+	 *
+	 * @return	void
+	 */
+	on()
+	{
+		this.eventEmitter.on.call( this, arguments );
+	}
+
+	/**
+	 * @brief	Ease of use method to add a listener once
+	 *
+	 * @return	void
+	 */
+	once()
+	{
+		this.eventEmitter.once.call( this, arguments );
+	}
+
+	/**
+	 * @brief	Ease of use method to add a listener once
+	 *
+	 * @return	void
+	 */
+	off()
+	{
+		this.eventEmitter.off.call( this, arguments );
 	}
 
 	/**
@@ -38,9 +70,9 @@ class Logger
 	 *
 	 * @return	void
 	 */
-	addLog( logConfig )
+	addLogger( logConfig )
 	{
-		this.container.addLog( logConfig );
+		this.container.addLogger( logConfig );
 	}
 
 	/**
@@ -62,10 +94,6 @@ class Logger
 		}
 		else
 		{
-			setTimeout(() => {
-				this.eventEmitter.emit( 'logged', log )
-			});
-
 			this.container.log( log );
 		}
 	}
