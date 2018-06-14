@@ -12,8 +12,10 @@ class Container
 	constructor()
 	{
 		this.loggers	= {};
-		this.uniqueId	= uniqueId.makeId( 30 );
-		this.processId	= process.pid;
+		Object.defineProperty( this, 'uniqueId', {
+			writable	: false,
+			value		: uniqueId.makeId( 30 )
+		});
 	}
 
 	/**
@@ -69,12 +71,16 @@ class Container
 	/**
 	 * @brief	Logs the data
 	 *
-	 * @param	Object data
+	 * @param	mixed data
 	 *
 	 * @return	void
 	 */
 	log( data )
 	{
+		for ( let loggerId in this.loggers )
+		{
+			this.loggers[loggerId].log( data );
+		}
 	}
 }
 

@@ -3,7 +3,6 @@
 // Dependencies
 const Transport				= require( './transport_types/transport' );
 const { Log, LOG_LEVELS }	= require( './log' );
-const stream				= require( 'stream' );
 
 /**
  * @brief	Constants
@@ -17,14 +16,18 @@ const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.error;
  */
 class Logger
 {
-	constructor( options = {}, uniqueId )
+	constructor( options = {}, uniqueId = false )
 	{
 		this.transports		= null;
 		this.logLevel		= null;
 		this.logLevels		= null;
 		this.capture		= null;
 		this.dieOnCapture	= null;
-		this.uniqueId		= typeof uniqueId === 'string' ? uniqueId : false;
+
+		Object.defineProperty( this, 'uniqueId', {
+			writable	: false,
+			value		: uniqueId
+		});
 
 		this.sanitizeConfig( options );
 	}
@@ -48,7 +51,7 @@ class Logger
 							? options.logLevel
 							: LOGGER_DEFAULT_LOG_LEVEL;
 
-		this.logLevels		= typeof options.logLevels === 'object' && Array.isArray( options.logLevels )
+		this.logLevels		= typeof options.logLevels === 'object'
 							? options.logLevels
 							: LOG_LEVELS;
 
@@ -61,6 +64,33 @@ class Logger
 							: true;
 
 		this.attachLogLevelsToLogger();
+		this.attachUnhandledEventListener();
+	}
+
+	/**
+	 * @brief	Attach an event handler to process.on uncaughtException and unhandledRejection
+	 *
+	 * @details	If capture is set to true only. If dieOnCapture is set to false the process won't die but this is
+	 * 			not recommended
+	 *
+	 * @return	void
+	 */
+	attachUnhandledEventListener()
+	{
+		if ( this.capture )
+		{
+			process.on( 'unhandledRejection', ( reason, p ) => {
+				console.error( reason, 'Unhandled Rejection at Promise', p );
+			});
+
+			process.on( 'uncaughtException', ( err ) => {
+				console.error( err, 'Uncaught Exception thrown' );
+				if ( this.dieOnCapture )
+				{
+					process.exit( 1 );
+				}
+			});
+		}
 	}
 
 	/**
@@ -152,12 +182,14 @@ class Logger
 
 		if ( this.supports( log ) )
 		{
+			log.setUniqueId( this.uniqueId );
+
 			this.transports.forEach( ( transport ) =>{
 				if ( transport.supports( log ) )
 				{
 					// Log whenever ready
 					setTimeout( () => {
-						transport.log( log, this.uniqueId );
+						transport.log( log );
 					});
 				}
 			});

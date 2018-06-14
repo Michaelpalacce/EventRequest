@@ -1,9 +1,10 @@
 'use strict';
 
 // Dependencies
-const Container			= require( './components/container' );
-const { EventEmitter }	= require( 'events' );
-const Logger			= require( './components/logger' );
+const Container				= require( './components/container' );
+const { EventEmitter }		= require( 'events' );
+const Logger				= require( './components/logger' );
+const { Log, LOG_LEVELS }	= require( './components/log' );
 
 /**
  * @brief	Logger class that is used to create different loggers and log information to them when called
@@ -23,6 +24,11 @@ class Loggur
 			value		: new Container(),
 			writable	: false
 		});
+	}
+
+	getUniqueId()
+	{
+		return this.container.uniqueId;
 	}
 
 	/**
@@ -58,13 +64,14 @@ class Loggur
 	/**
 	 * @brief	Adds the logger to the container
 	 *
-	 * @param	Object logConfig
+	 * @param	String loggerId
+	 * @param	Logger logger
 	 *
 	 * @return	void
 	 */
-	addLogger( logConfig )
+	addLogger( loggerId, logger )
 	{
-		this.container.addLogger( logConfig );
+		this.container.addLogger( loggerId, logger );
 	}
 
 	/**
@@ -94,24 +101,13 @@ class Loggur
 	/**
 	 * @brief	Log the data data
 	 *
-	 * @param	Object log
+	 * @param	mixed log
 	 *
 	 * @return	void
 	 */
 	log( log )
 	{
-		log	= typeof log === 'object' ? log : false;
-
-		if ( log === false )
-		{
-			setTimeout(() => {
-				this.eventEmitter.emit( 'error', 'Could not log the data' );
-			});
-		}
-		else
-		{
-			this.container.log( log );
-		}
+		this.container.log( log );
 	}
 }
 

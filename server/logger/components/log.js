@@ -8,9 +8,10 @@ const LOG_LEVELS	= {
 	warning	: 200,
 	notice	: 300,
 	info	: 400,
-	debug	: 500
+	verbose	: 500,
+	debug	: 600
 };
-const DEFAULT_LOG_LEVEL			= LOG_LEVELS.info;
+const DEFAULT_LOG_LEVEL			= LOG_LEVELS.error;
 const WRONG_LOG_DEFAULT_LEVEL	= LOG_LEVELS.debug;
 const WRONG_LOG_DEFAULT_MESSAGE	= 'Invalid log message provided, could not be parsed';
 
@@ -27,6 +28,7 @@ class Log
 		this.level		= 0;
 		this.message	= '';
 		this.timestamp	= 0;
+		this.uniqueId	= '';
 
 		this.processLog( log );
 	}
@@ -92,6 +94,26 @@ class Log
 	}
 
 	/**
+	 * @brief	Get the unique id set by the Loggur
+	 *
+	 * @return	String
+	 */
+	getUniqueId()
+	{
+		return this.uniqueId;
+	}
+
+	/**
+	 * @param	String uniqueId
+	 *
+	 * @return	void
+	 */
+	setUniqueId( uniqueId )
+	{
+		this.uniqueId	= uniqueId;
+	}
+
+	/**
 	 * @brief	Get the log in a string format
 	 *
 	 * @return	String
@@ -110,6 +132,11 @@ class Log
 	 */
 	static getInstance( log = {} )
 	{
+		if ( log instanceof Log )
+		{
+			return log;
+		}
+
 		return new this( log );
 	}
 

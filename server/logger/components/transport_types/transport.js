@@ -70,13 +70,12 @@ class Transport
 	/**
 	 * @brief	Saves the log
 	 *
-	 * @param	Object log
+	 * @param	Log log
 	 *
 	 * @return	void
 	 */
 	log( log )
 	{
-		console.error( 'IMPLEMENT', console.stack );
 	}
 }
 

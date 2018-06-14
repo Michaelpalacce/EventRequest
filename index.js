@@ -178,9 +178,6 @@ module.exports	= {
 
 
 
-
-
-
 if ( cluster.isMaster )
 {
 	for ( let i = 0; i < 1; ++ i )
@@ -202,5 +199,10 @@ else
 		logLevel	: LOG_LEVELS.notice
 	});
 
-	logger.notice( 'hello' );
+	Loggur.addLogger( 'my_logger', logger );
+	
+	Loggur.log( {
+		level	: LOG_LEVELS.error,
+		message	: 'hello'
+	} );
 }
