@@ -3,6 +3,7 @@
 // Dependencies
 const Container			= require( './components/container' );
 const { EventEmitter }	= require( 'events' );
+const Logger			= require( './components/logger' );
 
 /**
  * @brief	Logger class that is used to create different loggers and log information to them when called
@@ -64,6 +65,30 @@ class Loggur
 	addLogger( logConfig )
 	{
 		this.container.addLogger( logConfig );
+	}
+
+	/**
+	 * @brief	Get the desired logger
+	 *
+	 * @param	String loggerId
+	 *
+	 * @return	Logger
+	 */
+	getLogger( loggerId )
+	{
+		return this.container.getLogger( loggerId );
+	}
+
+	/**
+	 * @brief	Create a new logger
+	 *
+	 * @param	Object loggerConfig
+	 *
+	 * @return	Logger
+	 */
+	createLogger( loggerConfig )
+	{
+		return this.container.createLogger( loggerConfig );
 	}
 
 	/**

@@ -2,7 +2,7 @@
 
 // Dependencies
 const Logger	= require( './logger' );
-
+const uniqueId	= require( './../../unique_id' );
 
 /**
  * @brief	Container that holds all the different loggers
@@ -12,6 +12,8 @@ class Container
 	constructor()
 	{
 		this.loggers	= {};
+		this.uniqueId	= uniqueId.makeId( 30 );
+		this.processId	= process.pid;
 	}
 
 	/**
@@ -59,9 +61,9 @@ class Container
 	 *
 	 * @return	Logger
 	 */
-	static createLogger( loggerConfig )
+	createLogger( loggerConfig )
 	{
-		return new Logger( loggerConfig );
+		return new Logger( loggerConfig, this.uniqueId );
 	}
 
 	/**

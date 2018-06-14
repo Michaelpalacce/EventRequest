@@ -1,9 +1,9 @@
 'use strict';
 
 // Dependencies
-const Transport					= require( './transport_types/transport' );
-const { Log, LOG_LEVELS }		= require( './log' );
-const stream					= require( 'stream' );
+const Transport				= require( './transport_types/transport' );
+const { Log, LOG_LEVELS }	= require( './log' );
+const stream				= require( 'stream' );
 
 /**
  * @brief	Constants
@@ -12,17 +12,19 @@ const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.error;
 
 /**
  * @brief	Logger class used to hold transports
+ *
+ * @todo	Implement Streams
  */
-class Logger extends stream.Transform
+class Logger
 {
-	constructor( options = {} )
+	constructor( options = {}, uniqueId )
 	{
-		super({
-			objectMode	: true
-		});
-		this.transports	= [];
-		this.logLevel	= LOGGER_DEFAULT_LOG_LEVEL;
-		this.logLevels	= LOG_LEVELS;
+		this.transports		= null;
+		this.logLevel		= null;
+		this.logLevels		= null;
+		this.capture		= null;
+		this.dieOnCapture	= null;
+		this.uniqueId		= typeof uniqueId === 'string' ? uniqueId : false;
 
 		this.sanitizeConfig( options );
 	}
@@ -40,12 +42,7 @@ class Logger extends stream.Transform
 						? options.transports
 						: [];
 
-		transports.forEach( ( currentTransport ) => {
-			if ( ! this.addTransport( currentTransport ) )
-			{
-				this.addTransport( Transport.getInstance( currentTransport ) );
-			}
-		});
+		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport ) } );
 
 		this.logLevel		= typeof options.logLevel === 'number'
 							? options.logLevel
@@ -99,7 +96,12 @@ class Logger extends stream.Transform
 	 */
 	addTransport( transport )
 	{
-		if ( ! ( transport instanceof Transport ) )
+		if ( ! Array.isArray( this.transports ) )
+		{
+			this.transports	= [];
+		}
+
+		if ( transport instanceof Transport )
 		{
 			this.transports.push( transport );
 			return true;
@@ -111,7 +113,7 @@ class Logger extends stream.Transform
 	/**
 	 * @brief	Checks whether the given log's level matches the supported log levels by this transport
 	 *
-	 * @breief	Object log
+	 * @brief	Object log
 	 *
 	 * @return	Boolean
 	 */
@@ -122,7 +124,7 @@ class Logger extends stream.Transform
 			return false;
 		}
 
-		return log.getLevel() in this.supportedLevels;
+		return this.logLevel >= log.getLevel();
 	}
 
 	/**
@@ -148,9 +150,18 @@ class Logger extends stream.Transform
 			log	= Log.getInstance( log );
 		}
 
-		console.log( log );
-		// this.transports.forEach( () =>{
-		// });
+		if ( this.supports( log ) )
+		{
+			this.transports.forEach( ( transport ) =>{
+				if ( transport.supports( log ) )
+				{
+					// Log whenever ready
+					setTimeout( () => {
+						transport.log( log, this.uniqueId );
+					});
+				}
+			});
+		}
 	}
 }
 

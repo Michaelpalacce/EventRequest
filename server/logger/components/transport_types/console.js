@@ -13,8 +13,9 @@ class Console extends Transport
 		super( options );
 	}
 
-	log( data )
+	log( data, uniqueId )
 	{
+		console.log( uniqueId, data );
 	}
 }
 

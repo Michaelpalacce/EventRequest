@@ -181,15 +181,26 @@ module.exports	= {
 
 
 
-const { Log, LOG_LEVELS }	= require( './server/logger/components/log' );
-const Logger				= require( './server/logger/components/logger' );
+if ( cluster.isMaster )
+{
+	for ( let i = 0; i < 1; ++ i )
+	{
+		cluster.fork();
+	}
+}
+else
+{
 
-let logger	= new Logger();
-logger.debug( 'Test' );
-let log		= Log.getInstance({
-	level	: LOG_LEVELS.debug,
-	message	: 'Test 2'
-});
+	const { Log, LOG_LEVELS }	= require( './server/logger/components/log' );
+	const Loggur				= require( './server/logger/loggur' );
+	const Console				= require( './server/logger/components/transport_types/console' );
 
-console.log( log );
+	let logger	= Loggur.createLogger({
+		transports	: [
+			new Console( { logLevel : LOG_LEVELS.notice } )
+		],
+		logLevel	: LOG_LEVELS.notice
+	});
 
+	logger.notice( 'hello' );
+}
