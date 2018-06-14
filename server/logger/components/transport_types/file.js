@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const Transport	= require( './../transport' );
+const Transport	= require( './transport' );
 
 /**
  * @brief	File transport

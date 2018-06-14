@@ -174,3 +174,22 @@ module.exports	= {
 	SessionHandler			: SessionHandler,
 	BodyParserHandler		: BodyParserHandler
 };
+
+
+
+
+
+
+
+
+
+
+
+
+const { Log, LOG_LEVELS }	= require( './server/logger/components/log' );
+
+let log	= Log.getInstance({
+	level	: LOG_LEVELS.DEBUG,
+	message	: 'HELLO LOG ME PLEASE!!'
+});
+

@@ -115,13 +115,33 @@ class RequestEvent
 	}
 
 	/**
-	 * @brief	Returns the event emitter of the current event
+	 * @brief	Ease of use method to add a listener
 	 *
-	 * @return	EventEmitter
+	 * @return	void
 	 */
-	getEventEmitter()
+	on()
 	{
-		return this.eventEmitter;
+		this.eventEmitter.on.call( this.eventEmitter, arguments );
+	}
+
+	/**
+	 * @brief	Ease of use method to add a listener once
+	 *
+	 * @return	void
+	 */
+	once()
+	{
+		this.eventEmitter.once.call( this.eventEmitter, arguments );
+	}
+
+	/**
+	 * @brief	Ease of use method to add a listener once
+	 *
+	 * @return	void
+	 */
+	off()
+	{
+		this.eventEmitter.off.call( this.eventEmitter, arguments );
 	}
 
 	/**

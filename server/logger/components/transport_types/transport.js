@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @brief	Transport class used by all the different transport types
+ * @brief	Transport class used by the other Transport types
  */
 class Transport
 {

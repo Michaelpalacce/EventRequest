@@ -9,7 +9,7 @@ const { EventEmitter }	= require( 'events' );
  *
  * @return	void
  */
-class Logger
+class Loggur
 {
 	constructor()
 	{
@@ -31,7 +31,7 @@ class Logger
 	 */
 	on()
 	{
-		this.eventEmitter.on.call( this, arguments );
+		this.eventEmitter.on.call( this.eventEmitter, arguments );
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Logger
 	 */
 	once()
 	{
-		this.eventEmitter.once.call( this, arguments );
+		this.eventEmitter.once.call( this.eventEmitter, arguments );
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Logger
 	 */
 	off()
 	{
-		this.eventEmitter.off.call( this, arguments );
+		this.eventEmitter.off.call( this.eventEmitter, arguments );
 	}
 
 	/**
@@ -90,4 +90,4 @@ class Logger
 	}
 }
 
-module.exports	= new Logger();
+module.exports	= new Loggur();
