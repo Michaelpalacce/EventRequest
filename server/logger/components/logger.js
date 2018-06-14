@@ -1,30 +1,95 @@
 'use strict';
 
 // Dependencies
-const Transport				= require( './transport_types/transport' );
-const { Log, LOG_LEVELS }	= require( './log' );
+const Transport					= require( './transport_types/transport' );
+const { Log, LOG_LEVELS }		= require( './log' );
+const stream					= require( 'stream' );
+
+/**
+ * @brief	Constants
+ */
+const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.error;
 
 /**
  * @brief	Logger class used to hold transports
  */
-class Logger
+class Logger extends stream.Transform
 {
 	constructor( options = {} )
 	{
-		this.options			= options;
-		this.transports			= [];
-		this.supportedLevels	= LOG_LEVELS;
+		super({
+			objectMode	: true
+		});
+		this.transports	= [];
+		this.logLevel	= LOGGER_DEFAULT_LOG_LEVEL;
+		this.logLevels	= LOG_LEVELS;
 
-		this.sanitizeConfig();
+		this.sanitizeConfig( options );
 	}
 
 	/**
 	 * @brief	Sanitize the loggers config
 	 *
+	 * @param	Object options
+	 *
 	 * @return	void
 	 */
-	sanitizeConfig()
+	sanitizeConfig( options )
 	{
+		let transports	= typeof options.transports === 'object' && Array.isArray( options.transports )
+						? options.transports
+						: [];
+
+		transports.forEach( ( currentTransport ) => {
+			if ( ! this.addTransport( currentTransport ) )
+			{
+				this.addTransport( Transport.getInstance( currentTransport ) );
+			}
+		});
+
+		this.logLevel		= typeof options.logLevel === 'number'
+							? options.logLevel
+							: LOGGER_DEFAULT_LOG_LEVEL;
+
+		this.logLevels		= typeof options.logLevels === 'object' && Array.isArray( options.logLevels )
+							? options.logLevels
+							: LOG_LEVELS;
+
+		this.capture		= typeof options.capture === 'boolean'
+							? options.capture
+							: true;
+
+		this.dieOnCapture	= typeof options.dieOnCapture === 'boolean'
+							? options.dieOnCapture
+							: true;
+
+		this.attachLogLevelsToLogger();
+	}
+
+	/**
+	 * @brief	Attach the provided log levels to the logger for convenience
+	 *
+	 * @return	void
+	 */
+	attachLogLevelsToLogger()
+	{
+		for ( let key in this.logLevels )
+		{
+			let logLevel			= this.logLevels[key];
+			let objectProperties	= Object.getOwnPropertyNames( this.constructor.prototype );
+
+			if ( ! ( key in objectProperties ) )
+			{
+				this[key]	= ( log ) => {
+					log	= Log.getInstance({
+						level	: logLevel,
+						message	: log
+					});
+
+					this.log( log );
+				};
+			}
+		}
 	}
 
 	/**
@@ -72,10 +137,20 @@ class Logger
 	/**
 	 * @brief	Logs the given data
 	 *
+	 * @param	mixed log
+	 *
 	 * @return	void
 	 */
-	log()
+	log( log )
 	{
+		if ( ! ( log instanceof Log ) )
+		{
+			log	= Log.getInstance( log );
+		}
+
+		console.log( log );
+		// this.transports.forEach( () =>{
+		// });
 	}
 }
 

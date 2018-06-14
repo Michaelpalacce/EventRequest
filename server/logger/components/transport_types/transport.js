@@ -9,6 +9,11 @@ class Transport
 	{
 		this.options	= options;
 	}
+
+	static getInstance( options = {} )
+	{
+		return new this( options );
+	}
 }
 
 module.exports	= Transport;

@@ -17,13 +17,20 @@ class Container
 	/**
 	 * @brief	Adds the given logger to the container
 	 *
+	 * @details	Configuration for the logger can be passed here and if valid the logger will be created and added
+	 *
 	 * @param	String loggerId
-	 * @param	Logger logger
+	 * @param	Logger|Object logger
 	 *
 	 * @return	Boolean
 	 */
 	addLogger( loggerId, logger )
 	{
+		if ( typeof logger === 'object' && ( logger instanceof Logger ) === false )
+		{
+			logger	= new Logger( logger );
+		}
+
 		if ( logger instanceof Logger && typeof this.loggers[loggerId] === 'undefined')
 		{
 			this.loggers[loggerId]	= logger;

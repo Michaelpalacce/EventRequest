@@ -4,14 +4,14 @@
  * @brief	Constants
  */
 const LOG_LEVELS	= {
-	ERROR	: 100,
-	WARNING	: 200,
-	NOTICE	: 300,
-	INFO	: 400,
-	DEBUG	: 500
+	error	: 100,
+	warning	: 200,
+	notice	: 300,
+	info	: 400,
+	debug	: 500
 };
-const DEFAULT_LOG_LEVEL			= LOG_LEVELS.INFO;
-const WRONG_LOG_DEFAULT_LEVEL	= LOG_LEVELS.DEBUG;
+const DEFAULT_LOG_LEVEL			= LOG_LEVELS.info;
+const WRONG_LOG_DEFAULT_LEVEL	= LOG_LEVELS.debug;
 const WRONG_LOG_DEFAULT_MESSAGE	= 'Invalid log message provided, could not be parsed';
 
 /**
@@ -76,7 +76,7 @@ class Log
 	 *
 	 * @return	String
 	 */
-	getLogMessage()
+	getMessage()
 	{
 		return this.message;
 	}
@@ -86,9 +86,19 @@ class Log
 	 *
 	 * @return	Number
 	 */
-	getLogTimestamp()
+	getTimestamp()
 	{
 		return this.timestamp;
+	}
+
+	/**
+	 * @brief	Get the log in a string format
+	 *
+	 * @return	String
+	 */
+	toString()
+	{
+		return `{Level: ${this.getLevel()}, Message: ${this.getMessage()}, Time: ${this.getTimestamp()}`;
 	}
 
 	/**

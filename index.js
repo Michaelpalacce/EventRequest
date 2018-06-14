@@ -181,15 +181,15 @@ module.exports	= {
 
 
 
-
-
-
-
-
 const { Log, LOG_LEVELS }	= require( './server/logger/components/log' );
+const Logger				= require( './server/logger/components/logger' );
 
-let log	= Log.getInstance({
-	level	: LOG_LEVELS.DEBUG,
-	message	: 'HELLO LOG ME PLEASE!!'
+let logger	= new Logger();
+logger.debug( 'Test' );
+let log		= Log.getInstance({
+	level	: LOG_LEVELS.debug,
+	message	: 'Test 2'
 });
+
+console.log( log );
 
