@@ -55,15 +55,6 @@ class Logger
 	}
 
 	/**
-	 * @brief	Sanitize the config to make sure valid options are provided
-	 *
-	 * @return	void
-	 */
-	sanitizeConfig()
-	{
-	}
-
-	/**
 	 * @brief	Adds the logger to the container
 	 *
 	 * @param	Object logConfig

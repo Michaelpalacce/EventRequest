@@ -5,12 +5,9 @@
  */
 class Container
 {
-	/**
-	 * @param	Object options
-	 */
-	constructor( options = {} )
+	constructor()
 	{
-		this.options	= options;
+		this.loggers	= [];
 	}
 
 	/**

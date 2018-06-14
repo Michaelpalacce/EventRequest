@@ -9,8 +9,6 @@ const TemplatingEngine		= require( './middlewares/templating_engine' );
 const BaseTemplatingEngine	= require( './middlewares/templating_engines/base_templating_engine' );
 const FileStreams			= require( './middlewares/file_stream_handler' );
 const Session				= require( './middlewares/session_handler' );
-const Logger				= require( './middlewares/logger' );
-const ConsoleLogger			= require( './middlewares/loggers/console_logger' );
 
 const SessionHandler		= Session.SessionHandler;
 const FileStreamHandler		= FileStreams.FileStreamHandler;
@@ -153,47 +151,6 @@ middlewaresContainer.parseCookies	= ( options ) =>
 };
 
 /**
- * @brief	Logs information about the current event
- *
- * @details	This should ideally be used after the static path middleware.
- * 			Accepts options:
- * 			- logger - Logger - The logger to use. Defaults to ConsoleLogger
- * 			- options - Object - Any options to be passed to the logger
- * 			- level - log level
- *
- * @param	Object options
- *
- * @return	Object
- */
-middlewaresContainer.logger	= ( options ) => {
-	return {
-		handler	: ( event ) => {
-			if ( typeof options !== 'undefined' )
-			{
-				let logger	= typeof options.logger === 'function'
-				&& typeof options.logger.getInstance === 'function'
-					? options.logger.getInstance( event, options.options )
-					: null;
-
-				if ( ! logger instanceof Logger || logger === null )
-				{
-					logger	= ConsoleLogger.getInstance( event, options.options );
-				}
-
-				event.logger	= logger;
-
-				event.logData( options.level );
-				event.next();
-			}
-			else
-			{
-				event.sendError( 'Invalid logger provided' );
-			}
-		}
-	};
-};
-
-/**
  * @brief	Sets the given path as the static path where resources can be delivered easily
  *
  * @param	string staticPath
@@ -240,7 +197,6 @@ middlewaresContainer.timeout	= ( options ) =>
 	return {
 		handler	: ( event ) => {
 			event.internalTimeout	= setAdvTimeout( () => {
-					event.log( 'Request timed out', event.path );
 					if ( ! event.isFinished() )
 					{
 						event.sendError( 'TIMEOUT' );
