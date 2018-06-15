@@ -18,6 +18,8 @@ class Transport
 	{
 		this.logLevel	= null;
 		this.logLevels	= null;
+		this.color		= null;
+		this.logColors	= null;
 		this.sanitizeConfig( options );
 	}
 
@@ -41,6 +43,8 @@ class Transport
 		this.color			= typeof options.color === 'boolean'
 							? options.color
 							: LOGGER_DEFAULT_SHOULD_COLOR;
+
+		this.logColors		= {};
 	}
 
 	/**
@@ -53,6 +57,18 @@ class Transport
 	static getInstance( options = {} )
 	{
 		return new this( options );
+	}
+
+	/**
+	 * @brief	Sets the log colors for the transport provided by the logger
+	 *
+	 * @param	Object colors
+	 *
+	 * @return	void
+	 */
+	setColors( logColors )
+	{
+		this.logColors	= logColors;
 	}
 
 	/**

@@ -51,12 +51,6 @@ class Logger
 	 */
 	sanitizeConfig( options )
 	{
-		let transports					= typeof options.transports === 'object' && Array.isArray( options.transports )
-										? options.transports
-										: [];
-
-		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport ) } );
-
 		this.logLevel					= typeof options.logLevel === 'number'
 										? options.logLevel
 										: LOGGER_DEFAULT_LOG_LEVEL;
@@ -64,6 +58,10 @@ class Logger
 		this.logLevels					= typeof options.logLevels === 'object'
 										? options.logLevels
 										: LOG_LEVELS;
+
+		this.logColors					= typeof options.logColors === 'object'
+										? options.logColors
+										: {};
 
 		this.capture					= typeof options.capture === 'boolean'
 										? options.capture
@@ -76,6 +74,12 @@ class Logger
 		this.unhandledExceptionLevel	= typeof options.unhandledExceptionLevel === 'number'
 										? options.unhandledExceptionLevel
 										: LOG_LEVELS.error;
+
+		let transports					= typeof options.transports === 'object' && Array.isArray( options.transports )
+										? options.transports
+										: [];
+
+		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport, this.logColors ) } );
 
 		this.attachLogLevelsToLogger();
 		this.attachUnhandledEventListener();
@@ -105,7 +109,7 @@ class Logger
 			process.on( 'uncaughtException', ( err ) => {
 				let uncaughtExceptionLog	= Log.getInstance({
 					level	: this.unhandledExceptionLevel,
-					message	: err
+					message	: err.stack
 				});
 
 				this.log( uncaughtExceptionLog );
@@ -147,9 +151,12 @@ class Logger
 	/**
 	 * @brief	Add a transport to the logger
 	 *
+	 * @param	mixed transport
+	 * @param	object logColors
+	 *
 	 * @return	Boolean
 	 */
-	addTransport( transport )
+	addTransport( transport, logColors )
 	{
 		if ( ! Array.isArray( this.transports ) )
 		{
@@ -158,6 +165,8 @@ class Logger
 
 		if ( transport instanceof Transport )
 		{
+			transport.setColors( logColors );
+
 			this.transports.push( transport );
 			return true;
 		}
