@@ -82,12 +82,12 @@ class Console extends Transport
 		if ( this.color )
 		{
 			let color	= typeof this.logColors[level] === 'undefined'
-				? TRANSPORT_DEFAULT_COLOR
-				: this.logColors[level];
+						? TRANSPORT_DEFAULT_COLOR
+						: this.logColors[level];
 
 			color		= typeof colorize[color] === 'function'
-				? color
-				: TRANSPORT_DEFAULT_COLOR;
+						? color
+						: TRANSPORT_DEFAULT_COLOR;
 
 			message		= colorize[color]( message );
 			uniqueId	= colorize.reset( uniqueId );
