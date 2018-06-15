@@ -12,6 +12,8 @@ const SessionHandler				= require( './server/middlewares/session_handler' );
 const BodyParserHandler				= require( './server/middlewares/body_parser_handler' );
 const Cluster						= require( './server/cluster/cluster' );
 const CommunicationManager			= require( './server/cluster/communication_manager' );
+const Loggur						= require( './server/logger/loggur' );
+const Logger						= require( './server/logger/components/logger' );
 
 /**
  * @brief	Constants
@@ -172,25 +174,23 @@ module.exports	= {
 	Router					: Router,
 	TemplatingEngine		: TemplatingEngine,
 	SessionHandler			: SessionHandler,
-	BodyParserHandler		: BodyParserHandler
+	BodyParserHandler		: BodyParserHandler,
+	Loggur					: Loggur,
+	Logger					: Logger
 };
-
 
 
 if ( cluster.isMaster )
 {
-	for ( var i = 0; i < 2; i ++ )
+	for ( var i = 0; i < 4; i ++ )
 	{
 		cluster.fork();
 	}
 }
 else
 {
-
 	const { Log, LOG_LEVELS }	= require( './server/logger/components/log' );
-	const Loggur				= require( './server/logger/loggur' );
-	const Console				= require( './server/logger/components/transport_types/console' );
-	const File					= require( './server/logger/components/transport_types/file' );
+	const { Console, File }		= Logger;
 
 	let logger	= Loggur.createLogger({
 		serverName	: 'EventRequestTest',

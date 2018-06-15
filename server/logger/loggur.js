@@ -2,7 +2,7 @@
 
 // Dependencies
 const uniqueId	= require( './../unique_id' );
-const Logger	= require( './components/logger' );
+const { Logger }	= require( './components/logger' );
 
 /**
  * @brief	Container that holds all the different loggers

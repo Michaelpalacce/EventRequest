@@ -2,6 +2,8 @@
 
 // Dependencies
 const Transport				= require( './transport_types/transport' );
+const Console				= require( './transport_types/console' );
+const File					= require( './transport_types/file' );
 const { Log, LOG_LEVELS }	= require( './log' );
 
 /**
@@ -11,8 +13,6 @@ const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
 
 /**
  * @brief	Logger class used to hold transports
- *
- * @todo	Implement Streams
  */
 class Logger
 {
@@ -220,4 +220,9 @@ class Logger
 	}
 }
 
-module.exports	= Logger;
+module.exports	= {
+	Logger		: Logger,
+	Transport	: Transport,
+	Console		: Console,
+	File		: File,
+};
