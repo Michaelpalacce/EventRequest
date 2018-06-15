@@ -74,13 +74,13 @@ class File extends Transport
 	}
 
 	/**
-	 * @brief	Logs the log in a file
+	 * @brief	Format the given log
 	 *
 	 * @param	Log log
 	 *
-	 * @return	void
+	 * @return	String
 	 */
-	log( log )
+	format( log )
 	{
 		let message		= log.getMessage();
 		let uniqueId	= log.getUniqueId();
@@ -96,10 +96,22 @@ class File extends Transport
 			second	: '2-digit'
 		}).format( timestamp );
 
-		message			=  uniqueId + ' :: ' + timestamp + ' : ' + message;
+		return uniqueId + ' - ' + timestamp + ': ' + message;
+	}
 
+	/**
+	 * @brief	Logs the log in a file
+	 *
+	 * @param	Log log
+	 *
+	 * @return	void
+	 */
+	log( log )
+	{
 		if ( this.fileStream !== null )
 		{
+			let message	= this.format( log );
+
 			this.fileStream.write( message + SYSTEM_EOL, 'utf8', ( err ) =>{
 				if ( err )
 				{

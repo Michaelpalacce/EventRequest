@@ -71,9 +71,11 @@ class Transport
 	/**
 	 * @brief	Formats the log according to the specified format
 	 *
-	 * @return	mixed
+	 * @param	Log log
+	 *
+	 * @return	String|mixed
 	 */
-	format()
+	format( log )
 	{
 	}
 

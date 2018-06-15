@@ -56,13 +56,13 @@ class Console extends Transport
 	}
 
 	/**
-	 * @brief	Logs the data
+	 * @brief	Format the given log
 	 *
 	 * @param	Log log
 	 *
-	 * @return	void
+	 * @return	String
 	 */
-	log( log )
+	format( log )
 	{
 		let message		= log.getMessage();
 		let level		= log.getLevel();
@@ -82,20 +82,31 @@ class Console extends Transport
 		if ( this.color )
 		{
 			let color	= typeof this.logColors[level] === 'undefined'
-						? TRANSPORT_DEFAULT_COLOR
-						: this.logColors[level];
+				? TRANSPORT_DEFAULT_COLOR
+				: this.logColors[level];
 
 			color		= typeof colorize[color] === 'function'
-						? color
-						: TRANSPORT_DEFAULT_COLOR;
+				? color
+				: TRANSPORT_DEFAULT_COLOR;
 
 			message		= colorize[color]( message );
 			uniqueId	= colorize.reset( uniqueId );
 			timestamp	= colorize.blue( timestamp );
 		}
 
+		return uniqueId + ' - ' + timestamp + ': ' + message + colorize.reset( '' );
+	}
 
-		console.log( uniqueId, '::', timestamp, ': ', message, colorize.reset( '' ) );
+	/**
+	 * @brief	Logs the data
+	 *
+	 * @param	Log log
+	 *
+	 * @return	void
+	 */
+	log( log )
+	{
+		console.log( this.format( log ) );
 	}
 }
 
