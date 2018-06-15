@@ -1,7 +1,9 @@
 'use strict';
 
 // Dependencies
-const cluster	= require( 'cluster' );
+const cluster			= require( 'cluster' );
+const Loggur			= require( './../logger/loggur' );
+const { LOG_LEVELS }	= require( './../logger/components/log' );
 
 /**
  * @brief	Communication manager to handle the messages send by the workers to the master
@@ -34,8 +36,11 @@ class CommunicationManager
 	 */
 	handleExit( deadWorker )
 	{
-		console.log( `Worker ${deadWorker.id} died with pid: ${deadWorker.process.pid}` );
-		
+		Loggur.log({
+			level	: LOG_LEVELS.warning,
+			message	: `Worker ${deadWorker.id} exited with pid: ${deadWorker.process.pid}`
+		});
+
 		this.workers.forEach( ( worker, position ) => {
 			if ( worker.id === deadWorker.id )
 			{
@@ -82,7 +87,10 @@ class CommunicationManager
 	 */
 	handleError( message )
 	{
-		console.log( message );
+		Loggur.log({
+			level	: LOG_LEVELS.error,
+			message	: message.toString()
+		});
 	}
 
 	/**

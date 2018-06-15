@@ -117,7 +117,7 @@ class Logger
 
 				if ( this.dieOnCapture )
 				{
-					process.exit( 1 );
+					throw err;
 				}
 			});
 		}

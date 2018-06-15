@@ -1,8 +1,8 @@
 'use strict';
 
 // Dependencies
-const uniqueId	= require( './../unique_id' );
 const { Logger }	= require( './components/logger' );
+const cluster		= require( 'cluster' );
 
 /**
  * @brief	Container that holds all the different loggers
@@ -14,9 +14,13 @@ class Loggur
 	constructor()
 	{
 		this.loggers	= {};
+
+		let uniqueId	= cluster.isMaster ? 'Master'
+			: 'Worker/' + process.pid;
+
 		Object.defineProperty( this, 'uniqueId', {
 			writable	: false,
-			value		: uniqueId.makeId( 30 )
+			value		: uniqueId
 		});
 	}
 

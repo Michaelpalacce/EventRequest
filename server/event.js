@@ -13,7 +13,7 @@ const FileStream		= FileStreams.FileStream;
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
  */
-class RequestEvent
+class RequestEvent extends EventEmitter
 {
 	/**
 	 * @param	Object request
@@ -22,18 +22,9 @@ class RequestEvent
 	 */
 	constructor( request, response )
 	{
-		let parsedUrl	= url.parse( request.url, true );
-
+		super();
 		// Define read only properties of the Request Event
-		Object.defineProperty( this, 'method', {
-			value		: request.method.toUpperCase(),
-			writable	: false
-		});
-
-		Object.defineProperty( this, 'headers', {
-			value		: request.headers,
-			writable	: false
-		});
+		let parsedUrl	= url.parse( request.url, true );
 
 		Object.defineProperty( this, 'queryString', {
 			value		: parsedUrl.query,
@@ -45,8 +36,13 @@ class RequestEvent
 			writable	: false
 		});
 
-		Object.defineProperty( this, 'eventEmitter', {
-			value		: new EventEmitter(),
+		Object.defineProperty( this, 'method', {
+			value		: request.method.toUpperCase(),
+			writable	: false
+		});
+
+		Object.defineProperty( this, 'headers', {
+			value		: request.headers,
 			writable	: false
 		});
 
@@ -111,36 +107,6 @@ class RequestEvent
 	}
 
 	/**
-	 * @brief	Ease of use method to add a listener
-	 *
-	 * @return	void
-	 */
-	on()
-	{
-		this.eventEmitter.on.call( this.eventEmitter, arguments );
-	}
-
-	/**
-	 * @brief	Ease of use method to add a listener once
-	 *
-	 * @return	void
-	 */
-	once()
-	{
-		this.eventEmitter.once.call( this.eventEmitter, arguments );
-	}
-
-	/**
-	 * @brief	Ease of use method to add a listener once
-	 *
-	 * @return	void
-	 */
-	off()
-	{
-		this.eventEmitter.off.call( this.eventEmitter, arguments );
-	}
-
-	/**
 	 * @brief	Clean ups the event
 	 *
 	 * @details	Clears the timeout
@@ -152,9 +118,8 @@ class RequestEvent
 	 */
 	cleanUp()
 	{
-		this.eventEmitter.emit( 'cleanUp' );
+		this.emit( 'cleanUp' );
 		this.clearTimeout();
-		this.eventEmitter.removeAllListeners();
 		this.stop();
 
 		this.extra				= undefined;
@@ -162,6 +127,9 @@ class RequestEvent
 		this.body				= undefined;
 		this.templatingEngine	= undefined;
 		this.fileStreamHandler	= undefined;
+
+		this.emit( 'finished' );
+		this.removeAllListeners();
 	}
 
 	/**
@@ -191,7 +159,7 @@ class RequestEvent
 		this.response.statusCode	= code;
 		this.response.end( response );
 
-		this.eventEmitter.emit( 'send', arguments );
+		this.emit( 'send', { response, code, raw } );
 
 		this.cleanUp();
 	}
@@ -203,7 +171,7 @@ class RequestEvent
 	 */
 	stop()
 	{
-		this.eventEmitter.emit( 'stop' );
+		this.emit( 'stop' );
 
 		this.isStopped	= true;
 	}
@@ -220,7 +188,7 @@ class RequestEvent
 	 */
 	setHeader( key, value )
 	{
-		this.eventEmitter.emit( 'setHeader', arguments );
+		this.emit( 'setHeader', { key, value } );
 
 		if ( ! this.isFinished() )
 		{
@@ -241,7 +209,7 @@ class RequestEvent
 	 */
 	redirect( redirectUrl, statusCode = 302 )
 	{
-		this.eventEmitter.emit( 'redirect', arguments );
+		this.emit( 'redirect', { redirectUrl, statusCode } );
 
 		this.setHeader( 'Location', redirectUrl );
 		this.send( { redirectURL : redirectUrl }, statusCode );
@@ -254,7 +222,7 @@ class RequestEvent
 	 */
 	clearTimeout()
 	{
-		this.eventEmitter.emit( 'clearTimeout' );
+		this.emit( 'clearTimeout' );
 
 		if (
 			typeof this.internalTimeout === 'object'
@@ -298,7 +266,7 @@ class RequestEvent
 	 */
 	render( templateName, variables, callback )
 	{
-		this.eventEmitter.emit( 'render', arguments );
+		this.emit( 'render', { templateName, variables, callback } );
 
 		if ( this.templatingEngine instanceof TemplatingEngine )
 		{
@@ -338,11 +306,17 @@ class RequestEvent
 	 * @details	if there is nothing else to send and the response has not been sent YET, then send a server error
 	 * 			if the event is stopped and the response has not been set then send a server error
 	 *
+	 * @param	Error err
+	 *
 	 * @return	void
 	 */
-	next()
+	next( err )
 	{
-		this.eventEmitter.emit( 'next', arguments );
+		if ( typeof err ==='object' && err instanceof Error )
+		{
+			this.sendError( err );
+			return;
+		}
 
 		if ( this.block.length <= 0 && ! this.isFinished() )
 		{
@@ -380,7 +354,7 @@ class RequestEvent
 	 */
 	sendError( message = '', code = 500 )
 	{
-		this.eventEmitter.emit( 'sendError', arguments );
+		this.emit( 'error', { message, code } );
 
 		if ( message instanceof Error )
 		{
@@ -391,8 +365,6 @@ class RequestEvent
 		{
 			message	= JSON.stringify( message );
 		}
-
-		this.eventEmitter.emit( 'error', message );
 
 		if ( ! this.isFinished() )
 		{
@@ -425,8 +397,6 @@ class RequestEvent
 	 */
 	streamFile( file, options )
 	{
-		this.eventEmitter.emit( 'streamFile', arguments );
-
 		let fileStream	= this.getFileStreamHandler().getFileStreamerForType( file );
 
 		if ( fileStream !== null || fileStream instanceof FileStream )

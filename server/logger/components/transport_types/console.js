@@ -69,6 +69,15 @@ class Console extends Transport
 		let uniqueId	= log.getUniqueId();
 		let timestamp	= log.getTimestamp();
 		timestamp		= new Date( timestamp * 1000 );
+		timestamp		= Intl.DateTimeFormat( 'en-GB', {
+			hour12	: false,
+			year	: '2-digit',
+			month	: '2-digit',
+			day		: '2-digit',
+			hour	: '2-digit',
+			minute	: '2-digit',
+			second	: '2-digit'
+		}).format( timestamp );
 
 		if ( this.color )
 		{
@@ -86,7 +95,7 @@ class Console extends Transport
 		}
 
 
-		console.log( uniqueId, '::', timestamp, ': ', message );
+		console.log( uniqueId, '::', timestamp, ': ', message, colorize.reset( '' ) );
 	}
 }
 

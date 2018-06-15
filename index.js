@@ -141,15 +141,25 @@ class Server
 						: http.createServer( serverCallback );
 
 		server.listen( this.options[OPTIONS_PARAM_PORT], () => {
-				console.log( `Server ${cluster.worker.id} successfully started and listening on port: ${this.options[OPTIONS_PARAM_PORT]}` );
+				Loggur.log({
+					level	: LOG_LEVELS.warning,
+					message	: `Server ${cluster.worker.id} successfully started and listening on port: ${this.options[OPTIONS_PARAM_PORT]}`
+				});
 				successCallback();
 			}
 		);
 
 		// Add an error handler in case of an error.
 		server.on( 'error', ( err )=>{
-			console.log( 'Could not start the server on port: ', this.options[OPTIONS_PARAM_PORT] );
-			console.log( 'Error Returned was: ', err.code );
+			Loggur.log({
+				level	: LOG_LEVELS.error,
+				message	: 'Could not start the server on port: ' + this.options[OPTIONS_PARAM_PORT]
+			});
+			Loggur.log({
+				level	: LOG_LEVELS.error,
+				message	: 'Error Returned was: ' + err.code
+			});
+
 			errorCallback( err );
 		});
 

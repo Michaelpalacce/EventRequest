@@ -1,17 +1,16 @@
 'use strict';
 
 // Dependencies
-const fs							= require( 'fs' );
-const path							= require( 'path' );
-const setAdvTimeout					= require( './timeout' );
-const { BodyParserHandler }			= require( './middlewares/body_parser_handler' );
-const TemplatingEngine				= require( './middlewares/templating_engine' );
-const BaseTemplatingEngine			= require( './middlewares/templating_engines/base_templating_engine' );
-const { FileStreamHandler }			= require( './middlewares/file_stream_handler' );
-const { SessionHandler }			= require( './middlewares/session_handler' );
-const { Console, File, Transport }	= require( './logger/components/logger' );
-const Loggur						= require( './logger/loggur' );
-const { LOG_LEVELS }				= require( './logger/components/log' );
+const fs									= require( 'fs' );
+const path									= require( 'path' );
+const setAdvTimeout							= require( './timeout' );
+const { BodyParserHandler }					= require( './middlewares/body_parser_handler' );
+const TemplatingEngine						= require( './middlewares/templating_engine' );
+const BaseTemplatingEngine					= require( './middlewares/templating_engines/base_templating_engine' );
+const { FileStreamHandler }					= require( './middlewares/file_stream_handler' );
+const { SessionHandler }					= require( './middlewares/session_handler' );
+const { LOG_LEVELS }						= require( './logger/components/log' );
+const { Transport, Console, File, Logger }	= require( './logger/components/logger' );
 
 // Define the object
 let middlewaresContainer	= {};
@@ -20,7 +19,6 @@ let middlewaresContainer	= {};
  * @brief	Constants
  */
 const PROJECT_ROOT			= path.parse( require.main.filename ).dir;
-const DEFAULT_SERVER_NAME	= 'EventRequest';
 
 /**
  * @brief	Sets up the Loggur and attaches it to the EventRequest events
@@ -30,52 +28,53 @@ const DEFAULT_SERVER_NAME	= 'EventRequest';
  * @return	Object
  */
 middlewaresContainer.logger				= ( options ) =>{
-	let serverName				= typeof options.serverName	=== 'string'
-								? options.serverName
-								: DEFAULT_SERVER_NAME;
-
-	let consoleLogLevel			= typeof options.consoleLogLevel === 'number'
-								? options.consoleLogLevel
-								: LOG_LEVELS.info;
-
-	let loggerLogLevel			= typeof options.loggerLogLevel === 'number'
-								? options.loggerLogLevel
-								: LOG_LEVELS.info;
-
-	let fileLogLevel			= typeof options.fileLogLevel === 'number'
-								? options.fileLogLevel
-								: LOG_LEVELS.info;
-
-	let filePath				= typeof options.filePath === 'string'
-								? options.filePath
-								: false;
-
-	let dieOnCapture			= typeof options.dieOnCapture === 'boolean'
-								? options.dieOnCapture
-								: false;
-
-	let unhandledExceptionLevel	= typeof options.unhandledExceptionLevel === 'number'
-								? options.unhandledExceptionLevel
-								: false;
-
-	let logger	= Loggur.createLogger({
-		serverName	: serverName,
-		transports	: [
-			new Console({ logLevel : consoleLogLevel }),
-			new File({ logLevel : fileLogLevel, filePath : filePath }),
-		],
-		logLevel				: loggerLogLevel,
-		dieOnCapture			: dieOnCapture,
-		unhandledExceptionLevel	: unhandledExceptionLevel
-	});
-
-	Loggur.addLogger( 'default_logger', logger );
-
+	let logger	= typeof options.logger !== 'undefined' && options.logger instanceof Logger
+				? options.logger
+				: false;
 	return {
 		handler	: ( event ) =>{
-			event.on( 'send', () =>{
-				logger.verbose( '' )
-			});
+			if ( logger )
+			{
+				let requestURL	= event.request.url;
+				logger.notice( requestURL );
+
+				event.on( 'error', ( error ) =>{
+					logger.error( `Error : ${error.message}` );
+				});
+
+				event.on( 'finished', () =>{
+					logger.info( 'Event finished' )
+				});
+
+				event.on( 'send', ( response ) =>{
+					logger.info( `Responded with: ${response.code} to ${requestURL}` )
+				});
+
+				event.on( 'redirect', ( redirect ) =>{
+					logger.info( `Redirect to: ${redirect.redirectUrl} with status code: ${redirect.statusCode}` )
+				});
+
+				event.on( 'stop', () =>{
+					logger.verbose( 'Event stopped' )
+				});
+
+				event.on( 'setHeader', ( header ) =>{
+					logger.verbose( `Header set: ${header.key} with value: ${header.value}` )
+				});
+
+				event.on( 'cleanUp', () =>{
+					logger.verbose( 'Event is cleaning up' )
+				});
+
+				event.on( 'clearTimeout', () =>{
+					logger.debug( 'Timeout cleared' )
+				});
+
+				event.on( 'render', ( template ) =>{
+					logger.debug( `Rendering ${template.templateName}` )
+				});
+			}
+
 			event.next();
 		}
 	};
