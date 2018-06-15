@@ -5,7 +5,6 @@ const os				= require( 'os' );
 const path				= require( 'path' );
 const fs				= require( 'fs' );
 const BodyParser		= require( './body_parser' );
-const { EventEmitter }	= require( 'events' );
 
 /**
  * @brief	Constants
@@ -29,20 +28,20 @@ const RANDOM_NAME_LENGTH						= 20;
 const DATA_TYPE_FILE							= 'file';
 const DATA_TYPE_PARAMETER						= 'parameter';
 
-let STATE_START					= 0;
-let STATE_START_BOUNDARY		= 1;
-let STATE_HEADER_FIELD_START	= 2;
-let STATE_HEADERS_DONE			= 3;
-let STATE_PART_DATA_START		= 4;
-let STATE_PART_DATA				= 5;
-let STATE_CLOSE_BOUNDARY		= 6;
-let STATE_END					= 7;
+let STATE_START									= 0;
+let STATE_START_BOUNDARY						= 1;
+let STATE_HEADER_FIELD_START					= 2;
+let STATE_HEADERS_DONE							= 3;
+let STATE_PART_DATA_START						= 4;
+let STATE_PART_DATA								= 5;
+let STATE_CLOSE_BOUNDARY						= 6;
+let STATE_END									= 7;
 
-const ERROR_INVALID_STATE			= 101;
-const ERROR_INCORRECT_END_OF_STREAM	= 102;
-const ERROR_COULD_NOT_FLUSH_BUFFER	= 103;
-const ERROR_INVALID_METADATA		= 104;
-const ERROR_RESOURCE_TAKEN			= 106;
+const ERROR_INVALID_STATE						= 101;
+const ERROR_INCORRECT_END_OF_STREAM				= 102;
+const ERROR_COULD_NOT_FLUSH_BUFFER				= 103;
+const ERROR_INVALID_METADATA					= 104;
+const ERROR_RESOURCE_TAKEN						= 106;
 
 /**
  * @brief	FormParser used to parse multipart data
@@ -65,7 +64,6 @@ class MultipartFormParser extends BodyParser
 		this.maxPayload		= this.options.maxPayload || 0;
 		this.tempDir		= this.options.tempDir || os.tmpdir();
 
-		this.eventEmitter	= new EventEmitter();
 		this.parts			= [];
 		this.parsingError	= false;
 		this.ended			= false;
@@ -85,8 +83,7 @@ class MultipartFormParser extends BodyParser
 	 */
 	terminate()
 	{
-		this.eventEmitter.removeAllListeners();
-		this.eventEmitter	= null;
+		this.removeAllListeners();
 		this.parts			= null;
 	}
 
@@ -128,9 +125,9 @@ class MultipartFormParser extends BodyParser
 	 */
 	upgradeToFileTypePart( part )
 	{
-		part.file		= null;
+		part.file	= null;
 		part.path	= null;
-		part.type		= DATA_TYPE_FILE;
+		part.type	= DATA_TYPE_FILE;
 	}
 
 	/**
@@ -208,7 +205,7 @@ class MultipartFormParser extends BodyParser
 		}
 		catch ( e )
 		{
-			this.eventEmitter.emit( 'onError', e.message );
+			this.emit( 'onError', e.message );
 		}
 	}
 
@@ -620,12 +617,12 @@ class MultipartFormParser extends BodyParser
 	 */
 	attachEvents()
 	{
-		this.eventEmitter.on( 'onError', ( err )=>{
+		this.on( 'onError', ( err )=>{
 			this.parsingError	= true;
 			this.callback( err );
 		});
 
-		this.eventEmitter.on( 'end', ()=>{
+		this.on( 'end', ()=>{
 			this.ended	= true;
 			this.stripDataFromParts();
 			this.separateParts();
@@ -645,12 +642,29 @@ class MultipartFormParser extends BodyParser
 	 */
 	cleanUpItems()
 	{
-		this.parts.files.forEach( ( part ) =>{
-			if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
-			{
-				fs.unlinkSync( part.path )
-			}
-		});
+		if ( typeof this.parts.files !== 'undefined' )
+		{
+			this.parts.files.forEach( ( part ) =>{
+				if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
+				{
+					fs.unlinkSync( part.path )
+				}
+			});
+		}
+		else
+		{
+			this.parts.forEach( ( part ) =>{
+				if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
+				{
+					if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
+					{
+						part.file.end();
+					}
+
+					fs.unlinkSync( part.path )
+				}
+			});
+		}
 	}
 
 	/**
@@ -702,7 +716,7 @@ class MultipartFormParser extends BodyParser
 		this.event.request.on( 'end', () => {
 			if ( ! this.hasFinished() )
 			{
-				this.eventEmitter.emit( 'end' );
+				this.emit( 'end' );
 			}
 		});
 	}

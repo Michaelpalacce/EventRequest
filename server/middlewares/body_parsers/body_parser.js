@@ -1,15 +1,19 @@
 'use strict';
 
+// Dependencies
+const { EventEmitter }	= require( 'events' );
+
 /**
  * @brief	BodyParser extended by all body parsers
  */
-class BodyParser
+class BodyParser extends EventEmitter
 {
 	/**
 	 * @param	Object options
 	 */
 	constructor( options = {} )
 	{
+		super();
 		this.options	= options;
 	}
 

@@ -9,8 +9,7 @@ const TemplatingEngine						= require( './middlewares/templating_engine' );
 const BaseTemplatingEngine					= require( './middlewares/templating_engines/base_templating_engine' );
 const { FileStreamHandler }					= require( './middlewares/file_stream_handler' );
 const { SessionHandler }					= require( './middlewares/session_handler' );
-const { LOG_LEVELS }						= require( './logger/components/log' );
-const { Transport, Console, File, Logger }	= require( './logger/components/logger' );
+const { Logger }							= require( './logger/components/logger' );
 
 // Define the object
 let middlewaresContainer	= {};
@@ -37,7 +36,6 @@ middlewaresContainer.logger				= ( options ) =>{
 			{
 				let requestURL	= event.request.url;
 				logger.notice( event.method + ': ' + requestURL );
-
 
 				event.on( 'error', ( error ) =>{
 					logger.error( `Error : ${error.message}` );

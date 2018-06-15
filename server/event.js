@@ -1,14 +1,10 @@
 'use strict';
 
 // Dependencies
-const url				= require( 'url' );
-const { EventEmitter }	= require( 'events' );
-const FileStreams		= require( './middlewares/file_stream_handler' );
-const TemplatingEngine	= require( './middlewares/templating_engine' );
-
-
-const FileStreamHandler	= FileStreams.FileStreamHandler;
-const FileStream		= FileStreams.FileStream;
+const url								= require( 'url' );
+const { EventEmitter }					= require( 'events' );
+const { FileStreamHandler, FileStream }	= require( './middlewares/file_stream_handler' );
+const TemplatingEngine					= require( './middlewares/templating_engine' );
 
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
@@ -312,7 +308,7 @@ class RequestEvent extends EventEmitter
 	 */
 	next( err )
 	{
-		if ( typeof err ==='object' && err instanceof Error )
+		if ( err )
 		{
 			this.sendError( err );
 			return;

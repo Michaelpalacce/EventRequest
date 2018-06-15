@@ -117,6 +117,11 @@ class Worker
 	serverCallback( req, res ) {
 		let requestEvent	= Worker.resolve( req, res );
 
+		req.on( 'close', ()=> {
+			requestEvent.cleanUp();
+			requestEvent	= null;
+		});
+
 		res.on( 'finish', () => {
 			requestEvent.cleanUp();
 			requestEvent	= null;

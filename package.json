@@ -1,25 +1,24 @@
 {
-  "_from": "github:Michaelpalacce/EventRequest##17-Implement-clusters",
-  "_id": "event_request@1.0.3",
+  "_from": "github:Michaelpalacce/EventRequest#master",
+  "_id": "event_request@1.2.0",
   "_inBundle": false,
   "_location": "/event_request",
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "event_request@github:Michaelpalacce/EventRequest##17-Implement-clusters",
-    "name": "event_request",
-    "escapedName": "event_request",
-    "rawSpec": "github:Michaelpalacce/EventRequest##17-Implement-clusters",
-    "saveSpec": "github:Michaelpalacce/EventRequest##17-Implement-clusters",
+    "raw": "github:Michaelpalacce/EventRequest#master",
+    "rawSpec": "github:Michaelpalacce/EventRequest#master",
+    "saveSpec": "github:Michaelpalacce/EventRequest#master",
     "fetchSpec": null,
-    "gitCommittish": "#17-Implement-clusters"
+    "gitCommittish": "master"
   },
   "_requiredBy": [
+    "#USER",
     "/"
   ],
-  "_resolved": "github:Michaelpalacce/EventRequest#8f3cb7db1890754d7572d33bf875c7c6193455b4",
-  "_spec": "event_request@github:Michaelpalacce/EventRequest##17-Implement-clusters",
-  "_where": "D:\\JS\\Storage",
+  "_resolved": "github:Michaelpalacce/EventRequest#0703e6adfd4d2f49734622d56ffce486f4079c82",
+  "_spec": "github:Michaelpalacce/EventRequest#master",
+  "_where": "E:\\Coding\\FileSystem",
   "author": {
     "name": "Stefan Genov"
   },
