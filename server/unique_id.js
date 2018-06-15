@@ -1,15 +1,15 @@
 'use strict';
 
-let helperContainer	= {};
+let uniqueId	= {};
 
 /**
- * @brief	Helper method that generates a random string id
+ * @brief	Helper method that generates a random string
  *
  * @param	Number length
  *
  * @return	String
  */
-helperContainer.makeId	= ( length ) => {
+uniqueId.makeId	= ( length ) => {
 	let text		= "";
 	let possible	= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	length			= typeof length === 'number' ? length : 10;
@@ -23,4 +23,4 @@ helperContainer.makeId	= ( length ) => {
 };
 
 // Export the module
-module.exports	= helperContainer;
+module.exports	= uniqueId;

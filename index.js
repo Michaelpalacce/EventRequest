@@ -10,9 +10,11 @@ const Router						= require( './server/router' );
 const TemplatingEngine				= require( './server/middlewares/templating_engine' );
 const SessionHandler				= require( './server/middlewares/session_handler' );
 const BodyParserHandler				= require( './server/middlewares/body_parser_handler' );
-const Logger						= require( './server/middlewares/logger' );
 const Cluster						= require( './server/cluster/cluster' );
 const CommunicationManager			= require( './server/cluster/communication_manager' );
+const Loggur						= require( './server/logger/loggur' );
+const Logger						= require( './server/logger/components/logger' );
+const { LOG_LEVELS }				= require( './server/logger/components/log' );
 
 /**
  * @brief	Constants
@@ -139,15 +141,25 @@ class Server
 						: http.createServer( serverCallback );
 
 		server.listen( this.options[OPTIONS_PARAM_PORT], () => {
-				console.log( `Server ${cluster.worker.id} successfully started and listening on port: ${this.options[OPTIONS_PARAM_PORT]}` );
+				Loggur.log({
+					level	: LOG_LEVELS.warning,
+					message	: `Server ${cluster.worker.id} successfully started and listening on port: ${this.options[OPTIONS_PARAM_PORT]}`
+				});
 				successCallback();
 			}
 		);
 
 		// Add an error handler in case of an error.
 		server.on( 'error', ( err )=>{
-			console.log( 'Could not start the server on port: ', this.options[OPTIONS_PARAM_PORT] );
-			console.log( 'Error Returned was: ', err.code );
+			Loggur.log({
+				level	: LOG_LEVELS.error,
+				message	: 'Could not start the server on port: ' + this.options[OPTIONS_PARAM_PORT]
+			});
+			Loggur.log({
+				level	: LOG_LEVELS.error,
+				message	: 'Error Returned was: ' + err.code
+			});
+
 			errorCallback( err );
 		});
 
@@ -169,10 +181,14 @@ class Server
 
 // Export the server module
 module.exports	= {
-	Server					: Server,
-	Router					: Router,
-	TemplatingEngine		: TemplatingEngine,
-	SessionHandler			: SessionHandler,
-	BodyParserHandler		: BodyParserHandler,
-	Logger					: Logger
+	Server				: Server,
+	Router				: Router,
+	TemplatingEngine	: TemplatingEngine,
+	SessionHandler		: SessionHandler,
+	BodyParserHandler	: BodyParserHandler,
+	Logging				: {
+		Loggur		: Loggur,
+		Logger		: Logger,
+		LOG_LEVELS	: LOG_LEVELS
+	}
 };

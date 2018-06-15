@@ -2,10 +2,10 @@
 
 // Dependencies
 const url				= require( 'url' );
-const events			= require( 'events' );
+const { EventEmitter }	= require( 'events' );
 const FileStreams		= require( './middlewares/file_stream_handler' );
 const TemplatingEngine	= require( './middlewares/templating_engine' );
-const Logger			= require( './middlewares/logger' );
+
 
 const FileStreamHandler	= FileStreams.FileStreamHandler;
 const FileStream		= FileStreams.FileStream;
@@ -13,7 +13,7 @@ const FileStream		= FileStreams.FileStream;
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
  */
-class RequestEvent
+class RequestEvent extends EventEmitter
 {
 	/**
 	 * @param	Object request
@@ -22,18 +22,9 @@ class RequestEvent
 	 */
 	constructor( request, response )
 	{
-		let parsedUrl	= url.parse( request.url, true );
-
+		super();
 		// Define read only properties of the Request Event
-		Object.defineProperty( this, 'method', {
-			value		: request.method.toUpperCase(),
-			writable	: false
-		});
-
-		Object.defineProperty( this, 'headers', {
-			value		: request.headers,
-			writable	: false
-		});
+		let parsedUrl	= url.parse( request.url, true );
 
 		Object.defineProperty( this, 'queryString', {
 			value		: parsedUrl.query,
@@ -45,8 +36,13 @@ class RequestEvent
 			writable	: false
 		});
 
-		Object.defineProperty( this, 'eventEmitter', {
-			value		: new events.EventEmitter(),
+		Object.defineProperty( this, 'method', {
+			value		: request.method.toUpperCase(),
+			writable	: false
+		});
+
+		Object.defineProperty( this, 'headers', {
+			value		: request.headers,
 			writable	: false
 		});
 
@@ -74,8 +70,6 @@ class RequestEvent
 				if ( arg instanceof TemplatingEngine )
 				{
 					templatingEngine	= arg;
-
-					this.eventEmitter.emit( 'templatingEngineSet', templatingEngine );
 				}
 				else
 				{
@@ -100,8 +94,6 @@ class RequestEvent
 				if ( arg instanceof FileStreamHandler )
 				{
 					fileStreamHandler	= arg;
-
-					this.eventEmitter.emit( 'fileStreamHandlerSet', fileStreamHandler );
 				}
 				else
 				{
@@ -112,42 +104,6 @@ class RequestEvent
 				return fileStreamHandler;
 			}
 		});
-
-		let logger	= null;
-		Object.defineProperty( this, 'logger', {
-			enumerable	: true,
-			set			: ( arg ) =>{
-				if ( arg == null )
-				{
-					logger	= arg;
-					return;
-				}
-
-				if ( arg instanceof Logger )
-				{
-					logger	= arg;
-
-					this.eventEmitter.emit( 'loggerSet', logger );
-				}
-				else
-				{
-					throw new Error( 'File stream handler must be an instance of FileStreamHandler' );
-				}
-			},
-			get			: () =>{
-				return logger;
-			}
-		});
-	}
-
-	/**
-	 * @brief	Returns the event emitter of the current event
-	 *
-	 * @return	EventEmitter
-	 */
-	getEventEmitter()
-	{
-		return this.eventEmitter;
 	}
 
 	/**
@@ -162,9 +118,8 @@ class RequestEvent
 	 */
 	cleanUp()
 	{
-		this.eventEmitter.emit( 'cleanUp' );
+		this.emit( 'cleanUp' );
 		this.clearTimeout();
-		this.eventEmitter.removeAllListeners();
 		this.stop();
 
 		this.extra				= undefined;
@@ -172,21 +127,9 @@ class RequestEvent
 		this.body				= undefined;
 		this.templatingEngine	= undefined;
 		this.fileStreamHandler	= undefined;
-	}
 
-	/**
-	 * @brief	Logs Data if a logger is defined
-	 *
-	 * @param	mixed data
-	 *
-	 * @return	void
-	 */
-	log( data )
-	{
-		if ( this.logger instanceof Logger )
-		{
-			this.logger.log( data );
-		}
+		this.emit( 'finished' );
+		this.removeAllListeners();
 	}
 
 	/**
@@ -216,7 +159,7 @@ class RequestEvent
 		this.response.statusCode	= code;
 		this.response.end( response );
 
-		this.eventEmitter.emit( 'send', arguments );
+		this.emit( 'send', { response, code, raw } );
 
 		this.cleanUp();
 	}
@@ -228,44 +171,9 @@ class RequestEvent
 	 */
 	stop()
 	{
-		this.eventEmitter.emit( 'stop' );
+		this.emit( 'stop' );
 
 		this.isStopped	= true;
-	}
-
-	/**
-	 * @brief	Outputs basic data about the request
-	 *
-	 * @param	Number level
-	 *
-	 * @return	void
-	 */
-	logData( level )
-	{
-		level		= typeof level === 'number' ? level : 1;
-
-		if ( level >= 1 )
-		{
-			this.log({
-				method				: this.method,
-				path				: this.path,
-				queryString			: this.queryString,
-			});
-		}
-
-		if ( level >= 2 )
-		{
-			this.log({
-				headers				: this.headers,
-				cookies				: this.cookies,
-				extra				: this.extra
-			});
-		}
-
-		if ( level >= 3 )
-		{
-			this.log({});
-		}
 	}
 
 	/**
@@ -280,7 +188,7 @@ class RequestEvent
 	 */
 	setHeader( key, value )
 	{
-		this.eventEmitter.emit( 'setHeader', arguments );
+		this.emit( 'setHeader', { key, value } );
 
 		if ( ! this.isFinished() )
 		{
@@ -301,7 +209,7 @@ class RequestEvent
 	 */
 	redirect( redirectUrl, statusCode = 302 )
 	{
-		this.eventEmitter.emit( 'redirect', arguments );
+		this.emit( 'redirect', { redirectUrl, statusCode } );
 
 		this.setHeader( 'Location', redirectUrl );
 		this.send( { redirectURL : redirectUrl }, statusCode );
@@ -314,7 +222,7 @@ class RequestEvent
 	 */
 	clearTimeout()
 	{
-		this.eventEmitter.emit( 'clearTimeout' );
+		this.emit( 'clearTimeout' );
 
 		if (
 			typeof this.internalTimeout === 'object'
@@ -334,8 +242,6 @@ class RequestEvent
 	 */
 	extendTimeout( ms )
 	{
-		this.eventEmitter.emit( 'extendTimeout', ms );
-
 		if (
 			typeof this.internalTimeout === 'object'
 			&& this.internalTimeout !== null
@@ -360,7 +266,7 @@ class RequestEvent
 	 */
 	render( templateName, variables, callback )
 	{
-		this.eventEmitter.emit( 'render', arguments );
+		this.emit( 'render', { templateName, variables, callback } );
 
 		if ( this.templatingEngine instanceof TemplatingEngine )
 		{
@@ -400,11 +306,17 @@ class RequestEvent
 	 * @details	if there is nothing else to send and the response has not been sent YET, then send a server error
 	 * 			if the event is stopped and the response has not been set then send a server error
 	 *
+	 * @param	Error err
+	 *
 	 * @return	void
 	 */
-	next()
+	next( err )
 	{
-		this.eventEmitter.emit( 'next', arguments );
+		if ( typeof err ==='object' && err instanceof Error )
+		{
+			this.sendError( err );
+			return;
+		}
 
 		if ( this.block.length <= 0 && ! this.isFinished() )
 		{
@@ -442,11 +354,10 @@ class RequestEvent
 	 */
 	sendError( message = '', code = 500 )
 	{
-		this.eventEmitter.emit( 'sendError', arguments );
+		this.emit( 'error', { message, code } );
 
 		if ( message instanceof Error )
 		{
-			this.log( message );
 			message	= message.toString();
 		}
 
@@ -458,10 +369,6 @@ class RequestEvent
 		if ( ! this.isFinished() )
 		{
 			this.send( message, code );
-		}
-		else
-		{
-			this.log( `Server error: ${message}` );
 		}
 	}
 
@@ -480,7 +387,7 @@ class RequestEvent
 		return this.fileStreamHandler;
 	}
 
-	/**
+	/**f
 	 * @brief	Streams files
 	 *
 	 * @param	String file
@@ -490,8 +397,6 @@ class RequestEvent
 	 */
 	streamFile( file, options )
 	{
-		this.eventEmitter.emit( 'streamFile', arguments );
-
 		let fileStream	= this.getFileStreamHandler().getFileStreamerForType( file );
 
 		if ( fileStream !== null || fileStream instanceof FileStream )

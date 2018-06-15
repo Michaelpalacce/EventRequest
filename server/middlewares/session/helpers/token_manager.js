@@ -1,7 +1,7 @@
 'use strict';
 
 const data			= require( './filesystem_data_store' );
-const stringHelper	= require( './string_helper' );
+const stringHelper	= require( './../../../unique_id' );
 
 /**
  * @brief	Token Manager responsible for working with the tokens

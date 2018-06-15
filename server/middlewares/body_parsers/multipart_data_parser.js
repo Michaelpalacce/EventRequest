@@ -1,13 +1,11 @@
 'use strict';
 
 // Dependencies
-const os			= require( 'os' );
-const path			= require( 'path' );
-const fs			= require( 'fs' );
-const BodyParser	= require( './body_parser' );
-const events		= require( 'events' );
-
-const EventEmitter	= events.EventEmitter;
+const os				= require( 'os' );
+const path				= require( 'path' );
+const fs				= require( 'fs' );
+const BodyParser		= require( './body_parser' );
+const { EventEmitter }	= require( 'events' );
 
 /**
  * @brief	Constants
@@ -634,7 +632,7 @@ class MultipartFormParser extends BodyParser
 			this.callback( false, this.parts );
 		});
 
-		this.event.getEventEmitter().on( 'cleanUp', () => {
+		this.event.on( 'cleanUp', () => {
 			this.cleanUpItems();
 			this.terminate();
 		});
@@ -648,7 +646,7 @@ class MultipartFormParser extends BodyParser
 	cleanUpItems()
 	{
 		this.parts.files.forEach( ( part ) =>{
-			if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' )
+			if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
 			{
 				fs.unlinkSync( part.path )
 			}
