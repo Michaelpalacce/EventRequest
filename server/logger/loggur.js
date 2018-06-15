@@ -6,6 +6,8 @@ const { Logger }	= require( './components/logger' );
 
 /**
  * @brief	Container that holds all the different loggers
+ *
+ * @todo	Implement streams in the future
  */
 class Loggur
 {

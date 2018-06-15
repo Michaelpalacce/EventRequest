@@ -14,6 +14,7 @@ const Cluster						= require( './server/cluster/cluster' );
 const CommunicationManager			= require( './server/cluster/communication_manager' );
 const Loggur						= require( './server/logger/loggur' );
 const Logger						= require( './server/logger/components/logger' );
+const { LOG_LEVELS }				= require( './server/logger/components/log' );
 
 /**
  * @brief	Constants
@@ -170,43 +171,14 @@ class Server
 
 // Export the server module
 module.exports	= {
-	Server					: Server,
-	Router					: Router,
-	TemplatingEngine		: TemplatingEngine,
-	SessionHandler			: SessionHandler,
-	BodyParserHandler		: BodyParserHandler,
-	Loggur					: Loggur,
-	Logger					: Logger
-};
-
-
-if ( cluster.isMaster )
-{
-	for ( var i = 0; i < 4; i ++ )
-	{
-		cluster.fork();
+	Server				: Server,
+	Router				: Router,
+	TemplatingEngine	: TemplatingEngine,
+	SessionHandler		: SessionHandler,
+	BodyParserHandler	: BodyParserHandler,
+	Logging				: {
+		Loggur		: Loggur,
+		Logger		: Logger,
+		LOG_LEVELS	: LOG_LEVELS
 	}
-}
-else
-{
-	const { Log, LOG_LEVELS }	= require( './server/logger/components/log' );
-	const { Console, File }		= Logger;
-
-	let logger	= Loggur.createLogger({
-		serverName	: 'EventRequestTest',
-		transports	: [
-			new Console({ logLevel : LOG_LEVELS.debug }),
-			new File({ logLevel : LOG_LEVELS.debug, filePath: '/logs/error_log.log' }),
-		],
-		logLevel				: LOG_LEVELS.debug,
-		dieOnCapture			: false,
-		unhandledExceptionLevel	: 1
-	});
-
-	Loggur.addLogger( 'my_logger', logger );
-
-	Loggur.log({
-		level	: LOG_LEVELS.debug,
-		message	: 'Logging test'
-	});
-}
+};

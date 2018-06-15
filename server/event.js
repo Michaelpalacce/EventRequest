@@ -74,8 +74,6 @@ class RequestEvent
 				if ( arg instanceof TemplatingEngine )
 				{
 					templatingEngine	= arg;
-
-					this.eventEmitter.emit( 'templatingEngineSet', templatingEngine );
 				}
 				else
 				{
@@ -100,8 +98,6 @@ class RequestEvent
 				if ( arg instanceof FileStreamHandler )
 				{
 					fileStreamHandler	= arg;
-
-					this.eventEmitter.emit( 'fileStreamHandlerSet', fileStreamHandler );
 				}
 				else
 				{
@@ -278,8 +274,6 @@ class RequestEvent
 	 */
 	extendTimeout( ms )
 	{
-		this.eventEmitter.emit( 'extendTimeout', ms );
-
 		if (
 			typeof this.internalTimeout === 'object'
 			&& this.internalTimeout !== null
