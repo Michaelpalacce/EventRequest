@@ -36,7 +36,8 @@ middlewaresContainer.logger				= ( options ) =>{
 			if ( logger )
 			{
 				let requestURL	= event.request.url;
-				logger.notice( requestURL );
+				logger.notice( event.method + ': ' + requestURL );
+
 
 				event.on( 'error', ( error ) =>{
 					logger.error( `Error : ${error.message}` );
