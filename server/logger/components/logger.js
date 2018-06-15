@@ -36,6 +36,7 @@ class Logger
 	 * @brief	Sanitize the loggers config
 	 *
 	 * @details	Accepted options:
+	 * 			- serverName - String - The name of the server to be concatenated with the uniqueId - Defaults to empty
 	 * 			- transports - Array - Array of the transports to be added to the logger - Defaults to empty
 	 * 			- logLevel - Number - The log severity level -> Defaults to error
 	 * 			- logLevels - Object - JSON object with all the log severity levels and their values
@@ -51,6 +52,10 @@ class Logger
 	 */
 	sanitizeConfig( options )
 	{
+		this.serverName					= typeof options.serverName === 'string'
+										? options.serverName
+										: false;
+
 		this.logLevel					= typeof options.logLevel === 'number'
 										? options.logLevel
 										: LOGGER_DEFAULT_LOG_LEVEL;
@@ -197,7 +202,10 @@ class Logger
 
 		if ( this.supports( log ) )
 		{
-			log.setUniqueId( this.uniqueId );
+			let uniqueServerId	= typeof this.serverName === 'string'
+								? this.serverName + '/' + this.uniqueId
+								: this.uniqueId;
+			log.setUniqueId( uniqueServerId );
 
 			this.transports.forEach( ( transport ) =>{
 				if ( transport.supports( log ) )

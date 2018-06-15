@@ -193,6 +193,7 @@ else
 	const File					= require( './server/logger/components/transport_types/file' );
 
 	let logger	= Loggur.createLogger({
+		serverName	: 'EventRequestTest',
 		transports	: [
 			new Console({ logLevel : LOG_LEVELS.debug }),
 			new File({ logLevel : LOG_LEVELS.debug, filePath: '/logs/error_log.log' }),
