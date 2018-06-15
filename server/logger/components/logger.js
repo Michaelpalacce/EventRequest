@@ -35,33 +35,47 @@ class Logger
 	/**
 	 * @brief	Sanitize the loggers config
 	 *
+	 * @details	Accepted options:
+	 * 			- transports - Array - Array of the transports to be added to the logger - Defaults to empty
+	 * 			- logLevel - Number - The log severity level -> Defaults to error
+	 * 			- logLevels - Object - JSON object with all the log severity levels and their values
+	 * 						All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
+	 * 			- capture - Boolean - Whether to attach event listeners for process.on
+	 * 						uncaughtException and unhandledRejection - Defaults to true
+	 * 			- dieOnCapture - Boolean - If the process should exit in case of a caught exception -> Defaults to true
+	 * 			- unhandledExceptionLevel - Number - What level should the unhandled exceptions be logged at -> Defaults to error
+	 *
 	 * @param	Object options
 	 *
 	 * @return	void
 	 */
 	sanitizeConfig( options )
 	{
-		let transports	= typeof options.transports === 'object' && Array.isArray( options.transports )
-						? options.transports
-						: [];
+		let transports					= typeof options.transports === 'object' && Array.isArray( options.transports )
+										? options.transports
+										: [];
 
 		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport ) } );
 
-		this.logLevel		= typeof options.logLevel === 'number'
-							? options.logLevel
-							: LOGGER_DEFAULT_LOG_LEVEL;
+		this.logLevel					= typeof options.logLevel === 'number'
+										? options.logLevel
+										: LOGGER_DEFAULT_LOG_LEVEL;
 
-		this.logLevels		= typeof options.logLevels === 'object'
-							? options.logLevels
-							: LOG_LEVELS;
+		this.logLevels					= typeof options.logLevels === 'object'
+										? options.logLevels
+										: LOG_LEVELS;
 
-		this.capture		= typeof options.capture === 'boolean'
-							? options.capture
-							: true;
+		this.capture					= typeof options.capture === 'boolean'
+										? options.capture
+										: true;
 
-		this.dieOnCapture	= typeof options.dieOnCapture === 'boolean'
-							? options.dieOnCapture
-							: true;
+		this.dieOnCapture				= typeof options.dieOnCapture === 'boolean'
+										? options.dieOnCapture
+										: true;
+
+		this.unhandledExceptionLevel	= typeof options.unhandledExceptionLevel === 'number'
+										? options.unhandledExceptionLevel
+										: LOG_LEVELS.error;
 
 		this.attachLogLevelsToLogger();
 		this.attachUnhandledEventListener();
@@ -80,11 +94,22 @@ class Logger
 		if ( this.capture )
 		{
 			process.on( 'unhandledRejection', ( reason, p ) => {
-				console.error( reason, 'Unhandled Rejection at Promise', p );
+				let unhandledRejectionLog	= Log.getInstance({
+					level	: this.unhandledExceptionLevel,
+					message	: [reason + ' Unhandled Rejection at Promise: ' + p]
+				});
+
+				this.log( unhandledRejectionLog );
 			});
 
 			process.on( 'uncaughtException', ( err ) => {
-				console.error( err, 'Uncaught Exception thrown' );
+				let uncaughtExceptionLog	= Log.getInstance({
+					level	: this.unhandledExceptionLevel,
+					message	: err
+				});
+
+				this.log( uncaughtExceptionLog );
+
 				if ( this.dieOnCapture )
 				{
 					process.exit( 1 );
@@ -158,15 +183,6 @@ class Logger
 	}
 
 	/**
-	 * @brief	Formats the log according to the specified format
-	 *
-	 * @return	mixed
-	 */
-	format()
-	{
-	}
-
-	/**
 	 * @brief	Logs the given data
 	 *
 	 * @param	mixed log
@@ -175,10 +191,7 @@ class Logger
 	 */
 	log( log )
 	{
-		if ( ! ( log instanceof Log ) )
-		{
-			log	= Log.getInstance( log );
-		}
+		log	= Log.getInstance( log );
 
 		if ( this.supports( log ) )
 		{
@@ -187,7 +200,7 @@ class Logger
 			this.transports.forEach( ( transport ) =>{
 				if ( transport.supports( log ) )
 				{
-					// Log whenever ready
+					// Add log to the queue
 					setTimeout( () => {
 						transport.log( log );
 					});

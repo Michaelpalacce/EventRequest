@@ -196,13 +196,17 @@ else
 		transports	: [
 			new Console( { logLevel : LOG_LEVELS.notice } )
 		],
-		logLevel	: LOG_LEVELS.notice
+		logLevel	: 1,
+		dieOnCapture	: false,
+		logLevels	: {
+			'test'	: 0,
+			'test2'	: 1,
+			'test3'	: 2,
+		},
+		unhandledExceptionLevel	: 1
 	});
 
 	Loggur.addLogger( 'my_logger', logger );
-	
-	Loggur.log( {
-		level	: LOG_LEVELS.error,
-		message	: 'hello'
-	} );
+
+	throw new Error( 'An error' );
 }

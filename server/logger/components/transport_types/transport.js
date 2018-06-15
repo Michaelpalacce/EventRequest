@@ -6,7 +6,8 @@ const { Log, LOG_LEVELS }	= require( './../log' );
 /**
  * @brief	Constants
  */
-const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.error;
+const LOGGER_DEFAULT_LOG_LEVEL		= LOG_LEVELS.error;
+const LOGGER_DEFAULT_SHOULD_COLOR	= true;
 
 /**
  * @brief	Transport class used by the other Transport types
@@ -36,6 +37,10 @@ class Transport
 		this.logLevels		= typeof options.logLevels === 'object' && Array.isArray( options.logLevels )
 							? options.logLevels
 							: LOG_LEVELS;
+
+		this.color			= typeof options.color === 'boolean'
+							? options.color
+							: LOGGER_DEFAULT_SHOULD_COLOR;
 	}
 
 	/**
@@ -65,6 +70,15 @@ class Transport
 		}
 
 		return this.logLevel >= log.getLevel();
+	}
+
+	/**
+	 * @brief	Formats the log according to the specified format
+	 *
+	 * @return	mixed
+	 */
+	format()
+	{
 	}
 
 	/**
