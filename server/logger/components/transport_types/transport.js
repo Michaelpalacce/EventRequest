@@ -6,8 +6,7 @@ const { Log, LOG_LEVELS }	= require( './../log' );
 /**
  * @brief	Constants
  */
-const LOGGER_DEFAULT_LOG_LEVEL		= LOG_LEVELS.error;
-const LOGGER_DEFAULT_SHOULD_COLOR	= true;
+const TRANSPORT_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
 
 /**
  * @brief	Transport class used by the other Transport types
@@ -18,8 +17,7 @@ class Transport
 	{
 		this.logLevel	= null;
 		this.logLevels	= null;
-		this.color		= null;
-		this.logColors	= null;
+
 		this.sanitizeConfig( options );
 	}
 
@@ -34,17 +32,11 @@ class Transport
 	{
 		this.logLevel		= typeof options.logLevel === 'number'
 							? options.logLevel
-							: LOGGER_DEFAULT_LOG_LEVEL;
+							: TRANSPORT_DEFAULT_LOG_LEVEL;
 
 		this.logLevels		= typeof options.logLevels === 'object' && Array.isArray( options.logLevels )
 							? options.logLevels
 							: LOG_LEVELS;
-
-		this.color			= typeof options.color === 'boolean'
-							? options.color
-							: LOGGER_DEFAULT_SHOULD_COLOR;
-
-		this.logColors		= {};
 	}
 
 	/**
@@ -57,18 +49,6 @@ class Transport
 	static getInstance( options = {} )
 	{
 		return new this( options );
-	}
-
-	/**
-	 * @brief	Sets the log colors for the transport provided by the logger
-	 *
-	 * @param	Object colors
-	 *
-	 * @return	void
-	 */
-	setColors( logColors )
-	{
-		this.logColors	= logColors;
 	}
 
 	/**

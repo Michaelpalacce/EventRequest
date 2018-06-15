@@ -177,10 +177,9 @@ module.exports	= {
 
 
 
-
 if ( cluster.isMaster )
 {
-	for ( let i = 0; i < 1; ++ i )
+	for ( var i = 0; i < 2; i ++ )
 	{
 		cluster.fork();
 	}
@@ -191,22 +190,22 @@ else
 	const { Log, LOG_LEVELS }	= require( './server/logger/components/log' );
 	const Loggur				= require( './server/logger/loggur' );
 	const Console				= require( './server/logger/components/transport_types/console' );
+	const File					= require( './server/logger/components/transport_types/file' );
 
 	let logger	= Loggur.createLogger({
 		transports	: [
-			new Console( { logLevel : LOG_LEVELS.notice } )
+			new Console({ logLevel : LOG_LEVELS.debug }),
+			new File({ logLevel : LOG_LEVELS.debug, filePath: '/logs/error_log.log' }),
 		],
-		logLevel	: 1,
-		dieOnCapture	: false,
-		logLevels	: {
-			'test'	: 0,
-			'test2'	: 1,
-			'test3'	: 2,
-		},
+		logLevel				: LOG_LEVELS.debug,
+		dieOnCapture			: false,
 		unhandledExceptionLevel	: 1
 	});
 
 	Loggur.addLogger( 'my_logger', logger );
 
-	throw new Error( 'An error' );
+	Loggur.log({
+		level	: LOG_LEVELS.debug,
+		message	: 'Logging test'
+	});
 }

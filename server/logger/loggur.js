@@ -1,10 +1,8 @@
 'use strict';
 
 // Dependencies
-const { EventEmitter }		= require( 'events' );
-const uniqueId				= require( './../unique_id' );
-const Logger				= require( './components/logger' );
-const { Log, LOG_LEVELS }	= require( './components/log' );
+const uniqueId	= require( './../unique_id' );
+const Logger	= require( './components/logger' );
 
 /**
  * @brief	Container that holds all the different loggers
@@ -18,41 +16,6 @@ class Loggur
 			writable	: false,
 			value		: uniqueId.makeId( 30 )
 		});
-
-		Object.defineProperty( this, 'eventEmitter', {
-			value		: new EventEmitter(),
-			writable	: false
-		});
-	}
-
-	/**
-	 * @brief	Ease of use method to add a listener
-	 *
-	 * @return	void
-	 */
-	on()
-	{
-		this.eventEmitter.on.call( this.eventEmitter, arguments );
-	}
-
-	/**
-	 * @brief	Ease of use method to add a listener once
-	 *
-	 * @return	void
-	 */
-	once()
-	{
-		this.eventEmitter.once.call( this.eventEmitter, arguments );
-	}
-
-	/**
-	 * @brief	Ease of use method to add a listener once
-	 *
-	 * @return	void
-	 */
-	off()
-	{
-		this.eventEmitter.off.call( this.eventEmitter, arguments );
 	}
 
 	/**

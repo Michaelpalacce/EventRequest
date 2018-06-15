@@ -7,7 +7,7 @@ const { Log, LOG_LEVELS }	= require( './log' );
 /**
  * @brief	Constants
  */
-const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.error;
+const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
 
 /**
  * @brief	Logger class used to hold transports
@@ -59,10 +59,6 @@ class Logger
 										? options.logLevels
 										: LOG_LEVELS;
 
-		this.logColors					= typeof options.logColors === 'object'
-										? options.logColors
-										: {};
-
 		this.capture					= typeof options.capture === 'boolean'
 										? options.capture
 										: true;
@@ -79,7 +75,7 @@ class Logger
 										? options.transports
 										: [];
 
-		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport, this.logColors ) } );
+		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport ) } );
 
 		this.attachLogLevelsToLogger();
 		this.attachUnhandledEventListener();
@@ -152,11 +148,10 @@ class Logger
 	 * @brief	Add a transport to the logger
 	 *
 	 * @param	mixed transport
-	 * @param	object logColors
 	 *
 	 * @return	Boolean
 	 */
-	addTransport( transport, logColors )
+	addTransport( transport )
 	{
 		if ( ! Array.isArray( this.transports ) )
 		{
@@ -165,8 +160,6 @@ class Logger
 
 		if ( transport instanceof Transport )
 		{
-			transport.setColors( logColors );
-
 			this.transports.push( transport );
 			return true;
 		}
