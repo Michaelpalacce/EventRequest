@@ -8,7 +8,7 @@ const { BodyParserHandler }					= require( './middlewares/body_parser_handler' )
 const TemplatingEngine						= require( './middlewares/templating_engine' );
 const BaseTemplatingEngine					= require( './middlewares/templating_engines/base_templating_engine' );
 const { FileStreamHandler }					= require( './middlewares/file_stream_handler' );
-const { SessionHandler }					= require( './middlewares/session_handler' );
+const { SessionHandler, TokenManager }		= require( './middlewares/session_handler' );
 const { Logger }							= require( './logger/components/logger' );
 
 // Define the object
@@ -38,7 +38,12 @@ middlewaresContainer.logger				= ( options ) =>{
 				logger.notice( event.method + ': ' + requestURL );
 
 				event.on( 'error', ( error ) =>{
-					logger.error( `Error : ${error.message}` );
+					if ( error instanceof Error )
+					{
+						error	= error.stack;
+					}
+
+					logger.error( `Error : ${error}` );
 				});
 
 				event.on( 'finished', () =>{
@@ -145,14 +150,7 @@ middlewaresContainer.session	= ( options ) =>{
 		handler	: ( event ) =>{
 			let sessionHandler	= new SessionHandler( event, options );
 			sessionHandler.handle( ( err ) =>{
-				if ( ! err )
-				{
-					event.next();
-				}
-				else
-				{
-					event.sendError( err )
-				}
+				event.next();
 			});
 		}
 	};

@@ -1,6 +1,6 @@
 {
   "_from": "github:Michaelpalacce/EventRequest#master",
-  "_id": "event_request@1.2.0",
+  "_id": "event_request@1.2.1",
   "_inBundle": false,
   "_location": "/event_request",
   "_phantomChildren": {},
@@ -16,9 +16,9 @@
     "#USER",
     "/"
   ],
-  "_resolved": "github:Michaelpalacce/EventRequest#0703e6adfd4d2f49734622d56ffce486f4079c82",
+  "_resolved": "github:Michaelpalacce/EventRequest#d4910af72cce2537b2f74beffacc13c4790d7bf0",
   "_spec": "github:Michaelpalacce/EventRequest#master",
-  "_where": "E:\\Coding\\FileSystem",
+  "_where": "D:\\JS\\Storage",
   "author": {
     "name": "Stefan Genov"
   },

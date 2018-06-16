@@ -32,15 +32,16 @@ class TokenManager
 	{
 		let sid			= stringHelper.makeId();
 		let tokenData	= {
-			id		: sid,
-			expires	: Date.now() + this.tokenExpiration
+			authenticated	: true,
+			sessionId		: sid,
+			expires			: Date.now() + this.tokenExpiration
 		};
 
 		data.create( 'tokens', sid, tokenData, ( err ) => {
 			if ( ! err )
 			{
 				event.setHeader( 'Set-Cookie', [ name + '=' + sid] );
-				callback( false );
+				callback( false, tokenData );
 			}
 			else {
 				callback( err );
@@ -64,7 +65,7 @@ class TokenManager
 			{
 				if ( sidData.expires > Date.now() )
 				{
-					callback( false )
+					callback( false, sidData )
 				}
 				else {
 					callback( true );
@@ -79,24 +80,26 @@ class TokenManager
 	/**
 	 * @brief	Updates the token expiration tim
 	 *
-	 * @param	String sid
+	 * @param	Object token
 	 * @param	Function callback
 	 *
 	 * @return	void
 	 */
-	updateToken( sid, callback )
+	updateToken( token, callback )
 	{
+		let sid	= token.sessionId;
+
 		data.read( 'tokens', sid, ( err, sidData ) => {
 			if ( ! err && sidData )
 			{
-				sidData.expires	= Date.now() + this.tokenExpiration;
-				data.update( 'tokens', sid, sidData, ( err ) => {
+				token.expires	= Date.now() + this.tokenExpiration;
+				data.update( 'tokens', sid, token, ( err ) => {
 					if ( err )
 					{
 						callback( err );
 					}
 					else {
-						callback( false );
+						callback( false, sidData );
 					}
 				});
 			}

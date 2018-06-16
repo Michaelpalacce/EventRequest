@@ -5,12 +5,10 @@ const TokenManager		= require( './helpers/token_manager' );
 const SecurityManager	= require( './security_manager' );
 
 // Constants
-const MANAGER_NAME		= 'SessionAuthenticationManager';
 const MANAGER_METHODS	= ['POST'];
 
 /**
- * @brief	Handles the authentication by refreshing the authenticated token
- * 			if expired or if the token does not exists, then redirect to /login happens
+ * @brief	Authenticates the user if correct data is passed
  */
 class SessionAuthenticationManager extends SecurityManager
 {
@@ -22,7 +20,7 @@ class SessionAuthenticationManager extends SecurityManager
 		super( options );
 		this.sessionName			= this.options.sessionName;
 		this.authenticationCallback	= this.options.authenticationCallback;
-		this.loginRoute				= this.options.loginRoute;
+		this.authenticationRoute	= this.options.authenticationRoute;
 		this.tokenExpiration		= this.options.tokenExpiration;
 		this.sanitize();
 
@@ -34,8 +32,12 @@ class SessionAuthenticationManager extends SecurityManager
 	 */
 	sanitize()
 	{
-		if ( this.sessionName == undefined || this.authenticationCallback == undefined || this.loginRoute == undefined || this.tokenExpiration == undefined )
-		{
+		if (
+			this.sessionName == undefined
+			|| this.authenticationCallback == undefined
+			|| this.authenticationRoute == undefined
+			|| this.tokenExpiration == undefined
+		) {
 			throw new Error( 'Invalid Configuration provided' );
 		}
 	}
@@ -45,7 +47,7 @@ class SessionAuthenticationManager extends SecurityManager
 	 */
 	getPath()
 	{
-		return this.loginRoute;
+		return this.authenticationRoute;
 	}
 
 	/**
@@ -61,22 +63,24 @@ class SessionAuthenticationManager extends SecurityManager
 	 */
 	handle( event, next, terminate )
 	{
+		event.session	= {
+			authenticated	: false
+		};
+		
 		if ( this.authenticationCallback( event ) )
 		{
-			this.tokenManager.createCookie( event, this.sessionName, ( err ) =>{
-				if ( err )
+			this.tokenManager.createCookie( event, this.sessionName, ( err, tokenData ) =>{
+				if ( ! err )
 				{
-					event.sendError( 'Could not create token' );
+					event.session	= tokenData;
 				}
-				else
-				{
-					next();
-				}
+
+				next();
 			});
 		}
 		else
 		{
-			event.sendError( 'Invalid username or password' );
+			next();
 		}
 	}
 }

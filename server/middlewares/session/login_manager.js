@@ -1,15 +1,14 @@
 'use strict';
 
 // Dependencies
-const TokenManager		= require( './helpers/token_manager' );
-const SecurityManager	= require( './security_manager' );
+const SecurityManager		= require( './security_manager' );
+const TokenManager			= require( './helpers/token_manager' );
 
 // Constants
 const MANAGER_METHODS	= ['GET'];
 
 /**
- * @brief	Handles the authentication by refreshing the authenticated token
- * 			if expired or if the token does not exists, then redirect to /login happens
+ * @brief	Checks if the user is authenticated
  */
 class LoginManager extends SecurityManager
 {
@@ -19,10 +18,9 @@ class LoginManager extends SecurityManager
 	constructor( options )
 	{
 		super( options );
-		this.indexRoute			= this.options.indexRoute;
-		this.sessionName		= this.options.sessionName;
-		this.loginRoute			= this.options.loginRoute;
-		this.tokenExpiration	= this.options.tokenExpiration;
+		this.sessionName			= this.options.sessionName;
+		this.authenticationRoute	= this.options.authenticationRoute;
+		this.tokenExpiration		= this.options.tokenExpiration;
 
 		this.sanitize();
 		this.tokenManager		= new TokenManager( this.options );
@@ -33,7 +31,7 @@ class LoginManager extends SecurityManager
 	 */
 	sanitize()
 	{
-		if ( this.indexRoute == undefined || this.sessionName == undefined || this.loginRoute == undefined || this.tokenExpiration == undefined )
+		if ( this.sessionName == undefined || this.authenticationRoute == undefined || this.tokenExpiration == undefined )
 		{
 			throw new Error( 'Invalid Configuration provided' );
 		}
@@ -44,7 +42,7 @@ class LoginManager extends SecurityManager
 	 */
 	getPath()
 	{
-		return this.loginRoute;
+		return this.authenticationRoute;
 	}
 
 	/**
@@ -61,23 +59,24 @@ class LoginManager extends SecurityManager
 	handle( event, next, terminate )
 	{
 		let sidCookie	= typeof event.cookies[this.sessionName] === 'string' ? event.cookies[this.sessionName] : false;
+		event.session	= {
+			authenticated	: false
+		};
 
 		if ( sidCookie )
 		{
-			this.tokenManager.isExpired( sidCookie, ( err ) =>{
-				if ( err )
+			this.tokenManager.isExpired( sidCookie, ( err, sidData ) =>{
+				if ( ! err )
 				{
-					terminate( false );
+					event.session	= sidData;
 				}
-				else
-				{
-					event.redirect( this.indexRoute );
-				}
+
+				next();
 			});
 		}
 		else
 		{
-			terminate( false );
+			next();
 		}
 	}
 }

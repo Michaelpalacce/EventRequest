@@ -10,7 +10,7 @@ const MANAGER_METHODS	= [];
 /**
  * @brief	Handles the authentication by refreshing the authenticated token
  */
-class AuthenticationManager extends SecurityManager
+class SessionSaveManager extends SecurityManager
 {
 	/**
 	 * @see	SecurityManager::constructor()
@@ -18,7 +18,6 @@ class AuthenticationManager extends SecurityManager
 	constructor( options )
 	{
 		super( options );
-		this.authenticationRoute	= this.options.authenticationRoute;
 		this.sessionName			= this.options.sessionName;
 		this.tokenExpiration		= this.options.tokenExpiration;
 
@@ -31,7 +30,7 @@ class AuthenticationManager extends SecurityManager
 	 */
 	sanitize()
 	{
-		if ( this.authenticationRoute == undefined || this.sessionName == undefined || this.tokenExpiration == undefined )
+		if ( this.sessionName == undefined || this.tokenExpiration == undefined )
 		{
 			throw new Error( 'Invalid Configuration provided' );
 		}
@@ -42,7 +41,7 @@ class AuthenticationManager extends SecurityManager
 	 */
 	getPath()
 	{
-		return new RegExp( '^(?!' + this.authenticationRoute + ').*$' );
+		return new RegExp( '' );
 	}
 
 	/**
@@ -58,28 +57,23 @@ class AuthenticationManager extends SecurityManager
 	 */
 	handle( event, next, terminate )
 	{
-		let sidCookie	= typeof event.cookies[this.sessionName] === 'string' ? event.cookies[this.sessionName] : false;
-		event.session	= {
-			authenticated	: false
-		};
+		event.on( 'cleanUp', () =>{
+			let session	= event.session;
 
-		if ( sidCookie )
-		{
-			this.tokenManager.isExpired( sidCookie, ( err, sidData ) =>{
-				if ( ! err )
-				{
-					event.session	= sidData;
-				}
+			if ( typeof session !== 'undefined' && session.authenticated )
+			{
+				this.tokenManager.updateToken( session, ( err, sidData )=>{
+					if ( err )
+					{
+						event.emit( 'error', new Error( 'Could not save the token' ) );
+					}
+				});
+			}
+		});
 
-				next();
-			});
-		}
-		else
-		{
-			next();
-		}
+		next();
 	}
 }
 
 // Export the module
-module.exports	= AuthenticationManager;
+module.exports	= SessionSaveManager;
