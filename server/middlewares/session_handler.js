@@ -4,12 +4,12 @@
 const Router						= require( '../router' );
 const AuthenticationManager			= require( './session/authentication_manager' );
 const LoginManager					= require( './session/login_manager' );
+const SessionSaveManager			= require( './session/session_save_manager' );
 const SessionAuthenticationManager	= require( './session/session_authentication_manager' );
 const SecurityManager				= require( './session/security_manager' );
+const TokenManager					= require( './session/helpers/token_manager' );
 
 const DEFAULT_SESSION_NAME				= 'sid';
-const DEFAULT_LOGIN_ROUTE				= '/login';
-const DEFAULT_INDEX_ROUTE				= '/index';
 const DEFAULT_TOKEN_EXPIRATION_TIME		= 0;
 const DEFAULT_AUTHENTICATION_CALLBACK	= ()=>{ return false; };
 
@@ -21,9 +21,8 @@ class SessionHandler
 	/**
 	 * @details	Accepted options:
 	 * 			- sessionName - String - the session name ( aka cookie name ) - Defaults to DEFAULT_SESSION_NAME
-	 * 			- loginRoute - String - The route of the login page - Defaults to DEFAULT_LOGIN_ROUTE
-	 * 			- indexRoute - String - The route of the login page - Defaults to DEFAULT_INDEX_ROUTE
-	 * 			- tokenExpiration - NUmber - The Time to keep the tokens before they expire - Defaults to DEFAULT_TOKEN_EXPIRATION_TIME
+	 * 			- authenticationRoute - String - The route on which authentication should happen
+	 * 			- tokenExpiration - Number - The Time to keep the tokens before they expire - Defaults to DEFAULT_TOKEN_EXPIRATION_TIME
 	 * 			- authenticationCallback - Function - The callback to be called when authentication has to happen
 	 * 									This callback must return a boolean	- Defaults to DEFAULT_AUTHENTICATION_CALLBACK
 	 * 			- managers - Array - The managers to be added to the security ( they have 2 parameters : instance which
@@ -53,10 +52,9 @@ class SessionHandler
 	sanitizeConfig()
 	{
 		this.baseOptions				= {
-			sessionName				: this.securityConfig.sessionName || DEFAULT_SESSION_NAME,
-			loginRoute				: this.securityConfig.loginRoute || DEFAULT_LOGIN_ROUTE,
-			indexRoute				: this.securityConfig.indexRoute || DEFAULT_INDEX_ROUTE,
+			authenticationRoute		: this.securityConfig.authenticationRoute,
 			authenticationCallback	: this.securityConfig.authenticationCallback || DEFAULT_AUTHENTICATION_CALLBACK,
+			sessionName				: this.securityConfig.sessionName || DEFAULT_SESSION_NAME,
 			tokenExpiration			: this.securityConfig.tokenExpiration || DEFAULT_TOKEN_EXPIRATION_TIME,
 		};
 
@@ -74,7 +72,8 @@ class SessionHandler
 			let defaultManagers	= [
 				{ instance : AuthenticationManager },
 				{ instance : SessionAuthenticationManager },
-				{ instance : LoginManager }
+				{ instance : LoginManager },
+				{ instance : SessionSaveManager },
 			];
 
 			this.securityConfig.managers	= defaultManagers.concat( managers );
@@ -195,7 +194,9 @@ class SessionHandler
 module.exports	= {
 	AuthenticationManager			: AuthenticationManager,
 	LoginManager					: LoginManager,
+	SessionSaveManager				: SessionSaveManager,
 	SessionAuthenticationManager	: SessionAuthenticationManager,
 	SecurityManager					: SecurityManager,
+	TokenManager					: TokenManager,
 	SessionHandler					: SessionHandler
 };
