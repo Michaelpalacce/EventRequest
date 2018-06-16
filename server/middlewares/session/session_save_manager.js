@@ -65,7 +65,7 @@ class SessionSaveManager extends SecurityManager
 				this.tokenManager.updateToken( session, ( err, sidData )=>{
 					if ( err )
 					{
-						event.emit( 'error', new Error( 'Could not save the token' ) );
+						event.next( 'Could not save the token' );
 					}
 				});
 			}

@@ -113,7 +113,7 @@ class SessionHandler
 		}
 		catch ( e )
 		{
-			this.event.sendError( 'Invalid configuration provided' );
+			this.event.next( 'Invalid configuration provided' );
 		}
 	}
 
@@ -131,7 +131,7 @@ class SessionHandler
 	{
 		if ( typeof callback !== 'function' )
 		{
-			this.event.sendError( 'Invalid callback provided to the session handler' );
+			this.event.next( 'Invalid callback provided to the session handler' );
 		}
 
 		this.callback	= callback;
@@ -155,7 +155,7 @@ class SessionHandler
 		}
 		else
 		{
-			this.event.sendError( 'Could not call the callback when terminating the session handler' )
+			this.event.next( 'Could not call the callback when terminating the session handler' )
 		}
 	}
 

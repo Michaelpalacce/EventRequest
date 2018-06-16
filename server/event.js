@@ -192,7 +192,7 @@ class RequestEvent extends EventEmitter
 		}
 		else
 		{
-			this.sendError( 'Trying to set headers when response is already sent' );
+			this.next( 'Trying to set headers when response is already sent' );
 		}
 	}
 
@@ -280,7 +280,7 @@ class RequestEvent extends EventEmitter
 		}
 		else
 		{
-			event.sendError( 'Trying to render but templating engine is not set' );
+			event.next( 'Trying to render but templating engine is not set' );
 		}
 	}
 
@@ -316,7 +316,7 @@ class RequestEvent extends EventEmitter
 
 		if ( this.block.length <= 0 && ! this.isFinished() )
 		{
-			this.sendError( 'No middlewares left and response has not been sent.' );
+			this.next( 'No middlewares left and response has not been sent.' );
 			return;
 		}
 
@@ -336,7 +336,7 @@ class RequestEvent extends EventEmitter
 		}
 		catch ( error )
 		{
-			this.sendError( error );
+			this.next( error );
 		}
 	}
 
@@ -355,6 +355,11 @@ class RequestEvent extends EventEmitter
 		if ( message instanceof Error )
 		{
 			message	= message.toString();
+		}
+
+		if ( typeof message === 'string' )
+		{
+			message	= { 'error' : message };
 		}
 
 		if ( typeof message !== 'string' )
@@ -401,7 +406,7 @@ class RequestEvent extends EventEmitter
 		}
 		else
 		{
-			this.sendError( 'Could not find a FileStream that supports that format' )
+			this.next( 'Could not find a FileStream that supports that format' )
 		}
 	}
 }

@@ -132,7 +132,7 @@ middlewaresContainer.templatingEngine	= ( options ) =>{
 			}
 			else
 			{
-				event.sendError( 'Invalid templating engine provided' );
+				event.next( 'Invalid templating engine provided' );
 			}
 		}
 	};
@@ -168,16 +168,7 @@ middlewaresContainer.bodyParser	= ( options ) =>{
 		handler	: ( event ) =>
 		{
 			let bodyParserHandler	= new BodyParserHandler( event, options );
-			bodyParserHandler.parseBody( ( err ) =>{
-				if ( ! err )
-				{
-					event.next();
-				}
-				else
-				{
-					event.sendError( 'Could not parse the body' );
-				}
-			});
+			bodyParserHandler.parseBody( event.next.bind( event ) );
 		}
 	};
 };
@@ -233,7 +224,7 @@ middlewaresContainer.addStaticPath	= ( options ) => {
 				}
 				else
 				{
-					event.sendError( 'File not found' );
+					event.next( 'File not found' );
 				}
 			});
 		}
@@ -258,7 +249,7 @@ middlewaresContainer.timeout	= ( options ) =>
 			event.internalTimeout	= setAdvTimeout( () => {
 					if ( ! event.isFinished() )
 					{
-						event.sendError( 'TIMEOUT' );
+						event.next( 'TIMEOUT' );
 					}
 				},
 				timeout

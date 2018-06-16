@@ -128,7 +128,7 @@ class Worker
 		});
 
 		res.on( 'error', ( error ) => {
-			requestEvent.sendError( error );
+			requestEvent.next( error );
 			requestEvent.cleanUp();
 			requestEvent	= null;
 		});
@@ -141,7 +141,7 @@ class Worker
 		}
 		catch ( e )
 		{
-			requestEvent.sendError( e );
+			requestEvent.next( e );
 		}
 	}
 

@@ -47,7 +47,7 @@ class TextFileStream extends FileStream
 	{
 		if ( ! fs.existsSync( file ) )
 		{
-			this.event.sendError( 'File not found' );
+			this.event.next( 'File not found' );
 			return;
 		}
 

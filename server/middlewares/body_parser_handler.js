@@ -96,7 +96,7 @@ class BodyParserHandler
 		}
 		catch ( e )
 		{
-			this.event.sendError( 'Invalid configuration provided' );
+			this.event.next( 'Invalid configuration provided' );
 		}
 	}
 
