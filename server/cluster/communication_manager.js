@@ -87,10 +87,7 @@ class CommunicationManager
 	 */
 	handleError( message )
 	{
-		Loggur.log({
-			level	: LOG_LEVELS.error,
-			message	: message.toString()
-		});
+		// Do nothing
 	}
 
 	/**

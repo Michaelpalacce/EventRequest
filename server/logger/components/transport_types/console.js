@@ -1,10 +1,9 @@
 'use strict';
 
 // Dependencies
-const Transport				= require( './transport' );
-const { LOG_LEVELS, Log }	= require( './../log' );
-const colorize				= require( './formatters/colorize' );
-const os					= require( 'os' );
+const Transport			= require( './transport' );
+const { LOG_LEVELS }	= require( './../log' );
+const colorize			= require( './formatters/colorize' );
 
 /**
  * @brief	Constants
@@ -19,7 +18,6 @@ const TRANSPORT_DEFAULT_COLORS			= {
 	[LOG_LEVELS.verbose]	: 'cyan',
 	[LOG_LEVELS.debug]		: 'white'
 };
-const SYSTEM_EOL	= os.EOL;
 
 /**
  * @brief	Console transport

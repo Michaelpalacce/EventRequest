@@ -30,13 +30,15 @@ class Transport
 	 */
 	sanitizeConfig( options )
 	{
-		this.logLevel		= typeof options.logLevel === 'number'
-							? options.logLevel
-							: TRANSPORT_DEFAULT_LOG_LEVEL;
+		this.logLevel			= typeof options.logLevel === 'number'
+								? options.logLevel
+								: TRANSPORT_DEFAULT_LOG_LEVEL;
 
-		this.logLevels		= typeof options.logLevels === 'object' && Array.isArray( options.logLevels )
-							? options.logLevels
-							: LOG_LEVELS;
+		this.logLevels			= typeof options.logLevels === 'object'
+								? options.logLevels
+								: LOG_LEVELS;
+
+		this.supportedLevels	= Object.values( this.logLevels );
 	}
 
 	/**
@@ -61,6 +63,11 @@ class Transport
 	supports( log )
 	{
 		if ( ( log instanceof Log ) === false )
+		{
+			return false;
+		}
+
+		if ( this.supportedLevels.indexOf( log.getLevel() ) === -1 )
 		{
 			return false;
 		}
