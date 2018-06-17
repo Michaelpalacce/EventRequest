@@ -350,12 +350,12 @@ class RequestEvent extends EventEmitter
 	 */
 	sendError( message = '', code = 500 )
 	{
-		this.emit( 'error', message );
-
 		if ( message instanceof Error )
 		{
 			message	= message.toString();
 		}
+
+		this.emit( 'error', message );
 
 		if ( typeof message === 'string' )
 		{
