@@ -37,7 +37,7 @@ class Cluster
 		}
 		else
 		{
-			new Worker( this.server.router, this.server.setUpNewServer.bind( this.server ) );
+			new Worker( this.server );
 		}
 	}
 }

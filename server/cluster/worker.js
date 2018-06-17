@@ -1,7 +1,6 @@
 'use strict';
 
 // Dependencies
-const RequestEvent	= require( './../event' );
 const cluster		= require( 'cluster' );
 
 /**
@@ -18,14 +17,12 @@ const MASTER_COMMAND_DIE		= 'die';
 class Worker
 {
 	/**
-	 * @param	Router router
-	 * @param	Function newServerCallback
+	 * @param	Server server
 	 */
-	constructor( router, newServerCallback )
+	constructor( server )
 	{
-		this.router				= router;
-		this.newServerCallback	= newServerCallback;
-		this.server				= null;
+		this.server				= server;
+		this.httpServer			= null;
 
 		this.setIPC();
 	}
@@ -74,24 +71,13 @@ class Worker
 	}
 
 	/**
-	 * @brief	Resolves the given request and response
-	 *
-	 * @details	Creates a RequestEvent used by the Server with helpful methods
-	 *
-	 * @return	RequestEvent
-	 */
-	static resolve ( request, response )
-	{
-		return new RequestEvent( request, response );
-	};
-
-	/**
 	 * @brief	Called when the server is successfully created
 	 *
 	 * @return	void
 	 */
 	successCallback()
 	{
+		// Do nothing
 	}
 
 	/**
@@ -107,55 +93,15 @@ class Worker
 	}
 
 	/**
-	 * @brief	Called when a request is received to the server
-	 *
-	 * @param	IncomingMessage req
-	 * @param	ServerResponse res
-	 *
-	 * @return	void
-	 */
-	serverCallback( req, res ) {
-		let requestEvent	= Worker.resolve( req, res );
-
-		req.on( 'close', ()=> {
-			requestEvent.cleanUp();
-			requestEvent	= null;
-		});
-
-		res.on( 'finish', () => {
-			requestEvent.cleanUp();
-			requestEvent	= null;
-		});
-
-		res.on( 'error', ( error ) => {
-			requestEvent.next( error );
-			requestEvent.cleanUp();
-			requestEvent	= null;
-		});
-
-		try
-		{
-			let block	= this.router.getExecutionBlockForCurrentEvent( requestEvent );
-			requestEvent.setBlock( block );
-			requestEvent.next();
-		}
-		catch ( e )
-		{
-			requestEvent.next( e );
-		}
-	}
-
-	/**
 	 * @brief	Starts the worker and together with it the web server
 	 *
 	 * @return	void
 	 */
 	start()
 	{
-		if ( this.server === null )
+		if ( this.httpServer === null )
 		{
-			this.server	= this.newServerCallback(
-				this.serverCallback.bind( this ),
+			this.httpServer	= this.server.setUpNewServer(
 				this.successCallback.bind( this ),
 				this.errorCallback.bind( this )
 			);
@@ -169,10 +115,10 @@ class Worker
 	 */
 	stop()
 	{
-		if ( this.server !== null )
+		if ( this.httpServer !== null )
 		{
-			this.server.close();
-			this.server	= null;
+			this.httpServer.close();
+			this.httpServer	= null;
 		}
 	}
 }

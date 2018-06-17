@@ -13,18 +13,7 @@ class CommunicationManager
 	constructor( options = {} )
 	{
 		this.options	= options;
-	}
-
-	/**
-	 * @brief	Get an instance of the manager
-	 *
-	 * @param	Object options
-	 *
-	 * @return	CommunicationManager
-	 */
-	static getInstance( options = {} )
-	{
-		return new this( options );
+		this.workers	= [];
 	}
 
 	/**
@@ -44,6 +33,7 @@ class CommunicationManager
 		this.workers.forEach( ( worker, position ) => {
 			if ( worker.id === deadWorker.id )
 			{
+				// Replace worker with new one
 				let workerToRemove	= this.workers.splice( position, 1, cluster.fork() );
 				workerToRemove		= null;
 			}

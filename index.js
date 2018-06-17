@@ -5,8 +5,10 @@ const http							= require( 'http' );
 const https							= require( 'https' );
 const os							= require( 'os' );
 const cluster						= require( 'cluster' );
-const middlewaresContainer			= require( './server/middleware_container' );
+const RequestEvent					= require( './server/event' );
 const Router						= require( './server/router' );
+const ErrorHandler					= require( './server/error_handler' );
+const middlewaresContainer			= require( './server/middleware_container' );
 const TemplatingEngine				= require( './server/middlewares/templating_engine' );
 const SessionHandler				= require( './server/middlewares/session_handler' );
 const BodyParserHandler				= require( './server/middlewares/body_parser_handler' );
@@ -32,6 +34,8 @@ const OPTIONS_PARAM_CLUSTERS						= 'clusters';
 const OPTIONS_PARAM_CLUSTERS_DEFAULT				= CPU_NUM;
 const OPTIONS_PARAM_COMMUNICATION_MANAGER			= 'communicationManager';
 const OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT	= CommunicationManager;
+const OPTIONS_PARAM_ERROR_HANDLER					= 'errorHandler';
+const OPTIONS_PARAM_ERROR_HANDLER_DEFAULT			= ErrorHandler;
 
 const POSSIBLE_PROTOCOL_OPTIONS						= {};
 POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]			= http;
@@ -58,6 +62,17 @@ class Server
 
 	/**
 	 * @brief	Sets defaults for the server options
+	 *
+	 * @details	Accepted options:
+	 * 			- protocol - String - The protocol to be used ( http || https ) -> Defaults to http
+	 * 			- httpsOptions - Object - Options that will be given to the https webserver -> Defaults to {}
+	 * 			- port - Number - The port to run the webserver/s on -> Defaults to 3000
+	 * 			- clusters - Number - The amount of instances of the webserver to be started. Cannot be more than the
+	 * 			machine's CPUs -> Defaults to the max amount of CPUs of the machine's
+	 * 			- communicationManager - CommunicationManager - The communication manager to be used for the IPC communication
+	 * 			between the master and the workers -> Defaults to base CommunicationManager
+	 * 			- errorHandler - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest
+	 * 			-> Defaults to base errorHandler
 	 *
 	 * @return	void
 	 */
@@ -90,9 +105,13 @@ class Server
 		this.options[OPTIONS_PARAM_COMMUNICATION_MANAGER]	= typeof communicationManager === 'object'
 															&& communicationManager instanceof CommunicationManager
 															? communicationManager
-															: OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT;
-		
-		this.options[OPTIONS_PARAM_COMMUNICATION_MANAGER]	= this.options[OPTIONS_PARAM_COMMUNICATION_MANAGER].getInstance();
+															: new OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT();
+
+		let errorHandler									= options[OPTIONS_PARAM_ERROR_HANDLER];
+		this.options[OPTIONS_PARAM_ERROR_HANDLER]			= typeof errorHandler === 'object'
+															&& errorHandler instanceof ErrorHandler
+															? errorHandler
+															: new OPTIONS_PARAM_ERROR_HANDLER_DEFAULT();
 	}
 
 	/**
@@ -124,21 +143,73 @@ class Server
 	};
 
 	/**
+	 * @brief	Resolves the given request and response
+	 *
+	 * @details	Creates a RequestEvent used by the Server with helpful methods
+	 *
+	 * @return	RequestEvent
+	 */
+	resolve ( request, response )
+	{
+		return new RequestEvent( request, response );
+	};
+
+	/**
+	 * @brief	Called when a request is received to the server
+	 *
+	 * @param	IncomingMessage req
+	 * @param	ServerResponse res
+	 *
+	 * @return	void
+	 */
+	serverCallback( req, res )
+	{
+		let requestEvent			= this.resolve( req, res );
+		requestEvent.errorHandler	= this.options[OPTIONS_PARAM_ERROR_HANDLER];
+
+		req.on( 'close', ()=> {
+			requestEvent.cleanUp();
+			requestEvent	= null;
+		});
+
+		res.on( 'finish', () => {
+			requestEvent.cleanUp();
+			requestEvent	= null;
+		});
+
+		res.on( 'error', ( error ) => {
+			requestEvent.next( error );
+			requestEvent.cleanUp();
+			requestEvent	= null;
+		});
+
+		try
+		{
+			let block	= this.router.getExecutionBlockForCurrentEvent( requestEvent );
+			requestEvent.setBlock( block );
+			requestEvent.next();
+		}
+		catch ( e )
+		{
+			requestEvent.next( e );
+		}
+	}
+
+	/**
 	 * @brief	Starts a new server
 	 *
-	 * @param	Function serverCallback
 	 * @param	Function successCallback
 	 * @param	Function errorCallback
 	 *
 	 * @return	Server
 	 */
-	setUpNewServer( serverCallback, successCallback, errorCallback )
+	setUpNewServer( successCallback, errorCallback )
 	{
 		// Create the server
 		let protocol	= this.options[OPTIONS_PARAM_PROTOCOL];
 		let server		= protocol === PROTOCOL_HTTPS
-						? https.createServer( this.options[OPTIONS_PARAM_HTTPS], serverCallback )
-						: http.createServer( serverCallback );
+						? https.createServer( this.options[OPTIONS_PARAM_HTTPS], this.serverCallback.bind( this ) )
+						: http.createServer( this.serverCallback.bind( this ) );
 
 		server.listen( this.options[OPTIONS_PARAM_PORT], () => {
 				Loggur.log({
@@ -186,6 +257,7 @@ module.exports	= {
 	TemplatingEngine	: TemplatingEngine,
 	SessionHandler		: SessionHandler,
 	BodyParserHandler	: BodyParserHandler,
+	ErrorHandler		: ErrorHandler,
 	Logging				: {
 		Loggur		: Loggur,
 		Logger		: Logger,

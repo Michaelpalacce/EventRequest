@@ -5,6 +5,7 @@ const url								= require( 'url' );
 const { EventEmitter }					= require( 'events' );
 const { FileStreamHandler, FileStream }	= require( './middlewares/file_stream_handler' );
 const TemplatingEngine					= require( './middlewares/templating_engine' );
+const ErrorHandler						= require( './error_handler' );
 
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
@@ -19,6 +20,7 @@ class RequestEvent extends EventEmitter
 	constructor( request, response )
 	{
 		super();
+
 		// Define read only properties of the Request Event
 		let parsedUrl	= url.parse( request.url, true );
 
@@ -98,6 +100,30 @@ class RequestEvent extends EventEmitter
 			},
 			get			: () =>{
 				return fileStreamHandler;
+			}
+		});
+
+		let errorHandler	= null;
+		Object.defineProperty( this, 'errorHandler', {
+			enumerable	: true,
+			set			: ( arg ) =>{
+				if ( arg == null )
+				{
+					errorHandler	= arg;
+					return;
+				}
+
+				if ( arg instanceof ErrorHandler )
+				{
+					errorHandler	= arg;
+				}
+				else
+				{
+					throw new Error( 'Error handler must be an instance of ErrorHandler' );
+				}
+			},
+			get			: () =>{
+				return errorHandler;
 			}
 		});
 	}
@@ -303,14 +329,16 @@ class RequestEvent extends EventEmitter
 	 * 			if the event is stopped and the response has not been set then send a server error
 	 *
 	 * @param	Error err
+	 * @param	Number code
 	 *
 	 * @return	void
 	 */
-	next( err )
+	next( err, code )
 	{
 		if ( err )
 		{
-			this.sendError( err );
+			code	= typeof code === 'number' ? code : 500;
+			this.sendError( err, code );
 			return;
 		}
 
@@ -327,7 +355,7 @@ class RequestEvent extends EventEmitter
 				this.send();
 			}
 
-			return ;
+			return;
 		}
 
 		try
@@ -348,29 +376,9 @@ class RequestEvent extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	sendError( message = '', code = 500 )
+	sendError( error = '', code = 500 )
 	{
-		if ( message instanceof Error )
-		{
-			message	= message.stack;
-		}
-
-		this.emit( 'error', message );
-
-		if ( typeof message === 'string' )
-		{
-			message	= { 'error' : message };
-		}
-
-		if ( typeof message !== 'string' )
-		{
-			message	= JSON.stringify( message );
-		}
-
-		if ( ! this.isFinished() )
-		{
-			this.send( message, code );
-		}
+		errorHandler.handle( this, error, code );
 	}
 
 	/**
@@ -388,7 +396,7 @@ class RequestEvent extends EventEmitter
 		return this.fileStreamHandler;
 	}
 
-	/**f
+	/**
 	 * @brief	Streams files
 	 *
 	 * @param	String file
