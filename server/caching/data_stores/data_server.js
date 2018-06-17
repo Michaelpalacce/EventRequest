@@ -68,6 +68,8 @@ class DataServer
 	/**
 	 * @brief	Checks whether the namespace exists
 	 *
+	 * @details	Returns true if the namespace exists
+	 *
 	 * @param	String namespace
 	 * @param	Object options
 	 * @param	Function callback
