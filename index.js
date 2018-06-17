@@ -1,22 +1,22 @@
 'use strict';
 
 // Dependencies
-const http							= require( 'http' );
-const https							= require( 'https' );
-const os							= require( 'os' );
-const cluster						= require( 'cluster' );
-const RequestEvent					= require( './server/event' );
-const Router						= require( './server/router' );
-const ErrorHandler					= require( './server/error_handler' );
-const middlewaresContainer			= require( './server/middleware_container' );
-const TemplatingEngine				= require( './server/middlewares/templating_engine' );
-const SessionHandler				= require( './server/middlewares/session_handler' );
-const BodyParserHandler				= require( './server/middlewares/body_parser_handler' );
-const Cluster						= require( './server/cluster/cluster' );
-const CommunicationManager			= require( './server/cluster/communication_manager' );
-const Loggur						= require( './server/logger/loggur' );
-const Logger						= require( './server/logger/components/logger' );
-const { LOG_LEVELS }				= require( './server/logger/components/log' );
+const http					= require( 'http' );
+const https					= require( 'https' );
+const os					= require( 'os' );
+const cluster				= require( 'cluster' );
+const RequestEvent			= require( './server/event' );
+const Router				= require( './server/router' );
+const ErrorHandler			= require( './server/error_handler' );
+const middlewaresContainer	= require( './server/middleware_container' );
+const TemplatingEngine		= require( './server/middlewares/templating_engine' );
+const SessionHandler		= require( './server/middlewares/session_handler' );
+const BodyParserHandler		= require( './server/middlewares/body_parser_handler' );
+const Cluster				= require( './server/cluster/cluster' );
+const CommunicationManager	= require( './server/cluster/communication_manager' );
+const Loggur				= require( './server/logger/loggur' );
+const Logger				= require( './server/logger/components/logger' );
+const { LOG_LEVELS }		= require( './server/logger/components/log' );
 
 /**
  * @brief	Constants
