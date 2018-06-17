@@ -11,6 +11,7 @@ class DataServer
 	constructor( options = {} )
 	{
 		this.options	= options;
+		this.sanitize( options );
 	}
 
 	/**
@@ -26,9 +27,11 @@ class DataServer
 	/**
 	 * @brief	Sanitizes the configuration
 	 *
+	 * @param	Object options
+	 *
 	 * @return	void
 	 */
-	sanitize()
+	sanitize( options )
 	{
 		throw new Error( 'Invalid configuration provided' );
 	}

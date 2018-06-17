@@ -1,6 +1,6 @@
 'use strict';
 
-const data			= require( './filesystem_data_store' );
+const data			= require( '../../../caching/data_stores/filesystem_data_store' );
 const stringHelper	= require( './../../../unique_id' );
 
 /**
