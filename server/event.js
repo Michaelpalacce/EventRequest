@@ -352,7 +352,7 @@ class RequestEvent extends EventEmitter
 	{
 		if ( message instanceof Error )
 		{
-			message	= message.toString();
+			message	= message.stack;
 		}
 
 		this.emit( 'error', message );
