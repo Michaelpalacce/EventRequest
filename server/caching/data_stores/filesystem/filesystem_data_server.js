@@ -5,7 +5,7 @@ const os			= require( 'os' );
 const fs			= require( 'fs' );
 const path			= require( 'path' );
 const fork			= require( 'child_process' ).fork;
-const { Socket }	= require( 'net' );
+const net			= require( 'net' );
 
 const PIPE_NAME	= path.join( __dirname, 'filesystem_data_client.js' );
 const PIPE_PATH	= "\\\\.\\pipe\\" + PIPE_NAME;
@@ -63,28 +63,37 @@ class FilesystemDataServer extends DataServer
 	 */
 	command( args, callback )
 	{
-		let socket			= new Socket();
 		let responseData	= [];
+		let socket	= net.createConnection( PIPE_PATH, ( err ) =>{
+			socket.on( 'error', ( err ) => {
+				callback( err )
+			});
 
-		socket.on( 'error', ( err ) => {
-			callback( err )
+			socket.on( 'data', ( data ) => {
+				responseData.push( data );
+			});
+
+			socket.on( 'end', () => {
+				let response	= Buffer.concat( responseData ).toString( 'utf8' );
+
+				try
+				{
+					response	= JSON.parse( response );
+				}
+				catch ( error )
+				{
+					response	= {};
+				}
+
+				response.error	= typeof response.error === 'boolean' ? response.error : true;
+				response.data	= typeof response.data !== 'undefined' ? response.data : {};
+
+				callback( response.error, response.data );
+			});
+
+			args	= typeof args === 'object' ? args : {};
+			socket.write( JSON.stringify( args ), 'utf8' );
 		});
-
-		socket.on( 'data', ( data ) => {
-			responseData.push( data );
-		});
-
-		socket.on( 'end', () => {
-			let bufferedData	= Buffer.concat( responseData );
-
-			callback( bufferedData.toString( 'utf8' ) );
-		});
-
-		socket.connect( PIPE_PATH, () => {});
-		socket.on( 'close', () => {});
-
-		args	= typeof args === 'object' ? args : {};
-		socket.end( JSON.stringify( args ) );
 	}
 
 	/**
@@ -107,6 +116,10 @@ class FilesystemDataServer extends DataServer
 	{
 		command	= typeof command === 'string' ? command : false;
 		args	= typeof args === 'object' ? args : false;
+		if ( typeof callback !== 'function' )
+		{
+			throw new Error( 'Callback must be provided' );
+		}
 
 		command	= {
 			command	: command,
@@ -133,13 +146,6 @@ class FilesystemDataServer extends DataServer
 	 */
 	existsNamespace( namespace, options = {}, callback = null )
 	{
-		if ( typeof namespace !== 'string' )
-		{
-			callback( new Error( `The namespace should be a string, ${typeof namespace} given.` ) );
-			return;
-		}
-
-		callback( fs.existsSync( namespace ) );
 	}
 
 	/**
