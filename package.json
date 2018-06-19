@@ -24,7 +24,8 @@
   },
   "bundleDependencies": false,
   "dependencies": {
-    "npm": "^6.1.0"
+    "npm": "^6.1.0",
+    "snyk": "^1.83.0"
   },
   "deprecated": false,
   "description": "An event driven restful server with useful functionality",
@@ -32,7 +33,10 @@
   "main": "server.js",
   "name": "event_request",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
-  "version": "1.2.2"
+  "version": "1.2.2",
+  "snyk": true
 }
