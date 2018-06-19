@@ -1,9 +1,14 @@
 'use strict';
 
-const DataServer	= require( './data_server' );
+const DataServer	= require( '../data_server' );
 const os			= require( 'os' );
 const fs			= require( 'fs' );
 const path			= require( 'path' );
+const fork			= require( 'child_process' ).fork;
+const { Socket }	= require( 'net' );
+
+const PIPE_NAME	= path.join( __dirname, 'filesystem_data_client.js' );
+const PIPE_PATH	= "\\\\.\\pipe\\" + PIPE_NAME;
 
 /**
  * @brief	Simple caching server that stores cache on the file system
@@ -26,18 +31,69 @@ class FilesystemDataServer extends DataServer
 	}
 
 	/**
+	 * @brief	Creates a new instance of the filesystem_data_client if needed
+	 *
+	 * @param	Function callback
+	 *
+	 * @return	void
+	 */
+	forkClient( callback )
+	{
+		let spawnedClient	= fork( path.join( __dirname, './filesystem_data_client' ), [], {
+			cwd	: undefined,
+			env	: process.env,
+		} );
+
+		spawnedClient.on( 'error', ( err )=>{
+			callback( err );
+		});
+
+		spawnedClient.on( 'message', ( message )=>{
+			callback( message.status );
+		});
+	}
+
+	/**
+	 * @brief	Establishes a socket connection to the filesystem data client
+	 *
+	 * @param	Object args
+	 * @param	Function callback
+	 *
+	 * @return	void
+	 */
+	command( args, callback )
+	{
+		let socket			= new Socket();
+		let responseData	= [];
+
+		socket.on( 'error', ( err ) => {
+			callback( err )
+		});
+
+		socket.on( 'data', ( data ) => {
+			responseData.push( data );
+		});
+
+		socket.on( 'end', () => {
+			let bufferedData	= Buffer.concat( responseData );
+
+			console.log( bufferedData.toString( 'utf8' ) );
+			callback( bufferedData.toString( 'utf8' ) );
+		});
+
+		socket.connect( PIPE_PATH, () => {});
+		socket.on( 'close', () => {});
+
+		args	= typeof args === 'object' ? args : {};
+		socket.write( args );
+	}
+
+	/**
 	 * @see	DataServer::setUp()
 	 */
 	setUp( options = {}, callback = ()=>{} )
 	{
-		if ( ! fs.existsSync( this.cachingFolder ) )
-		{
-			fs.mkdir( this.cachingFolder, null, callback );
-		}
-		else
-		{
-			callback( false );
-		}
+		this.forkClient( callback );
 	}
 
 	/**

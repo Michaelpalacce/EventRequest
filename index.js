@@ -264,3 +264,11 @@ module.exports	= {
 		LOG_LEVELS	: LOG_LEVELS
 	}
 };
+
+
+// const FilesystemDataServer	= require( './server/caching/data_stores/filesystem/filesystem_data_server' );
+//
+// let fileSystemDataServer	= new FilesystemDataServer( { cachingFolder: 'Cache' } );
+// fileSystemDataServer.setUp({}, ( err )=>{
+// 	console.log('setup', err );
+// });

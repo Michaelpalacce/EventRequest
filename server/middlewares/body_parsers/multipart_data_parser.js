@@ -21,7 +21,7 @@ const CONTENT_DISPOSITION_FILENAME_REGEX		= /\bfilename="([^"]+)"/;
 const CONTENT_TYPE_GET_TYPE_REGEX				= /Content-Type:\s+(.+)$/;
 const SYSTEM_EOL								= os.EOL;
 const SYSTEM_EOL_LENGTH							= SYSTEM_EOL.length;
-const DEFAULT_BUFFER_ENCODING					= 'ascii';
+const DEFAULT_BUFFER_ENCODING					= 'utf8';
 const DEFAULT_BOUNDARY_PREFIX					= '--';
 const MULTIPART_PARSER_SUPPORTED_TYPE			= 'multipart/form-data';
 const RANDOM_NAME_LENGTH						= 20;
