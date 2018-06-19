@@ -77,7 +77,6 @@ class FilesystemDataServer extends DataServer
 		socket.on( 'end', () => {
 			let bufferedData	= Buffer.concat( responseData );
 
-			console.log( bufferedData.toString( 'utf8' ) );
 			callback( bufferedData.toString( 'utf8' ) );
 		});
 
@@ -85,7 +84,7 @@ class FilesystemDataServer extends DataServer
 		socket.on( 'close', () => {});
 
 		args	= typeof args === 'object' ? args : {};
-		socket.write( args );
+		socket.end( JSON.stringify( args ) );
 	}
 
 	/**
@@ -97,29 +96,36 @@ class FilesystemDataServer extends DataServer
 	}
 
 	/**
+	 * @brief	Gets a command given command name and arguments
+	 *
+	 * @param	String command
+	 * @param	Object args
+	 *
+	 * @return	Object
+	 */
+	getCommand( command, args, callback )
+	{
+		command	= typeof command === 'string' ? command : false;
+		args	= typeof args === 'object' ? args : false;
+
+		command	= {
+			command	: command,
+			args	: args
+		};
+
+		return () => {
+			this.command( command, callback );
+		}
+	}
+
+	/**
 	 * @see	DataServer::createNamespace()
 	 */
 	createNamespace( namespace, options = {}, callback = ()=>{} )
 	{
-		if ( typeof namespace !== 'string' )
-		{
-			callback( new Error( `The namespace should be a string, ${typeof namespace} given.` ) );
-		}
-		else
-		{
-			let newNamespace	= path.join( this.cachingFolder, namespace );
+		let command	= this.getCommand( 'createNamespace', { namespace: namespace }, callback );
 
-			this.existsNamespace( newNamespace, {}, ( exists )=>{
-				if ( ! exists )
-				{
-					fs.mkdir( newNamespace, null, callback );
-				}
-				else
-				{
-					callback( new Error( `The namespace ${namespace} already exists!` ) );
-				}
-			});
-		}
+		command();
 	}
 
 	/**
