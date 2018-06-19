@@ -266,13 +266,15 @@ module.exports	= {
 };
 
 
-// const FilesystemDataServer	= require( './server/caching/data_stores/filesystem/filesystem_data_server' );
-//
-// let fileSystemDataServer	= new FilesystemDataServer( { cachingFolder: 'Cache' } );
-// fileSystemDataServer.setUp({}, ( err )=>{
-// 	fileSystemDataServer.createNamespace( 'test', {}, ( nextErr, data )=>{
-// 		console.log( nextErr );
-// 		console.log( data );
-// 	});
-// });
+const FilesystemDataServer	= require( './server/caching/data_stores/filesystem/filesystem_data_server' );
+
+let fileSystemDataServer	= new FilesystemDataServer( { cachingFolder: 'Cache' } );
+fileSystemDataServer.setUp( {}, ( err, data ) => {
+	console.log( err );
+	console.log( data );
+	fileSystemDataServer.createNamespace( 'test', {}, ( nextErr, data )=>{
+		console.log( nextErr );
+		console.log( data );
+	});
+});
 

@@ -49,7 +49,16 @@ class FilesystemDataServer extends DataServer
 		});
 
 		spawnedClient.on( 'message', ( message )=>{
-			callback( message.status );
+			if ( ! message.status )
+			{
+				let command	= this.getCommand( 'setUp', { cachingFolder : this.cachingFolder }, callback );
+
+				command();
+			}
+			else
+			{
+				callback( message.status );
+			}
 		});
 	}
 
@@ -85,10 +94,7 @@ class FilesystemDataServer extends DataServer
 					response	= {};
 				}
 
-				response.error	= typeof response.error === 'boolean' ? response.error : true;
-				response.data	= typeof response.data !== 'undefined' ? response.data : {};
-
-				callback( response.error, response.data );
+				callback( response );
 			});
 
 			args	= typeof args === 'object' ? args : {};
@@ -127,7 +133,12 @@ class FilesystemDataServer extends DataServer
 		};
 
 		return () => {
-			this.command( command, callback );
+			this.command( command, ( response ) =>{
+				response.error	= typeof response.error !== 'undefined' ? response.error : true;
+				response.data	= typeof response.data !== 'undefined' ? response.data : {};
+
+				callback( response.error, response.data );
+			});
 		}
 	}
 
@@ -144,14 +155,17 @@ class FilesystemDataServer extends DataServer
 	/**
 	 * @see	DataServer::existsNamespace()
 	 */
-	existsNamespace( namespace, options = {}, callback = null )
+	existsNamespace( namespace, options = {}, callback = ()=>{} )
 	{
+		let command	= this.getCommand( 'existsNamespace', { namespace: namespace }, callback );
+
+		command();
 	}
 
 	/**
 	 * @see	DataServer::create()
 	 */
-	create( namespace, recordName, ttl = 0, data = {}, options = {}, callback = null )
+	create( namespace, recordName, ttl = 0, data = {}, options = {}, callback = ()=>{} )
 	{
 		if ( typeof recordName !== 'string' )
 		{
