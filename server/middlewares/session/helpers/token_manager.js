@@ -1,7 +1,7 @@
 'use strict';
 
 const data			= require( '../../../caching/data_stores/filesystem_data_store' );
-const stringHelper	= require( './../../../unique_id' );
+const stringHelper	= require( '../../../helpers/unique_id' );
 
 /**
  * @brief	Token Manager responsible for working with the tokens
@@ -48,7 +48,6 @@ class TokenManager
 			}
 		});
 	}
-
 
 	/**
 	 * @brief	Check if token is expired

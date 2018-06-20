@@ -14,9 +14,14 @@ const PING					= 'ping';
 const SET_UP				= 'setUp';
 const CREATE_NAMESPACE		= 'createNamespace';
 const EXISTS_NAMESPACE		= 'existsNamespace';
+const REMOVE_NAMESPACE		= 'removeNamespace';
+const GET_ALL_NAMESPACE		= 'getAll';
 const CREATE_DATA_RECORD	= 'create';
 const EXISTS_DATA_RECORD	= 'exists';
 const TOUCH_DATA_RECORD		= 'touch';
+const UPDATE_DATA_RECORD	= 'update';
+const READ_DATA_RECORD		= 'read';
+const DELETE_DATA_RECORD	= 'delete';
 
 /**
  * @brief	Memory worker that stores data in memory
@@ -27,7 +32,8 @@ class MemoryWorker
 {
 	constructor()
 	{
-		this.data	= {};
+		this.data		= {};
+		this.timeouts	= {};
 		this.setUpServer();
 	}
 
@@ -56,10 +62,7 @@ class MemoryWorker
 					error			= error instanceof Error ? error.stack : error;
 					data			= typeof data !== 'undefined' ? data : {};
 
-					let response	= {
-						error	: error,
-						data	: data
-					};
+					let response	= { error, data };
 
 					stream.end( JSON.stringify( response ) );
 				});
@@ -96,10 +99,7 @@ class MemoryWorker
 			this.processCommand( '', callback );
 		}
 
-		command	= {
-			command	: command,
-			args	: args
-		};
+		command	= { command, args };
 
 		this.processCommand( command, callback );
 	};
@@ -114,8 +114,7 @@ class MemoryWorker
 	 */
 	processCommand( data, callback )
 	{
-		let command	= data.command;
-		let args	= data.args;
+		let { command, args }	= data;
 
 		switch ( command )
 		{
@@ -129,6 +128,10 @@ class MemoryWorker
 
 			case CREATE_NAMESPACE:
 				this.createNamespace( args, callback );
+				break;
+
+			case REMOVE_NAMESPACE:
+				this.removeNamespace( args, callback );
 				break;
 
 			case PING:
@@ -147,10 +150,107 @@ class MemoryWorker
 				this.touch( args, callback );
 				break;
 
+			case UPDATE_DATA_RECORD:
+				this.update( args, callback );
+				break;
+
+			case READ_DATA_RECORD:
+				this.read( args, callback );
+				break;
+
+			case DELETE_DATA_RECORD:
+				this.delete( args, callback );
+				break;
+
+			case GET_ALL_NAMESPACE:
+				this.getAll( args, callback );
+				break;
+
 			default:
 				callback( new Error( 'Invalid command' ) );
 				break;
 		}
+	}
+
+	/**
+	 * @brief	Gets all data from namespace
+	 *
+	 * @param args
+	 * @param callback
+	 */
+	getAll( args, callback )
+	{
+		this.executeInternalCommand( 'existsNamespace', args, ( err, exists ) =>{
+			let { namespace }	= args;
+
+			if ( ! err && exists )
+			{
+				callback( false, this.data[namespace] );
+			}
+			else
+			{
+				callback( new Error( `The namespace ${namespace} does not exist` ) );
+			}
+		});
+	}
+
+	/**
+	 * @see	DataServer::delete()
+	 */
+	delete( args, callback )
+	{
+		this.executeInternalCommand( 'exists', args, ( err, exists ) => {
+			if ( ! err && exists )
+			{
+				let { namespace, recordName } = args;
+
+				this.clearTimeoutFromData( namespace, recordName );
+				delete this.data[namespace][recordName];
+				callback( false );
+			}
+			else
+			{
+				callback( new Error( 'Record does not exist' ) );
+			}
+		});
+	}
+
+	/**
+	 * @see	DataServer::update()
+	 */
+	read( args, callback )
+	{
+		this.executeInternalCommand( 'touch', args, ( err ) => {
+			if ( ! err )
+			{
+				let { namespace, recordName }	= args;
+
+				callback( false, this.data[namespace][recordName].data );
+			}
+			else
+			{
+				callback( err );
+			}
+		});
+	}
+
+	/**
+	 * @see	DataServer::update()
+	 */
+	update( args, callback )
+	{
+		this.executeInternalCommand( 'touch', args, ( err ) => {
+			if ( ! err )
+			{
+				let { namespace, recordName, data }		= args;
+				this.data[namespace][recordName].data	= data;
+				callback( false );
+			}
+			else
+			{
+				callback( err );
+			}
+		});
 	}
 
 	/**
@@ -161,10 +261,8 @@ class MemoryWorker
 		this.executeInternalCommand( 'exists', args, ( err, exists ) => {
 			if ( ! err && exists )
 			{
-				let namespace	= args.namespace;
-				let recordName	= args.recordName;
+				let { namespace, recordName } = args;
 
-				this.clearTimeoutFromData( namespace, recordName );
 				this.addTimeoutToData( namespace, recordName, this.getTTL( args ) );
 				callback( false );
 			}
@@ -180,12 +278,8 @@ class MemoryWorker
 	 */
 	exists( args, callback )
 	{
-		let namespace	= args.namespace;
-		let recordName	= typeof args.recordName === 'string'
-						? args.recordName
-						: false;
-
-		if ( ! recordName )
+		let { namespace, recordName }	= args;
+		if ( typeof recordName !== 'string' )
 		{
 			callback( new Error( 'Invalid record name' ) );
 			return;
@@ -218,16 +312,14 @@ class MemoryWorker
 					}
 					else
 					{
-						let namespace	= args.namespace;
-						let data		= args.data;
-						let recordName	= args.recordName;
+						let { namespace, data, recordName }	= args;
 
 						if ( exists )
 						{
 							this.clearTimeoutFromData( namespace, recordName );
 						}
 
-						this.data[namespace][recordName]	= { data : data };
+						this.data[namespace][recordName]	= data;
 						this.addTimeoutToData( namespace, recordName, this.getTTL( args ) );
 
 						callback( false );
@@ -246,7 +338,7 @@ class MemoryWorker
 	 */
 	existsNamespace( args, callback )
 	{
-		let namespace	= args.namespace;
+		let { namespace }	= args;
 
 		if ( typeof namespace !== 'string' )
 		{
@@ -257,37 +349,54 @@ class MemoryWorker
 		callback( false, typeof this.data[namespace] === 'object' );
 	};
 
-
 	/**
 	 * @see	DataServer::createNamespace()
 	 */
 	createNamespace( args, callback )
 	{
-		let namespace	= args.namespace;
-		if ( typeof namespace !== 'string' )
-		{
-			callback( new Error( `The namespace should be a string, ${typeof namespace} given.` ) );
-		}
-		else
-		{
-			this.executeInternalCommand( 'existsNamespace', args, ( err, exists )=>{
+		let { namespace }	= args;
 
-				if ( ! err && ! exists )
-				{
-					this.data[namespace]	= {};
-				}
+		this.executeInternalCommand( 'existsNamespace', args, ( err, exists )=>{
 
-				if ( err )
+			if ( ! err && ! exists )
+			{
+				this.data[namespace]	= {};
+			}
+
+			callback( err ? err : true );
+		});
+	};
+
+	/**
+	 * @see	DataServer::removeNamespace()
+	 */
+	removeNamespace( args, callback )
+	{
+		let { namespace }	= args;
+
+		this.executeInternalCommand( 'existsNamespace', args, ( err, exists ) => {
+			if ( err )
+			{
+				callback( err ? err : true );
+			}
+			else
+			{
+				if ( exists )
 				{
-					callback( err );
+					Object.keys( this.data[namespace] ).forEach( ( key ) => {
+						this.clearTimeoutFromData( namespace, key );
+					});
+					delete this.data[namespace];
+
+					callback( false, this.data );
 				}
 				else
 				{
 					callback( false );
 				}
-			});
-		}
-	};
+			}
+		});
+	}
 
 	/**
 	 * @brief	Adds a timeout to the given data
@@ -300,13 +409,18 @@ class MemoryWorker
 	 */
 	addTimeoutToData( namespace, recordName, ttl )
 	{
+		this.clearTimeoutFromData( namespace, recordName );
+
 		if ( ttl > 0 )
 		{
-			this.data[namespace][recordName][TIMEOUT_OPTION]	= setTimeout( () => {
+			let keyPair	= namespace + recordName;
+			this.timeouts[keyPair]	= setTimeout( () => {
 				if ( typeof this.data[namespace] !== 'undefined' )
 				{
 					delete this.data[namespace][recordName];
 				}
+
+				delete this.timeouts[keyPair]
 			}, ttl );
 		}
 	}
@@ -321,7 +435,10 @@ class MemoryWorker
 	 */
 	clearTimeoutFromData( namespace, recordName )
 	{
-		clearInterval( this.data[namespace][recordName][TIMEOUT_OPTION] );
+		let keyPair	= namespace + recordName;
+
+		clearInterval( this.timeouts[keyPair] );
+		delete this.timeouts[keyPair];
 	}
 
 	/**

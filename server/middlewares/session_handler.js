@@ -192,11 +192,11 @@ class SessionHandler
  * @brief	Export all the relevant security modules
  */
 module.exports	= {
-	AuthenticationManager			: AuthenticationManager,
-	LoginManager					: LoginManager,
-	SessionSaveManager				: SessionSaveManager,
-	SessionAuthenticationManager	: SessionAuthenticationManager,
-	SecurityManager					: SecurityManager,
-	TokenManager					: TokenManager,
-	SessionHandler					: SessionHandler
+	AuthenticationManager,
+	LoginManager,
+	SessionSaveManager,
+	SessionAuthenticationManager,
+	SecurityManager,
+	TokenManager,
+	SessionHandler
 };

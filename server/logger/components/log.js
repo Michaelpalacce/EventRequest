@@ -152,6 +152,6 @@ class Log
 }
 
 module.exports	= {
-	Log			: Log,
-	LOG_LEVELS	: LOG_LEVELS
+	Log,
+	LOG_LEVELS
 };

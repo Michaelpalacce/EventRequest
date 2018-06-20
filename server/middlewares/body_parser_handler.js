@@ -133,9 +133,9 @@ class BodyParserHandler
 }
 
 module.exports	= {
-	BodyParserHandler	: BodyParserHandler,
-	BodyParser			: BodyParser,
-	MultipartFormParser	: MultipartFormParser,
-	JsonBodyParser		: JsonBodyParser,
-	FormBodyParser		: FormBodyParser
+	BodyParserHandler,
+	BodyParser,
+	MultipartFormParser,
+	JsonBodyParser,
+	FormBodyParser
 };

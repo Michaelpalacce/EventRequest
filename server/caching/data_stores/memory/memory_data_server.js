@@ -154,10 +154,7 @@ class MemoryDataServer extends DataServer
 			throw new Error( 'Callback must be provided' );
 		}
 
-		command	= {
-			command	: command,
-			args	: args
-		};
+		command	= { command, args };
 
 		this.command( command, ( response ) =>{
 			response.error	= typeof response.error !== 'undefined' ? response.error : true;
@@ -172,7 +169,7 @@ class MemoryDataServer extends DataServer
 	 */
 	createNamespace( namespace, options = {}, callback = ()=>{} )
 	{
-		this.doCommand( 'createNamespace', { namespace: namespace }, callback );
+		this.doCommand( 'createNamespace', { namespace, options  }, callback );
 	}
 
 	/**
@@ -180,7 +177,15 @@ class MemoryDataServer extends DataServer
 	 */
 	existsNamespace( namespace, options = {}, callback = ()=>{} )
 	{
-		this.doCommand( 'existsNamespace', { namespace: namespace }, callback );
+		this.doCommand( 'existsNamespace', { namespace, options  }, callback );
+	}
+
+	/**
+	 * @see	DataServer::removeNamespace()
+	 */
+	removeNamespace( namespace, options = {}, callback = null )
+	{
+		this.doCommand( 'removeNamespace', { namespace, options  }, callback );
 	}
 
 	/**
@@ -188,7 +193,7 @@ class MemoryDataServer extends DataServer
 	 */
 	create( namespace, recordName, data = {}, options = {}, callback = ()=>{} )
 	{
-		this.doCommand( 'create', { namespace: namespace, recordName: recordName, data: data, options: options }, callback );
+		this.doCommand( 'create', { namespace, recordName, data, options }, callback );
 	}
 
 	/**
@@ -196,7 +201,7 @@ class MemoryDataServer extends DataServer
 	 */
 	exists( namespace, recordName, options = {}, callback = ()=>{} )
 	{
-		this.doCommand( 'exists', { namespace: namespace, recordName: recordName, options: options }, callback );
+		this.doCommand( 'exists', { namespace, recordName, options }, callback );
 	}
 
 	/**
@@ -204,7 +209,39 @@ class MemoryDataServer extends DataServer
 	 */
 	touch( namespace, recordName, options = {}, callback = ()=>{} )
 	{
-		this.doCommand( 'touch', { namespace: namespace, recordName: recordName, options: options }, callback );
+		this.doCommand( 'touch', { namespace, recordName, options }, callback );
+	}
+
+	/**
+	 * @see	DataServer::update()
+	 */
+	update( namespace, recordName, data = {}, options = {}, callback = null )
+	{
+		this.doCommand( 'update', { namespace, recordName, data, options }, callback );
+	}
+
+	/**
+	 * @see	DataServer::read()
+	 */
+	read( namespace, recordName, options = {}, callback = null )
+	{
+		this.doCommand( 'read', { namespace, recordName, options }, callback );
+	}
+
+	/**
+	 * @see	DataServer::delete()
+	 */
+	delete( namespace, recordName, options = {}, callback = null )
+	{
+		this.doCommand( 'delete', { namespace, recordName, options }, callback );
+	}
+
+	/**
+	 * @see	DataServer::getAll()
+	 */
+	getAll( namespace, options = {}, callback = null )
+	{
+		this.doCommand( 'getAll', { namespace, options }, callback );
 	}
 }
 

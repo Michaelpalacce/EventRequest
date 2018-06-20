@@ -3,7 +3,7 @@
 // Dependencies
 const fs									= require( 'fs' );
 const path									= require( 'path' );
-const setAdvTimeout							= require( './timeout' );
+const setAdvTimeout							= require( './helpers/timeout' );
 const { BodyParserHandler }					= require( './middlewares/body_parser_handler' );
 const TemplatingEngine						= require( './middlewares/templating_engine' );
 const BaseTemplatingEngine					= require( './middlewares/templating_engines/base_templating_engine' );

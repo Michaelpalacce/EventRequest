@@ -131,8 +131,8 @@ class FileStreamHandler
 }
 
 module.exports	= {
-	FileStreamHandler	: FileStreamHandler,
-	FileStream			: FileStream,
-	Mp4FileStream		: Mp4FileStream,
-	TextFileStream		: TextFileStream
+	FileStreamHandler,
+	FileStream,
+	Mp4FileStream,
+	TextFileStream
 };

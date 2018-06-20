@@ -221,8 +221,8 @@ class Logger
 }
 
 module.exports	= {
-	Logger		: Logger,
-	Transport	: Transport,
-	Console		: Console,
-	File		: File,
+	Logger,
+	Transport,
+	Console,
+	File
 };
