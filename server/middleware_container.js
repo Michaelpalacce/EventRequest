@@ -8,7 +8,7 @@ const { BodyParserHandler }					= require( './middlewares/body_parser_handler' )
 const TemplatingEngine						= require( './middlewares/templating_engine' );
 const BaseTemplatingEngine					= require( './middlewares/templating_engines/base_templating_engine' );
 const { FileStreamHandler }					= require( './middlewares/file_stream_handler' );
-const { SessionHandler, TokenManager }		= require( './middlewares/session_handler' );
+const { SessionHandler }					= require( './middlewares/session_handler' );
 const { Logger }							= require( './logger/components/logger' );
 
 // Define the object

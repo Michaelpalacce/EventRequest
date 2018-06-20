@@ -45,7 +45,7 @@ class MemoryDataServer extends DataServer
 		let spawnedClient	= fork( path.join( __dirname, './memory_data_client' ), [], {
 			cwd	: undefined,
 			env	: process.env,
-		} );
+		});
 
 		spawnedClient.on( 'error', ( err )=>{
 			callback( err );
@@ -132,6 +132,10 @@ class MemoryDataServer extends DataServer
 				if ( cluster.isMaster )
 				{
 					this.forkClient( callback )
+				}
+				else
+				{
+					callback( false, 'Worker found caching server' );
 				}
 			}
 			else

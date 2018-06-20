@@ -19,10 +19,9 @@ class SessionSaveManager extends SecurityManager
 	{
 		super( options );
 		this.sessionName			= this.options.sessionName;
-		this.tokenExpiration		= this.options.tokenExpiration;
+		this.tokenManager			= this.options.tokenManager;
 
 		this.sanitize();
-		this.tokenManager			= new TokenManager( this.options );
 	}
 
 	/**
@@ -30,7 +29,7 @@ class SessionSaveManager extends SecurityManager
 	 */
 	sanitize()
 	{
-		if ( this.sessionName == undefined || this.tokenExpiration == undefined )
+		if ( this.sessionName == undefined || this.tokenManager == undefined )
 		{
 			throw new Error( 'Invalid Configuration provided' );
 		}

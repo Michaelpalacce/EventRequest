@@ -408,7 +408,7 @@ class RequestEvent extends EventEmitter
 			this.errorHandler	= new ErrorHandler();
 		}
 
-		this.errorHandler.handle( this, error, code );
+		this.errorHandler.handleError( this, error, code );
 	}
 
 	/**

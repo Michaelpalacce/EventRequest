@@ -39,8 +39,8 @@ const OPTIONS_PARAM_COMMUNICATION_MANAGER			= 'communicationManager';
 const OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT	= CommunicationManager;
 const OPTIONS_PARAM_ERROR_HANDLER					= 'errorHandler';
 const OPTIONS_PARAM_ERROR_HANDLER_DEFAULT			= ErrorHandler;
-const OPTIONS_PARAM_CACHING_HANDLER					= 'cachingHandler';
-const OPTIONS_PARAM_CACHING_HANDLER_DEFAULT			= MemoryDataServer;
+const OPTIONS_PARAM_CACHING_SERVER					= 'cachingServer';
+const OPTIONS_PARAM_CACHING_SERVER_DEFAULT			= MemoryDataServer;
 
 const POSSIBLE_PROTOCOL_OPTIONS						= {};
 POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]			= http;
@@ -111,17 +111,31 @@ class Server
 									? this.communicationManager
 									: new OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT();
 
-		this.cachingHandler			= options[OPTIONS_PARAM_CACHING_HANDLER];
-		this.cachingHandler			= typeof this.cachingHandler === 'object'
-									&& this.cachingHandler instanceof DataServer
-									? this.cachingHandler
-									: new OPTIONS_PARAM_CACHING_HANDLER_DEFAULT();
-
 		this.errorHandler			= options[OPTIONS_PARAM_ERROR_HANDLER];
 		this.errorHandler			= typeof this.errorHandler === 'object'
 									&& this.errorHandler instanceof ErrorHandler
 									? this.errorHandler
 									: new OPTIONS_PARAM_ERROR_HANDLER_DEFAULT();
+
+		this.cachingServer			= options[OPTIONS_PARAM_CACHING_SERVER];
+		this.cachingServer			= typeof this.cachingServer === 'object'
+									&& this.cachingServer instanceof DataServer
+									? this.cachingServer
+									: new OPTIONS_PARAM_CACHING_SERVER_DEFAULT();
+
+		this.cachingServer.setUp( {}, ( err, data ) =>{
+			if ( err )
+			{
+				throw new Error( err );
+			}
+			else
+			{
+				Loggur.log({
+					level	: LOG_LEVELS.warning,
+					message	: data
+				});
+			}
+		});
 	}
 
 	/**
@@ -176,7 +190,7 @@ class Server
 	{
 		let requestEvent			= this.resolve( req, res );
 		requestEvent.errorHandler	= this.errorHandler;
-		requestEvent.cachingHandler	= this.cachingHandler;
+		requestEvent.cachingServer	= this.cachingServer;
 
 		req.on( 'close', ()=> {
 			requestEvent.cleanUp();
@@ -227,6 +241,7 @@ class Server
 					level	: LOG_LEVELS.warning,
 					message	: `Server ${cluster.worker.id} successfully started and listening on port: ${this.port}`
 				});
+
 				successCallback();
 			}
 		);

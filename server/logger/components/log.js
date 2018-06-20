@@ -52,6 +52,16 @@ class Log
 		else if ( logType === 'object' )
 		{
 			this.level		= typeof log.level === 'number' ? log.level : WRONG_LOG_DEFAULT_LEVEL;
+
+			if ( log.message instanceof Error )
+			{
+				log.message	= log.message.stack;
+			}
+			if ( typeof log.message === 'object' )
+			{
+				log.message	= JSON.stringify( log.message );
+			}
+
 			this.message	= typeof log.message === 'string' ? log.message : WRONG_LOG_DEFAULT_MESSAGE;
 		}
 		else

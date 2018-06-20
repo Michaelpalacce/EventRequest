@@ -1,7 +1,12 @@
 'use strict';
 
-const data			= require( '../../../caching/data_stores/filesystem_data_store' );
 const stringHelper	= require( '../../../helpers/unique_id' );
+const RequestEvent	= require( '../../../event' );
+
+/**
+ * @brief	Constants
+ */
+const TOKEN_NAMESPACE	= 'tokens';
 
 /**
  * @brief	Token Manager responsible for working with the tokens
@@ -9,14 +14,35 @@ const stringHelper	= require( '../../../helpers/unique_id' );
 class TokenManager
 {
 	/**
-	 * @brief	Accepted options:
-	 * 			- tokenExpiration - Number - The amount of time before expiring the token Defaults to 0
-	 *
+	 * @param	RequestEvent event
 	 * @param	Object options
 	 */
-	constructor( options )
+	constructor( event, options )
 	{
-		this.tokenExpiration	= options.tokenExpiration || 0;
+		this.tokenExpiration	= typeof options.tokenExpiration === 'number' ? options.tokenExpiration : 0;
+		this.cachingServer		= typeof event === 'object' && event instanceof RequestEvent ? event.cachingServer : false;
+
+		if ( ! this.cachingServer )
+		{
+			throw new Error( 'Invalid Caching server provided. Token manager uses DataServer as cache' );
+		}
+
+		this.setUpNamespace();
+	}
+
+	/**
+	 * @brief	Sets up the namespace
+	 *
+	 * @return	void
+	 */
+	setUpNamespace()
+	{
+		this.cachingServer.createNamespace( TOKEN_NAMESPACE, {}, ( err ) =>{
+			if ( err )
+			{
+				throw new Error( 'Could not create Namespace' );
+			}
+		});
 	}
 
 	/**
@@ -31,19 +57,21 @@ class TokenManager
 	createCookie( event, name, callback )
 	{
 		let sid			= stringHelper.makeId();
+		let ttl			= this.tokenExpiration;
 		let tokenData	= {
 			authenticated	: true,
 			sessionId		: sid,
-			expires			: Date.now() + this.tokenExpiration
+			expires			: Date.now() + ttl
 		};
 
-		data.create( 'tokens', sid, tokenData, ( err ) => {
+		this.cachingServer.create( TOKEN_NAMESPACE, sid, tokenData, { ttl }, ( err ) => {
 			if ( ! err )
 			{
 				event.setHeader( 'Set-Cookie', [ name + '=' + sid] );
 				callback( false, tokenData );
 			}
-			else {
+			else
+			{
 				callback( err );
 			}
 		});
@@ -59,18 +87,20 @@ class TokenManager
 	 */
 	isExpired( sid, callback )
 	{
-		data.read( 'tokens', sid, ( err, sidData ) => {
+		this.cachingServer.read( TOKEN_NAMESPACE, sid, {}, ( err, sidData ) => {
 			if ( ! err && sidData )
 			{
 				if ( sidData.expires > Date.now() )
 				{
 					callback( false, sidData )
 				}
-				else {
+				else
+				{
 					callback( true );
 				}
 			}
-			else {
+			else
+			{
 				callback( true );
 			}
 		});
@@ -88,21 +118,25 @@ class TokenManager
 	{
 		let sid	= token.sessionId;
 
-		data.read( 'tokens', sid, ( err, sidData ) => {
+		this.cachingServer.read( TOKEN_NAMESPACE, sid, {}, ( err, sidData ) => {
 			if ( ! err && sidData )
 			{
-				token.expires	= Date.now() + this.tokenExpiration;
-				data.update( 'tokens', sid, token, ( err ) => {
+				let ttl			= this.tokenExpiration;
+				token.expires	= Date.now() + ttl;
+
+				this.cachingServer.update( TOKEN_NAMESPACE, sid, token, { ttl }, ( err ) => {
 					if ( err )
 					{
 						callback( err );
 					}
-					else {
+					else
+					{
 						callback( false, sidData );
 					}
 				});
 			}
-			else {
+			else
+			{
 				callback( true );
 			}
 		});

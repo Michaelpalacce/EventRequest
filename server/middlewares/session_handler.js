@@ -56,7 +56,13 @@ class SessionHandler
 			authenticationCallback	: this.securityConfig.authenticationCallback || DEFAULT_AUTHENTICATION_CALLBACK,
 			sessionName				: this.securityConfig.sessionName || DEFAULT_SESSION_NAME,
 			tokenExpiration			: this.securityConfig.tokenExpiration || DEFAULT_TOKEN_EXPIRATION_TIME,
+			tokenManager			: typeof this.securityConfig.tokenManager === 'object'
+									&& this.securityConfig.tokenManager instanceof TokenManager
+									? this.securityConfig.tokenManager
+									: TokenManager
 		};
+
+		this.baseOptions.tokenManager	= new this.baseOptions.tokenManager( this.event, this.baseOptions );
 
 		this.securityConfig.managers	= typeof this.securityConfig.managers === 'object' ? this.securityConfig.managers : [];
 

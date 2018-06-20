@@ -20,10 +20,9 @@ class AuthenticationManager extends SecurityManager
 		super( options );
 		this.authenticationRoute	= this.options.authenticationRoute;
 		this.sessionName			= this.options.sessionName;
-		this.tokenExpiration		= this.options.tokenExpiration;
+		this.tokenManager			= this.options.tokenManager;
 
 		this.sanitize();
-		this.tokenManager			= new TokenManager( this.options );
 	}
 
 	/**
@@ -31,7 +30,7 @@ class AuthenticationManager extends SecurityManager
 	 */
 	sanitize()
 	{
-		if ( this.authenticationRoute == undefined || this.sessionName == undefined || this.tokenExpiration == undefined )
+		if ( this.authenticationRoute == undefined || this.sessionName == undefined || this.tokenManager == undefined )
 		{
 			throw new Error( 'Invalid Configuration provided' );
 		}

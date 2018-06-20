@@ -21,10 +21,9 @@ class SessionAuthenticationManager extends SecurityManager
 		this.sessionName			= this.options.sessionName;
 		this.authenticationCallback	= this.options.authenticationCallback;
 		this.authenticationRoute	= this.options.authenticationRoute;
-		this.tokenExpiration		= this.options.tokenExpiration;
-		this.sanitize();
+		this.tokenManager			= this.options.tokenManager;
 
-		this.tokenManager			= new TokenManager( this.options );
+		this.sanitize();
 	}
 
 	/**
@@ -36,7 +35,7 @@ class SessionAuthenticationManager extends SecurityManager
 			this.sessionName == undefined
 			|| this.authenticationCallback == undefined
 			|| this.authenticationRoute == undefined
-			|| this.tokenExpiration == undefined
+			|| this.tokenManager == undefined
 		) {
 			throw new Error( 'Invalid Configuration provided' );
 		}

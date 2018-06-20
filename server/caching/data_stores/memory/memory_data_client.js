@@ -8,8 +8,6 @@ const PIPE_PATH		= "\\\\.\\pipe\\" + PIPE_NAME;
 /**
  * @brief	Constants
  */
-const TIMEOUT_OPTION		= 'timeout';
-
 const PING					= 'ping';
 const SET_UP				= 'setUp';
 const CREATE_NAMESPACE		= 'createNamespace';
@@ -119,7 +117,7 @@ class MemoryWorker
 		switch ( command )
 		{
 			case SET_UP:
-				callback( false );
+				callback( false, 'Caching server is set up' );
 				break;
 
 			case EXISTS_NAMESPACE:
@@ -225,7 +223,7 @@ class MemoryWorker
 			{
 				let { namespace, recordName }	= args;
 
-				callback( false, this.data[namespace][recordName].data );
+				callback( false, this.data[namespace][recordName] );
 			}
 			else
 			{
@@ -242,8 +240,8 @@ class MemoryWorker
 		this.executeInternalCommand( 'touch', args, ( err ) => {
 			if ( ! err )
 			{
-				let { namespace, recordName, data }		= args;
-				this.data[namespace][recordName].data	= data;
+				let { namespace, recordName, data }	= args;
+				this.data[namespace][recordName]	= data;
 				callback( false );
 			}
 			else
@@ -363,7 +361,7 @@ class MemoryWorker
 				this.data[namespace]	= {};
 			}
 
-			callback( err ? err : true );
+			callback( err === true );
 		});
 	};
 
@@ -377,7 +375,7 @@ class MemoryWorker
 		this.executeInternalCommand( 'existsNamespace', args, ( err, exists ) => {
 			if ( err )
 			{
-				callback( err ? err : true );
+				callback( err );
 			}
 			else
 			{
@@ -410,7 +408,7 @@ class MemoryWorker
 	addTimeoutToData( namespace, recordName, ttl )
 	{
 		this.clearTimeoutFromData( namespace, recordName );
-
+		
 		if ( ttl > 0 )
 		{
 			let keyPair	= namespace + recordName;
