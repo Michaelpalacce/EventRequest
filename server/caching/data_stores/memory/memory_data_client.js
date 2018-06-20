@@ -127,17 +127,25 @@ class MemoryWorker
 				break;
 
 			case PING:
-				console.log( 'PINGED!' );
 				callback( false, 'pong' );
 				break;
 
 			case CREATE_DATA_RECORD:
+				this.create( args, callback );
+				break;
+
 			default:
 				callback( 'Invalid command' );
 				break;
 		}
 	}
 
+	create( args, callback )
+	{
+		console.log( args );
+
+		callback( 'NOT IMPLEMENTED YET' );
+	}
 
 	/**
 	 * @see	DataServer::existsNamespace

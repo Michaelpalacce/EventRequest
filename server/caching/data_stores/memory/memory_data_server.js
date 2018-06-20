@@ -85,7 +85,10 @@ class MemoryDataServer extends DataServer
 		});
 
 		socket.on( 'error', ( error )=>{
-			callback( error );
+			callback({
+				error	: true,
+				data	: error
+			});
 		});
 
 		socket.on( 'data', ( data ) => {
@@ -113,7 +116,7 @@ class MemoryDataServer extends DataServer
 	 */
 	setUp( options = {}, callback = ()=>{} )
 	{
-		this.ping( options, callback() );
+		this.ping( options, callback );
 	}
 
 	/**
@@ -133,7 +136,7 @@ class MemoryDataServer extends DataServer
 			}
 			else
 			{
-				callback( false, {} );
+				callback( err, data );
 			}
 		});
 

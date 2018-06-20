@@ -270,10 +270,10 @@ const MemoryDataServer	= require( './server/caching/data_stores/memory/memory_da
 
 let memoryDataServer	= new MemoryDataServer();
 memoryDataServer.setUp( {}, ( err, data ) => {
-	memoryDataServer.createNamespace( 'test', {}, ( nextErr, data )=>{
-		console.log( 'here' );
-		console.log( nextErr );
-		console.log( data );
+	memoryDataServer.createNamespace( 'test', {}, ( err, data )=>{
+		memoryDataServer.create( 'test', 'TestRecord', 0, ' WRITE THIS TO THE DATA', {}, ( err, data )=>{
+			console.log( err, data );
+		})
 	});
 });
 
