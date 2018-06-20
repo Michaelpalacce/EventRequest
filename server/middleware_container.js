@@ -3,13 +3,13 @@
 // Dependencies
 const fs									= require( 'fs' );
 const path									= require( 'path' );
-const setAdvTimeout							= require( './helpers/timeout' );
-const { BodyParserHandler }					= require( './middlewares/body_parser_handler' );
-const TemplatingEngine						= require( './middlewares/templating_engine' );
-const BaseTemplatingEngine					= require( './middlewares/templating_engines/base_templating_engine' );
-const { FileStreamHandler }					= require( './middlewares/file_stream_handler' );
-const { SessionHandler }					= require( './middlewares/session_handler' );
-const { Logger }							= require( './logger/components/logger' );
+const setAdvTimeout							= require( './components/helpers/timeout' );
+const { BodyParserHandler }					= require( './components/body_parser_handler' );
+const TemplatingEngine						= require( './components/templating_engine' );
+const BaseTemplatingEngine					= require( './components/templating_engines/base_templating_engine' );
+const { FileStreamHandler }					= require( './components/file_stream_handler' );
+const { SessionHandler }					= require( './components/session_handler' );
+const { Logger }							= require( './components/logger/components/logger' );
 
 // Define the object
 let middlewaresContainer	= {};

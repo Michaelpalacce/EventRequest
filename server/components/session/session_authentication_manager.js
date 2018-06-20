@@ -1,16 +1,15 @@
 'use strict';
 
 // Dependencies
-const SecurityManager		= require( './security_manager' );
-const TokenManager			= require( './helpers/token_manager' );
+const SecurityManager	= require( './security_manager' );
 
 // Constants
-const MANAGER_METHODS	= ['GET'];
+const MANAGER_METHODS	= ['POST'];
 
 /**
- * @brief	Checks if the user is authenticated
+ * @brief	Authenticates the user if correct data is passed
  */
-class LoginManager extends SecurityManager
+class SessionAuthenticationManager extends SecurityManager
 {
 	/**
 	 * @see	SecurityManager::constructor()
@@ -19,6 +18,7 @@ class LoginManager extends SecurityManager
 	{
 		super( options );
 		this.sessionName			= this.options.sessionName;
+		this.authenticationCallback	= this.options.authenticationCallback;
 		this.authenticationRoute	= this.options.authenticationRoute;
 		this.tokenManager			= this.options.tokenManager;
 
@@ -30,8 +30,12 @@ class LoginManager extends SecurityManager
 	 */
 	sanitize()
 	{
-		if ( this.sessionName == undefined || this.authenticationRoute == undefined || this.tokenManager == undefined )
-		{
+		if (
+			this.sessionName == undefined
+			|| this.authenticationCallback == undefined
+			|| this.authenticationRoute == undefined
+			|| this.tokenManager == undefined
+		) {
 			throw new Error( 'Invalid Configuration provided' );
 		}
 	}
@@ -57,17 +61,16 @@ class LoginManager extends SecurityManager
 	 */
 	handle( event, next, terminate )
 	{
-		let sidCookie	= typeof event.cookies[this.sessionName] === 'string' ? event.cookies[this.sessionName] : false;
 		event.session	= {
 			authenticated	: false
 		};
-
-		if ( sidCookie )
+		
+		if ( this.authenticationCallback( event ) )
 		{
-			this.tokenManager.isExpired( sidCookie, ( err, sidData ) =>{
+			this.tokenManager.createCookie( event, this.sessionName, ( err, tokenData ) =>{
 				if ( ! err )
 				{
-					event.session	= sidData;
+					event.session	= tokenData;
 				}
 
 				next();
@@ -81,4 +84,4 @@ class LoginManager extends SecurityManager
 }
 
 // Export the module
-module.exports	= LoginManager;
+module.exports	= SessionAuthenticationManager;

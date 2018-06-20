@@ -1,7 +1,6 @@
 'use strict';
 
 // Dependencies
-const TokenManager		= require( './helpers/token_manager' );
 const SecurityManager	= require( './security_manager' );
 
 // Constants

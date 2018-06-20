@@ -3,10 +3,10 @@
 // Dependencies
 const url								= require( 'url' );
 const { EventEmitter }					= require( 'events' );
-const { FileStreamHandler, FileStream }	= require( './middlewares/file_stream_handler' );
-const TemplatingEngine					= require( './middlewares/templating_engine' );
+const { FileStreamHandler, FileStream }	= require( './components/file_stream_handler' );
+const TemplatingEngine					= require( './components/templating_engine' );
 const ErrorHandler						= require( './error_handler' );
-const DataServer						= require( './caching/data_stores/data_server' );
+const DataServer						= require( './components/caching/data_server' );
 
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router

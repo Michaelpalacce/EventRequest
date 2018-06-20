@@ -1,16 +1,15 @@
 'use strict';
 
 // Dependencies
-const TokenManager		= require( './helpers/token_manager' );
-const SecurityManager	= require( './security_manager' );
+const SecurityManager		= require( './security_manager' );
 
 // Constants
-const MANAGER_METHODS	= ['POST'];
+const MANAGER_METHODS	= ['GET'];
 
 /**
- * @brief	Authenticates the user if correct data is passed
+ * @brief	Checks if the user is authenticated
  */
-class SessionAuthenticationManager extends SecurityManager
+class LoginManager extends SecurityManager
 {
 	/**
 	 * @see	SecurityManager::constructor()
@@ -19,7 +18,6 @@ class SessionAuthenticationManager extends SecurityManager
 	{
 		super( options );
 		this.sessionName			= this.options.sessionName;
-		this.authenticationCallback	= this.options.authenticationCallback;
 		this.authenticationRoute	= this.options.authenticationRoute;
 		this.tokenManager			= this.options.tokenManager;
 
@@ -31,12 +29,8 @@ class SessionAuthenticationManager extends SecurityManager
 	 */
 	sanitize()
 	{
-		if (
-			this.sessionName == undefined
-			|| this.authenticationCallback == undefined
-			|| this.authenticationRoute == undefined
-			|| this.tokenManager == undefined
-		) {
+		if ( this.sessionName == undefined || this.authenticationRoute == undefined || this.tokenManager == undefined )
+		{
 			throw new Error( 'Invalid Configuration provided' );
 		}
 	}
@@ -62,16 +56,17 @@ class SessionAuthenticationManager extends SecurityManager
 	 */
 	handle( event, next, terminate )
 	{
+		let sidCookie	= typeof event.cookies[this.sessionName] === 'string' ? event.cookies[this.sessionName] : false;
 		event.session	= {
 			authenticated	: false
 		};
-		
-		if ( this.authenticationCallback( event ) )
+
+		if ( sidCookie )
 		{
-			this.tokenManager.createCookie( event, this.sessionName, ( err, tokenData ) =>{
+			this.tokenManager.isExpired( sidCookie, ( err, sidData ) =>{
 				if ( ! err )
 				{
-					event.session	= tokenData;
+					event.session	= sidData;
 				}
 
 				next();
@@ -85,4 +80,4 @@ class SessionAuthenticationManager extends SecurityManager
 }
 
 // Export the module
-module.exports	= SessionAuthenticationManager;
+module.exports	= LoginManager;

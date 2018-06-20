@@ -1,6 +1,6 @@
 'use strict';
 
-const stringHelper	= require( '../../../helpers/unique_id' );
+const stringHelper	= require( '../../helpers/unique_id' );
 const RequestEvent	= require( '../../../event' );
 
 /**

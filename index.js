@@ -9,16 +9,16 @@ const RequestEvent			= require( './server/event' );
 const Router				= require( './server/router' );
 const ErrorHandler			= require( './server/error_handler' );
 const middlewaresContainer	= require( './server/middleware_container' );
-const TemplatingEngine		= require( './server/middlewares/templating_engine' );
-const SessionHandler		= require( './server/middlewares/session_handler' );
-const BodyParserHandler		= require( './server/middlewares/body_parser_handler' );
-const Cluster				= require( './server/cluster/cluster' );
-const CommunicationManager	= require( './server/cluster/communication_manager' );
-const Loggur				= require( './server/logger/loggur' );
-const Logger				= require( './server/logger/components/logger' );
-const { LOG_LEVELS }		= require( './server/logger/components/log' );
-const DataServer			= require( './server/caching/data_stores/data_server' );
-const MemoryDataServer		= require( './server/caching/data_stores/memory/memory_data_server' );
+const TemplatingEngine		= require( './server/components/templating_engine' );
+const SessionHandler		= require( './server/components/session_handler' );
+const BodyParserHandler		= require( './server/components/body_parser_handler' );
+const Cluster				= require( './server/components/cluster/cluster' );
+const CommunicationManager	= require( './server/components/cluster/communication_manager' );
+const Loggur				= require( './server/components/logger/loggur' );
+const Logger				= require( './server/components/logger/components/logger' );
+const { LOG_LEVELS }		= require( './server/components/logger/components/log' );
+const DataServer			= require( './server/components/caching/data_server' );
+const MemoryDataServer		= require( './server/components/caching/memory/memory_data_server' );
 
 
 /**

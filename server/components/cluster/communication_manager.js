@@ -2,8 +2,8 @@
 
 // Dependencies
 const cluster			= require( 'cluster' );
-const Loggur			= require( './../logger/loggur' );
-const { LOG_LEVELS }	= require( './../logger/components/log' );
+const Loggur			= require( '../logger/loggur' );
+const { LOG_LEVELS }	= require( '../logger/components/log' );
 
 /**
  * @brief	Communication manager to handle the messages send by the workers to the master
