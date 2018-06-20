@@ -6,6 +6,7 @@ const { EventEmitter }					= require( 'events' );
 const { FileStreamHandler, FileStream }	= require( './middlewares/file_stream_handler' );
 const TemplatingEngine					= require( './middlewares/templating_engine' );
 const ErrorHandler						= require( './error_handler' );
+const DataServer						= require( './caching/data_stores/data_server' );
 
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
@@ -124,6 +125,30 @@ class RequestEvent extends EventEmitter
 			},
 			get			: () =>{
 				return errorHandler;
+			}
+		});
+
+		let cachingServer	= null;
+		Object.defineProperty( this, 'cachingServer', {
+			enumerable	: true,
+			set			: ( arg ) =>{
+				if ( arg == null )
+				{
+					cachingServer	= arg;
+					return;
+				}
+
+				if ( arg instanceof DataServer )
+				{
+					cachingServer	= arg;
+				}
+				else
+				{
+					throw new Error( 'Error handler must be an instance of DataServer' );
+				}
+			},
+			get			: () =>{
+				return cachingServer;
 			}
 		});
 	}
@@ -378,7 +403,12 @@ class RequestEvent extends EventEmitter
 	 */
 	sendError( error = '', code = 500 )
 	{
-		errorHandler.handle( this, error, code );
+		if ( ! ( this.errorHandler instanceof ErrorHandler ) )
+		{
+			this.errorHandler	= new ErrorHandler();
+		}
+
+		this.errorHandler.handle( this, error, code );
 	}
 
 	/**

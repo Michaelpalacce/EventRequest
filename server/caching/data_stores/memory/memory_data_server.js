@@ -1,6 +1,7 @@
 'use strict';
 
 const DataServer	= require( '../data_server' );
+const cluster		= require( 'cluster' );
 const path			= require( 'path' );
 const fork			= require( 'child_process' ).fork;
 const net			= require( 'net' );
@@ -128,7 +129,10 @@ class MemoryDataServer extends DataServer
 		this.doCommand( 'ping', {}, ( err, data ) => {
 			if ( err || data !== 'pong' )
 			{
-				this.forkClient( callback )
+				if ( cluster.isMaster )
+				{
+					this.forkClient( callback )
+				}
 			}
 			else
 			{
