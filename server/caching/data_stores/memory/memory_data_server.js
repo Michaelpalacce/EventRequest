@@ -1,19 +1,17 @@
 'use strict';
 
 const DataServer	= require( '../data_server' );
-const os			= require( 'os' );
-const fs			= require( 'fs' );
 const path			= require( 'path' );
 const fork			= require( 'child_process' ).fork;
 const net			= require( 'net' );
 
-const PIPE_NAME	= path.join( __dirname, 'filesystem_data_client.js' );
+const PIPE_NAME	= path.join( __dirname, 'memory_data_client.js' );
 const PIPE_PATH	= "\\\\.\\pipe\\" + PIPE_NAME;
 
 /**
- * @brief	Simple caching server that stores cache on the file system
+ * @brief	Simple caching server that stores cache in memory
  */
-class FilesystemDataServer extends DataServer
+class MemoryDataServer extends DataServer
 {
 	constructor( options = {} )
 	{
@@ -25,13 +23,19 @@ class FilesystemDataServer extends DataServer
 	 */
 	sanitize( options )
 	{
-		this.cachingFolder	= typeof options.cachingFolder === 'string'
-							? options.cachingFolder
-							: os.tmpdir();
+		this.pingInterval	= typeof options.pingInterval === 'number'
+							? options.pingInterval
+							: 60 * 1000; // Default to 1 minute
+
+		this.doPing			= typeof options.doPing === 'boolean'
+							? options.doPing
+							: true;
+
+
 	}
 
 	/**
-	 * @brief	Creates a new instance of the filesystem_data_client if needed
+	 * @brief	Creates a new instance of the memory_data_client if needed
 	 *
 	 * @param	Function callback
 	 *
@@ -39,7 +43,7 @@ class FilesystemDataServer extends DataServer
 	 */
 	forkClient( callback )
 	{
-		let spawnedClient	= fork( path.join( __dirname, './filesystem_data_client' ), [], {
+		let spawnedClient	= fork( path.join( __dirname, './memory_data_client' ), [], {
 			cwd	: undefined,
 			env	: process.env,
 		} );
@@ -51,7 +55,7 @@ class FilesystemDataServer extends DataServer
 		spawnedClient.on( 'message', ( message )=>{
 			if ( ! message.status )
 			{
-				let command	= this.getCommand( 'setUp', { cachingFolder : this.cachingFolder }, callback );
+				let command	= this.getCommand( 'setUp', {}, callback );
 
 				command();
 			}
@@ -63,7 +67,7 @@ class FilesystemDataServer extends DataServer
 	}
 
 	/**
-	 * @brief	Establishes a socket connection to the filesystem data client
+	 * @brief	Establishes a socket connection to the memory_data_client
 	 *
 	 * @param	Object args
 	 * @param	Function callback
@@ -73,32 +77,34 @@ class FilesystemDataServer extends DataServer
 	command( args, callback )
 	{
 		let responseData	= [];
-		let socket	= net.createConnection( PIPE_PATH, ( err ) =>{
-			socket.on( 'error', ( err ) => {
-				callback( err )
-			});
+		let socket			= net.createConnection( PIPE_PATH );
 
-			socket.on( 'data', ( data ) => {
-				responseData.push( data );
-			});
-
-			socket.on( 'end', () => {
-				let response	= Buffer.concat( responseData ).toString( 'utf8' );
-
-				try
-				{
-					response	= JSON.parse( response );
-				}
-				catch ( error )
-				{
-					response	= {};
-				}
-
-				callback( response );
-			});
-
+		socket.on( 'connect', () =>{
 			args	= typeof args === 'object' ? args : {};
 			socket.write( JSON.stringify( args ), 'utf8' );
+		});
+
+		socket.on( 'error', ( error )=>{
+			callback( error );
+		});
+
+		socket.on( 'data', ( data ) => {
+			responseData.push( data );
+		});
+
+		socket.on( 'end', () => {
+			let response	= Buffer.concat( responseData ).toString( 'utf8' );
+
+			try
+			{
+				response	= JSON.parse( response );
+			}
+			catch ( error )
+			{
+				response	= {};
+			}
+
+			callback( response );
 		});
 	}
 
@@ -107,7 +113,31 @@ class FilesystemDataServer extends DataServer
 	 */
 	setUp( options = {}, callback = ()=>{} )
 	{
-		this.forkClient( callback );
+		this.ping( options, callback() );
+	}
+
+	/**
+	 * @brief	Sends a ping to the client and if it's down, restarts it
+	 *
+	 * @param	Object options
+	 * @param	Function callback
+	 *
+	 * @return	void
+	 */
+	ping( options = {}, callback = ()=>{} )
+	{
+		let pingCommand	= this.getCommand( 'ping', {}, ( err, data ) => {
+			if ( err || data !== 'pong' )
+			{
+				this.forkClient( callback )
+			}
+			else
+			{
+				callback( false, {} );
+			}
+		});
+
+		pingCommand();
 	}
 
 	/**
@@ -116,7 +146,7 @@ class FilesystemDataServer extends DataServer
 	 * @param	String command
 	 * @param	Object args
 	 *
-	 * @return	Object
+	 * @return	Function
 	 */
 	getCommand( command, args, callback )
 	{
@@ -147,9 +177,9 @@ class FilesystemDataServer extends DataServer
 	 */
 	createNamespace( namespace, options = {}, callback = ()=>{} )
 	{
-		let command	= this.getCommand( 'createNamespace', { namespace: namespace }, callback );
+		let createNamespaceCommand	= this.getCommand( 'createNamespace', { namespace: namespace }, callback );
 
-		command();
+		createNamespaceCommand();
 	}
 
 	/**
@@ -157,9 +187,9 @@ class FilesystemDataServer extends DataServer
 	 */
 	existsNamespace( namespace, options = {}, callback = ()=>{} )
 	{
-		let command	= this.getCommand( 'existsNamespace', { namespace: namespace }, callback );
+		let existsNamespaceCommand	= this.getCommand( 'existsNamespace', { namespace: namespace }, callback );
 
-		command();
+		existsNamespaceCommand();
 	}
 
 	/**
@@ -167,24 +197,10 @@ class FilesystemDataServer extends DataServer
 	 */
 	create( namespace, recordName, ttl = 0, data = {}, options = {}, callback = ()=>{} )
 	{
-		if ( typeof recordName !== 'string' )
-		{
-			callback( new Error( `Record should be a string. ${typeof recordName} given.` ) );
-		}
-		else
-		{
-			this.existsNamespace( namespace, {}, ( exists ) =>{
-				if ( ! exists )
-				{
-					callback( new Error( `Could not create record in namespace that does not exist.` ) );
-				}
-				else
-				{
+		let createCommand	= this.getCommand( 'create', { namespace: namespace, recordName: recordName, ttl: ttl, data: data }, callback );
 
-				}
-			});
-		}
+		createCommand();
 	}
 }
 
-module.exports	= FilesystemDataServer;
+module.exports	= MemoryDataServer;
