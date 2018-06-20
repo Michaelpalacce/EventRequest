@@ -81,22 +81,32 @@ class DataServer
 	}
 
 	/**
-	 * @brief	Create the record
+	 * @brief	Deletes the namespace if it exists
 	 *
-	 * @details	If ttl ( time to leave ) is not supported by the data server then it should be left blank
-	 * 			If ttl is set to 0 then the time to leave will be set to never expire or in case of creating it, the ttl
-	 * 			will not be changed
+	 * @details	Returns true if the namespace was deleted
+	 *
+	 * @param	String namespace
+	 * @param	Object options
+	 * @param	Function callback
+	 *
+	 * @return	void
+	 */
+	removeNamespace( namespace, options = {}, callback = null )
+	{
+	}
+
+	/**
+	 * @brief	Create the record
 	 *
 	 * @param	String namespace
 	 * @param	String recordName
-	 * @param	Number ttl
 	 * @param	mixed data
 	 * @param	Object options
 	 * @param	Function callback
 	 *
 	 * @return	void
 	 */
-	create( namespace, recordName, ttl = 0, data = {}, options = {}, callback = null )
+	create( namespace, recordName, data = {}, options = {}, callback = null )
 	{
 	}
 
@@ -119,11 +129,10 @@ class DataServer
 	 *
 	 * @param	String namespace
 	 * @param	String recordName
-	 * @param	Number ttl
 	 * @param	Object options
 	 * @param	Function callback
 	 */
-	touch( namespace, recordName, ttl = 0, options = {}, callback = null )
+	touch( namespace, recordName, options = {}, callback = null )
 	{
 	}
 
@@ -132,14 +141,13 @@ class DataServer
 	 *
 	 * @param	String namespace
 	 * @param	String recordName
-	 * @param	Number ttl
 	 * @param	mixed data
 	 * @param	Object options
 	 * @param	Function callback
 	 *
 	 * @return	void
 	 */
-	update( namespace, recordName, ttl = 0, data = {}, options = {}, callback = null )
+	update( namespace, recordName, data = {}, options = {}, callback = null )
 	{
 	}
 
@@ -148,13 +156,12 @@ class DataServer
 	 *
 	 * @param	String namespace
 	 * @param	String recordName
-	 * @param	Number ttl
 	 * @param	Object options
 	 * @param	Function callback
 	 *
 	 * @return	void
 	 */
-	read( namespace, recordName, ttl = 0, options = {}, callback = null )
+	read( namespace, recordName, options = {}, callback = null )
 	{
 	}
 

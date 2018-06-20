@@ -30,8 +30,6 @@ class MemoryDataServer extends DataServer
 		this.doPing			= typeof options.doPing === 'boolean'
 							? options.doPing
 							: true;
-
-
 	}
 
 	/**
@@ -55,9 +53,7 @@ class MemoryDataServer extends DataServer
 		spawnedClient.on( 'message', ( message )=>{
 			if ( ! message.status )
 			{
-				let command	= this.getCommand( 'setUp', {}, callback );
-
-				command();
+				this.doCommand( 'setUp', {}, callback );
 			}
 			else
 			{
@@ -129,7 +125,7 @@ class MemoryDataServer extends DataServer
 	 */
 	ping( options = {}, callback = ()=>{} )
 	{
-		let pingCommand	= this.getCommand( 'ping', {}, ( err, data ) => {
+		this.doCommand( 'ping', {}, ( err, data ) => {
 			if ( err || data !== 'pong' )
 			{
 				this.forkClient( callback )
@@ -139,8 +135,6 @@ class MemoryDataServer extends DataServer
 				callback( err, data );
 			}
 		});
-
-		pingCommand();
 	}
 
 	/**
@@ -149,9 +143,9 @@ class MemoryDataServer extends DataServer
 	 * @param	String command
 	 * @param	Object args
 	 *
-	 * @return	Function
+	 * @return	void
 	 */
-	getCommand( command, args, callback )
+	doCommand( command, args, callback )
 	{
 		command	= typeof command === 'string' ? command : false;
 		args	= typeof args === 'object' ? args : false;
@@ -165,14 +159,12 @@ class MemoryDataServer extends DataServer
 			args	: args
 		};
 
-		return () => {
-			this.command( command, ( response ) =>{
-				response.error	= typeof response.error !== 'undefined' ? response.error : true;
-				response.data	= typeof response.data !== 'undefined' ? response.data : {};
+		this.command( command, ( response ) =>{
+			response.error	= typeof response.error !== 'undefined' ? response.error : true;
+			response.data	= typeof response.data !== 'undefined' ? response.data : {};
 
-				callback( response.error, response.data );
-			});
-		}
+			callback( response.error, response.data );
+		});
 	}
 
 	/**
@@ -180,9 +172,7 @@ class MemoryDataServer extends DataServer
 	 */
 	createNamespace( namespace, options = {}, callback = ()=>{} )
 	{
-		let createNamespaceCommand	= this.getCommand( 'createNamespace', { namespace: namespace }, callback );
-
-		createNamespaceCommand();
+		this.doCommand( 'createNamespace', { namespace: namespace }, callback );
 	}
 
 	/**
@@ -190,19 +180,31 @@ class MemoryDataServer extends DataServer
 	 */
 	existsNamespace( namespace, options = {}, callback = ()=>{} )
 	{
-		let existsNamespaceCommand	= this.getCommand( 'existsNamespace', { namespace: namespace }, callback );
-
-		existsNamespaceCommand();
+		this.doCommand( 'existsNamespace', { namespace: namespace }, callback );
 	}
 
 	/**
 	 * @see	DataServer::create()
 	 */
-	create( namespace, recordName, ttl = 0, data = {}, options = {}, callback = ()=>{} )
+	create( namespace, recordName, data = {}, options = {}, callback = ()=>{} )
 	{
-		let createCommand	= this.getCommand( 'create', { namespace: namespace, recordName: recordName, ttl: ttl, data: data }, callback );
+		this.doCommand( 'create', { namespace: namespace, recordName: recordName, data: data, options: options }, callback );
+	}
 
-		createCommand();
+	/**
+	 * @see	DataServer::exists()
+	 */
+	exists( namespace, recordName, options = {}, callback = ()=>{} )
+	{
+		this.doCommand( 'exists', { namespace: namespace, recordName: recordName, options: options }, callback );
+	}
+
+	/**
+	 * @see	DataServer::touch()
+	 */
+	touch( namespace, recordName, options = {}, callback = ()=>{} )
+	{
+		this.doCommand( 'touch', { namespace: namespace, recordName: recordName, options: options }, callback );
 	}
 }
 

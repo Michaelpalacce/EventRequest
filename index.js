@@ -271,8 +271,12 @@ const MemoryDataServer	= require( './server/caching/data_stores/memory/memory_da
 let memoryDataServer	= new MemoryDataServer();
 memoryDataServer.setUp( {}, ( err, data ) => {
 	memoryDataServer.createNamespace( 'test', {}, ( err, data )=>{
-		memoryDataServer.create( 'test', 'TestRecord', 0, ' WRITE THIS TO THE DATA', {}, ( err, data )=>{
-			console.log( err, data );
+		memoryDataServer.create( 'test', 'TestRecord', {'test': ['test',1,2,3,4] }, { ttl: 2000 }, ( err, data )=>{
+			setTimeout( function () {
+				memoryDataServer.touch( 'test', 'TestRecord', { ttl: 5000 }, ( err, data )=>{
+					console.log( err, data );
+				});
+			}, 1000 )
 		})
 	});
 });
