@@ -24,7 +24,7 @@
   },
   "bundleDependencies": false,
   "dependencies": {
-    "npm": "^6.1.0",
+    "npm": "^6.1.0"
   },
   "deprecated": false,
   "description": "An event driven restful server with useful functionality",
@@ -32,6 +32,5 @@
   "main": "server.js",
   "name": "event_request",
   "scripts": {},
-  "version": "1.2.2",
-  "snyk": true
+  "version": "1.2.2"
 }
