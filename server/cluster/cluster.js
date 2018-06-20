@@ -15,7 +15,7 @@ class Cluster
 	constructor( server )
 	{
 		this.server					= server;
-		this.communicationManager	= this.server.options['communicationManager']
+		this.communicationManager	= this.server.communicationManager;
 	}
 
 	/**

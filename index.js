@@ -17,7 +17,8 @@ const CommunicationManager	= require( './server/cluster/communication_manager' )
 const Loggur				= require( './server/logger/loggur' );
 const Logger				= require( './server/logger/components/logger' );
 const { LOG_LEVELS }		= require( './server/logger/components/log' );
-const CachingHandler		= require( './server/caching/caching_handler' );
+const DataServer			= require( './server/caching/data_stores/data_server' );
+const MemoryDataServer		= require( './server/caching/data_stores/memory/memory_data_server' );
 
 
 /**
@@ -38,6 +39,8 @@ const OPTIONS_PARAM_COMMUNICATION_MANAGER			= 'communicationManager';
 const OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT	= CommunicationManager;
 const OPTIONS_PARAM_ERROR_HANDLER					= 'errorHandler';
 const OPTIONS_PARAM_ERROR_HANDLER_DEFAULT			= ErrorHandler;
+const OPTIONS_PARAM_CACHING_HANDLER					= 'cachingHandler';
+const OPTIONS_PARAM_CACHING_HANDLER_DEFAULT			= MemoryDataServer;
 
 const POSSIBLE_PROTOCOL_OPTIONS						= {};
 POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]			= http;
@@ -55,8 +58,7 @@ class Server
 	 */
 	constructor( options	= {} )
 	{
-		this.options	= options;
-		this.sanitizeConfig();
+		this.sanitizeConfig( options );
 
 		this.router		= new Router();
 		this.cluster	= new Cluster( this );
@@ -76,44 +78,50 @@ class Server
 	 * 			- errorHandler - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest
 	 * 			-> Defaults to base errorHandler
 	 *
+	 * 	@param	Object options
+	 *
 	 * @return	void
 	 */
-	sanitizeConfig()
+	sanitizeConfig( options )
 	{
-		let options											= this.options;
+		this.protocol				= options[OPTIONS_PARAM_PROTOCOL];
+		this.protocol				= typeof this.protocol === 'string'
+									&& typeof POSSIBLE_PROTOCOL_OPTIONS[this.protocol] !== 'undefined'
+									? this.protocol
+									: OPTIONS_PARAM_PROTOCOL_DEFAULT;
 
-		let protocol										= options[OPTIONS_PARAM_PROTOCOL];
-		this.options[OPTIONS_PARAM_PROTOCOL]				= typeof protocol === 'string'
-															&& typeof POSSIBLE_PROTOCOL_OPTIONS[protocol] !== 'undefined'
-															? protocol
-															: OPTIONS_PARAM_PROTOCOL_DEFAULT;
+		this.httpsOptions			= options[OPTIONS_PARAM_HTTPS];
+		this.httpsOptions			= typeof this.httpsOptions === 'object'
+									? this.httpsOptions
+									: OPTIONS_PARAM_HTTPS_DEFAULT;
 
-		let httpsOptions									= this.options[OPTIONS_PARAM_HTTPS];
-		this.options[OPTIONS_PARAM_HTTPS]					= typeof httpsOptions === 'object'
-															? httpsOptions
-															: OPTIONS_PARAM_HTTPS_DEFAULT;
+		this.port					= options[OPTIONS_PARAM_PORT];
+		this.port					= typeof this.port === 'number'
+									? this.port
+									: OPTIONS_PARAM_PORT_DEFAULT;
 
-		let port											= options[OPTIONS_PARAM_PORT];
-		this.options[OPTIONS_PARAM_PORT]					= typeof port === 'number'
-															? port
-															: OPTIONS_PARAM_PORT_DEFAULT;
+		this.clusters				= options[OPTIONS_PARAM_CLUSTERS];
+		this.clusters				= typeof this.clusters === 'number' && this.clusters <= CPU_NUM
+									? this.clusters
+									: OPTIONS_PARAM_CLUSTERS_DEFAULT;
 
-		let clusters										= options[OPTIONS_PARAM_CLUSTERS];
-		this.options[OPTIONS_PARAM_CLUSTERS]				= typeof clusters === 'number' && clusters <= CPU_NUM
-															? clusters
-															: OPTIONS_PARAM_CLUSTERS_DEFAULT;
+		this.communicationManager	= options[OPTIONS_PARAM_COMMUNICATION_MANAGER];
+		this.communicationManager	= typeof this.communicationManager === 'object'
+									&& this.communicationManager instanceof CommunicationManager
+									? this.communicationManager
+									: new OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT();
 
-		let communicationManager							= options[OPTIONS_PARAM_COMMUNICATION_MANAGER];
-		this.options[OPTIONS_PARAM_COMMUNICATION_MANAGER]	= typeof communicationManager === 'object'
-															&& communicationManager instanceof CommunicationManager
-															? communicationManager
-															: new OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT();
+		this.cachingHandler			= options[OPTIONS_PARAM_CACHING_HANDLER];
+		this.cachingHandler			= typeof this.cachingHandler === 'object'
+									&& this.cachingHandler instanceof DataServer
+									? this.cachingHandler
+									: new OPTIONS_PARAM_CACHING_HANDLER_DEFAULT();
 
-		let errorHandler									= options[OPTIONS_PARAM_ERROR_HANDLER];
-		this.options[OPTIONS_PARAM_ERROR_HANDLER]			= typeof errorHandler === 'object'
-															&& errorHandler instanceof ErrorHandler
-															? errorHandler
-															: new OPTIONS_PARAM_ERROR_HANDLER_DEFAULT();
+		this.errorHandler			= options[OPTIONS_PARAM_ERROR_HANDLER];
+		this.errorHandler			= typeof this.errorHandler === 'object'
+									&& this.errorHandler instanceof ErrorHandler
+									? this.errorHandler
+									: new OPTIONS_PARAM_ERROR_HANDLER_DEFAULT();
 	}
 
 	/**
@@ -167,7 +175,8 @@ class Server
 	serverCallback( req, res )
 	{
 		let requestEvent			= this.resolve( req, res );
-		requestEvent.errorHandler	= this.options[OPTIONS_PARAM_ERROR_HANDLER];
+		requestEvent.errorHandler	= this.errorHandler;
+		requestEvent.cachingHandler	= this.cachingHandler;
 
 		req.on( 'close', ()=> {
 			requestEvent.cleanUp();
@@ -208,15 +217,15 @@ class Server
 	setUpNewServer( successCallback, errorCallback )
 	{
 		// Create the server
-		let protocol	= this.options[OPTIONS_PARAM_PROTOCOL];
+		let protocol	= this.protocol;
 		let server		= protocol === PROTOCOL_HTTPS
-						? https.createServer( this.options[OPTIONS_PARAM_HTTPS], this.serverCallback.bind( this ) )
+						? https.createServer( this.httpsOptions, this.serverCallback.bind( this ) )
 						: http.createServer( this.serverCallback.bind( this ) );
 
-		server.listen( this.options[OPTIONS_PARAM_PORT], () => {
+		server.listen( this.port, () => {
 				Loggur.log({
 					level	: LOG_LEVELS.warning,
-					message	: `Server ${cluster.worker.id} successfully started and listening on port: ${this.options[OPTIONS_PARAM_PORT]}`
+					message	: `Server ${cluster.worker.id} successfully started and listening on port: ${this.port}`
 				});
 				successCallback();
 			}
@@ -226,7 +235,7 @@ class Server
 		server.on( 'error', ( err )=>{
 			Loggur.log({
 				level	: LOG_LEVELS.error,
-				message	: 'Could not start the server on port: ' + this.options[OPTIONS_PARAM_PORT]
+				message	: 'Could not start the server on port: ' + this.port
 			});
 			Loggur.log({
 				level	: LOG_LEVELS.error,
@@ -248,7 +257,7 @@ class Server
 	 */
 	start ()
 	{
-		this.cluster.startCluster( this.options[OPTIONS_PARAM_CLUSTERS] );
+		this.cluster.startCluster( this.clusters );
 	}
 }
 
@@ -260,7 +269,8 @@ module.exports	= {
 	SessionHandler,
 	BodyParserHandler,
 	ErrorHandler,
-	CachingHandler,
+	DataServer,
+	MemoryDataServer,
 	Logging				: {
 		Loggur		: Loggur,
 		Logger		: Logger,
