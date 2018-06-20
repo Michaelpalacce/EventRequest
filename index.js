@@ -267,30 +267,3 @@ module.exports	= {
 		LOG_LEVELS	: LOG_LEVELS
 	}
 };
-
-//@TODO	REMOVE THIS
-const { MemoryDataServer }	= CachingHandler;
-
-let memoryDataServer	= new MemoryDataServer();
-memoryDataServer.setUp( {}, ( err, data ) => {
-	memoryDataServer.createNamespace( 'testFirst', {}, ( err, data )=>{
-		memoryDataServer.createNamespace( 'test', {}, ( err, data )=>{
-			memoryDataServer.create( 'test', 'TestRecord', {'test': ['test',1,2,3,4] }, { ttl: 2000 }, ( err, data )=>{
-				memoryDataServer.update( 'test', 'TestRecord', {'test': ['test',4,3,2,1] }, { ttl: 2000 }, ( err, data )=>{
-					// memoryDataServer.read( 'test', 'TestRecord', { ttl: 2000 }, ( err, data )=>{
-					// 	console.log( err,data );
-					// 	memoryDataServer.delete( 'test', 'TestRecord', {}, ( err, data )=>{
-					// 		memoryDataServer.read( 'test', 'TestRecord', { ttl: 2000 }, ( err, data )=>{
-					// 		});
-					// 	});
-					// });
-					memoryDataServer.getAll( 'test', {}, ( err, data )=>{
-						console.log( err );
-						console.log( data );
-					});
-				});
-			});
-		});
-	});
-});
-
