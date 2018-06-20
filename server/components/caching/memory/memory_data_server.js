@@ -24,13 +24,6 @@ class MemoryDataServer extends DataServer
 	 */
 	sanitize( options )
 	{
-		this.pingInterval	= typeof options.pingInterval === 'number'
-							? options.pingInterval
-							: 60 * 1000; // Default to 1 minute
-
-		this.doPing			= typeof options.doPing === 'boolean'
-							? options.doPing
-							: true;
 	}
 
 	/**
