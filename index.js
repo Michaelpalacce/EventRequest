@@ -41,6 +41,8 @@ const OPTIONS_PARAM_ERROR_HANDLER					= 'errorHandler';
 const OPTIONS_PARAM_ERROR_HANDLER_DEFAULT			= ErrorHandler;
 const OPTIONS_PARAM_CACHING_SERVER					= 'cachingServer';
 const OPTIONS_PARAM_CACHING_SERVER_DEFAULT			= MemoryDataServer;
+const OPTIONS_PARAM_CACHING_SERVER_OPTIONS			= 'cachingServerOptions';
+const OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT	= {};
 
 const POSSIBLE_PROTOCOL_OPTIONS						= {};
 POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]			= http;
@@ -123,7 +125,12 @@ class Server
 									? this.cachingServer
 									: new OPTIONS_PARAM_CACHING_SERVER_DEFAULT();
 
-		this.cachingServer.setUp( {}, ( err, data ) =>{
+		this.cachingServerOptions	= options[OPTIONS_PARAM_CACHING_SERVER_OPTIONS];
+		this.cachingServerOptions	= typeof this.cachingServerOptions === 'object'
+									? this.cachingServerOptions
+									: OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT;
+
+		this.cachingServer.setUp( this.cachingServerOptions, ( err, data ) =>{
 			if ( err )
 			{
 				throw new Error( err );

@@ -1,6 +1,6 @@
 {
   "_from": "github:Michaelpalacce/EventRequest#master",
-  "_id": "event_request@1.2.2",
+  "_id": "event_request@1.3.0",
   "_inBundle": false,
   "_location": "/event_request",
   "_phantomChildren": {},
@@ -16,7 +16,7 @@
     "#USER",
     "/"
   ],
-  "_resolved": "github:Michaelpalacce/EventRequest#ee017b447cabc574a9d097a3f85ca79a2aac682e",
+  "_resolved": "github:Michaelpalacce/EventRequest#87b74a30fe77c10d5063fd42ff807a6ce9edba10",
   "_spec": "github:Michaelpalacce/EventRequest#master",
   "_where": "D:\\JS\\Storage",
   "author": {

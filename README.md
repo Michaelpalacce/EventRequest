@@ -17,3 +17,4 @@ Includes:
 - Static Routes
 - Request timeout
 - Error handling
+- Caching ( in memory )
