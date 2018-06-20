@@ -25,18 +25,13 @@
   "bundleDependencies": false,
   "dependencies": {
     "npm": "^6.1.0",
-    "snyk": "^1.83.0"
   },
   "deprecated": false,
   "description": "An event driven restful server with useful functionality",
   "license": "GPL-3.0",
   "main": "server.js",
   "name": "event_request",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
-  },
+  "scripts": {},
   "version": "1.2.2",
   "snyk": true
 }
