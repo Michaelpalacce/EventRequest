@@ -5,7 +5,7 @@ const url								= require( 'url' );
 const { EventEmitter }					= require( 'events' );
 const { FileStreamHandler, FileStream }	= require( './components/file_stream_handler' );
 const TemplatingEngine					= require( './components/templating_engine' );
-const ErrorHandler						= require( './error_handler' );
+const ErrorHandler						= require( './components/error_handler' );
 const DataServer						= require( './components/caching/data_server' );
 
 /**

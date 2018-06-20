@@ -7,7 +7,7 @@ const os					= require( 'os' );
 const cluster				= require( 'cluster' );
 const RequestEvent			= require( './server/event' );
 const Router				= require( './server/router' );
-const ErrorHandler			= require( './server/error_handler' );
+const ErrorHandler			= require( './server/components/error_handler' );
 const middlewaresContainer	= require( './server/middleware_container' );
 const TemplatingEngine		= require( './server/components/templating_engine' );
 const SessionHandler		= require( './server/components/session_handler' );
@@ -299,3 +299,34 @@ module.exports	= {
 		LOG_LEVELS	: LOG_LEVELS
 	}
 };
+
+const ValidationHandler	= require( './server/components/validation_handler' );
+
+let body				= {
+	testString			: 'string',
+	// testEmptyString		: '',
+	// testNumber			: 123,
+	// testArray			: [],
+	// testPopulatedArray	: [1, 2, 3],
+	// testObject			: {
+	// 	objectKey	: 'objectValue'
+	// },
+	// testBoolean			: true,
+	// testFloat			: 1.23
+};
+
+let skeleton			= {
+	testString			: 'string|min:1|max:2|nullable',
+	// testEmptyString		: '',
+	// testNumber			: 123,
+	// testArray			: [],
+	// testPopulatedArray	: [1, 2, 3],
+	// testObject			: {
+	// 	objectKey	: 'objectValue'
+	// },
+	// testBoolean			: true,
+	// testFloat			: 1.23
+};
+
+let validationHandler	= new ValidationHandler();
+console.log( validationHandler.validateEventBody( body, skeleton ) );
