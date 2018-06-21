@@ -6,8 +6,8 @@ const path			= require( 'path' );
 const fork			= require( 'child_process' ).fork;
 const net			= require( 'net' );
 
-const PIPE_NAME	= path.join( __dirname, 'memory_data_client.js' );
-const PIPE_PATH	= "\\\\.\\pipe\\" + PIPE_NAME;
+const PIPE_NAME		= path.join( __dirname, 'memory_data_client.js' );
+const PIPE_PATH		= "\\\\.\\pipe\\" + PIPE_NAME;
 
 /**
  * @brief	Simple caching server that stores cache in memory

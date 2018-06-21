@@ -1,6 +1,7 @@
 'use strict';
-const net	= require( 'net' );
-const path	= require( 'path' );
+
+const net			= require( 'net' );
+const path			= require( 'path' );
 
 const PIPE_NAME		= path.join( __dirname, 'memory_data_client.js' );
 const PIPE_PATH		= "\\\\.\\pipe\\" + PIPE_NAME;
@@ -42,7 +43,7 @@ class MemoryWorker
 	 */
 	setUpServer()
 	{
-		let server	= net.createServer( ( stream ) => {
+		net.createServer( ( stream ) => {
 			stream.on( 'data', ( chunk ) => {
 				chunk	= chunk.toString( 'utf8' );
 
