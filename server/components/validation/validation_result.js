@@ -12,6 +12,14 @@ class ValidationResult
 
 	addAttribute( attribute )
 	{
+		this.attributes.push( attribute );
+	}
+
+	validateAllAttributes()
+	{
+		this.attributes.forEach( ( attribute ) => {
+			attribute.validateSelf();
+		})
 	}
 }
 

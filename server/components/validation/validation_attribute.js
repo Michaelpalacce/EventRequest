@@ -12,6 +12,24 @@ class ValidationAttribute
 		this.rules	= rules;
 		this.data	= data;
 	}
+
+	/**
+	 * @brief	Returns true otherwise returns reason why it is not valid
+	 *
+	 * @return	String
+	 */
+	validateSelf()
+	{
+		if ( this.rules === undefined )
+		{
+			return 'rules';
+		}
+
+		this.rules	= this.rules.split( '||' );
+
+		this.rules.forEach( ( rule, index, allRules ) => {
+		})
+	}
 }
 
 module.exports	= ValidationAttribute;

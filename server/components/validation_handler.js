@@ -10,15 +10,13 @@ const ValidationResult		= require( './validation/validation_result' );
 class ValidationHandler
 {
 	/**
-	 * @brief	Validates the body given
-	 *
-	 *
+	 * @brief	Validates the given object
 	 */
-	validateEventBody( body, skeleton )
+	validate( validationInput, skeleton )
 	{
-		if ( typeof body !== 'object' )
+		if ( typeof validationInput !== 'object' )
 		{
-			body	= {};
+			validationInput	= {};
 		}
 
 		let key,
@@ -27,14 +25,16 @@ class ValidationHandler
 			validationAttribute,
 			validationResult	= new ValidationResult();
 
-		for ( key in body )
+		for ( key in validationInput )
 		{
-			value				= body[key];
+			value				= validationInput[key];
 			rules				= skeleton[key];
-			validationAttribute	= new ValidationAttribute( key, value, rules, body );
 
+			validationAttribute	= new ValidationAttribute( key, value, rules, validationInput );
 			validationResult.addAttribute( validationAttribute );
 		}
+
+		validationResult.validateAllAttributes();
 	}
 }
 
