@@ -299,34 +299,3 @@ module.exports	= {
 		LOG_LEVELS	: LOG_LEVELS
 	}
 };
-
-const ValidationHandler	= require( './server/components/validation_handler' );
-
-let body				= {
-	testString			: 'string',
-	// testEmptyString		: '',
-	// testNumber			: 123,
-	// testArray			: [],
-	// testPopulatedArray	: [1, 2, 3],
-	// testObject			: {
-	// 	objectKey	: 'objectValue'
-	// },
-	// testBoolean			: true,
-	// testFloat			: 1.23
-};
-
-let skeleton			= {
-	testString			: 'string|min:1|max:2|nullable',
-	// testEmptyString		: '',
-	// testNumber			: 123,
-	// testArray			: [],
-	// testPopulatedArray	: [1, 2, 3],
-	// testObject			: {
-	// 	objectKey	: 'objectValue'
-	// },
-	// testBoolean			: true,
-	// testFloat			: 1.23
-};
-
-let validationHandler	= new ValidationHandler();
-console.log( validationHandler.validateEventBody( body, skeleton ) );

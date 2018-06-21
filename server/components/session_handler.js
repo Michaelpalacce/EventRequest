@@ -27,7 +27,7 @@ class SessionHandler
 	 * 									This callback must return a boolean	- Defaults to DEFAULT_AUTHENTICATION_CALLBACK
 	 * 			- managers - Array - The managers to be added to the security ( they have 2 parameters : instance which
 	 * 								must be an instance of SecurityManager and options which are options to be passed
-	 * 								to that specific manager only - Defaults to DEFAULT_AUTHENTICATION_CALLBACK
+	 * 								to that specific manager only
 	 *
 	 * @param event
 	 * @param options

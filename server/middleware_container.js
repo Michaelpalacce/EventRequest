@@ -114,27 +114,19 @@ middlewaresContainer.setFileStream		= ( options ) =>{
 middlewaresContainer.templatingEngine	= ( options ) =>{
 	return {
 		handler	: ( event ) =>{
-			let engineOptions	= typeof options.options === 'object' ? options.options : {};
+			let engineOptions		= typeof options.options === 'object' ? options.options : {};
+			let templatingEngine	= typeof options.engine === 'function'
+									&& typeof options.engine.getInstance === 'function'
+									? options.engine.getInstance( engineOptions )
+									: null;
 
-			if ( typeof options !== 'undefined' )
+			if ( ! ( templatingEngine instanceof TemplatingEngine ) || templatingEngine === null )
 			{
-				let templatingEngine	= typeof options.engine === 'function'
-				&& typeof options.engine.getInstance === 'function'
-					? options.engine.getInstance( engineOptions )
-					: null;
-
-				if ( ! templatingEngine instanceof TemplatingEngine || templatingEngine === null )
-				{
-					templatingEngine	= BaseTemplatingEngine.getInstance( engineOptions );
-				}
-
-				event.templatingEngine	= templatingEngine;
-				event.next();
+				templatingEngine	= BaseTemplatingEngine.getInstance( engineOptions );
 			}
-			else
-			{
-				event.next( 'Invalid templating engine provided' );
-			}
+
+			event.templatingEngine	= templatingEngine;
+			event.next();
 		}
 	};
 };
