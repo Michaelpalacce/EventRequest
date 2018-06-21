@@ -219,6 +219,14 @@ class Server
 		{
 			let block	= this.router.getExecutionBlockForCurrentEvent( requestEvent );
 			requestEvent.setBlock( block );
+
+			requestEvent.on( 'error', ( err ) =>{
+				if ( requestEvent.logger === null )
+				{
+					Loggur.log( err );
+				}
+			});
+
 			requestEvent.next();
 		}
 		catch ( e )
@@ -246,7 +254,7 @@ class Server
 		server.listen( this.port, () => {
 				Loggur.log({
 					level	: LOG_LEVELS.warning,
-					message	: `Server ${cluster.worker.id} successfully started and listening on port: ${this.port}`
+					message	: `Worker ${cluster.worker.id} successfully started and listening on port: ${this.port}`
 				});
 
 				successCallback();

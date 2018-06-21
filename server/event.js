@@ -7,6 +7,7 @@ const { FileStreamHandler, FileStream }	= require( './components/file_stream_han
 const TemplatingEngine					= require( './components/templating_engine' );
 const ErrorHandler						= require( './components/error_handler' );
 const DataServer						= require( './components/caching/data_server' );
+const { Logger }						= require( './components/logger/components/logger' );
 
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
@@ -149,6 +150,30 @@ class RequestEvent extends EventEmitter
 			},
 			get			: () =>{
 				return cachingServer;
+			}
+		});
+
+		let logger	= null;
+		Object.defineProperty( this, 'logger', {
+			enumerable	: true,
+			set			: ( arg ) =>{
+				if ( arg == null )
+				{
+					logger	= arg;
+					return;
+				}
+
+				if ( arg instanceof Logger )
+				{
+					logger	= arg;
+				}
+				else
+				{
+					throw new Error( 'Logger must be an instance of Logger' );
+				}
+			},
+			get			: () =>{
+				return logger;
 			}
 		});
 	}
@@ -331,7 +356,7 @@ class RequestEvent extends EventEmitter
 		}
 		else
 		{
-			event.next( 'Trying to render but templating engine is not set' );
+			this.sendError( `Could not render ${this.path}` );
 		}
 	}
 
@@ -369,7 +394,7 @@ class RequestEvent extends EventEmitter
 
 		if ( this.block.length <= 0 && ! this.isFinished() )
 		{
-			this.next( 'No middlewares left and response has not been sent.' );
+			this.send( `Cannot ${this.method} ${this.path}` );
 			return;
 		}
 

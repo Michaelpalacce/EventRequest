@@ -1,8 +1,9 @@
 'use strict';
 
 // Dependencies
-const { Logger }	= require( './components/logger' );
-const cluster		= require( 'cluster' );
+const { Logger }		= require( './components/logger' );
+const { LOG_LEVELS }	= require( './components/log' );
+const cluster			= require( 'cluster' );
 
 /**
  * @brief	Container that holds all the different loggers
@@ -13,9 +14,10 @@ class Loggur
 {
 	constructor()
 	{
-		this.loggers	= {};
+		this.loggers		= {};
+		this.defaultLogger	= null;
 
-		let uniqueId	= cluster.isMaster ? 'Master'
+		let uniqueId		= cluster.isMaster ? 'Master'
 			: 'Worker/' + process.pid;
 
 		Object.defineProperty( this, 'uniqueId', {
@@ -69,9 +71,27 @@ class Loggur
 	 *
 	 * @return	Logger
 	 */
-	createLogger( loggerConfig )
+	createLogger( loggerConfig = {} )
 	{
 		return new Logger( loggerConfig, this.uniqueId );
+	}
+
+	/**
+	 * @brief	Returns a single instance of the default logger
+	 *
+	 * @return	Logger
+	 */
+	getDefaultLogger()
+	{
+		if ( this.defaultLogger === null )
+		{
+			this.defaultLogger	= this.createLogger({
+				serverName	: 'DefaultLogger',
+				logLevel	: LOG_LEVELS.error
+			});
+		}
+		
+		return this.defaultLogger;
 	}
 
 	/**
@@ -83,9 +103,16 @@ class Loggur
 	 */
 	log( data )
 	{
-		for ( let loggerId in this.loggers )
+		if ( Object.keys( this.loggers ).length !== 0 )
 		{
-			this.loggers[loggerId].log( data );
+			for ( let loggerId in this.loggers )
+			{
+				this.loggers[loggerId].log( data );
+			}
+		}
+		else
+		{
+			this.getDefaultLogger().log( data );
 		}
 	}
 }

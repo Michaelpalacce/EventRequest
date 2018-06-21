@@ -78,6 +78,8 @@ middlewaresContainer.logger				= ( options ) =>{
 				event.on( 'render', ( template ) =>{
 					logger.debug( `Rendering ${template.templateName}` )
 				});
+
+				event.logger	= logger;
 			}
 
 			event.next();
@@ -87,6 +89,8 @@ middlewaresContainer.logger				= ( options ) =>{
 
 /**
  * @brief	File stream middleware
+ *
+ * @TODO	IMPLEMENT THIS. RIGHT NOW THIS IS USELESS
  *
  * @param	Object options
  *

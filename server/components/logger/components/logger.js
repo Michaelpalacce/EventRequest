@@ -76,11 +76,17 @@ class Logger
 										? options.unhandledExceptionLevel
 										: LOG_LEVELS.error;
 
+		this.transports					= [];
 		let transports					= typeof options.transports === 'object' && Array.isArray( options.transports )
 										? options.transports
 										: [];
 
 		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport ) } );
+
+		if ( this.transports.length === 0 )
+		{
+			this.transports.push( new Console() );
+		}
 
 		this.attachLogLevelsToLogger();
 		this.attachUnhandledEventListener();
@@ -113,11 +119,11 @@ class Logger
 					message	: err.stack
 				});
 
-				this.log( uncaughtExceptionLog );
+				this.log( uncaughtExceptionLog, true );
 
 				if ( this.dieOnCapture )
 				{
-					throw err;
+					process.exit( 1 );
 				}
 			});
 		}
@@ -192,11 +198,15 @@ class Logger
 	/**
 	 * @brief	Logs the given data
 	 *
+	 * @details	If forced is set as true then the log will be logged immediately this is done mainly so we can log critical
+	 * 			errors
+	 *
 	 * @param	mixed log
+	 * @param	Boolean force
 	 *
 	 * @return	void
 	 */
-	log( log )
+	log( log, force = false )
 	{
 		log	= Log.getInstance( log );
 
@@ -211,9 +221,16 @@ class Logger
 				if ( transport.supports( log ) )
 				{
 					// Add log to the queue
-					setTimeout( () => {
+					if ( force )
+					{
 						transport.log( log );
-					});
+					}
+					else
+					{
+						setImmediate( () => {
+							transport.log( log );
+						});
+					}
 				}
 			});
 		}
