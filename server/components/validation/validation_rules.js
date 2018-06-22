@@ -15,6 +15,11 @@ function getType( value )
 }
 
 /**
+ * @var	RegExp EMAIL_REGEX
+ */
+const EMAIL_REGEX	= /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+/**
  * @brief	Assert if the two values are equal ignoring type coercion
  *
  * @param	mixed actual
@@ -135,7 +140,7 @@ assert.assertNotEmpty		= ( actual ) => {
  * @return	Boolean
  */
 assert.assertIsDate			= ( actual ) => {
-
+	return ! isNaN( Date.parse( actual ) );
 };
 
 /**
@@ -157,7 +162,7 @@ assert.assertIsDateObject	= ( actual ) => {
  * @return	Boolean
  */
 assert.assertNotDate		= ( actual ) => {
-
+	return isNaN( Date.parse( actual ) );
 };
 
 /**
@@ -167,8 +172,55 @@ assert.assertNotDate		= ( actual ) => {
  *
  * @return	Boolean
  */
-assert.assertIsDateObject	= ( actual ) => {
+assert.assertNotDateObject	= ( actual ) => {
 	return ! ( actual instanceof Date );
+};
+
+/**
+ * @brief	Assert that the given value is the given internal type like: string, number, array etc
+ *
+ * @param	mixed actual
+ * @param	String internalType
+ *
+ * @return	Boolean
+ */
+assert.assertIsInternalType	= ( actual, internalType ) => {
+	return getType( actual ) === internalType;
+};
+
+/**
+ * @brief	Assert that the given value is NOT the given internal type like: string, number, array etc
+ *
+ * @param	mixed actual
+ * @param	String internalType
+ *
+ * @return	Boolean
+ */
+assert.assertNotInternalType	= ( actual, internalType ) => {
+	return getType( actual ) !== internalType;
+};
+
+/**
+ * @brief	Asserts that the given value is a valid email address
+ *
+ * @param	String actual
+ *
+ * @return	Boolean
+ */
+assert.assertIsValidEmail		= ( actual ) => {
+	return EMAIL_REGEX.test( String( actual ).toLowerCase() );
+};
+
+
+/**
+ * @brief	Asserts that the given value is NOT a valid email address
+ *
+ * @param	String actual
+ *
+ * @return	Boolean
+ */
+assert.assertNotValidEmail		= ( actual ) => {
+	return ! EMAIL_REGEX.test( String( actual ).toLowerCase() );
 };
 
 module.exports	= assert;

@@ -1,5 +1,9 @@
 'use strict';
 
+const VALIDATION_ERRORS	= {
+	rules	: 'rules'
+};
+
 /**
  * @brief	Validation attribute that holds data for the current attribute and can be used to validate it
  */
@@ -22,13 +26,54 @@ class ValidationAttribute
 	{
 		if ( this.rules === undefined )
 		{
-			return 'rules';
+			return VALIDATION_ERRORS.rules;
 		}
 
-		this.rules	= this.rules.split( '||' );
+		let allRules	= this.rules.split( '||' );
+		let index, rule, result;
 
-		this.rules.forEach( ( rule, index, allRules ) => {
-		})
+		for ( index = 0; index < allRules.length; ++ index )
+		{
+			rule	= allRules[index];
+			result	= this.validateRule( rule, index, allRules );
+
+			if ( result !== true )
+			{
+				return result;
+			}
+		}
+	}
+
+	/**
+	 * @brief	Validates each rule separately
+	 *
+	 * @param	String rule
+	 * @param	Number index
+	 * @param	Array allRules
+	 *
+	 * @return	String|Boolean
+	 */
+	validateRule( rule, index, allRules )
+	{
+		rule	= this.getRuleParams( rule );
+		switch ( rule )
+		{
+
+			default:
+				return VALIDATION_ERRORS.rules;
+		}
+	}
+
+	/**
+	 * @brief	Splits the rule additionally and returns any params found
+	 *
+	 * @param	String rule
+	 *
+	 * @return	Object
+	 */
+	getRuleParams( rule )
+	{
+
 	}
 }
 

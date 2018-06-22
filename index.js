@@ -307,12 +307,7 @@ module.exports	= {
 		LOG_LEVELS	: LOG_LEVELS
 	}
 };
-//
-//
 // const ValidationHandler	= require( './server/components/validation_handler' );
-// const assert			= require( './server/components/validation/validation_rules' );
-//
-// console.log( assert.assertNotEmpty( {} ) );
 //
 // let validationHandler	= new ValidationHandler();
 //
@@ -321,6 +316,6 @@ module.exports	= {
 // };
 //
 // let skeleton			= {
-// 	testString	: 'string'
+// 	testString	: 'filled||string'
 // };
 // validationHandler.validate( validationInput, skeleton );
