@@ -340,7 +340,9 @@ assert.assertSmallerOrEqual		= ( actual, comparator ) => {
  * @return	Boolean
  */
 assert.assertIsBoolean			= ( actual ) => {
-	return assert.assertIsInternalType( actual, 'boolean' );
+	return assert.assertIsInternalType( actual, 'boolean' )
+			? true
+			: assert.assertTrue( actual ) || assert.assertFalse( actual );
 };
 
 /**
