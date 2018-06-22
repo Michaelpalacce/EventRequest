@@ -18,6 +18,7 @@ Includes:
 - Request timeout
 - Error handling
 - Caching ( in memory )
+- Input Validation
 
 
 # Server Options
@@ -40,7 +41,7 @@ The server constructor accepts the following options:
 
 **errorHandler** - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest -> Defaults to base errorHandler
 
-# The server is started by calling server.start();
+## The server is started by calling server.start();
 
 ***
 The server has 2 ways of adding routes/middleware
@@ -136,3 +137,32 @@ There are 2 predefined transport layers:
 
 When logging an object can be passed that accepts 2 options: level, message. Alternatively a string can be passed which will be interpreted as an error
 
+# Validation
+
+The validation is done by using the event.validationHandler.validate( objectToValidate, skeleton )
+
+skeleton must have the keys that are to be validated that point to a string of rules separated by ||
+
+## Possible rules are:
+
+* rules - if malformed rules string is passed
+* optional - if set as long as the input is empty it will always be valid. if not empty other possible rules will be called
+* filled - checks if the input is filled
+* string - checks if the input is a string
+* notString - checks if the input is NOT a string
+* range - Is followed by min and max aka: range:1-2 where 1 is the minimum and 2 maximum.
+* min - minimum input length
+* max - maximum input length
+* email - checks if the input is a valid email
+* isTrue - checks if the input evaluates to true
+* isFalse - checks if the input evaluates to false
+* boolean - checks if the input is a boolean
+* notBoolean - checks if the input is not a boolean 
+* numeric - checks if the input is a number
+* notNumeric  - checks if the input is not a number
+* date  - checks if the input is a date
+* same  - checks if the input is the same as another input aka: same:emailInput
+* different  - checks if the input is different from anotehr input aka: different:emailInput
+* equals  - checks if the input equals another given string: equals:makeSureToEqualToThis
+
+If any errors occurr they will be returned as an array of keys eg: ['string','min','max','range','filled'] 
