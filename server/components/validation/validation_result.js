@@ -23,15 +23,18 @@ class ValidationResult
 	}
 
 	/**
-	 * @brief	Triggers the validate self on each of the added attributes
+	 * @brief	Triggers the validate self on each of the added attributes and returns the validation
 	 *
-	 * @return	void
+	 * @return	Object
 	 */
 	validateAllAttributes()
 	{
+		let result	= {};
 		this.attributes.forEach( ( attribute ) => {
-			console.log( attribute.validateSelf() );
-		})
+			result[attribute.key]	= attribute.validateSelf();
+		});
+
+		return result;
 	}
 }
 

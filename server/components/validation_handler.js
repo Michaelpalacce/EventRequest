@@ -10,7 +10,9 @@ const ValidationResult		= require( './validation/validation_result' );
 class ValidationHandler
 {
 	/**
-	 * @brief	Validates the given object
+	 * @brief	Validates the given object and returns validation results for each object property
+	 *
+	 * @return	Object
 	 */
 	validate( validationInput, skeleton )
 	{
@@ -34,7 +36,7 @@ class ValidationHandler
 			validationResult.addAttribute( validationAttribute );
 		}
 
-		validationResult.validateAllAttributes();
+		return validationResult.validateAllAttributes();
 	}
 }
 

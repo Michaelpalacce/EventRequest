@@ -307,16 +307,3 @@ module.exports	= {
 		LOG_LEVELS	: LOG_LEVELS
 	}
 };
-
-const ValidationHandler	= require( './server/components/validation_handler' );
-
-let validationHandler	= new ValidationHandler();
-
-let validationInput		= {
-	testString	: 'test',
-};
-
-let skeleton			= {
-	testString	: 'filled||string||range:2-4'
-};
-validationHandler.validate( validationInput, skeleton );

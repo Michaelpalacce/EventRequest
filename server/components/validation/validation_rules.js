@@ -1,5 +1,6 @@
 'use strict';
 
+// Container
 let assert	= {};
 
 /**
@@ -81,6 +82,30 @@ assert.assertStrictEqual	= ( actual, expected ) => {
 };
 
 /**
+ * @brief	Assert if the two values are NOT equal ignoring type coercion
+ *
+ * @param	mixed actual
+ * @param	mixed expected
+ *
+ * @return	Boolean
+ */
+assert.assertNotEqual	= ( actual, expected ) => {
+	return actual != expected;
+};
+
+/**
+ * @brief	Assert if the two values are NOT equal acknowledges type coercion
+ *
+ * @param	mixed actual
+ * @param	mixed expected
+ *
+ * @return	Boolean
+ */
+assert.assertStrictNotEqual	= ( actual, expected ) => {
+	return actual !== expected;
+};
+
+/**
  * @brief	Assert that the given value is a string
  *
  * @param	mixed actual
@@ -88,7 +113,7 @@ assert.assertStrictEqual	= ( actual, expected ) => {
  * @return	Boolean
  */
 assert.assertIsString		= ( actual ) => {
-	return getType( actual ) === 'string';
+	return assert.assertIsInternalType( actual, 'string' );
 };
 
 /**
@@ -99,7 +124,7 @@ assert.assertIsString		= ( actual ) => {
  * @return	Boolean
  */
 assert.assertNotString		= ( actual ) => {
-	return getType( actual ) !== 'string';
+	return assert.assertNotInternalType( actual, 'string' );
 };
 
 /**
@@ -306,5 +331,81 @@ assert.assertSmallerThan		= ( actual, comparator ) => {
 assert.assertSmallerOrEqual		= ( actual, comparator ) => {
 	return getLength( actual ) <= getLength( comparator );
 };
+
+/**
+ * @brief	Assert that the given value is a Boolean
+ *
+ * @param	mixed actual
+ *
+ * @return	Boolean
+ */
+assert.assertIsBoolean			= ( actual ) => {
+	return assert.assertIsInternalType( actual, 'boolean' );
+};
+
+/**
+ * @brief	Assert that the given value is NOT a Boolean
+ *
+ * @param	mixed actual
+ *
+ * @return	Boolean
+ */
+assert.assertNotBoolean			= ( actual ) => {
+	return assert.assertNotInternalType( actual, 'boolean' );
+};
+
+/**
+ * @brief	Asserts that the given value is or casts to TRUE
+ *
+ * @param	mixed actual
+ *
+ * @return	Boolean
+ */
+assert.assertTrue				= ( actual ) => {
+	if ( assert.assertIsInternalType( actual, 'boolean' ) )
+	{
+		return actual === true;
+	}
+
+	if ( assert.assertIsInternalType( actual, 'number' ) )
+	{
+		return actual === 1;
+	}
+
+	if ( assert.assertIsInternalType( actual, 'string' ) )
+	{
+		return actual === 'true' || actual === '1';
+	}
+
+	return false;
+};
+
+/**
+ * @brief	Asserts that the given value is or casts to FALSE
+ *
+ * @param	mixed actual
+ *
+ * @return	Boolean
+ */
+assert.assertFalse			= ( actual ) => {
+	if ( assert.assertIsInternalType( actual, 'boolean' ) )
+	{
+		return actual === false;
+	}
+
+	if ( assert.assertIsInternalType( actual, 'number' ) )
+	{
+		return actual === 0;
+	}
+
+	if ( assert.assertIsInternalType( actual, 'string' ) )
+	{
+		return actual === 'false' || actual === '0';
+	}
+
+	return false;
+};
+
+assert.getLength				= getLength;
 
 module.exports	= assert;

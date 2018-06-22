@@ -8,7 +8,7 @@ const TemplatingEngine					= require( './components/templating_engine' );
 const ErrorHandler						= require( './components/error_handler' );
 const DataServer						= require( './components/caching/data_server' );
 const { Logger }						= require( './components/logger/components/logger' );
-
+const ValidationHandler					= require( './components/validation_handler' );
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
  */
@@ -43,6 +43,11 @@ class RequestEvent extends EventEmitter
 
 		Object.defineProperty( this, 'headers', {
 			value		: request.headers,
+			writable	: false
+		});
+
+		Object.defineProperty( this, 'validationHandler', {
+			value		: new ValidationHandler(),
 			writable	: false
 		});
 
