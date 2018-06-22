@@ -10,15 +10,27 @@ class ValidationResult
 		this.attributes	= [];
 	}
 
+	/**
+	 * @brief	Adds attributes to the validation result
+	 *
+	 * @param	ValidationAttribute attribute
+	 *
+	 * @return	void
+	 */
 	addAttribute( attribute )
 	{
 		this.attributes.push( attribute );
 	}
 
+	/**
+	 * @brief	Triggers the validate self on each of the added attributes
+	 *
+	 * @return	void
+	 */
 	validateAllAttributes()
 	{
 		this.attributes.forEach( ( attribute ) => {
-			attribute.validateSelf();
+			console.log( attribute.validateSelf() );
 		})
 	}
 }

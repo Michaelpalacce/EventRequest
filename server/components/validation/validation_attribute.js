@@ -1,7 +1,13 @@
 'use strict';
 
+// Dependencies
+const assert	= require( './validation_rules' );
+
 const VALIDATION_ERRORS	= {
-	rules	: 'rules'
+	rules	: 'rules',
+	string	: 'string',
+	filled	: 'filled',
+	range	: 'range',
 };
 
 /**
@@ -15,12 +21,13 @@ class ValidationAttribute
 		this.value	= value;
 		this.rules	= rules;
 		this.data	= data;
+		console.log( this );
 	}
 
 	/**
 	 * @brief	Returns true otherwise returns reason why it is not valid
 	 *
-	 * @return	String
+	 * @return	String|Boolean
 	 */
 	validateSelf()
 	{
@@ -42,6 +49,8 @@ class ValidationAttribute
 				return result;
 			}
 		}
+
+		return true;
 	}
 
 	/**
@@ -55,9 +64,28 @@ class ValidationAttribute
 	 */
 	validateRule( rule, index, allRules )
 	{
-		rule	= this.getRuleParams( rule );
-		switch ( rule )
+		let params	= this.getRuleParams( rule );
+
+		switch ( params.rule )
 		{
+			case VALIDATION_ERRORS.string:
+				return assert.assertIsString( this.value ) ? true : VALIDATION_ERRORS.string;
+
+			case VALIDATION_ERRORS.filled:
+				return assert.assertNotEmpty( this.value ) ? true : VALIDATION_ERRORS.filled;
+
+			case VALIDATION_ERRORS.range:
+				let range		= params.params[0].split( '-' );
+				let valueLength	= typeof this.value.length === 'undefined' ? this.value : this.value.length;
+				if ( range.length !== 2 || assert.assertIsEmpty( range[0] ) || assert.assertIsEmpty( range[1] ) )
+				{
+					return VALIDATION_ERRORS.range;
+				}
+
+				return assert.assertBiggerOrEqual( valueLength, Number( range[0] ) )
+						&& assert.assertSmallerOrEqual( valueLength, Number( range[1] ) )
+						? true
+						: VALIDATION_ERRORS.range;
 
 			default:
 				return VALIDATION_ERRORS.rules;
@@ -73,7 +101,12 @@ class ValidationAttribute
 	 */
 	getRuleParams( rule )
 	{
+		rule	= rule.split( ':' );
 
+		return{
+			rule	: rule.shift(),
+			params	: rule
+		}
 	}
 }
 

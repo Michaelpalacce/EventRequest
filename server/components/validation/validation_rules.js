@@ -15,6 +15,43 @@ function getType( value )
 }
 
 /**
+ * @brief	Gets the array of the value
+ *
+ * @param	mixed value
+ *
+ * @return	Number
+ */
+function getLength( value )
+{
+	if ( value === undefined )
+	{
+		return -1;
+	}
+
+	if ( Array.isArray( value ) )
+	{
+		return value.length;
+	}
+
+	if( getType( value ) === 'number' )
+	{
+		return value;
+	}
+
+	if( getType( value ) === 'string' )
+	{
+		return value.length;
+	}
+
+	if ( getType( value ) === 'object'  )
+	{
+		return Object.keys( value ).length;
+	}
+
+	return -1;
+}
+
+/**
  * @var	RegExp EMAIL_REGEX
  */
 const EMAIL_REGEX	= /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -211,7 +248,6 @@ assert.assertIsValidEmail		= ( actual ) => {
 	return EMAIL_REGEX.test( String( actual ).toLowerCase() );
 };
 
-
 /**
  * @brief	Asserts that the given value is NOT a valid email address
  *
@@ -221,6 +257,54 @@ assert.assertIsValidEmail		= ( actual ) => {
  */
 assert.assertNotValidEmail		= ( actual ) => {
 	return ! EMAIL_REGEX.test( String( actual ).toLowerCase() );
+};
+
+/**
+ * @brief	Asserts that the given value is bigger than the given comparator
+ *
+ * @param	mixed actual
+ * @param	mixed comparator
+ *
+ * @return	Boolean
+ */
+assert.assertBiggerThan			= ( actual, comparator ) => {
+	return getLength( actual ) > getLength( comparator );
+};
+
+/**
+ * @brief	Asserts that the given value is bigger or equal in regards to the given comparator
+ *
+ * @param	mixed actual
+ * @param	mixed comparator
+ *
+ * @return	Boolean
+ */
+assert.assertBiggerOrEqual		= ( actual, comparator ) => {
+	return getLength( actual ) >= getLength( comparator );
+};
+
+/**
+ * @brief	Asserts that the given value is smaller than the given comparator
+ *
+ * @param	mixed actual
+ * @param	mixed comparator
+ *
+ * @return	Boolean
+ */
+assert.assertSmallerThan		= ( actual, comparator ) => {
+	return getLength( actual ) < getLength( comparator );
+};
+
+/**
+ * @brief	Asserts that the given value is smaller or equal in regards to the given comparator
+ *
+ * @param	mixed actual
+ * @param	mixed comparator
+ *
+ * @return	Boolean
+ */
+assert.assertSmallerOrEqual		= ( actual, comparator ) => {
+	return getLength( actual ) <= getLength( comparator );
 };
 
 module.exports	= assert;
