@@ -2,6 +2,7 @@
 
 // Dependencies
 const RequestEvent	= require( './event' );
+const Route			= require( './route' );
 
 /**
  * @brief	Handler used to return all the needed middleware for the given event
@@ -30,33 +31,13 @@ class Router
 	 */
 	add( route )
 	{
-		if ( typeof route !== 'object' )
-		{
-			throw new Error( 'Invalid middleware added!!' );
-		}
-
 		if ( route instanceof Router )
 		{
 			this.middleware	= this.middleware.concat( route.middleware );
 			return;
 		}
 
-		route.route		= typeof route.route === 'string' || route.route instanceof RegExp
-						? route.route
-						: '';
-
-		route.method	= typeof route.method === 'string' || route.method instanceof Array
-						? route.method
-						: '';
-
-		route.handler	= route.handler instanceof Function
-						? route.handler
-						: null;
-
-		if ( route.handler === null )
-		{
-			throw new Error( 'Invalid middleware added!!' );
-		}
+		route	= new Route( route );
 
 		this.middleware.push( route );
 	}
@@ -79,21 +60,21 @@ class Router
 
 		for ( let index in this.middleware )
 		{
-			let value				= this.middleware[index];
-			if ( value.route === '' )
+			let value	= this.middleware[index];
+			if ( value.getRoute() === '' )
 			{
 				block.push( value.handler );
 				continue;
 			}
 
-			let match	= Router.matchRoute( event.path, value.route );
+			let match	= Router.matchRoute( event.path, value.getRoute() );
 
 			if ( match !== false )
 			{
-				if ( Router.matchMethod( event.method, value.method ) )
+				if ( Router.matchMethod( event.method, value.getMethod() ) )
 				{
 					event.params	= Object.assign( event.params, match );
-					block.push( value.handler );
+					block.push( value.getHandler() );
 				}
 			}
 		}
@@ -124,6 +105,7 @@ class Router
 	 */
 	static matchRoute( requestedRoute, eventPath )
 	{
+		Route.match()
 		if ( eventPath instanceof RegExp )
 		{
 			return eventPath.exec( requestedRoute ) !== null ? {} : false;
