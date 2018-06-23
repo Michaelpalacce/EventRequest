@@ -37,6 +37,7 @@ class MethodMock
 			|| this.method === null
 			|| ( shouldReturn === null && onConsecutiveCalls === null )
 		) {
+			console.log( shouldReturn );
 			throw new Error( 'Invalid mock options provided' );
 		}
 
@@ -100,12 +101,18 @@ class MethodMock
 	 */
 	attachMockedMethod()
 	{
-		if ( typeof this.mockedClass[this.method] !== 'function' )
+		if ( typeof this.mockedClass[this.method] === 'undefined' )
 		{
 			throw new Error( 'Trying to mock a method that does not exist.' );
 		}
-
-		this.mockedClass[this.method]	= this.mockedMethod;
+		else if ( typeof this.mockedClass[this.method] === 'function' )
+		{
+			this.mockedClass[this.method]	= this.mockedMethod;
+		}
+		else
+		{
+			this.mockedClass[this.method]	= this.getNextExecutionFunction( [] );
+		}
 	}
 
 	/**

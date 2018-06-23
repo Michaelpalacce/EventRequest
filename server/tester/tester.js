@@ -2,8 +2,9 @@
 
 // Dependencies
 const assert		= require( 'assert' );
-const Loggur		= require( './../logger/loggur' );
-const { Console }	= require( './../logger/components/logger' );
+const Loggur		= require( '../components/logger/loggur' );
+const { Console }	= require( '../components/logger/components/logger' );
+const Mock			= require( './mocker' );
 
 /**
  * @brief	Constants
@@ -111,7 +112,7 @@ class Tester
 	 *
 	 * @return	void
 	 */
-	runAllTests( options )
+	runAllTests( options = {} )
 	{
 		this.initialize();
 		this.consoleLogger.info( `Running ${this.tests.length} tests.` );
@@ -119,15 +120,26 @@ class Tester
 		let start			= Date.now();
 		let dieOnFirstError	= typeof options.dieOnFirstError === 'boolean' ? options.dieOnFirstError : true;
 		let stop			= false;
+		let index			= 0;
+		let hasFinished		= false;
 
-		for ( let index = 0; index < this.tests.length; ++ index )
-		{
-			if ( stop )
+		let finished	= ()=>{
+			this.consoleLogger.info( `Finished in: ${ ( Date.now() - start ) / 1000 }` );
+			this.consoleLogger.success( `There were ${this.successes.length} successful tests` );
+			this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` );
+			hasFinished	= true;
+		};
+
+		let done	= () =>{
+			let test	= this.tests[index];
+
+			if ( stop || test === undefined )
 			{
-				break;
+				finished();
+				return;
 			}
-			let test				= this.tests[index];
-			let testCallback		= test.test;
+
+			let testCallback	= test.test;
 
 			/**
 			 * @brief	Called if the test passes successfully
@@ -150,7 +162,7 @@ class Tester
 			let errorCallback		= ( err ) =>{
 				if ( err instanceof Error )
 				{
-					err	= err.message;
+					err	= err.stack;
 				}
 
 				test.status	= TEST_STATUSES.failed;
@@ -161,7 +173,6 @@ class Tester
 				this.consoleLogger.error( `---------------------END ERROR---------------------` );
 				if ( dieOnFirstError )
 				{
-					console.log( 'hA?' );
 					stop	= true;
 				}
 			};
@@ -172,6 +183,11 @@ class Tester
 			 * @param	mixed err
 			 */
 			let testDoneCallback	= ( err ) =>{
+				if ( hasFinished )
+				{
+					throw new Error( 'Done called after testing has finished' );
+				}
+
 				if ( err )
 				{
 					errorCallback( err );
@@ -180,6 +196,8 @@ class Tester
 				{
 					successCallback();
 				}
+				index	++;
+				done();
 			};
 
 			try
@@ -188,20 +206,19 @@ class Tester
 			}
 			catch( e )
 			{
-				errorCallback( e );
+				testDoneCallback( e );
 			}
-		}
+		};
 
-		this.consoleLogger.info( `Finished in: ${ ( Date.now() - start ) / 1000 }` );
-		this.consoleLogger.success( `There were ${this.successes.length} successful tests` );
-		this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` );
+		done();
 	}
 }
 
-let tester	= new Tester();
+let tester		= new Tester();
 module.exports	= {
 	Tester,
+	Mock,
+	assert,
 	test		: tester.addTest.bind( tester ),
-	runAllTests	: tester.runAllTests.bind( tester ),
-	assert		: assert
+	runAllTests	: tester.runAllTests.bind( tester )
 };

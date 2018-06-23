@@ -1,14 +1,16 @@
 'use strict';
 
 // Dependencies
-const url								= require( 'url' );
-const { EventEmitter }					= require( 'events' );
-const { FileStreamHandler, FileStream }	= require( './components/file_stream_handler' );
-const TemplatingEngine					= require( './components/templating_engine' );
-const ErrorHandler						= require( './components/error_handler' );
-const DataServer						= require( './components/caching/data_server' );
-const { Logger }						= require( './components/logger/components/logger' );
-const ValidationHandler					= require( './components/validation_handler' );
+const url									= require( 'url' );
+const { EventEmitter }						= require( 'events' );
+const { FileStreamHandler, FileStream }		= require( './components/file_stream_handler' );
+const TemplatingEngine						= require( './components/templating_engine' );
+const ErrorHandler							= require( './components/error_handler' );
+const DataServer							= require( './components/caching/data_server' );
+const { Logger }							= require( './components/logger/components/logger' );
+const ValidationHandler						= require( './components/validation_handler' );
+const { IncomingMessage, ServerResponse }	= require( 'http' );
+
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
  */
@@ -22,6 +24,11 @@ class RequestEvent extends EventEmitter
 	constructor( request, response )
 	{
 		super();
+
+		if ( ! ( request instanceof IncomingMessage ) || ! ( response instanceof ServerResponse ) )
+		{
+			throw new Error( 'Invalid parameters passed to EventRequest' );
+		}
 
 		// Define read only properties of the Request Event
 		let parsedUrl	= url.parse( request.url, true );
@@ -204,6 +211,11 @@ class RequestEvent extends EventEmitter
 		this.body				= undefined;
 		this.templatingEngine	= undefined;
 		this.fileStreamHandler	= undefined;
+		this.errorHandler		= undefined;
+		this.cachingServer		= undefined;
+		this.extra				= undefined;
+		this.cookies			= undefined;
+		this.params				= undefined;
 
 		this.emit( 'finished' );
 		this.removeAllListeners();
