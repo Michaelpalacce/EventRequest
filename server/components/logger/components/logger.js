@@ -241,5 +241,7 @@ module.exports	= {
 	Logger,
 	Transport,
 	Console,
-	File
+	File,
+	Log,
+	LOG_LEVELS
 };

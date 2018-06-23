@@ -10,5 +10,5 @@
   "main": "server.js",
   "name": "event_request",
   "scripts": {},
-  "version": "1.5.0"
+  "version": "1.5.1"
 }
