@@ -31,14 +31,16 @@ class Tester
 			logLevel	: 'success',
 			logLevels	: {
 				error	: 100,
-				success	: 200
+				success	: 200,
+				info	: 300
 			},
 			transports	: [
 				new Console({
 					color		: true,
 					logColors	: {
 						100	: 'red',
-						200	: 'green'
+						200	: 'green',
+						300	: 'cyan'
 					}
 				})
 			]
@@ -112,7 +114,19 @@ class Tester
 	runAllTests( options )
 	{
 		this.initialize();
-		this.tests.forEach( ( test, index, allTests ) =>{
+		this.consoleLogger.info( `Running ${this.tests.length} tests.` );
+
+		let start			= Date.now();
+		let dieOnFirstError	= typeof options.dieOnFirstError === 'boolean' ? options.dieOnFirstError : true;
+		let stop			= false;
+
+		for ( let index = 0; index < this.tests.length; ++ index )
+		{
+			if ( stop )
+			{
+				break;
+			}
+			let test				= this.tests[index];
 			let testCallback		= test.test;
 
 			/**
@@ -145,6 +159,11 @@ class Tester
 				this.consoleLogger.error( `--------------------BEGIN ERROR--------------------` );
 				this.consoleLogger.error( `${index}. ${test.message} failed with the following error: ${err}` );
 				this.consoleLogger.error( `---------------------END ERROR---------------------` );
+				if ( dieOnFirstError )
+				{
+					console.log( 'hA?' );
+					stop	= true;
+				}
 			};
 
 			/**
@@ -171,7 +190,11 @@ class Tester
 			{
 				errorCallback( e );
 			}
-		});
+		}
+
+		this.consoleLogger.info( `Finished in: ${ ( Date.now() - start ) / 1000 }` );
+		this.consoleLogger.success( `There were ${this.successes.length} successful tests` );
+		this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` );
 	}
 }
 
@@ -179,5 +202,6 @@ let tester	= new Tester();
 module.exports	= {
 	Tester,
 	test		: tester.addTest.bind( tester ),
-	runAllTests	: tester.runAllTests.bind( tester )
+	runAllTests	: tester.runAllTests.bind( tester ),
+	assert		: assert
 };

@@ -309,9 +309,9 @@ module.exports	= {
 		LOG_LEVELS	: LOG_LEVELS
 	}
 };
-//
-// const { test, runAllTests }	= require( './server/components/tester/tester' );
-// const assert				= require( 'assert' );
+
+const Mocker	= require( './server/components/tester/mocker' );
+// const { assert, test, runAllTests }	= require( './server/components/tester/tester' );
 //
 // test({
 // 	message	: 'Should just test',
@@ -362,4 +362,6 @@ module.exports	= {
 // 	}
 // });
 //
-// runAllTests();
+// runAllTests({
+// 	dieOnFirstError	: false
+// });
