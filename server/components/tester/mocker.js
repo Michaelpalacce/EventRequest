@@ -22,34 +22,57 @@ let Mock	= function ( objectToMock )
 		 */
 		_mock( mockMethodOptions )
 		{
-			let method			= typeof mockMethodOptions.method === 'string'
-								? mockMethodOptions.method
-								: null;
+			let method				= typeof mockMethodOptions.method === 'string'
+									? mockMethodOptions.method
+									: null;
 
-			let shouldReturn	= typeof mockMethodOptions.shouldReturn !== 'undefined'
-								? mockMethodOptions.shouldReturn
-								: null;
+			let shouldReturn		= typeof mockMethodOptions.shouldReturn !== 'undefined'
+									? mockMethodOptions.shouldReturn
+									: null;
 
-			let withArguments	= Array.isArray( mockMethodOptions.with )
-								? mockMethodOptions.with
-								: [];
+			let withArguments		= Array.isArray( mockMethodOptions.with )
+									? mockMethodOptions.with
+									: [];
 
-			if ( method === null || shouldReturn === null )
+			let called				= typeof mockMethodOptions.called === 'number'
+									? mockMethodOptions.called
+									: null;
+
+			let onConsecutiveCalls	= Array.isArray( mockMethodOptions.onConsecutiveCalls )
+									? mockMethodOptions.onConsecutiveCalls
+									: null;
+
+			if ( method === null || ( shouldReturn === null && onConsecutiveCalls === null ) )
 			{
 				throw new Error( 'Invalid mock options provided' );
 			}
+
+			onConsecutiveCalls	= shouldReturn === null ? onConsecutiveCalls : [shouldReturn];
 
 			if ( typeof this[method] !== 'function' )
 			{
 				throw new Error( 'Trying to mock a method that does not exist.' );
 			}
 
-			this[method]	= ( ...args ) => {
+			let functionCalled	= 0;
+
+			this[method]		= ( ...args ) => {
+				functionCalled ++;
+				if ( called !== null && called < functionCalled )
+				{
+					throw new Error( `Method ${method} was not expected to be called more than ${called} times.` );
+				}
+
 				if ( withArguments.length > 0 )
 				{
-					for ( let index = 0; index < withArguments.length; ++ index )
+					let currentArguments	= withArguments.length === 1 ? withArguments[0] : withArguments.shift();
+					if ( ! Array.isArray( currentArguments ) )
 					{
-						let value	= withArguments[index];
+						throw new Error( 'Invalid arguments provided' );
+					}
+					for ( let index = 0; index < currentArguments.length; ++ index )
+					{
+						let value	= currentArguments[index];
 						assert.strictEqual( value, args[index], `Failed asserting that ${method} was called `
 							+ ` with correct argument at position ${index}. `
 							+ `${value} was expected, but ${args[index]} received`
@@ -57,13 +80,15 @@ let Mock	= function ( objectToMock )
 					}
 				}
 
-				if ( typeof shouldReturn === 'function' )
+				let functionToExecute	= onConsecutiveCalls.length > 1 ? onConsecutiveCalls.shift() : onConsecutiveCalls[0];
+
+				if ( typeof functionToExecute === 'function' )
 				{
-					return shouldReturn.call( this, args )
+					return functionToExecute.call( this, args )
 				}
 				else
 				{
-					return shouldReturn;
+					return functionToExecute;
 				}
 			};
 
@@ -76,24 +101,20 @@ let Mock	= function ( objectToMock )
 
 class Test
 {
-	constructor()
-	{}
-
-	methodToMock()
-	{
-		return 'hey';
-	}
+	methodToMock() { return 'hey'; }
 }
 
 let MockedTest	= Mock( Test );
 let mockedTest	= new MockedTest();
 mockedTest._mock({
-	method			: 'methodToMock',
-	shouldReturn	: 'MOCKED',
-	with			: [
-		'hello',
-		'secondTest'
-	]
+	method				: 'methodToMock',
+	onConsecutiveCalls	: ['MOCKED', ()=>{ return 'MOCKED AGAIN'; }],
+	with				: [
+		['hello', 'test'],
+		['secondHello', 'secondTest']
+	],
+	called				: 2
 });
 
-console.log( mockedTest.methodToMock( 'hello', 'secondTest' ) );
+console.log( mockedTest.methodToMock( 'hello', 'test' ) );
+console.log( mockedTest.methodToMock( 'secondHello', 'secondTest' ) );
