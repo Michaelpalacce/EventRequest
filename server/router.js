@@ -60,21 +60,21 @@ class Router
 
 		for ( let index in this.middleware )
 		{
-			let value	= this.middleware[index];
-			if ( value.getRoute() === '' )
+			let route	= this.middleware[index];
+			if ( route.getRoute() === '' )
 			{
-				block.push( value.handler );
+				block.push( route.getHandler() );
 				continue;
 			}
 
-			let match	= Router.matchRoute( event.path, value.getRoute() );
+			let match	= Router.matchRoute( event.path, route );
 
-			if ( match !== false )
+			if ( match.matched )
 			{
-				if ( Router.matchMethod( event.method, value.getMethod() ) )
+				if ( Router.matchMethod( event.method, route ) )
 				{
-					event.params	= Object.assign( event.params, match );
-					block.push( value.getHandler() );
+					event.params	= Object.assign( event.params, match.params );
+					block.push( route.getHandler() );
 				}
 			}
 		}
@@ -84,76 +84,52 @@ class Router
 
 	/**
 	 * @brief	Matches the requested method with the ones set in the event
-	 * @param requestedMethod
-	 * @param eventMethod
-	 * @return {boolean}
+	 *
+	 * @param	String|Array requestedMethod
+	 * @param	Route eventMethod
+	 *
+	 * @return	Boolean
 	 */
-	static matchMethod( requestedMethod, eventMethod )
+	static matchMethod( requestedMethod, route )
 	{
-		return eventMethod === requestedMethod
-				|| eventMethod === ''
-				|| ( eventMethod.constructor === Array && ( eventMethod.indexOf( requestedMethod ) !== -1 || eventMethod.length === 0 ) )
+		if ( typeof route === 'string' || Array.isArray( route ) )
+		{
+			route	= new Route({
+				route	: route
+			});
+		}
+
+		if ( ! ( route instanceof Route ) )
+		{
+			return false;
+		}
+
+		return route.matchMethod( requestedMethod );
 	}
 
 	/**
 	 * @brief	Match the given route and returns any route parameters passed
 	 *
 	 * @param	String|RegExp requestedRoute
-	 * @param	String eventPath
+	 * @param	String|Route eventPath
 	 *
-	 * @return	Object|Boolean
+	 * @return	Object
 	 */
-	static matchRoute( requestedRoute, eventPath )
+	static matchRoute( requestedRoute, route )
 	{
-		Route.match()
-		if ( eventPath instanceof RegExp )
+		if ( typeof route === 'string' || route instanceof RegExp )
 		{
-			return eventPath.exec( requestedRoute ) !== null ? {} : false;
+			route	= new Route({
+				route	: route
+			});
 		}
 
-		let routeRe		= /\/:([^:]+):/g;
-		let matched		= false;
-		let matchedKeys	= [];
-
-		eventPath	= eventPath.replace( routeRe, function( matchedString, capturingGroupOne, offset, examinedString )
+		if ( ! ( route instanceof Route ) )
 		{
-			if ( arguments === null )
-			{
-				return '';
-			}
-
-			matched	= true;
-			matchedKeys.push( capturingGroupOne );
-
-			return '/(\\S+)';
-		});
-
-		if ( ! matched && typeof requestedRoute === 'string' )
-		{
-			return requestedRoute === eventPath ? {} : false;
+			return Route.getMatchObject();
 		}
 
-		if ( matched && typeof requestedRoute === 'string' )
-		{
-			eventPath			= eventPath.replace( new RegExp( '\/', 'g' ), '\\/');
-			let matchPathKeys	= requestedRoute.match( eventPath );
-			let match			= {};
-
-			if ( matchPathKeys !== null )
-			{
-				matchPathKeys.shift();
-
-				for ( let index in matchedKeys )
-				{
-					let key	= matchedKeys[index];
-					match[key]	= matchPathKeys[index]
-				}
-			}
-
-			return match !== null ? match : false;
-		}
-
-		return false;
+		return route.matchPath( requestedRoute );
 	}
 }
 

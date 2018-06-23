@@ -29,6 +29,19 @@ class Route
 	}
 
 	/**
+	 * @brief	Returns an empty unmatched object to work with
+	 *
+	 * @return	Object
+	 */
+	static getMatchObject()
+	{
+		return {
+			matched	: false,
+			params	: {}
+		}
+	}
+
+	/**
 	 * @brief	Sets Route options
 	 *
 	 * @param	Object routeConfig
@@ -91,12 +104,81 @@ class Route
 	}
 
 	/**
+	 * @brief	Matches the requestedMethod with the route's one
+	 *
+	 * @param	Array|String requestedMethod
+	 *
+	 * @return	Boolean
+	 */
+	matchMethod( requestedMethod )
+	{
+		return this.method === requestedMethod
+				|| this.method === ''
+				|| ( this.method.constructor === Array && ( this.method.indexOf( requestedMethod ) !== -1 || this.method.length === 0 ) );
+	}
+
+	/**
 	 * @brief	Matches this route with the requested path
 	 *
-	 * @return	void
+	 * @details	Returns an object with the matched parameters and whether the route actually matches
+	 *
+	 * @return	Object
 	 */
-	match()
+	matchPath( requestedRoute )
 	{
+		let matchResult	= Route.getMatchObject();
+		if ( this.route instanceof RegExp )
+		{
+			matchResult.matched	= this.route.test( requestedRoute );
+
+			return matchResult;
+		}
+
+		let routeRe		= /\/:([^:]+):/g;
+		let matched		= false;
+		let matchedKeys	= [];
+
+		this.route	= this.route.replace( routeRe, function( matchedString, capturingGroupOne, offset, examinedString )
+		{
+			if ( arguments === null )
+			{
+				return '';
+			}
+
+			matched	= true;
+			matchedKeys.push( capturingGroupOne );
+
+			return '/(\\S+)';
+		});
+
+		if ( ! matched && typeof requestedRoute === 'string' )
+		{
+			matchResult.matched	= requestedRoute === this.route;
+			return matchResult;
+		}
+
+		if ( matched && typeof requestedRoute === 'string' )
+		{
+			this.route			= this.route.replace( new RegExp( '\/', 'g' ), '\\/');
+			let matchPathKeys	= requestedRoute.match( this.route );
+			let match			= {};
+
+			if ( matchPathKeys !== null )
+			{
+				matchPathKeys.shift();
+
+				for ( let index in matchedKeys )
+				{
+					let key	= matchedKeys[index];
+					match[key]	= matchPathKeys[index]
+				}
+			}
+
+			matchResult.matched	= true;
+			matchResult.params	= match;
+		}
+
+		return matchResult;
 	}
 }
 
