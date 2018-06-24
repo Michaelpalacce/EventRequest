@@ -1,13 +1,14 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, runAllTests, helpers, assertions }	= require( './../testing_suite' );
-const EventRequest												= require( './../../server/event' );
-const TemplatingEngine											= require( './../../server/components/templating_engine' );
-const { FileStreamHandler }										= require( './../../server/components/file_stream_handler' );
-const ErrorHandler												= require( './../../server/components/error_handler' );
-const MemoryDataServer											= require( './../../server/components/caching/memory/memory_data_server' );
-const { Logger }												= require( './../../server/components/logger/components/logger' );
+const { Mock, assert, test, helpers, assertions }	= require( './../testing_suite' );
+const EventRequest									= require( './../../server/event' );
+const TemplatingEngine								= require( './../../server/components/templating_engine' );
+const { FileStreamHandler }							= require( './../../server/components/file_stream_handler' );
+const ErrorHandler									= require( './../../server/components/error_handler' );
+const MemoryDataServer								= require( './../../server/components/caching/memory/memory_data_server' );
+const { Logger }									= require( './../../server/components/logger/components/logger' );
+const MockedErrorHandler							= Mock( ErrorHandler );
 
 test({
 	message	: 'EventRequest should throw an error with invalid constructor parameters',
@@ -196,7 +197,6 @@ test({
 		eventRequest.cleanUp();
 
 		assert.equal( eventRequest.internalTimeout, undefined );
-		assert.equal( eventRequest.isStopped, true );
 		assert.equal( eventRequest.extra, undefined );
 		assert.equal( eventRequest.body, undefined );
 		assert.equal( eventRequest.templatingEngine, undefined );
@@ -307,35 +307,6 @@ test({
 });
 
 test({
-	message	: 'EventRequest stop method emits stop',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let stop			= false;
-
-		eventRequest.on( 'stop', ()=>{
-			stop	= true;
-		});
-
-		eventRequest.stop();
-
-		stop	? done() : done( 'EventRequest stop event not emitted' );
-	}
-});
-
-test({
-	message	: 'EventRequest stop method sets isStopped to true',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-
-		assert.equal( eventRequest.isStopped, false );
-		eventRequest.stop();
-		assert.equal( eventRequest.isStopped, true );
-
-		done();
-	}
-});
-
-test({
 	message	: 'EventRequest setHeader emits a setHeader event',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
@@ -418,7 +389,6 @@ test({
 	message	: 'EventRequest setHeader does not set header when event is finished and throws error',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
-		let MockedErrorHandler	= Mock( ErrorHandler );
 		let errorHandler		= new MockedErrorHandler();
 		let errorCalled			= false;
 
@@ -529,7 +499,7 @@ test({
 });
 
 test({
-	message	: 'EventReqeust.isFinished returns response.finished',
+	message	: 'EventRequest.isFinished returns response.finished',
 	test	: ( done ) =>{
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.response._mock({
@@ -547,5 +517,176 @@ test({
 		assert.equal( eventRequest.isFinished(), false );
 
 		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.render emits a render event and returns a callback',
+	test	: ( done ) =>{
+		let eventRequest				= helpers.getEventRequest();
+		let MockTemplatingEngine		= Mock( TemplatingEngine );
+		let render						= false;
+		let send						= false;
+		let templateName				= 'test';
+		let templateVariables			= {};
+		eventRequest.templatingEngine	= new MockTemplatingEngine();
+		eventRequest.templatingEngine._mock({
+			method			: 'render',
+			shouldReturn	: ( template, variables, callback ) =>{
+				assert.equal( template, templateName );
+				assert.deepEqual( variables, templateVariables );
+				callback( false, 'result' );
+			}
+		});
+
+		eventRequest.on( 'render', ()=>{
+			render	= true;
+		});
+
+		eventRequest.on( 'send', ()=>{
+			send	= true;
+		});
+
+		eventRequest.render( 'test', {}, ( err )=>{
+			if ( ! err )
+			{
+				render && send ? done() : done( 'Render event not called' );
+			}
+			else
+			{
+				done( 'Rendering failed' );
+			}
+		});
+	}
+});
+
+test({
+	message	: 'EventRequest.render sends error if templating engine not set',
+	test	: ( done ) =>{
+		let eventRequest	= helpers.getEventRequest();
+		let error			= false;
+
+		eventRequest.errorHandler	= new MockedErrorHandler();
+		eventRequest.errorHandler._mock({
+			method			: 'handleError',
+			shouldReturn	: ()=>{
+				error	= true;
+			}
+		});
+
+		eventRequest.render();
+
+		error ? done() : done( 'Rendering should have called errorHandler.handleError but it did not' );
+	}
+});
+
+test({
+	message	: 'EventRequest.setBlock should set block',
+	test	: ( done ) =>{
+		let eventRequest	= helpers.getEventRequest();
+		let block			= ['test'];
+		eventRequest.setBlock( block );
+
+		assert.deepEqual( eventRequest.block, block );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.next calls next middleware',
+	test	: ( done ) =>{
+		let eventRequest	= helpers.getEventRequest();
+		let firstCalled		= false;
+		let secondCalled	= false;
+
+		let callbackOne		= ( event ) =>{
+			firstCalled	= true;
+			event.next();
+		};
+		let callbackTwo		= () =>{
+			secondCalled	= true;
+		};
+
+		let block			= [callbackOne, callbackTwo];
+		eventRequest.setBlock( block );
+
+		eventRequest.next();
+
+		firstCalled && secondCalled ? done() : done( 'EventRequest.next chain did not execute correctly' );
+	}
+});
+
+test({
+	message	: 'EventRequest.next sends error on error',
+	test	: ( done ) =>{
+		let eventRequest			= helpers.getEventRequest();
+		let error					= false;
+		let errorToSend				= 'Error was thrown.';
+		let errorCode				= 503;
+
+		eventRequest.errorHandler	= new MockedErrorHandler();
+		eventRequest.errorHandler._mock({
+			method			: 'handleError',
+			shouldReturn	: ( event, errorThrown )=>{
+				assert.equal( errorThrown, errorToSend );
+				error	= true;
+			}
+		});
+
+		let callback	= ()=>{};
+
+		let block		= [callback];
+		eventRequest.setBlock( block );
+
+		eventRequest.next( errorToSend, errorCode );
+
+		error ? done() : done( 'EventRequest.next did not dispatch an error' );
+	}
+});
+
+test({
+	message	: 'EventRequest.next calls errorHandler on no more middleware',
+	test	: ( done ) =>{
+		let eventRequest			= helpers.getEventRequest();
+		let error					= false;
+
+		eventRequest.errorHandler	= new MockedErrorHandler();
+		eventRequest.errorHandler._mock({
+			method			: 'handleError',
+			shouldReturn	: ( event, errorThrown )=>{
+				assert.equal( errorThrown.length > 0, true );
+				error	= true;
+			}
+		});
+
+		let block	= [];
+		eventRequest.setBlock( block );
+
+		eventRequest.next();
+
+		error ? done() : done( 'EventRequest.next did not call errorHandler on no more middleware' );
+	}
+});
+
+test({
+	message	: 'EventRequest.sendError emits an error event',
+	test	: ( done ) =>{
+		let eventRequest			= helpers.getEventRequest();
+		let errorToThrow			= 'Error to throw';
+		let error					= false;
+
+		eventRequest.errorHandler	= new MockedErrorHandler();
+		eventRequest.errorHandler._mock({
+			method			: 'handleError',
+			shouldReturn	: ( event, errorThrown )=>{
+				assert.equal( errorThrown, errorToThrow );
+				error	= true;
+			}
+		});
+
+		eventRequest.sendError( errorToThrow );
+
+		error ? done() : done( 'Send error did not emit an error' );
 	}
 });

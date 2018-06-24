@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const { Tester, Mock, assert }			= require( './../server/tester/tester' );
+const { Tester, Mock, assert, logger }	= require( './../server/tester/tester' );
 const EventRequest						= require( './../server/event' );
 const assertions						= require( './../server/components/validation/validation_rules' );
 let { IncomingMessage, ServerResponse }	= require( 'http' );
@@ -41,6 +41,7 @@ module.exports	= {
 	Mock,
 	assert,
 	assertions,
+	logger,
 	helpers,
 	test		: tester.addTest.bind( tester ),
 	runAllTests	: tester.runAllTests.bind( tester )

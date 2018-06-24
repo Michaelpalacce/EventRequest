@@ -61,7 +61,6 @@ class RequestEvent extends EventEmitter
 		this.request			= request;
 		this.response			= response;
 
-		this.isStopped			= false;
 		this.internalTimeout	= null;
 		this.extra				= {};
 		this.cookies			= {};
@@ -204,7 +203,6 @@ class RequestEvent extends EventEmitter
 	{
 		this.emit( 'cleanUp' );
 		this.clearTimeout();
-		this.stop();
 
 		this.extra				= undefined;
 		this.internalTimeout	= undefined;
@@ -251,18 +249,6 @@ class RequestEvent extends EventEmitter
 		this.emit( 'send', { response, code, raw } );
 
 		this.cleanUp();
-	}
-
-	/**
-	 * @brief	Stops block execution
-	 *
-	 * @return	void
-	 */
-	stop()
-	{
-		this.emit( 'stop' );
-
-		this.isStopped	= true;
 	}
 
 	/**
@@ -418,17 +404,7 @@ class RequestEvent extends EventEmitter
 
 		if ( this.block.length <= 0 && ! this.isFinished() )
 		{
-			this.send( `Cannot ${this.method} ${this.path}` );
-			return;
-		}
-
-		if ( this.isStopped )
-		{
-			if ( ! this.isFinished() )
-			{
-				this.send();
-			}
-
+			this.sendError( `Cannot ${this.method} ${this.path}` );
 			return;
 		}
 

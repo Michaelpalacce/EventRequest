@@ -19,7 +19,7 @@ const Logger				= require( './server/components/logger/components/logger' );
 const { LOG_LEVELS }		= require( './server/components/logger/components/log' );
 const DataServer			= require( './server/components/caching/data_server' );
 const MemoryDataServer		= require( './server/components/caching/memory/memory_data_server' );
-
+const Testing				= require( './server/tester/tester' );
 
 /**
  * @brief	Constants
@@ -303,6 +303,7 @@ module.exports	= {
 	ErrorHandler,
 	DataServer,
 	MemoryDataServer,
+	Testing,
 	Logging				: {
 		Loggur		: Loggur,
 		Logger		: Logger,
