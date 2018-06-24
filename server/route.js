@@ -52,7 +52,7 @@ class Route
 	{
 		if ( typeof routeConfig !== 'object' )
 		{
-			throw new Error( 'Invalid middleware added!!' );
+			throw new Error( 'Invalid middleware added!' );
 		}
 
 		this.route		= typeof routeConfig.route === 'string' || routeConfig.route instanceof RegExp
@@ -69,7 +69,7 @@ class Route
 
 		if ( this.handler === null )
 		{
-			throw new Error( 'Invalid middleware added!!' );
+			throw new Error( 'Invalid middleware added!' );
 		}
 	}
 
@@ -127,6 +127,12 @@ class Route
 	matchPath( requestedRoute )
 	{
 		let matchResult	= Route.getMatchObject();
+
+		if ( requestedRoute === '' )
+		{
+			return matchResult;
+		}
+
 		if ( this.route instanceof RegExp )
 		{
 			matchResult.matched	= this.route.test( requestedRoute );
@@ -138,8 +144,7 @@ class Route
 		let matched		= false;
 		let matchedKeys	= [];
 
-		this.route	= this.route.replace( routeRe, function( matchedString, capturingGroupOne, offset, examinedString )
-		{
+		let route		= this.route.replace( routeRe, ( matchedString, capturingGroupOne, offset, examinedString )=>{
 			if ( arguments === null )
 			{
 				return '';
@@ -148,19 +153,19 @@ class Route
 			matched	= true;
 			matchedKeys.push( capturingGroupOne );
 
-			return '/(\\S+)';
+			return '/([^\\/]*)$';
 		});
 
 		if ( ! matched && typeof requestedRoute === 'string' )
 		{
-			matchResult.matched	= requestedRoute === this.route;
+			matchResult.matched	= requestedRoute === route;
 			return matchResult;
 		}
 
 		if ( matched && typeof requestedRoute === 'string' )
 		{
-			this.route			= this.route.replace( new RegExp( '\/', 'g' ), '\\/');
-			let matchPathKeys	= requestedRoute.match( this.route );
+			route				= route.replace( new RegExp( '\/', 'g' ), '\\/');
+			let matchPathKeys	= requestedRoute.match( route );
 			let match			= {};
 
 			if ( matchPathKeys !== null )
@@ -172,10 +177,10 @@ class Route
 					let key	= matchedKeys[index];
 					match[key]	= matchPathKeys[index]
 				}
-			}
 
-			matchResult.matched	= true;
-			matchResult.params	= match;
+				matchResult.matched	= true;
+				matchResult.params	= match;
+			}
 		}
 
 		return matchResult;
