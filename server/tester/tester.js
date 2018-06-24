@@ -211,6 +211,14 @@ class Tester
 		};
 
 		done();
+
+		if ( this.errors.length + this.successes.length !== this.tests.length )
+		{
+			throw new Error(
+				'Test errors and test successes do not match. ' +
+				'Some tests may have called done twice or possible async mishandling.'
+			);
+		}
 	}
 }
 

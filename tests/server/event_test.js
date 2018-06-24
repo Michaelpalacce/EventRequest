@@ -156,16 +156,18 @@ test({
 	message	: 'EventRequest cleanUp emits event: cleanUp',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		let timeout			= setTimeout( () =>{
-			done( 'Did not emit an event' );
-		}, 500 );
+		let finished		= false;
 
 		eventRequest.on( 'cleanUp', ()=>{
-			clearTimeout( timeout );
+			finished	= true;
 			done();
 		});
 
 		eventRequest.cleanUp();
+		if ( ! finished )
+		{
+			done( 'Did not emit an event' );
+		}
 	}
 });
 
@@ -174,16 +176,17 @@ test({
 	message	: 'EventRequest cleanUp emits event: finished',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		let timeout			= setTimeout( () =>{
-			done( 'Did not emit an event' );
-		}, 500 );
-
+		let finished		= false;
 		eventRequest.on( 'finished', ()=>{
-			clearTimeout( timeout );
+			finished	= true;
 			done();
 		});
 
 		eventRequest.cleanUp();
+		if ( ! finished )
+		{
+			done( 'Did not emit an event' );
+		}
 	}
 });
 
@@ -216,4 +219,74 @@ test({
 	}
 });
 
-module.exports	= {};
+test({
+	message	: 'EventRequest send calls response.end when not raw',
+	test	: ( done ) =>{
+		let eventRequest	= helpers.getEventRequest();
+		let send			= false;
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: ()=>{
+				send	= true;
+				done();
+			}
+		});
+
+		eventRequest.send( '' );
+
+		if ( ! send )
+		{
+			done( 'Send did not get called' );
+		}
+	}
+});
+
+test({
+	message	: 'EventRequest send calls response.end when raw',
+	test	: ( done ) =>{
+		let eventRequest	= helpers.getEventRequest();
+		let send			= false;
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: ()=>{
+				send	= true;
+				done();
+			}
+		});
+
+		eventRequest.send( '', 200, true );
+
+		if ( ! send )
+		{
+			done( 'Send did not get called' )
+		}
+	}
+});
+
+test({
+	message	: 'EventRequest send emits send event',
+	test	: ( done ) =>{
+		let eventRequest	= helpers.getEventRequest();
+		let send			= false;
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: ()=>{}
+		});
+
+		eventRequest.on( 'send', () =>{
+			send	= true;
+		});
+
+		eventRequest.send( '', 200, true );
+
+		if ( send )
+		{
+			done();
+		}
+		else
+		{
+			done( 'EventRequest send event not emitted' );
+		}
+	}
+});
+

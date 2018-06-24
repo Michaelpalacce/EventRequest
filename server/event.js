@@ -239,7 +239,7 @@ class RequestEvent extends EventEmitter
 			}
 			catch ( e )
 			{
-				response	= 'Error while sending the payload';
+				response	= 'Malformed payload';
 			}
 
 			code	= typeof code === 'number' ? code : 200;
