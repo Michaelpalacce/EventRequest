@@ -1,8 +1,8 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers, assertions }	= require( './../testing_suite' );
-const Route											= require( './../../server/route' );
+const { assert, test }	= require( './../testing_suite' );
+const Route				= require( './../../server/route' );
 
 /**
  * @brief	Gets a route with the given arguments
