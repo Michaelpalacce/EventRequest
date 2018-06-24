@@ -300,8 +300,15 @@ class RequestEvent extends EventEmitter
 	{
 		this.emit( 'redirect', { redirectUrl, statusCode } );
 
-		this.setHeader( 'Location', redirectUrl );
-		this.send( { redirectURL : redirectUrl }, statusCode );
+		if ( ! this.isFinished() )
+		{
+			this.setHeader( 'Location', redirectUrl );
+			this.send( { redirectURL : redirectUrl }, statusCode );
+		}
+		else
+		{
+			this.next( 'Could not redirect, response already finished' );
+		}
 	}
 
 	/**

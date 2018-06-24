@@ -3,6 +3,7 @@
 // Dependencies
 const { Tester, Mock, assert }			= require( './../server/tester/tester' );
 const EventRequest						= require( './../server/event' );
+const assertions						= require( './../server/components/validation/validation_rules' );
 let { IncomingMessage, ServerResponse }	= require( 'http' );
 
 ServerResponse	= Mock( ServerResponse );
@@ -39,6 +40,7 @@ module.exports	= {
 	Tester,
 	Mock,
 	assert,
+	assertions,
 	helpers,
 	test		: tester.addTest.bind( tester ),
 	runAllTests	: tester.runAllTests.bind( tester )

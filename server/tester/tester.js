@@ -119,6 +119,7 @@ class Tester
 
 		let start			= Date.now();
 		let dieOnFirstError	= typeof options.dieOnFirstError === 'boolean' ? options.dieOnFirstError : true;
+		let debug			= typeof options.debug === 'boolean' ? options.debug : false;
 		let stop			= false;
 		let index			= 0;
 		let hasFinished		= false;
@@ -151,7 +152,8 @@ class Tester
 			let successCallback		= () =>{
 				test.status	= TEST_STATUSES.success;
 				this.successes.push( test );
-				this.consoleLogger.success( `${index}. ${test.message}` )
+				this.consoleLogger.success( `${index}. ${test.message}` );
+				done();
 			};
 
 			/**
@@ -162,7 +164,14 @@ class Tester
 			let errorCallback		= ( err ) =>{
 				if ( err instanceof Error )
 				{
-					err	= err.stack;
+					if ( debug )
+					{
+						err	= err.stack;
+					}
+					else
+					{
+						err	= err.message;
+					}
 				}
 
 				test.status	= TEST_STATUSES.failed;
@@ -174,6 +183,11 @@ class Tester
 				if ( dieOnFirstError )
 				{
 					stop	= true;
+					finished();
+				}
+				else
+				{
+					done();
 				}
 			};
 
@@ -188,6 +202,8 @@ class Tester
 					throw new Error( 'Done called after testing has finished' );
 				}
 
+				index	++;
+
 				if ( err )
 				{
 					errorCallback( err );
@@ -196,8 +212,6 @@ class Tester
 				{
 					successCallback();
 				}
-				index	++;
-				done();
 			};
 
 			try
@@ -206,18 +220,23 @@ class Tester
 			}
 			catch( e )
 			{
-				testDoneCallback( e );
+				if ( ! hasFinished )
+				{
+					errorCallback( e );
+				}
+				else
+				{
+					this.consoleLogger.error( 'Possible async error occurred:' );
+					this.consoleLogger.error( e.stack );
+				}
 			}
 		};
 
 		done();
 
-		if ( this.errors.length + this.successes.length !== this.tests.length )
+		if ( ! hasFinished )
 		{
-			throw new Error(
-				'Test errors and test successes do not match. ' +
-				'Some tests may have called done twice or possible async mishandling.'
-			);
+			this.consoleLogger.error( 'Testing has not finished but is exiting. This may indicate incorrect handling of async errors.' );
 		}
 	}
 }
