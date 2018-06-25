@@ -216,7 +216,8 @@ class Tester
 			let testDoneCallback	= ( err ) =>{
 				if ( hasFinished )
 				{
-					throw new Error( 'Done called after testing has finished' );
+					this.consoleLogger.error( 'Done called after testing has finished' );
+					return;
 				}
 
 				index	++;
