@@ -3,7 +3,6 @@
 // Dependencies
 const fs									= require( 'fs' );
 const path									= require( 'path' );
-const setAdvTimeout							= require( './components/helpers/timeout' );
 const { BodyParserHandler }					= require( './components/body_parser_handler' );
 const TemplatingEngine						= require( './components/templating_engine' );
 const BaseTemplatingEngine					= require( './components/templating_engines/base_templating_engine' );
@@ -229,24 +228,24 @@ middlewaresContainer.addStaticPath	= ( options ) => {
 };
 
 /**
- * @brief	Adds a timeout middleware that will cause the event to timeout after a sepcific time
+ * @brief	Adds a timeout middleware that will cause the event to timeout after a specific time
  *
  * @param	string staticPath
  * 			Accepts options:
- * 			- timeout - the amount in seconds to cause the timeout defaults to 60
+ * 			- timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
  *
  * @return	Object
  */
 middlewaresContainer.timeout	= ( options ) =>
 {
-	let timeout	= typeof options.timeout === 'number' ? parseInt( options.timeout ) : 60;
+	let timeout	= typeof options.timeout === 'number' ? parseInt( options.timeout ) : 60 * 1000;
 
 	return {
 		handler	: ( event ) => {
-			event.internalTimeout	= setAdvTimeout( () => {
+			event.internalTimeout	= setTimeout( () => {
 					if ( ! event.isFinished() )
 					{
-						event.next( 'TIMEOUT' );
+						event.next( `Request timed out in: ${timeout}` );
 					}
 				},
 				timeout

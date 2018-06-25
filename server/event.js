@@ -306,30 +306,9 @@ class RequestEvent extends EventEmitter
 	{
 		this.emit( 'clearTimeout' );
 
-		if (
-			typeof this.internalTimeout === 'object'
-			&& this.internalTimeout !== null
-			&& typeof this.internalTimeout.cancel === 'function'
-		) {
-			this.internalTimeout.cancel();
-		}
-	}
-
-	/**
-	 * @brief	Extends the timeout event given milliseconds
-	 *
-	 * @param	Number ms
-	 *
-	 * @return	void
-	 */
-	extendTimeout( ms )
-	{
-		if (
-			typeof this.internalTimeout === 'object'
-			&& this.internalTimeout !== null
-			&& typeof this.internalTimeout.extend === 'function'
-		) {
-			this.internalTimeout.extend( ms );
+		if ( this.internalTimeout !== null && this.internalTimeout !== undefined )
+		{
+			clearTimeout( this.internalTimeout );
 		}
 	}
 

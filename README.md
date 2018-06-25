@@ -99,7 +99,7 @@ Available middleware:
 
 * timeout -> Adds a timeout to the request
 * * Accepted options:
-* * - timeout - Number - the time after which the request should timeout
+* * - timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
 
 
 
