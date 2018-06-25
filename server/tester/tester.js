@@ -16,6 +16,11 @@ const TEST_STATUSES	= {
 	incomplete	: 'incomplete',
 	pending		: 'pending'
 };
+const LOG_LEVELS	= {
+	error	: 100,
+	success	: 200,
+	info	: 300
+};
 
 /**
  * @brief	Tester class that holds all tests that should be executed
@@ -29,15 +34,13 @@ class Tester
 		this.successes		= [];
 		this.consoleLogger	= Loggur.createLogger({
 			serverName	: 'Tester',
-			logLevel	: 'success',
-			logLevels	: {
-				error	: 100,
-				success	: 200,
-				info	: 300
-			},
+			logLevel	: LOG_LEVELS.info,
+			logLevels	: LOG_LEVELS,
 			transports	: [
 				new Console({
 					color		: true,
+					logLevels	: LOG_LEVELS,
+					logLevel	: LOG_LEVELS.info,
 					logColors	: {
 						100	: 'red',
 						200	: 'green',

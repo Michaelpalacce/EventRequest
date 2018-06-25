@@ -124,12 +124,12 @@ There are 2 predefined transport layers:
 * * Accepted options:
 * * - color - Boolean - Whether the log should be colored -> Defaults to true
 * * - logColors - Object - The colors to use -> Defaults to 
-* * * [LOG_LEVELS.error]	: 'red',
-* * * [LOG_LEVELS.warning]	: 'yellow',
-* * * [LOG_LEVELS.notice]	: 'green',
-* * * [LOG_LEVELS.info]		: 'blue',
-* * * [LOG_LEVELS.verbose]	: 'cyan',
-* * * [LOG_LEVELS.debug]	: 'white'
+* *  [LOG_LEVELS.error]	: 'red',
+* *  [LOG_LEVELS.warning]	: 'yellow',
+* *  [LOG_LEVELS.notice]	: 'green',
+* *  [LOG_LEVELS.info]		: 'blue',
+* *  [LOG_LEVELS.verbose]	: 'cyan',
+* *  [LOG_LEVELS.debug]	: 'white'
 
 * **File**
 * * Accepted options:
@@ -148,7 +148,8 @@ When logging an object can be passed that accepts 2 options: level, message. Alt
 
 # Validation
 
-The validation is done by using the event.validationHandler.validate( objectToValidate, skeleton )
+The validation is done by using:
+>     event.validationHandler.validate( objectToValidate, skeleton )
 
 skeleton must have the keys that are to be validated that point to a string of rules separated by ||
 
@@ -176,6 +177,15 @@ skeleton must have the keys that are to be validated that point to a string of r
 
 If any errors occur they will be returned as an array of keys eg: ['string','min','max','range','filled']
 
+Example:
+
+>     let body = { stringToValidate: 'str', emailToValidate: 'example@test.com' };
+>     event.validationHandler.handle( body, { stringToValidate: 'filled||string||range:2-3',
+>                                       emailToValidate: 'optional||email' } 
+>                                   );
+
+The example will validate that the stringToValidate is filled is a string and is within a range of 2-3 characters
+It will also validate that the emailToValidate in case it is provided is an actual email.
 
 
 # Testing
@@ -198,18 +208,18 @@ have a _mock function otherwise it will be overwritten. From here you can use th
 that is attached to the 'Test' class:
 
 >     let testDouble    = new MockedTest();  
->     testDouble._mock({  
->     method        : 'mockThis',  
->     shouldReturn  : ''  
+>       testDouble._mock({  
+>       method        : 'mockThis',  
+>       shouldReturn  : ''  
 >     });  
 
 Note: As you can see when you mock a class you MUST specify what it should return from now on. You can also give instructions
 on what should be returned on consecutive calls to this method like so :
 
 >     let testDouble    = new MockedTest();  
->     testDouble._mock({  
->     method              : 'mockThis',  
->     onConsecutiveCalls  : ['first', 'secondAndOnwards']  
+>       testDouble._mock({  
+>       method              : 'mockThis',  
+>       onConsecutiveCalls  : ['first', 'secondAndOnwards']  
 >     });
 
 This will result in the following:
@@ -223,10 +233,10 @@ an async approach and relies heavily on callbacks, a minimum cannot be set.
 
 
 >     let testDouble    = new MockedTest();  
->     testDouble._mock({  
->     method        : 'mockThis',  
->     shouldReturn  : '',  
->     called        : 1  
+>        testDouble._mock({  
+>        method        : 'mockThis',  
+>        shouldReturn  : '',  
+>        called        : 1  
 >     });
 
 This way if the method mockThis is called more than once an error will be thrown.
@@ -236,14 +246,14 @@ You can also Specify the arguments that should be provided to the mocked method 
 
 
 >     let testDouble    = new MockedTest();  
->     testDouble._mock({  
->     method        : 'mockThis',  
->     shouldReturn  : '',  
->     called        : 1,  
->     with:         [  
->         [ 'firstArgument', 'secondArgument' ]  
->         [ 'secondCallFirstArgument', 'secondCallSecondArgument' ]  
->      ]  
+>       testDouble._mock({  
+>       method        : 'mockThis',  
+>       shouldReturn  : '',  
+>       called        : 1,  
+>       with:         [  
+>           [ 'firstArgument', 'secondArgument' ]  
+>           [ 'secondCallFirstArgument', 'secondCallSecondArgument' ]  
+>        ]  
 >     });  
 
 The 'with' option accepts an array of arrays where each array in the with array is a call. Again if it's called more than 
@@ -271,18 +281,28 @@ the testing will stop.
 Example:
 
 >     test({  
->      message    : 'This test should pass',  
->      test       : ( done ) =>{  
->         let one = 1;  
->           
->        one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );  
->      }  
+>       message    : 'This test should pass',  
+>       test       : ( done ) =>{  
+>          let one = 1;  
+>            
+>         one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );  
+>       }  
 >     });  
 
 
-You can also create your own Tester if you want the test to be separated by some reason:
+You can also create your own Tester if you want separate test cases:
 
 >     const { Tester }    = TestingTools;  
 >     let tester          = new Tester();  
 
 The tester has the same functions: 'test', 'runAllTests'
+
+
+The TestingTools export:
+
+	Tester, -> Tester constructor
+	Mock,   -> Mock function
+	assert, -> nodejs assert module
+	logger		: tester.consoleLogger, -> Predefined logger that has 3 log levels: error, success, info
+	test		: tester.addTest.bind( tester ),
+	runAllTests	: tester.runAllTests.bind( tester )
