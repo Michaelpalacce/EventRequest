@@ -131,20 +131,6 @@ class Server
 		this.cachingServerOptions	= typeof this.cachingServerOptions === 'object'
 									? this.cachingServerOptions
 									: OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT;
-
-		this.cachingServer.setUp( this.cachingServerOptions, ( err, data ) =>{
-			if ( err )
-			{
-				throw new Error( err );
-			}
-			else
-			{
-				Loggur.log({
-					level	: LOG_LEVELS.warning,
-					message	: data
-				});
-			}
-		});
 	}
 
 	/**
@@ -281,6 +267,28 @@ class Server
 	}
 
 	/**
+	 * @brief	Sets up the caching server
+	 *
+	 * @return	void
+	 */
+	setUpCachingServer()
+	{
+		this.cachingServer.setUp( this.cachingServerOptions, ( err, data ) =>{
+			if ( err )
+			{
+				throw new Error( err );
+			}
+			else
+			{
+				Loggur.log({
+					level	: LOG_LEVELS.warning,
+					message	: data
+				});
+			}
+		});
+	}
+
+	/**
 	 * @brief	Starts the server on a given port
 	 *
 	 * @param	Number port
@@ -289,6 +297,8 @@ class Server
 	 */
 	start ()
 	{
+		this.setUpCachingServer();
+
 		this.cluster.startCluster( this.clusters );
 	}
 }

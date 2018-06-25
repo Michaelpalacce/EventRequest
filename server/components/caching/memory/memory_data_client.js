@@ -43,7 +43,7 @@ class MemoryWorker
 	 */
 	setUpServer()
 	{
-		net.createServer( ( stream ) => {
+		let server	= net.createServer( ( stream ) => {
 			stream.on( 'data', ( chunk ) => {
 				chunk	= chunk.toString( 'utf8' );
 
@@ -66,7 +66,9 @@ class MemoryWorker
 					stream.end( JSON.stringify( response ) );
 				});
 			});
-		}).listen( PIPE_PATH, ( err )=>{
+		});
+
+		server.listen( PIPE_PATH, ( err )=>{
 			process.send(
 				{
 					error	: typeof err === 'undefined' ? false : err,
@@ -77,6 +79,13 @@ class MemoryWorker
 			if ( err )
 			{
 				process.exit();
+			}
+		});
+
+		server.on( 'error', ( err )=>{
+			if ( err.message.indexOf( 'EADDRINUSE' ) === -1 )
+			{
+				throw err;
 			}
 		});
 	}
