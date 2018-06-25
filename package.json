@@ -12,5 +12,5 @@
   "scripts": {
 	"test": "node ./tests/test_script.js"
   },
-  "version": "1.5.6"
+  "version": "1.5.7"
 }
