@@ -257,7 +257,8 @@ You can also Specify the arguments that should be provided to the mocked method 
 >     });  
 
 The 'with' option accepts an array of arrays where each array in the with array is a call. Again if it's called more than 
-the times the with arguments, the last one will be returned. In case of mismatch an Error will be thrown
+the times the with arguments, the last one will be returned. In case of mismatch an Error will be thrown.
+If you do not want the mocker to check one of the arguments, then undefined should be passed
 
 If you wan an environment to run your tests then you can use the test and runAllTests provided by the testing tools:
 
@@ -266,6 +267,7 @@ If you wan an environment to run your tests then you can use the test and runAll
 The 'runAllTests' function accepts an object that accepts the following options:
 * dieOnFirstError - Boolean - Whether the testing should stop on the first error - Defaults to true
 * debug - Boolean - Whether errors thrown should show their entire stack or just the message - Defaults to false
+* silent - Boolean - This will set the consoleLogger logLevel to error, meaning only errors will be displayed - Defaults to false
 
 The run all tests will run all tests added by the test function.
 

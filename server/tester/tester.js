@@ -16,11 +16,14 @@ const TEST_STATUSES	= {
 	incomplete	: 'incomplete',
 	pending		: 'pending'
 };
+
 const LOG_LEVELS	= {
 	error	: 100,
 	success	: 200,
 	info	: 300
 };
+
+const DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
 
 /**
  * @brief	Tester class that holds all tests that should be executed
@@ -34,13 +37,13 @@ class Tester
 		this.successes		= [];
 		this.consoleLogger	= Loggur.createLogger({
 			serverName	: 'Tester',
-			logLevel	: LOG_LEVELS.info,
+			logLevel	: DEFAULT_LOG_LEVEL,
 			logLevels	: LOG_LEVELS,
 			transports	: [
 				new Console({
 					color		: true,
 					logLevels	: LOG_LEVELS,
-					logLevel	: LOG_LEVELS.info,
+					logLevel	: DEFAULT_LOG_LEVEL,
 					logColors	: {
 						100	: 'red',
 						200	: 'green',
@@ -123,9 +126,20 @@ class Tester
 		let start			= Date.now();
 		let dieOnFirstError	= typeof options.dieOnFirstError === 'boolean' ? options.dieOnFirstError : true;
 		let debug			= typeof options.debug === 'boolean' ? options.debug : false;
+		let silent			= typeof options.silent === 'boolean' ? options.silent : false;
 		let stop			= false;
 		let index			= 0;
 		let hasFinished		= false;
+
+		if ( silent )
+		{
+			// Will display only errors
+			this.consoleLogger.logLevel	= LOG_LEVELS.error;
+		}
+		else
+		{
+			this.consoleLogger.logLevel	= DEFAULT_LOG_LEVEL;
+		}
 
 		let finished	= ()=>{
 			this.consoleLogger.info( `Finished in: ${ ( Date.now() - start ) / 1000 }` );

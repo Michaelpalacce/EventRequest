@@ -159,9 +159,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
 
-		eventRequest.on( 'cleanUp', ()=>{
-			cleanUp	= true;
-		});
+		eventRequest.on( 'cleanUp', ()=>{ cleanUp = true; });
 
 		eventRequest.cleanUp();
 
@@ -175,9 +173,7 @@ test({
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let finished		= false;
-		eventRequest.on( 'finished', ()=>{
-			finished	= true;
-		});
+		eventRequest.on( 'finished', ()=>{ finished = true; });
 
 		eventRequest.cleanUp();
 
@@ -220,9 +216,8 @@ test({
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
-			shouldReturn	: ()=>{
-				send	= true;
-			}
+			shouldReturn	: ()=>{ send = true; },
+			called			: 1
 		});
 
 		eventRequest.send( '' );
@@ -238,18 +233,13 @@ test({
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
-			shouldReturn	: ()=>{
-				send	= true;
-				done();
-			}
+			shouldReturn	: ()=>{ send = true; },
+			called			: 1
 		});
 
 		eventRequest.send( '', 200, true );
 
-		if ( ! send )
-		{
-			done( 'Send did not get called' )
-		}
+		send	? done() : done( 'Send did not get called' );
 	}
 });
 
@@ -296,9 +286,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
 
-		eventRequest.on( 'cleanUp', ()=>{
-			cleanUp	= true;
-		});
+		eventRequest.on( 'cleanUp', ()=>{ cleanUp = true; });
 
 		eventRequest.send( '' );
 
@@ -312,9 +300,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		let setHeader		= false;
 
-		eventRequest.on( 'setHeader', ()=>{
-			setHeader	= true;
-		});
+		eventRequest.on( 'setHeader', ()=>{ setHeader = true; });
 
 		eventRequest.setHeader( 'key', 'value' );
 
@@ -328,9 +314,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		let setHeader		= false;
 
-		eventRequest.on( 'setHeader', ()=>{
-			setHeader	= true;
-		});
+		eventRequest.on( 'setHeader', ()=>{ setHeader = true; });
 
 		eventRequest.setHeader( 'key', 'value' );
 
@@ -350,9 +334,9 @@ test({
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
-			shouldReturn	: ()=>{
-				setHeader	= true;
-			}
+			shouldReturn	: ()=>{ setHeader = true; },
+			called			: 1,
+			with			: [['key', 'value']]
 		});
 
 		eventRequest.setHeader( 'key', 'value' );
@@ -372,11 +356,9 @@ test({
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
-			shouldReturn	: ( key, value )=>{
-				assert.equal( key, 'key' );
-				assert.equal( value, 'value' );
-				setHeader	= true;
-			}
+			shouldReturn	: ()=>{ setHeader = true; },
+			called			: 1,
+			with			: [['key', 'value']]
 		});
 
 		eventRequest.setHeader( 'key', 'value' );
@@ -410,9 +392,9 @@ test({
 
 		errorHandler._mock({
 			method			: 'handleError',
-			shouldReturn	: () => {
-				errorCalled	= true;
-			}
+			shouldReturn	: () => { errorCalled = true; },
+			with			: [[eventRequest, undefined]],
+			called			: 1
 		});
 
 		eventRequest.setHeader( 'key', 'value' );
@@ -449,11 +431,9 @@ test({
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
-			shouldReturn	: ( key, value )=>{
-				assert.equal( key, 'Location' );
-				assert.equal( value, redirectUrl );
-				setHeader	= true;
-			}
+			shouldReturn	: ()=>{ setHeader = true; },
+			with			: [['Location', redirectUrl]],
+			called			: 1
 		});
 
 		eventRequest.redirect( redirectUrl, 302 );
@@ -533,10 +513,10 @@ test({
 		eventRequest.templatingEngine._mock({
 			method			: 'render',
 			shouldReturn	: ( template, variables, callback ) =>{
-				assert.equal( template, templateName );
-				assert.deepEqual( variables, templateVariables );
 				callback( false, 'result' );
-			}
+			},
+			with			: [[templateName, templateVariables, undefined]],
+			called			: 1
 		});
 
 		eventRequest.on( 'render', ()=>{
@@ -571,7 +551,9 @@ test({
 			method			: 'handleError',
 			shouldReturn	: ()=>{
 				error	= true;
-			}
+			},
+			with			: [[eventRequest, undefined]],
+			called			: 1
 		});
 
 		eventRequest.render();
@@ -628,10 +610,9 @@ test({
 		eventRequest.errorHandler	= new MockedErrorHandler();
 		eventRequest.errorHandler._mock({
 			method			: 'handleError',
-			shouldReturn	: ( event, errorThrown )=>{
-				assert.equal( errorThrown, errorToSend );
-				error	= true;
-			}
+			shouldReturn	: ()=>{ error = true; },
+			with			: [[eventRequest, errorToSend]],
+			called			: 1
 		});
 
 		let callback	= ()=>{};
@@ -654,10 +635,9 @@ test({
 		eventRequest.errorHandler	= new MockedErrorHandler();
 		eventRequest.errorHandler._mock({
 			method			: 'handleError',
-			shouldReturn	: ( event, errorThrown )=>{
-				assert.equal( errorThrown.length > 0, true );
-				error	= true;
-			}
+			shouldReturn	: ()=>{ error = true; },
+			with			: [[eventRequest, undefined]],
+			called			: 1
 		});
 
 		let block	= [];
@@ -676,13 +656,13 @@ test({
 		let errorToThrow			= 'Error to throw';
 		let error					= false;
 
+		let MockedErrorHandler		= Mock( ErrorHandler );
 		eventRequest.errorHandler	= new MockedErrorHandler();
 		eventRequest.errorHandler._mock({
 			method			: 'handleError',
-			shouldReturn	: ( event, errorThrown )=>{
-				assert.equal( errorThrown, errorToThrow );
-				error	= true;
-			}
+			called			: 1,
+			with			: [[eventRequest, errorToThrow]],
+			shouldReturn	: ()=>{ error = true; }
 		});
 
 		eventRequest.sendError( errorToThrow );

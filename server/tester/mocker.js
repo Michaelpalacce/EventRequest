@@ -86,7 +86,12 @@ class MethodMock
 			for ( let index = 0; index < currentArguments.length; ++ index )
 			{
 				let value	= currentArguments[index];
-				assert.strictEqual( value, args[index], `Failed asserting that ${this.method} was called `
+				if ( value === undefined )
+				{
+					continue;
+				}
+
+				assert.deepStrictEqual( value, args[index], `Failed asserting that ${this.method} was called `
 					+ ` with correct argument at position ${index}. `
 					+ `${value} was expected, but ${args[index]} received`
 				)
