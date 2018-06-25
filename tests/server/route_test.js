@@ -146,6 +146,21 @@ test({
 });
 
 test({
+	message	: 'Route.matchRoute matches all, BESIDES empty request path, in case of empty route provided',
+	test	: ( done ) => {
+		let route	= getRoute( undefined, '' );
+
+		assert.deepEqual( route.matchPath( '' ), { matched: false, params: {} } );
+		assert.deepEqual( route.matchPath( '/' ), { matched: true, params: {} } );
+		assert.deepEqual( route.matchPath( '/path' ), { matched: true, params: {} } );
+		assert.deepEqual( route.matchPath( '/path/test' ), { matched: true, params: {} } );
+		assert.deepEqual( route.matchPath( '/path/valueToMatch' ), { matched: true, params: {} } );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Route.matchRoute matches params',
 	test	: ( done ) => {
 		let route	= getRoute( undefined, '/path/:test:' );

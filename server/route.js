@@ -106,7 +106,7 @@ class Route
 	/**
 	 * @brief	Matches the requestedMethod with the route's one
 	 *
-	 * @param	Array|String requestedMethod
+	 * @param	String requestedMethod
 	 *
 	 * @return	Boolean
 	 */
@@ -130,6 +130,12 @@ class Route
 
 		if ( requestedRoute === '' )
 		{
+			return matchResult;
+		}
+
+		if ( this.route === '' )
+		{
+			matchResult.matched	= true;
 			return matchResult;
 		}
 

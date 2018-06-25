@@ -37,7 +37,10 @@ class Router
 			return;
 		}
 
-		route	= new Route( route );
+		if ( ! ( route instanceof Route ) )
+		{
+			route	= new Route( route );
+		}
 
 		this.middleware.push( route );
 	}
@@ -51,7 +54,7 @@ class Router
 	 */
 	getExecutionBlockForCurrentEvent( event )
 	{
-		if ( ! event instanceof RequestEvent )
+		if ( ! ( event instanceof RequestEvent ) )
 		{
 			throw new Error( 'Invalid Event provided' );
 		}
@@ -61,12 +64,6 @@ class Router
 		for ( let index in this.middleware )
 		{
 			let route	= this.middleware[index];
-			if ( route.getRoute() === '' )
-			{
-				block.push( route.getHandler() );
-				continue;
-			}
-
 			let match	= Router.matchRoute( event.path, route );
 
 			if ( match.matched )
@@ -85,8 +82,8 @@ class Router
 	/**
 	 * @brief	Matches the requested method with the ones set in the event
 	 *
-	 * @param	String|Array requestedMethod
-	 * @param	Route eventMethod
+	 * @param	String requestedMethod
+	 * @param	Route|Array|String route
 	 *
 	 * @return	Boolean
 	 */
@@ -95,7 +92,7 @@ class Router
 		if ( typeof route === 'string' || Array.isArray( route ) )
 		{
 			route	= new Route({
-				route	: route
+				method	: route
 			});
 		}
 
@@ -110,8 +107,8 @@ class Router
 	/**
 	 * @brief	Match the given route and returns any route parameters passed
 	 *
-	 * @param	String|RegExp requestedRoute
-	 * @param	String|Route eventPath
+	 * @param	String requestedRoute
+	 * @param	String|RegExp|Route eventPath
 	 *
 	 * @return	Object
 	 */

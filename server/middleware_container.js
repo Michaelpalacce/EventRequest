@@ -220,7 +220,7 @@ middlewaresContainer.addStaticPath	= ( options ) => {
 				}
 				else
 				{
-					event.next( 'File not found' );
+					event.next( `File not found: ${item}` );
 				}
 			});
 		}

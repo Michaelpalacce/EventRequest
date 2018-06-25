@@ -44,7 +44,7 @@ class Mp4FileStream extends FileStream
 	{
 		if ( ! fs.existsSync( file ) )
 		{
-			this.event.next( 'File not found' );
+			this.event.sendError( `File not found: ${file}` );
 			return;
 		}
 

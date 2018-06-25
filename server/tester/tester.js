@@ -127,6 +127,7 @@ class Tester
 		let dieOnFirstError	= typeof options.dieOnFirstError === 'boolean' ? options.dieOnFirstError : true;
 		let debug			= typeof options.debug === 'boolean' ? options.debug : false;
 		let silent			= typeof options.silent === 'boolean' ? options.silent : false;
+		let filter			= typeof options.filter === 'string' ? options.filter : false;
 		let stop			= false;
 		let index			= 0;
 		let hasFinished		= false;
@@ -232,22 +233,31 @@ class Tester
 				}
 			};
 
-			try
+			if ( typeof filter !== 'string' || filter === test.message )
 			{
-				testCallback( testDoneCallback );
+				try
+				{
+					testCallback( testDoneCallback );
+				}
+				catch( e )
+				{
+					if ( ! hasFinished )
+					{
+						errorCallback( e );
+					}
+					else
+					{
+						this.consoleLogger.error( 'Possible async error occurred:' );
+						this.consoleLogger.error( e.stack );
+					}
+				}
 			}
-			catch( e )
+			else
 			{
-				if ( ! hasFinished )
-				{
-					errorCallback( e );
-				}
-				else
-				{
-					this.consoleLogger.error( 'Possible async error occurred:' );
-					this.consoleLogger.error( e.stack );
-				}
+				index++;
+				done();
 			}
+
 		};
 
 		done();
