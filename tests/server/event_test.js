@@ -309,20 +309,6 @@ test({
 });
 
 test({
-	message	: 'EventRequest setHeader emits a setHeader event',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let setHeader		= false;
-
-		eventRequest.on( 'setHeader', ()=>{ setHeader = true; });
-
-		eventRequest.setHeader( 'key', 'value' );
-
-		setHeader	? done() : done( 'EventRequest setHeader event not emitted' );
-	}
-});
-
-test({
 	message	: 'EventRequest setHeader sets the header in the response if response is not sent',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
@@ -343,36 +329,13 @@ test({
 		setHeader	? done() : done( 'EventRequest setHeader did not call response.setHeader' );
 	}
 });
-
-test({
-	message	: 'EventRequest setHeader sets the header in the response if response is not sent',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		if ( ! assertions.assertFalse( eventRequest.isFinished() ) )
-		{
-			throw new Error( 'Event is finished but it should not be' );
-		}
-		let setHeader	= false;
-
-		eventRequest.response._mock({
-			method			: 'setHeader',
-			shouldReturn	: ()=>{ setHeader = true; },
-			called			: 1,
-			with			: [['key', 'value']]
-		});
-
-		eventRequest.setHeader( 'key', 'value' );
-		setHeader	? done() : done( 'EventRequest setHeader did not call response.setHeader' );
-	}
-});
-
 
 test({
 	message	: 'EventRequest setHeader does not set header when event is finished and throws error',
 	test	: ( done ) => {
-		let eventRequest		= helpers.getEventRequest();
-		let errorHandler		= new MockedErrorHandler();
-		let errorCalled			= false;
+		let eventRequest	= helpers.getEventRequest();
+		let errorHandler	= new MockedErrorHandler();
+		let errorCalled		= false;
 
 		assert.equal( eventRequest.isFinished(), false );
 
@@ -481,7 +444,7 @@ test({
 test({
 	message	: 'EventRequest.isFinished returns response.finished',
 	test	: ( done ) =>{
-		let eventRequest		= helpers.getEventRequest();
+		let eventRequest	= helpers.getEventRequest();
 		eventRequest.response._mock({
 			method			: 'finished',
 			shouldReturn	: true
@@ -509,6 +472,7 @@ test({
 		let send						= false;
 		let templateName				= 'test';
 		let templateVariables			= {};
+
 		eventRequest.templatingEngine	= new MockTemplatingEngine();
 		eventRequest.templatingEngine._mock({
 			method			: 'render',
