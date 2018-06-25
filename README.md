@@ -50,6 +50,10 @@ The server constructor accepts the following options:
 
 **errorHandler** - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest -> Defaults to base errorHandler
 
+**cachingServer** - DataServer - The caching server to be used through the application. Defaults to Memory Data Server which should **NOT** be used in production under any circumstances. The data server will be changed to default to something else in the future or not be set up at all. 
+
+**cachingServerOptions** - Object - The options to be passed to the setup of the caching server 
+
 ## The server is started by calling server.start();
 
 ***
@@ -268,6 +272,7 @@ The 'runAllTests' function accepts an object that accepts the following options:
 * dieOnFirstError - Boolean - Whether the testing should stop on the first error - Defaults to true
 * debug - Boolean - Whether errors thrown should show their entire stack or just the message - Defaults to false
 * silent - Boolean - This will set the consoleLogger logLevel to error, meaning only errors will be displayed - Defaults to false
+* filter - String - the string to search for and filter by when testing - Defaults to false 
 
 The run all tests will run all tests added by the test function.
 
