@@ -34,7 +34,7 @@ Includes:
 
 The server is exported from the main module:
 
-> const { Server } = require( 'event_request' )
+>     const { Server } = require( 'event_request' )
 
 The server constructor accepts the following options:
 
@@ -182,35 +182,35 @@ If any errors occur they will be returned as an array of keys eg: ['string','min
 
 If you need to test your project, then you can use the Testing tools included in the project.
 
-> const { TestingTools }  = require( 'event_request' );
+>     const { TestingTools }  = require( 'event_request' );
 
 The testing tools include a mocker. The mocker class can be retrieved with:
 
-> const { Mock }    = TestingTools;
+>     const { Mock }    = TestingTools;
 
 The exported Mock is a Function that should be used directly on the constructor of the class you want to mock. For example:
 
-> class Test { mockThis(){} };
-> let MockedTest    = Mock( Test );
+>     class Test { mockThis(){} };  
+>     let MockedTest    = Mock( Test );  
 
 This will return the same class but with an extra _mock function added directly to it so make sure your original class does NOT
 have a _mock function otherwise it will be overwritten. From here you can use the _mock function to mock any other function/parameter
 that is attached to the 'Test' class:
 
-> let testDouble    = new MockedTest();
-> testDouble._mock({
-> method        : 'mockThis',
-> shouldReturn  : ''
->});
+>     let testDouble    = new MockedTest();  
+>     testDouble._mock({  
+>     method        : 'mockThis',  
+>     shouldReturn  : ''  
+>     });  
 
 Note: As you can see when you mock a class you MUST specify what it should return from now on. You can also give instructions
 on what should be returned on consecutive calls to this method like so :
 
-> let testDouble    = new MockedTest();
-> testDouble._mock({
-> method              : 'mockThis',
-> onConsecutiveCalls  : ['first', 'secondAndOnwards']
->});
+>     let testDouble    = new MockedTest();  
+>     testDouble._mock({  
+>     method              : 'mockThis',  
+>     onConsecutiveCalls  : ['first', 'secondAndOnwards']  
+>     });
 
 This will result in the following:
 1. The first time you make a call to mockThis you will get 'first' as a return
@@ -222,12 +222,12 @@ When making a mock of a class you can specify the MAX amount of times an object 
 an async approach and relies heavily on callbacks, a minimum cannot be set.
 
 
-> let testDouble    = new MockedTest();
-> testDouble._mock({
-> method        : 'mockThis',
-> shouldReturn  : '',
-> called        : 1
->});
+>     let testDouble    = new MockedTest();  
+>     testDouble._mock({  
+>     method        : 'mockThis',  
+>     shouldReturn  : '',  
+>     called        : 1  
+>     });
 
 This way if the method mockThis is called more than once an error will be thrown.
 
@@ -235,23 +235,23 @@ This way if the method mockThis is called more than once an error will be thrown
 You can also Specify the arguments that should be provided to the mocked method like so:
 
 
-> let testDouble    = new MockedTest();
-> testDouble._mock({
-> method        : 'mockThis',
-> shouldReturn  : '',
-> called        : 1,
-> with:         [
-> [ 'firstArgument', 'secondArgument' ]
-> [ 'secondCallFirstArgument', 'secondCallSecondArgument' ]
-> ]
->});
+>     let testDouble    = new MockedTest();  
+>     testDouble._mock({  
+>     method        : 'mockThis',  
+>     shouldReturn  : '',  
+>     called        : 1,  
+>     with:         [  
+>         [ 'firstArgument', 'secondArgument' ]  
+>         [ 'secondCallFirstArgument', 'secondCallSecondArgument' ]  
+>      ]  
+>     });  
 
 The 'with' option accepts an array of arrays where each array in the with array is a call. Again if it's called more than 
 the times the with arguments, the last one will be returned. In case of mismatch an Error will be thrown
 
 If you wan an environment to run your tests then you can use the test and runAllTests provided by the testing tools:
 
-> const { test, runAllTests }    = TestingTools;
+>     const { test, runAllTests }    = TestingTools;
 
 The 'runAllTests' function accepts an object that accepts the following options:
 * dieOnFirstError - Boolean - Whether the testing should stop on the first error - Defaults to true
@@ -270,19 +270,19 @@ the testing will stop.
 
 Example:
 
-test({
- message    : 'This test should pass',
- test       : ( done ) =>{
-    let one = 1;
-    
-    one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );
- }
-});
+>     test({  
+>      message    : 'This test should pass',  
+>      test       : ( done ) =>{  
+>         let one = 1;  
+>           
+>        one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );  
+>      }  
+>     });  
 
 
 You can also create your own Tester if you want the test to be separated by some reason:
 
-> const { Tester }    = TestingTools;
-> let tester          = new Tester();
+>     const { Tester }    = TestingTools;  
+>     let tester          = new Tester();  
 
 The tester has the same functions: 'test', 'runAllTests'
