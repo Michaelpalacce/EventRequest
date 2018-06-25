@@ -244,6 +244,14 @@ class MemoryDataServer extends DataServer
 	{
 		this.doCommand( 'getAll', { namespace, options }, callback );
 	}
+
+	/**
+	 * @see	DataServer::exit()
+	 */
+	exit( options = {}, callback = null )
+	{
+		this.doCommand( 'exit', { options }, callback );
+	}
 }
 
 module.exports	= MemoryDataServer;

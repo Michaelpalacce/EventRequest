@@ -4,6 +4,7 @@ const net			= require( 'net' );
 const path			= require( 'path' );
 
 const PIPE_NAME		= path.join( __dirname, 'memory_data_client.js' );
+// Test if it works on linux?
 const PIPE_PATH		= "\\\\.\\pipe\\" + PIPE_NAME;
 
 /**
@@ -11,6 +12,7 @@ const PIPE_PATH		= "\\\\.\\pipe\\" + PIPE_NAME;
  */
 const PING					= 'ping';
 const SET_UP				= 'setUp';
+const EXIT					= 'exit';
 const CREATE_NAMESPACE		= 'createNamespace';
 const EXISTS_NAMESPACE		= 'existsNamespace';
 const REMOVE_NAMESPACE		= 'removeNamespace';
@@ -43,7 +45,7 @@ class MemoryWorker
 	 */
 	setUpServer()
 	{
-		let server	= net.createServer( ( stream ) => {
+		this.server	= net.createServer( ( stream ) => {
 			stream.on( 'data', ( chunk ) => {
 				chunk	= chunk.toString( 'utf8' );
 
@@ -128,6 +130,11 @@ class MemoryWorker
 		{
 			case SET_UP:
 				callback( false, 'Caching server is set up' );
+				break;
+
+			case EXIT:
+				this.server.close();
+				callback( false, 'Caching server is exiting' );
 				break;
 
 			case EXISTS_NAMESPACE:

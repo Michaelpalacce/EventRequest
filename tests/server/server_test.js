@@ -1,9 +1,9 @@
 'use strict';
 
 // Dependencies
-const { assert, Mock, test }	= require( './../testing_suite' );
-const { Server, Router }		= require( './../../index' );
-const Cluster					= require( './../../server/components/cluster/cluster' );
+const { assert, test }		= require( './../testing_suite' );
+const { Server, Router }	= require( './../../index' );
+const Cluster				= require( './../../server/components/cluster/cluster' );
 
 test({
 	message	: 'Server.constructor starts without crashing',

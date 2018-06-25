@@ -51,6 +51,18 @@ class DataServer
 	}
 
 	/**
+	 * @brief	Disconnects from the data server
+	 *
+	 * @param	Object options
+	 * @param	Function callback
+	 *
+	 * @return	void
+	 */
+	exit( options = {}, callback = null )
+	{
+	}
+
+	/**
 	 * @brief	Create the namespace
 	 *
 	 * @details	If the Data Server supports namespaces ( folders on the file system, tables in CQL/SQl, etc )

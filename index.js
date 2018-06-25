@@ -269,35 +269,31 @@ class Server
 	/**
 	 * @brief	Sets up the caching server
 	 *
+	 * @param	Function callback
+	 *
 	 * @return	void
 	 */
-	setUpCachingServer()
+	setUpCachingServer( callback )
 	{
-		this.cachingServer.setUp( this.cachingServerOptions, ( err, data ) =>{
-			if ( err )
-			{
-				throw new Error( err );
-			}
-			else
-			{
-				Loggur.log({
-					level	: LOG_LEVELS.warning,
-					message	: data
-				});
-			}
-		});
+		this.cachingServer.setUp( this.cachingServerOptions, ( err, data ) =>{ callback( err, data ); });
 	}
 
 	/**
 	 * @brief	Starts the server on a given port
 	 *
-	 * @param	Number port
-	 *
 	 * @return	void
 	 */
-	start ()
+	start()
 	{
-		this.setUpCachingServer();
+		this.setUpCachingServer( ( err ) =>{
+			if ( err )
+			{
+				Loggur.log({
+					level	: LOG_LEVELS.error,
+					message	: err
+				});
+			}
+		});
 
 		this.cluster.startCluster( this.clusters );
 	}
