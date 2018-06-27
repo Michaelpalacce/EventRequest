@@ -78,6 +78,10 @@ Available middleware:
 
 * setFileStream
 
+* errorHandler -> Sets the error handler if not uses the event's default
+* * Accepted options:
+* * - errorHandler - ErrorHandler - The error handler to use -> Defaults to ErrorHandler
+
 * templatingEngine -> Sets the templating engine
 * * Accepted options:
 * * - engine - TemplatingEngine - the templating engine to be used. Must be an instance of TemplatingEngine defaults to BaseTemplatingEngine

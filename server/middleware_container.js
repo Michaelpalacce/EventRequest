@@ -6,6 +6,7 @@ const path									= require( 'path' );
 const { BodyParserHandler }					= require( './components/body_parser_handler' );
 const TemplatingEngine						= require( './components/templating_engine' );
 const BaseTemplatingEngine					= require( './components/templating_engines/base_templating_engine' );
+const ErrorHandler							= require( './components/error_handler' );
 const { FileStreamHandler }					= require( './components/file_stream_handler' );
 const { SessionHandler }					= require( './components/session_handler' );
 const { Logger }							= require( './components/logger/components/logger' );
@@ -17,6 +18,24 @@ let middlewaresContainer	= {};
  * @brief	Constants
  */
 const PROJECT_ROOT			= path.parse( require.main.filename ).dir;
+
+/**
+ * @brief	Attaches an error handler to the event
+ *
+ * @param	Object options
+ *
+ * @return	Object
+ */
+middlewaresContainer.errorHandler		= ( options ) =>{
+	return {
+		handler	: ( event ) =>{
+			event.errorHandler	= typeof options.errorHandler === 'object'
+								&& options.errorHandler instanceof ErrorHandler
+								? options.errorHandler
+								: new ErrorHandler()
+		}
+	}
+};
 
 /**
  * @brief	Sets up the Loggur and attaches it to the EventRequest events

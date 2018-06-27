@@ -399,7 +399,7 @@ class RequestEvent extends EventEmitter
 
 	/**
 	 * @brief	Will send a server error in case a response has not been already sent
-	 * 
+	 *
 	 * @param	mixed message
 	 * @param	Number code
 	 *

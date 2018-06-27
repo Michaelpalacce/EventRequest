@@ -37,8 +37,6 @@ const OPTIONS_PARAM_CLUSTERS						= 'clusters';
 const OPTIONS_PARAM_CLUSTERS_DEFAULT				= 1;
 const OPTIONS_PARAM_COMMUNICATION_MANAGER			= 'communicationManager';
 const OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT	= CommunicationManager;
-const OPTIONS_PARAM_ERROR_HANDLER					= 'errorHandler';
-const OPTIONS_PARAM_ERROR_HANDLER_DEFAULT			= ErrorHandler;
 const OPTIONS_PARAM_CACHING_SERVER					= 'cachingServer';
 const OPTIONS_PARAM_CACHING_SERVER_DEFAULT			= MemoryDataServer;
 const OPTIONS_PARAM_CACHING_SERVER_OPTIONS			= 'cachingServerOptions';
@@ -115,12 +113,6 @@ class Server
 									? this.communicationManager
 									: new OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT();
 
-		this.errorHandler			= options[OPTIONS_PARAM_ERROR_HANDLER];
-		this.errorHandler			= typeof this.errorHandler === 'object'
-									&& this.errorHandler instanceof ErrorHandler
-									? this.errorHandler
-									: new OPTIONS_PARAM_ERROR_HANDLER_DEFAULT();
-
 		this.cachingServer			= options[OPTIONS_PARAM_CACHING_SERVER];
 		this.cachingServer			= typeof this.cachingServer === 'object'
 									&& this.cachingServer instanceof DataServer
@@ -184,7 +176,6 @@ class Server
 	serverCallback( req, res )
 	{
 		let requestEvent			= this.resolve( req, res );
-		requestEvent.errorHandler	= this.errorHandler;
 		requestEvent.cachingServer	= this.cachingServer;
 
 		req.on( 'close', ()=> {

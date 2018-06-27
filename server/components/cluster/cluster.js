@@ -20,7 +20,10 @@ class Cluster
 
 	/**
 	 * @brief	Starts the cluster and spawns the given amount of workers
-	 * @param workers
+	 *
+	 * @param	Number workers
+	 *
+	 * @return	void
 	 */
 	startCluster( workers )
 	{
@@ -42,12 +45,16 @@ class Cluster
 	}
 
 	/**
-	 * @brief	Starts the cluster and spawns the given amount of workers
-	 * @param workers
+	 * @brief	Stops all the spawned workers
+	 *
+	 * @return	void
 	 */
 	stopClusters()
 	{
-		this.communicationManager.exitAllWorkers();
+		if ( cluster.isMaster )
+		{
+			this.communicationManager.exitAllWorkers();
+		}
 	}
 }
 
