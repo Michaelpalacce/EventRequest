@@ -23,6 +23,20 @@ class CommunicationManager
 	 *
 	 * @return	void
 	 */
+	exitAllWorkers()
+	{
+		this.workers.forEach( ( worker, position ) => {
+			worker.send( 'die' );
+		});
+	}
+
+	/**
+	 * @brief	Called when the worker exits
+	 *
+	 * @param	Worker worker
+	 *
+	 * @return	void
+	 */
 	handleExit( deadWorker )
 	{
 		Loggur.log({
@@ -30,14 +44,7 @@ class CommunicationManager
 			message	: `Worker ${deadWorker.id} exited with pid: ${deadWorker.process.pid}`
 		});
 
-		this.workers.forEach( ( worker, position ) => {
-			if ( worker.id === deadWorker.id )
-			{
-				// Replace worker with new one
-				let workerToRemove	= this.workers.splice( position, 1, cluster.fork() );
-				workerToRemove		= null;
-			}
-		});
+		this.replaceWorker( deadWorker, cluster.fork() );
 
 		deadWorker	= null;
 	}
@@ -59,7 +66,7 @@ class CommunicationManager
 	 *
 	 * @details	Start the server
 	 *
-	 * @param	String message
+	 * @param	Worker worker
 	 *
 	 * @return	void
 	 */
@@ -103,9 +110,17 @@ class CommunicationManager
 	attachListeners( workers )
 	{
 		this.workers	= workers;
-		
+
 		cluster.on( 'exit', ( worker, code, signal ) =>{
-			this.handleExit( worker )
+			// One is the process willingly dying
+			if ( code !== 1)
+			{
+				this.handleExit( worker )
+			}
+			else
+			{
+				this.replaceWorker( worker, false );
+			}
 		});
 
 		cluster.on( 'disconnect', ( worker ) => {
@@ -122,6 +137,31 @@ class CommunicationManager
 
 		cluster.on( 'message', ( worker, message ) => {
 			this.handleMessage( worker, message );
+		});
+	}
+
+	/**
+	 * @brief	Replaces the worker with another
+	 *
+	 * @param	Worker workerToReplace
+	 * @param	mixedreplaceWith
+	 *
+	 * @return	void
+	 */
+	replaceWorker( workerToReplace, replaceWith )
+	{
+		this.workers.forEach( ( worker, position ) => {
+			if ( worker.id === workerToReplace.id )
+			{
+				if ( replaceWith !== false )
+				{
+					this.workers.splice( position, 1, replaceWith );
+				}
+				else
+				{
+					this.workers.splice( position, 1 );
+				}
+			}
 		});
 	}
 }

@@ -44,3 +44,5 @@ test({
 		done();
 	}
 });
+
+// Cannot test the server more since until i figure out how to test clusters efficiently

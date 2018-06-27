@@ -70,7 +70,7 @@ class MemoryWorker
 			});
 		});
 
-		server.listen( PIPE_PATH, ( err )=>{
+		this.server.listen( PIPE_PATH, ( err )=>{
 			process.send(
 				{
 					error	: typeof err === 'undefined' ? false : err,
@@ -84,7 +84,7 @@ class MemoryWorker
 			}
 		});
 
-		server.on( 'error', ( err )=>{
+		this.server.on( 'error', ( err )=>{
 			if ( err.message.indexOf( 'EADDRINUSE' ) === -1 )
 			{
 				throw err;
@@ -135,6 +135,7 @@ class MemoryWorker
 			case EXIT:
 				this.server.close();
 				callback( false, 'Caching server is exiting' );
+				process.exit( 1 );
 				break;
 
 			case EXISTS_NAMESPACE:
@@ -425,7 +426,7 @@ class MemoryWorker
 	addTimeoutToData( namespace, recordName, ttl )
 	{
 		this.clearTimeoutFromData( namespace, recordName );
-		
+
 		if ( ttl > 0 )
 		{
 			let keyPair	= namespace + recordName;

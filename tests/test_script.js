@@ -7,9 +7,7 @@ const routerTest					= require( './server/router_test' );
 const serverTest					= require( './server/server_test' );
 
 runAllTests({
-	dieOnFirstError	: true,
-	// silent			: true,
-	// debug			: true
+	dieOnFirstError	: true
 });
 
 module.exports	= {};

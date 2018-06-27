@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const cluster		= require( 'cluster' );
+const cluster	= require( 'cluster' );
 
 /**
  * @brief	Constants
@@ -63,7 +63,7 @@ class Worker
 				this.start();
 				break;
 			case MASTER_COMMAND_DIE:
-				cluster.worker.kill();
+				process.exit( 1 );
 				break;
 			default:
 				break;

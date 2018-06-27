@@ -34,7 +34,7 @@ const OPTIONS_PARAM_PROTOCOL_DEFAULT				= PROTOCOL_HTTP;
 const OPTIONS_PARAM_HTTPS							= 'httpsOptions';
 const OPTIONS_PARAM_HTTPS_DEFAULT					= {};
 const OPTIONS_PARAM_CLUSTERS						= 'clusters';
-const OPTIONS_PARAM_CLUSTERS_DEFAULT				= CPU_NUM;
+const OPTIONS_PARAM_CLUSTERS_DEFAULT				= 1;
 const OPTIONS_PARAM_COMMUNICATION_MANAGER			= 'communicationManager';
 const OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT	= CommunicationManager;
 const OPTIONS_PARAM_ERROR_HANDLER					= 'errorHandler';
@@ -211,7 +211,10 @@ class Server
 			requestEvent.on( 'error', ( err ) =>{
 				if ( requestEvent.logger === null )
 				{
-					Loggur.log( err );
+					Loggur.log({
+						level	: LOG_LEVELS.error,
+						message	: err
+					});
 				}
 			});
 
@@ -281,10 +284,14 @@ class Server
 	/**
 	 * @brief	Starts the server on a given port
 	 *
+	 * @param	Function callback
+	 *
 	 * @return	void
 	 */
-	start()
+	start( callback )
 	{
+		callback	= typeof callback === 'function' ? callback : ()=>{};
+
 		this.setUpCachingServer( ( err ) =>{
 			if ( err )
 			{
@@ -292,10 +299,36 @@ class Server
 					level	: LOG_LEVELS.error,
 					message	: err
 				});
+
+				callback( err );
+			}
+			else
+			{
+				this.cluster.startCluster( this.clusters );
+				callback( false );
 			}
 		});
 
-		this.cluster.startCluster( this.clusters );
+	}
+
+	/**
+	 * @brief	Starts the server on a given port
+	 *
+	 * @return	void
+	 */
+	stop()
+	{
+		this.cachingServer.exit( {}, ( err, data )=>{
+			if ( err )
+			{
+				Loggur.log({
+					level	: LOG_LEVELS.error,
+					message	: data
+				});
+			}
+		});
+
+		this.cluster.stopClusters();
 	}
 }
 

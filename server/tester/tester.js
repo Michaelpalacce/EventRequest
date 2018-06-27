@@ -147,6 +147,11 @@ class Tester
 			this.consoleLogger.success( `There were ${this.successes.length} successful tests` );
 			this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` );
 			hasFinished	= true;
+
+			if ( this.errors.length > 0 )
+			{
+				throw new Error( 'Testing failed' );
+			}
 		};
 
 		let done	= () =>{
@@ -261,11 +266,6 @@ class Tester
 		};
 
 		done();
-
-		if ( ! hasFinished )
-		{
-			this.consoleLogger.error( 'Testing has not finished but is exiting. This may indicate incorrect handling of async errors.' );
-		}
 	}
 }
 

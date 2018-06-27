@@ -40,6 +40,15 @@ class Cluster
 			new Worker( this.server );
 		}
 	}
+
+	/**
+	 * @brief	Starts the cluster and spawns the given amount of workers
+	 * @param workers
+	 */
+	stopClusters()
+	{
+		this.communicationManager.exitAllWorkers();
+	}
 }
 
 module.exports	= Cluster;
