@@ -22,10 +22,11 @@ class Cluster
 	 * @brief	Starts the cluster and spawns the given amount of workers
 	 *
 	 * @param	Number workers
+	 * @param	Function callback
 	 *
 	 * @return	void
 	 */
-	startCluster( workers )
+	startCluster( workers, callback )
 	{
 		if ( cluster.isMaster )
 		{
@@ -37,6 +38,7 @@ class Cluster
 			}
 
 			this.communicationManager.attachListeners( spawnedWorkers );
+			callback( false );
 		}
 		else
 		{

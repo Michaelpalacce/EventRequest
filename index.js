@@ -290,16 +290,10 @@ class Server
 					level	: LOG_LEVELS.error,
 					message	: err
 				});
-
-				callback( err );
-			}
-			else
-			{
-				callback( false );
 			}
 		});
 
-		this.cluster.startCluster( this.clusters );
+		this.cluster.startCluster( this.clusters, callback );
 	}
 
 	/**
