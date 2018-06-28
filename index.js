@@ -295,11 +295,11 @@ class Server
 			}
 			else
 			{
-				this.cluster.startCluster( this.clusters );
 				callback( false );
 			}
 		});
 
+		this.cluster.startCluster( this.clusters );
 	}
 
 	/**
