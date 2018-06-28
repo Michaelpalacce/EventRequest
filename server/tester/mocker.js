@@ -37,7 +37,6 @@ class MethodMock
 			|| this.method === null
 			|| ( shouldReturn === null && onConsecutiveCalls === null )
 		) {
-			console.log( shouldReturn );
 			throw new Error( 'Invalid mock options provided' );
 		}
 

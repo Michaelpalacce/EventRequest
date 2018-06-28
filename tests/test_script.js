@@ -6,16 +6,28 @@ const routeTest						= require( './server/route_test' );
 const routerTest					= require( './server/router_test' );
 const serverTest					= require( './server/server_test' );
 const child_process					= require( 'child_process' );
-const path							= require( 'path' );
 
-// let spawnedServer	= child_process.exec( 'node tests/server/external_server_for_testing.js', function(error, stdout, stderr){
-// 	console.log(stdout);
-// });
+let spawnedServer					= child_process.spawn(
+	'node',
+	['tests/server/external_server_for_testing.js'],
+	{},
+	( error, stdout, stderr )=> {
+		console.log( stdout );
+		console.error( stderr );
+	}
+);
 
 runAllTests({
-	dieOnFirstError	: true
+	dieOnFirstError	: true,
+	callback		: ( err )=>{
+		spawnedServer.kill();
+
+		if ( err )
+		{
+			throw new Error( err );
+		}
+	}
 });
 
-// spawnedServer.kill();
 
 module.exports	= {};

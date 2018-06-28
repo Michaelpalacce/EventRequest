@@ -1,10 +1,11 @@
 'use strict';
 
 // Dependencies
-const { Tester, Mock, assert, logger }	= require( './../server/tester/tester' );
-const EventRequest						= require( './../server/event' );
-const assertions						= require( './../server/components/validation/validation_rules' );
-let { IncomingMessage, ServerResponse }	= require( 'http' );
+const { Tester, Mock, assert, logger }				= require( './../server/tester/tester' );
+const EventRequest									= require( './../server/event' );
+const assertions									= require( './../server/components/validation/validation_rules' );
+const querystring									= require( 'querystring' );
+let { IncomingMessage, ServerResponse, request }	= require( 'http' );
 
 ServerResponse	= Mock( ServerResponse );
 IncomingMessage	= Mock( IncomingMessage );
@@ -28,6 +29,42 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
 	let response	= new ServerResponse( request );
 
 	return new EventRequest( request, response );
+};
+
+/**
+ * @brief	Sends a request to the server and returns a callback with the response
+ *
+ * @param	mixed data
+ * @param	String path
+ * @param	String method
+ * @param	Function callback
+ *
+ * @return	void
+ */
+helpers.sendServerRequest	= ( data, path, method, callback )=>{
+	const postData = querystring.stringify( data );
+
+	const options = {
+		hostname	: 'localhost',
+		port		: 3333,
+		path		: path,
+		method		: method,
+		headers		: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Content-Length': Buffer.byteLength( postData )
+		}
+	};
+
+	let req	= request( options, ( res ) =>{
+		callback( false, res );
+	});
+
+	req.on('error', (e) => {
+		callback( e );
+	});
+
+	req.write( postData );
+	req.end();
 };
 
 /**

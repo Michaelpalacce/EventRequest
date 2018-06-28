@@ -128,6 +128,12 @@ class Tester
 		let debug			= typeof options.debug === 'boolean' ? options.debug : false;
 		let silent			= typeof options.silent === 'boolean' ? options.silent : false;
 		let filter			= typeof options.filter === 'string' ? options.filter : false;
+		let callback		= typeof options.callback === 'function' ? options.callback : ( err )=>{
+			if ( err )
+			{
+				throw new Error( err );
+			}
+		};
 		let stop			= false;
 		let index			= 0;
 		let hasFinished		= false;
@@ -148,10 +154,7 @@ class Tester
 			this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` );
 			hasFinished	= true;
 
-			if ( this.errors.length > 0 )
-			{
-				throw new Error( 'Testing failed' );
-			}
+			callback( this.errors.length > 0 ? 'Error while testing' : false );
 		};
 
 		let done	= () =>{
@@ -222,7 +225,7 @@ class Tester
 			let testDoneCallback	= ( err ) =>{
 				if ( hasFinished )
 				{
-					this.consoleLogger.error( 'Done called after testing has finished' );
+					callback( 'Done called after testing has finished' );
 					return;
 				}
 
@@ -252,8 +255,7 @@ class Tester
 					}
 					else
 					{
-						this.consoleLogger.error( 'Possible async error occurred:' );
-						this.consoleLogger.error( e.stack );
+						throw e;
 					}
 				}
 			}
@@ -262,7 +264,6 @@ class Tester
 				index++;
 				done();
 			}
-
 		};
 
 		done();

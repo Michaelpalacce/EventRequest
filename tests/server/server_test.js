@@ -1,11 +1,11 @@
 'use strict';
 
 // Dependencies
-const { assert, test }		= require( './../testing_suite' );
-const { Server, Router }	= require( './../../index' );
-const Cluster				= require( './../../server/components/cluster/cluster' );
-const http					= require( 'http' );
-const querystring			= require( 'querystring' );
+const { assert, test, helpers }	= require( './../testing_suite' );
+const { Server, Router }		= require( './../../index' );
+const Cluster					= require( './../../server/components/cluster/cluster' );
+const http						= require( 'http' );
+const querystring				= require( 'querystring' );
 
 test({
 	message	: 'Server.constructor starts without crashing',
@@ -50,31 +50,16 @@ test({
 test({
 	message	: 'Server is started',
 	test	: ( done ) =>{
-
-		const postData = querystring.stringify({});
-
-		const options = {
-			hostname	: 'localhost',
-			port		: 3333,
-			path		: '/ping',
-			method		: 'GET',
-			headers		: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-				'Content-Length': Buffer.byteLength( postData )
+		helpers.sendServerRequest( '', '/ping', 'GET', ( err, response )=>{
+			if ( err )
+			{
+				done( err );
 			}
-		};
-
-		let req	= http.request( options, ( res ) =>{
-			console.log(`STATUS: ${res.statusCode}`);
-			done();
+			else
+			{
+				response.statusCode === 200 ? done() : done( 'Wrong status code returned' );
+			}
 		});
-
-		req.on('error', (e) => {
-			console.error(`problem with request: ${e.message}`);
-		});
-
-		req.write( postData );
-		req.end();
 	}
 });
 

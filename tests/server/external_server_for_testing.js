@@ -4,8 +4,9 @@ const { Server }	= require( './../../index' );
 
 let server	= new Server({
 	port		: 3333,
-	clusters	: 2
+	clusters	: 1
 });
+
 server.add({
 	route	: '/ping',
 	method	: 'GET',
@@ -13,5 +14,5 @@ server.add({
 		event.send( 'pong', 200 );
 	}
 });
+
 server.start(()=>{});
-console.log( 'here' );
