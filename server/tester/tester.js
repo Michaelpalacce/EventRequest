@@ -20,10 +20,11 @@ const TEST_STATUSES	= {
 const LOG_LEVELS	= {
 	error	: 100,
 	success	: 200,
-	info	: 300
+	info	: 300,
+	warning	: 400
 };
 
-const DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
+const DEFAULT_LOG_LEVEL	= LOG_LEVELS.warning;
 
 /**
  * @brief	Tester class that holds all tests that should be executed
@@ -46,6 +47,8 @@ class Tester
 	{
 		this.errors			= [];
 		this.successes		= [];
+		this.skipped		= [];
+		this.incomplete		= [];
 		this.consoleLogger	= Loggur.createLogger({
 			serverName	: 'Tester',
 			logLevel	: DEFAULT_LOG_LEVEL,
@@ -58,7 +61,8 @@ class Tester
 					logColors	: {
 						100	: 'red',
 						200	: 'green',
-						300	: 'cyan'
+						300	: 'cyan',
+						400	: 'magenta'
 					}
 				})
 			]
@@ -184,8 +188,11 @@ class Tester
 		this.consoleLogger.info( `Finished in: ${ ( Date.now() - this.start ) / 1000 }` );
 		this.consoleLogger.success( `There were ${this.successes.length} successful tests` );
 		this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` );
+		this.consoleLogger.warning( `There were ${this.skipped.length} skipped tests` );
+		this.consoleLogger.warning( `There were ${this.incomplete.length} incomplete tests` );
 		this.hasFinished	= true;
 
+		// Done so logging can occur by adding this to the end of the event loop
 		setImmediate(()=>{
 			let errors	= '';
 			this.errors.forEach( ( value )=>{
@@ -212,8 +219,6 @@ class Tester
 			return;
 		}
 
-		++ this.index;
-
 		if ( err )
 		{
 			this.errorCallback( test, err );
@@ -224,6 +229,32 @@ class Tester
 		}
 
 		this.done();
+	}
+
+	/**
+	 * @brief	Checks the given test's status and determines what should happen
+	 *
+	 * @param	Object test
+	 *
+	 * @return	Boolean
+	 */
+	checkTestStatus( test )
+	{
+		switch ( test.status )
+		{
+			case TEST_STATUSES.incomplete:
+				this.incomplete.push( test );
+				this.consoleLogger.warning( `${this.index}. INCOMPLETE ${test.message}` );
+				return true;
+
+			case TEST_STATUSES.skipped:
+				this.skipped.push( test );
+				this.consoleLogger.warning( `${this.index}. SKIPPED ${test.message}` );
+				return true;
+
+			default:
+				return false;
+		}
 	}
 
 	/**
@@ -238,6 +269,21 @@ class Tester
 		if ( this.stop || test === undefined )
 		{
 			this.finished();
+			return;
+		}
+
+		if ( this.filter !== false && test.message.indexOf( this.filter ) === -1 )
+		{
+			this.done();
+			return;
+		}
+
+		++ this.index;
+
+		let status	= this.checkTestStatus( test );
+		if ( status	=== true )
+		{
+			this.done();
 			return;
 		}
 
@@ -288,7 +334,7 @@ module.exports	= {
 	Tester,
 	Mock,
 	assert,
-	logger		: tester.consoleLogger,
-	test		: tester.addTest.bind( tester ),
-	runAllTests	: tester.runAllTests.bind( tester )
+	logger			: tester.consoleLogger,
+	test			: tester.addTest.bind( tester ),
+	runAllTests		: tester.runAllTests.bind( tester )
 };
