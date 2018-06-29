@@ -17,7 +17,7 @@ let middlewaresContainer	= {};
 /**
  * @brief	Constants
  */
-const PROJECT_ROOT			= path.parse( require.main.filename ).dir;
+const PROJECT_ROOT	= path.parse( require.main.filename ).dir;
 
 /**
  * @brief	Attaches an error handler to the event
@@ -26,7 +26,7 @@ const PROJECT_ROOT			= path.parse( require.main.filename ).dir;
  *
  * @return	Object
  */
-middlewaresContainer.errorHandler		= ( options ) =>{
+middlewaresContainer.errorHandler		= ( options = {} ) =>{
 	return {
 		handler	: ( event ) =>{
 			event.errorHandler	= typeof options.errorHandler === 'object'
@@ -46,7 +46,7 @@ middlewaresContainer.errorHandler		= ( options ) =>{
  *
  * @return	Object
  */
-middlewaresContainer.logger				= ( options ) =>{
+middlewaresContainer.logger				= ( options = {} ) =>{
 	let logger	= typeof options.logger !== 'undefined' && options.logger instanceof Logger
 				? options.logger
 				: false;
@@ -116,7 +116,7 @@ middlewaresContainer.logger				= ( options ) =>{
  *
  * @return	Object
  */
-middlewaresContainer.setFileStream		= ( options ) =>{
+middlewaresContainer.setFileStream		= ( options = {} ) =>{
 	return {
 		handler	: ( event ) =>{
 			event.fileStreamHandler	= new FileStreamHandler( event, options );
@@ -135,7 +135,7 @@ middlewaresContainer.setFileStream		= ( options ) =>{
  *
  * @return	Object
  */
-middlewaresContainer.templatingEngine	= ( options ) =>{
+middlewaresContainer.templatingEngine	= ( options = {} ) =>{
 	return {
 		handler	: ( event ) =>{
 			let engineOptions		= typeof options.options === 'object' ? options.options : {};
@@ -162,7 +162,7 @@ middlewaresContainer.templatingEngine	= ( options ) =>{
  *
  * @return	Object
  */
-middlewaresContainer.session	= ( options ) =>{
+middlewaresContainer.session	= ( options = {} ) =>{
 	return {
 		handler	: ( event ) =>{
 			let sessionHandler	= new SessionHandler( event, options );
@@ -180,7 +180,7 @@ middlewaresContainer.session	= ( options ) =>{
  *
  * @return	Object
  */
-middlewaresContainer.bodyParser	= ( options ) =>{
+middlewaresContainer.bodyParser	= ( options = {} ) =>{
 	return {
 		handler	: ( event ) =>
 		{
@@ -199,7 +199,7 @@ middlewaresContainer.bodyParser	= ( options ) =>{
  *
  * @return	Object
  */
-middlewaresContainer.parseCookies	= ( options ) =>
+middlewaresContainer.parseCookies	= ( options = {} ) =>
 {
 	return {
 		handler	: ( event ) =>{
@@ -226,7 +226,7 @@ middlewaresContainer.parseCookies	= ( options ) =>
  *
  * @return	Object
  */
-middlewaresContainer.addStaticPath	= ( options ) => {
+middlewaresContainer.addStaticPath	= ( options = {} ) => {
 	let regExp	= new RegExp( '^(\/' + options.path + ')' );
 
 	return {
@@ -257,7 +257,7 @@ middlewaresContainer.addStaticPath	= ( options ) => {
  *
  * @return	Object
  */
-middlewaresContainer.timeout	= ( options ) =>
+middlewaresContainer.timeout	= ( options = {} ) =>
 {
 	let timeout	= typeof options.timeout === 'number' ? parseInt( options.timeout ) : 60 * 1000;
 

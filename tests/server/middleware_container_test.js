@@ -4,6 +4,8 @@ const { assert, Mock, test, helpers }	= require( './../testing_suite' );
 const middlewareContainer				= require( './../../server/middleware_container' );
 const Router							= require( './../../server/router' );
 const ErrorHandler						= require( './../../server/components/error_handler' );
+const TemplatingEngine					= require( './../../server/components/templating_engine' );
+const BaseTemplatingEngine				= require( './../../server/components/templating_engines/base_templating_engine' );
 const Loggur							= require( './../../server/components/logger/loggur' );
 const { Logger }						= require( './../../server/components/logger/components/logger' );
 
@@ -174,14 +176,94 @@ test({
 	message		: 'MiddlewareContainer setFileStream on default',
 	incomplete	: true,
 	test		: ( done )=>{
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer setFileStream on correct arguments',
+	incomplete	: true,
+	test		: ( done )=>{
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer setFileStream on incorrect arguments',
+	incomplete	: true,
+	test		: ( done )=>{
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer templatingEngine on default',
+	test		: ( done )=>{
 		let eventRequest		= helpers.getEventRequest();
 		let router				= new Router();
 
-		router.add( middlewareContainer.setFileStream( {} ) );
+		router.add( middlewareContainer.templatingEngine( {} ) );
 		router.add( helpers.getEmptyMiddleware() );
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		assert.equal( eventRequest.templatingEngine, null );
 		eventRequest.next();
+		assert.equal( eventRequest.templatingEngine instanceof TemplatingEngine, true );
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer templatingEngine on correct arguments',
+	test		: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+		let router				= new Router();
+
+		router.add( middlewareContainer.templatingEngine( { engine: BaseTemplatingEngine } ) );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		assert.equal( eventRequest.templatingEngine, null );
+		eventRequest.next();
+		assert.equal( eventRequest.templatingEngine instanceof TemplatingEngine, true );
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer templatingEngine on incorrect arguments',
+	test		: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+		let router				= new Router();
+
+		router.add( middlewareContainer.templatingEngine() );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		assert.equal( eventRequest.templatingEngine, null );
+		eventRequest.next();
+		assert.equal( eventRequest.templatingEngine instanceof TemplatingEngine, true );
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer session on default throws exception if DataServer is not set',
+	test		: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+		let router				= new Router();
+
+		router.add( middlewareContainer.session() );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+
+		assert.throws(()=>{
+			eventRequest.next();
+		});
 
 		done();
 	}

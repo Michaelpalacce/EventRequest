@@ -3,7 +3,7 @@
 // Dependencies
 const { Mock, assert, test, helpers, assertions }	= require( './../testing_suite' );
 const EventRequest									= require( './../../server/event' );
-const TemplatingEngine								= require( './../../server/components/templating_engine' );
+const BaseTemplatingEngine							= require( './../../server/components/templating_engines/base_templating_engine' );
 const { FileStreamHandler }							= require( './../../server/components/file_stream_handler' );
 const ErrorHandler									= require( './../../server/components/error_handler' );
 const MemoryDataServer								= require( './../../server/components/caching/memory/memory_data_server' );
@@ -74,7 +74,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 
 		assert.doesNotThrow( () =>{
-			eventRequest.templatingEngine	= new TemplatingEngine()
+			eventRequest.templatingEngine	= new BaseTemplatingEngine()
 		});
 
 		assert.throws( () => {
@@ -467,7 +467,7 @@ test({
 	message	: 'EventRequest.render emits a render event and returns a callback',
 	test	: ( done ) =>{
 		let eventRequest				= helpers.getEventRequest();
-		let MockTemplatingEngine		= Mock( TemplatingEngine );
+		let MockTemplatingEngine		= Mock( BaseTemplatingEngine );
 		let render						= false;
 		let send						= false;
 		let templateName				= 'test';

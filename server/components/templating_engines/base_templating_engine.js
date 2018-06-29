@@ -6,6 +6,11 @@ const path				= require( 'path' );
 const TemplatingEngine	= require( './../templating_engine' );
 
 /**
+ * @brief	Constants
+ */
+const DEFAULT_TEMPLATE_DIR	= '/templates';
+
+/**
  * @brief	A simple templating engine
  */
 class BaseTemplatingEngine extends TemplatingEngine
@@ -13,22 +18,20 @@ class BaseTemplatingEngine extends TemplatingEngine
 	constructor( options )
 	{
 		super( options );
-		this.templateDir	= options.templateDir;
-
-		this.sanitizeConfig()
 	}
 
 	/**
 	 * @brief	Sanitize the config to check if everything is present
 	 *
+	 * @param	Object option
+	 *
 	 * @return	void
 	 */
-	sanitizeConfig()
+	sanitizeConfig( options )
 	{
-		if ( ! this.templateDir )
-		{
-			throw new Error( 'Invalid configuration provided' );
-		}
+		this.templateDir	= typeof options.templateDir === 'string'
+							? options.templateDir
+							: DEFAULT_TEMPLATE_DIR;
 	}
 
 	/**

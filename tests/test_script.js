@@ -19,7 +19,7 @@ let spawnedServer					= child_process.spawn(
 );
 
 runAllTests({
-	dieOnFirstError	: true,
+	dieOnFirstError	: false,
 	callback		: ( err )=>{
 		spawnedServer.kill();
 
@@ -29,6 +29,5 @@ runAllTests({
 		}
 	}
 });
-
 
 module.exports	= {};

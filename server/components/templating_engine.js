@@ -11,7 +11,19 @@ class TemplatingEngine
 {
 	constructor( options = {} )
 	{
-		this.options	= options;
+		this.sanitizeConfig( options )
+	}
+
+	/**
+	 * @brief	Sanitize the config to check if everything is present
+	 *
+	 * @param	Object option
+	 *
+	 * @return	void
+	 */
+	sanitizeConfig( options )
+	{
+		throw new Error( 'Invalid configuration provided' );
 	}
 
 	/**
