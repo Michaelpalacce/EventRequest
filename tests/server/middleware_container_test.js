@@ -3,11 +3,22 @@
 const { assert, Mock, test, helpers }	= require( './../testing_suite' );
 const middlewareContainer				= require( './../../server/middleware_container' );
 const Router							= require( './../../server/router' );
+const DataServer						= require( './../../server/components/caching/data_server' );
 const ErrorHandler						= require( './../../server/components/error_handler' );
 const TemplatingEngine					= require( './../../server/components/templating_engine' );
 const BaseTemplatingEngine				= require( './../../server/components/templating_engines/base_templating_engine' );
 const Loggur							= require( './../../server/components/logger/loggur' );
 const { Logger }						= require( './../../server/components/logger/components/logger' );
+
+class TestDataServer extends DataServer
+{
+	constructor( options )
+	{
+		super( options );
+	}
+
+	sanitize( options ) {}
+}
 
 test({
 	message	: 'MiddlewareContainer error handler defaults',
@@ -264,6 +275,34 @@ test({
 		assert.throws(()=>{
 			eventRequest.next();
 		});
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer session on default does not throw an exception with correct configuration',
+	incomplete	: true,
+	test		: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+		let router				= new Router();
+
+		eventRequest._mock({
+			method			: 'cachingServer',
+			shouldReturn	: new TestDataServer( {} )
+		});
+
+		router.add( middlewareContainer.session() );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest._mock({
+			method	: 'on',
+			called	: 0
+		});
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+
+		eventRequest.next();
 
 		done();
 	}

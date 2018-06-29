@@ -2,6 +2,7 @@
 
 const stringHelper	= require( '../../helpers/unique_id' );
 const RequestEvent	= require( '../../../event' );
+const DataServer	= require( './../../caching/data_server' );
 
 /**
  * @brief	Constants
@@ -22,7 +23,7 @@ class TokenManager
 		this.tokenExpiration	= typeof options.tokenExpiration === 'number' ? options.tokenExpiration : 0;
 		this.cachingServer		= typeof event === 'object' && event instanceof RequestEvent ? event.cachingServer : false;
 
-		if ( ! this.cachingServer )
+		if ( ! this.cachingServer || ! ( this.cachingServer instanceof DataServer ) )
 		{
 			throw new Error( 'Invalid Caching server provided. Token manager uses DataServer as cache' );
 		}
