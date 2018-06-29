@@ -9,6 +9,8 @@ A backend server in NodeJs
 ## After all the Projects from the Projects tab in the github page have been implemented and everything has been tested,
 ## then this will be finished
 
+[![Build Status](https://travis-ci.org/Michaelpalacce/EventRequest.png?branch=master)](https://travis-ci.org/Michaelpalacce/EventRequest)
+
 Includes:
 - Body parsers 
 1) Form Body Parser
