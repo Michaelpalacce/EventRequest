@@ -12,6 +12,7 @@ const TokenManager					= require( './session/helpers/token_manager' );
 const DEFAULT_SESSION_NAME				= 'sid';
 const DEFAULT_TOKEN_EXPIRATION_TIME		= 0;
 const DEFAULT_AUTHENTICATION_CALLBACK	= ()=>{ return false; };
+const DEFAULT_AUTHENTICATION_ROUTE		= '/login';
 
 /**
  * @brief	Handler responsible for security and authentication
@@ -52,7 +53,7 @@ class SessionHandler
 	sanitizeConfig()
 	{
 		this.baseOptions				= {
-			authenticationRoute		: this.securityConfig.authenticationRoute,
+			authenticationRoute		: this.securityConfig.authenticationRoute || DEFAULT_AUTHENTICATION_ROUTE,
 			authenticationCallback	: this.securityConfig.authenticationCallback || DEFAULT_AUTHENTICATION_CALLBACK,
 			sessionName				: this.securityConfig.sessionName || DEFAULT_SESSION_NAME,
 			tokenExpiration			: this.securityConfig.tokenExpiration || DEFAULT_TOKEN_EXPIRATION_TIME,

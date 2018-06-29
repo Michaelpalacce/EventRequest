@@ -6,6 +6,7 @@ const { EventEmitter }						= require( 'events' );
 const { FileStreamHandler, FileStream }		= require( './components/file_stream_handler' );
 const TemplatingEngine						= require( './components/templating_engine' );
 const ErrorHandler							= require( './components/error_handler' );
+const Streams								= require( 'stream' );
 const DataServer							= require( './components/caching/data_server' );
 const { Logger }							= require( './components/logger/components/logger' );
 const ValidationHandler						= require( './components/validation_handler' );
@@ -222,31 +223,40 @@ class RequestEvent extends EventEmitter
 	/**
 	 * @brief	Sends the response to the user
 	 *
+	 * @details	Raw is a flag to tell the eventRequest how to send the data
+	 *
 	 * @param	mixed response
 	 * @param	Number code
+	 * @param	Boolean raw
 	 *
 	 * @return	void
 	 */
 	send( response, code = 200, raw = false )
 	{
-		if ( raw === false )
+		this.response.statusCode	= typeof code === 'number' ? code : 200;
+
+		if ( typeof response.pipe === 'function' && response instanceof Streams.Readable )
 		{
-			try
+			response.pipe( this.response );
+		}
+		else
+		{
+			if ( raw === false )
 			{
-				response	= typeof response === 'string' ? response : JSON.stringify( response );
-			}
-			catch ( e )
-			{
-				response	= 'Malformed payload';
+				try
+				{
+					response	= typeof response === 'string' ? response : JSON.stringify( response );
+				}
+				catch ( e )
+				{
+					response	= 'Malformed payload';
+				}
 			}
 
-			code	= typeof code === 'number' ? code : 200;
+			this.response.end( response );
 		}
 
-		this.response.statusCode	= code;
-		this.response.end( response );
-
-		this.emit( 'send', { response, code, raw } );
+		this.emit( 'send', { code, raw } );
 
 		this.cleanUp();
 	}

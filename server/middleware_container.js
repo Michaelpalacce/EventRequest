@@ -227,6 +227,13 @@ middlewaresContainer.parseCookies	= ( options = {} ) =>
  * @return	Object
  */
 middlewaresContainer.addStaticPath	= ( options = {} ) => {
+	let path	= typeof options.path === 'string' ? options.path : false;
+
+	if ( path === false )
+	{
+		throw new Error( 'Invalid path provided' );
+	}
+
 	let regExp	= new RegExp( '^(\/' + options.path + ')' );
 
 	return {

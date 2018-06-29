@@ -32,11 +32,13 @@ class MethodMock
 								? mockMethodOptions.onConsecutiveCalls
 								: null;
 
-		if (
-			this.mockedClass === undefined
-			|| this.method === null
-			|| ( shouldReturn === null && onConsecutiveCalls === null )
-		) {
+		if ( shouldReturn === null && onConsecutiveCalls === null )
+		{
+			shouldReturn	= '';
+		}
+
+		if ( this.mockedClass === undefined || this.method === null )
+		{
 			throw new Error( 'Invalid mock options provided' );
 		}
 

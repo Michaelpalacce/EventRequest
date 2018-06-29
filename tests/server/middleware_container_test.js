@@ -5,6 +5,7 @@ const middlewareContainer				= require( './../../server/middleware_container' );
 const Router							= require( './../../server/router' );
 const DataServer						= require( './../../server/components/caching/data_server' );
 const ErrorHandler						= require( './../../server/components/error_handler' );
+const MultipartFormParser				= require( './../../server/components/body_parsers/multipart_data_parser' );
 const TemplatingEngine					= require( './../../server/components/templating_engine' );
 const BaseTemplatingEngine				= require( './../../server/components/templating_engines/base_templating_engine' );
 const Loggur							= require( './../../server/components/logger/loggur' );
@@ -262,7 +263,7 @@ test({
 });
 
 test({
-	message		: 'MiddlewareContainer session on default throws exception if DataServer is not set',
+	message		: 'MiddlewareContainer session on default throws exception if incorrect configuration',
 	test		: ( done )=>{
 		let eventRequest		= helpers.getEventRequest();
 		let router				= new Router();
@@ -282,7 +283,6 @@ test({
 
 test({
 	message		: 'MiddlewareContainer session on default does not throw an exception with correct configuration',
-	incomplete	: true,
 	test		: ( done )=>{
 		let eventRequest		= helpers.getEventRequest();
 		let router				= new Router();
@@ -295,13 +295,117 @@ test({
 		router.add( middlewareContainer.session() );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest._mock({
-			method	: 'on',
-			called	: 0
-		});
+		eventRequest._mock( { method : 'on' } );
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 
+		eventRequest.next();
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer bodyParser on default',
+	test		: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+		let router				= new Router();
+
+		router.add( middlewareContainer.bodyParser() );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+
+		eventRequest.next();
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer bodyParser on incorrect options',
+	test		: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+		let router				= new Router();
+
+		router.add( middlewareContainer.bodyParser( { error	: 'error', test: [] } ) );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+
+		eventRequest.next();
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer bodyParser on correct options',
+	test		: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+		let router				= new Router();
+
+		router.add(
+			middlewareContainer.bodyParser(
+				{
+					parsers: [{ instance : MultipartFormParser, options : { tempDir : 'tempDir' } }]
+				}
+			)
+		);
+
+		router.add( helpers.getEmptyMiddleware() );
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest.next();
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer parseCookies on default',
+	test		: ( done )=>{
+		let cookieKey			= 'cookieKey';
+		let cookieValue			= 'cookieValue';
+		let headers				= { cookie : `${cookieKey}=${cookieValue}` };
+		let eventRequest		= helpers.getEventRequest( undefined, undefined, headers );
+		let router				= new Router();
+
+		router.add( middlewareContainer.parseCookies() );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest.next();
+
+		assert.equal( typeof eventRequest.cookies[cookieKey] !== 'undefined', true );
+		assert.equal( eventRequest.cookies[cookieKey], cookieValue );
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer addStaticPath on default throws exception in case of error',
+	test		: ( done )=>{
+		let router	= new Router();
+
+		assert.throws( ()=>{
+			router.add( middlewareContainer.addStaticPath() );
+		});
+
+		done();
+	}
+});
+
+test({
+	message		: 'MiddlewareContainer addStaticPath on default does not throw an exception if configuration is correct',
+	test		: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+		let router				= new Router();
+
+		router.add( middlewareContainer.addStaticPath( { path : 'path' }) );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		done();

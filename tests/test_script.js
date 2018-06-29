@@ -19,7 +19,9 @@ let spawnedServer					= child_process.spawn(
 );
 
 runAllTests({
-	dieOnFirstError	: false,
+	dieOnFirstError	: true,
+	debug			: false,
+	silent			: false,
 	callback		: ( err )=>{
 		spawnedServer.kill();
 
