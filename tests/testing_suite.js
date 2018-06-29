@@ -13,6 +13,18 @@ IncomingMessage	= Mock( IncomingMessage );
 let helpers	= {};
 
 /**
+ * @brief	Empty middleware that does nothing
+ *
+ * @return	Object
+ */
+helpers.getEmptyMiddleware	= ()=>{
+	return {
+		route	: '',
+		handler	: ( event )=>{}
+	};
+};
+
+/**
  * @brief	Returns a mocked instance of the eventRequest
  *
  * @param	requestMethod
@@ -21,14 +33,15 @@ let helpers	= {};
  * @return	RequestEvent
  */
 helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} ) => {
-	let request		= new IncomingMessage();
+	let request	= new IncomingMessage();
 	request._mock( { method : 'method', shouldReturn : requestMethod } );
 	request._mock( { method : 'url', shouldReturn : requestUrl, } );
 	request._mock( { method : 'headers', shouldReturn : headers, } );
 
-	let response	= new ServerResponse( request );
+	let response			= new ServerResponse( request );
+	let MockedEventRequest	= Mock( EventRequest );
 
-	return new EventRequest( request, response );
+	return new MockedEventRequest( request, response );
 };
 
 /**

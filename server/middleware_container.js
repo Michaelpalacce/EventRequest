@@ -32,7 +32,9 @@ middlewaresContainer.errorHandler		= ( options ) =>{
 			event.errorHandler	= typeof options.errorHandler === 'object'
 								&& options.errorHandler instanceof ErrorHandler
 								? options.errorHandler
-								: new ErrorHandler()
+								: new ErrorHandler();
+
+			event.next();
 		}
 	}
 };

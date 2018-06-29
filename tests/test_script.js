@@ -20,7 +20,6 @@ let spawnedServer					= child_process.spawn(
 
 runAllTests({
 	dieOnFirstError	: true,
-	debug			: false,
 	callback		: ( err )=>{
 		spawnedServer.kill();
 
