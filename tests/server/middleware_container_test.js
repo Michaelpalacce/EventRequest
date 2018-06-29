@@ -411,3 +411,28 @@ test({
 		done();
 	}
 });
+
+test({
+	message		: 'MiddlewareContainer timeout times out',
+	test		: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+		let router				= new Router();
+		let error				= false;
+
+		router.add( middlewareContainer.timeout( { timeout : 0 } ) );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest.on('error', ( err )=>{
+			assert.equal( typeof err === 'string', true );
+			error	= true;
+		});
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest.next();
+
+		// Since the timeout is in the event loop, add the done callback at the end of the event loop
+		setTimeout(()=>{
+			error ? done() : done( 'Request did not time out and it should have' );
+		});
+	}
+});

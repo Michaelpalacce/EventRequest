@@ -220,37 +220,35 @@ middlewaresContainer.parseCookies	= ( options = {} ) =>
 /**
  * @brief	Sets the given path as the static path where resources can be delivered easily
  *
- * @param	string staticPath
+ * @param	String staticPath
  * 			Accepts options:
- * 			- path - the path to make static
+ * 			- path - String - the path to make static
  *
  * @return	Object
  */
 middlewaresContainer.addStaticPath	= ( options = {} ) => {
-	let path	= typeof options.path === 'string' ? options.path : false;
+	let staticPath	= typeof options.path === 'string' ? options.path : false;
 
-	if ( path === false )
+	if ( staticPath === false )
 	{
 		throw new Error( 'Invalid path provided' );
 	}
 
-	let regExp	= new RegExp( '^(\/' + options.path + ')' );
+	let regExp	= new RegExp( '^(\/' + staticPath + ')' );
 
 	return {
 		route	: regExp,
 		handler	: ( event ) => {
 			let item	= path.join( PROJECT_ROOT, event.path );
 
-			fs.readFile( item, {}, ( err, data ) => {
-				if ( ! err && data )
-				{
-					event.send( data, 200, true );
-				}
-				else
-				{
-					event.next( `File not found: ${item}` );
-				}
-			});
+			if ( fs.existsSync( item ) )
+			{
+				event.send( fs.createReadStream( item ), 200 );
+			}
+			else
+			{
+				event.next( `File not found: ${item}` );
+			}
 		}
 	};
 };
