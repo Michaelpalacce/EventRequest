@@ -5,6 +5,7 @@ const eventTest						= require( './server/event_test' );
 const routeTest						= require( './server/route_test' );
 const routerTest					= require( './server/router_test' );
 const serverTest					= require( './server/server_test' );
+const middlewareContainerTest		= require( './server/middleware_container_test' );
 const child_process					= require( 'child_process' );
 
 let spawnedServer					= child_process.spawn(
@@ -19,6 +20,7 @@ let spawnedServer					= child_process.spawn(
 
 runAllTests({
 	dieOnFirstError	: true,
+	debug			: false,
 	callback		: ( err )=>{
 		spawnedServer.kill();
 

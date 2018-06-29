@@ -32,7 +32,18 @@ class Tester
 {
 	constructor()
 	{
-		this.tests			= [];
+		this.tests	= [];
+	}
+
+	/**
+	 * @brief	Initializes the tester and clears up any previously recorded errors or successes
+	 *
+	 * @details	This is done so we can run the test many times per instance
+	 *
+	 * @return	void
+	 */
+	initialize( options )
+	{
 		this.errors			= [];
 		this.successes		= [];
 		this.consoleLogger	= Loggur.createLogger({
@@ -52,19 +63,26 @@ class Tester
 				})
 			]
 		});
-	}
+		this.start				= Date.now();
+		this.dieOnFirstError	= typeof options.dieOnFirstError === 'boolean' ? options.dieOnFirstError : true;
+		this.debug				= typeof options.debug === 'boolean' ? options.debug : false;
+		this.silent				= typeof options.silent === 'boolean' ? options.silent : false;
+		this.filter				= typeof options.filter === 'string' ? options.filter : false;
+		this.callback			= typeof options.callback === 'function' ? options.callback : ( err )=>{
+			if ( err )
+			{
+				throw new Error( err );
+			}
+		};
+		this.stop			= false;
+		this.index			= 0;
+		this.hasFinished	= false;
 
-	/**
-	 * @brief	Initializes the tester and clears up any previously recorded errors or successes
-	 *
-	 * @details	This is done so we can run the test many times per instance
-	 *
-	 * @return	void
-	 */
-	initialize()
-	{
-		this.errors		= [];
-		this.successes	= [];
+		if ( this.silent )
+		{
+			// Will display only errors
+			this.consoleLogger.logLevel	= LOG_LEVELS.error;
+		}
 	}
 
 	/**
@@ -110,6 +128,144 @@ class Tester
 	}
 
 	/**
+	 * @brief	Called if the test passes successfully
+	 *
+	 * @details	It will output the index of the test as well as the message
+	 *
+	 * @return	void
+	 */
+	successCallback( test )
+	{
+		test.status	= TEST_STATUSES.success;
+		this.successes.push( test );
+		this.consoleLogger.success( `${this.index}. ${test.message}` );
+	};
+
+	/**
+	 * @brief	Called if there is an error in the test
+	 *
+	 * @param	Object test
+	 * @param	mixed err
+	 */
+	errorCallback( test, error )
+	{
+		if ( error instanceof Error )
+		{
+			if ( this.debug )
+			{
+				error	= error.stack;
+			}
+			else
+			{
+				error	= error.message;
+			}
+		}
+
+		test.status	= TEST_STATUSES.failed;
+		test.error	= error;
+		this.errors.push( test );
+		this.consoleLogger.error( `--------------------BEGIN ERROR--------------------` );
+		this.consoleLogger.error( `${this.index}. ${test.message} failed with the following error: ${error}` );
+		this.consoleLogger.error( `---------------------END ERROR---------------------` );
+		if ( this.dieOnFirstError )
+		{
+			this.stop	= true;
+			this.finished();
+		}
+	};
+
+	/**
+	 * @brief	Called when all the tests have finished
+	 *
+	 * @return	void
+	 */
+	finished()
+	{
+		this.consoleLogger.info( `Finished in: ${ ( Date.now() - this.start ) / 1000 }` );
+		this.consoleLogger.success( `There were ${this.successes.length} successful tests` );
+		this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` );
+		this.hasFinished	= true;
+
+		setImmediate(()=>{
+			let errors	= '';
+			this.errors.forEach( ( value )=>{
+				errors	+= `\r\n${value.message} failed with: ${value.error} \r\n`;
+			});
+
+			this.callback( this.errors.length > 0 ? errors : false );
+		});
+	};
+
+	/**
+	 * @brief	Called by the done function of the tests
+	 *
+	 * @param	Object test
+	 * @param	mixed err
+	 *
+	 * @return	void
+	 */
+	doneCallback( test, err )
+	{
+		if ( this.hasFinished || this.stop )
+		{
+			throw new Error( 'Done called after finishing up. There could be a potential error!' );
+			return;
+		}
+
+		++ this.index;
+
+		if ( err )
+		{
+			this.errorCallback( test, err );
+		}
+		else
+		{
+			this.successCallback( test );
+		}
+
+		this.done();
+	}
+
+	/**
+	 * @brief	Call next test
+	 *
+	 * @return	void
+	 */
+	done()
+	{
+		let test	= this.tests.shift();
+
+		if ( this.stop || test === undefined )
+		{
+			this.finished();
+			return;
+		}
+
+		/**
+		 * @brief	Wrapper for the done callback to add the test to the callback
+		 */
+		let callback	= ( err )=>{
+			this.doneCallback( test, err );
+		};
+
+		try
+		{
+			test.test( callback );
+		}
+		catch ( error )
+		{
+			if ( ! this.stop && ! this.hasFinished )
+			{
+				this.doneCallback( test, error );
+			}
+			else
+			{
+				throw error;
+			}
+		}
+	}
+
+	/**
 	 * @brief	Runs all added tests
 	 *
 	 * @details	This will produce an output directly to the console of the user
@@ -120,153 +276,10 @@ class Tester
 	 */
 	runAllTests( options = {} )
 	{
-		this.initialize();
+		this.initialize( options );
 		this.consoleLogger.info( `Running ${this.tests.length} tests.` );
 
-		let start			= Date.now();
-		let dieOnFirstError	= typeof options.dieOnFirstError === 'boolean' ? options.dieOnFirstError : true;
-		let debug			= typeof options.debug === 'boolean' ? options.debug : false;
-		let silent			= typeof options.silent === 'boolean' ? options.silent : false;
-		let filter			= typeof options.filter === 'string' ? options.filter : false;
-		let callback		= typeof options.callback === 'function' ? options.callback : ( err )=>{
-			if ( err )
-			{
-				throw new Error( err );
-			}
-		};
-		let stop			= false;
-		let index			= 0;
-		let hasFinished		= false;
-
-		if ( silent )
-		{
-			// Will display only errors
-			this.consoleLogger.logLevel	= LOG_LEVELS.error;
-		}
-		else
-		{
-			this.consoleLogger.logLevel	= DEFAULT_LOG_LEVEL;
-		}
-
-		let finished	= ()=>{
-			this.consoleLogger.info( `Finished in: ${ ( Date.now() - start ) / 1000 }` );
-			this.consoleLogger.success( `There were ${this.successes.length} successful tests` );
-			this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` );
-			hasFinished	= true;
-
-			callback( this.errors.length > 0 ? 'Error while testing' : false );
-		};
-
-		let done	= () =>{
-			let test	= this.tests[index];
-
-			if ( stop || test === undefined )
-			{
-				finished();
-				return;
-			}
-
-			let testCallback	= test.test;
-
-			/**
-			 * @brief	Called if the test passes successfully
-			 *
-			 * @details	It will output the index of the test as well as the message
-			 *
-			 * @return	void
-			 */
-			let successCallback		= () =>{
-				test.status	= TEST_STATUSES.success;
-				this.successes.push( test );
-				this.consoleLogger.success( `${index}. ${test.message}` );
-				done();
-			};
-
-			/**
-			 * @brief	Called if there is an error in the test
-			 *
-			 * @param	mixed err
-			 */
-			let errorCallback		= ( err ) =>{
-				if ( err instanceof Error )
-				{
-					if ( debug )
-					{
-						err	= err.stack;
-					}
-					else
-					{
-						err	= err.message;
-					}
-				}
-
-				test.status	= TEST_STATUSES.failed;
-				test.error	= err;
-				this.errors.push( test );
-				this.consoleLogger.error( `--------------------BEGIN ERROR--------------------` );
-				this.consoleLogger.error( `${index}. ${test.message} failed with the following error: ${err}` );
-				this.consoleLogger.error( `---------------------END ERROR---------------------` );
-				if ( dieOnFirstError )
-				{
-					stop	= true;
-					finished();
-				}
-				else
-				{
-					done();
-				}
-			};
-
-			/**
-			 * @brief	Called always when the test finishes ( this callback dispatches either a successCallback or errorCallback )
-			 *
-			 * @param	mixed err
-			 */
-			let testDoneCallback	= ( err ) =>{
-				if ( hasFinished )
-				{
-					callback( 'Done called after testing has finished' );
-					return;
-				}
-
-				index	++;
-
-				if ( err )
-				{
-					errorCallback( err );
-				}
-				else
-				{
-					successCallback();
-				}
-			};
-
-			if ( typeof filter !== 'string' || filter === test.message )
-			{
-				try
-				{
-					testCallback( testDoneCallback );
-				}
-				catch( e )
-				{
-					if ( ! hasFinished )
-					{
-						errorCallback( e );
-					}
-					else
-					{
-						throw e;
-					}
-				}
-			}
-			else
-			{
-				index++;
-				done();
-			}
-		};
-
-		done();
+		this.done();
 	}
 }
 
