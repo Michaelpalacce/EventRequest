@@ -5,12 +5,23 @@ const { Tester, Mock, assert, logger }				= require( './../server/tester/tester'
 const EventRequest									= require( './../server/event' );
 const assertions									= require( './../server/components/validation/validation_rules' );
 const querystring									= require( 'querystring' );
+const Loggur										= require( './../server/components/logger/loggur' );
+const MockLoggur									= Mock( Loggur.constructor );
 let { IncomingMessage, ServerResponse, request }	= require( 'http' );
 
 ServerResponse	= Mock( ServerResponse );
 IncomingMessage	= Mock( IncomingMessage );
 
 let helpers	= {};
+
+/**
+ * @brief	Gets a mocked loggur class
+ *
+ * @return	Loggur
+ */
+helpers.getMockedLoggur		= ()=>{
+	return new MockLoggur();
+};
 
 /**
  * @brief	Empty middleware that does nothing

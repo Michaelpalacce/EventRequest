@@ -6,11 +6,12 @@ const routeTest						= require( './server/route_test' );
 const routerTest					= require( './server/router_test' );
 const serverTest					= require( './server/server_test' );
 const middlewareContainerTest		= require( './server/middleware_container_test' );
+const loggurTest					= require( './server/components/logger/loggur_test' );
 const child_process					= require( 'child_process' );
 
 let spawnedServer					= child_process.spawn(
 	'node',
-	['tests/server/external_server_for_testing.js'],
+	['tests/external_server_for_testing.js'],
 	{},
 	( error, stdout, stderr )=> {
 		console.log( stdout );

@@ -1,6 +1,6 @@
 'use strict';
 
-const { Server }	= require( './../../index' );
+const { Server }	= require( '../index' );
 
 let server	= new Server({
 	port		: 3333,

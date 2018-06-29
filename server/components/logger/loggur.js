@@ -17,8 +17,9 @@ class Loggur
 		this.loggers		= {};
 		this.defaultLogger	= null;
 
-		let uniqueId		= cluster.isMaster ? 'Master'
-			: 'Worker/' + process.pid;
+		let uniqueId		= cluster.isMaster
+							? 'Master'
+							: 'Worker/' + process.pid;
 
 		Object.defineProperty( this, 'uniqueId', {
 			writable	: false,

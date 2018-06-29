@@ -348,7 +348,7 @@ test({
 		router.add(
 			middlewareContainer.bodyParser(
 				{
-					parsers: [{ instance : MultipartFormParser, options : { tempDir : 'tempDir' } }]
+					parsers: [{ instance : MultipartFormParser, options : { tempDir : 'tests' } }]
 				}
 			)
 		);
