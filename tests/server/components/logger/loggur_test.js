@@ -128,7 +128,7 @@ test({
 test({
 	message	: 'Loggur log returns a Promise',
 	test	: ( done )=>{
-		let loggur			= helpers.getMockedLoggur();
+		let loggur	= helpers.getMockedLoggur();
 		loggur.addLogger( 'nullLogger', { logLevel: 0 } );
 		assert.equal( loggur.log( 'test' ) instanceof Promise, true );
 
@@ -137,17 +137,34 @@ test({
 });
 
 test({
-	message		: 'Loggur log logs only to loggers added to it that support the log',
-	incomplete	: true,
-	test		: ( done )=>{
-		done();
-	}
-});
+	message	: 'Loggur log logs to default logger if none are added',
+	test	: ( done )=>{
+		let loggur		= helpers.getMockedLoggur();
+		let MockLogger	= Mock( Logger );
+		let logger		= new MockLogger();
+		let logged		= 0;
 
-test({
-	message		: 'Loggur log logs to default logger if none are added',
-	incomplete	: true,
-	test		: ( done )=>{
+		logger._mock({
+			method			: 'log',
+			shouldReturn	: ()=>{
+				++ logged;
+				return new Promise(( resolve, reject )=>{
+					resolve();
+				});
+			}
+		});
+
+		loggur._mock({
+			method			: 'getDefaultLogger',
+			shouldReturn	: logger
+		});
+
+		loggur.log( 'Test' );
+		loggur.addLogger( 'testLogger', { logLevel: 0 } );
+		loggur.log( 'Test' );
+
+		assert.equal( logged, 1 );
+
 		done();
 	}
 });
