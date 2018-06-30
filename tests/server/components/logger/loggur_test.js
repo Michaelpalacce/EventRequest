@@ -135,3 +135,19 @@ test({
 		done();
 	}
 });
+
+test({
+	message		: 'Loggur log logs only to loggers added to it that support the log',
+	incomplete	: true,
+	test		: ( done )=>{
+		done();
+	}
+});
+
+test({
+	message		: 'Loggur log logs to default logger if none are added',
+	incomplete	: true,
+	test		: ( done )=>{
+		done();
+	}
+});
