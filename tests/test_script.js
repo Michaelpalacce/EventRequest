@@ -11,6 +11,7 @@ const logTest					= require( './server/components/logger/components/log_test' );
 const loggerTest				= require( './server/components/logger/components/logger_test' );
 const transportTest				= require( './server/components/logger/components/transport_types/transport_test' );
 const consoleTest				= require( './server/components/logger/components/transport_types/console_test' );
+const fileTest					= require( './server/components/logger/components/transport_types/file_test' );
 const child_process				= require( 'child_process' );
 
 let spawnedServer				= child_process.spawn(
