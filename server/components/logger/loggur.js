@@ -1,14 +1,15 @@
 'use strict';
 
 // Dependencies
-const { Logger }		= require( './components/logger' );
-const { LOG_LEVELS }	= require( './components/log' );
-const cluster			= require( 'cluster' );
+const Logger				= require( './components/logger' );
+const Transport				= require( './components/transport_types/transport' );
+const File					= require( './components/transport_types/file' );
+const Console				= require( './components/transport_types/console' );
+const { Log, LOG_LEVELS }	= require( './components/log' );
+const cluster				= require( 'cluster' );
 
 /**
  * @brief	Container that holds all the different loggers
- *
- * @todo	Implement streams in the future
  */
 class Loggur
 {
@@ -37,11 +38,11 @@ class Loggur
 	 *
 	 * @return	Boolean
 	 */
-	addLogger( loggerId, logger )
+	addLogger( loggerId, logger = {} )
 	{
 		if ( typeof logger === 'object' && ( logger instanceof Logger ) === false )
 		{
-			logger	= new Logger( logger );
+			logger	= this.createLogger( logger );
 		}
 
 		if ( logger instanceof Logger && typeof this.loggers[loggerId] === 'undefined')
@@ -56,13 +57,21 @@ class Loggur
 	/**
 	 * @brief	Get the desired logger
 	 *
+	 * @details	Returns false if the logger is not added
+	 *
 	 * @param	String loggerId
 	 *
-	 * @return	Logger
+	 * @return	Logger|Boolean
 	 */
 	getLogger( loggerId )
 	{
-		return this.loggers[loggerId];
+		let logger	= this.loggers[loggerId];
+		if ( logger === undefined )
+		{
+			return false;
+		}
+
+		return logger;
 	}
 
 	/**
@@ -121,4 +130,12 @@ class Loggur
 	}
 }
 
-module.exports	= new Loggur();
+module.exports	= {
+	Loggur	: new Loggur(),
+	Logger,
+	Transport,
+	Console,
+	File,
+	Log,
+	LOG_LEVELS
+};

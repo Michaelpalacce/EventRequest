@@ -8,8 +8,7 @@ const ErrorHandler						= require( './../../server/components/error_handler' );
 const MultipartFormParser				= require( './../../server/components/body_parsers/multipart_data_parser' );
 const TemplatingEngine					= require( './../../server/components/templating_engine' );
 const BaseTemplatingEngine				= require( './../../server/components/templating_engines/base_templating_engine' );
-const Loggur							= require( './../../server/components/logger/loggur' );
-const { Logger }						= require( './../../server/components/logger/components/logger' );
+const { Loggur, Logger }				= require( './../../server/components/logger/loggur' );
 
 class TestDataServer extends DataServer
 {
@@ -103,9 +102,7 @@ test({
 		let eventRequest		= helpers.getEventRequest();
 		let router				= new Router();
 
-		router.add( middlewareContainer.logger( {
-			logLevel	: 0
-		} ) );
+		router.add( middlewareContainer.logger( { logLevel : 0 } ) );
 		router.add( helpers.getEmptyMiddleware() );
 
 		eventRequest._mock({
@@ -131,9 +128,7 @@ test({
 		let index				= 0;
 		let shouldBeCalled		= 9;
 		// Create a logger that has a logLevel of 0 so that we will not see any logs while testing
-		let logger				= Loggur.createLogger({
-			logLevel	: 0
-		});
+		let logger				= Loggur.createLogger( { logLevel : 0  } );
 
 		router.add( middlewareContainer.logger( { logger } ) );
 		router.add( helpers.getEmptyMiddleware() );

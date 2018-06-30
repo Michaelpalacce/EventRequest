@@ -31,6 +31,15 @@ Includes:
 - Caching ( in memory )
 - Input Validation
 
+# Properties exported by the Server:
+	Server,				// The actual server to be used
+	Router,				// The router. Can be used to add routes to it and then to the main server route
+	TemplatingEngine,	// Instance to be extended if you want to create your own templating engine
+	ErrorHandler,		// Error handler to extend if you want to create a custom error handler
+	DataServer,			// Instance to be extended to implement your own DataServer
+	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ), 
+						// test( function to use to add tests ), runAllTests( way to run all tests added by test ) 
+	Loggur
 
 # Server Options
 
@@ -122,7 +131,7 @@ The Loggur can be used to create Loggers which accept the following options:
 * **transports** - Array - Array of the transports to be added to the logger - Defaults to empty
 * **logLevel** - Number - The log severity level -> Defaults to error
 *  **logLevels** - Object - JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
-* **capture** - Boolean - Whether to attach event listeners for process.on uncaughtException and unhandledRejection - Defaults to true
+* **capture** - Boolean - Whether to attach event listeners for process.on uncaughtException and unhandledRejection - Defaults to false
 * **dieOnCapture** - Boolean - If the process should exit in case of a caught exception -> Defaults to true
 * **unhandledExceptionLevel** - Number - What level should the unhandled exceptions be logged at -> Defaults to error
 

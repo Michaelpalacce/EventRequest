@@ -8,7 +8,7 @@ const TemplatingEngine						= require( './components/templating_engine' );
 const ErrorHandler							= require( './components/error_handler' );
 const Streams								= require( 'stream' );
 const DataServer							= require( './components/caching/data_server' );
-const { Logger }							= require( './components/logger/components/logger' );
+const { Logger }							= require( './components/logger/loggur' );
 const ValidationHandler						= require( './components/validation_handler' );
 const { IncomingMessage, ServerResponse }	= require( 'http' );
 

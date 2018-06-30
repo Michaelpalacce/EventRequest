@@ -1,8 +1,7 @@
 'use strict';
 
 // Dependencies
-const Loggur				= require( './components/logger/loggur' );
-const { LOG_LEVELS }		= require( './components/logger/components/log' );
+const { Loggur, LOG_LEVELS }	= require( './components/logger/loggur' );
 
 /**
  * @brief	Constants

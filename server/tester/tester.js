@@ -1,10 +1,9 @@
 'use strict';
 
 // Dependencies
-const assert		= require( 'assert' );
-const Loggur		= require( '../components/logger/loggur' );
-const { Console }	= require( '../components/logger/components/logger' );
-const Mock			= require( './mocker' );
+const assert				= require( 'assert' );
+const { Console, Loggur }	= require( '../components/logger/loggur' );
+const Mock					= require( './mocker' );
 
 /**
  * @brief	Constants
@@ -196,14 +195,9 @@ class Tester
 		logPromises.push( this.consoleLogger.warning( `There were ${this.incomplete.length} incomplete tests` ) );
 
 		// Done so logging can occur by adding this to the end of the event loop
-		Promise.all( logPromises ).then(()=>{
-			let errors	= '';
-			this.errors.forEach( ( value )=>{
-				errors	+= `\r\n${value.message} failed with: ${value.error} \r\n`;
-			});
-
-			this.callback( this.errors.length > 0 ? errors : false );
-		})
+		setImmediate(()=>{
+			this.callback( this.errors.length > 0 ? 'Errors while testing' : false );
+		});
 	};
 
 	/**
@@ -336,7 +330,6 @@ let tester		= new Tester();
 module.exports	= {
 	Tester,
 	Mock,
-	assert,
 	logger			: tester.consoleLogger,
 	test			: tester.addTest.bind( tester ),
 	runAllTests		: tester.runAllTests.bind( tester )

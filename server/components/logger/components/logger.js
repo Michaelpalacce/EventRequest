@@ -3,7 +3,6 @@
 // Dependencies
 const Transport				= require( './transport_types/transport' );
 const Console				= require( './transport_types/console' );
-const File					= require( './transport_types/file' );
 const { Log, LOG_LEVELS }	= require( './log' );
 
 /**
@@ -42,7 +41,7 @@ class Logger
 	 * 			- logLevels - Object - JSON object with all the log severity levels and their values
 	 * 						All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
 	 * 			- capture - Boolean - Whether to attach event listeners for process.on
-	 * 						uncaughtException and unhandledRejection - Defaults to true
+	 * 						uncaughtException and unhandledRejection - Defaults to false
 	 * 			- dieOnCapture - Boolean - If the process should exit in case of a caught exception -> Defaults to true
 	 * 			- unhandledExceptionLevel - Number - What level should the unhandled exceptions be logged at -> Defaults to error
 	 *
@@ -66,7 +65,7 @@ class Logger
 
 		this.capture					= typeof options.capture === 'boolean'
 										? options.capture
-										: true;
+										: false;
 
 		this.dieOnCapture				= typeof options.dieOnCapture === 'boolean'
 										? options.dieOnCapture
@@ -110,7 +109,7 @@ class Logger
 					message	: [reason + ' Unhandled Rejection at Promise: ' + p]
 				});
 
-				this.log( unhandledRejectionLog );
+				this.log( unhandledRejectionLog ).then( ()=>{}, ()=>{} );
 			});
 
 			process.on( 'uncaughtException', ( err ) => {
@@ -254,11 +253,4 @@ class Logger
 	}
 }
 
-module.exports	= {
-	Logger,
-	Transport,
-	Console,
-	File,
-	Log,
-	LOG_LEVELS
-};
+module.exports	= Logger;

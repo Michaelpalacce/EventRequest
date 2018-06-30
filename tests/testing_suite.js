@@ -1,11 +1,11 @@
 'use strict';
 
 // Dependencies
-const { Tester, Mock, assert, logger }				= require( './../server/tester/tester' );
+const { Tester, Mock, logger }						= require( './../server/tester/tester' );
 const EventRequest									= require( './../server/event' );
-const assertions									= require( './../server/components/validation/validation_rules' );
 const querystring									= require( 'querystring' );
-const Loggur										= require( './../server/components/logger/loggur' );
+const assert										= require( 'assert' );
+const { Loggur }									= require( './../server/components/logger/loggur' );
 const MockLoggur									= Mock( Loggur.constructor );
 let { IncomingMessage, ServerResponse, request }	= require( 'http' );
 
@@ -101,7 +101,6 @@ module.exports	= {
 	Tester,
 	Mock,
 	assert,
-	assertions,
 	logger,
 	helpers,
 	test		: tester.addTest.bind( tester ),

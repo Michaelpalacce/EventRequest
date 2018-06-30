@@ -1,14 +1,15 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers, assertions }	= require( './../testing_suite' );
-const EventRequest									= require( './../../server/event' );
-const BaseTemplatingEngine							= require( './../../server/components/templating_engines/base_templating_engine' );
-const { FileStreamHandler }							= require( './../../server/components/file_stream_handler' );
-const ErrorHandler									= require( './../../server/components/error_handler' );
-const MemoryDataServer								= require( './../../server/components/caching/memory/memory_data_server' );
-const { Logger }									= require( './../../server/components/logger/components/logger' );
-const MockedErrorHandler							= Mock( ErrorHandler );
+const { Mock, assert, test, helpers }	= require( './../testing_suite' );
+const EventRequest						= require( './../../server/event' );
+const BaseTemplatingEngine				= require( './../../server/components/templating_engines/base_templating_engine' );
+const { FileStreamHandler }				= require( './../../server/components/file_stream_handler' );
+const ErrorHandler						= require( './../../server/components/error_handler' );
+const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );
+const { Loggur }						= require( './../../server/components/logger/loggur' );
+
+const MockedErrorHandler				= Mock( ErrorHandler );
 
 test({
 	message	: 'EventRequest should throw an error with invalid constructor parameters',
@@ -142,7 +143,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 
 		assert.doesNotThrow( () =>{
-			eventRequest.logger	= new Logger()
+			eventRequest.logger	= Loggur.createLogger();
 		});
 
 		assert.throws( () => {
@@ -185,7 +186,6 @@ test({
 	message	: 'EventRequest cleanUp cleans up data',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		eventRequest.logger	= new Logger();
 		eventRequest.on( 'test', ()=>{} );
 
 		assert.equal( eventRequest.listeners( 'test' ).length, 1 );
@@ -202,7 +202,6 @@ test({
 		assert.equal( eventRequest.extra, undefined );
 		assert.equal( eventRequest.cookies, undefined );
 		assert.equal( eventRequest.params, undefined );
-		assert.equal( eventRequest.logger instanceof Logger, true );
 		assert.equal( eventRequest.listeners( 'test' ).length, 0 );
 
 		done();
@@ -312,10 +311,7 @@ test({
 	message	: 'EventRequest setHeader sets the header in the response if response is not sent',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		if ( ! assertions.assertFalse( eventRequest.isFinished() ) )
-		{
-			throw new Error( 'Event is finished but it should not be' );
-		}
+		assert.equal( eventRequest.isFinished(), false );
 		let setHeader	= false;
 
 		eventRequest.response._mock({
