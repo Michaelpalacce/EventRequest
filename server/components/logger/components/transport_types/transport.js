@@ -15,9 +15,6 @@ class Transport
 {
 	constructor( options = {} )
 	{
-		this.logLevel	= null;
-		this.logLevels	= null;
-
 		this.sanitizeConfig( options );
 	}
 
@@ -84,6 +81,7 @@ class Transport
 	 */
 	format( log )
 	{
+		return log;
 	}
 
 	/**
