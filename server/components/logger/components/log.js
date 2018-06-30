@@ -51,7 +51,7 @@ class Log
 		}
 		else if ( logType === 'object' )
 		{
-			this.level		= typeof log.level === 'number' ? log.level : WRONG_LOG_DEFAULT_LEVEL;
+			this.level	= typeof log.level === 'number' ? log.level : WRONG_LOG_DEFAULT_LEVEL;
 
 			if ( log.message instanceof Error )
 			{
