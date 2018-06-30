@@ -222,11 +222,6 @@ class Logger
 			log.setUniqueId( this.getUniqueId() );
 
 			this.transports.forEach( ( transport ) =>{
-				if ( ! transport.supports( log ) )
-				{
-					return;
-				}
-
 				let logPromise	= new Promise( ( resolve, reject )=>{
 					setImmediate(()=>{
 						let transportPromise	= transport.log( log );

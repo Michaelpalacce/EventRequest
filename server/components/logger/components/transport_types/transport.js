@@ -85,6 +85,22 @@ class Transport
 	}
 
 	/**
+	 * @brief	The method that actually logs the data
+	 *
+	 * @param	Log log
+	 * @param	Function resolve
+	 * @param	Function reject
+	 *
+	 * @private
+	 *
+	 * @return	void
+	 */
+	_log( log, resolve, reject )
+	{
+		resolve();
+	}
+
+	/**
 	 * @brief	Saves the log
 	 *
 	 * @param	Log log
@@ -94,7 +110,13 @@ class Transport
 	log( log )
 	{
 		return new Promise(( resolve, reject )=>{
-			resolve();
+			if ( ! this.supports( log ) )
+			{
+				resolve();
+				return;
+			}
+
+			this._log( log, resolve, reject );
 		});
 	}
 }

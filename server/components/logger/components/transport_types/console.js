@@ -99,16 +99,16 @@ class Console extends Transport
 	 * @brief	Logs the data
 	 *
 	 * @param	Log log
+	 * @param	Function resolve
+	 * @param	Function reject
 	 *
 	 * @return	Promise
 	 */
-	log( log )
+	_log( log, resolve, reject )
 	{
-		return new Promise( ( resolve, reject )=>{
-			let logFormat	= this.format( log );
-			console.log( logFormat );
-			resolve();
-		});
+		console.log( this.format( log ) );
+
+		resolve();
 	}
 }
 

@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test }			= require( './../../../../../testing_suite' );
+const { assert, test }					= require( './../../../../../testing_suite' );
 const { LOG_LEVELS, Transport, Log }	= require( './../../../../../../server/components/logger/loggur' );
 
 /**

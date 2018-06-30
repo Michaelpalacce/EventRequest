@@ -103,32 +103,32 @@ class File extends Transport
 	 * @brief	Logs the log in a file
 	 *
 	 * @param	Log log
+	 * @param	Function resolve
+	 * @param	Function reject
 	 *
 	 * @return	Promise
 	 */
-	log( log )
+	_log( log, resolve, reject )
 	{
-		return new Promise( ( resolve, reject )=>{
-			if ( this.fileStream !== null )
-			{
-				let message	= this.format( log );
+		if ( this.fileStream !== null )
+		{
+			let message	= this.format( log );
 
-				this.fileStream.write( message + SYSTEM_EOL, 'utf8', ( err ) =>{
-					if ( err )
-					{
-						reject( err );
-					}
-					else
-					{
-						resolve();
-					}
-				});
-			}
-			else
-			{
-				reject( 'File stream is not opened' );
-			}
-		});
+			this.fileStream.write( message + SYSTEM_EOL, 'utf8', ( err ) =>{
+				if ( err )
+				{
+					reject( err );
+				}
+				else
+				{
+					resolve();
+				}
+			});
+		}
+		else
+		{
+			reject( 'File stream is not opened' );
+		}
 	}
 }
 
