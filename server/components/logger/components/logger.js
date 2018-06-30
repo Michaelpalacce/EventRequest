@@ -201,22 +201,18 @@ class Logger
 	getUniqueId()
 	{
 		return typeof this.serverName === 'string'
-				? this.serverName + '/' + this.uniqueId
+				? `${this.serverName}/${this.uniqueId}`
 				: this.uniqueId
 	}
 
 	/**
 	 * @brief	Logs the given data
 	 *
-	 * @details	If forced is set as true then the log will be logged immediately this is done mainly so we can log critical
-	 * 			errors
-	 *
 	 * @param	mixed log
-	 * @param	Boolean force
 	 *
 	 * @return	Promise
 	 */
-	log( log, force = false )
+	log( log )
 	{
 		log						= Log.getInstance( log );
 		let transportPromises	= [];
@@ -231,30 +227,18 @@ class Logger
 					return;
 				}
 
-				let transportSendCallback	= ( resolve, reject )=>{
-					let transportPromise	= transport.log( log );
-
-					transportPromise.then(()=>{
-						resolve();
-					});
-
-					transportPromise.catch(( err )=>{
-						console.log( 'here' );
-						reject( err );
-					});
-				};
-
 				let logPromise	= new Promise( ( resolve, reject )=>{
-					if ( force )
-					{
-						transportSendCallback( resolve, reject );
-					}
-					else
-					{
-						setImmediate(()=>{
-							transportSendCallback( resolve, reject );
+					setImmediate(()=>{
+						let transportPromise	= transport.log( log );
+
+						transportPromise.then(()=>{
+							resolve();
 						});
-					}
+
+						transportPromise.catch(( err )=>{
+							reject( err );
+						});
+					});
 				});
 
 				transportPromises.push( logPromise );

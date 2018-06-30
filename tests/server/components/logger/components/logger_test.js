@@ -1,8 +1,8 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test }						= require( './../../../../testing_suite' );
-const { Logger, LOG_LEVELS, Console, Transport }	= require( './../../../../../server/components/logger/loggur' );
+const { Mock, assert, test }							= require( './../../../../testing_suite' );
+const { Logger, LOG_LEVELS, Console, Transport, Log }	= require( './../../../../../server/components/logger/loggur' );
 
 /**
  * @brief	Constants
@@ -123,7 +123,7 @@ test({
 });
 
 test({
-	message	: 'Logger.constructor logLevel logs only up to given log level',
+	message	: 'Logger.log logs only up to given log level and always returns a promise',
 	test	: ( done )=>{
 		let TransportMock	= Mock( Transport );
 		let logged			= 0;
@@ -161,5 +161,48 @@ test({
 		}).catch(( err )=>{
 			done( err );
 		});
+	}
+});
+
+test({
+	message	: 'Logger.addTransport adds only a transport that is an instance of Transport',
+	test	: ( done )=>{
+		let logger	= new Logger( {}, 'id' );
+		assert.equal( logger.addTransport( new Console( { logLevel : 0 } ) ), true );
+		assert.equal( logger.addTransport( new Error() ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Logger.supports',
+	test	: ( done )=>{
+		let logger	= new Logger( {}, 'id' );
+
+		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.error, message	: '' } ) ), true );
+		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.warning, message	: '' } ) ), true );
+		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.notice, message	: '' } ) ), true );
+		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.info, message	: '' } ) ), true );
+		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.verbose, message	: '' } ) ), false );
+		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.debug, message	: '' } ) ), false );
+		assert.equal( logger.supports( 'Not an instance of Log' ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Logger.getUniqueId',
+	test	: ( done )=>{
+		let uniqueId	= 'id';
+		let serverName	= 'Test';
+		let logger		= new Logger( {}, uniqueId );
+
+		assert.equal( logger.getUniqueId(), uniqueId );
+		logger.serverName	= serverName;
+		assert.equal( logger.getUniqueId(), `${serverName}/${uniqueId}` );
+
+		done();
 	}
 });
