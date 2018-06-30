@@ -194,6 +194,18 @@ class Logger
 	}
 
 	/**
+	 * @brief	Returns a unique id to be set in the log
+	 *
+	 * @return	String
+	 */
+	getUniqueId()
+	{
+		return typeof this.serverName === 'string'
+				? this.serverName + '/' + this.uniqueId
+				: this.uniqueId
+	}
+
+	/**
 	 * @brief	Logs the given data
 	 *
 	 * @details	If forced is set as true then the log will be logged immediately this is done mainly so we can log critical
@@ -211,10 +223,7 @@ class Logger
 
 		if ( this.supports( log ) )
 		{
-			let uniqueServerId		= typeof this.serverName === 'string'
-									? this.serverName + '/' + this.uniqueId
-									: this.uniqueId;
-			log.setUniqueId( uniqueServerId );
+			log.setUniqueId( this.getUniqueId() );
 
 			this.transports.forEach( ( transport ) =>{
 				if ( ! transport.supports( log ) )
@@ -251,7 +260,8 @@ class Logger
 				transportPromises.push( logPromise );
 			});
 		}
-		else
+
+		if ( transportPromises.length === 0 )
 		{
 			// Do not reject the log if not supported
 			transportPromises.push( new Promise(( resolve, reject )=>{
