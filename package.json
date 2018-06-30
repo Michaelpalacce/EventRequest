@@ -36,5 +36,5 @@
   "scripts": {
     "test": "node ./tests/test_script.js"
   },
-  "version": "1.6.1"
+  "version": "1.6.2"
 }

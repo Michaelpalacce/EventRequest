@@ -95,6 +95,9 @@ class Transport
 	 */
 	log( log )
 	{
+		return new Promise(( resolve, reject )=>{
+			resolve();
+		});
 	}
 }
 

@@ -8,6 +8,7 @@ const serverTest				= require( './server/server_test' );
 const middlewareContainerTest	= require( './server/middleware_container_test' );
 const loggurTest				= require( './server/components/logger/loggur_test' );
 const logTest					= require( './server/components/logger/components/log_test' );
+const loggerTest				= require( './server/components/logger/components/logger_test' );
 const child_process				= require( 'child_process' );
 
 let spawnedServer				= child_process.spawn(

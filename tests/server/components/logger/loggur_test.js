@@ -141,7 +141,7 @@ test({
 	test	: ( done )=>{
 		let loggur		= helpers.getMockedLoggur();
 		let MockLogger	= Mock( Logger );
-		let logger		= new MockLogger();
+		let logger		= new MockLogger( {}, 'id' );
 		let logged		= 0;
 
 		logger._mock({

@@ -17,16 +17,15 @@ class Logger
 {
 	constructor( options = {}, uniqueId = false )
 	{
-		this.transports		= null;
-		this.logLevel		= null;
-		this.logLevels		= null;
-		this.capture		= null;
-		this.dieOnCapture	= null;
-
 		Object.defineProperty( this, 'uniqueId', {
 			writable	: false,
-			value		: uniqueId
+			value		: typeof uniqueId === 'string' ? uniqueId : false
 		});
+
+		if ( this.uniqueId === false )
+		{
+			throw new Error( 'Logger created without an uniqueId' );
+		}
 
 		this.sanitizeConfig( options );
 	}
@@ -118,12 +117,12 @@ class Logger
 					message	: err.stack
 				});
 
-				this.log( uncaughtExceptionLog, true );
-
-				if ( this.dieOnCapture )
-				{
-					process.exit( 1 );
-				}
+				this.log( uncaughtExceptionLog ).finally(()=>{
+					if ( this.dieOnCapture )
+					{
+						process.exit( 1 );
+					}
+				});
 			});
 		}
 	}
@@ -207,11 +206,11 @@ class Logger
 	 */
 	log( log, force = false )
 	{
-		log	= Log.getInstance( log );
+		log						= Log.getInstance( log );
+		let transportPromises	= [];
 
 		if ( this.supports( log ) )
 		{
-			let transportPromises	= [];
 			let uniqueServerId		= typeof this.serverName === 'string'
 									? this.serverName + '/' + this.uniqueId
 									: this.uniqueId;
@@ -223,33 +222,44 @@ class Logger
 					return;
 				}
 
-				if ( force )
-				{
-					// Log immediately
-					transport.log( log );
-					return;
-				}
+				let transportSendCallback	= ( resolve, reject )=>{
+					let transportPromise	= transport.log( log );
 
-				// Add log to the queue
-				let logPromise	= new Promise( ( resolve, reject )=>{
-					setImmediate( () => {
-						let transportPromise	= transport.log( log );
-
-						transportPromise.then(()=>{
-							resolve();
-						});
-
-						transportPromise.catch(( err )=>{
-							reject( err );
-						});
+					transportPromise.then(()=>{
+						resolve();
 					});
+
+					transportPromise.catch(( err )=>{
+						console.log( 'here' );
+						reject( err );
+					});
+				};
+
+				let logPromise	= new Promise( ( resolve, reject )=>{
+					if ( force )
+					{
+						transportSendCallback( resolve, reject );
+					}
+					else
+					{
+						setImmediate(()=>{
+							transportSendCallback( resolve, reject );
+						});
+					}
 				});
 
 				transportPromises.push( logPromise );
 			});
-
-			return Promise.all( transportPromises );
 		}
+		else
+		{
+			// Do not reject the log if not supported
+			transportPromises.push( new Promise(( resolve, reject )=>{
+				resolve();
+			}));
+		}
+
+		return Promise.all( transportPromises );
 	}
 }
 
