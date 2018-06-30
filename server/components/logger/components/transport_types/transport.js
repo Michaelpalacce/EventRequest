@@ -91,7 +91,7 @@ class Transport
 	 *
 	 * @param	Log log
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
 	log( log )
 	{

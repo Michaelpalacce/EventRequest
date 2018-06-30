@@ -185,22 +185,25 @@ class Tester
 	 */
 	finished()
 	{
-		this.consoleLogger.info( `Finished in: ${ ( Date.now() - this.start ) / 1000 }` );
-		this.consoleLogger.success( `There were ${this.successes.length} successful tests` );
-		this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` );
-		this.consoleLogger.warning( `There were ${this.skipped.length} skipped tests` );
-		this.consoleLogger.warning( `There were ${this.incomplete.length} incomplete tests` );
 		this.hasFinished	= true;
 
+		let logPromises		= [];
+
+		logPromises.push( this.consoleLogger.info( `Finished in: ${ ( Date.now() - this.start ) / 1000 }` ) );
+		logPromises.push( this.consoleLogger.success( `There were ${this.successes.length} successful tests` ) );
+		logPromises.push( this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` ) );
+		logPromises.push( this.consoleLogger.warning( `There were ${this.skipped.length} skipped tests` ) );
+		logPromises.push( this.consoleLogger.warning( `There were ${this.incomplete.length} incomplete tests` ) );
+
 		// Done so logging can occur by adding this to the end of the event loop
-		setImmediate(()=>{
+		Promise.all( logPromises ).then(()=>{
 			let errors	= '';
 			this.errors.forEach( ( value )=>{
 				errors	+= `\r\n${value.message} failed with: ${value.error} \r\n`;
 			});
 
 			this.callback( this.errors.length > 0 ? errors : false );
-		});
+		})
 	};
 
 	/**

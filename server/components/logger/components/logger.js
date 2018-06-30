@@ -149,7 +149,7 @@ class Logger
 						message	: log
 					});
 
-					this.log( log );
+					return this.log( log );
 				};
 			}
 		}
@@ -204,7 +204,7 @@ class Logger
 	 * @param	mixed log
 	 * @param	Boolean force
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
 	log( log, force = false )
 	{
@@ -212,27 +212,44 @@ class Logger
 
 		if ( this.supports( log ) )
 		{
-			let uniqueServerId	= typeof this.serverName === 'string'
-								? this.serverName + '/' + this.uniqueId
-								: this.uniqueId;
+			let transportPromises	= [];
+			let uniqueServerId		= typeof this.serverName === 'string'
+									? this.serverName + '/' + this.uniqueId
+									: this.uniqueId;
 			log.setUniqueId( uniqueServerId );
 
 			this.transports.forEach( ( transport ) =>{
-				if ( transport.supports( log ) )
+				if ( ! transport.supports( log ) )
 				{
-					// Add log to the queue
-					if ( force )
-					{
-						transport.log( log );
-					}
-					else
-					{
-						setImmediate( () => {
-							transport.log( log );
-						});
-					}
+					return;
 				}
+
+				if ( force )
+				{
+					// Log immediately
+					transport.log( log );
+					return;
+				}
+
+				// Add log to the queue
+				let logPromise	= new Promise( ( resolve, reject )=>{
+					setImmediate( () => {
+						let transportPromise	= transport.log( log );
+
+						transportPromise.then(()=>{
+							resolve();
+						});
+
+						transportPromise.catch(( err )=>{
+							reject( err );
+						});
+					});
+				});
+
+				transportPromises.push( logPromise );
 			});
+
+			return Promise.all( transportPromises );
 		}
 	}
 }

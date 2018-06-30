@@ -104,21 +104,31 @@ class File extends Transport
 	 *
 	 * @param	Log log
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
 	log( log )
 	{
-		if ( this.fileStream !== null )
-		{
-			let message	= this.format( log );
+		return new Promise( ( resolve, reject )=>{
+			if ( this.fileStream !== null )
+			{
+				let message	= this.format( log );
 
-			this.fileStream.write( message + SYSTEM_EOL, 'utf8', ( err ) =>{
-				if ( err )
-				{
-					console.error( 'Could not write to file' );
-				}
-			});
-		}
+				this.fileStream.write( message + SYSTEM_EOL, 'utf8', ( err ) =>{
+					if ( err )
+					{
+						reject( err );
+					}
+					else
+					{
+						resolve();
+					}
+				});
+			}
+			else
+			{
+				reject( 'File stream is not opened' );
+			}
+		});
 	}
 }
 

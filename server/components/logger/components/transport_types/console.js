@@ -100,11 +100,15 @@ class Console extends Transport
 	 *
 	 * @param	Log log
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
 	log( log )
 	{
-		console.log( this.format( log ) );
+		return new Promise( ( resolve, reject )=>{
+			let logFormat	= this.format( log );
+			console.log( logFormat );
+			resolve();
+		});
 	}
 }
 

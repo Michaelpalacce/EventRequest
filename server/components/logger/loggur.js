@@ -100,21 +100,24 @@ class Loggur
 	 *
 	 * @param	mixed data
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
 	log( data )
 	{
+		let loggersPromises	= [];
 		if ( Object.keys( this.loggers ).length !== 0 )
 		{
 			for ( let loggerId in this.loggers )
 			{
-				this.loggers[loggerId].log( data );
+				loggersPromises.push( this.loggers[loggerId].log( data ) );
 			}
 		}
 		else
 		{
-			this.getDefaultLogger().log( data );
+			loggersPromises.push( this.getDefaultLogger().log( data ) );
 		}
+
+		return Promise.all( loggersPromises );
 	}
 }
 

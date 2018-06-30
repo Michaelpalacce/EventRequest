@@ -24,15 +24,3 @@ test({
 		done();
 	}
 });
-
-test({
-	message	: 'Loggur constructor defaults',
-	test	: ( done )=>{
-		let loggur	= helpers.getMockedLoggur();
-		assert.deepStrictEqual( loggur.loggers, {} );
-		assert.deepStrictEqual( loggur.defaultLogger, null );
-		assert.deepStrictEqual( loggur.uniqueId, 'Master' );
-
-		done();
-	}
-});
