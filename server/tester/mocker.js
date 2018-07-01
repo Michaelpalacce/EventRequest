@@ -13,24 +13,24 @@ class Mocker
 		this.mockedMethod		= ()=>{};
 
 		this.method				= typeof mockMethodOptions.method === 'string'
-			? mockMethodOptions.method
-			: null;
+								? mockMethodOptions.method
+								: null;
 
 		this.withArguments		= Array.isArray( mockMethodOptions.with )
-			? mockMethodOptions.with
-			: [];
+								? mockMethodOptions.with
+								: [];
 
 		this.executionTimes		= typeof mockMethodOptions.called === 'number'
-			? mockMethodOptions.called
-			: null;
+								? mockMethodOptions.called
+								: null;
 
 		let shouldReturn		= typeof mockMethodOptions.shouldReturn !== 'undefined'
-			? mockMethodOptions.shouldReturn
-			: null;
+								? mockMethodOptions.shouldReturn
+								: null;
 
 		let onConsecutiveCalls	= Array.isArray( mockMethodOptions.onConsecutiveCalls )
-			? mockMethodOptions.onConsecutiveCalls
-			: null;
+								? mockMethodOptions.onConsecutiveCalls
+								: null;
 
 		if ( shouldReturn === null && onConsecutiveCalls === null )
 		{

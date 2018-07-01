@@ -33,7 +33,7 @@ helpers.clearUpTestFile	= ()=> {
  * @return	String
  */
 helpers.getTestFile	= ()=> {
-	return './fixture/testfile';
+	return './testfile';
 };
 
 /**
