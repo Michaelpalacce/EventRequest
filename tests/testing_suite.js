@@ -1,10 +1,12 @@
 'use strict';
 
 // Dependencies
-const { Tester, Mock, logger }						= require( './../server/tester/tester' );
+const { Tester, Mock, logger, Mocker }				= require( './../server/tester/tester' );
 const EventRequest									= require( './../server/event' );
 const querystring									= require( 'querystring' );
 const assert										= require( 'assert' );
+const fs											= require( 'fs' );
+const path											= require( 'path' );
 const { Loggur }									= require( './../server/components/logger/loggur' );
 const MockLoggur									= Mock( Loggur.constructor );
 let { IncomingMessage, ServerResponse, request }	= require( 'http' );
@@ -13,6 +15,33 @@ ServerResponse	= Mock( ServerResponse );
 IncomingMessage	= Mock( IncomingMessage );
 
 let helpers	= {};
+
+
+/**
+ * @brief	Deletes test file
+ *
+ * @return	Boolean
+ */
+helpers.clearUpTestFile	= ()=> {
+	try{
+		fs.unlinkSync( helpers.getTestFilePath() )
+	}
+	catch ( error ) {}
+};
+
+/**
+ * @return	String
+ */
+helpers.getTestFile	= ()=> {
+	return './fixture/testfile';
+};
+
+/**
+ * @return	String
+ */
+helpers.getTestFilePath	= ()=> {
+	return path.join( path.dirname( require.main.filename ), helpers.getTestFile() );
+};
 
 /**
  * @brief	Gets a mocked loggur class
@@ -100,6 +129,7 @@ let tester		= new Tester();
 module.exports	= {
 	Tester,
 	Mock,
+	Mocker,
 	assert,
 	logger,
 	helpers,

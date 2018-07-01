@@ -3,9 +3,9 @@
 const assert	= require( 'assert' );
 
 /**
- * @brief	Method mock. This class is responsible for mocking a method and attaching it to the mocked class
+ * @brief	Mocks methods of classes
  */
-class MethodMock
+class Mocker
 {
 	constructor( mockedClass, mockMethodOptions )
 	{
@@ -13,24 +13,24 @@ class MethodMock
 		this.mockedMethod		= ()=>{};
 
 		this.method				= typeof mockMethodOptions.method === 'string'
-								? mockMethodOptions.method
-								: null;
+			? mockMethodOptions.method
+			: null;
 
 		this.withArguments		= Array.isArray( mockMethodOptions.with )
-								? mockMethodOptions.with
-								: [];
+			? mockMethodOptions.with
+			: [];
 
 		this.executionTimes		= typeof mockMethodOptions.called === 'number'
-								? mockMethodOptions.called
-								: null;
+			? mockMethodOptions.called
+			: null;
 
 		let shouldReturn		= typeof mockMethodOptions.shouldReturn !== 'undefined'
-								? mockMethodOptions.shouldReturn
-								: null;
+			? mockMethodOptions.shouldReturn
+			: null;
 
 		let onConsecutiveCalls	= Array.isArray( mockMethodOptions.onConsecutiveCalls )
-								? mockMethodOptions.onConsecutiveCalls
-								: null;
+			? mockMethodOptions.onConsecutiveCalls
+			: null;
 
 		if ( shouldReturn === null && onConsecutiveCalls === null )
 		{
@@ -107,17 +107,21 @@ class MethodMock
 	 */
 	attachMockedMethod()
 	{
-		if ( typeof this.mockedClass[this.method] === 'undefined' )
+		let prototypeSpider	= typeof this.mockedClass.prototype === 'undefined'
+							? this.mockedClass
+							: this.mockedClass.prototype;
+
+		if ( typeof prototypeSpider[this.method] === 'undefined' )
 		{
 			throw new Error( 'Trying to mock a method that does not exist.' );
 		}
-		else if ( typeof this.mockedClass[this.method] === 'function' )
+		else if ( typeof prototypeSpider[this.method] === 'function' )
 		{
-			this.mockedClass[this.method]	= this.mockedMethod;
+			prototypeSpider[this.method]	= this.mockedMethod;
 		}
 		else
 		{
-			this.mockedClass[this.method]	= this.getNextExecutionFunction( [] );
+			prototypeSpider[this.method]	= this.getNextExecutionFunction( [] );
 		}
 	}
 
@@ -163,34 +167,7 @@ class MethodMock
 	}
 }
 
-/**
- * @brief	Used to create a MockedObject
- *
- * @param	Object objectToMock
- *
- * @return	MockedClass
- */
-let Mock	= function ( objectToMock )
-{
-	class MockedClass extends objectToMock
-	{
-		/**
-		 * @brief	Method used to mock other methods
-		 *
-		 * @param	Object mockMethodOptions
-		 *
-		 * @return	MockedClass
-		 */
-		_mock( mockMethodOptions )
-		{
-			let methodMock	= new MethodMock( this, mockMethodOptions );
-			methodMock.attachMockedMethod();
-
-			return this;
-		}
-	}
-
-	return MockedClass;
+module.exports	= ( classToMock, mockMethodOptions )=>{
+	let methodMock	= new Mocker( classToMock, mockMethodOptions );
+	methodMock.attachMockedMethod();
 };
-
-module.exports	= Mock;

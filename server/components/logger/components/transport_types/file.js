@@ -44,10 +44,6 @@ class File extends Transport
 		if ( this.filePath )
 		{
 			this.fileStream	= this.getWriteStream( this.filePath );
-
-			this.fileStream.on( 'finish', () => {
-				this.fileStream	= null;
-			});
 		}
 	}
 

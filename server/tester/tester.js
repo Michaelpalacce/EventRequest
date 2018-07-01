@@ -3,7 +3,8 @@
 // Dependencies
 const assert				= require( 'assert' );
 const { Console, Loggur }	= require( '../components/logger/loggur' );
-const Mock					= require( './mocker' );
+const Mock					= require( './mock' );
+const Mocker				= require( './mocker' );
 
 /**
  * @brief	Constants
@@ -330,6 +331,7 @@ let tester		= new Tester();
 module.exports	= {
 	Tester,
 	Mock,
+	Mocker,
 	logger			: tester.consoleLogger,
 	test			: tester.addTest.bind( tester ),
 	runAllTests		: tester.runAllTests.bind( tester )
