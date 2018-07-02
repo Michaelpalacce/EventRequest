@@ -226,11 +226,11 @@ class MemoryDataServer extends DataServer
 	}
 
 	/**
-	 * @see	DataServer::update()
+	 * @see	DataServer::touch()
 	 */
-	update( namespace, recordName, data = {}, options = {} )
+	touch( namespace, recordName, options = { ttl : 0 } )
 	{
-		return this.doCommand( 'update', { namespace, recordName, data, options } );
+		return this.doCommand( 'touch', { namespace, recordName, options } );
 	}
 
 	/**
@@ -239,6 +239,14 @@ class MemoryDataServer extends DataServer
 	read( namespace, recordName, options = {} )
 	{
 		return this.doCommand( 'read', { namespace, recordName, options } );
+	}
+
+	/**
+	 * @see	DataServer::update()
+	 */
+	update( namespace, recordName, data = {}, options = {} )
+	{
+		return this.doCommand( 'update', { namespace, recordName, data, options } );
 	}
 
 	/**

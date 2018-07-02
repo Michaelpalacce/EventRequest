@@ -199,3 +199,139 @@ test({
 		});
 	}
 });
+
+test({
+	message	: 'MemoryDataServer.touch increases ttl',
+	test	: ( done )=>{
+		helpers.setUpTestNamespace( testServer, ( err )=>{
+			if ( err )
+			{
+				done( err );
+				return;
+			}
+
+			testServer.create( 'test', 'testRecord', { testKey: 'testValue' }, { ttl : 400 } ).then(()=>{
+				setTimeout(()=>{
+					testServer.exists( 'test', 'testRecord' ).then(( exists )=>{
+						assert.equal( exists, true );
+						done();
+					})
+				}, 500 );
+
+				testServer.touch( 'test', 'testRecord', { ttl : 1000 } ).then().catch( done );
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'MemoryDataServer.read gets data',
+	test	: ( done )=>{
+		helpers.setUpTestNamespace( testServer, ( err )=>{
+			if ( err )
+			{
+				done( err );
+				return;
+			}
+
+			let dataToWrite	= { testKey: 'testValue' };
+
+			testServer.create( 'test', 'testRecord', dataToWrite, { ttl : 1000 } ).then(()=>{
+				testServer.read( 'test', 'testRecord' ).then(( data )=>{
+					assert.deepStrictEqual( data, dataToWrite );
+					done();
+				}).catch( done );
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'MemoryDataServer.update updates data',
+	test	: ( done )=>{
+		helpers.setUpTestNamespace( testServer, ( err )=>{
+			if ( err )
+			{
+				done( err );
+				return;
+			}
+
+			let dataToWrite		= { testKey : 'testValue' };
+			let dataToUpdate	= { testKeyTwo : 'testValueTwo' };
+
+			testServer.create( 'test', 'testRecord', dataToWrite, { ttl : 1000 } ).then(()=>{
+				testServer.update( 'test', 'testRecord', dataToUpdate, { ttl : 1000 } ).then(()=>{
+					testServer.read( 'test', 'testRecord' ).then(( data )=>{
+						assert.deepStrictEqual( data, dataToUpdate );
+						done();
+					}).catch( done )
+				}).catch( done );
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'MemoryDataServer.delete deletes data',
+	test	: ( done )=>{
+		helpers.setUpTestNamespace( testServer, ( err )=>{
+			if ( err )
+			{
+				done( err );
+				return;
+			}
+
+			let dataToWrite	= { testKey : 'testValue' };
+
+			testServer.create( 'test', 'testRecord', dataToWrite, { ttl : 1000 } ).then(()=>{
+				testServer.delete( 'test', 'testRecord' ).then(()=>{
+					testServer.exists( 'test', 'testRecord' ).then(( exists )=>{
+						assert.equal( exists, false );
+						done();
+					}).catch( done )
+				}).catch( done );
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'MemoryDataServer.getAll returns all data',
+	test	: ( done )=>{
+		helpers.setUpTestNamespace( testServer, ( err )=>{
+			if ( err )
+			{
+				done( err );
+				return;
+			}
+
+			let dataToWrite		= { testKey : 'testValue' };
+			let expectedData	= { testRecord : dataToWrite };
+
+			testServer.create( 'test', 'testRecord', dataToWrite, { ttl : 1000 } ).then(()=>{
+				testServer.getAll( 'test' ).then(( data )=>{
+					assert.deepStrictEqual( data, expectedData );
+					done();
+				}).catch( done );
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'MemoryDataServer.getAll returns all data',
+	test	: ( done )=>{
+		helpers.setUpTestNamespace( testServer, ( err )=>{
+			if ( err )
+			{
+				done( err );
+				return;
+			}
+
+			testServer.exit().then(( data )=>{
+				assert.equal( data, 'ok' );
+				done();
+			}).catch( done );
+		});
+	}
+});

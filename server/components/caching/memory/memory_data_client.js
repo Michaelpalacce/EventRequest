@@ -17,6 +17,7 @@ const REMOVE_NAMESPACE		= 'removeNamespace';
 const GET_ALL_NAMESPACE		= 'getAll';
 const CREATE_DATA_RECORD	= 'create';
 const EXISTS_DATA_RECORD	= 'exists';
+const TOUCH_DATA_RECORD		= 'touch';
 const UPDATE_DATA_RECORD	= 'update';
 const READ_DATA_RECORD		= 'read';
 const DELETE_DATA_RECORD	= 'delete';
@@ -131,7 +132,7 @@ class MemoryWorker
 
 			case EXIT:
 				this.server.close();
-				callback( false, 'Caching server is exiting' );
+				callback( false, 'ok' );
 				process.exit( 1 );
 				break;
 
@@ -157,6 +158,10 @@ class MemoryWorker
 
 			case EXISTS_DATA_RECORD:
 				this.exists( args, callback );
+				break;
+
+			case TOUCH_DATA_RECORD:
+				this.touch( args, callback );
 				break;
 
 			case UPDATE_DATA_RECORD:
@@ -287,6 +292,26 @@ class MemoryWorker
 	}
 
 	/**
+	 * @see	DataServer::touch()
+	 */
+	touch( args, callback )
+	{
+		this.executeInternalCommand( 'exists', args, ( err, exists ) => {
+			if ( ! err && exists )
+			{
+				let { namespace, recordName } = args;
+
+				this.addTimeoutToData( namespace, recordName, this.getTTL( args ) );
+				callback( false );
+			}
+			else
+			{
+				callback( new Error( 'Record does not exist' ) );
+			}
+		});
+	}
+
+	/**
 	 * @see	DataServer::create()
 	 */
 	create( args, callback )
@@ -400,11 +425,12 @@ class MemoryWorker
 	{
 		this.clearTimeoutFromData( namespace, recordName );
 
-		console.log( ttl );
 		if ( ttl > 0 )
 		{
+			console.log( ttl );
 			let keyPair	= namespace + recordName;
 			this.timeouts[keyPair]	= setTimeout( () => {
+				console.log( 'DELETING', namespace, recordName );
 				if ( typeof this.data[namespace] !== 'undefined' )
 				{
 					delete this.data[namespace][recordName];
@@ -427,7 +453,7 @@ class MemoryWorker
 	{
 		let keyPair	= namespace + recordName;
 
-		clearInterval( this.timeouts[keyPair] );
+		clearTimeout( this.timeouts[keyPair] );
 		delete this.timeouts[keyPair];
 	}
 

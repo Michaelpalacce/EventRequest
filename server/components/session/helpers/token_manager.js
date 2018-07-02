@@ -108,7 +108,7 @@ class TokenManager
 			let ttl			= this.tokenExpiration;
 			token.expires	= Date.now() + ttl;
 
-			this.cachingServer.update( TOKEN_NAMESPACE, sid, token ).then(()=>{
+			this.cachingServer.update( TOKEN_NAMESPACE, sid, token, { ttl } ).then(()=>{
 				callback( false, sidData );
 			}).catch( callback );
 		}).catch( callback );
