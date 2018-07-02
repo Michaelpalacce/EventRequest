@@ -1,11 +1,9 @@
 'use strict';
 
-const net			= require( 'net' );
-const path			= require( 'path' );
+const net	= require( 'net' );
 
-const PIPE_NAME		= path.join( __dirname, 'memory_data_client.js' );
 // Test if it works on linux?
-const PIPE_PATH		= "\\\\.\\pipe\\" + PIPE_NAME;
+const PIPE_PATH	= "\\\\.\\pipe\\" + __filename;
 
 /**
  * @brief	Constants
@@ -59,7 +57,7 @@ class MemoryWorker
 				}
 
 				this.processCommand( chunk, ( error, data ) => {
-					error			= typeof error !== 'undefined' ? error : true;
+					error			= typeof error !== 'undefined' ? error : 'Internal error';
 					error			= error instanceof Error ? error.stack : error;
 					data			= typeof data !== 'undefined' ? data : {};
 
@@ -379,7 +377,7 @@ class MemoryWorker
 				this.data[namespace]	= {};
 			}
 
-			callback( err === true );
+			callback( err === true ? new Error( 'Could not create namespace since it probably exists already' ) : false );
 		});
 	};
 
@@ -404,7 +402,7 @@ class MemoryWorker
 					});
 					delete this.data[namespace];
 
-					callback( false, this.data );
+					callback( false );
 				}
 				else
 				{
@@ -472,4 +470,4 @@ class MemoryWorker
 	}
 }
 
-let memoryWorker	= new MemoryWorker();
+new MemoryWorker();

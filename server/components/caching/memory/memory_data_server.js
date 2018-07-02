@@ -29,30 +29,37 @@ class MemoryDataServer extends DataServer
 	/**
 	 * @brief	Creates a new instance of the memory_data_client if needed
 	 *
-	 * @param	Function callback
-	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	forkClient( callback )
+	forkClient()
 	{
-		let spawnedClient	= fork( path.join( __dirname, './memory_data_client' ), [], {
-			cwd	: undefined,
-			env	: process.env,
-		});
+		return new Promise( ( resolve, reject )=>{
+			let spawnedClient	= fork( path.join( __dirname, './memory_data_client.js' ), [], {
+				cwd	: undefined,
+				env	: process.env,
+			});
 
-		spawnedClient.on( 'error', ( err )=>{
-			callback( err );
-		});
+			spawnedClient.on( 'error', ( err )=>{
+				reject( err );
+			});
 
-		spawnedClient.on( 'message', ( message )=>{
-			if ( ! message.status )
-			{
-				this.doCommand( 'setUp', {}, callback );
-			}
-			else
-			{
-				callback( message.status );
-			}
+			spawnedClient.on( 'message', ( message )=>{
+				if ( ! message.error )
+				{
+					let onFulfilled	= ( data )=>{
+						resolve( data );
+					};
+					let onRejected	= ( err )=>{
+						reject( err );
+					};
+
+					this.doCommand( 'setUp', {} ).then( onFulfilled, onRejected );
+				}
+				else
+				{
+					reject( message.error );
+				}
+			});
 		});
 	}
 
@@ -104,9 +111,9 @@ class MemoryDataServer extends DataServer
 	/**
 	 * @see	DataServer::setUp()
 	 */
-	setUp( options = {}, callback = ()=>{} )
+	setUp( options = {} )
 	{
-		this.ping( options, callback );
+		return this.ping( options );
 	}
 
 	/**
@@ -115,26 +122,34 @@ class MemoryDataServer extends DataServer
 	 * @param	Object options
 	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	ping( options = {}, callback = ()=>{} )
+	ping( options = {} )
 	{
-		this.doCommand( 'ping', {}, ( err, data ) => {
-			if ( err || data !== 'pong' )
-			{
+		return new Promise( ( resolve, reject )=>{
+
+			let onFulfilled	= ( data )=>{
+				resolve( data );
+			};
+			let onRejected	= ( err )=>{
 				if ( cluster.isMaster )
 				{
-					this.forkClient( callback )
+					let onFulfilled	= ( data )=>{
+						resolve( data );
+					};
+					let onRejected	= ( err )=>{
+						reject( err );
+					};
+
+					this.forkClient().then( onFulfilled, onRejected );
 				}
 				else
 				{
-					callback( false, 'Worker found caching server' );
+					resolve( 'Worker found caching server' );
 				}
-			}
-			else
-			{
-				callback( err, data );
-			}
+			};
+
+			this.doCommand( 'ping', options ).then( onFulfilled, onRejected );
 		});
 	}
 
@@ -144,113 +159,118 @@ class MemoryDataServer extends DataServer
 	 * @param	String command
 	 * @param	Object args
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	doCommand( command, args, callback )
+	doCommand( command, args )
 	{
 		command	= typeof command === 'string' ? command : false;
 		args	= typeof args === 'object' ? args : false;
-		if ( typeof callback !== 'function' )
-		{
-			throw new Error( 'Callback must be provided' );
-		}
 
 		command	= { command, args };
 
-		this.command( command, ( response ) =>{
-			response.error	= typeof response.error !== 'undefined' ? response.error : true;
-			response.data	= typeof response.data !== 'undefined' ? response.data : {};
+		return new Promise( ( resolve, reject )=>{
+			this.command( command, ( response ) =>{
+				response.error	= typeof response.error !== 'undefined' ? response.error : true;
+				response.data	= typeof response.data !== 'undefined' ? response.data : {};
 
-			callback( response.error, response.data );
+				if ( response.error !== false )
+				{
+					reject( response.error );
+				}
+				else
+				{
+					resolve( response.data );
+				}
+			});
 		});
 	}
 
 	/**
 	 * @see	DataServer::createNamespace()
 	 */
-	createNamespace( namespace, options = {}, callback = ()=>{} )
+	createNamespace( namespace, options = {} )
 	{
-		this.doCommand( 'createNamespace', { namespace, options  }, callback );
+		return this.doCommand( 'createNamespace', { namespace, options } );
 	}
 
 	/**
 	 * @see	DataServer::existsNamespace()
 	 */
-	existsNamespace( namespace, options = {}, callback = ()=>{} )
+	existsNamespace( namespace, options = {} )
 	{
-		this.doCommand( 'existsNamespace', { namespace, options  }, callback );
+		return this.doCommand( 'existsNamespace', { namespace, options } );
 	}
 
 	/**
 	 * @see	DataServer::removeNamespace()
 	 */
-	removeNamespace( namespace, options = {}, callback = null )
+	removeNamespace( namespace, options = {} )
 	{
-		this.doCommand( 'removeNamespace', { namespace, options  }, callback );
+		return this.doCommand( 'removeNamespace', { namespace, options } );
 	}
 
 	/**
 	 * @see	DataServer::create()
 	 */
-	create( namespace, recordName, data = {}, options = {}, callback = ()=>{} )
+	create( namespace, recordName, data = {}, options = {} )
 	{
-		this.doCommand( 'create', { namespace, recordName, data, options }, callback );
+		return this.doCommand( 'create', { namespace, recordName, data, options } );
 	}
 
 	/**
 	 * @see	DataServer::exists()
 	 */
-	exists( namespace, recordName, options = {}, callback = ()=>{} )
+	exists( namespace, recordName, options = {} )
 	{
-		this.doCommand( 'exists', { namespace, recordName, options }, callback );
+		return this.doCommand( 'exists', { namespace, recordName, options } );
 	}
 
 	/**
 	 * @see	DataServer::touch()
 	 */
-	touch( namespace, recordName, options = {}, callback = ()=>{} )
+	touch( namespace, recordName, options = {} )
 	{
-		this.doCommand( 'touch', { namespace, recordName, options }, callback );
+		return this.doCommand( 'touch', { namespace, recordName, options } );
 	}
 
 	/**
 	 * @see	DataServer::update()
 	 */
-	update( namespace, recordName, data = {}, options = {}, callback = null )
+	update( namespace, recordName, data = {}, options = {} )
 	{
-		this.doCommand( 'update', { namespace, recordName, data, options }, callback );
+		return this.doCommand( 'update', { namespace, recordName, data, options } );
 	}
 
 	/**
 	 * @see	DataServer::read()
 	 */
-	read( namespace, recordName, options = {}, callback = null )
+	read( namespace, recordName, options = {} )
 	{
-		this.doCommand( 'read', { namespace, recordName, options }, callback );
+		return this.doCommand( 'read', { namespace, recordName, options } );
 	}
 
 	/**
 	 * @see	DataServer::delete()
 	 */
-	delete( namespace, recordName, options = {}, callback = null )
+	delete( namespace, recordName, options = {} )
 	{
-		this.doCommand( 'delete', { namespace, recordName, options }, callback );
+		return this.doCommand( 'delete', { namespace, recordName, options } );
 	}
 
 	/**
 	 * @see	DataServer::getAll()
 	 */
-	getAll( namespace, options = {}, callback = null )
+	getAll( namespace, options = {} )
 	{
-		this.doCommand( 'getAll', { namespace, options }, callback );
+		return this.doCommand( 'getAll', { namespace, options } );
 	}
 
 	/**
 	 * @see	DataServer::exit()
 	 */
-	exit( options = {}, callback = null )
+	exit( options = {} )
 	{
-		this.doCommand( 'exit', { options }, callback );
+		return this.doCommand( 'exit', { options } );
 	}
 }
 

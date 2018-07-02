@@ -42,11 +42,10 @@ class DataServer
 	 * @details	Any connections to external sources should be done here if needed
 	 *
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	setUp( options = {}, callback = null )
+	setUp( options = {} )
 	{
 	}
 
@@ -54,11 +53,10 @@ class DataServer
 	 * @brief	Disconnects from the data server
 	 *
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	exit( options = {}, callback = null )
+	exit( options = {} )
 	{
 	}
 
@@ -69,11 +67,10 @@ class DataServer
 	 *
 	 * @param	String namespace
 	 * @param	String options
-	 * @param	String callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	createNamespace( namespace, options = {}, callback = null )
+	createNamespace( namespace, options = {} )
 	{
 	}
 
@@ -84,11 +81,10 @@ class DataServer
 	 *
 	 * @param	String namespace
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	existsNamespace( namespace, options = {}, callback = null )
+	existsNamespace( namespace, options = {} )
 	{
 	}
 
@@ -99,11 +95,10 @@ class DataServer
 	 *
 	 * @param	String namespace
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	removeNamespace( namespace, options = {}, callback = null )
+	removeNamespace( namespace, options = {} )
 	{
 	}
 
@@ -114,11 +109,10 @@ class DataServer
 	 * @param	String recordName
 	 * @param	mixed data
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	create( namespace, recordName, data = {}, options = {}, callback = null )
+	create( namespace, recordName, data = {}, options = {} )
 	{
 	}
 
@@ -128,11 +122,10 @@ class DataServer
 	 * @param	String namespace
 	 * @param	String recordName
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	exists( namespace, recordName, options = {}, callback = null )
+	exists( namespace, recordName, options = {} )
 	{
 	}
 
@@ -142,9 +135,10 @@ class DataServer
 	 * @param	String namespace
 	 * @param	String recordName
 	 * @param	Object options
-	 * @param	Function callback
+	 *
+	 * @return	Promise
 	 */
-	touch( namespace, recordName, options = {}, callback = null )
+	touch( namespace, recordName, options = {} )
 	{
 	}
 
@@ -155,11 +149,10 @@ class DataServer
 	 * @param	String recordName
 	 * @param	mixed data
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	update( namespace, recordName, data = {}, options = {}, callback = null )
+	update( namespace, recordName, data = {}, options = {} )
 	{
 	}
 
@@ -169,11 +162,10 @@ class DataServer
 	 * @param	String namespace
 	 * @param	String recordName
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	read( namespace, recordName, options = {}, callback = null )
+	read( namespace, recordName, options = {} )
 	{
 	}
 
@@ -183,11 +175,10 @@ class DataServer
 	 * @param	String namespace
 	 * @param	String recordName
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	delete( namespace, recordName, options = {}, callback = null )
+	delete( namespace, recordName, options = {} )
 	{
 	}
 
@@ -196,11 +187,10 @@ class DataServer
 	 *
 	 * @param	String namespace
 	 * @param	Object options
-	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	getAll( namespace, options = {}, callback = null )
+	getAll( namespace, options = {} )
 	{
 	}
 }

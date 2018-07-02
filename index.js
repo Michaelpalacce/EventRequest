@@ -259,13 +259,11 @@ class Server
 	/**
 	 * @brief	Sets up the caching server
 	 *
-	 * @param	Function callback
-	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	setUpCachingServer( callback )
+	setUpCachingServer()
 	{
-		this.cachingServer.setUp( this.cachingServerOptions, ( err, data ) =>{ callback( err, data ); });
+		return this.cachingServer.setUp( this.cachingServerOptions );
 	}
 
 	/**
@@ -279,14 +277,11 @@ class Server
 	{
 		callback	= typeof callback === 'function' ? callback : ()=>{};
 
-		this.setUpCachingServer( ( err ) =>{
-			if ( err )
-			{
-				Loggur.log({
-					level	: LOG_LEVELS.error,
-					message	: err
-				});
-			}
+		this.setUpCachingServer().then(()=>{}).catch(( err )=>{
+			Loggur.log({
+				level	: LOG_LEVELS.error,
+				message	: err
+			});
 		});
 
 		this.cluster.startCluster( this.clusters, callback );
@@ -299,14 +294,11 @@ class Server
 	 */
 	stop()
 	{
-		this.cachingServer.exit( {}, ( err, data )=>{
-			if ( err )
-			{
-				Loggur.log({
-					level	: LOG_LEVELS.error,
-					message	: data
-				});
-			}
+		this.cachingServer.exit( {} ).then(()=>{},( err )=>{
+			Loggur.log({
+				level	: LOG_LEVELS.error,
+				message	: err
+			});
 		});
 
 		this.cluster.stopClusters();

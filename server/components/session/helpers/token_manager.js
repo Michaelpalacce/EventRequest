@@ -38,11 +38,8 @@ class TokenManager
 	 */
 	setUpNamespace()
 	{
-		this.cachingServer.createNamespace( TOKEN_NAMESPACE, {}, ( err ) =>{
-			if ( err )
-			{
-				throw new Error( 'Could not create Namespace' );
-			}
+		this.cachingServer.createNamespace( TOKEN_NAMESPACE ).catch(()=>{
+			throw new Error( 'Could not create Namespace' );
 		});
 	}
 
@@ -65,16 +62,11 @@ class TokenManager
 			expires			: Date.now() + ttl
 		};
 
-		this.cachingServer.create( TOKEN_NAMESPACE, sid, tokenData, { ttl }, ( err ) => {
-			if ( ! err )
-			{
-				event.setHeader( 'Set-Cookie', [ name + '=' + sid] );
-				callback( false, tokenData );
-			}
-			else
-			{
-				callback( err );
-			}
+		this.cachingServer.create( TOKEN_NAMESPACE, sid, tokenData, { ttl } ).then(()=>{
+			event.setHeader( 'Set-Cookie', [ name + '=' + sid] );
+			callback( false, tokenData );
+		}).catch(( err )=>{
+			callback( err )
 		});
 	}
 
@@ -88,23 +80,16 @@ class TokenManager
 	 */
 	isExpired( sid, callback )
 	{
-		this.cachingServer.read( TOKEN_NAMESPACE, sid, {}, ( err, sidData ) => {
-			if ( ! err && sidData )
+		this.cachingServer.read( TOKEN_NAMESPACE, sid, {} ).then(( sidData )=>{
+			if ( sidData.expires > Date.now() )
 			{
-				if ( sidData.expires > Date.now() )
-				{
-					callback( false, sidData )
-				}
-				else
-				{
-					callback( true );
-				}
+				callback( false, sidData )
 			}
 			else
 			{
 				callback( true );
 			}
-		});
+		}).catch( callback );
 	};
 
 	/**
@@ -119,28 +104,14 @@ class TokenManager
 	{
 		let sid	= token.sessionId;
 
-		this.cachingServer.read( TOKEN_NAMESPACE, sid, {}, ( err, sidData ) => {
-			if ( ! err && sidData )
-			{
-				let ttl			= this.tokenExpiration;
-				token.expires	= Date.now() + ttl;
+		this.cachingServer.read( TOKEN_NAMESPACE, sid, {} ).then(( sidData )=>{
+			let ttl			= this.tokenExpiration;
+			token.expires	= Date.now() + ttl;
 
-				this.cachingServer.update( TOKEN_NAMESPACE, sid, token, { ttl }, ( err ) => {
-					if ( err )
-					{
-						callback( err );
-					}
-					else
-					{
-						callback( false, sidData );
-					}
-				});
-			}
-			else
-			{
-				callback( true );
-			}
-		});
+			this.cachingServer.update( TOKEN_NAMESPACE, sid, token ).then(()=>{
+				callback( false, sidData );
+			}).catch( callback );
+		}).catch( callback );
 	};
 }
 

@@ -16,6 +16,41 @@ IncomingMessage	= Mock( IncomingMessage );
 
 let helpers	= {};
 
+/**
+ * @brief	Sets up the test namespace for the given caching server
+ *
+ * @param	DataServer server
+ * @param	Function callback
+ *
+ * @return	void
+ */
+helpers.setUpTestNamespace	= ( server, callback )=>{
+	helpers.removeTestNamespace( server, ( err )=>{
+		if ( ! err )
+		{
+			server.createNamespace( 'test', {} ).then( ()=>{
+				callback( false )
+			}).catch( callback );
+		}
+		else
+		{
+			callback( err );
+		}
+	});
+};
+/**
+ * @brief	Removes the test namespace for the given caching server
+ *
+ * @param	DataServer server
+ * @param	Function callback
+ *
+ * @return	void
+ */
+helpers.removeTestNamespace	= ( server, callback )=>{
+	server.removeNamespace( 'test', {} ).then( ()=>{
+		callback( false )
+	}).catch( callback );
+};
 
 /**
  * @brief	Deletes test file

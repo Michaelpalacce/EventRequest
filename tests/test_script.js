@@ -1,6 +1,6 @@
 'use strict';
 
-const { test, runAllTests }		= require( './testing_suite' );
+const { runAllTests }			= require( './testing_suite' );
 const eventTest					= require( './server/event_test' );
 const routeTest					= require( './server/route_test' );
 const routerTest				= require( './server/router_test' );
@@ -37,6 +37,10 @@ runAllTests({
 		if ( err )
 		{
 			throw new Error( err );
+		}
+		else
+		{
+			process.exit( 0 );
 		}
 	}
 });
