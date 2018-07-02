@@ -3,18 +3,25 @@
 const { assert, Mock, test, helpers }	= require( './../testing_suite' );
 const middlewareContainer				= require( './../../server/middleware_container' );
 const Router							= require( './../../server/router' );
-const DataServer						= require( './../../server/components/caching/data_server' );
+const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );
 const ErrorHandler						= require( './../../server/components/error_handler' );
 const MultipartFormParser				= require( './../../server/components/body_parsers/multipart_data_parser' );
 const TemplatingEngine					= require( './../../server/components/templating_engine' );
 const BaseTemplatingEngine				= require( './../../server/components/templating_engines/base_templating_engine' );
 const { Loggur, Logger }				= require( './../../server/components/logger/loggur' );
 
-class TestDataServer extends DataServer
+class TestDataServer extends MemoryDataServer
 {
 	constructor( options )
 	{
 		super( options );
+	}
+
+	doCommand()
+	{
+		return new Promise(( resolve, reject )=>{
+			resolve( true );
+		})
 	}
 
 	sanitize( options ) {}
