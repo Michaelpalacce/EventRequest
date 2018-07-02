@@ -36,10 +36,12 @@ Includes:
 	Router,				// The router. Can be used to add routes to it and then to the main server route
 	TemplatingEngine,	// Instance to be extended if you want to create your own templating engine
 	ErrorHandler,		// Error handler to extend if you want to create a custom error handler
+	SessionHandler,		// Session handler to be extended by other security modules
+	BodyParserHandler,	// Body parser handler that contains the different body parsers
 	DataServer,			// Instance to be extended to implement your own DataServer
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ), 
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test ) 
-	Loggur
+	Logging
 
 # Server Options
 

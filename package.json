@@ -1,27 +1,27 @@
 {
-  "_from": "event_request@1.5.8",
-  "_id": "event_request@1.5.8",
+  "_from": "event_request@1.6.6",
+  "_id": "event_request@1.6.6",
   "_inBundle": false,
-  "_integrity": "sha512-mywnF33CTdx6NJO8tyokmnnmCkhIiOIqVCIfSm7abpzyJEFrLdz6v65jSSXc8zxUE1GdIsRO0wYShlRB6aBa4g==",
+  "_integrity": "sha512-oYT91gPkQr0gDXas3qfL9ek9fCmro0sDOx2VS4VC3rbbcEMDGFTroACqoFki4Yo+D7ltMXCCZaFlUo/8K7/NCQ==",
   "_location": "/event_request",
   "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "event_request@1.5.8",
+    "raw": "event_request@1.6.6",
     "name": "event_request",
     "escapedName": "event_request",
-    "rawSpec": "1.5.8",
+    "rawSpec": "1.6.6",
     "saveSpec": null,
-    "fetchSpec": "1.5.8"
+    "fetchSpec": "1.6.6"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/event_request/-/event_request-1.5.8.tgz",
-  "_shasum": "5f408b3b12406acdf00b922a3df11472489da7c5",
-  "_spec": "event_request@1.5.8",
+  "_resolved": "https://registry.npmjs.org/event_request/-/event_request-1.6.6.tgz",
+  "_shasum": "45610dfc1480c231ae29977c057f3b158cf4c2c5",
+  "_spec": "event_request@1.6.6",
   "_where": "D:\\JS\\Storage",
   "author": {
     "name": "Stefan Genov"
@@ -36,5 +36,5 @@
   "scripts": {
     "test": "node ./tests/test_script.js"
   },
-  "version": "1.6.6"
+  "version": "1.6.7"
 }

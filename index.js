@@ -8,11 +8,14 @@ const cluster					= require( 'cluster' );
 const RequestEvent				= require( './server/event' );
 const Router					= require( './server/router' );
 const ErrorHandler				= require( './server/components/error_handler' );
+const SessionHandler			= require( './server/components/session_handler' );
+const BodyParserHandler			= require( './server/components/body_parser_handler' );
 const middlewaresContainer		= require( './server/middleware_container' );
 const TemplatingEngine			= require( './server/components/templating_engine' );
 const Cluster					= require( './server/components/cluster/cluster' );
 const CommunicationManager		= require( './server/components/cluster/communication_manager' );
-const { Loggur, LOG_LEVELS }	= require( './server/components/logger/loggur' );
+const Logging					= require( './server/components/logger/loggur' );
+const { Loggur, LOG_LEVELS }	= Logging;
 const DataServer				= require( './server/components/caching/data_server' );
 const MemoryDataServer			= require( './server/components/caching/memory/memory_data_server' );
 const Testing					= require( './server/tester/tester' );
@@ -312,6 +315,8 @@ module.exports	= {
 	TemplatingEngine,
 	ErrorHandler,
 	DataServer,
+	SessionHandler,
+	BodyParserHandler,
 	Testing,
-	Loggur
+	Logging
 };
