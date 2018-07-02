@@ -156,6 +156,30 @@ test({
 	}
 });
 
+
+test({
+	message	: 'MemoryDataServer.exists returns false if record does not exist',
+	test	: ( done )=>{
+		helpers.setUpTestNamespace( testServer, ( err )=>{
+			if ( err )
+			{
+				done( err );
+				return;
+			}
+
+			testServer.exists( 'test', 'testRecord', {} ).then(( exists )=>{
+				assert.equal( exists, false );
+				testServer.create( 'test', 'testRecord', { testKey: 'testValue' }, { ttl : 1000 } ).then(()=>{
+					testServer.exists( 'test', 'testRecord', {} ).then(( exists )=>{
+						assert.equal( exists, true );
+						done();
+					}).catch( done );
+				}).catch( done );
+			}).catch( done );
+		});
+	}
+});
+
 test({
 	message	: 'MemoryDataServer.create creates a record with ttl',
 	test	: ( done )=>{
@@ -171,6 +195,30 @@ test({
 					assert.equal( exists, false );
 					done();
 				}).catch( done );
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'MemoryDataServer.touch increases ttl',
+	test	: ( done )=>{
+		helpers.setUpTestNamespace( testServer, ( err )=>{
+			if ( err )
+			{
+				done( err );
+				return;
+			}
+
+			testServer.create( 'test', 'testRecord', { testKey: 'testValue' }, { ttl : 500 } ).then(()=>{
+				setTimeout(()=>{
+					testServer.getAll( 'test' ).then(( data )=>{
+						console.log( data );
+						done();
+					})
+				}, 500 );
+
+				testServer.touch( 'test', 'testRecord', { ttl : 1000 } ).then().catch( done );
 			}).catch( done );
 		});
 	}
