@@ -321,12 +321,181 @@ You can also create your own Tester if you want separate test cases:
 
 The tester has the same functions: 'test', 'runAllTests'
 
+###Mocker
+You can also use the Mocker class by:
+ >      Mocker( classToMock, methodToMockOptions ) 
+ where the methodToMockOptions are the same
+as the _mock function of a testDouble. Note that this can alter a class before it is actually instantiated and WILL alter
+the original class passed so it is suggested to be used ONLY on testDoubles
+
 
 The TestingTools export:
 
 	Tester, -> Tester constructor
 	Mock,   -> Mock function
+	Mocker,   -> the class used to mock methods of testDoubles. Please note that if you use this class you will alter the original one
 	assert, -> nodejs assert module
 	logger		: tester.consoleLogger, -> Predefined logger that has 3 log levels: error, success, info
 	test		: tester.addTest.bind( tester ),
 	runAllTests	: tester.runAllTests.bind( tester )
+
+
+
+# Caching
+There is an built-in in-memory caching server that works with promises
+
+Below are the methods supported by the base DataServer and the in memory data server implements them 
+
+	/**
+	 * @brief	Gets a instance of the current DataServer
+	 *
+	 * @return	DataServer
+	 */
+	static getInstance( options = {} );
+
+	/**
+	 * @brief	Sanitizes the configuration
+	 *
+	 * @param	Object options
+	 */
+	sanitize( options );
+
+	/**
+	 * @brief	Sets up the data server
+	 *
+	 * @details	Any connections to external sources should be done here if needed
+	 *
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	setUp( options = {} );
+
+	/**
+	 * @brief	Disconnects from the data server
+	 *
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	exit( options = {} );
+
+	/**
+	 * @brief	Create the namespace
+	 *
+	 * @details	If the Data Server supports namespaces ( folders on the file system, tables in CQL/SQl, etc )
+	 *
+	 * @param	String namespace
+	 * @param	String options
+	 *
+	 * @return	Promise
+	 */
+	createNamespace( namespace, options = {} );
+
+	/**
+	 * @brief	Checks whether the namespace exists
+	 *
+	 * @details	Returns true if the namespace exists
+	 *
+	 * @param	String namespace
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	existsNamespace( namespace, options = {} );
+
+	/**
+	 * @brief	Deletes the namespace if it exists
+	 *
+	 * @details	Returns true if the namespace was deleted
+	 *
+	 * @param	String namespace
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	removeNamespace( namespace, options = {} );
+
+	/**
+	 * @brief	Create the record
+	 *
+	 * @param	String namespace
+	 * @param	String recordName
+	 * @param	mixed data
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	create( namespace, recordName, data = {}, options = {} );
+
+	/**
+	 * @brief	Checks whether the record exists
+	 *
+	 * @param	String namespace
+	 * @param	String recordName
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	exists( namespace, recordName, options = {} );
+
+	/**
+	 * @brief	Touches ( aka updates the ttl ) of the record
+	 *
+	 * @param	String namespace
+	 * @param	String recordName
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	touch( namespace, recordName, options = {} );
+
+	/**
+	 * @brief	Update the record
+	 *
+	 * @param	String namespace
+	 * @param	String recordName
+	 * @param	mixed data
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	update( namespace, recordName, data = {}, options = {} );
+
+	/**
+	 * @brief	Read the record
+	 *
+	 * @param	String namespace
+	 * @param	String recordName
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	read( namespace, recordName, options = {} );
+
+	/**
+	 * @brief	Delete the record
+	 *
+	 * @param	String namespace
+	 * @param	String recordName
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	delete( namespace, recordName, options = {} );
+
+	/**
+	 * @brief	Get all records from the namespace
+	 *
+	 * @param	String namespace
+	 * @param	Object options
+	 *
+	 * @return	Promise
+	 */
+	getAll( namespace, options = {} );
+	
+The create, update, read all accept ttl as an options which must be a number in milliseconds stating for how long the entry should be kept within the memory
+
+The caching server is added to every event: event.cachingServer and can be used anywhere
+
+### Again this caching server should not be used in production and is solely for development purposes.
