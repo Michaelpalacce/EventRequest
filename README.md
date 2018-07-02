@@ -440,17 +440,6 @@ Below are the methods supported by the base DataServer and the in memory data se
 	exists( namespace, recordName, options = {} );
 
 	/**
-	 * @brief	Touches ( aka updates the ttl ) of the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	touch( namespace, recordName, options = {} );
-
-	/**
 	 * @brief	Update the record
 	 *
 	 * @param	String namespace

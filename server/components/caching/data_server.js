@@ -130,19 +130,6 @@ class DataServer
 	}
 
 	/**
-	 * @brief	Touches ( aka updates the ttl ) of the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	touch( namespace, recordName, options = {} )
-	{
-	}
-
-	/**
 	 * @brief	Update the record
 	 *
 	 * @param	String namespace

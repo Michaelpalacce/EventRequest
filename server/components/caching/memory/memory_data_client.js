@@ -17,7 +17,6 @@ const REMOVE_NAMESPACE		= 'removeNamespace';
 const GET_ALL_NAMESPACE		= 'getAll';
 const CREATE_DATA_RECORD	= 'create';
 const EXISTS_DATA_RECORD	= 'exists';
-const TOUCH_DATA_RECORD		= 'touch';
 const UPDATE_DATA_RECORD	= 'update';
 const READ_DATA_RECORD		= 'read';
 const DELETE_DATA_RECORD	= 'delete';
@@ -160,10 +159,6 @@ class MemoryWorker
 				this.exists( args, callback );
 				break;
 
-			case TOUCH_DATA_RECORD:
-				this.touch( args, callback );
-				break;
-
 			case UPDATE_DATA_RECORD:
 				this.update( args, callback );
 				break;
@@ -263,26 +258,6 @@ class MemoryWorker
 			else
 			{
 				callback( err );
-			}
-		});
-	}
-
-	/**
-	 * @see	DataServer::touch()
-	 */
-	touch( args, callback )
-	{
-		this.executeInternalCommand( 'exists', args, ( err, exists ) => {
-			if ( ! err && exists )
-			{
-				let { namespace, recordName } = args;
-
-				this.addTimeoutToData( namespace, recordName, this.getTTL( args ) );
-				callback( false );
-			}
-			else
-			{
-				callback( new Error( 'Record does not exist' ) );
 			}
 		});
 	}
@@ -425,6 +400,7 @@ class MemoryWorker
 	{
 		this.clearTimeoutFromData( namespace, recordName );
 
+		console.log( ttl );
 		if ( ttl > 0 )
 		{
 			let keyPair	= namespace + recordName;

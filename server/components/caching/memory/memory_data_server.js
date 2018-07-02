@@ -226,14 +226,6 @@ class MemoryDataServer extends DataServer
 	}
 
 	/**
-	 * @see	DataServer::touch()
-	 */
-	touch( namespace, recordName, options = {} )
-	{
-		return this.doCommand( 'touch', { namespace, recordName, options } );
-	}
-
-	/**
 	 * @see	DataServer::update()
 	 */
 	update( namespace, recordName, data = {}, options = {} )
