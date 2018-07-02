@@ -105,7 +105,7 @@ helpers.getEmptyMiddleware	= ()=>{
  * @param	requestMethod
  * @param	requestUrl
  *
- * @return	RequestEvent
+ * @return	EventRequest
  */
 helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} ) => {
 	let request	= new IncomingMessage();

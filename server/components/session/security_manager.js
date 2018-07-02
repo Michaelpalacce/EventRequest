@@ -58,7 +58,7 @@ class SecurityManager
 	 *
 	 * @details	Ideally it should be avoided calling event.next()
 	 *
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 * @param	Function next
 	 * @param	Function terminate
 	 *

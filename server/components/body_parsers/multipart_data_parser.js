@@ -505,7 +505,7 @@ class MultipartFormParser extends BodyParser
 	/**
 	 * @brief	Return if the current body type is supported by the current body parser
 	 *
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 *
 	 * @return	Boolean
 	 */

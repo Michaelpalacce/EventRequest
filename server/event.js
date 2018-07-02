@@ -15,7 +15,7 @@ const { IncomingMessage, ServerResponse }	= require( 'http' );
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
  */
-class RequestEvent extends EventEmitter
+class EventRequest extends EventEmitter
 {
 	/**
 	 * @param	Object request
@@ -464,4 +464,4 @@ class RequestEvent extends EventEmitter
 }
 
 // Export The Module
-module.exports	= RequestEvent;
+module.exports	= EventRequest;

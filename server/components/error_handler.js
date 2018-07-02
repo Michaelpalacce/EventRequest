@@ -29,7 +29,7 @@ class ErrorHandler
 	/**
 	 * @brief	Handle the error
 	 *
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 * @param	mixed error
 	 * @param	Number code
 	 *

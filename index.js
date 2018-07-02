@@ -5,7 +5,7 @@ const http						= require( 'http' );
 const https						= require( 'https' );
 const os						= require( 'os' );
 const cluster					= require( 'cluster' );
-const RequestEvent				= require( './server/event' );
+const EventRequest				= require( './server/event' );
 const Router					= require( './server/router' );
 const ErrorHandler				= require( './server/components/error_handler' );
 const SessionHandler			= require( './server/components/session_handler' );
@@ -155,13 +155,13 @@ class Server
 	/**
 	 * @brief	Resolves the given request and response
 	 *
-	 * @details	Creates a RequestEvent used by the Server with helpful methods
+	 * @details	Creates a EventRequest used by the Server with helpful methods
 	 *
-	 * @return	RequestEvent
+	 * @return	EventRequest
 	 */
 	resolve ( request, response )
 	{
-		return new RequestEvent( request, response );
+		return new EventRequest( request, response );
 	};
 
 	/**
@@ -174,32 +174,32 @@ class Server
 	 */
 	serverCallback( req, res )
 	{
-		let requestEvent			= this.resolve( req, res );
-		requestEvent.cachingServer	= this.cachingServer;
+		let eventRequest			= this.resolve( req, res );
+		eventRequest.cachingServer	= this.cachingServer;
 
 		req.on( 'close', ()=> {
-			requestEvent.cleanUp();
-			requestEvent	= null;
+			eventRequest.cleanUp();
+			eventRequest	= null;
 		});
 
 		res.on( 'finish', () => {
-			requestEvent.cleanUp();
-			requestEvent	= null;
+			eventRequest.cleanUp();
+			eventRequest	= null;
 		});
 
 		res.on( 'error', ( error ) => {
-			requestEvent.next( error );
-			requestEvent.cleanUp();
-			requestEvent	= null;
+			eventRequest.next( error );
+			eventRequest.cleanUp();
+			eventRequest	= null;
 		});
 
 		try
 		{
-			let block	= this.router.getExecutionBlockForCurrentEvent( requestEvent );
-			requestEvent.setBlock( block );
+			let block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
+			eventRequest.setBlock( block );
 
-			requestEvent.on( 'error', ( err ) =>{
-				if ( requestEvent.logger === null )
+			eventRequest.on( 'error', ( err ) =>{
+				if ( eventRequest.logger === null )
 				{
 					Loggur.log({
 						level	: LOG_LEVELS.error,
@@ -208,11 +208,11 @@ class Server
 				}
 			});
 
-			requestEvent.next();
+			eventRequest.next();
 		}
 		catch ( e )
 		{
-			requestEvent.next( e );
+			eventRequest.next( e );
 		}
 	}
 

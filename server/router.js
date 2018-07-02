@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const RequestEvent	= require( './event' );
+const EventRequest	= require( './event' );
 const Route			= require( './route' );
 
 /**
@@ -48,13 +48,13 @@ class Router
 	/**
 	 * @brief	This will process the request and return the appropriate block chain
 	 *
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 *
 	 * @return	Array
 	 */
 	getExecutionBlockForCurrentEvent( event )
 	{
-		if ( ! ( event instanceof RequestEvent ) )
+		if ( ! ( event instanceof EventRequest ) )
 		{
 			throw new Error( 'Invalid Event provided' );
 		}

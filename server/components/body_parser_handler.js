@@ -5,6 +5,7 @@ const MultipartFormParser	= require( './body_parsers/multipart_data_parser' );
 const FormBodyParser		= require( './body_parsers/form_body_parser' );
 const JsonBodyParser		= require( './body_parsers/json_body_parser' );
 const BodyParser			= require( './body_parsers/body_parser' );
+const EventRequest			= require( './../event' );
 
 /**
  * @brief	BodyParserHandler responsible for parsing the body of the request
@@ -19,15 +20,20 @@ class BodyParserHandler
 	 * 			FormBodyParser		: {} -> instructions to initialize the FormBodyParser with the specified options
 	 * 			JsonBodyParser		: {} -> instructions to initialize the JsonBodyParser with the specified options
 	 *
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 * @param	Object options
 	 */
-	constructor( event, options )
+	constructor( event, options = {} )
 	{
 		this.options		= options;
-		this.baseOptions	= {};
 		this.event			= event;
+		this.baseOptions	= {};
 		this.parsers		= [];
+
+		if ( ! ( this.event instanceof EventRequest ) || typeof this.options !== 'object' )
+		{
+			throw new Error( 'Invalid constructor arguments passed' );
+		}
 
 		this.sanitizeConfig();
 		this.initParsers();

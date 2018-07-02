@@ -11,7 +11,7 @@ const TextFileStream	= require( './file_streams/text_file_stream' );
 class FileStreamHandler
 {
 	/**
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 * @param	Object options
 	 */
 	constructor( event, options = {} )

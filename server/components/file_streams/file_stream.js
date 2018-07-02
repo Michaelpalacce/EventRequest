@@ -6,7 +6,7 @@
 class FileStream
 {
 	/**
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 * @param	Object options
 	 */
 	constructor( event, options = {} )

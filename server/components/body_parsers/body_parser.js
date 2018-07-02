@@ -30,7 +30,7 @@ class BodyParser extends EventEmitter
 	/**
 	 * @brief	Returns a boolean whether this parser supports the given event
 	 *
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 *
 	 * @return	Boolean
 	 */

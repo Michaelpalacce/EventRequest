@@ -1,8 +1,9 @@
 'use strict';
 
-const { Mock, assert, test, helpers, Mocker }	= require( './../../../../testing_suite' );
-const MemoryDataServer							= require( './../../../../../server/components/caching/memory/memory_data_server' );
-let testServer									= null;
+const { assert, test, helpers }	= require( './../../../../testing_suite' );
+const MemoryDataServer			= require( './../../../../../server/components/caching/memory/memory_data_server' );
+
+let testServer					= null;
 
 // This has to be on top
 test({

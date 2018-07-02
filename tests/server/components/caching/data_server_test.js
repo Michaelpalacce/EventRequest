@@ -1,7 +1,7 @@
 'use strict';
 
-const { Mock, assert, test, helpers, Mocker }	= require( './../../../testing_suite' );
-const DataServer								= require( './../../../../server/components/caching/data_server' );
+const { Mock, assert, test, Mocker }	= require( './../../../testing_suite' );
+const DataServer						= require( './../../../../server/components/caching/data_server' );
 
 test({
 	message	: 'DataServer.constructor throws an exception since sanitize is not changed',

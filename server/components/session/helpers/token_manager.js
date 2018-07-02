@@ -1,7 +1,7 @@
 'use strict';
 
 const stringHelper	= require( '../../helpers/unique_id' );
-const RequestEvent	= require( '../../../event' );
+const EventRequest	= require( '../../../event' );
 const DataServer	= require( './../../caching/data_server' );
 
 /**
@@ -15,13 +15,13 @@ const TOKEN_NAMESPACE	= 'tokens';
 class TokenManager
 {
 	/**
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 * @param	Object options
 	 */
 	constructor( event, options )
 	{
 		this.tokenExpiration	= typeof options.tokenExpiration === 'number' ? options.tokenExpiration : 0;
-		this.cachingServer		= typeof event === 'object' && event instanceof RequestEvent ? event.cachingServer : false;
+		this.cachingServer		= typeof event === 'object' && event instanceof EventRequest ? event.cachingServer : false;
 
 		if ( ! this.cachingServer || ! ( this.cachingServer instanceof DataServer ) )
 		{
@@ -46,7 +46,7 @@ class TokenManager
 	/**
 	 * @brief	Creates a cookie and a token
 	 *
-	 * @param	RequestEvent event
+	 * @param	EventRequest event
 	 * @param	String name
 	 * @param	Function callback
 	 *
