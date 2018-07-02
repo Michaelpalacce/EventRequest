@@ -294,6 +294,21 @@ test({
 });
 
 test({
+	message		: 'EventRequest.send sends a stream',
+	incomplete	: true,
+	test		: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		let cleanUp			= false;
+
+		eventRequest.on( 'cleanUp', ()=>{ cleanUp = true; });
+
+		eventRequest.send( '' );
+
+		cleanUp	? done() : done( 'EventRequest cleanUp event not emitted on send' );
+	}
+});
+
+test({
 	message	: 'EventRequest setHeader emits a setHeader event',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
