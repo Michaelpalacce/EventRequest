@@ -155,3 +155,23 @@ test({
 		});
 	}
 });
+
+test({
+	message	: 'MemoryDataServer.create creates a record with ttl',
+	test	: ( done )=>{
+		helpers.setUpTestNamespace( testServer, ( err )=>{
+			if ( err )
+			{
+				done( err );
+				return;
+			}
+
+			testServer.create( 'test', 'testRecord', { testKey: 'testValue' }, { ttl : 1 } ).then(()=>{
+				testServer.exists( 'test', 'testRecord', {} ).then(( exists )=>{
+					assert.equal( exists, false );
+					done();
+				}).catch( done );
+			}).catch( done );
+		});
+	}
+});
