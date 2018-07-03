@@ -25,10 +25,9 @@ class BodyParserHandler
 	 */
 	constructor( event, options = {} )
 	{
-		this.options		= options;
-		this.event			= event;
-		this.baseOptions	= {};
-		this.parsers		= [];
+		this.options	= options;
+		this.event		= event;
+		this.parsers	= [];
 
 		if ( ! ( this.event instanceof EventRequest ) || typeof this.options !== 'object' )
 		{
@@ -64,7 +63,7 @@ class BodyParserHandler
 				{ instance : JsonBodyParser }
 			];
 
-			this.options.parsers	= defaultParsers.concat( parsers );
+			this.options.parsers	= parsers.concat(  defaultParsers );
 		}
 	}
 
@@ -84,7 +83,7 @@ class BodyParserHandler
 					let parserConfig	= this.options.parsers[index];
 
 					let parser			= typeof parserConfig.instance === 'function' ? parserConfig.instance : null;
-					let parserOptions	= typeof parserConfig.options === 'object' ? parserConfig.options : [];
+					let parserOptions	= typeof parserConfig.options === 'object' ? parserConfig.options : {};
 
 					if ( parser === null )
 					{
