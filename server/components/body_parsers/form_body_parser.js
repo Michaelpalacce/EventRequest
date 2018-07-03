@@ -23,11 +23,17 @@ class FormBodyParser extends BodyParser
 	 */
 	constructor( options = {} )
 	{
-		super( options = {} );
+		super( options );
 
 		// Defaults to 10 MB
-		this.maxPayloadLength	= options.maxPayloadLength || 10 * 1048576;
-		this.strict				= options.strict || true;
+		this.maxPayloadLength	= typeof options.maxPayloadLength === 'number'
+								? options.maxPayloadLength
+								: 10 * 1048576;
+
+		this.strict				= typeof options.strict === 'boolean'
+								? options.strict
+								: true;
+
 		this.rawPayload			= [];
 		this.payloadLength		= 0;
 	}

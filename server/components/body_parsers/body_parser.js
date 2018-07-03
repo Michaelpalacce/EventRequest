@@ -36,6 +36,7 @@ class BodyParser extends EventEmitter
 	 */
 	supports( event )
 	{
+		return false;
 	}
 
 	/**
@@ -48,6 +49,7 @@ class BodyParser extends EventEmitter
 	 */
 	parse( event, callback )
 	{
+		callback( 'Not implemented' );
 	}
 }
 

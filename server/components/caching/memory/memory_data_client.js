@@ -427,10 +427,8 @@ class MemoryWorker
 
 		if ( ttl > 0 )
 		{
-			console.log( ttl );
 			let keyPair	= namespace + recordName;
 			this.timeouts[keyPair]	= setTimeout( () => {
-				console.log( 'DELETING', namespace, recordName );
 				if ( typeof this.data[namespace] !== 'undefined' )
 				{
 					delete this.data[namespace][recordName];

@@ -15,6 +15,8 @@ const fileTest					= require( './server/components/logger/components/transport_t
 const dataServerTest			= require( './server/components/caching/data_server_test' );
 const memoryDataServerTest		= require( './server/components/caching/memory/memory_data_server_test' );
 const bodyParserHandlerTest		= require( './server/components/body_parser_handler_test' );
+const bodyParserTest			= require( './server/components/body_parsers/body_parser_test' );
+const formBodyParserTest		= require( './server/components/body_parsers/form_body_parser_test' );
 const child_process				= require( 'child_process' );
 
 let spawnedServer				= child_process.spawn(
