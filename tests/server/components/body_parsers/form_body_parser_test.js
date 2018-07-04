@@ -2,7 +2,7 @@
 
 const { Mock, Mocker, assert, test, helpers }	= require( './../../../testing_suite' );
 const { FormBodyParser }						= require( './../../../../server/components/body_parser_handler' );
-const { Duplex, Readable, Writable, PassThrough }	= require( 'stream' );
+
 test({
 	message	: 'FormBodyParser.constructor on defaults does not die',
 	test	: ( done )=>{
@@ -74,7 +74,7 @@ test({
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
 			undefined,
-			{ 'content-type' : 'application/json' }
+			{ 'content-type' : 'application/x-www-form-urlencoded' }
 		);
 		eventRequest.request._mock({
 			method			: 'on',
@@ -107,7 +107,7 @@ test({
 			undefined,
 			undefined,
 			{
-				'content-type'		: 'application/json',
+				'content-type'		: 'application/x-www-form-urlencoded',
 				'content-length'	: 10,
 			}
 		);
@@ -125,6 +125,26 @@ test({
 			}
 		});
 		let formBodyParser	= new FormBodyParser( { strict: false, maxPayloadLength : 1 } );
+
+		formBodyParser.parse( eventRequest, ( err, body )=>{
+			assert.equal( err !== false, true );
+			done();
+		} );
+	}
+});
+
+test({
+	message	: 'FormBodyParser.parse does not parse if content-type is not application/x-www-form-urlencoded',
+	test	: ( done )=>{
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'application/json',
+				'content-length'	: 1000,
+			}
+		);
+		let formBodyParser	= new FormBodyParser();
 
 		formBodyParser.parse( eventRequest, ( err, body )=>{
 			assert.equal( err !== false, true );

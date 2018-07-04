@@ -76,9 +76,9 @@ class FormBodyParser extends BodyParser
 			return;
 		}
 
-		let decodedPayload	= decodeURIComponent( rawPayload.toString( 'ascii' ) );
+		let payload			= rawPayload.toString();
 		let body			= {};
-		let payloadParts	= decodedPayload.split( '&' );
+		let payloadParts	= payload.split( '&' );
 
 		for ( let i = 0; i < payloadParts.length; ++ i )
 		{
@@ -89,7 +89,7 @@ class FormBodyParser extends BodyParser
 				continue;
 			}
 
-			body[param[0]]	= param[1];
+			body[param[0]]	= decodeURIComponent( param[1] );
 		}
 
 		callback( false, body );
@@ -105,6 +105,12 @@ class FormBodyParser extends BodyParser
 	 */
 	parse( event, callback )
 	{
+		if ( ! this.supports( event ) )
+		{
+			callback( 'Body type not supported' );
+			return;
+		}
+
 		event.request.on( 'data', ( data ) =>
 		{
 			if ( ! event.isFinished() )

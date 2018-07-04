@@ -61,6 +61,7 @@ class JsonBodyParser extends BodyParser
 		if ( rawPayload.length > this.maxPayloadLength )
 		{
 			callback( 'Max payload length reached' );
+			return;
 		}
 
 		if (
@@ -77,9 +78,13 @@ class JsonBodyParser extends BodyParser
 
 		try
 		{
-			let decodedPayload	= decodeURIComponent( rawPayload.toString( 'ascii' ) );
+			let payload			= JSON.parse( rawPayload.toString() );
+			for ( let index in payload )
+			{
+				payload[index]	= decodeURIComponent( payload[index] );
+			}
 
-			callback( false, JSON.parse( decodedPayload ) );
+			callback( false, payload );
 		}
 		catch ( e )
 		{
@@ -92,6 +97,12 @@ class JsonBodyParser extends BodyParser
 	 */
 	parse( event, callback )
 	{
+		if ( ! this.supports( event ) )
+		{
+			callback( 'Body type not supported' );
+			return;
+		}
+
 		event.request.on( 'data', ( data ) =>
 		{
 			if ( ! event.isFinished() )
@@ -109,7 +120,7 @@ class JsonBodyParser extends BodyParser
 					if ( ! err )
 					{
 						event.body	= body;
-						callback( false );
+						callback( false, body );
 					}
 					else
 					{
