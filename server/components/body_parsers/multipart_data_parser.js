@@ -61,8 +61,13 @@ class MultipartFormParser extends BodyParser
 	{
 		super( options );
 
-		this.maxPayload		= this.options.maxPayload || 0;
-		this.tempDir		= this.options.tempDir || os.tmpdir();
+		this.maxPayload		= typeof this.options.maxPayload === 'number'
+							? this.options.maxPayload
+							: 0;
+
+		this.tempDir		= typeof this.options.tempDir === 'string'
+							? this.options.tempDir
+							: os.tmpdir();
 
 		this.parts			= [];
 		this.parsingError	= false;
@@ -83,8 +88,16 @@ class MultipartFormParser extends BodyParser
 	 */
 	terminate()
 	{
+		this.cleanUpItems();
 		this.removeAllListeners();
 		this.parts			= null;
+		this.parsingError	= false;
+		this.ended			= false;
+
+		this.event			= null;
+		this.callback		= null;
+		this.headerData		= null;
+		this.boundary		= null;
 	}
 
 	/**
@@ -630,7 +643,6 @@ class MultipartFormParser extends BodyParser
 		});
 
 		this.event.on( 'cleanUp', () => {
-			this.cleanUpItems();
 			this.terminate();
 		});
 	}
