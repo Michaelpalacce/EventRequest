@@ -133,7 +133,7 @@ test({
 
 				multipartParser.terminate();
 				done();
-			}, 100 );
+			}, 1000 );
 		});
 	}
 });
