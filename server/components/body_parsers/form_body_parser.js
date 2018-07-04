@@ -61,13 +61,14 @@ class FormBodyParser extends BodyParser
 		if ( rawPayload.length > this.maxPayloadLength )
 		{
 			callback( 'Max payload length reached' );
+			return;
 		}
 
 		if (
 			this.strict &&
 			(
 				typeof headers !== 'object'
-				|| typeof headers[CONTENT_LENGTH_HEADER] !== 'string'
+				|| typeof headers[CONTENT_LENGTH_HEADER] === 'undefined'
 				|| rawPayload.length !== Number( headers[CONTENT_LENGTH_HEADER] )
 			)
 		) {

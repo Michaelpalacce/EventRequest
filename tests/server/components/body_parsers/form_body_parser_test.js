@@ -2,7 +2,7 @@
 
 const { Mock, Mocker, assert, test, helpers }	= require( './../../../testing_suite' );
 const { FormBodyParser }						= require( './../../../../server/components/body_parser_handler' );
-
+const { Duplex, Readable, Writable, PassThrough }	= require( 'stream' );
 test({
 	message	: 'FormBodyParser.constructor on defaults does not die',
 	test	: ( done )=>{
@@ -68,8 +68,67 @@ test({
 
 test({
 	message	: 'FormBodyParser.parse parses event request body',
-	incomplete	: true,
 	test	: ( done )=>{
-		done();
+		let expectedBody	= { key: 'value' };
+		let bodyToStream	= 'key=value';
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{ 'content-type' : 'application/json' }
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback )=>{
+				if ( event === 'data' )
+				{
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let formBodyParser	= new FormBodyParser( { strict: false } );
+
+		formBodyParser.parse( eventRequest, ( err, body )=>{
+			assert.equal( err, false );
+			assert.deepStrictEqual( body, expectedBody );
+			done();
+		} );
+	}
+});
+
+test({
+	message	: 'FormBodyParser.parse does not parse if maxPayloadLength is reached',
+	test	: ( done )=>{
+		let bodyToStream	= 'key=value';
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'application/json',
+				'content-length'	: 10,
+			}
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback )=>{
+				if ( event === 'data' )
+				{
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let formBodyParser	= new FormBodyParser( { strict: false, maxPayloadLength : 1 } );
+
+		formBodyParser.parse( eventRequest, ( err, body )=>{
+			assert.equal( err !== false, true );
+			done();
+		} );
 	}
 });
