@@ -68,7 +68,7 @@ class JsonBodyParser extends BodyParser
 			this.strict &&
 			(
 				typeof headers !== 'object'
-				|| typeof headers[CONTENT_LENGTH_HEADER] !== 'string'
+				|| typeof headers[CONTENT_LENGTH_HEADER] === 'undefined'
 				|| rawPayload.length !== Number( headers[CONTENT_LENGTH_HEADER] )
 			)
 		) {

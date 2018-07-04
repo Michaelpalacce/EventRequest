@@ -543,7 +543,7 @@ class MultipartFormParser extends BodyParser
 							? headers[CONTENT_TYPE_HEADER]
 							: false;
 
-		let contentLength	= typeof headers[CONTENT_LENGTH_HEADER] === 'string'
+		let contentLength	= typeof headers[CONTENT_LENGTH_HEADER] !== 'undefined'
 							? parseInt( headers[CONTENT_LENGTH_HEADER] )
 							: false;
 
@@ -590,8 +590,8 @@ class MultipartFormParser extends BodyParser
 			}
 			else
 			{
-				this.terminate();
 				this.callback( err );
+				this.terminate();
 			}
 		});
 	}
