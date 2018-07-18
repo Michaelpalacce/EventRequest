@@ -1,10 +1,11 @@
 'use strict';
 
 // Dependencies
-const Transport	= require( './transport' );
-const fs		= require( 'fs' );
-const os		= require( 'os' );
-const path		= require( 'path' );
+const Transport		= require( './transport' );
+const fs			= require( 'fs' );
+const WriteStream	= fs.WriteStream;
+const os			= require( 'os' );
+const path			= require( 'path' );
 
 /**
  * @brief	Constants
@@ -43,30 +44,65 @@ class File extends Transport
 
 		if ( this.filePath )
 		{
-			this.fileStream	= this.getWriteStream( this.filePath );
+			this.getWriteStream();
 		}
 	}
 
 	/**
 	 * @brief	Get a new write stream for the given path
 	 *
-	 * @param	String filePath
-	 *
 	 * @return	WriteStream
 	 */
-	getWriteStream( filePath )
+	getWriteStream()
 	{
-		let folder	= path.dirname( filePath );
+		let file	= path.parse( this.filePath );
 
-		if ( ! fs.existsSync( folder ) )
+		if ( ! fs.existsSync( file.dir ) )
 		{
-			fs.mkdirSync( folder );
+			fs.mkdirSync( file.dir );
 		}
 
-		return fs.createWriteStream( filePath, {
-			flags		: 'a',
-			autoClose	: true
-		});
+		let fileName	= this.getFileName();
+
+		if ( this.fileStream !== null || ! fs.existsSync( fileName ) )
+		{
+			if ( this.fileStream instanceof WriteStream )
+			{
+				this.fileStream.end();
+			}
+
+			this.fileStream	= fs.createWriteStream( this.getFileName(), {
+				flags		: 'a',
+				autoClose	: true
+			});
+		}
+
+		return this.fileStream;
+	}
+
+	/**
+	 * @brief	Gets the file name with added timestamp
+	 *
+	 * @param	Object file
+	 *
+	 * @return	String
+	 */
+	getFileName()
+	{
+		let file	= path.parse( this.filePath );
+		return file.dir + '/' + file.name + this.getCurrentDayTimestamp() + file.ext;
+	}
+
+	/**
+	 * @brief	Gets the beginning of the current day
+	 *
+	 * @return	Number
+	 */
+	getCurrentDayTimestamp()
+	{
+		let now			= new Date();
+		let startOfDay	= new Date( now.getFullYear(), now.getMonth(), now.getDate() );
+		return startOfDay / 1000;
 	}
 
 	/**
@@ -106,25 +142,18 @@ class File extends Transport
 	 */
 	_log( log, resolve, reject )
 	{
-		if ( this.fileStream !== null )
-		{
-			let message	= this.format( log );
+		let message	= this.format( log );
 
-			this.fileStream.write( message + SYSTEM_EOL, 'utf8', ( err ) =>{
-				if ( err )
-				{
-					reject( err );
-				}
-				else
-				{
-					resolve();
-				}
-			});
-		}
-		else
-		{
-			reject( 'File stream is not opened' );
-		}
+		this.getWriteStream().write( message + SYSTEM_EOL, 'utf8', ( err ) =>{
+			if ( err )
+			{
+				reject( err );
+			}
+			else
+			{
+				resolve();
+			}
+		});
 	}
 }
 

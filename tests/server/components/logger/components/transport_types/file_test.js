@@ -1,3 +1,4 @@
+
 'use strict';
 
 // Dependencies
@@ -65,7 +66,7 @@ test({
 		assert.deepStrictEqual( file.logLevels, logLevels );
 		assert.deepStrictEqual( file.supportedLevels, Object.values( logLevels ) );
 		assert.deepStrictEqual( file.filePath, expectedPath );
-		assert.deepStrictEqual( file.fileStream !== null, true );
+		assert.deepStrictEqual( file.fileStream === null, true );
 		assert.deepStrictEqual( called, 1 );
 
 		helpers.clearUpTestFile();
@@ -103,6 +104,66 @@ test({
 });
 
 test({
+	message	: 'File.getFileName adds timestamp',
+	test	: ( done )=>{
+		let logLevel		= LOG_LEVELS.error;
+		let logLevels		= LOG_LEVELS;
+		let filePath		= './server/components/logger/components/transport_types/fixtures/error.log';
+		let MockedFile		= Mock( File );
+
+		let file			= new MockedFile({
+			logLevel,
+			logLevels,
+			filePath
+		});
+
+		let now				= new Date();
+		let startOfDay		= new Date( now.getFullYear(), now.getMonth(), now.getDate() );
+		let timestamp		= startOfDay / 1000;
+
+		let expectedPath	= path.join(
+			path.dirname( require.main.filename ),
+			filePath
+		);
+
+		expectedPath	= path.parse( expectedPath );
+		expectedPath	= expectedPath.dir + '/' + expectedPath.name + timestamp + expectedPath.ext;
+
+		assert.equal( file.getFileName().indexOf( expectedPath ) !== -1, true );
+
+		helpers.clearUpTestFile();
+
+		done();
+	}
+});
+
+test({
+	message	: 'File.getCurrentDat gives the beginning of the day',
+	test	: ( done )=>{
+		let logLevel	= LOG_LEVELS.error;
+		let logLevels	= LOG_LEVELS;
+		let filePath	= './server/components/logger/components/transport_types/fixtures/error.log';
+		let MockedFile	= Mock( File );
+
+		let file	= new MockedFile({
+			logLevel,
+			logLevels,
+			filePath
+		});
+
+		let now			= new Date();
+		let startOfDay	= new Date( now.getFullYear(), now.getMonth(), now.getDate() );
+		let timestamp	= startOfDay / 1000;
+
+		assert.equal( file.getCurrentDayTimestamp(), timestamp );
+
+		helpers.clearUpTestFile();
+
+		done();
+	}
+});
+
+test({
 	message	: 'File.log returns a Promise',
 	test	: ( done )=>{
 		let logLevel	= LOG_LEVELS.error;
@@ -118,7 +179,7 @@ test({
 					autoClose	: true
 				});
 			},
-			called			: 1
+			called			: 2
 		} );
 
 		let file	= new MockedFile({
@@ -127,10 +188,21 @@ test({
 			filePath
 		});
 
-		assert.equal( file.log( Log.getInstance( 'test' ) ) instanceof Promise, true );
+		let logData	= 'This is a test log';
+		let promise	= file.log( Log.getInstance( logData ) );
 
-		helpers.clearUpTestFile();
+		assert.equal( promise instanceof Promise, true );
 
-		done();
+		promise.then(
+			()=>{
+				let data	= fs.readFileSync( path.join( __dirname, './fixtures/testfile' ) );
+				assert.equal( data.toString().indexOf( logData ) !== -1, true );
+				
+				helpers.clearUpTestFile();
+
+				done();
+			},
+			done
+		);
 	}
 });
