@@ -89,7 +89,6 @@ test({
 });
 
 test({
-	incomplete	: true,
 	message		: 'MultipartFormParser.parse parses multipart data',
 	test		: ( done )=>{
 		let tempDir			= path.join( __dirname, './fixture/testUploads');

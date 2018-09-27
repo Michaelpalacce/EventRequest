@@ -108,24 +108,6 @@ middlewaresContainer.logger				= ( options = {} ) =>{
 };
 
 /**
- * @brief	File stream middleware
- *
- * @TODO	IMPLEMENT THIS. RIGHT NOW THIS IS USELESS
- *
- * @param	Object options
- *
- * @return	Object
- */
-middlewaresContainer.setFileStream		= ( options = {} ) =>{
-	return {
-		handler	: ( event ) =>{
-			event.fileStreamHandler	= new FileStreamHandler( event, options );
-			event.next();
-		}
-	};
-};
-
-/**
  * @brief	Sets the given templating engine to the event
  *
  * @param	Object options
