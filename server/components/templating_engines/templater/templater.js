@@ -15,6 +15,9 @@ const DEFAULT_TEMPLATE_DIR	= '/templates';
  */
 class Templater extends TemplatingEngine
 {
+	/**
+	 * @param	Object options
+	 */
 	constructor( options )
 	{
 		super( options );
