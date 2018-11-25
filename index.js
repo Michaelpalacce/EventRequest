@@ -74,8 +74,6 @@ class Server
 	 * 			machine's CPUs -> Defaults to the max amount of CPUs of the machine's
 	 * 			- communicationManager - CommunicationManager - The communication manager to be used for the IPC communication
 	 * 			between the master and the workers -> Defaults to base CommunicationManager
-	 * 			- errorHandler - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest
-	 * 			-> Defaults to base errorHandler
 	 * 			- cachingServer - DataServer - The caching server to be used to store data - Defaults to MemoryDataServer
 	 * 			- cachingServerOptions - Object - Options to be passed to the data server - Defaults to OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT
 	 *

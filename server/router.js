@@ -82,18 +82,27 @@ class Router
 	/**
 	 * @brief	Matches the requested method with the ones set in the event
 	 *
+	 * @details	If a string or an array is passed, then it will be converted to a Route
+	 *
 	 * @param	String requestedMethod
 	 * @param	Route|Array|String route
 	 *
 	 * @return	Boolean
 	 */
-	static matchMethod( requestedMethod, route )
+	static matchMethod( requestedMethod, method )
 	{
-		if ( typeof route === 'string' || Array.isArray( route ) )
+		let route;
+
+		if ( typeof method === 'string' || Array.isArray( method ) )
 		{
 			route	= new Route({
-				method	: route
+				method	: method
 			});
+		}
+		else
+		{
+			// Its should be a route object
+			route	= method;
 		}
 
 		if ( ! ( route instanceof Route ) )

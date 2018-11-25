@@ -67,7 +67,7 @@ class SessionAuthenticationManager extends SecurityManager
 		
 		if ( this.authenticationCallback( event ) )
 		{
-			this.tokenManager.createCookie( event, this.sessionName, ( err, tokenData ) =>{
+			this.tokenManager.createCookie( this.sessionName, ( err, tokenData ) =>{
 				if ( ! err )
 				{
 					event.session	= tokenData;

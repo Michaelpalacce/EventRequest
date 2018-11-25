@@ -20,8 +20,9 @@ class TokenManager
 	 */
 	constructor( event, options )
 	{
+		this.event				= typeof event === 'object' && event instanceof EventRequest ? event : false;
 		this.tokenExpiration	= typeof options.tokenExpiration === 'number' ? options.tokenExpiration : 0;
-		this.cachingServer		= typeof event === 'object' && event instanceof EventRequest ? event.cachingServer : false;
+		this.cachingServer		= event !== false ? event.cachingServer : false;
 
 		if ( ! this.cachingServer || ! ( this.cachingServer instanceof DataServer ) )
 		{
@@ -46,13 +47,12 @@ class TokenManager
 	/**
 	 * @brief	Creates a cookie and a token
 	 *
-	 * @param	EventRequest event
 	 * @param	String name
 	 * @param	Function callback
 	 *
 	 * @return	void
 	 */
-	createCookie( event, name, callback )
+	createCookie( name, callback )
 	{
 		let sid			= stringHelper.makeId();
 		let ttl			= this.tokenExpiration;
@@ -63,7 +63,7 @@ class TokenManager
 		};
 
 		this.cachingServer.create( TOKEN_NAMESPACE, sid, tokenData, { ttl } ).then(()=>{
-			event.setHeader( 'Set-Cookie', [ name + '=' + sid] );
+			this.event.setHeader( 'Set-Cookie', [ name + '=' + sid] );
 			callback( false, tokenData );
 		}).catch(( err )=>{
 			callback( err )

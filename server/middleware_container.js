@@ -7,7 +7,6 @@ const { BodyParserHandler }	= require( './components/body_parser_handler' );
 const TemplatingEngine		= require( './components/templating_engine' );
 const BaseTemplatingEngine	= require( './components/templating_engines/base_templating_engine' );
 const ErrorHandler			= require( './components/error_handler' );
-const { FileStreamHandler }	= require( './components/file_stream_handler' );
 const { SessionHandler }	= require( './components/session_handler' );
 const { Logger }			= require( './components/logger/loggur' );
 
@@ -102,24 +101,6 @@ middlewaresContainer.logger				= ( options = {} ) =>{
 				event.logger	= logger;
 			}
 
-			event.next();
-		}
-	};
-};
-
-/**
- * @brief	File stream middleware
- *
- * @TODO	IMPLEMENT THIS. RIGHT NOW THIS IS USELESS
- *
- * @param	Object options
- *
- * @return	Object
- */
-middlewaresContainer.setFileStream		= ( options = {} ) =>{
-	return {
-		handler	: ( event ) =>{
-			event.fileStreamHandler	= new FileStreamHandler( event, options );
 			event.next();
 		}
 	};

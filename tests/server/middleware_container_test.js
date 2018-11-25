@@ -187,30 +187,6 @@ test({
 });
 
 test({
-	message		: 'MiddlewareContainer setFileStream on default',
-	incomplete	: true,
-	test		: ( done )=>{
-		done();
-	}
-});
-
-test({
-	message		: 'MiddlewareContainer setFileStream on correct arguments',
-	incomplete	: true,
-	test		: ( done )=>{
-		done();
-	}
-});
-
-test({
-	message		: 'MiddlewareContainer setFileStream on incorrect arguments',
-	incomplete	: true,
-	test		: ( done )=>{
-		done();
-	}
-});
-
-test({
 	message		: 'MiddlewareContainer templatingEngine on default',
 	test		: ( done )=>{
 		let eventRequest		= helpers.getEventRequest();

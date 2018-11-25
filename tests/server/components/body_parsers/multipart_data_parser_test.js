@@ -89,8 +89,8 @@ test({
 });
 
 test({
-	message	: 'MultipartFormParser.parse parses multipart data',
-	test	: ( done )=>{
+	message		: 'MultipartFormParser.parse parses multipart data',
+	test		: ( done )=>{
 		let tempDir			= path.join( __dirname, './fixture/testUploads');
 		let multipartParser	= new MockMultipartFormParser( { tempDir } );
 		let eventRequest	= helpers.getEventRequest(

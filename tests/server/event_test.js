@@ -295,7 +295,6 @@ test({
 
 test({
 	message		: 'EventRequest.send sends a stream',
-	incomplete	: true,
 	test		: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
