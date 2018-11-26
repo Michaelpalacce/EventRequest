@@ -12,14 +12,13 @@ A backend server in NodeJs
 [![Build Status](https://travis-ci.org/Michaelpalacce/EventRequest.png?branch=master)](https://travis-ci.org/Michaelpalacce/EventRequest)
 
 Includes:
-- Body parsers 
+- Body parsers
 1) Form Body Parser
-2) Multipart Body Parser 
+2) Multipart Body Parser
 3) Json Body Parser
 - Cookie parser
 - Session security
 - File streams
-- Templating engine
 - Easy Routing
 - Middlewares
 - Logging
@@ -34,13 +33,12 @@ Includes:
 # Properties exported by the Server:
 	Server,				// The actual server to be used
 	Router,				// The router. Can be used to add routes to it and then to the main server route
-	TemplatingEngine,	// Instance to be extended if you want to create your own templating engine
 	ErrorHandler,		// Error handler to extend if you want to create a custom error handler
 	SessionHandler,		// Session handler to be extended by other security modules
 	BodyParserHandler,	// Body parser handler that contains the different body parsers
 	DataServer,			// Instance to be extended to implement your own DataServer
-	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ), 
-						// test( function to use to add tests ), runAllTests( way to run all tests added by test ) 
+	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
+						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
 	Logging
 
 # Server Options
@@ -63,9 +61,9 @@ The server constructor accepts the following options:
 
 **errorHandler** - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest -> Defaults to base errorHandler
 
-**cachingServer** - DataServer - The caching server to be used through the application. Defaults to Memory Data Server which should **NOT** be used in production under any circumstances. The data server will be changed to default to something else in the future or not be set up at all. 
+**cachingServer** - DataServer - The caching server to be used through the application. Defaults to Memory Data Server which should **NOT** be used in production under any circumstances. The data server will be changed to default to something else in the future or not be set up at all.
 
-**cachingServerOptions** - Object - The options to be passed to the setup of the caching server 
+**cachingServerOptions** - Object - The options to be passed to the setup of the caching server
 
 ## The server is started by calling server.start();
 
@@ -95,12 +93,7 @@ Available middleware:
 * * Accepted options:
 * * - errorHandler - ErrorHandler - The error handler to use -> Defaults to ErrorHandler
 
-* templatingEngine -> Sets the templating engine
-* * Accepted options:
-* * - engine - TemplatingEngine - the templating engine to be used. Must be an instance of TemplatingEngine defaults to BaseTemplatingEngine
-* * - options - Object - the options to be passed to the engine
-
-* session -> Adds one or many SecurityManager descendants 
+* session -> Adds one or many SecurityManager descendants
 * * Accepted options:
 * * - sessionName - String - the session name ( aka cookie name ) - Defaults to sid
 * * - authenticationRoute - String - The route on which authentication should happen ! Required
@@ -108,7 +101,7 @@ Available middleware:
 * * - authenticationCallback - Function - The callback to be called when authentication has to happen. This callback must return a boolean - Defaults to ()=>{ return false; };
 * * - managers - Array - The managers to be added to the security ( they have 2 parameters : instance which must be an instance of SecurityManager and options which are options to be passed to that specific manager only - Defaults to { instance : AuthenticationManager }, { instance : SessionAuthenticationManager }, { instance : LoginManager }, { instance : SessionSaveManager } if default is passed to the array
 
-* bodyParser -> Adds one or many BodyParser descendants 
+* bodyParser -> Adds one or many BodyParser descendants
 * * Accepted options:
 * * - parsers - Array - Array of BodyParser descendants. If the array has a key default these parsers will be added:  { instance : FormBodyParser }, { instance : MultipartFormParser }, { instance : JsonBodyParser }
 
@@ -116,7 +109,7 @@ Available middleware:
 
 * addStaticPath -> adds static resource path
 * * Accepted options:
-* * - path - String - The path to make available 
+* * - path - String - The path to make available
 
 * timeout -> Adds a timeout to the request
 * * Accepted options:
@@ -141,10 +134,10 @@ Loggers can be added to the main instance of the Loggur who later can be used by
 
 Each Logger can have it's own transport layers.
 There are 2 predefined transport layers:
-* **Console** 
+* **Console**
 * * Accepted options:
 * * - color - Boolean - Whether the log should be colored -> Defaults to true
-* * - logColors - Object - The colors to use -> Defaults to 
+* * - logColors - Object - The colors to use -> Defaults to
 * *  [LOG_LEVELS.error]	: 'red',
 * *  [LOG_LEVELS.warning]	: 'yellow',
 * *  [LOG_LEVELS.notice]	: 'green',
@@ -188,7 +181,7 @@ skeleton must have the keys that are to be validated that point to a string of r
 * isTrue - checks if the input evaluates to true
 * isFalse - checks if the input evaluates to false
 * boolean - checks if the input is a boolean
-* notBoolean - checks if the input is not a boolean 
+* notBoolean - checks if the input is not a boolean
 * numeric - checks if the input is a number
 * notNumeric  - checks if the input is not a number
 * date  - checks if the input is a date
@@ -202,7 +195,7 @@ Example:
 
 >     let body = { stringToValidate: 'str', emailToValidate: 'example@test.com' };
 >     event.validationHandler.handle( body, { stringToValidate: 'filled||string||range:2-3',
->                                       emailToValidate: 'optional||email' } 
+>                                       emailToValidate: 'optional||email' }
 >                                   );
 
 The example will validate that the stringToValidate is filled is a string and is within a range of 2-3 characters
@@ -277,7 +270,7 @@ You can also Specify the arguments that should be provided to the mocked method 
 >        ]  
 >     });  
 
-The 'with' option accepts an array of arrays where each array in the with array is a call. Again if it's called more than 
+The 'with' option accepts an array of arrays where each array in the with array is a call. Again if it's called more than
 the times the with arguments, the last one will be returned. In case of mismatch an Error will be thrown.
 If you do not want the mocker to check one of the arguments, then undefined should be passed
 
@@ -289,7 +282,7 @@ The 'runAllTests' function accepts an object that accepts the following options:
 * dieOnFirstError - Boolean - Whether the testing should stop on the first error - Defaults to true
 * debug - Boolean - Whether errors thrown should show their entire stack or just the message - Defaults to false
 * silent - Boolean - This will set the consoleLogger logLevel to error, meaning only errors will be displayed - Defaults to false
-* filter - String - the string to search for and filter by when testing - Defaults to false 
+* filter - String - the string to search for and filter by when testing - Defaults to false
 
 The run all tests will run all tests added by the test function.
 
@@ -297,8 +290,8 @@ The 'test' function accepts an object with the following options:
 
 * message - String - the name of the test
 * test - Function - the callback to execute.
-* * the tester provides a done function as the first argument to the test callback. The done should be called just ONCE 
-and only when the test finishes. If done is called twice within the same test then that will be seen as an error and 
+* * the tester provides a done function as the first argument to the test callback. The done should be called just ONCE
+and only when the test finishes. If done is called twice within the same test then that will be seen as an error and
 the testing will stop.
 * * If any arguments that evaluate to true are provided to done then the test will be seen as failed.
 
@@ -323,7 +316,7 @@ The tester has the same functions: 'test', 'runAllTests'
 
 ###Mocker
 You can also use the Mocker class by:
- >      Mocker( classToMock, methodToMockOptions ) 
+ >      Mocker( classToMock, methodToMockOptions )
  where the methodToMockOptions are the same
 as the _mock function of a testDouble. Note that this can alter a class before it is actually instantiated and WILL alter
 the original class passed so it is suggested to be used ONLY on testDoubles
@@ -344,7 +337,7 @@ The TestingTools export:
 # Caching
 There is an built-in in-memory caching server that works with promises
 
-Below are the methods supported by the base DataServer and the in memory data server implements them 
+Below are the methods supported by the base DataServer and the in memory data server implements them
 
 	/**
 	 * @brief	Gets a instance of the current DataServer
@@ -482,7 +475,7 @@ Below are the methods supported by the base DataServer and the in memory data se
 	 * @return	Promise
 	 */
 	getAll( namespace, options = {} );
-	
+
 The create, update, read all accept ttl as an options which must be a number in milliseconds stating for how long the entry should be kept within the memory
 
 The caching server is added to every event: event.cachingServer and can be used anywhere

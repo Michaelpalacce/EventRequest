@@ -10,8 +10,7 @@ const Router					= require( './server/router' );
 const ErrorHandler				= require( './server/components/error_handler' );
 const SessionHandler			= require( './server/components/session_handler' );
 const BodyParserHandler			= require( './server/components/body_parser_handler' );
-const middlewaresContainer		= require( './server/middleware_container' );
-const TemplatingEngine			= require( './server/components/templating_engine' );
+const middlewaresContainer		= require( './server/middleware_container' )
 const Cluster					= require( './server/components/cluster/cluster' );
 const CommunicationManager		= require( './server/components/cluster/communication_manager' );
 const Logging					= require( './server/components/logger/loggur' );
@@ -310,7 +309,6 @@ class Server
 module.exports	= {
 	Server,
 	Router,
-	TemplatingEngine,
 	ErrorHandler,
 	DataServer,
 	SessionHandler,

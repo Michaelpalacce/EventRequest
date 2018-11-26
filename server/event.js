@@ -4,7 +4,6 @@
 const url									= require( 'url' );
 const { EventEmitter }						= require( 'events' );
 const { FileStreamHandler, FileStream }		= require( './components/file_stream_handler' );
-const TemplatingEngine						= require( './components/templating_engine' );
 const ErrorHandler							= require( './components/error_handler' );
 const Streams								= require( 'stream' );
 const DataServer							= require( './components/caching/data_server' );
@@ -70,29 +69,6 @@ class EventRequest extends EventEmitter
 		this.body				= {};
 
 		let templatingEngine	= null;
-		Object.defineProperty( this, 'templatingEngine', {
-			enumerable	: true,
-			set			: ( arg ) =>{
-				if ( arg == null )
-				{
-					templatingEngine	= arg;
-					return;
-				}
-
-				if ( arg instanceof TemplatingEngine )
-				{
-					templatingEngine	= arg;
-				}
-				else
-				{
-					throw new Error( 'Templating engine must be an instance of TemplatingEngine' );
-				}
-			},
-			get			: () =>{
-				return templatingEngine;
-			}
-		});
-
 		let fileStreamHandler	= null;
 		Object.defineProperty( this, 'fileStreamHandler', {
 			enumerable	: true,
@@ -339,23 +315,33 @@ class EventRequest extends EventEmitter
 	{
 		this.emit( 'render', { templateName, variables, callback } );
 
-		if ( this.templatingEngine instanceof TemplatingEngine )
-		{
-			this.templatingEngine.render( templateName, variables, ( err, result ) => {
-				if ( ! err && result && result.length > 0 )
+		templateName	= typeof templateName === 'string' && templateName.length > 0
+						? templateName + '.html'
+						: false;
+
+		if (
+			typeof this.templatingEngine !== "undefined"
+			&& this.templatingEngine.render !== "undefined"
+			templateName !== false
+		) {
+			let templatePath	= path.join( this.templateDir, templateName );
+
+			fs.readFile( templatePath, 'utf8', ( err, html ) => {
+				if ( ! err && html && html.length > 0 )
 				{
+					let result	= this.templatingEngine.render( html, variables );
 					this.send( result, 200, true );
 					callback( false );
 				}
 				else
 				{
-					callback( err );
+					callback( 'ERROR WHILE RENDERING' );
 				}
 			});
 		}
 		else
 		{
-			this.sendError( `Could not render ${this.path}` );
+			callback( 'ERROR WHILE RENDERING' )
 		}
 	}
 
