@@ -6,9 +6,12 @@ const Router							= require( './../../server/router' );
 const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );
 const ErrorHandler						= require( './../../server/components/error_handler' );
 const MultipartFormParser				= require( './../../server/components/body_parsers/multipart_data_parser' );
-const TemplatingEngine					= require( './../../server/components/templating_engine' );
-const BaseTemplatingEngine				= require( './../../server/components/templating_engines/base_templating_engine' );
 const { Loggur, Logger }				= require( './../../server/components/logger/loggur' );
+
+class MockTemplatingEngine
+{
+	render(){}
+}
 
 class TestDataServer extends MemoryDataServer
 {
@@ -187,18 +190,19 @@ test({
 });
 
 test({
-	message		: 'MiddlewareContainer templatingEngine on default',
+	message		: 'MiddlewareContainer templatingEngine on default fails',
 	test		: ( done )=>{
 		let eventRequest		= helpers.getEventRequest();
 		let router				= new Router();
 
-		router.add( middlewareContainer.templatingEngine( {} ) );
-		router.add( helpers.getEmptyMiddleware() );
+		assert.throws( () => {
+			router.add( middlewareContainer.templatingEngine( {} ) );
+			router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		assert.equal( eventRequest.templatingEngine, null );
-		eventRequest.next();
-		assert.equal( eventRequest.templatingEngine instanceof TemplatingEngine, true );
+			eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+			assert.equal( eventRequest.templatingEngine, null );
+			eventRequest.next();
+		});
 
 		done();
 	}
@@ -210,31 +214,13 @@ test({
 		let eventRequest		= helpers.getEventRequest();
 		let router				= new Router();
 
-		router.add( middlewareContainer.templatingEngine( { engine: BaseTemplatingEngine } ) );
+		router.add( middlewareContainer.templatingEngine( { engine: new MockTemplatingEngine() } ) );
 		router.add( helpers.getEmptyMiddleware() );
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		assert.equal( eventRequest.templatingEngine, null );
 		eventRequest.next();
-		assert.equal( eventRequest.templatingEngine instanceof TemplatingEngine, true );
-
-		done();
-	}
-});
-
-test({
-	message		: 'MiddlewareContainer templatingEngine on incorrect arguments',
-	test		: ( done )=>{
-		let eventRequest		= helpers.getEventRequest();
-		let router				= new Router();
-
-		router.add( middlewareContainer.templatingEngine() );
-		router.add( helpers.getEmptyMiddleware() );
-
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		assert.equal( eventRequest.templatingEngine, null );
-		eventRequest.next();
-		assert.equal( eventRequest.templatingEngine instanceof TemplatingEngine, true );
+		assert.equal( eventRequest.templatingEngine instanceof MockTemplatingEngine, true );
 
 		done();
 	}

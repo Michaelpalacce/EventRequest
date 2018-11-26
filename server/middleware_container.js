@@ -4,8 +4,6 @@
 const fs					= require( 'fs' );
 const path					= require( 'path' );
 const { BodyParserHandler }	= require( './components/body_parser_handler' );
-const TemplatingEngine		= require( './components/templating_engine' );
-const BaseTemplatingEngine	= require( './components/templating_engines/base_templating_engine' );
 const ErrorHandler			= require( './components/error_handler' );
 const { SessionHandler }	= require( './components/session_handler' );
 const { Logger }			= require( './components/logger/loggur' );
@@ -120,14 +118,14 @@ middlewaresContainer.templatingEngine	= ( options = {} ) =>{
 	return {
 		handler	: ( event ) =>{
 			let engineOptions		= typeof options.options === 'object' ? options.options : {};
-			let templatingEngine	= typeof options.engine === 'function'
-									&& typeof options.engine.getInstance === 'function'
-									? options.engine.getInstance( engineOptions )
-									: null;
+			let templatingEngine	= typeof options.engine !== 'undefined'
+									&& typeof options.engine.render !== 'undefined'
+									? options.engine
+									: false;
 
-			if ( ! ( templatingEngine instanceof TemplatingEngine ) || templatingEngine === null )
+			if ( templatingEngine === false )
 			{
-				templatingEngine	= BaseTemplatingEngine.getInstance( engineOptions );
+				throw new Error( 'Invalid templating engine provided. Must have a method render.' );
 			}
 
 			event.templatingEngine	= templatingEngine;

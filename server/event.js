@@ -2,6 +2,8 @@
 
 // Dependencies
 const url									= require( 'url' );
+const path									= require( 'path' );
+const fs									= require( 'fs' );
 const { EventEmitter }						= require( 'events' );
 const { FileStreamHandler, FileStream }		= require( './components/file_stream_handler' );
 const ErrorHandler							= require( './components/error_handler' );
@@ -309,7 +311,13 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-	 * @see	TemplatingEngine::render()
+	 * @brief	Renders the template given
+	 *
+	 * @param	String templateName
+	 * @param	Object variables
+	 * @param	Callable callback
+	 *
+	 * @return	String
 	 */
 	render( templateName, variables, callback )
 	{
@@ -322,7 +330,7 @@ class EventRequest extends EventEmitter
 		if (
 			typeof this.templatingEngine !== "undefined"
 			&& this.templatingEngine.render !== "undefined"
-			templateName !== false
+			&& templateName !== false
 		) {
 			let templatePath	= path.join( this.templateDir, templateName );
 
@@ -335,13 +343,15 @@ class EventRequest extends EventEmitter
 				}
 				else
 				{
-					callback( 'ERROR WHILE RENDERING' );
+					this.sendError( 'Error while rendering', 500 );
+					callback( 'Error while rendering' );
 				}
 			});
 		}
 		else
 		{
-			callback( 'ERROR WHILE RENDERING' )
+			this.sendError( 'Error while rendering', 500 );
+			callback( 'Error while rendering' )
 		}
 	}
 

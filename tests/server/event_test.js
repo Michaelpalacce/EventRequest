@@ -3,13 +3,17 @@
 // Dependencies
 const { Mock, assert, test, helpers }	= require( './../testing_suite' );
 const EventRequest						= require( './../../server/event' );
-const BaseTemplatingEngine				= require( './../../server/components/templating_engines/base_templating_engine' );
 const { FileStreamHandler }				= require( './../../server/components/file_stream_handler' );
 const ErrorHandler						= require( './../../server/components/error_handler' );
 const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );
 const { Loggur }						= require( './../../server/components/logger/loggur' );
 
 const MockedErrorHandler				= Mock( ErrorHandler );
+
+class MockTemplatingEngine
+{
+	render(){}
+}
 
 test({
 	message	: 'EventRequest should throw an error with invalid constructor parameters',
@@ -64,23 +68,6 @@ test({
 		let eventRequest	= helpers.getEventRequest( undefined, undefined, headers );
 
 		assert.deepEqual( eventRequest.headers, headers );
-
-		done();
-	}
-});
-
-test({
-	message	: 'EventRequest templating engine can only be an instance of TemplatingEngine',
-	test	: ( done ) =>{
-		let eventRequest	= helpers.getEventRequest();
-
-		assert.doesNotThrow( () =>{
-			eventRequest.templatingEngine	= new BaseTemplatingEngine()
-		});
-
-		assert.throws( () => {
-			eventRequest.templatingEngine	= {};
-		});
 
 		done();
 	}
@@ -477,39 +464,26 @@ test({
 	message	: 'EventRequest.render emits a render event and returns a callback',
 	test	: ( done ) =>{
 		let eventRequest				= helpers.getEventRequest();
-		let MockTemplatingEngine		= Mock( BaseTemplatingEngine );
+		let TemplatingEngine			= Mock( MockTemplatingEngine );
 		let render						= false;
 		let send						= false;
-		let templateName				= 'test';
+		let templateName				= 'test_template';
 		let templateVariables			= {};
 
-		eventRequest.templatingEngine	= new MockTemplatingEngine();
+		eventRequest.templatingEngine	= new TemplatingEngine();
+		eventRequest.templateDir		= __dirname;
 		eventRequest.templatingEngine._mock({
 			method			: 'render',
-			shouldReturn	: ( template, variables, callback ) =>{
-				callback( false, 'result' );
+			shouldReturn	: ( template, variables ) => {
+				render	= true;
+				return template;
 			},
-			with			: [[templateName, templateVariables, undefined]],
+			with			: [["TEST\n", templateVariables]],
 			called			: 1
 		});
 
-		eventRequest.on( 'render', ()=>{
-			render	= true;
-		});
-
-		eventRequest.on( 'send', ()=>{
-			send	= true;
-		});
-
-		eventRequest.render( 'test', {}, ( err )=>{
-			if ( ! err )
-			{
-				render && send ? done() : done( 'Render event not called' );
-			}
-			else
-			{
-				done( 'Rendering failed' );
-			}
+		eventRequest.render( templateName, templateVariables, ( err ) => {
+			render ? done( err ) : done( 'Render was not called' );
 		});
 	}
 });
@@ -530,9 +504,9 @@ test({
 			called			: 1
 		});
 
-		eventRequest.render();
-
-		error ? done() : done( 'Rendering should have called errorHandler.handleError but it did not' );
+		eventRequest.render( 'test_template', {}, ( error ) => {
+					error ? done() : done( 'Rendering should have called errorHandler.handleError but it did not' );
+		});
 	}
 });
 
