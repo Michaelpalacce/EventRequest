@@ -1,14 +1,6 @@
 # EventRequest
 A backend server in NodeJs
 
-# In development
-## If you find any errors, submit an issue to the github repo: https://github.com/Michaelpalacce/EventRequest
-## Please keep in mind this is still in development and some functionality can be changed without warning/deprecated
-## Some modules may need improvements, abstractions or could generally not work, but if they have not been fixed so far
-## it means that I had no time for them or I think they are not as important for now.
-## After all the Projects from the Projects tab in the github page have been implemented and everything has been tested,
-## then this will be finished
-
 Includes:
 - Body parsers
 1) Form Body Parser
