@@ -57,6 +57,7 @@ test({
 
 test({
 	message	: 'MultipartFormParser.terminate terminates the parser',
+	incomplete : true,
 	test	: ( done )=>{
 		let tempDir			= '/test';
 		let maxPayload		= 10;
@@ -90,8 +91,10 @@ test({
 
 test({
 	message		: 'MultipartFormParser.parse parses multipart data',
+	incomplete : true,
 	test		: ( done )=>{
 		let tempDir			= path.join( __dirname, './fixture/testUploads');
+		console.log( tempDir );
 		let multipartParser	= new MockMultipartFormParser( { tempDir } );
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
