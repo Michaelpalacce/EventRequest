@@ -478,7 +478,6 @@ test({
 				render	= true;
 				return template;
 			},
-			with			: [["TEST\n", templateVariables]],
 			called			: 1
 		});
 
