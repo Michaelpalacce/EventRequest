@@ -64,7 +64,7 @@ class File extends Transport
 
 		let fileName	= this.getFileName();
 
-		if ( this.fileStream !== null || ! fs.existsSync( fileName ) )
+		if ( this.fileStream === null || ! fs.existsSync( fileName ) )
 		{
 			if ( this.fileStream instanceof WriteStream )
 			{
