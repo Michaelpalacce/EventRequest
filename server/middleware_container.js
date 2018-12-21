@@ -118,16 +118,22 @@ middlewaresContainer.templatingEngine	= ( options = {} ) =>{
 	return {
 		handler	: ( event ) =>{
 			let engineOptions		= typeof options.options === 'object' ? options.options : {};
-			let templatingEngine	= typeof options.engine !== 'undefined'
-									&& typeof options.engine.render !== 'undefined'
-									? options.engine
+
+			let templatingEngine	= typeof engineOptions.engine !== 'undefined'
+									&& typeof engineOptions.engine.render !== 'undefined'
+									? engineOptions.engine
 									: false;
 
-			if ( templatingEngine === false )
+			let templateDir			= typeof engineOptions.templateDir !== 'undefined'
+									? engineOptions.templateDir
+									: false;
+
+			if ( templatingEngine === false || templateDir === false )
 			{
-				throw new Error( 'Invalid templating engine provided. Must have a method render.' );
+				throw new Error( 'Invalid templating config provided.' );
 			}
 
+			event.templateDir		= templateDir;
 			event.templatingEngine	= templatingEngine;
 			event.next();
 		}

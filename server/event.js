@@ -64,11 +64,12 @@ class EventRequest extends EventEmitter
 		this.response			= response;
 
 		this.internalTimeout	= null;
+		this.templateDir		= null;
 		this.extra				= {};
 		this.cookies			= {};
 		this.params				= {};
-		this.block				= {};
 		this.body				= {};
+		this.block				= {};
 
 		let templatingEngine	= null;
 		let fileStreamHandler	= null;
@@ -187,6 +188,7 @@ class EventRequest extends EventEmitter
 		this.internalTimeout	= undefined;
 		this.body				= undefined;
 		this.templatingEngine	= undefined;
+		this.templateDir		= undefined;
 		this.fileStreamHandler	= undefined;
 		this.errorHandler		= undefined;
 		this.cachingServer		= undefined;
