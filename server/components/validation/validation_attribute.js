@@ -74,7 +74,7 @@ class ValidationAttribute
 			}
 		}
 
-		return validationErrors.length > 0 ? validationErrors : true;
+		return validationErrors.length > 0 ? validationErrors : false;
 	}
 
 	/**

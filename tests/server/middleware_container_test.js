@@ -214,7 +214,7 @@ test({
 		let eventRequest		= helpers.getEventRequest();
 		let router				= new Router();
 
-		router.add( middlewareContainer.templatingEngine( { engine: new MockTemplatingEngine() } ) );
+		router.add( middlewareContainer.templatingEngine( { engine: new MockTemplatingEngine(), templateDir: '/' } ) );
 		router.add( helpers.getEmptyMiddleware() );
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );

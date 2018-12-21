@@ -83,6 +83,11 @@ Available middleware:
 * * Accepted options:
 * * - errorHandler - ErrorHandler - The error handler to use -> Defaults to ErrorHandler
 
+* templatingEngine -> Sets a templating engine to be used
+* * Accepted options:
+* * - engine - Mixed - Must be an object that defines a render function and will accept as first parameter template and as a second variables
+* * - templateDir - String - Path to the templates
+
 * session -> Adds one or many SecurityManager descendants
 * * Accepted options:
 * * - sessionName - String - the session name ( aka cookie name ) - Defaults to sid
@@ -190,6 +195,8 @@ Example:
 
 The example will validate that the stringToValidate is filled is a string and is within a range of 2-3 characters
 It will also validate that the emailToValidate in case it is provided is an actual email.
+
+In case there is no error False will be returned
 
 
 # Testing

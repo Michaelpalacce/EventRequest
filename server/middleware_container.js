@@ -117,15 +117,13 @@ middlewaresContainer.logger				= ( options = {} ) =>{
 middlewaresContainer.templatingEngine	= ( options = {} ) =>{
 	return {
 		handler	: ( event ) =>{
-			let engineOptions		= typeof options.options === 'object' ? options.options : {};
-
-			let templatingEngine	= typeof engineOptions.engine !== 'undefined'
-									&& typeof engineOptions.engine.render !== 'undefined'
-									? engineOptions.engine
+			let templatingEngine	= typeof options.engine !== 'undefined'
+									&& typeof options.engine.render !== 'undefined'
+									? options.engine
 									: false;
 
-			let templateDir			= typeof engineOptions.templateDir !== 'undefined'
-									? engineOptions.templateDir
+			let templateDir			= typeof options.templateDir !== 'undefined'
+									? options.templateDir
 									: false;
 
 			if ( templatingEngine === false || templateDir === false )

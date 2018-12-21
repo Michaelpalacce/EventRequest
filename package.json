@@ -33,8 +33,32 @@
   "license": "GPL-3.0",
   "main": "server.js",
   "name": "event_request",
+  "keywords": [
+   "server",
+   "api",
+   "app",
+   "framework",
+   "rest",
+   "restful",
+   "web",
+   "net",
+   "router",
+   "logger",
+   "body-parser",
+   "cookie-parser",
+   "session",
+   "security",
+   "file-streams",
+   "middleware",
+   "logging",
+   "console-logging",
+   "file-logging",
+   "static-resources",
+   "caching",
+   "error-handling",
+   "input-validation" ],
   "scripts": {
     "test": "node ./tests/test_script.js"
   },
-  "version": "1.8.8"
+  "version": "1.8.9"
 }
