@@ -116,3 +116,117 @@ test({
 		done();
 	}
 });
+
+test({
+	message	: 'ValidationRules assertNotEqual',
+	test	: ( done )=>{
+		let testProvider	= [
+			{
+				first	: 0,
+				second	: 0,
+				result	: false
+			},
+			{
+				first	: '1',
+				second	: '1',
+				result	: false
+			},
+			{
+				first	: 'string',
+				second	: 'string',
+				result	: false
+			},
+			{
+				first	: true,
+				second	: true,
+				result	: false
+			},
+			{
+				first	: 0,
+				second	: '0',
+				result	: false
+			},
+			{
+				first	: '1',
+				second	: 1,
+				result	: false
+			},
+			{
+				first	: 'string',
+				second	: 'wrong',
+				result	: true
+			},
+			{
+				first	: 0,
+				second	: false,
+				result	: false
+			}
+		];
+
+		testProvider.forEach( ( value )=>{
+			let shouldBeEqual	= value.result;
+			let result			= ValidationRules.assertNotEqual( value.first, value.second );
+
+			assert.equal( result, shouldBeEqual );
+		});
+
+		done();
+	}
+});
+
+test({
+	message	: 'ValidationRules assertStrictNotEqual',
+	test	: ( done )=>{
+		let testProvider	= [
+			{
+				first	: 0,
+				second	: 0,
+				result	: false
+			},
+			{
+				first	: '1',
+				second	: '1',
+				result	: false
+			},
+			{
+				first	: 'string',
+				second	: 'string',
+				result	: false
+			},
+			{
+				first	: true,
+				second	: true,
+				result	: false
+			},
+			{
+				first	: 0,
+				second	: '0',
+				result	: true
+			},
+			{
+				first	: '1',
+				second	: 1,
+				result	: true
+			},
+			{
+				first	: 'string',
+				second	: 'wrong',
+				result	: true
+			},
+			{
+				first	: 0,
+				second	: false,
+				result	: true
+			}
+		];
+
+		testProvider.forEach( ( value )=>{
+			let shouldBeEqual	= value.result;
+			let result			= ValidationRules.assertStrictNotEqual( value.first, value.second );
+
+			assert.equal( result, shouldBeEqual );
+		});
+
+		done();
+	}
+});
