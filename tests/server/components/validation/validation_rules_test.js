@@ -5,227 +5,185 @@ const ValidationRules							= require( './../../../../server/components/validati
 
 test({
 	message	: 'ValidationRules assertStrictEqual',
-	test	: ( done )=>{
-		let testProvider	= [
-			{
-				first	: 0,
-				second	: 0,
-				result	: true
-			},
-			{
-				first	: '1',
-				second	: '1',
-				result	: true
-			},
-			{
-				first	: 'string',
-				second	: 'string',
-				result	: true
-			},
-			{
-				first	: true,
-				second	: true,
-				result	: true
-			},
-			{
-				first	: 0,
-				second	: '0',
-				result	: false
-			},
-			{
-				first	: '1',
-				second	: 1,
-				result	: false
-			},
-			{
-				first	: 'string',
-				second	: 'wrong',
-				result	: false
-			},
-			{
-				first	: 0,
-				second	: false,
-				result	: false
-			}
-		];
-
-		testProvider.forEach( ( value )=>{
-			let shouldBeEqual	= value.result;
-			let result			= ValidationRules.assertStrictEqual( value.first, value.second );
-
-			assert.equal( result, shouldBeEqual );
-		});
+	dataProvider	: [
+		[0, 0, true],
+		['1', '1', true],
+		['string', 'string', true],
+		[true, true, true],
+		[0, '0', false],
+		['string', 'wrong', false],
+		[0, false, false]
+	],
+	test			: ( done, first, second, shouldBeEqual )=>{
+		assert.equal( ValidationRules.assertStrictEqual( first, second ), shouldBeEqual );
 
 		done();
 	}
 });
 
 test({
-	message	: 'ValidationRules assertEqual',
-	test	: ( done )=>{
-		let testProvider	= [
-			{
-				first	: 0,
-				second	: 0,
-				result	: true
-			},
-			{
-				first	: '1',
-				second	: '1',
-				result	: true
-			},
-			{
-				first	: 'string',
-				second	: 'string',
-				result	: true
-			},
-			{
-				first	: true,
-				second	: true,
-				result	: true
-			},
-			{
-				first	: 0,
-				second	: '0',
-				result	: true
-			},
-			{
-				first	: '1',
-				second	: 1,
-				result	: true
-			},
-			{
-				first	: 'string',
-				second	: 'wrong',
-				result	: false
-			},
-			{
-				first	: 0,
-				second	: false,
-				result	: true
-			}
-		];
-
-		testProvider.forEach( ( value )=>{
-			let shouldBeEqual	= value.result;
-			let result			= ValidationRules.assertEqual( value.first, value.second );
-
-			assert.equal( result, shouldBeEqual );
-		});
+	message			: 'ValidationRules assertEqual',
+	dataProvider	: [
+		[0, 0, true],
+		['1', '1', true],
+		['string', 'string', true],
+		[true, true, true],
+		[0, '0', true],
+		['string', 'wrong', false],
+		[0, false, true]
+	],
+	test			: ( done, first, second, shouldBeEqual )=>{
+		assert.equal( ValidationRules.assertEqual( first, second ), shouldBeEqual );
 
 		done();
 	}
 });
 
 test({
-	message	: 'ValidationRules assertNotEqual',
-	test	: ( done )=>{
-		let testProvider	= [
-			{
-				first	: 0,
-				second	: 0,
-				result	: false
-			},
-			{
-				first	: '1',
-				second	: '1',
-				result	: false
-			},
-			{
-				first	: 'string',
-				second	: 'string',
-				result	: false
-			},
-			{
-				first	: true,
-				second	: true,
-				result	: false
-			},
-			{
-				first	: 0,
-				second	: '0',
-				result	: false
-			},
-			{
-				first	: '1',
-				second	: 1,
-				result	: false
-			},
-			{
-				first	: 'string',
-				second	: 'wrong',
-				result	: true
-			},
-			{
-				first	: 0,
-				second	: false,
-				result	: false
-			}
-		];
-
-		testProvider.forEach( ( value )=>{
-			let shouldBeEqual	= value.result;
-			let result			= ValidationRules.assertNotEqual( value.first, value.second );
-
-			assert.equal( result, shouldBeEqual );
-		});
+	message			: 'ValidationRules assertNotEqual',
+	dataProvider	: [
+		[0, 0, false],
+		['1', '1', false],
+		['string', 'string', false],
+		[true, true, false],
+		[0, '0', false],
+		['string', 'wrong', true],
+		[0, false, false]
+	],
+	test			: ( done, first, second, shouldBeEqual )=>{
+		assert.equal( ValidationRules.assertNotEqual( first, second ), shouldBeEqual );
 
 		done();
 	}
 });
 
 test({
-	message	: 'ValidationRules assertStrictNotEqual',
-	test	: ( done )=>{
-		let testProvider	= [
-			{
-				first	: 0,
-				second	: 0,
-				result	: false
-			},
-			{
-				first	: '1',
-				second	: '1',
-				result	: false
-			},
-			{
-				first	: 'string',
-				second	: 'string',
-				result	: false
-			},
-			{
-				first	: true,
-				second	: true,
-				result	: false
-			},
-			{
-				first	: 0,
-				second	: '0',
-				result	: true
-			},
-			{
-				first	: '1',
-				second	: 1,
-				result	: true
-			},
-			{
-				first	: 'string',
-				second	: 'wrong',
-				result	: true
-			},
-			{
-				first	: 0,
-				second	: false,
-				result	: true
-			}
-		];
+	message			: 'ValidationRules assertStrictNotEqual',
+	dataProvider	: [
+		[0, 0, false],
+		['1', '1', false],
+		['string', 'string', false],
+		[true, true, false],
+		[0, '0', true],
+		['string', 'wrong', true],
+		[0, false, true]
+	],
+	test			: ( done, first, second, shouldBeEqual )=>{
+		assert.equal( ValidationRules.assertStrictNotEqual( first, second ), shouldBeEqual );
+		done();
+	}
+});
 
-		testProvider.forEach( ( value )=>{
-			let shouldBeEqual	= value.result;
-			let result			= ValidationRules.assertStrictNotEqual( value.first, value.second );
+test({
+	message			: 'ValidationRules assertIsString',
+	dataProvider	: [
+		['', true],
+		['hey', true],
+		[1, false],
+		[false, false],
+		[[], false]
+	],
+	test			: ( done, value, shouldBeEqual ) =>{
+		assert.equal( ValidationRules.assertIsString( value ), shouldBeEqual );
 
-			assert.equal( result, shouldBeEqual );
-		});
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules assertNotString',
+	dataProvider	: [
+		['', false],
+		['hey', false],
+		[1, true],
+		[false, true],
+		[[], true]
+	],
+	test			: ( done, value, shouldBeEqual ) =>{
+		assert.equal( ValidationRules.assertNotString( value ), shouldBeEqual );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules assertIsNumeric',
+	dataProvider	: [
+		[0, true],
+		[false, false],
+		[[], false],
+		['string', false],
+		[NaN, false]
+	],
+	test			: ( done, value, shouldBeEqual ) =>{
+		assert.equal( ValidationRules.assertIsNumeric( value ), shouldBeEqual );
+
+		done();
+	}
+});
+
+
+test({
+	message			: 'ValidationRules assertNotNumeric',
+	dataProvider	: [
+		['string', true],
+		[NaN, true],
+		[[], false],
+		[false, false],
+		[1, false]
+	],
+	test			: ( done, value, shouldBeEqual ) =>{
+		assert.equal( ValidationRules.assertNotNumeric( value ), shouldBeEqual );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules assertIsEmpty',
+	dataProvider	: [
+		['', true],
+		[{}, true],
+		[[], true],
+		[true, false],
+		[1, false],
+		[{key:'value'}, false],
+		[[1,2,3], false],
+		['string', false]
+	],
+	test			: ( done, value, shouldBeEqual )=>{
+		assert.equal( ValidationRules.assertIsEmpty( value ), shouldBeEqual );
+
+		done();
+	}
+});
+
+
+test({
+	message			: 'ValidationRules assertIsEmpty',
+	dataProvider	: [
+		['', false],
+		[{}, false],
+		[[], false],
+		[true, true],
+		[1, true],
+		[{key:'value'}, true],
+		[[1,2,3], true]
+	],
+	test			: ( done, value, shouldBeEqual )=>{
+		assert.equal( ValidationRules.assertNotEmpty( value ), shouldBeEqual );
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules assertIsDateObject',
+	dataProvider	: [
+		[new Date(), true],
+		['string', false]
+	],
+	test			: ( done, value, shouldBeEqual )=>{
+		assert.equal( ValidationRules.assertIsDateObject( value ), shouldBeEqual );
 
 		done();
 	}

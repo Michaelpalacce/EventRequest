@@ -2,7 +2,8 @@
 - Separated test into test suites
 - Renamed the testing_suite to test_helper
 - Added test_bootstrap
-- Validation tests added
+- Validation Rule tests added
+- Added dataProviders to the tester
 
 1.8.10:
 - Fixed Templating engine bug

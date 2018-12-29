@@ -286,6 +286,10 @@ The run all tests will run all tests added by the test function.
 The 'test' function accepts an object with the following options:
 
 * message - String - the name of the test
+* skipped - Boolean - defaults to false - If this is set to true the test will be skipped
+* incomplete - Boolean - defaults to false - If this is set to true the test will be marked as incomplete
+* dataProvider - Array - Optional - If this is provided then an Array of Arrays must be supplied.
+* * For each Array supplied, a new test will be created and called with the Array elements set as arguments to the test callback
 * test - Function - the callback to execute.
 * * the tester provides a done function as the first argument to the test callback. The done should be called just ONCE
 and only when the test finishes. If done is called twice within the same test then that will be seen as an error and
@@ -295,10 +299,16 @@ the testing will stop.
 Example:
 
 >     test({  
->       message    : 'This test should pass',  
->       test       : ( done ) =>{  
+>       message     : 'This test should pass',  
+>       dataProvier : [
+>           ['first', 2 ],
+>           ['firstTwo', 21 ],
+>       ]
+>       test        : ( done, first, second ) =>{  
+>          console.log( first ); this will log 'first', then on the second iterration 'firstTwo'
+>          console.log( second ); this will log 2, then on the second iterration 21
 >          let one = 1;  
->            
+>
 >         one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );  
 >       }  
 >     });  

@@ -94,7 +94,7 @@ class Tester
 	 *
 	 * @param	Object test
 	 *
-	 * @return	Object
+	 * @return	Array
 	 */
 	formatTest( test )
 	{
@@ -102,6 +102,7 @@ class Tester
 		{
 			throw new Error( 'Invalid test provided' );
 		}
+		let tests	= [];
 
 		if ( test.skipped === true )
 		{
@@ -116,7 +117,32 @@ class Tester
 			test.status	= TEST_STATUSES.pending;
 		}
 
-		return test;
+		if ( Array.isArray( test.dataProvider ) )
+		{
+			let i	= 0;
+			test.dataProvider.forEach( ( data )=>{
+				let newTest	= {};
+
+				newTest.message	= test.message + '#' + i;
+				newTest.status	= test.status;
+
+				newTest.test	= ( done )=>{
+					data.unshift( done );
+
+					test.test.apply( this, data );
+				};
+
+				tests.push( newTest );
+
+				++ i;
+			});
+		}
+		else
+		{
+			tests.push( test );
+		}
+
+		return tests;
 	}
 
 	/**
@@ -128,7 +154,7 @@ class Tester
 	 */
 	addTest( test )
 	{
-		this.tests.push( this.formatTest( test ) );
+		this.tests	= this.tests.concat( this.formatTest( test ) );
 	}
 
 	/**
