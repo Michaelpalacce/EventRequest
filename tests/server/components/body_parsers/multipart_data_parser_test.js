@@ -1,6 +1,6 @@
 'use strict';
 
-const { Mock, Mocker, assert, test, helpers }	= require( './../../../testing_suite' );
+const { Mock, Mocker, assert, test, helpers }	= require( '../../../test_helper' );
 const { MultipartFormParser }					= require( './../../../../server/components/body_parser_handler' );
 const os										= require( 'os' );
 const fs										= require( 'fs' );

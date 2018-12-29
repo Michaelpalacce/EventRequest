@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers }	= require( './../testing_suite' );
+const { Mock, assert, test, helpers }	= require( '../test_helper' );
 const EventRequest						= require( './../../server/event' );
 const { FileStreamHandler }				= require( './../../server/components/file_stream_handler' );
 const ErrorHandler						= require( './../../server/components/error_handler' );

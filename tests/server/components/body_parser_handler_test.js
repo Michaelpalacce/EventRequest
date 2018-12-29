@@ -1,6 +1,6 @@
 'use strict';
 
-const { Mock, Mocker, assert, test, helpers }	= require( './../../testing_suite' );
+const { Mock, Mocker, assert, test, helpers }	= require( '../../test_helper' );
 const {
 	BodyParserHandler,
 	BodyParser,

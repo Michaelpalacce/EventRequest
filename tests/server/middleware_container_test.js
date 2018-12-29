@@ -1,6 +1,6 @@
 'use strict';
 
-const { assert, Mock, test, helpers }	= require( './../testing_suite' );
+const { assert, Mock, test, helpers }	= require( '../test_helper' );
 const middlewareContainer				= require( './../../server/middleware_container' );
 const Router							= require( './../../server/router' );
 const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );

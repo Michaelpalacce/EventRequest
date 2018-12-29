@@ -2,7 +2,7 @@
 'use strict';
 
 // Dependencies
-const { assert, test, Mock, Mocker, helpers }	= require( './../../../../../testing_suite' );
+const { assert, test, Mock, Mocker, helpers }	= require( '../../../../../test_helper' );
 const { LOG_LEVELS, File, Log }					= require( './../../../../../../server/components/logger/loggur' );
 const { Writable }								= require( 'stream' );
 const fs										= require( 'fs' );

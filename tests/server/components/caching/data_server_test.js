@@ -1,6 +1,6 @@
 'use strict';
 
-const { Mock, assert, test, Mocker }	= require( './../../../testing_suite' );
+const { Mock, assert, test, Mocker }	= require( '../../../test_helper' );
 const DataServer						= require( './../../../../server/components/caching/data_server' );
 
 test({

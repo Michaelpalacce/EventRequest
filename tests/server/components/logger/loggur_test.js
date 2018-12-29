@@ -1,6 +1,6 @@
 'use strict';
 
-const { Mock, assert, test, helpers }	= require( './../../../testing_suite' );
+const { Mock, assert, test, helpers }	= require( '../../../test_helper' );
 const { Loggur, Logger, LOG_LEVELS }	= require( './../../../../server/components/logger/loggur' );
 const MockLoggur						= Mock( Loggur.constructor );
 

@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers }	= require( './../testing_suite' );
+const { assert, test, helpers }	= require( '../test_helper' );
 const Router					= require( './../../server/router' );
 const Route						= require( './../../server/route' );
 

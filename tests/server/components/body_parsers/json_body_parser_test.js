@@ -1,6 +1,6 @@
 'use strict';
 
-const { assert, test, helpers }	= require( './../../../testing_suite' );
+const { assert, test, helpers }	= require( '../../../test_helper' );
 const { JsonBodyParser }		= require( './../../../../server/components/body_parser_handler' );
 
 test({

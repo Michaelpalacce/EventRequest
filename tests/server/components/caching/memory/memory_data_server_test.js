@@ -1,6 +1,6 @@
 'use strict';
 
-const { assert, test, helpers }	= require( './../../../../testing_suite' );
+const { assert, test, helpers }	= require( '../../../../test_helper' );
 const MemoryDataServer			= require( './../../../../../server/components/caching/memory/memory_data_server' );
 
 let testServer					= null;

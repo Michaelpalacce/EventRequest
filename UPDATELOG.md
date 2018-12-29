@@ -1,4 +1,10 @@
-1.9.0:
+1.8.11
+- Separated test into test suites
+- Renamed the testing_suite to test_helper
+- Added test_bootstrap
+- Validation tests added
+
+1.8.10:
 - Fixed Templating engine bug
 
 1.8.9:
