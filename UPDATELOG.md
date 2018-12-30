@@ -1,4 +1,12 @@
-1.8.11
+1.10.0
+- Fixed Validation Attributes to actually return negative  in case of no error. Thank you tests
+- Added Validation Attribute tests
+- Modification to Validation Results, they will not return an array anymore but a validation result.
+    The array can still be extracted by doing validationResult.getValidationResult and using hasValidationFailed
+    will check if the validation has failed.
+- Version incremented to 1.10.0 because of big bug fix
+
+1.9.0
 - Separated test into test suites
 - Renamed the testing_suite to test_helper
 - Added test_bootstrap

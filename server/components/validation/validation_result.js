@@ -8,6 +8,7 @@ class ValidationResult
 	constructor()
 	{
 		this.attributes	= [];
+		this.result		= null;
 	}
 
 	/**
@@ -29,12 +30,38 @@ class ValidationResult
 	 */
 	validateAllAttributes()
 	{
-		let result	= {};
-		this.attributes.forEach( ( attribute ) => {
-			result[attribute.key]	= attribute.validateSelf();
-		});
+		if ( this.result === null )
+		{
+			this.result	= [];
 
-		return result;
+			this.attributes.forEach( ( attribute ) => {
+				this.result[attribute.key]	= attribute.validateSelf();
+			});
+		}
+	}
+
+	/**
+	 * @brief	Checks if the validation of a given ValidationInput has failed.
+	 *
+	 * @return	Boolean
+	 */
+	hasValidationFailed()
+	{
+		this.validateAllAttributes();
+
+		return this.result !== false;
+	}
+
+	/**
+	 * @brief	Gets the reason if any of validation failure
+	 *
+	 * @return	Array|Boolean
+	 */
+	getValidationResult()
+	{
+		this.validateAllAttributes();
+
+		return this.result;
 	}
 }
 

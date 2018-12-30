@@ -184,7 +184,9 @@ skeleton must have the keys that are to be validated that point to a string of r
 * different  - checks if the input is different from another input aka: different:emailInput
 * equals  - checks if the input equals another given string: equals:makeSureToEqualToThis
 
-If any errors occur they will be returned as an array of keys eg: ['string','min','max','range','filled']
+When validation is done a ValidationResult is returned. It has 2 main methods:
+    getValidationResult that will return an array of error keys eg: ['string','min','max','range','filled']
+    hasValidationFailed that returns a boolean whether there is an error
 
 Example:
 

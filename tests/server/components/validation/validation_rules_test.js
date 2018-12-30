@@ -1,7 +1,7 @@
 'use strict';
 
-const { Mock, assert, test, helpers, Mocker }	= require( '../../../test_helper' );
-const ValidationRules							= require( './../../../../server/components/validation/validation_rules' );
+const { assert, test }	= require( '../../../test_helper' );
+const ValidationRules	= require( './../../../../server/components/validation/validation_rules' );
 
 test({
 	message	: 'ValidationRules assertStrictEqual',

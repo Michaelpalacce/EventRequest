@@ -37,6 +37,7 @@ testSuites.bodyParserSuite	= ()=>{
 
 testSuites.validationSuite	= ()=>{
 	require( './server/components/validation/validation_rules_test' );
+	require( './server/components/validation/validation_attribute_test' );
 };
 
 module.exports	= testSuites;

@@ -36,7 +36,9 @@ class ValidationHandler
 			validationResult.addAttribute( validationAttribute );
 		}
 
-		return validationResult.validateAllAttributes();
+		validationResult.validateAllAttributes();
+
+		return validationResult;
 	}
 }
 
