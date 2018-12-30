@@ -120,7 +120,9 @@ class BodyParserHandler
 
 			if ( parser.supports( this.event ) )
 			{
+				this.event.emit( 'stream_start' );
 				parser.parse( this.event, ( err, data ) =>{
+					this.event.emit( 'stream_end' );
 					if ( ! err && data ) {
 						this.event.body	= data;
 						callback( false );

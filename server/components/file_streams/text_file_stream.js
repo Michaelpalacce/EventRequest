@@ -51,7 +51,7 @@ class TextFileStream extends FileStream
 			return;
 		}
 
-		this.event.clearTimeout();
+		this.event.emit( 'stream_start' );
 
 		file	= fs.createReadStream( file );
 

@@ -19,6 +19,7 @@ Includes:
 - Error handling
 - Caching ( in memory )
 - Input Validation
+- Plugin Manager
 
 # Properties exported by the Server:
 	Server,				// The actual server to be used
@@ -30,6 +31,7 @@ Includes:
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
 	PluginInterface,	// Used to add plugins to the system
+	PluginManager,		// Contains ready to use plugins
 	Logging
 
 # Server Options
@@ -111,10 +113,6 @@ Available middleware:
 * addStaticPath -> adds static resource path
 * * Accepted options:
 * * - path - String - The path to make available
-
-* timeout -> Adds a timeout to the request
-* * Accepted options:
-* * - timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
 
 
 
@@ -500,10 +498,30 @@ The caching server is added to every event: event.cachingServer and can be used 
 
 # PluginInterface
 The PluginInterface has a getPluginMiddleware method that must return normal middleware objects implementing handler,
- 
 route, method keys or instances of Route. 
+
+The PluginInterface has a setOptions function that can be used to give instructions to the Plugin when it is being 
+created and added to the event request
 
 When Using server.apply() you can pass a PluginContainer as well for easier functionality implementation.
 This is also done to make it easier for middleware with options to be implemented as to not spaghetti code that is hard
 to read and understand.
 
+# Plugin Manager
+The Plugin manager contains pre loaded plugins. You can add your own plugins to it for easy control over what is used or 
+if you want the bootstrap of the project to be in a different place.
+
+The plugin Manager exports the following functions:
+
+* addPlugin( plugin ) - accepts only a plugin of instance PluginInterface and only if it does not exist already otherwise throws
+    an exception
+* hasPlugin( id ) - checks if a plugin with the specified id exist
+* removePlugin( id ) - removes a plugin 
+* getAllPluginIds - returns an array with all the possible plugins
+* getPlugin( id ) - returns a PluginInterface otherwise throw
+
+### Available plugins:
+
+* event_request_timeout -> Adds a timeout to the request
+* * Accepted options:
+* * - timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds

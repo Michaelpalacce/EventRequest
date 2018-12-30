@@ -17,7 +17,7 @@ class PluginInterface
 	constructor( pluginId, options = {} )
 	{
 		this.options	= options;
-		this.pluginId	= '';
+		this.pluginId	= pluginId;
 	}
 
 	/**
@@ -56,4 +56,4 @@ class PluginInterface
 	}
 }
 
-module.exports	= PluginContainer;
+module.exports	= PluginInterface;

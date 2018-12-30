@@ -21,10 +21,26 @@ class PluginManager
 	 */
 	addPlugin( plugin )
 	{
-		if ( plugin instanceof PluginInterface )
+		if ( plugin instanceof PluginInterface && ! this.hasPlugin( plugin.getPluginId() ) )
 		{
 			this.plugins[plugin.getPluginId()]	= plugin;
 		}
+		else
+		{
+			throw new Error( 'Cannot add plugin' );
+		}
+	}
+
+	/**
+	 * @brief	Checks whether the given plugin id corresponds to a plugin added to the manager
+	 *
+	 * @param	String id
+	 *
+	 * @return	Boolean
+	 */
+	hasPlugin( id )
+	{
+		return this.plugins[id] != null;
 	}
 
 	/**
@@ -36,7 +52,34 @@ class PluginManager
 	 */
 	removePlugin( id )
 	{
-		this.plugins[id]	= undefined;
+		delete this.plugins[id];
+	}
+
+	/**
+	 * @brief	Get all plugins added to the plugin manager
+	 *
+	 * @return	Array
+	 */
+	getAllPluginIds()
+	{
+		return Object.keys( this.plugins );
+	}
+
+	/**
+	 * @brief	Gets a plugin given an id
+	 *
+	 * @param	String id
+	 *
+	 * @return	PluginInterface
+	 */
+	getPlugin( id )
+	{
+		if ( ! this.hasPlugin( id ) )
+		{
+			throw new Error( 'Plugin cannot be found' );
+		}
+
+		return this.plugins[id];
 	}
 }
 

@@ -63,7 +63,6 @@ class EventRequest extends EventEmitter
 		this.request			= request;
 		this.response			= response;
 
-		this.internalTimeout	= null;
 		this.templateDir		= null;
 		this.templatingEngine	= null;
 		this.extra				= {};
@@ -172,8 +171,7 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Clean ups the event
 	 *
-	 * @details	Clears the timeout
-	 * 			Removes all listeners from the eventEmitter
+	 * @details	Removes all listeners from the eventEmitter
 	 * 			Stops the event
 	 * 			Clears internal pointers
 	 *
@@ -182,10 +180,8 @@ class EventRequest extends EventEmitter
 	cleanUp()
 	{
 		this.emit( 'cleanUp' );
-		this.clearTimeout();
 
 		this.extra				= undefined;
-		this.internalTimeout	= undefined;
 		this.body				= undefined;
 		this.templatingEngine	= undefined;
 		this.templateDir		= undefined;
@@ -288,21 +284,6 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-	 * @brief	Clears the timeout event
-	 *
-	 * @return	void
-	 */
-	clearTimeout()
-	{
-		this.emit( 'clearTimeout' );
-
-		if ( this.internalTimeout !== null && this.internalTimeout !== undefined )
-		{
-			clearTimeout( this.internalTimeout );
-		}
-	}
-
-	/**
 	 * @brief	Checks if the response is finished
 	 *
 	 * @return	Boolean
@@ -330,8 +311,8 @@ class EventRequest extends EventEmitter
 						: false;
 
 		if (
-			typeof this.templatingEngine !== "undefined"
-			&& this.templatingEngine.render !== "undefined"
+			this.templatingEngine != null
+			&& this.templatingEngine.render !== 'undefined'
 			&& templateName !== false
 		) {
 			let templatePath	= path.join( this.templateDir, templateName );

@@ -237,34 +237,5 @@ middlewaresContainer.addStaticPath	= ( options = {} ) => {
 	};
 };
 
-/**
- * @brief	Adds a timeout middleware that will cause the event to timeout after a specific time
- *
- * @param	string staticPath
- * 			Accepts options:
- * 			- timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
- *
- * @return	Object
- */
-middlewaresContainer.timeout	= ( options = {} ) =>
-{
-	let timeout	= typeof options.timeout === 'number' ? parseInt( options.timeout ) : 60 * 1000;
-
-	return {
-		handler	: ( event ) => {
-			event.internalTimeout	= setTimeout( () => {
-					if ( ! event.isFinished() )
-					{
-						event.next( `Request timed out in: ${timeout}` );
-					}
-				},
-				timeout
-			);
-
-			event.next();
-		}
-	};
-};
-
 // Export the module
 module.exports	= middlewaresContainer;

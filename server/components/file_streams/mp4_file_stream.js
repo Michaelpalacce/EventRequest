@@ -52,7 +52,7 @@ class Mp4FileStream extends FileStream
 		let fileSize	= stat.size;
 		let range		= this.event.headers.range;
 
-		this.event.clearTimeout();
+		this.event.emit( 'stream_start' );
 		if ( range )
 		{
 			let parts	= range.replace( /bytes=/, "" ).split( "-" );

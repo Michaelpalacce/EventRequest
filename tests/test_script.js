@@ -10,6 +10,7 @@ testSuites.loggingSuite();
 testSuites.cachingSuite();
 testSuites.bodyParserSuite();
 testSuites.validationSuite();
+testSuites.pluginsSuite();
 
 runAllTests({
 	dieOnFirstError	: true,

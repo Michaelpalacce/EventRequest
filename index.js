@@ -11,6 +11,8 @@ const ErrorHandler				= require( './server/components/error/error_handler' );
 const SessionHandler			= require( './server/components/session/session_handler' );
 const BodyParserHandler			= require( './server/components/body_parsers/body_parser_handler' );
 const PluginInterface			= require( './server/components/plugin_interface' );
+const PluginManagerClass		= require( './server/plugins/plugin_manager' );
+const TimeoutPlugin				= require( './server/plugins/timeout_plugin' );
 const middlewaresContainer		= require( './server/middleware_container' );
 const Cluster					= require( './server/components/cluster/cluster' );
 const CommunicationManager		= require( './server/components/cluster/communication_manager' );
@@ -151,15 +153,15 @@ class Server
 	};
 
 	/**
-	 * @brief	This is used to apply a new PluginContainer
+	 * @brief	This is used to apply a new PluginInterface
 	 *
-	 * @param	PluginContainer plugin
+	 * @param	PluginInterface plugin
 	 *
 	 * @return	void
 	 */
 	apply( plugin )
 	{
-		if ( plugin instanceof PluginContainer )
+		if ( plugin instanceof PluginInterface )
 		{
 			let pluginMiddleware	= plugin.getPluginMiddleware();
 
@@ -325,6 +327,10 @@ class Server
 	}
 }
 
+let PluginManager	= new PluginManagerClass();
+
+PluginManager.addPlugin( new TimeoutPlugin( 'event_request_timeout' ) );
+
 // Export the server module
 module.exports	= {
 	Server,
@@ -335,5 +341,6 @@ module.exports	= {
 	BodyParserHandler,
 	Testing,
 	PluginInterface,
+	PluginManager,
 	Logging
 };

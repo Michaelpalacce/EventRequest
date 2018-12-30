@@ -689,6 +689,7 @@ class MultipartFormParser extends BodyParser
 		let parts	= {
 			'files'			: []
 		};
+
 		this.parts.forEach( ( part ) =>{
 			if ( part.type === DATA_TYPE_FILE )
 			{
@@ -714,8 +715,6 @@ class MultipartFormParser extends BodyParser
 	 */
 	absorbStream()
 	{
-		this.event.clearTimeout();
-
 		let self	= this;
 		this.event.request.on( 'data', ( chunk ) =>
 		{

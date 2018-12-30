@@ -2,6 +2,10 @@
 - New Plugin Interface Functionality
 - The tester will no longer throw an error by default, also removed the error throwing from the test_script callback
 - Moved components to different folders for readability 
+- Added PluginManager to hold all available plugins
+- Removed the timeout middleware, moved to a plugin
+- Added Timeout Plugin Tests
+- Added Plugin Manager Tests
 
 1.10.2 
 - Error from npm version increment
