@@ -1,13 +1,13 @@
 'use strict';
 
 // Dependencies
-const Router						= require( './../router' );
-const AuthenticationManager			= require( './session/authentication_manager' );
-const LoginManager					= require( './session/login_manager' );
-const SessionSaveManager			= require( './session/session_save_manager' );
-const SessionAuthenticationManager	= require( './session/session_authentication_manager' );
-const SecurityManager				= require( './session/security_manager' );
-const TokenManager					= require( './session/helpers/token_manager' );
+const Router						= require( '../../router' );
+const AuthenticationManager			= require( './authentication_manager' );
+const LoginManager					= require( './login_manager' );
+const SessionSaveManager			= require( './session_save_manager' );
+const SessionAuthenticationManager	= require( './session_authentication_manager' );
+const SecurityManager				= require( './security_manager' );
+const TokenManager					= require( './helpers/token_manager' );
 
 const DEFAULT_SESSION_NAME				= 'sid';
 const DEFAULT_TOKEN_EXPIRATION_TIME		= 0;

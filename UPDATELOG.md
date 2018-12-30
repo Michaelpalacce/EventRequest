@@ -1,5 +1,7 @@
-1.10.3
+1.11.0
+- New Plugin Container Functionality
 - The tester will no longer throw an error by default, also removed the error throwing from the test_script callback
+- Moved components to different folders for readability 
 
 1.10.2 
 - Error from npm version increment

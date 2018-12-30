@@ -1,9 +1,9 @@
 'use strict';
 
 // Dependencies
-const FileStream		= require( './file_streams/file_stream' );
-const Mp4FileStream		= require( './file_streams/mp4_file_stream' );
-const TextFileStream	= require( './file_streams/text_file_stream' );
+const FileStream		= require( './file_stream' );
+const Mp4FileStream		= require( './mp4_file_stream' );
+const TextFileStream	= require( './text_file_stream' );
 
 /**
  * @brief	File streamer used to stream files

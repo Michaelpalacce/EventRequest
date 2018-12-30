@@ -1,7 +1,7 @@
 'use strict';
 
 const { Mock, Mocker, assert, test, helpers }	= require( '../../../test_helper' );
-const { MultipartFormParser }					= require( './../../../../server/components/body_parser_handler' );
+const { MultipartFormParser }					= require( '../../../../server/components/body_parsers/body_parser_handler' );
 const os										= require( 'os' );
 const fs										= require( 'fs' );
 const path										= require( 'path' );

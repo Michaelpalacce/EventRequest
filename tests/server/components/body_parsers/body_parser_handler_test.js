@@ -1,13 +1,13 @@
 'use strict';
 
-const { Mock, Mocker, assert, test, helpers }	= require( '../../test_helper' );
+const { Mock, Mocker, assert, test, helpers }	= require( '../../../test_helper' );
 const {
 	BodyParserHandler,
 	BodyParser,
 	MultipartFormParser,
 	JsonBodyParser,
 	FormBodyParser
-}												= require( './../../../server/components/body_parser_handler' );
+}												= require( '../../../../server/components/body_parsers/body_parser_handler' );
 
 test({
 	message	: 'BodyParserHandler.constructor on defaults throws because EventRequest is invalid',

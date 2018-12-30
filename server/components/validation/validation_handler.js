@@ -1,8 +1,8 @@
 'use strict';
 
 // Dependencies
-const ValidationAttribute	= require( './validation/validation_attribute' );
-const ValidationResult		= require( './validation/validation_result' );
+const ValidationAttribute	= require( './validation_attribute' );
+const ValidationResult		= require( './validation_result' );
 
 /**
  * @brief	Validation Handler used to validate POST data

@@ -3,8 +3,8 @@
 // Dependencies
 const { Mock, assert, test, helpers }	= require( '../test_helper' );
 const EventRequest						= require( './../../server/event' );
-const { FileStreamHandler }				= require( './../../server/components/file_stream_handler' );
-const ErrorHandler						= require( './../../server/components/error_handler' );
+const { FileStreamHandler }				= require( '../../server/components/file_streams/file_stream_handler' );
+const ErrorHandler						= require( '../../server/components/error/error_handler' );
 const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );
 const { Loggur }						= require( './../../server/components/logger/loggur' );
 

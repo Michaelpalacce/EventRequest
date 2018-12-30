@@ -3,9 +3,9 @@
 // Dependencies
 const fs					= require( 'fs' );
 const path					= require( 'path' );
-const { BodyParserHandler }	= require( './components/body_parser_handler' );
-const ErrorHandler			= require( './components/error_handler' );
-const { SessionHandler }	= require( './components/session_handler' );
+const { BodyParserHandler }	= require( './components/body_parsers/body_parser_handler' );
+const ErrorHandler			= require( './components/error/error_handler' );
+const { SessionHandler }	= require( './components/session/session_handler' );
 const { Logger }			= require( './components/logger/loggur' );
 
 // Define the object
@@ -109,7 +109,8 @@ middlewaresContainer.logger				= ( options = {} ) =>{
  *
  * @param	Object options
  * 			Accepted options:
- * 			- engine - TemplatingEngine - Instance of TemplatingEngine. Defaults to BaseTemplatingEngine
+ * 			- engine - Object - Instance of a templating engine that has a method render defined that accepts
+ * 				html as first argument, object of variables as second and a callback as third
  * 			- options - Object - options to be passed to the engine
  *
  * @return	Object

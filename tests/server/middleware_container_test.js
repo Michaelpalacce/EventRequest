@@ -4,7 +4,7 @@ const { assert, Mock, test, helpers }	= require( '../test_helper' );
 const middlewareContainer				= require( './../../server/middleware_container' );
 const Router							= require( './../../server/router' );
 const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );
-const ErrorHandler						= require( './../../server/components/error_handler' );
+const ErrorHandler						= require( '../../server/components/error/error_handler' );
 const MultipartFormParser				= require( './../../server/components/body_parsers/multipart_data_parser' );
 const { Loggur, Logger }				= require( './../../server/components/logger/loggur' );
 

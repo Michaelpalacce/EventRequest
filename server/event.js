@@ -5,12 +5,12 @@ const url									= require( 'url' );
 const path									= require( 'path' );
 const fs									= require( 'fs' );
 const { EventEmitter }						= require( 'events' );
-const { FileStreamHandler, FileStream }		= require( './components/file_stream_handler' );
-const ErrorHandler							= require( './components/error_handler' );
+const { FileStreamHandler, FileStream }		= require( './components/file_streams/file_stream_handler' );
+const ErrorHandler							= require( './components/error/error_handler' );
 const Streams								= require( 'stream' );
 const DataServer							= require( './components/caching/data_server' );
 const { Logger }							= require( './components/logger/loggur' );
-const ValidationHandler						= require( './components/validation_handler' );
+const ValidationHandler						= require( './components/validation/validation_handler' );
 const { IncomingMessage, ServerResponse }	= require( 'http' );
 
 /**
@@ -65,13 +65,13 @@ class EventRequest extends EventEmitter
 
 		this.internalTimeout	= null;
 		this.templateDir		= null;
+		this.templatingEngine	= null;
 		this.extra				= {};
 		this.cookies			= {};
 		this.params				= {};
 		this.body				= {};
 		this.block				= {};
 
-		let templatingEngine	= null;
 		let fileStreamHandler	= null;
 		Object.defineProperty( this, 'fileStreamHandler', {
 			enumerable	: true,

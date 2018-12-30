@@ -1,7 +1,7 @@
 'use strict';
 
 const { assert, test, helpers }	= require( '../../../test_helper' );
-const { BodyParser }			= require( './../../../../server/components/body_parser_handler' );
+const { BodyParser }			= require( '../../../../server/components/body_parsers/body_parser_handler' );
 
 test({
 	message	: 'BodyParser.constructor on defaults does not die',

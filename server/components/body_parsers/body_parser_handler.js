@@ -1,11 +1,11 @@
 'use strict';
 
 // Dependencies
-const MultipartFormParser	= require( './body_parsers/multipart_data_parser' );
-const FormBodyParser		= require( './body_parsers/form_body_parser' );
-const JsonBodyParser		= require( './body_parsers/json_body_parser' );
-const BodyParser			= require( './body_parsers/body_parser' );
-const EventRequest			= require( './../event' );
+const MultipartFormParser	= require( './multipart_data_parser' );
+const FormBodyParser		= require( './form_body_parser' );
+const JsonBodyParser		= require( './json_body_parser' );
+const BodyParser			= require( './body_parser' );
+const EventRequest			= require( '../../event' );
 
 /**
  * @brief	BodyParserHandler responsible for parsing the body of the request
