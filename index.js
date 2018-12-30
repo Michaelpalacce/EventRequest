@@ -10,7 +10,7 @@ const Router					= require( './server/router' );
 const ErrorHandler				= require( './server/components/error/error_handler' );
 const SessionHandler			= require( './server/components/session/session_handler' );
 const BodyParserHandler			= require( './server/components/body_parsers/body_parser_handler' );
-const PluginContainer			= require( './server/components/plugin_container' );
+const PluginInterface			= require( './server/components/plugin_interface' );
 const middlewaresContainer		= require( './server/middleware_container' );
 const Cluster					= require( './server/components/cluster/cluster' );
 const CommunicationManager		= require( './server/components/cluster/communication_manager' );
@@ -334,6 +334,6 @@ module.exports	= {
 	SessionHandler,
 	BodyParserHandler,
 	Testing,
-	PluginContainer,
+	PluginInterface,
 	Logging
 };

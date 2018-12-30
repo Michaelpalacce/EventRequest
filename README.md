@@ -29,7 +29,7 @@ Includes:
 	DataServer,			// Instance to be extended to implement your own DataServer
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
-	PluginContainer,	// Used to add plugins to the system
+	PluginInterface,	// Used to add plugins to the system
 	Logging
 
 # Server Options
@@ -498,8 +498,8 @@ The caching server is added to every event: event.cachingServer and can be used 
 ### Again this caching server should not be used in production and is solely for development purposes.
 
 
-# PluginContainer
-The PluginContainer has a getPluginMiddleware method that must return normal middleware objects implementing handler,
+# PluginInterface
+The PluginInterface has a getPluginMiddleware method that must return normal middleware objects implementing handler,
  
 route, method keys or instances of Route. 
 

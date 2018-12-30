@@ -1,5 +1,5 @@
 1.11.0
-- New Plugin Container Functionality
+- New Plugin Interface Functionality
 - The tester will no longer throw an error by default, also removed the error throwing from the test_script callback
 - Moved components to different folders for readability 
 
