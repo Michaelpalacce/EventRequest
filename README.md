@@ -29,6 +29,7 @@ Includes:
 	DataServer,			// Instance to be extended to implement your own DataServer
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
+	PluginContainer,	// Used to add plugins to the system
 	Logging
 
 # Server Options
@@ -58,7 +59,7 @@ The server constructor accepts the following options:
 ## The server is started by calling server.start();
 
 ***
-The server has 2 ways of adding routes/middleware
+The server has 3 ways of adding routes/middleware
 
 When adding a Route the **server.add(route)** can be used
 
@@ -67,6 +68,11 @@ route accepts 3 parameters:
 * route - String|RegExp - The route to match - optional if omitted the handler will be called on every request
 * method - String|Array - The method(s) to be matched for the route - optional if omitted the handler will be called on every request as long as the route matches
 
+***
+
+Plugins can be added by using **server.apply( pluginContainerInstance )**
+
+Read down to the Plugin section for more information
 
 ***
 
@@ -490,3 +496,14 @@ The create, update, read all accept ttl as an options which must be a number in 
 The caching server is added to every event: event.cachingServer and can be used anywhere
 
 ### Again this caching server should not be used in production and is solely for development purposes.
+
+
+# PluginContainer
+The PluginContainer has a getPluginMiddleware method that must return normal middleware objects implementing handler,
+ 
+route, method keys or instances of Route. 
+
+When Using server.apply() you can pass a PluginContainer as well for easier functionality implementation.
+This is also done to make it easier for middleware with options to be implemented as to not spaghetti code that is hard
+to read and understand.
+

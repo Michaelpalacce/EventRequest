@@ -10,7 +10,8 @@ const Router					= require( './server/router' );
 const ErrorHandler				= require( './server/components/error/error_handler' );
 const SessionHandler			= require( './server/components/session/session_handler' );
 const BodyParserHandler			= require( './server/components/body_parsers/body_parser_handler' );
-const middlewaresContainer		= require( './server/middleware_container' )
+const PluginContainer			= require( './server/components/plugin_container' );
+const middlewaresContainer		= require( './server/middleware_container' );
 const Cluster					= require( './server/components/cluster/cluster' );
 const CommunicationManager		= require( './server/components/cluster/communication_manager' );
 const Logging					= require( './server/components/logger/loggur' );
@@ -148,6 +149,25 @@ class Server
 			this.add( middlewaresContainer[name]( options ) );
 		}
 	};
+
+	/**
+	 * @brief	This is used to apply a new PluginContainer
+	 *
+	 * @param	PluginContainer plugin
+	 *
+	 * @return	void
+	 */
+	apply( plugin )
+	{
+		if ( plugin instanceof PluginContainer )
+		{
+			let pluginMiddleware	= plugin.getPluginMiddleware();
+
+			pluginMiddleware.forEach( ( route )=>{
+				this.add( route );
+			});
+		}
+	}
 
 	/**
 	 * @brief	Resolves the given request and response
@@ -314,5 +334,6 @@ module.exports	= {
 	SessionHandler,
 	BodyParserHandler,
 	Testing,
+	PluginContainer,
 	Logging
 };
