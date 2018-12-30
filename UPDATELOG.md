@@ -1,3 +1,8 @@
+1.10.1
+- Added Validation Result tests
+- Reverted so the other test suites will be called
+- Fixed Validation Result hasValidationFailed method to return correctly
+
 1.10.0
 - Fixed Validation Attributes to actually return negative  in case of no error. Thank you tests
 - Added Validation Attribute tests

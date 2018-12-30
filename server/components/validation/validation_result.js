@@ -1,5 +1,7 @@
 'use strict';
 
+const ValidationAttribute	= require( './validation_attribute' );
+
 /**
  * @brief	Validation result that holds information of all the attributes being validated and their results
  */
@@ -7,8 +9,9 @@ class ValidationResult
 {
 	constructor()
 	{
-		this.attributes	= [];
-		this.result		= null;
+		this.attributes			= [];
+		this.result				= null;
+		this.validationFailed	= false;
 	}
 
 	/**
@@ -20,6 +23,11 @@ class ValidationResult
 	 */
 	addAttribute( attribute )
 	{
+		if ( ! ( attribute instanceof ValidationAttribute ) )
+		{
+			throw new Error( 'Invalid attribute added. Attribute must be an instanceof ValidationAttribute' );
+		}
+
 		this.attributes.push( attribute );
 	}
 
@@ -35,7 +43,13 @@ class ValidationResult
 			this.result	= [];
 
 			this.attributes.forEach( ( attribute ) => {
-				this.result[attribute.key]	= attribute.validateSelf();
+				let validation				= attribute.validateSelf();
+				this.result[attribute.key]	= validation;
+
+				if ( validation !== false )
+				{
+					this.validationFailed	= true;
+				}
 			});
 		}
 	}
@@ -49,7 +63,7 @@ class ValidationResult
 	{
 		this.validateAllAttributes();
 
-		return this.result !== false;
+		return this.validationFailed;
 	}
 
 	/**
