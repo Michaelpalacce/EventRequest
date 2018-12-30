@@ -19,14 +19,7 @@ runAllTests({
 	callback		: ( err )=>{
 		spawnedServer.kill();
 
-		if ( err )
-		{
-			throw new Error( err );
-		}
-		else
-		{
-			process.exit( 0 );
-		}
+		process.exit( 0 );
 	}
 });
 

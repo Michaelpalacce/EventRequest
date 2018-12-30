@@ -1,3 +1,6 @@
+1.10.3
+- The tester will no longer throw an error by default, also removed the error throwing from the test_script callback
+
 1.10.2 
 - Error from npm version increment
 
