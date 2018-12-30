@@ -1,3 +1,6 @@
+1.10.2 
+- Error from npm version increment
+
 1.10.1
 - Added Validation Result tests
 - Reverted so the other test suites will be called
