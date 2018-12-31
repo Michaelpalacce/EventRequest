@@ -24,8 +24,19 @@ class TestDataServer extends MemoryDataServer
 }
 
 test({
-	message		: 'SessionPlugin throws cause of missing cachingServer',
-	test		: ( done )=>{
+	message	: 'SessionPlugin getPluginDependencies returns cache_server as a dependency',
+	test	: ( done )=>{
+		let sessionPlugin	= new SessionPlugin( 'id', {} );
+
+		assert.deepEqual( ['cache_server'], sessionPlugin.getPluginDependencies() );
+
+		done();
+	}
+});
+
+test({
+	message	: 'SessionPlugin throws cause of missing cachingServer',
+	test	: ( done )=>{
 		let eventRequest			= helpers.getEventRequest();
 		let router					= new Router();
 		let sessionPlugin			= new SessionPlugin( 'id', {} );

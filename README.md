@@ -143,7 +143,6 @@ Available middleware:
 * * - path - String - The path to make available
 
 
-
 # Logging
 
 The Loggur can be accessed by directly from the server { Loggur }
@@ -531,6 +530,9 @@ route, method keys or instances of Route.
 The PluginInterface has a setOptions function that can be used to give instructions to the Plugin when it is being 
 created and added to the event request
 
+The PluginInterface implements a getPluginDependencies method that returns an Array of needed plugins to work.
+These plugins must be installed before the dependant plugin is.
+
 When Using server.apply() you can pass a PluginContainer as well for easier functionality implementation.
 This is also done to make it easier for middleware with options to be implemented as to not spaghetti code that is hard
 to read and understand.
@@ -561,6 +563,9 @@ The plugin Manager exports the following functions:
 * cache_server -> Adds a memory cache server
 
 * event_request_session -> Handles sessions and security
+* * DEPENDENCIES:
+* * cache_server
+##
 * * Accepted options:
 * * - sessionName - String - the session name ( aka cookie name ) - Defaults to DEFAULT_SESSION_NAME
 * * - authenticationRoute - String - The route on which authentication should happen

@@ -72,7 +72,12 @@ class MemoryWorker
 		});
 
 		// Start the server listening on the given PIPE
-		this.server.listen( PIPE_PATH );
+		this.server.listen( PIPE_PATH, ()=>{
+			process.send({
+				error	: false,
+				data	: PIPE_PATH
+			});
+		} );
 
 		// In case of an error, kill the process and send an error as a response.
 		// If the error is EADDRINUSE that means that the server is already set up and in this case we want to ignore the

@@ -1,7 +1,8 @@
 'use strict';
 
-const { Server }		= require( '../index' );
-const MemoryDataServer	= require( '../server/components/caching/memory/memory_data_server' );
+const { Server }				= require( '../index' );
+const MemoryDataServer			= require( '../server/components/caching/memory/memory_data_server' );
+const { Loggur, LOG_LEVELS }	= require( '../server/components/logger/loggur' );
 
 let server			= new Server({
 	port	: 3333

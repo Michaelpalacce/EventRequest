@@ -15,9 +15,11 @@ class MemoryDataServerPlugin extends PluginInterface
 	/**
 	 * @brief	Starts the memory server
 	 *
-	 * @return	MemoryDataServer
+	 * @param	function callback
+	 *
+	 * @return	void
 	 */
-	startServer()
+	startServer( callback = ()=>{} )
 	{
 		if ( this.server === null )
 		{
@@ -29,6 +31,8 @@ class MemoryDataServerPlugin extends PluginInterface
 						message	: data
 					}
 				);
+
+				callback( this.server );
 			};
 			let onRejected	= ( err )=>{
 				Loggur.log({
@@ -36,12 +40,16 @@ class MemoryDataServerPlugin extends PluginInterface
 						message	: err
 					}
 				);
+
+				callback( this.server );
 			};
 
 			this.server.setUp( this.options ).then( onFulfilled, onRejected );
 		}
-
-		return this.server;
+		else
+		{
+			callback( this.server );
+		}
 	}
 
 	/**

@@ -5,6 +5,8 @@
 - Moved the Session to a Plugin
 - Pre-loaded the Memory Caching server
 - Pre-loaded the SessionPlugin
+- Added tests for the memory data_server_plugin and session_plugin
+- Fixed the MemoryDataClient to respond when being created
 
 1.12.0
 - Removed the Clusters away from the main server. The clustering will reworked and will be exported as a module that you can use if you so desire but will not be 100% mandatory
