@@ -3,14 +3,10 @@
 // Dependencies
 const http						= require( 'http' );
 const https						= require( 'https' );
-const os						= require( 'os' );
-const cluster					= require( 'cluster' );
 const EventRequest				= require( './event' );
 const Router					= require( './components/routing/router' );
 const PluginInterface			= require( './plugins/plugin_interface' );
 const middlewaresContainer		= require( './middleware_container' );
-const Cluster					= require( './components/cluster/cluster' );
-const CommunicationManager		= require( './components/cluster/communication_manager' );
 const Logging					= require( './components/logger/loggur' );
 const { Loggur, LOG_LEVELS }	= Logging;
 const DataServer				= require( './components/caching/data_server' );
@@ -19,7 +15,6 @@ const MemoryDataServer			= require( './components/caching/memory/memory_data_ser
 /**
  * @brief	Constants
  */
-const CPU_NUM										= os.cpus().length;
 const PROTOCOL_HTTP									= 'http';
 const PROTOCOL_HTTPS								= 'https';
 const OPTIONS_PARAM_PORT							= 'port';
@@ -28,10 +23,6 @@ const OPTIONS_PARAM_PROTOCOL						= 'protocol';
 const OPTIONS_PARAM_PROTOCOL_DEFAULT				= PROTOCOL_HTTP;
 const OPTIONS_PARAM_HTTPS							= 'httpsOptions';
 const OPTIONS_PARAM_HTTPS_DEFAULT					= {};
-const OPTIONS_PARAM_CLUSTERS						= 'clusters';
-const OPTIONS_PARAM_CLUSTERS_DEFAULT				= 1;
-const OPTIONS_PARAM_COMMUNICATION_MANAGER			= 'communicationManager';
-const OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT	= CommunicationManager;
 const OPTIONS_PARAM_CACHING_SERVER					= 'cachingServer';
 const OPTIONS_PARAM_CACHING_SERVER_DEFAULT			= MemoryDataServer;
 const OPTIONS_PARAM_CACHING_SERVER_OPTIONS			= 'cachingServerOptions';
@@ -56,7 +47,6 @@ class Server
 		this.sanitizeConfig( options );
 
 		this.router		= new Router();
-		this.cluster	= new Cluster( this );
 	}
 
 	/**
@@ -66,10 +56,6 @@ class Server
 	 * 			- protocol - String - The protocol to be used ( http || https ) -> Defaults to http
 	 * 			- httpsOptions - Object - Options that will be given to the https webserver -> Defaults to {}
 	 * 			- port - Number - The port to run the webserver/s on -> Defaults to 3000
-	 * 			- clusters - Number - The amount of instances of the webserver to be started. Cannot be more than the
-	 * 			machine's CPUs -> Defaults to the max amount of CPUs of the machine's
-	 * 			- communicationManager - CommunicationManager - The communication manager to be used for the IPC communication
-	 * 			between the master and the workers -> Defaults to base CommunicationManager
 	 * 			- cachingServer - DataServer - The caching server to be used to store data - Defaults to MemoryDataServer
 	 * 			- cachingServerOptions - Object - Options to be passed to the data server - Defaults to OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT
 	 *
@@ -81,41 +67,30 @@ class Server
 	{
 		this.protocol				= options[OPTIONS_PARAM_PROTOCOL];
 		this.protocol				= typeof this.protocol === 'string'
-		&& typeof POSSIBLE_PROTOCOL_OPTIONS[this.protocol] !== 'undefined'
-			? this.protocol
-			: OPTIONS_PARAM_PROTOCOL_DEFAULT;
+									&& typeof POSSIBLE_PROTOCOL_OPTIONS[this.protocol] !== 'undefined'
+									? this.protocol
+									: OPTIONS_PARAM_PROTOCOL_DEFAULT;
 
 		this.httpsOptions			= options[OPTIONS_PARAM_HTTPS];
 		this.httpsOptions			= typeof this.httpsOptions === 'object'
-			? this.httpsOptions
-			: OPTIONS_PARAM_HTTPS_DEFAULT;
+									? this.httpsOptions
+									: OPTIONS_PARAM_HTTPS_DEFAULT;
 
 		this.port					= options[OPTIONS_PARAM_PORT];
 		this.port					= typeof this.port === 'number'
-			? this.port
-			: OPTIONS_PARAM_PORT_DEFAULT;
-
-		this.clusters				= options[OPTIONS_PARAM_CLUSTERS];
-		this.clusters				= typeof this.clusters === 'number' && this.clusters <= CPU_NUM
-			? this.clusters
-			: OPTIONS_PARAM_CLUSTERS_DEFAULT;
-
-		this.communicationManager	= options[OPTIONS_PARAM_COMMUNICATION_MANAGER];
-		this.communicationManager	= typeof this.communicationManager === 'object'
-		&& this.communicationManager instanceof CommunicationManager
-			? this.communicationManager
-			: new OPTIONS_PARAM_COMMUNICATION_MANAGER_DEFAULT();
+									? this.port
+									: OPTIONS_PARAM_PORT_DEFAULT;
 
 		this.cachingServer			= options[OPTIONS_PARAM_CACHING_SERVER];
 		this.cachingServer			= typeof this.cachingServer === 'object'
-		&& this.cachingServer instanceof DataServer
-			? this.cachingServer
-			: new OPTIONS_PARAM_CACHING_SERVER_DEFAULT();
+									&& this.cachingServer instanceof DataServer
+									? this.cachingServer
+									: new OPTIONS_PARAM_CACHING_SERVER_DEFAULT();
 
 		this.cachingServerOptions	= options[OPTIONS_PARAM_CACHING_SERVER_OPTIONS];
 		this.cachingServerOptions	= typeof this.cachingServerOptions === 'object'
-			? this.cachingServerOptions
-			: OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT;
+									? this.cachingServerOptions
+									: OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT;
 	}
 
 	/**
@@ -233,25 +208,24 @@ class Server
 	 * @brief	Starts a new server
 	 *
 	 * @param	Function successCallback
-	 * @param	Function errorCallback
 	 *
 	 * @return	Server
 	 */
-	setUpNewServer( successCallback, errorCallback )
+	setUpNewServer( callback )
 	{
 		// Create the server
 		let protocol	= this.protocol;
 		let server		= protocol === PROTOCOL_HTTPS
-			? https.createServer( this.httpsOptions, this.serverCallback.bind( this ) )
-			: http.createServer( this.serverCallback.bind( this ) );
+						? https.createServer( this.httpsOptions, this.serverCallback.bind( this ) )
+						: http.createServer( this.serverCallback.bind( this ) );
 
 		server.listen( this.port, () => {
 				Loggur.log({
 					level	: LOG_LEVELS.warning,
-					message	: `Worker ${cluster.worker.id} successfully started and listening on port: ${this.port}`
+					message	: `Server successfully started and listening on port: ${this.port}`
 				});
 
-				successCallback();
+				callback( false, server );
 			}
 		);
 
@@ -266,20 +240,10 @@ class Server
 				message	: 'Error Returned was: ' + err.code
 			});
 
-			errorCallback( err );
+			callback( err );
 		});
 
 		return server;
-	}
-
-	/**
-	 * @brief	Sets up the caching server
-	 *
-	 * @return	Promise
-	 */
-	setUpCachingServer()
-	{
-		return this.cachingServer.setUp( this.cachingServerOptions );
 	}
 
 	/**
@@ -291,33 +255,40 @@ class Server
 	 */
 	start( callback )
 	{
-		callback	= typeof callback === 'function' ? callback : ()=>{};
+		if ( this.httpServer == null )
+		{
+			callback	= typeof callback === 'function' ? callback : ()=>{};
 
-		this.setUpCachingServer().then(()=>{}).catch(( err )=>{
-			Loggur.log({
-				level	: LOG_LEVELS.error,
-				message	: err
+			this.cachingServer.setUp( this.cachingServerOptions ).then(()=>{}).catch(( err )=>{
+				Loggur.log({
+					level	: LOG_LEVELS.error,
+					message	: err
+				});
 			});
-		});
 
-		this.cluster.startCluster( this.clusters, callback );
+			this.httpServer	= this.setUpNewServer( callback );
+		}
 	}
 
 	/**
-	 * @brief	Starts the server on a given port
+	 * @brief	Stops the server and the caching server
 	 *
 	 * @return	void
 	 */
 	stop()
 	{
-		this.cachingServer.exit( {} ).then(()=>{},( err )=>{
-			Loggur.log({
-				level	: LOG_LEVELS.error,
-				message	: err
+		if ( this.httpServer != null )
+		{
+			this.cachingServer.exit( {} ).then(()=>{},( err )=>{
+				Loggur.log({
+					level	: LOG_LEVELS.error,
+					message	: err
+				});
 			});
-		});
 
-		this.cluster.stopClusters();
+			this.httpServer.close();
+			this.httpServer	= null;
+		}
 	}
 }
 

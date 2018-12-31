@@ -3,7 +3,6 @@
 // Dependencies
 const { assert, test, helpers }	= require( '../test_helper' );
 const { Server, Router }		= require( './../../index' );
-const Cluster					= require( './../../server/components/cluster/cluster' );
 
 test({
 	message	: 'Server.constructor starts without crashing',
@@ -16,11 +15,10 @@ test({
 });
 
 test({
-	message	: 'Server.constructor instantiates a router and a cluster',
+	message	: 'Server.constructor instantiates a router',
 	test	: ( done )=>{
 		let server	= new Server();
 		assert.deepStrictEqual( server.router, new Router() );
-		assert.deepStrictEqual( server.cluster, new Cluster( server ) );
 		done();
 	}
 });

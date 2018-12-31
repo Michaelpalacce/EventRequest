@@ -24,7 +24,7 @@ testSuites.loggingSuite		= ()=>{
 
 testSuites.cachingSuite		= ()=>{
 	require( './server/components/caching/data_server_test' );
-	require( './server/components/caching/memory/memory_data_server_test' );
+	// require( './server/components/caching/memory/memory_data_server_test' );
 };
 
 testSuites.bodyParserSuite	= ()=>{

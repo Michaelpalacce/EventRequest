@@ -2,7 +2,7 @@
 
 const { runAllTests }	= require( './tests/test_helper' );
 const testSuites		= require( './tests/test_suites' );
-const { spawnedServer }	= require( './tests/test_bootstrap' );
+const { server }		= require( './tests/test_bootstrap' );
 
 testSuites.eventSuite();
 testSuites.routingSuite();
@@ -14,11 +14,11 @@ testSuites.pluginsSuite();
 
 runAllTests({
 	dieOnFirstError	: true,
-	debug			: false,
+	debug			: true,
 	silent			: true,
 	filter			: '',
 	callback		: ( err )=>{
-		spawnedServer.kill();
+		server.stop();
 		process.exit( 0 );
 	}
 });

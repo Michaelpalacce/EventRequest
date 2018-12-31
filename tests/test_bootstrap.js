@@ -1,18 +1,21 @@
 'use strict';
 
-const child_process				= require( 'child_process' );
+const { Server }	= require( '../index' );
 
-let spawnedServer				= child_process.spawn(
-	'node',
-	['tests/external_server_for_testing.js'],
-	{},
-	( error, stdout, stderr )=> {
-		console.log( error );
-		console.log( stdout );
-		console.error( stderr );
+let server			= new Server({
+	port	: 3333
+});
+
+server.add({
+	route	: '/ping',
+	method	: 'GET',
+	handler	: ( event )=>{
+		event.send( 'pong', 200 );
 	}
-);
+});
+
+server.start(()=>{});
 
 module.exports	= {
-	spawnedServer
+	server
 };
