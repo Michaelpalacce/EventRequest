@@ -1,4 +1,4 @@
-1.12.1
+1.13.0
 - Removed the Caching Server from the server
 - Moved the Memory Caching server to a plugin
 - Pre-loaded the Memory Caching server
