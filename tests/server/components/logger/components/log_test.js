@@ -157,18 +157,6 @@ test({
 });
 
 test({
-	message	: 'Log.getInstance returns the same as constructor',
-	test	: ( done )=>{
-		let logOne	= new Log();
-		let logTwo	= Log.getInstance();
-
-		assert.deepStrictEqual( logOne, logTwo );
-
-		done();
-	}
-});
-
-test({
 	message	: 'Log.getInstance if an instance of Log is given returns it',
 	test	: ( done )=>{
 		let logOne	= new Log( 'test' );

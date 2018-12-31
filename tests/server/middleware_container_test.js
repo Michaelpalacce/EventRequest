@@ -3,7 +3,6 @@
 const { assert, Mock, test, helpers }	= require( '../test_helper' );
 const middlewareContainer				= require( './../../server/middleware_container' );
 const Router							= require( '../../server/components/routing/router' );
-const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );
 const ErrorHandler						= require( '../../server/components/error/error_handler' );
 const MultipartFormParser				= require( './../../server/components/body_parsers/multipart_data_parser' );
 const { Loggur, Logger }				= require( './../../server/components/logger/loggur' );
@@ -11,23 +10,6 @@ const { Loggur, Logger }				= require( './../../server/components/logger/loggur'
 class MockTemplatingEngine
 {
 	render(){}
-}
-
-class TestDataServer extends MemoryDataServer
-{
-	constructor( options )
-	{
-		super( options );
-	}
-
-	doCommand()
-	{
-		return new Promise(( resolve, reject )=>{
-			resolve( true );
-		})
-	}
-
-	sanitize( options ) {}
 }
 
 test({
@@ -221,45 +203,6 @@ test({
 		assert.equal( eventRequest.templatingEngine, null );
 		eventRequest.next();
 		assert.equal( eventRequest.templatingEngine instanceof MockTemplatingEngine, true );
-
-		done();
-	}
-});
-
-test({
-	message		: 'MiddlewareContainer session on default throws exception if incorrect configuration',
-	test		: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		let router					= new Router();
-
-		router.add( middlewareContainer.session() );
-		router.add( helpers.getEmptyMiddleware() );
-
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-
-		assert.throws(()=>{
-			eventRequest.next();
-		});
-
-		done();
-	}
-});
-
-test({
-	message		: 'MiddlewareContainer session on default does not throw an exception with correct configuration',
-	test		: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		let router					= new Router();
-
-		eventRequest.cachingServer	= new TestDataServer();
-		router.add( middlewareContainer.session() );
-		router.add( helpers.getEmptyMiddleware() );
-
-		eventRequest._mock( { method : 'on' } );
-
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-
-		eventRequest.next();
 
 		done();
 	}
