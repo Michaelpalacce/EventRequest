@@ -4,7 +4,7 @@
 const { Mock, assert, test, helpers }	= require( './../../test_helper' );
 const PluginManager						= require( './../../../server/plugins/plugin_manager' );
 const TimeoutPlugin						= require( './../../../server/plugins/timeout_plugin' );
-const PluginInterface					= require( './../../../server/components/plugin_interface' );
+const PluginInterface					= require( '../../../server/plugins/plugin_interface' );
 
 test({
 	message	: 'PluginManager addPlugin',

@@ -1,6 +1,6 @@
 'use strict';
 
-const PluginInterface	= require( './../components/plugin_interface' );
+const PluginInterface	= require( './plugin_interface' );
 
 /**
  * @brief	Timeout plugin that adds a timeout to the event request

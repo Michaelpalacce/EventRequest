@@ -48,7 +48,7 @@
    "input-validation"
   ],
   "scripts": {
-    "test": "node ./tests/test_script.js"
+    "test": "node ./test_script.js"
   },
-  "version": "1.11.0"
+  "version": "1.11.1"
 }

@@ -1,8 +1,8 @@
 'use strict';
 
-const { runAllTests }			= require( './test_helper' );
-const testSuites				= require( './test_suites' );
-const { spawnedServer }			= require( './test_bootstrap' );
+const { runAllTests }			= require( './tests/test_helper' );
+const testSuites				= require( './tests/test_suites' );
+const { spawnedServer }			= require( './tests/test_bootstrap' );
 
 testSuites.eventSuite();
 testSuites.routingSuite();
@@ -19,7 +19,6 @@ runAllTests({
 	filter			: '',
 	callback		: ( err )=>{
 		spawnedServer.kill();
-
 		process.exit( 0 );
 	}
 });

@@ -44,6 +44,7 @@ testSuites.validationSuite	= ()=>{
 testSuites.pluginsSuite		= ()=>{
 	require( './server/plugins/timeout_plugin_test' );
 	require( './server/plugins/plugin_manager_test' );
+	require( './server/plugins/static_resources_plugin_test' );
 };
 
 module.exports	= testSuites;

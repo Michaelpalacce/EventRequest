@@ -1,9 +1,9 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers }	= require( './../../test_helper' );
-const TimeoutPlugin						= require( './../../../server/plugins/timeout_plugin' );
-const Router							= require( './../../../server/router' );
+const { assert, test, helpers }	= require( './../../test_helper' );
+const TimeoutPlugin				= require( './../../../server/plugins/timeout_plugin' );
+const Router					= require( './../../../server/router' );
 
 test({
 	message	: 'TimeoutPlugin times out when added',

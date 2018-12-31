@@ -1,6 +1,6 @@
 'use strict';
 
-const PluginInterface	= require( './../components/plugin_interface' );
+const PluginInterface	= require( './plugin_interface' );
 
 /**
  * @brief	PluginManager that contains all the plugins added to the site

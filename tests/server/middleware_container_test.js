@@ -346,32 +346,3 @@ test({
 		done();
 	}
 });
-
-test({
-	message		: 'MiddlewareContainer addStaticPath on default throws exception in case of error',
-	test		: ( done )=>{
-		let router	= new Router();
-
-		assert.throws( ()=>{
-			router.add( middlewareContainer.addStaticPath() );
-		});
-
-		done();
-	}
-});
-
-test({
-	message		: 'MiddlewareContainer addStaticPath on default does not throw an exception if configuration is correct',
-	test		: ( done )=>{
-		let eventRequest		= helpers.getEventRequest();
-		let router				= new Router();
-
-		router.add( middlewareContainer.addStaticPath( { path : 'path' }) );
-		router.add( helpers.getEmptyMiddleware() );
-
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		eventRequest.next();
-
-		done();
-	}
-});

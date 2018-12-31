@@ -1,3 +1,9 @@
+1.11.1
+- Added static resources plugin as well as tested it. Functionality is the same as in the middleware container where it
+was removed from, but the headers are set correctly.
+- Added the plugin to the plugin manager
+- Moved the preloading of plugins away from the index.js
+
 1.11.0
 - New Plugin Interface Functionality
 - The tester will no longer throw an error by default, also removed the error throwing from the test_script callback

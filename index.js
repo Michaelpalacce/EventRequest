@@ -10,9 +10,8 @@ const Router					= require( './server/router' );
 const ErrorHandler				= require( './server/components/error/error_handler' );
 const SessionHandler			= require( './server/components/session/session_handler' );
 const BodyParserHandler			= require( './server/components/body_parsers/body_parser_handler' );
-const PluginInterface			= require( './server/components/plugin_interface' );
-const PluginManagerClass		= require( './server/plugins/plugin_manager' );
-const TimeoutPlugin				= require( './server/plugins/timeout_plugin' );
+const PluginInterface			= require( './server/plugins/plugin_interface' );
+const PluginManager				= require( './server/plugins/preloaded_plugins' );
 const middlewaresContainer		= require( './server/middleware_container' );
 const Cluster					= require( './server/components/cluster/cluster' );
 const CommunicationManager		= require( './server/components/cluster/communication_manager' );
@@ -326,10 +325,6 @@ class Server
 		this.cluster.stopClusters();
 	}
 }
-
-let PluginManager	= new PluginManagerClass();
-
-PluginManager.addPlugin( new TimeoutPlugin( 'event_request_timeout' ) );
 
 // Export the server module
 module.exports	= {

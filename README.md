@@ -569,3 +569,7 @@ The plugin Manager exports the following functions:
 * event_request_timeout -> Adds a timeout to the request
 * * Accepted options:
 * * - timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
+
+* event_request_static_resources -> Adds a static resources path to the request
+* * Accepted options:
+* * - path - String - The path to the static resources to be served. Defaults to 'public'
