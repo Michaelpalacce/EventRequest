@@ -21,6 +21,50 @@ Includes:
 - Input Validation
 - Plugin Manager
 
+# Event Request
+
+The event request is an object that is created by the server and passed through every single middleware.
+It contains the following properties:
+* queryString - Object - the query string
+* path - String - the current path
+* response - Response - the response to be sent to the user 
+* request - Request - the request send by the user
+* method - String - the current method ( GET, POST, DELETE, PUT, etc)
+* headers - Object - the current headers 
+* validationHandler - ValidationHandler - A handler used to do input validation
+* templateDir - String - the place where the templates are located
+* templatingEngine - mixed - the templating engine to be used
+* extra - Object - an object that holds extra data that is passed between middlewares
+* cookies - Object - the current cookies
+* params - Object - request url params that are set by the router
+* body - Object - the body of the request set by the body parsers
+* block - Array - The execution block of middlewares
+* fileStreamHandler - FileStreamHandler - Holds different file streams within himself and is responsible for deciding which one to use
+* errorHandler - ErrorHandler - set by the server. This is used to handle errors and format the messages
+* cachingServer - DataServer - Used for caching data
+* logger - Logger - Logs data
+
+Functions exported by the event request:
+
+* cleanUp - cleans up the event request. Usually called at the end of the request. Emits a cleanUp event and a finished event
+    This also removes all other event listeners and sets all the properties to undefined
+* send( response, statusCode, raw ) - sends the response to the user with the specified statusCode
+* * if response is a stream then the stream will be piped to the response
+* * if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be 
+a string or if it is not a sting it will be JSON stringified. Emits a 'send' event and calls cleanUp
+* setHeader( key, value ) - sets a new header to the response and emits a 'setHeader' event. If the response is finished then an error will be set to the next middleware
+* redirect( redirectUrl, statusCode ) - redirect to the given url with the specified status code (defaults to 302 ). 
+Emits a 'redirect' event. If the response is finished then an error will be set to the next middleware
+* isFinished - checks if the response is finished
+* render( templateName, variables, callback ) - this will try to render a template given that a templatingEngine is provided.
+This emits a 'render' event
+* setBlock - sets the middleware execution block for the event_request
+* next - Calls the next middleware in the execution block. If there is nothing else to send and the response has not been sent YET, then send a server error
+if the event is stopped and the response has not been set then send a server error
+* sendError - Like send but used to send errors 
+* getFileStreamHandler - Gets the file stream handler
+* streamFile - streams a given file
+
 # Properties exported by the Server:
 	Server,				// The actual server to be used
 	Router,				// The router. Can be used to add routes to it and then to the main server route

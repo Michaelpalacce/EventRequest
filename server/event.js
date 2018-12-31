@@ -188,7 +188,6 @@ class EventRequest extends EventEmitter
 		this.fileStreamHandler	= undefined;
 		this.errorHandler		= undefined;
 		this.cachingServer		= undefined;
-		this.extra				= undefined;
 		this.cookies			= undefined;
 		this.params				= undefined;
 
@@ -353,7 +352,7 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Calls the next middleware in the execution block
 	 *
-	 * @details	if there is nothing else to send and the response has not been sent YET, then send a server error
+	 * @details	If there is nothing else to send and the response has not been sent YET, then send a server error
 	 * 			if the event is stopped and the response has not been set then send a server error
 	 *
 	 * @param	Error err
