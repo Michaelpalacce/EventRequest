@@ -1,7 +1,6 @@
 'use strict';
 
 const DataServer	= require( '../data_server' );
-const cluster		= require( 'cluster' );
 const path			= require( 'path' );
 const fork			= require( 'child_process' ).fork;
 const net			= require( 'net' );
@@ -113,44 +112,7 @@ class MemoryDataServer extends DataServer
 	 */
 	setUp( options = {} )
 	{
-		return this.ping( options );
-	}
-
-	/**
-	 * @brief	Sends a ping to the client and if it's down, restarts it
-	 *
-	 * @param	Object options
-	 * @param	Function callback
-	 *
-	 * @return	Promise
-	 */
-	ping( options = {} )
-	{
-		return new Promise( ( resolve, reject )=>{
-
-			let onFulfilled	= ( data )=>{
-				resolve( data );
-			};
-			let onRejected	= ( err )=>{
-				if ( cluster.isMaster )
-				{
-					let onFulfilled	= ( data )=>{
-						resolve( data );
-					};
-					let onRejected	= ( err )=>{
-						reject( err );
-					};
-
-					this.forkClient().then( onFulfilled, onRejected );
-				}
-				else
-				{
-					resolve( 'Worker found caching server' );
-				}
-			};
-
-			this.doCommand( 'ping', options ).then( onFulfilled, onRejected );
-		});
+		return this.forkClient();
 	}
 
 	/**

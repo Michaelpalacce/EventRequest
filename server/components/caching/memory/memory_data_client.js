@@ -8,7 +8,6 @@ const PIPE_PATH	= "\\\\.\\pipe\\" + __filename;
 /**
  * @brief	Constants
  */
-const PING					= 'ping';
 const SET_UP				= 'setUp';
 const EXIT					= 'exit';
 const CREATE_NAMESPACE		= 'createNamespace';
@@ -43,7 +42,9 @@ class MemoryWorker
 	 */
 	setUpServer()
 	{
+		// Create a new server
 		this.server	= net.createServer( ( stream ) => {
+			// Listen for incoming data
 			stream.on( 'data', ( chunk ) => {
 				chunk	= chunk.toString( 'utf8' );
 
@@ -56,6 +57,7 @@ class MemoryWorker
 					chunk	= {};
 				}
 
+				// Process the incoming data
 				this.processCommand( chunk, ( error, data ) => {
 					error			= typeof error !== 'undefined' ? error : 'Internal error';
 					error			= error instanceof Error ? error.stack : error;
@@ -63,29 +65,30 @@ class MemoryWorker
 
 					let response	= { error, data };
 
+					// Send a response for the incoming data
 					stream.end( JSON.stringify( response ) );
 				});
 			});
 		});
 
-		this.server.listen( PIPE_PATH, ( err )=>{
-			process.send(
-				{
-					error	: typeof err === 'undefined' ? false : err,
-					pipe	: PIPE_PATH
-				}
-			);
+		// Start the server listening on the given PIPE
+		this.server.listen( PIPE_PATH );
 
-			if ( err )
+		// In case of an error, kill the process and send an error as a response.
+		// If the error is EADDRINUSE that means that the server is already set up and in this case we want to ignore the
+		// error. Then normal connections should happen.
+		this.server.on( 'error', ( err )=>{
+
+			let isNotInUse	= err.message.indexOf( 'EADDRINUSE' ) === -1;
+
+			process.send({
+				error	: isNotInUse,
+				data	: isNotInUse ? err : PIPE_PATH
+			});
+
+			if ( isNotInUse )
 			{
 				process.exit();
-			}
-		});
-
-		this.server.on( 'error', ( err )=>{
-			if ( err.message.indexOf( 'EADDRINUSE' ) === -1 )
-			{
-				throw err;
 			}
 		});
 	}
@@ -146,10 +149,6 @@ class MemoryWorker
 
 			case REMOVE_NAMESPACE:
 				this.removeNamespace( args, callback );
-				break;
-
-			case PING:
-				callback( false, 'pong' );
 				break;
 
 			case CREATE_DATA_RECORD:

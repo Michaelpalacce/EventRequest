@@ -2,6 +2,7 @@
 - Removed the Clusters away from the main server. The clustering will reworked and will be exported as a module that you can use if you so desire but will not be 100% mandatory
 - Moved the server functionality away from the index.js
 - Moved the routing to ./server/component/routing instead of ./server
+- Fixed the Caching in case of them not working when trying to set up 2 now should be fine
 
 1.11.1
 - Added static resources plugin as well as tested it. Functionality is the same as in the middleware container where it

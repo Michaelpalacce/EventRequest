@@ -259,12 +259,22 @@ class Server
 		{
 			callback	= typeof callback === 'function' ? callback : ()=>{};
 
-			this.cachingServer.setUp( this.cachingServerOptions ).then(()=>{}).catch(( err )=>{
+			let onFulfilled	= ( data )=>{
 				Loggur.log({
-					level	: LOG_LEVELS.error,
-					message	: err
-				});
-			});
+						level	: LOG_LEVELS.info,
+						message	: data
+					}
+				);
+			};
+			let onRejected	= ( err )=>{
+				Loggur.log({
+						level	: LOG_LEVELS.error,
+						message	: err
+					}
+				);
+			};
+
+			this.cachingServer.setUp( this.cachingServerOptions ).then( onFulfilled, onRejected );
 
 			this.httpServer	= this.setUpNewServer( callback );
 		}
@@ -279,12 +289,15 @@ class Server
 	{
 		if ( this.httpServer != null )
 		{
-			this.cachingServer.exit( {} ).then(()=>{},( err )=>{
+			let onFulfilled	= ()=>{};
+			let onRejected	= ( err )=>{
 				Loggur.log({
 					level	: LOG_LEVELS.error,
 					message	: err
 				});
-			});
+			};
+
+			this.cachingServer.exit( {} ).then( onFulfilled, onRejected );
 
 			this.httpServer.close();
 			this.httpServer	= null;

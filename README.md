@@ -92,10 +92,6 @@ The server constructor accepts the following options:
 
 **port** - Number - The port to run the webserver/s on -> Defaults to 3000
 
-**clusters** - Number - The amount of instances of the webserver to be started. Cannot be more than the machine's CPUs -> Defaults to the max amount of CPUs of the machine's
-
-**communicationManager**- CommunicationManager - The communication manager to be used for the IPC communication between the master and the workers -> Defaults to base CommunicationManager
-
 **errorHandler** - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest -> Defaults to base errorHandler
 
 **cachingServer** - DataServer - The caching server to be used through the application. Defaults to Memory Data Server which should **NOT** be used in production under any circumstances. The data server will be changed to default to something else in the future or not be set up at all.
