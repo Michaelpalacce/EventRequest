@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const EventRequest	= require( './event' );
+const EventRequest	= require( '../../event' );
 const Route			= require( './route' );
 
 /**

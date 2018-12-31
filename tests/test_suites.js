@@ -9,8 +9,8 @@ testSuites.eventSuite		= ()=>{
 };
 
 testSuites.routingSuite		= ()=>{
-	require( './server/route_test' );
-	require( './server/router_test' );
+	require( './server/components/routing/route_test' );
+	require( './server/components/routing/router_test' );
 };
 
 testSuites.loggingSuite		= ()=>{

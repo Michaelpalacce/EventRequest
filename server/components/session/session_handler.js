@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const Router						= require( '../../router' );
+const Router						= require( '../routing/router' );
 const AuthenticationManager			= require( './authentication_manager' );
 const LoginManager					= require( './login_manager' );
 const SessionSaveManager			= require( './session_save_manager' );

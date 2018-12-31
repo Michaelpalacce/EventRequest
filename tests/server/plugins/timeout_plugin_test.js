@@ -3,7 +3,7 @@
 // Dependencies
 const { assert, test, helpers }	= require( './../../test_helper' );
 const TimeoutPlugin				= require( './../../../server/plugins/timeout_plugin' );
-const Router					= require( './../../../server/router' );
+const Router					= require( '../../../server/components/routing/router' );
 
 test({
 	message	: 'TimeoutPlugin times out when added',

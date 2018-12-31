@@ -1,3 +1,7 @@
+1.11.2
+- Moved the server functionality away from the index.js
+- Moved the routing to ./server/component/routing instead of ./server
+
 1.11.1
 - Added static resources plugin as well as tested it. Functionality is the same as in the middleware container where it
 was removed from, but the headers are set correctly.

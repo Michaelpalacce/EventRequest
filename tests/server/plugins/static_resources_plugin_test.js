@@ -3,7 +3,7 @@
 // Dependencies
 const { assert, test, helpers }	= require( './../../test_helper' );
 const StaticResourcesPlugin		= require( './../../../server/plugins/static_resources_plugin' );
-const Router					= require( './../../../server/router' );
+const Router					= require( '../../../server/components/routing/router' );
 
 test({
 	message		: 'StaticResourcesPlugin sets content type to empty if accepts not passed',

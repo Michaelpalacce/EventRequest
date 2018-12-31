@@ -2,7 +2,7 @@
 
 const { assert, Mock, test, helpers }	= require( '../test_helper' );
 const middlewareContainer				= require( './../../server/middleware_container' );
-const Router							= require( './../../server/router' );
+const Router							= require( '../../server/components/routing/router' );
 const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );
 const ErrorHandler						= require( '../../server/components/error/error_handler' );
 const MultipartFormParser				= require( './../../server/components/body_parsers/multipart_data_parser' );

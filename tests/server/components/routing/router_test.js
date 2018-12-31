@@ -1,9 +1,9 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers }	= require( '../test_helper' );
-const Router					= require( './../../server/router' );
-const Route						= require( './../../server/route' );
+const { assert, test, helpers }	= require( '../../../test_helper' );
+const Router					= require( '../../../../server/components/routing/router' );
+const Route						= require( '../../../../server/components/routing/route' );
 
 test({
 	message	: 'Router.constructor does not die',
