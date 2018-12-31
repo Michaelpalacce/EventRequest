@@ -132,14 +132,6 @@ Available middleware:
 * * - engine - Mixed - Must be an object that defines a render function and will accept as first parameter template and as a second variables
 * * - templateDir - String - Path to the templates
 
-* session -> Adds one or many SecurityManager descendants
-* * Accepted options:
-* * - sessionName - String - the session name ( aka cookie name ) - Defaults to sid
-* * - authenticationRoute - String - The route on which authentication should happen ! Required
-* * - tokenExpiration - Number - The Time to keep the tokens before they expire - Defaults to 0 which is forever
-* * - authenticationCallback - Function - The callback to be called when authentication has to happen. This callback must return a boolean - Defaults to ()=>{ return false; };
-* * - managers - Array - The managers to be added to the security ( they have 2 parameters : instance which must be an instance of SecurityManager and options which are options to be passed to that specific manager only - Defaults to { instance : AuthenticationManager }, { instance : SessionAuthenticationManager }, { instance : LoginManager }, { instance : SessionSaveManager } if default is passed to the array
-
 * bodyParser -> Adds one or many BodyParser descendants
 * * Accepted options:
 * * - parsers - Array - Array of BodyParser descendants. If the array has a key default these parsers will be added:  { instance : FormBodyParser }, { instance : MultipartFormParser }, { instance : JsonBodyParser }
@@ -566,4 +558,15 @@ The plugin Manager exports the following functions:
 * * Accepted options:
 * * - path - String - The path to the static resources to be served. Defaults to 'public'
 
-* event_request_memory_cache -> Adds a memory cache server
+* cache_server -> Adds a memory cache server
+
+* event_request_session -> Handles sessions and security
+* * Accepted options:
+* * - sessionName - String - the session name ( aka cookie name ) - Defaults to DEFAULT_SESSION_NAME
+* * - authenticationRoute - String - The route on which authentication should happen
+* * - tokenExpiration - Number - The Time to keep the tokens before they expire - Defaults to DEFAULT_TOKEN_EXPIRATION_TIME
+* * - authenticationCallback - Function - The callback to be called when authentication has to happen
+* * 						This callback must return a boolean	- Defaults to DEFAULT_AUTHENTICATION_CALLBACK
+* * - managers - Array - The managers to be added to the security ( they have 2 parameters : instance which
+* * 					must be an instance of SecurityManager and options which are options to be passed
+* * 					to that specific manager only

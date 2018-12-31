@@ -80,7 +80,7 @@ class TokenManager
 	 */
 	isExpired( sid, callback )
 	{
-		this.cachingServer.read( TOKEN_NAMESPACE, sid, {} ).then(( sidData )=>{
+		this.cachingServer.read( TOKEN_NAMESPACE, sid, {} ).then( ( sidData )=>{
 			if ( sidData.expires > Date.now() )
 			{
 				callback( false, sidData )
@@ -93,7 +93,7 @@ class TokenManager
 	};
 
 	/**
-	 * @brief	Updates the token expiration tim
+	 * @brief	Updates the token expiration time
 	 *
 	 * @param	Object token
 	 * @param	Function callback
@@ -104,7 +104,7 @@ class TokenManager
 	{
 		let sid	= token.sessionId;
 
-		this.cachingServer.read( TOKEN_NAMESPACE, sid, {} ).then(( sidData )=>{
+		this.cachingServer.read( TOKEN_NAMESPACE, sid, {} ).then( ( sidData )=>{
 			let ttl			= this.tokenExpiration;
 			token.expires	= Date.now() + ttl;
 

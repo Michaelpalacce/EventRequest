@@ -1,11 +1,9 @@
 'use strict';
 
 // Dependencies
-const fs					= require( 'fs' );
 const path					= require( 'path' );
 const { BodyParserHandler }	= require( './components/body_parsers/body_parser_handler' );
 const ErrorHandler			= require( './components/error/error_handler' );
-const { SessionHandler }	= require( './components/session/session_handler' );
 const { Logger }			= require( './components/logger/loggur' );
 
 // Define the object
@@ -135,24 +133,6 @@ middlewaresContainer.templatingEngine	= ( options = {} ) =>{
 			event.templateDir		= templateDir;
 			event.templatingEngine	= templatingEngine;
 			event.next();
-		}
-	};
-};
-
-/**
- * @brief	Session middleware
- *
- * @param	Object options
- *
- * @return	Object
- */
-middlewaresContainer.session	= ( options = {} ) =>{
-	return {
-		handler	: ( event ) =>{
-			let sessionHandler	= new SessionHandler( event, options );
-			sessionHandler.handle( ( err ) =>{
-				event.next();
-			});
 		}
 	};
 };
