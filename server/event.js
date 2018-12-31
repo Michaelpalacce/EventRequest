@@ -8,7 +8,6 @@ const { EventEmitter }						= require( 'events' );
 const { FileStreamHandler, FileStream }		= require( './components/file_streams/file_stream_handler' );
 const ErrorHandler							= require( './components/error/error_handler' );
 const Streams								= require( 'stream' );
-const DataServer							= require( './components/caching/data_server' );
 const { Logger }							= require( './components/logger/loggur' );
 const ValidationHandler						= require( './components/validation/validation_handler' );
 const { IncomingMessage, ServerResponse }	= require( 'http' );
@@ -119,30 +118,6 @@ class EventRequest extends EventEmitter
 			}
 		});
 
-		let cachingServer	= null;
-		Object.defineProperty( this, 'cachingServer', {
-			enumerable	: true,
-			set			: ( arg ) =>{
-				if ( arg == null )
-				{
-					cachingServer	= arg;
-					return;
-				}
-
-				if ( arg instanceof DataServer )
-				{
-					cachingServer	= arg;
-				}
-				else
-				{
-					throw new Error( 'Error handler must be an instance of DataServer' );
-				}
-			},
-			get			: () =>{
-				return cachingServer;
-			}
-		});
-
 		let logger	= null;
 		Object.defineProperty( this, 'logger', {
 			enumerable	: true,
@@ -187,7 +162,6 @@ class EventRequest extends EventEmitter
 		this.templateDir		= undefined;
 		this.fileStreamHandler	= undefined;
 		this.errorHandler		= undefined;
-		this.cachingServer		= undefined;
 		this.cookies			= undefined;
 		this.params				= undefined;
 

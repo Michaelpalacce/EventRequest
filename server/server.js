@@ -41,6 +41,7 @@ class Server
 		this.sanitizeConfig( options );
 
 		this.router		= new Router();
+		this.plugins	= [];
 	}
 
 	/**
@@ -89,6 +90,10 @@ class Server
 	/**
 	 * @brief	Use a predefined middleware from middlewaresContainer
 	 *
+	 * @todo	MAKE THIS DEPRECATED WHEN THE PLUGINS ARE IMPLEMENTED
+	 *
+	 * @deprecated
+	 *
 	 * @param	String name
 	 * @param	Object options
 	 *
@@ -113,11 +118,22 @@ class Server
 	{
 		if ( plugin instanceof PluginInterface )
 		{
+			let pluginDependencies	= plugin.getPluginDependencies();
+
+			pluginDependencies.forEach(( dependency )=>{
+				if ( ! this.plugins.includes( dependency ) )
+				{
+					throw new Error( 'The plugin ' + plugin.getPluginId() + ' requires ' + dependency + ' which is missing.' );
+				}
+			});
+
 			let pluginMiddleware	= plugin.getPluginMiddleware();
 
 			pluginMiddleware.forEach( ( route )=>{
 				this.add( route );
 			});
+
+			this.plugins.push( plugin.getPluginId() );
 		}
 	}
 

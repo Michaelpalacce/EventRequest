@@ -78,7 +78,6 @@ class MemoryWorker
 		// If the error is EADDRINUSE that means that the server is already set up and in this case we want to ignore the
 		// error. Then normal connections should happen.
 		this.server.on( 'error', ( err )=>{
-
 			let isNotInUse	= err.message.indexOf( 'EADDRINUSE' ) === -1;
 
 			process.send({

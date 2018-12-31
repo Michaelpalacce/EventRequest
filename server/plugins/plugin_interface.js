@@ -31,6 +31,18 @@ class PluginInterface
 	}
 
 	/**
+	 * @brief	Returns an array of other plugins that this one is dependent on
+	 *
+	 * @details	If the dependencies are not added to the server, then an error will be thrown
+	 *
+	 * @return	Array
+	 */
+	getPluginDependencies()
+	{
+		return [];
+	}
+
+	/**
 	 * @brief	Sets new options for the plugin
 	 *
 	 * @param	Object options

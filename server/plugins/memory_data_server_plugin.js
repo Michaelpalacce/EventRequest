@@ -15,7 +15,7 @@ class MemoryDataServerPlugin extends PluginInterface
 	/**
 	 * @brief	Starts the memory server
 	 *
-	 * @return	void
+	 * @return	MemoryDataServer
 	 */
 	startServer()
 	{
@@ -40,6 +40,18 @@ class MemoryDataServerPlugin extends PluginInterface
 
 			this.server.setUp( this.options ).then( onFulfilled, onRejected );
 		}
+
+		return this.server;
+	}
+
+	/**
+	 * @brief	Returns the MemoryDataServer
+	 *
+	 * @returns	MemoryDataServer|false
+	 */
+	getServer()
+	{
+		return this.server === null ? false : this.server;
 	}
 
 	/**
@@ -63,6 +75,30 @@ class MemoryDataServerPlugin extends PluginInterface
 
 			this.server.exit( {} ).then( onFulfilled, onRejected );
 		}
+	}
+
+	/**
+	 * @brief	Attaches the middleware to the eventRequest
+	 *
+	 * @details	Attaches a cleanUp event as well
+	 *
+	 * @returns	Array
+	 */
+	getPluginMiddleware()
+	{
+		let pluginMiddleware	= {
+			handler	: ( event )=>{
+				event.cachingServer	= this.getServer();
+
+				event.on( 'cleanUp', ()=>{
+					event.cachingServer	= null;
+				} );
+
+				event.next();
+			}
+		};
+
+		return [pluginMiddleware];
 	}
 }
 

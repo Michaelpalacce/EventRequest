@@ -1,7 +1,10 @@
 1.13.0
+- Added Plugin dependencies. Now when adding a plugin if not all dependencies are present, then the application will throw an exception
 - Removed the Caching Server from the server
 - Moved the Memory Caching server to a plugin
+- Moved the Session to a Plugin
 - Pre-loaded the Memory Caching server
+- Pre-loaded the SessionPlugin
 
 1.12.0
 - Removed the Clusters away from the main server. The clustering will reworked and will be exported as a module that you can use if you so desire but will not be 100% mandatory

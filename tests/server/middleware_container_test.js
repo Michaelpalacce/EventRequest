@@ -229,8 +229,8 @@ test({
 test({
 	message		: 'MiddlewareContainer session on default throws exception if incorrect configuration',
 	test		: ( done )=>{
-		let eventRequest		= helpers.getEventRequest();
-		let router				= new Router();
+		let eventRequest			= helpers.getEventRequest();
+		let router					= new Router();
 
 		router.add( middlewareContainer.session() );
 		router.add( helpers.getEmptyMiddleware() );
@@ -248,14 +248,10 @@ test({
 test({
 	message		: 'MiddlewareContainer session on default does not throw an exception with correct configuration',
 	test		: ( done )=>{
-		let eventRequest		= helpers.getEventRequest();
-		let router				= new Router();
+		let eventRequest			= helpers.getEventRequest();
+		let router					= new Router();
 
-		eventRequest._mock({
-			method			: 'cachingServer',
-			shouldReturn	: new TestDataServer( {} )
-		});
-
+		eventRequest.cachingServer	= new TestDataServer();
 		router.add( middlewareContainer.session() );
 		router.add( helpers.getEmptyMiddleware() );
 

@@ -5,7 +5,6 @@ const { Mock, assert, test, helpers }	= require( '../test_helper' );
 const EventRequest						= require( './../../server/event' );
 const { FileStreamHandler }				= require( '../../server/components/file_streams/file_stream_handler' );
 const ErrorHandler						= require( '../../server/components/error/error_handler' );
-const MemoryDataServer					= require( './../../server/components/caching/memory/memory_data_server' );
 const { Loggur }						= require( './../../server/components/logger/loggur' );
 
 const MockedErrorHandler				= Mock( ErrorHandler );
@@ -108,23 +107,6 @@ test({
 });
 
 test({
-	message	: 'EventRequest cachingServer can only be an instance of DataServer',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-
-		assert.doesNotThrow( () =>{
-			eventRequest.cachingServer	= new MemoryDataServer()
-		});
-
-		assert.throws( () => {
-			eventRequest.cachingServer	= {};
-		});
-
-		done();
-	}
-});
-
-test({
 	message	: 'EventRequest logger can only be an instance of Logger',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
@@ -185,7 +167,6 @@ test({
 		assert.equal( eventRequest.templatingEngine, undefined );
 		assert.equal( eventRequest.fileStreamHandler, undefined );
 		assert.equal( eventRequest.errorHandler, undefined );
-		assert.equal( eventRequest.cachingServer, undefined );
 		assert.equal( eventRequest.extra, undefined );
 		assert.equal( eventRequest.cookies, undefined );
 		assert.equal( eventRequest.params, undefined );
