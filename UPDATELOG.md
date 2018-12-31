@@ -1,3 +1,8 @@
+1.12.1
+- Removed the Caching Server from the server
+- Moved the Memory Caching server to a plugin
+- Pre-loaded the Memory Caching server
+
 1.12.0
 - Removed the Clusters away from the main server. The clustering will reworked and will be exported as a module that you can use if you so desire but will not be 100% mandatory
 - Moved the server functionality away from the index.js

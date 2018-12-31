@@ -9,8 +9,6 @@ const PluginInterface			= require( './plugins/plugin_interface' );
 const middlewaresContainer		= require( './middleware_container' );
 const Logging					= require( './components/logger/loggur' );
 const { Loggur, LOG_LEVELS }	= Logging;
-const DataServer				= require( './components/caching/data_server' );
-const MemoryDataServer			= require( './components/caching/memory/memory_data_server' );
 
 /**
  * @brief	Constants
@@ -23,10 +21,6 @@ const OPTIONS_PARAM_PROTOCOL						= 'protocol';
 const OPTIONS_PARAM_PROTOCOL_DEFAULT				= PROTOCOL_HTTP;
 const OPTIONS_PARAM_HTTPS							= 'httpsOptions';
 const OPTIONS_PARAM_HTTPS_DEFAULT					= {};
-const OPTIONS_PARAM_CACHING_SERVER					= 'cachingServer';
-const OPTIONS_PARAM_CACHING_SERVER_DEFAULT			= MemoryDataServer;
-const OPTIONS_PARAM_CACHING_SERVER_OPTIONS			= 'cachingServerOptions';
-const OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT	= {};
 
 const POSSIBLE_PROTOCOL_OPTIONS						= {};
 POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]			= http;
@@ -56,8 +50,6 @@ class Server
 	 * 			- protocol - String - The protocol to be used ( http || https ) -> Defaults to http
 	 * 			- httpsOptions - Object - Options that will be given to the https webserver -> Defaults to {}
 	 * 			- port - Number - The port to run the webserver/s on -> Defaults to 3000
-	 * 			- cachingServer - DataServer - The caching server to be used to store data - Defaults to MemoryDataServer
-	 * 			- cachingServerOptions - Object - Options to be passed to the data server - Defaults to OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT
 	 *
 	 * 	@param	Object options
 	 *
@@ -80,17 +72,6 @@ class Server
 		this.port					= typeof this.port === 'number'
 									? this.port
 									: OPTIONS_PARAM_PORT_DEFAULT;
-
-		this.cachingServer			= options[OPTIONS_PARAM_CACHING_SERVER];
-		this.cachingServer			= typeof this.cachingServer === 'object'
-									&& this.cachingServer instanceof DataServer
-									? this.cachingServer
-									: new OPTIONS_PARAM_CACHING_SERVER_DEFAULT();
-
-		this.cachingServerOptions	= options[OPTIONS_PARAM_CACHING_SERVER_OPTIONS];
-		this.cachingServerOptions	= typeof this.cachingServerOptions === 'object'
-									? this.cachingServerOptions
-									: OPTIONS_PARAM_CACHING_SERVER_OPTIONS_DEFAULT;
 	}
 
 	/**
@@ -163,7 +144,6 @@ class Server
 	serverCallback( req, res )
 	{
 		let eventRequest			= this.resolve( req, res );
-		eventRequest.cachingServer	= this.cachingServer;
 
 		req.on( 'close', ()=> {
 			eventRequest.cleanUp();
@@ -257,26 +237,7 @@ class Server
 	{
 		if ( this.httpServer == null )
 		{
-			callback	= typeof callback === 'function' ? callback : ()=>{};
-
-			let onFulfilled	= ( data )=>{
-				Loggur.log({
-						level	: LOG_LEVELS.info,
-						message	: data
-					}
-				);
-			};
-			let onRejected	= ( err )=>{
-				Loggur.log({
-						level	: LOG_LEVELS.error,
-						message	: err
-					}
-				);
-			};
-
-			this.cachingServer.setUp( this.cachingServerOptions ).then( onFulfilled, onRejected );
-
-			this.httpServer	= this.setUpNewServer( callback );
+			this.httpServer	= this.setUpNewServer( typeof callback === 'function' ? callback : ()=>{} );
 		}
 	}
 
@@ -289,16 +250,6 @@ class Server
 	{
 		if ( this.httpServer != null )
 		{
-			let onFulfilled	= ()=>{};
-			let onRejected	= ( err )=>{
-				Loggur.log({
-					level	: LOG_LEVELS.error,
-					message	: err
-				});
-			};
-
-			this.cachingServer.exit( {} ).then( onFulfilled, onRejected );
-
 			this.httpServer.close();
 			this.httpServer	= null;
 		}

@@ -94,10 +94,6 @@ The server constructor accepts the following options:
 
 **errorHandler** - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest -> Defaults to base errorHandler
 
-**cachingServer** - DataServer - The caching server to be used through the application. Defaults to Memory Data Server which should **NOT** be used in production under any circumstances. The data server will be changed to default to something else in the future or not be set up at all.
-
-**cachingServerOptions** - Object - The options to be passed to the setup of the caching server
-
 ## The server is started by calling server.start();
 
 ***
@@ -569,3 +565,5 @@ The plugin Manager exports the following functions:
 * event_request_static_resources -> Adds a static resources path to the request
 * * Accepted options:
 * * - path - String - The path to the static resources to be served. Defaults to 'public'
+
+* event_request_memory_cache -> Adds a memory cache server
