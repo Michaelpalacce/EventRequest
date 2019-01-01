@@ -43,6 +43,19 @@ class PluginInterface
 	}
 
 	/**
+	 * @brief	Function that is called when applying the plugin to the server
+	 *
+	 * @details	This method should attach to any events dispatched by the server
+	 *
+	 * @param	Server server
+	 *
+	 * @return	void
+	 */
+	setServerOnRuntime( server )
+	{
+	}
+
+	/**
 	 * @brief	Sets new options for the plugin
 	 *
 	 * @param	Object options

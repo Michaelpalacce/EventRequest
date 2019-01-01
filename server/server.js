@@ -4,6 +4,7 @@
 const http						= require( 'http' );
 const https						= require( 'https' );
 const EventRequest				= require( './event' );
+const { EventEmitter }			= require( 'events' );
 const Router					= require( './components/routing/router' );
 const PluginInterface			= require( './plugins/plugin_interface' );
 const middlewaresContainer		= require( './middleware_container' );
@@ -29,7 +30,7 @@ POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTPS]			= https;
 /**
  * @brief	Server class responsible for receiving requests and sending responses
  */
-class Server
+class Server extends EventEmitter
 {
 	/**
 	 * @brief	Passes options for server configuration
@@ -38,6 +39,8 @@ class Server
 	 */
 	constructor( options	= {} )
 	{
+		super();
+
 		this.sanitizeConfig( options );
 
 		this.router		= new Router();
@@ -133,6 +136,8 @@ class Server
 				this.add( route );
 			});
 
+			pluginMiddleware.setServerOnRuntime( this );
+
 			this.plugins.push( plugin.getPluginId() );
 		}
 	}
@@ -152,26 +157,33 @@ class Server
 	/**
 	 * @brief	Called when a request is received to the server
 	 *
-	 * @param	IncomingMessage req
-	 * @param	ServerResponse res
+	 * @param	IncomingMessage request
+	 * @param	ServerResponse response
 	 *
 	 * @return	void
 	 */
-	serverCallback( req, res )
+	serverCallback( request, response )
 	{
-		let eventRequest			= this.resolve( req, res );
+		let eventRequest	= this.resolve( request, response );
+		this.emit( 'eventRequestResolved', { eventRequest, request, response  } );
 
-		req.on( 'close', ()=> {
+		request.on( 'close', ()=> {
+			this.emit( 'eventRequestRequestClosed', { eventRequest, request } );
+
 			eventRequest.cleanUp();
 			eventRequest	= null;
 		});
 
-		res.on( 'finish', () => {
+		response.on( 'finish', () => {
+			this.emit( 'eventRequestResponseFinish', { eventRequest, response } );
+
 			eventRequest.cleanUp();
 			eventRequest	= null;
 		});
 
-		res.on( 'error', ( error ) => {
+		response.on( 'error', ( error ) => {
+			this.emit( 'eventRequestResponseError', { eventRequest, response, error } );
+
 			eventRequest.next( error );
 			eventRequest.cleanUp();
 			eventRequest	= null;
@@ -180,23 +192,29 @@ class Server
 		try
 		{
 			let block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
+			this.emit( 'eventRequestBlockSetting', { eventRequest, block } );
 			eventRequest.setBlock( block );
+			this.emit( 'eventRequestBlockSet', { eventRequest, block } );
 
-			eventRequest.on( 'error', ( err ) =>{
+			eventRequest.on( 'error', ( error ) =>{
+				this.emit( 'eventRequestError', { eventRequest, error } );
+
 				if ( eventRequest.logger === null )
 				{
 					Loggur.log({
 						level	: LOG_LEVELS.error,
-						message	: err
+						message	: error
 					});
 				}
 			});
 
 			eventRequest.next();
 		}
-		catch ( e )
+		catch ( error )
 		{
-			eventRequest.next( e );
+			this.emit( 'eventRequestThrow', { eventRequest, error } );
+
+			eventRequest.next( error );
 		}
 	}
 
@@ -216,7 +234,9 @@ class Server
 						: http.createServer( this.serverCallback.bind( this ) );
 
 		server.listen( this.port, () => {
-				Loggur.log({
+			this.emit( 'serverCreationSuccess', { server, port: this.port } );
+
+			Loggur.log({
 					level	: LOG_LEVELS.warning,
 					message	: `Server successfully started and listening on port: ${this.port}`
 				});
@@ -226,17 +246,19 @@ class Server
 		);
 
 		// Add an error handler in case of an error.
-		server.on( 'error', ( err )=>{
+		server.on( 'error', ( error )=>{
+			this.emit( 'serverCreationError', { server, error } );
+
 			Loggur.log({
 				level	: LOG_LEVELS.error,
 				message	: 'Could not start the server on port: ' + this.port
 			});
 			Loggur.log({
 				level	: LOG_LEVELS.error,
-				message	: 'Error Returned was: ' + err.code
+				message	: 'Error Returned was: ' + error.code
 			});
 
-			callback( err );
+			callback( error );
 		});
 
 		return server;
@@ -253,6 +275,8 @@ class Server
 	{
 		if ( this.httpServer == null )
 		{
+			this.emit( 'serverStart' );
+
 			this.httpServer	= this.setUpNewServer( typeof callback === 'function' ? callback : ()=>{} );
 		}
 	}
@@ -266,6 +290,8 @@ class Server
 	{
 		if ( this.httpServer != null )
 		{
+			this.emit( 'serverStop' );
+
 			this.httpServer.close();
 			this.httpServer	= null;
 		}

@@ -267,51 +267,6 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-	 * @brief	Renders the template given
-	 *
-	 * @param	String templateName
-	 * @param	Object variables
-	 * @param	Callable callback
-	 *
-	 * @return	String
-	 */
-	render( templateName, variables, callback )
-	{
-		this.emit( 'render', { templateName, variables, callback } );
-
-		templateName	= typeof templateName === 'string' && templateName.length > 0
-						? templateName + '.html'
-						: false;
-
-		if (
-			this.templatingEngine != null
-			&& this.templatingEngine.render !== 'undefined'
-			&& templateName !== false
-		) {
-			let templatePath	= path.join( this.templateDir, templateName );
-
-			fs.readFile( templatePath, 'utf8', ( err, html ) => {
-				if ( ! err && html && html.length > 0 )
-				{
-					let result	= this.templatingEngine.render( html, variables );
-					this.send( result, 200, true );
-					callback( false );
-				}
-				else
-				{
-					this.sendError( 'Error while rendering', 500 );
-					callback( 'Error while rendering' );
-				}
-			});
-		}
-		else
-		{
-			this.sendError( 'Error while rendering', 500 );
-			callback( 'Error while rendering' )
-		}
-	}
-
-	/**
 	 * @brief	Sets the current execution block
 	 *
 	 * @param	Array block

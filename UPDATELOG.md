@@ -1,3 +1,7 @@
+1.13.1 
+- Plugin improvements. Plugins now have access to the server and can attach to events emitted by the server to fine tune any request
+- Removed the render from the event request, moved functionality to a templating engine plugin
+
 1.13.0
 - Added Plugin dependencies. Now when adding a plugin if not all dependencies are present, then the application will throw an exception
 - Removed the Caching Server from the server

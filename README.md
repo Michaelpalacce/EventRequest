@@ -41,7 +41,6 @@ It contains the following properties:
 * block - Array - The execution block of middlewares
 * fileStreamHandler - FileStreamHandler - Holds different file streams within himself and is responsible for deciding which one to use
 * errorHandler - ErrorHandler - set by the server. This is used to handle errors and format the messages
-* cachingServer - DataServer - Used for caching data
 * logger - Logger - Logs data
 
 Functions exported by the event request:
@@ -95,6 +94,24 @@ The server constructor accepts the following options:
 **errorHandler** - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest -> Defaults to base errorHandler
 
 ## The server is started by calling server.start();
+
+***
+
+The server emits the following events:
+
+* serverStart - no arguments - When the server is being started
+* serverStop - no arguments - When the server is being stopped
+* serverCreationSuccess - ( net.Server server, Number port ) - When the server is successfully started
+* serverCreationError - ( net.Server server, Error error ) - When an error occurs while starting the server
+* eventRequestResolved - ( EventRequest eventRequest, IncomingMessage request, ServerResponse response ) - When the event request is first created
+* eventRequestRequestClosed - ( EventRequest eventRequest, IncomingMessage request ) - When the request gets closed
+* eventRequestResponseFinish - ( EventRequest eventRequest, ServerResponse response ) - When the response is finished
+* eventRequestResponseError - ( EventRequest eventRequest, ServerResponse response, Error error ) - When there is an error with the response
+* eventRequestBlockSetting - ( EventRequest eventRequest, Array block ) - called when the block is retrieved from the router
+* eventRequestBlockSet - ( EventRequest eventRequest, Array block ) - called when the block is set in the eventRequest
+* eventRequestError - ( EventRequest eventRequest, Error error ) - called when there is an error event emitted by the eventRequest
+* eventRequestThrow - ( EventRequest eventRequest, Error error ) - called when an error is thrown from the eventRequest
+
 
 ***
 The server has 3 ways of adding routes/middleware
@@ -553,25 +570,50 @@ The plugin Manager exports the following functions:
 ### Available plugins:
 
 * event_request_timeout -> Adds a timeout to the request
-* * Accepted options:
-* * - timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
+##
+    * Accepted options:
+    * - timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
+##
 
 * event_request_static_resources -> Adds a static resources path to the request
-* * Accepted options:
-* * - path - String - The path to the static resources to be served. Defaults to 'public'
+##
+    * Accepted options: 
+    * - path - String - The path to the static resources to be served. Defaults to 'public'
+##
 
 * cache_server -> Adds a memory cache server
 
 * event_request_session -> Handles sessions and security
-* * DEPENDENCIES:
-* * cache_server
 ##
-* * Accepted options:
-* * - sessionName - String - the session name ( aka cookie name ) - Defaults to DEFAULT_SESSION_NAME
-* * - authenticationRoute - String - The route on which authentication should happen
-* * - tokenExpiration - Number - The Time to keep the tokens before they expire - Defaults to DEFAULT_TOKEN_EXPIRATION_TIME
-* * - authenticationCallback - Function - The callback to be called when authentication has to happen
-* * 						This callback must return a boolean	- Defaults to DEFAULT_AUTHENTICATION_CALLBACK
-* * - managers - Array - The managers to be added to the security ( they have 2 parameters : instance which
-* * 					must be an instance of SecurityManager and options which are options to be passed
-* * 					to that specific manager only
+    * DEPENDENCIES:
+    * cache_server
+##
+    * Accepted options:
+    * - sessionName - String - the session name ( aka cookie name ) - Defaults to DEFAULT_SESSION_NAME
+    * - authenticationRoute - String - The route on which authentication should happen
+    * - tokenExpiration - Number - The Time to keep the tokens before they expire - Defaults to DEFAULT_TOKEN_EXPIRATION_TIME
+    * - authenticationCallback - Function - The callback to be called when authentication has to happen
+    * 						This callback must return a boolean	- Defaults to DEFAULT_AUTHENTICATION_CALLBACK
+    * - managers - Array - The managers to be added to the security ( they have 2 parameters : instance which
+    * 					must be an instance of SecurityManager and options which are options to be passed
+    * 					to that specific manager only
+
+
+* event_request_templating_engine -> adds a templating engine to the event request ( the templating engine is not included this just adds the functionality )
+If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
+
+## 
+    * Accepted options: 
+    * Accepted options:
+    * Accepted options:
+    * - engine - Object - Instance of a templating engine that has a method render defined that accepts
+    *       html as first argument, object of variables as second and a callback as third
+    * - options - Object - options to be passed to the engine
+    
+    
+    
+    
+    
+    
+    
+    

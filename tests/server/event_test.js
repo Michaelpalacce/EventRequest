@@ -9,11 +9,6 @@ const { Loggur }						= require( './../../server/components/logger/loggur' );
 
 const MockedErrorHandler				= Mock( ErrorHandler );
 
-class MockTemplatingEngine
-{
-	render(){}
-}
-
 test({
 	message	: 'EventRequest should throw an error with invalid constructor parameters',
 	test	: function ( done )
@@ -164,7 +159,6 @@ test({
 		assert.equal( eventRequest.internalTimeout, undefined );
 		assert.equal( eventRequest.extra, undefined );
 		assert.equal( eventRequest.body, undefined );
-		assert.equal( eventRequest.templatingEngine, undefined );
 		assert.equal( eventRequest.fileStreamHandler, undefined );
 		assert.equal( eventRequest.errorHandler, undefined );
 		assert.equal( eventRequest.extra, undefined );
@@ -438,55 +432,6 @@ test({
 		assert.equal( eventRequest.isFinished(), false );
 
 		done();
-	}
-});
-
-test({
-	message	: 'EventRequest.render emits a render event and returns a callback',
-	test	: ( done ) =>{
-		let eventRequest				= helpers.getEventRequest();
-		let TemplatingEngine			= Mock( MockTemplatingEngine );
-		let render						= false;
-		let send						= false;
-		let templateName				= 'test_template';
-		let templateVariables			= {};
-
-		eventRequest.templatingEngine	= new TemplatingEngine();
-		eventRequest.templateDir		= __dirname;
-		eventRequest.templatingEngine._mock({
-			method			: 'render',
-			shouldReturn	: ( template, variables ) => {
-				render	= true;
-				return template;
-			},
-			called			: 1
-		});
-
-		eventRequest.render( templateName, templateVariables, ( err ) => {
-			render ? done( err ) : done( 'Render was not called' );
-		});
-	}
-});
-
-test({
-	message	: 'EventRequest.render sends error if templating engine not set',
-	test	: ( done ) =>{
-		let eventRequest	= helpers.getEventRequest();
-		let error			= false;
-
-		eventRequest.errorHandler	= new MockedErrorHandler();
-		eventRequest.errorHandler._mock({
-			method			: 'handleError',
-			shouldReturn	: ()=>{
-				error	= true;
-			},
-			with			: [[eventRequest, undefined]],
-			called			: 1
-		});
-
-		eventRequest.render( 'test_template', {}, ( error ) => {
-					error ? done() : done( 'Rendering should have called errorHandler.handleError but it did not' );
-		});
 	}
 });
 

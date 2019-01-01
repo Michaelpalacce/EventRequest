@@ -90,10 +90,6 @@ middlewaresContainer.logger				= ( options = {} ) =>{
 					logger.debug( 'Timeout cleared' )
 				});
 
-				event.on( 'render', ( template ) =>{
-					logger.debug( `Rendering ${template.templateName}` )
-				});
-
 				event.logger	= logger;
 			}
 
@@ -114,27 +110,7 @@ middlewaresContainer.logger				= ( options = {} ) =>{
  * @return	Object
  */
 middlewaresContainer.templatingEngine	= ( options = {} ) =>{
-	return {
-		handler	: ( event ) =>{
-			let templatingEngine	= typeof options.engine !== 'undefined'
-									&& typeof options.engine.render !== 'undefined'
-									? options.engine
-									: false;
-
-			let templateDir			= typeof options.templateDir !== 'undefined'
-									? options.templateDir
-									: false;
-
-			if ( templatingEngine === false || templateDir === false )
-			{
-				throw new Error( 'Invalid templating config provided.' );
-			}
-
-			event.templateDir		= templateDir;
-			event.templatingEngine	= templatingEngine;
-			event.next();
-		}
-	};
+	return ;
 };
 
 /**

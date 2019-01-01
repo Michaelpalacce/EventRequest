@@ -7,11 +7,6 @@ const ErrorHandler						= require( '../../server/components/error/error_handler'
 const MultipartFormParser				= require( './../../server/components/body_parsers/multipart_data_parser' );
 const { Loggur, Logger }				= require( './../../server/components/logger/loggur' );
 
-class MockTemplatingEngine
-{
-	render(){}
-}
-
 test({
 	message	: 'MiddlewareContainer error handler defaults',
 	test	: ( done )=>{
@@ -118,7 +113,7 @@ test({
 		let eventRequest		= helpers.getEventRequest();
 		let router				= new Router();
 		let index				= 0;
-		let shouldBeCalled		= 9;
+		let shouldBeCalled		= 8;
 		// Create a logger that has a logLevel of 0 so that we will not see any logs while testing
 		let logger				= Loggur.createLogger( { logLevel : 0  } );
 
@@ -166,43 +161,6 @@ test({
 		assert.equal( eventRequest.logger, null );
 		eventRequest.next();
 		assert.equal( eventRequest.logger, null );
-
-		done();
-	}
-});
-
-test({
-	message		: 'MiddlewareContainer templatingEngine on default fails',
-	test		: ( done )=>{
-		let eventRequest		= helpers.getEventRequest();
-		let router				= new Router();
-
-		assert.throws( () => {
-			router.add( middlewareContainer.templatingEngine( {} ) );
-			router.add( helpers.getEmptyMiddleware() );
-
-			eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-			assert.equal( eventRequest.templatingEngine, null );
-			eventRequest.next();
-		});
-
-		done();
-	}
-});
-
-test({
-	message		: 'MiddlewareContainer templatingEngine on correct arguments',
-	test		: ( done )=>{
-		let eventRequest		= helpers.getEventRequest();
-		let router				= new Router();
-
-		router.add( middlewareContainer.templatingEngine( { engine: new MockTemplatingEngine(), templateDir: '/' } ) );
-		router.add( helpers.getEmptyMiddleware() );
-
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		assert.equal( eventRequest.templatingEngine, null );
-		eventRequest.next();
-		assert.equal( eventRequest.templatingEngine instanceof MockTemplatingEngine, true );
 
 		done();
 	}
