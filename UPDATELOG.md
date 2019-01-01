@@ -1,4 +1,4 @@
-1.13.1 
+1.14.0
 - Plugin improvements. Plugins now have access to the server and can attach to events emitted by the server to fine tune any request
 - Removed the render from the event request, moved functionality to a templating engine plugin
 

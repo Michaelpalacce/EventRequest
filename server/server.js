@@ -61,21 +61,21 @@ class Server extends EventEmitter
 	 */
 	sanitizeConfig( options )
 	{
-		this.protocol				= options[OPTIONS_PARAM_PROTOCOL];
-		this.protocol				= typeof this.protocol === 'string'
-									&& typeof POSSIBLE_PROTOCOL_OPTIONS[this.protocol] !== 'undefined'
-									? this.protocol
-									: OPTIONS_PARAM_PROTOCOL_DEFAULT;
+		this.protocol		= options[OPTIONS_PARAM_PROTOCOL];
+		this.protocol		= typeof this.protocol === 'string'
+							&& typeof POSSIBLE_PROTOCOL_OPTIONS[this.protocol] !== 'undefined'
+							? this.protocol
+							: OPTIONS_PARAM_PROTOCOL_DEFAULT;
 
-		this.httpsOptions			= options[OPTIONS_PARAM_HTTPS];
-		this.httpsOptions			= typeof this.httpsOptions === 'object'
-									? this.httpsOptions
-									: OPTIONS_PARAM_HTTPS_DEFAULT;
+		this.httpsOptions	= options[OPTIONS_PARAM_HTTPS];
+		this.httpsOptions	= typeof this.httpsOptions === 'object'
+							? this.httpsOptions
+							: OPTIONS_PARAM_HTTPS_DEFAULT;
 
-		this.port					= options[OPTIONS_PARAM_PORT];
-		this.port					= typeof this.port === 'number'
-									? this.port
-									: OPTIONS_PARAM_PORT_DEFAULT;
+		this.port			= options[OPTIONS_PARAM_PORT];
+		this.port			= typeof this.port === 'number'
+							? this.port
+							: OPTIONS_PARAM_PORT_DEFAULT;
 	}
 
 	/**
@@ -87,6 +87,8 @@ class Server extends EventEmitter
 	 */
 	add( route )
 	{
+		this.emit( 'addRoute', route );
+
 		this.router.add( route );
 	};
 
@@ -136,7 +138,7 @@ class Server extends EventEmitter
 				this.add( route );
 			});
 
-			pluginMiddleware.setServerOnRuntime( this );
+			plugin.setServerOnRuntime( this );
 
 			this.plugins.push( plugin.getPluginId() );
 		}

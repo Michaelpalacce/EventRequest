@@ -2,8 +2,6 @@
 
 // Dependencies
 const url									= require( 'url' );
-const path									= require( 'path' );
-const fs									= require( 'fs' );
 const { EventEmitter }						= require( 'events' );
 const { FileStreamHandler, FileStream }		= require( './components/file_streams/file_stream_handler' );
 const ErrorHandler							= require( './components/error/error_handler' );

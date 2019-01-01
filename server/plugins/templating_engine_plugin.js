@@ -2,6 +2,7 @@
 
 const PluginInterface	= require( './plugin_interface' );
 const fs				= require( 'fs' );
+const path				= require( 'path' );
 
 /**
  * @brief	Templating engine plugin that attaches a render functionality to the eventRequest

@@ -99,6 +99,7 @@ The server constructor accepts the following options:
 
 The server emits the following events:
 
+* addRoute - ( mixed route ) - When a new route is being added
 * serverStart - no arguments - When the server is being started
 * serverStop - no arguments - When the server is being stopped
 * serverCreationSuccess - ( net.Server server, Number port ) - When the server is successfully started
@@ -111,7 +112,6 @@ The server emits the following events:
 * eventRequestBlockSet - ( EventRequest eventRequest, Array block ) - called when the block is set in the eventRequest
 * eventRequestError - ( EventRequest eventRequest, Error error ) - called when there is an error event emitted by the eventRequest
 * eventRequestThrow - ( EventRequest eventRequest, Error error ) - called when an error is thrown from the eventRequest
-
 
 ***
 The server has 3 ways of adding routes/middleware
@@ -604,8 +604,6 @@ If you want to add a templating engine you have to set the engine parameters in 
 
 ## 
     * Accepted options: 
-    * Accepted options:
-    * Accepted options:
     * - engine - Object - Instance of a templating engine that has a method render defined that accepts
     *       html as first argument, object of variables as second and a callback as third
     * - options - Object - options to be passed to the engine
