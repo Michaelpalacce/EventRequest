@@ -16,7 +16,6 @@ class TextFileStream extends FileStream
 	constructor( event, options )
 	{
 		super( event, options );
-		// @TODO ADD MORE FORMATS
 		this.SUPPORTED_FORMATS	= [
 			'.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini'
 		];

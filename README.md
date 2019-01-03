@@ -21,6 +21,28 @@ Includes:
 - Input Validation
 - Plugin Manager
 
+~~~ecmascript 6
+const { Server, Loggur }	= require( 'event_request' );
+
+/**
+ * @brief	Instantiate the server
+ */
+const server	= new Server();
+
+server.add({
+	route	: '/',
+	method	: 'GET',
+	handler	: ( event ) => {
+		Loggur.log( 'Hello From the Loggur' );
+		event.next( '<h1>Hello World!</h1>' )
+	}
+});
+
+server.start( ()=>{
+	Loggur.log( 'Server started' );
+});
+~~~
+
 # Event Request
 
 The event request is an object that is created by the server and passed through every single middleware.
@@ -70,7 +92,9 @@ if the event is stopped and the response has not been set then send a server err
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
 	PluginInterface,	// Used to add plugins to the system
 	PluginManager,		// Contains ready to use plugins
-	Logging
+	Logging,			// Contains helpful logging functions
+	Loggur,				// Easier access to the Logging.Loggur instance
+	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
 
 # Server Options
 
@@ -89,6 +113,11 @@ The server constructor accepts the following options:
 **errorHandler** - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest -> Defaults to base errorHandler
 
 ## The server is started by calling server.start();
+~~~javascript
+server.start( ()=>{
+	Loggur.log( 'Server started' );
+});
+~~~
 
 ***
 
@@ -113,6 +142,17 @@ The server has 3 ways of adding routes/middleware
 
 When adding a Route the **server.add(route)** can be used
 
+~~~javascript
+server.add({
+	route	: '/',
+	method	: 'GET',
+	handler	: ( event ) => {
+		Loggur.log( 'Hello From the Loggur' );
+		event.next( '<h1>Hello World!</h1>' )
+	}
+});
+~~~
+
 route accepts 3 parameters:
 * handler - Function - The callback function ! Required
 * route - String|RegExp - The route to match - optional if omitted the handler will be called on every request
@@ -122,10 +162,19 @@ route accepts 3 parameters:
 
 Plugins can be added by using **server.apply( pluginContainerInstance )**
 
+~~~javascript
+const { PluginManager }	= require( 'event_request' );
+let timeoutPlugin		= PluginManager.getPlugin( 'event_request_timeout' );
+
+timeoutPlugin.setOptions( { timeout : 10 * 1000 } );
+server.apply( timeoutPlugin );
+~~~
+
 Read down to the Plugin section for more information
 
 ***
 
+// Getting deprecated
 Middlewares can be added by **server.use('middlewareName', middlewareOptions)**
 
 Available middleware:
@@ -137,21 +186,11 @@ Available middleware:
 * * Accepted options:
 * * - errorHandler - ErrorHandler - The error handler to use -> Defaults to ErrorHandler
 
-* templatingEngine -> Sets a templating engine to be used
-* * Accepted options:
-* * - engine - Mixed - Must be an object that defines a render function and will accept as first parameter template and as a second variables
-* * - templateDir - String - Path to the templates
-
 * bodyParser -> Adds one or many BodyParser descendants
 * * Accepted options:
 * * - parsers - Array - Array of BodyParser descendants. If the array has a key default these parsers will be added:  { instance : FormBodyParser }, { instance : MultipartFormParser }, { instance : JsonBodyParser }
 
 * parseCookies -> Parses cookies and saves them to event.cookies
-
-* addStaticPath -> adds static resource path
-* * Accepted options:
-* * - path - String - The path to make available
-
 
 # Logging
 
@@ -161,12 +200,17 @@ The Loggur can be used to create Loggers which accept the following options:
 * **serverName** - String - The name of the server to be concatenated with the uniqueId - Defaults to empty
 * **transports** - Array - Array of the transports to be added to the logger - Defaults to empty
 * **logLevel** - Number - The log severity level -> Defaults to error
-*  **logLevels** - Object - JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
+* **logLevels** - Object - JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
 * **capture** - Boolean - Whether to attach event listeners for process.on uncaughtException and unhandledRejection - Defaults to false
 * **dieOnCapture** - Boolean - If the process should exit in case of a caught exception -> Defaults to true
 * **unhandledExceptionLevel** - Number - What level should the unhandled exceptions be logged at -> Defaults to error
 
 Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log and will call all added Loggers
+Logger.log accepts 2 parameters: 
+~~~javascript
+    logger.log( 'Log' ); // This logs by default to an error level
+    logger.log( 'Log', LOG_LEVELS.debug ); // LOG_LEVELS.debug === Number, this will log 'Log' with debug level
+~~~
 
 Each Logger can have it's own transport layers.
 There are 2 predefined transport layers:
@@ -174,17 +218,45 @@ There are 2 predefined transport layers:
 * * Accepted options:
 * * - color - Boolean - Whether the log should be colored -> Defaults to true
 * * - logColors - Object - The colors to use -> Defaults to
-* *  [LOG_LEVELS.error]	: 'red',
+* *  [LOG_LEVELS.error]		: 'red',
 * *  [LOG_LEVELS.warning]	: 'yellow',
 * *  [LOG_LEVELS.notice]	: 'green',
 * *  [LOG_LEVELS.info]		: 'blue',
 * *  [LOG_LEVELS.verbose]	: 'cyan',
-* *  [LOG_LEVELS.debug]	: 'white'
+* *  [LOG_LEVELS.debug]		: 'white'
 
 * **File**
 * * Accepted options:
 * * - filePath - String - the location of the file to log to -> if it is not provided the transport will not log
 
+
+~~~javascript
+const { Logging }							= require( 'event_request' );
+const { Loggur, LOG_LEVELS, Console, File }	= Logging;
+
+// Create a custom Logger
+let logger	= Loggur.createLogger({
+	serverName	: 'Test', // The name of the logger
+	logLevel	: LOG_LEVELS.debug, // The logLevel for which the logger should be fired
+	capture		: false, // Do not capture thrown errors
+	transports	: [
+		new Console( { logLevel : LOG_LEVELS.notice } ), // Console logger that logs everything below notice
+		new File({ // File logger
+			logLevel	: LOG_LEVELS.notice, // Logs everything below notice
+			filePath	: '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
+			logLevels	: { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level )
+		}),
+		new File({
+			logLevel	: LOG_LEVELS.error,
+			filePath	: '/logs/error_log.log',
+		}),
+		new File({
+			logLevel	: LOG_LEVELS.debug,
+			filePath	: '/logs/debug_log.log'
+		})
+	]
+});
+~~~
 
 ### Default log levels:
 	error	: 100,
@@ -193,8 +265,6 @@ There are 2 predefined transport layers:
 	info	: 400,
 	verbose	: 500,
 	debug	: 600
-
-When logging an object can be passed that accepts 2 options: level, message. Alternatively a string can be passed which will be interpreted as an error
 
 # Validation
 
@@ -382,8 +452,6 @@ The TestingTools export:
 	test		: tester.addTest.bind( tester ),
 	runAllTests	: tester.runAllTests.bind( tester )
 
-
-
 # Caching
 There is an built-in in-memory caching server that works with promises
 
@@ -568,13 +636,38 @@ The plugin Manager exports the following functions:
     * - timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
 ##
 
+~~~javascript
+const { PluginManager }		= require( 'event_request' );
+let timeoutPlugin			= PluginManager.getPlugin( 'event_request_timeout' );
+timeoutPlugin.setOptions( { timeout : envConfig.requestTimeout } );
+server.apply( timeoutPlugin );
+~~~
+
 * event_request_static_resources -> Adds a static resources path to the request
 ##
     * Accepted options: 
     * - path - String - The path to the static resources to be served. Defaults to 'public'
 ##
 
+~~~javascript
+const { PluginManager }		= require( 'event_request' );
+let staticResourcesPlugin	= PluginManager.getPlugin( 'event_request_static_resources' );
+staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
+server.apply( staticResourcesPlugin );
+~~~
+
 * cache_server -> Adds a memory cache server
+
+~~~javascript
+const { PluginManager, Loggur }	= require( 'event_request' );
+let cacheServerPlugin			= PluginManager.getPlugin( 'cache_server' );
+cacheServerPlugin.startServer( ()=>{
+	Loggur.log( 'Caching server started' );
+});
+server.apply( cacheServerPlugin );
+~~~
+
+##
 
 * event_request_session -> Handles sessions and security
 ##
@@ -591,6 +684,44 @@ The plugin Manager exports the following functions:
     * 					must be an instance of SecurityManager and options which are options to be passed
     * 					to that specific manager only
 
+~~~javascript
+
+// Authentication callback that will authenticated the request if the user has permissions
+// this can be changed to anything you want but must return a boolean at the end
+const authenticationCallback	= ( event )=>{
+	let username	= typeof event.body.username === 'string' ? event.body.username : false;
+	let password	= typeof event.body.password === 'string' ? event.body.password : false;
+
+	return username === 'test' && password === 'test';
+};
+
+let sessionPlugin	= PluginManager.getPlugin( 'event_request_session' );
+
+sessionPlugin.setOptions({
+	tokenExpiration			: 10000,
+	authenticationRoute		: '/login',
+	authenticationCallback	: authenticationCallback,
+	managers				: [
+		'default',
+		{
+			instance	: AuthenticationManager, // Some instance to an external manager
+			options		: { indexRoute : '/browse' }
+		}
+	]
+});
+server.add({
+	route	: '/',
+	method	: 'GET',
+	handler	: ( event ) => {
+		Loggur.log( event.session ); // This will hold session data and will be saved to the given cache server. Any data stored here will be stored later if the default session managers are used
+		event.next( '<h1>Hello World!</h1>' )
+	}
+});
+
+server.apply( sessionPlugin );
+~~~
+
+##
 
 * event_request_templating_engine -> adds a templating engine to the event request ( the templating engine is not included this just adds the functionality )
 If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
@@ -601,7 +732,23 @@ If you want to add a templating engine you have to set the engine parameters in 
     *       html as first argument, object of variables as second and a callback as third
     * - options - Object - options to be passed to the engine
     
-* event_request_file_stream -> Adds a file streaming plugin to the site allowing different MIME types to be streamed
+
+~~~javascript
+const { PluginManager }		= require( 'event_request' );
+let templatingEnginePlugin	= PluginManager.getPlugin( 'event_request_templating_engine' );
+templatingEnginePlugin.setOptions( { templateDir : path.join( __dirname, './templates' ), engine : someEngineConstructor } ); 
+server.apply( templatingEnginePlugin );
+~~~
 
 ##
-    
+
+* event_request_file_stream -> Adds a file streaming plugin to the site allowing different MIME types to be streamed
+
+
+~~~javascript
+const { PluginManager }		= require( 'event_request' );
+let fileStreamPlugin		= PluginManager.getPlugin( 'event_request_file_stream' );
+server.apply( fileStreamPlugin );
+~~~
+
+##

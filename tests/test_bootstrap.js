@@ -22,19 +22,11 @@ server.start(()=>{});
 let cachingServer	= new MemoryDataServer();
 
 let onFulfilled		= ( data )=>{
-	Loggur.log({
-			level	: LOG_LEVELS.info,
-			message	: data
-		}
-	);
+	Loggur.log( data, LOG_LEVELS.info );
 };
 
 let onRejected		= ( err )=>{
-	Loggur.log({
-			level	: LOG_LEVELS.error,
-			message	: err
-		}
-	);
+	Loggur.log( err, LOG_LEVELS.error );
 };
 
 cachingServer.setUp( {} ).then( onFulfilled, onRejected );

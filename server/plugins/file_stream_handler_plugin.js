@@ -3,7 +3,6 @@
 const PluginInterface					= require( './plugin_interface' );
 const FileStreamHandlers				= require( './../components/file_streams/file_stream_handler' );
 const { FileStreamHandler, FileStream }	= FileStreamHandlers;
-const { Mp4FileStream, TextFileStream }	= FileStreamHandlers;
 
 /**
  * @brief	File stream handler responsible for attaching FileStreams to the eventRequest
@@ -41,6 +40,16 @@ class FileStreamHandlerPlugin extends PluginInterface
 			{
 				this.next( 'Could not find a FileStream that supports that format' )
 			}
+		};
+
+		/**
+		 * @brief	Gets the file stream handler
+		 *
+		 * @return	FileStreamHandler
+		 */
+		event.getFileStreamHandler	= function ()
+		{
+			return this.fileStreamHandler;
 		}
 	}
 
@@ -51,12 +60,14 @@ class FileStreamHandlerPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let pluginMiddleware	= ( event ) => {
-			event.fileStreamHandler	= new FileStreamHandler( event );
+		let pluginMiddleware	= {
+			handler	: ( event ) => {
+				event.fileStreamHandler	= new FileStreamHandler( event );
 
-			this.attachFunctions( event );
+				this.attachFunctions( event );
 
-			event.next();
+				event.next();
+			}
 		};
 
 		return [pluginMiddleware];

@@ -142,10 +142,7 @@ class Logger
 			if ( ! ( key in objectProperties ) )
 			{
 				this[key]	= ( log ) => {
-					log	= Log.getInstance({
-						level	: logLevel,
-						message	: log
-					});
+					log	= Log.getInstance( log, logLevel );
 
 					return this.log( log );
 				};
@@ -209,12 +206,13 @@ class Logger
 	 * @brief	Logs the given data
 	 *
 	 * @param	mixed log
+	 * @param	Number level
 	 *
 	 * @return	Promise
 	 */
-	log( log )
+	log( log, level = null )
 	{
-		log						= Log.getInstance( log );
+		log						= Log.getInstance( log, level );
 		let transportPromises	= [];
 
 		if ( this.supports( log ) )

@@ -26,20 +26,12 @@ class MemoryDataServerPlugin extends PluginInterface
 			this.server	= new MemoryDataServer();
 
 			let onFulfilled	= ( data )=>{
-				Loggur.log({
-						level	: LOG_LEVELS.info,
-						message	: data
-					}
-				);
+				Loggur.log( data, LOG_LEVELS.info );
 
 				callback( this.server );
 			};
 			let onRejected	= ( err )=>{
-				Loggur.log({
-						level	: LOG_LEVELS.error,
-						message	: err
-					}
-				);
+				Loggur.log( err, LOG_LEVELS.error );
 
 				callback( this.server );
 			};
@@ -75,10 +67,7 @@ class MemoryDataServerPlugin extends PluginInterface
 				this.server	= null;
 			};
 			let onRejected	= ( err )=>{
-				Loggur.log({
-					level	: LOG_LEVELS.error,
-					message	: err
-				});
+				Loggur.log( err, LOG_LEVELS.error );
 			};
 
 			this.server.exit( {} ).then( onFulfilled, onRejected );

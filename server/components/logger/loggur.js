@@ -108,22 +108,23 @@ class Loggur
 	 * @brief	Logs the data
 	 *
 	 * @param	mixed data
+	 * @param	Number level
 	 *
 	 * @return	Promise
 	 */
-	log( data )
+	log( data, level = null )
 	{
 		let loggersPromises	= [];
 		if ( Object.keys( this.loggers ).length !== 0 )
 		{
 			for ( let loggerId in this.loggers )
 			{
-				loggersPromises.push( this.loggers[loggerId].log( data ) );
+				loggersPromises.push( this.loggers[loggerId].log( data, level ) );
 			}
 		}
 		else
 		{
-			loggersPromises.push( this.getDefaultLogger().log( data ) );
+			loggersPromises.push( this.getDefaultLogger().log( data, level ) );
 		}
 
 		return Promise.all( loggersPromises );

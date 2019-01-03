@@ -12,8 +12,6 @@ const LOG_LEVELS	= {
 	debug	: 600
 };
 const DEFAULT_LOG_LEVEL			= LOG_LEVELS.error;
-const WRONG_LOG_DEFAULT_LEVEL	= LOG_LEVELS.debug;
-const WRONG_LOG_DEFAULT_MESSAGE	= 'Invalid log message provided, could not be parsed';
 
 /**
  * @brief	Log object used to transport information inside the loggur
@@ -23,51 +21,35 @@ class Log
 	/**
 	 * @param	mixed log
 	 */
-	constructor( log )
+	constructor( log, level )
 	{
 		this.level		= 0;
 		this.message	= '';
 		this.timestamp	= 0;
 		this.uniqueId	= '';
 
-		this.processLog( log );
+		this.processLog( log, level );
 	}
 
 	/**
 	 * @brief	Processes the given log
 	 *
 	 * @param	mixed log
+	 * @param	Number level
 	 *
 	 * @return	void
 	 */
-	processLog( log )
+	processLog( message, level )
 	{
-		let logType	= typeof log;
+		this.level	= typeof level === 'number' ? level : DEFAULT_LOG_LEVEL;
 
-		if ( logType === 'string' )
+		if ( message instanceof Error )
 		{
-			this.level		= DEFAULT_LOG_LEVEL;
-			this.message	= log;
-		}
-		else if ( logType === 'object' )
-		{
-			this.level	= typeof log.level === 'number' ? log.level : WRONG_LOG_DEFAULT_LEVEL;
-
-			if ( log.message instanceof Error )
-			{
-				log.message	= log.message.stack;
-			}
-			if ( typeof log.message === 'object' )
-			{
-				log.message	= JSON.stringify( log.message );
-			}
-
-			this.message	= typeof log.message === 'string' ? log.message : WRONG_LOG_DEFAULT_MESSAGE;
+			this.message	= message.stack;
 		}
 		else
 		{
-			this.level		= WRONG_LOG_DEFAULT_LEVEL;
-			this.message	= WRONG_LOG_DEFAULT_MESSAGE;
+			this.message	= typeof message === 'string' ? message : JSON.stringify( message );
 		}
 
 		this.timestamp	= Log.getUNIXTime();
@@ -137,17 +119,23 @@ class Log
 	 * @brief	Get a new instance of the Log
 	 *
 	 * @param	mixed log
+	 * @param	Number level
 	 *
 	 * @return	Log
 	 */
-	static getInstance( log = {} )
+	static getInstance( log, level )
 	{
 		if ( log instanceof Log )
 		{
+			if ( typeof level === 'number' )
+			{
+				log.level	= level;
+			}
+
 			return log;
 		}
 
-		return new this( log );
+		return new this( log, level );
 	}
 
 	/**

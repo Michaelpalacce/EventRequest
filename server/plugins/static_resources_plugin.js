@@ -7,7 +7,7 @@ const path				= require( 'path' );
 /**
  * @brief	Constants
  */
-const PROJECT_ROOT		= path.parse( require.main.filename ).dir;
+const PROJECT_ROOT	= path.parse( require.main.filename ).dir;
 
 /**
  * @brief	Static resource plugin used to server static resources
@@ -24,31 +24,36 @@ class StaticResourcesPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let staticPath			= typeof this.options.path === 'string' ? this.options.path : 'public';
-		let regExp				= new RegExp( '^(\/' + staticPath + ')' );
+		let staticPaths			= Array.isArray( this.options.paths ) ? this.options.paths : ['public'];
+		let pluginMiddlewares	= [];
 
-		let pluginMiddleware	= {
-			route	: regExp,
-			handler	: ( event ) => {
-				let item		= path.join( PROJECT_ROOT, event.path );
-				let cssHeader	= 'text/css';
+		staticPaths.forEach( ( staticPath )=>{
+			let regExp	= new RegExp( '^(\/' + staticPath + ')' );
 
-				if ( fs.existsSync( item ) )
-				{
-					typeof event.headers.accept === 'string' && event.headers.accept.includes( cssHeader )
-						? event.setHeader( 'Content-Type', cssHeader )
-						: event.setHeader( 'Content-Type', '*/*' );
+			pluginMiddlewares.push( {
+				route	: regExp,
+				handler	: ( event ) => {
+					let item		= path.join( PROJECT_ROOT, event.path );
+					let cssHeader	= 'text/css';
 
-					event.send( fs.createReadStream( item ), 200 );
+					if ( fs.existsSync( item ) )
+					{
+						typeof event.headers.accept === 'string'
+							&& event.headers.accept.includes( cssHeader )
+							? event.setHeader( 'Content-Type', cssHeader )
+							: event.setHeader( 'Content-Type', '*/*' );
+
+						event.send( fs.createReadStream( item ), 200 );
+					}
+					else
+					{
+						event.next( `File not found: ${item}` );
+					}
 				}
-				else
-				{
-					event.next( `File not found: ${item}` );
-				}
-			}
-		};
+			} );
+		});
 
-		return [pluginMiddleware];
+		return pluginMiddlewares;
 	}
 }
 

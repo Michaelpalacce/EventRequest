@@ -7,10 +7,8 @@ const { Loggur, LOG_LEVELS }	= require( '../logger/loggur' );
  * @brief	Constants
  */
 const DEFAULT_ROUTE_HANDLER	= ( event ) => {
-	Loggur.log({
-		level	: LOG_LEVELS.info,
-		message	: 'Possible mishandling. This route does not have a handler specified.'
-	});
+	Loggur.log( 'Possible mishandling. This route does not have a handler specified.', LOG_LEVELS.info );
+
 	event.next()
 };
 

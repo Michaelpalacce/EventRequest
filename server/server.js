@@ -203,10 +203,7 @@ class Server extends EventEmitter
 
 				if ( eventRequest.logger === null )
 				{
-					Loggur.log({
-						level	: LOG_LEVELS.error,
-						message	: error
-					});
+					Loggur.log( error, LOG_LEVELS.error );
 				}
 			});
 
@@ -238,11 +235,7 @@ class Server extends EventEmitter
 		server.listen( this.port, () => {
 			this.emit( 'serverCreationSuccess', { server, port: this.port } );
 
-			Loggur.log({
-					level	: LOG_LEVELS.warning,
-					message	: `Server successfully started and listening on port: ${this.port}`
-				});
-
+				Loggur.log( `Server successfully started and listening on port: ${this.port}`, LOG_LEVELS.warning );
 				callback( false, server );
 			}
 		);
@@ -251,14 +244,8 @@ class Server extends EventEmitter
 		server.on( 'error', ( error )=>{
 			this.emit( 'serverCreationError', { server, error } );
 
-			Loggur.log({
-				level	: LOG_LEVELS.error,
-				message	: 'Could not start the server on port: ' + this.port
-			});
-			Loggur.log({
-				level	: LOG_LEVELS.error,
-				message	: 'Error Returned was: ' + error.code
-			});
+			Loggur.log( 'Could not start the server on port: ' + this.port, LOG_LEVELS.error );
+			Loggur.log( 'Error Returned was: ' + error.code + this.port, LOG_LEVELS.error );
 
 			callback( error );
 		});
