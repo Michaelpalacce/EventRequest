@@ -32,14 +32,11 @@ It contains the following properties:
 * method - String - the current method ( GET, POST, DELETE, PUT, etc)
 * headers - Object - the current headers 
 * validationHandler - ValidationHandler - A handler used to do input validation
-* templateDir - String - the place where the templates are located
-* templatingEngine - mixed - the templating engine to be used
 * extra - Object - an object that holds extra data that is passed between middlewares
 * cookies - Object - the current cookies
 * params - Object - request url params that are set by the router
 * body - Object - the body of the request set by the body parsers
 * block - Array - The execution block of middlewares
-* fileStreamHandler - FileStreamHandler - Holds different file streams within himself and is responsible for deciding which one to use
 * errorHandler - ErrorHandler - set by the server. This is used to handle errors and format the messages
 * logger - Logger - Logs data
 
@@ -61,8 +58,6 @@ This emits a 'render' event
 * next - Calls the next middleware in the execution block. If there is nothing else to send and the response has not been sent YET, then send a server error
 if the event is stopped and the response has not been set then send a server error
 * sendError - Like send but used to send errors 
-* getFileStreamHandler - Gets the file stream handler
-* streamFile - streams a given file
 
 # Properties exported by the Server:
 	Server,				// The actual server to be used
@@ -137,8 +132,6 @@ Available middleware:
 * logger -> Sets up the logger
 * * Accepted options:
 * * - logger - Logger - which must be provided in order for the logger to be added and must be an instance of Logger
-
-* setFileStream
 
 * errorHandler -> Sets the error handler if not uses the event's default
 * * Accepted options:
@@ -608,10 +601,7 @@ If you want to add a templating engine you have to set the engine parameters in 
     *       html as first argument, object of variables as second and a callback as third
     * - options - Object - options to be passed to the engine
     
-    
-    
-    
-    
-    
-    
+* event_request_file_stream -> Adds a file streaming plugin to the site allowing different MIME types to be streamed
+
+##
     

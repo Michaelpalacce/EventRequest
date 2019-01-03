@@ -1,18 +1,12 @@
 'use strict';
 
 // Dependencies
-const path					= require( 'path' );
 const { BodyParserHandler }	= require( './components/body_parsers/body_parser_handler' );
 const ErrorHandler			= require( './components/error/error_handler' );
 const { Logger }			= require( './components/logger/loggur' );
 
 // Define the object
 let middlewaresContainer	= {};
-
-/**
- * @brief	Constants
- */
-const PROJECT_ROOT	= path.parse( require.main.filename ).dir;
 
 /**
  * @brief	Attaches an error handler to the event
@@ -96,21 +90,6 @@ middlewaresContainer.logger				= ( options = {} ) =>{
 			event.next();
 		}
 	};
-};
-
-/**
- * @brief	Sets the given templating engine to the event
- *
- * @param	Object options
- * 			Accepted options:
- * 			- engine - Object - Instance of a templating engine that has a method render defined that accepts
- * 				html as first argument, object of variables as second and a callback as third
- * 			- options - Object - options to be passed to the engine
- *
- * @return	Object
- */
-middlewaresContainer.templatingEngine	= ( options = {} ) =>{
-	return ;
 };
 
 /**

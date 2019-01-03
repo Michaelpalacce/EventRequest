@@ -1,3 +1,6 @@
+1.15.0
+- Moved the file streaming functionality to a plugin, functionality removed from the eventRequest naturally 
+
 1.14.0
 - Plugin improvements. Plugins now have access to the server and can attach to events emitted by the server to fine tune any request
 - Removed the render from the event request, moved functionality to a templating engine plugin

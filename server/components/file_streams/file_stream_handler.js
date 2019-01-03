@@ -14,42 +14,18 @@ class FileStreamHandler
 	 * @param	EventRequest event
 	 * @param	Object options
 	 */
-	constructor( event, options = {} )
+	constructor( event )
 	{
 		this.event			= event;
-		this.options		= options;
 		this.fileStreams	= [];
-
-		this.sanitizeConfig();
-		this.initStreams();
-	}
-
-	/**
-	 * @brief	Sanitizes the given configuration options
-	 *
-	 * @return	void
-	 */
-	sanitizeConfig()
-	{
-		this.baseOptions		= {};
-		this.options.streams	= typeof this.options.streams === 'object' ? this.options.streams : [];
-		let streams				= this.options.streams;
-
-		if (
-			streams.constructor === Array
-			&& ( streams.indexOf( 'default' ) !== -1 || streams.length === 0 )
-		) {
-			let index	= streams.indexOf( 'default' );
-			if ( index !== -1 )
-				streams.splice( index, 1 );
-
-			let defaultStreams	= [
+		this.options		= {
+			streams	: [
 				{ instance : Mp4FileStream },
 				{ instance : TextFileStream }
-			];
+			]
+		};
 
-			this.options.streams	= defaultStreams.concat( streams );
-		}
+		this.initStreams();
 	}
 
 	/**
@@ -74,7 +50,7 @@ class FileStreamHandler
 						throw new Error( 'Invalid configuration' );
 					}
 
-					stream	= stream.getInstance( this.event, Object.assign( this.baseOptions, streamOptions ) );
+					stream	= stream.getInstance( this.event, streamOptions );
 
 					if ( stream instanceof FileStream )
 					{

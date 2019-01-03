@@ -329,43 +329,6 @@ class EventRequest extends EventEmitter
 
 		this.errorHandler.handleError( this, error, code );
 	}
-
-	/**
-	 * @brief	Gets the file stream handler if one exists, creates an empty one if not
-	 *
-	 * @return	FileStreamHandler
-	 */
-	getFileStreamHandler()
-	{
-		if ( this.fileStreamHandler === null )
-		{
-			this.fileStreamHandler	= new FileStreamHandler( this );
-		}
-
-		return this.fileStreamHandler;
-	}
-
-	/**
-	 * @brief	Streams files
-	 *
-	 * @param	String file
-	 * @param	Object options
-	 *
-	 * @return	void
-	 */
-	streamFile( file, options )
-	{
-		let fileStream	= this.getFileStreamHandler().getFileStreamerForType( file );
-
-		if ( fileStream !== null || fileStream instanceof FileStream )
-		{
-			fileStream.stream( file, options );
-		}
-		else
-		{
-			this.next( 'Could not find a FileStream that supports that format' )
-		}
-	}
 }
 
 // Export The Module
