@@ -49,7 +49,7 @@ class TemplatingEnginePlugin extends PluginInterface
 					else
 					{
 						this.sendError( 'Error while rendering', 500 );
-						callback( 'Error while rendering' );
+						callback( err );
 					}
 				});
 			}

@@ -2,6 +2,7 @@
 - Moved the file streaming functionality to a plugin, functionality removed from the eventRequest naturally 
 - Updated the Loggur and Logger to have the log function accept a second level argument instead of passing an object. Passing an object is now deprecated
 - Added examples to the README
+- The Plugin manager is now located in the server and is not extracted by default
 
 1.14.0
 - Plugin improvements. Plugins now have access to the server and can attach to events emitted by the server to fine tune any request

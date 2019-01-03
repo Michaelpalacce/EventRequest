@@ -91,7 +91,6 @@ if the event is stopped and the response has not been set then send a server err
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
 	PluginInterface,	// Used to add plugins to the system
-	PluginManager,		// Contains ready to use plugins
 	Logging,			// Contains helpful logging functions
 	Loggur,				// Easier access to the Logging.Loggur instance
 	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
@@ -161,13 +160,16 @@ route accepts 3 parameters:
 ***
 
 Plugins can be added by using **server.apply( pluginContainerInstance )**
+Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
+plugin all you have to do is do: plugin.apply( 'pluginId' )
 
 ~~~javascript
-const { PluginManager }	= require( 'event_request' );
-let timeoutPlugin		= PluginManager.getPlugin( 'event_request_timeout' );
+const PluginManager	= server.getPluginManager();
+let timeoutPlugin	= PluginManager.getPlugin( 'event_request_timeout' );
 
 timeoutPlugin.setOptions( { timeout : 10 * 1000 } );
 server.apply( timeoutPlugin );
+server.apply( 'event_request_timeout' ); // This is also valid.
 ~~~
 
 Read down to the Plugin section for more information
@@ -616,6 +618,11 @@ This is also done to make it easier for middleware with options to be implemente
 to read and understand.
 
 # Plugin Manager
+The manager can be extracted from the created Server by:
+~~~javascript
+let pluginManager   = server.getPluginManager();
+~~~
+
 The Plugin manager contains pre loaded plugins. You can add your own plugins to it for easy control over what is used or 
 if you want the bootstrap of the project to be in a different place.
 
@@ -637,8 +644,8 @@ The plugin Manager exports the following functions:
 ##
 
 ~~~javascript
-const { PluginManager }		= require( 'event_request' );
-let timeoutPlugin			= PluginManager.getPlugin( 'event_request_timeout' );
+const PluginManager	= server.getPluginManager();
+let timeoutPlugin	= PluginManager.getPlugin( 'event_request_timeout' );
 timeoutPlugin.setOptions( { timeout : envConfig.requestTimeout } );
 server.apply( timeoutPlugin );
 ~~~
@@ -650,7 +657,7 @@ server.apply( timeoutPlugin );
 ##
 
 ~~~javascript
-const { PluginManager }		= require( 'event_request' );
+const PluginManager			= server.getPluginManager();
 let staticResourcesPlugin	= PluginManager.getPlugin( 'event_request_static_resources' );
 staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
 server.apply( staticResourcesPlugin );
@@ -659,8 +666,9 @@ server.apply( staticResourcesPlugin );
 * cache_server -> Adds a memory cache server
 
 ~~~javascript
-const { PluginManager, Loggur }	= require( 'event_request' );
-let cacheServerPlugin			= PluginManager.getPlugin( 'cache_server' );
+const { Loggur }		= require( 'event_request' );
+const PluginManager		= server.getPluginManager();
+let cacheServerPlugin	= PluginManager.getPlugin( 'cache_server' );
 cacheServerPlugin.startServer( ()=>{
 	Loggur.log( 'Caching server started' );
 });
@@ -734,7 +742,7 @@ If you want to add a templating engine you have to set the engine parameters in 
     
 
 ~~~javascript
-const { PluginManager }		= require( 'event_request' );
+const PluginManager			= server.getPluginManager();
 let templatingEnginePlugin	= PluginManager.getPlugin( 'event_request_templating_engine' );
 templatingEnginePlugin.setOptions( { templateDir : path.join( __dirname, './templates' ), engine : someEngineConstructor } ); 
 server.apply( templatingEnginePlugin );
@@ -746,8 +754,8 @@ server.apply( templatingEnginePlugin );
 
 
 ~~~javascript
-const { PluginManager }		= require( 'event_request' );
-let fileStreamPlugin		= PluginManager.getPlugin( 'event_request_file_stream' );
+const PluginManager		= server.getPluginManager();
+let fileStreamPlugin	= PluginManager.getPlugin( 'event_request_file_stream' );
 server.apply( fileStreamPlugin );
 ~~~
 

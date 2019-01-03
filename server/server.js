@@ -7,6 +7,7 @@ const EventRequest				= require( './event' );
 const { EventEmitter }			= require( 'events' );
 const Router					= require( './components/routing/router' );
 const PluginInterface			= require( './plugins/plugin_interface' );
+const PluginManager				= require( './plugins/preloaded_plugins' );
 const middlewaresContainer		= require( './middleware_container' );
 const Logging					= require( './components/logger/loggur' );
 const { Loggur, LOG_LEVELS }	= Logging;
@@ -43,8 +44,19 @@ class Server extends EventEmitter
 
 		this.sanitizeConfig( options );
 
-		this.router		= new Router();
-		this.plugins	= [];
+		this.router			= new Router();
+		this.pluginManager	= PluginManager;
+		this.plugins		= [];
+	}
+
+	/**
+	 * @brief	Returns the plugin manager
+	 *
+	 * @return	PluginManager
+	 */
+	getPluginManager()
+	{
+		return this.pluginManager;
 	}
 
 	/**
@@ -115,7 +127,10 @@ class Server extends EventEmitter
 	/**
 	 * @brief	This is used to apply a new PluginInterface
 	 *
-	 * @param	PluginInterface plugin
+	 * @details	The plugin manager can be used to extract and set up plugins and then add them to the server just by
+	 * 			giving their plugin ids
+	 *
+	 * @param	PluginInterface|String plugin
 	 *
 	 * @return	void
 	 */
@@ -123,25 +138,41 @@ class Server extends EventEmitter
 	{
 		if ( plugin instanceof PluginInterface )
 		{
-			let pluginDependencies	= plugin.getPluginDependencies();
-
-			pluginDependencies.forEach(( dependency )=>{
-				if ( ! this.plugins.includes( dependency ) )
-				{
-					throw new Error( 'The plugin ' + plugin.getPluginId() + ' requires ' + dependency + ' which is missing.' );
-				}
-			});
-
-			let pluginMiddleware	= plugin.getPluginMiddleware();
-
-			pluginMiddleware.forEach( ( route )=>{
-				this.add( route );
-			});
-
-			plugin.setServerOnRuntime( this );
-
-			this.plugins.push( plugin.getPluginId() );
+			this._attachPlugin( plugin );
 		}
+		else if ( typeof plugin === 'string' )
+		{
+			this._attachPlugin( this.pluginManager.getPlugin( plugin ) );
+		}
+	}
+
+	/**
+	 * @brief	Attaches a PluginInterface to the server
+	 *
+	 * @param	PluginInterface plugin
+	 *
+	 * @return	void
+	 */
+	_attachPlugin( plugin )
+	{
+		let pluginDependencies	= plugin.getPluginDependencies();
+
+		pluginDependencies.forEach(( dependency )=>{
+			if ( ! this.plugins.includes( dependency ) )
+			{
+				throw new Error( 'The plugin ' + plugin.getPluginId() + ' requires ' + dependency + ' which is missing.' );
+			}
+		});
+
+		let pluginMiddleware	= plugin.getPluginMiddleware();
+
+		pluginMiddleware.forEach( ( route )=>{
+			this.add( route );
+		});
+
+		plugin.setServerOnRuntime( this );
+
+		this.plugins.push( plugin.getPluginId() );
 	}
 
 	/**
