@@ -94,6 +94,7 @@ if the event is stopped and the response has not been set then send a server err
 	Logging,			// Contains helpful logging functions
 	Loggur,				// Easier access to the Logging.Loggur instance
 	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
+	PluginManager		// The plugin manager also injected inside the server
 
 # Server Options
 
