@@ -137,7 +137,7 @@ test({
 					resolve();
 				});
 			},
-			called			: 1
+			called			: 2
 		});
 
 		let logger	= new Logger({
@@ -154,7 +154,7 @@ test({
 				message	: 'Warning',
 				level	: LOG_LEVELS.warning
 			}).then(()=>{
-				logged === 1 ? done() : done( 'Transport logged called more than once when it should have been called just once' );
+				logged === 2 ? done() : done( 'Transport logged called more than once when it should have been called just once' );
 			}).catch(( err )=>{
 				done( err );
 			});
@@ -180,12 +180,12 @@ test({
 	test	: ( done )=>{
 		let logger	= new Logger( {}, 'id' );
 
-		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.error, message	: '' } ) ), true );
-		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.warning, message	: '' } ) ), true );
-		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.notice, message	: '' } ) ), true );
-		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.info, message	: '' } ) ), true );
-		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.verbose, message	: '' } ) ), false );
-		assert.equal( logger.supports( Log.getInstance( { level : LOG_LEVELS.debug, message	: '' } ) ), false );
+		assert.equal( logger.supports( Log.getInstance( '',LOG_LEVELS.error ) ), true );
+		assert.equal( logger.supports( Log.getInstance( '',LOG_LEVELS.warning ) ), true );
+		assert.equal( logger.supports( Log.getInstance( '',LOG_LEVELS.notice ) ), true );
+		assert.equal( logger.supports( Log.getInstance( '',LOG_LEVELS.info ) ), true );
+		assert.equal( logger.supports( Log.getInstance( '',LOG_LEVELS.verbose ) ), false );
+		assert.equal( logger.supports( Log.getInstance( '',LOG_LEVELS.debug ) ), false );
 		assert.equal( logger.supports( 'Not an instance of Log' ), false );
 
 		done();

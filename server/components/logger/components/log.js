@@ -39,17 +39,26 @@ class Log
 	 *
 	 * @return	void
 	 */
-	processLog( message, level )
+	processLog( message = '', level = LOG_LEVELS.error )
 	{
+		let logType	= typeof message;
 		this.level	= typeof level === 'number' ? level : DEFAULT_LOG_LEVEL;
 
 		if ( message instanceof Error )
 		{
 			this.message	= message.stack;
 		}
+		else if ( logType === 'string' )
+		{
+			this.message	= message;
+		}
+		else if ( logType === 'undefined' )
+		{
+			this.message	= '';
+		}
 		else
 		{
-			this.message	= typeof message === 'string' ? message : JSON.stringify( message );
+			this.message	= JSON.stringify( message );
 		}
 
 		this.timestamp	= Log.getUNIXTime();

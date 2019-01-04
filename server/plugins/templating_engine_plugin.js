@@ -68,7 +68,7 @@ class TemplatingEnginePlugin extends PluginInterface
 	 * 			Accepted options:
 	 * 			- engine - Object - Instance of a templating engine that has a method render defined that accepts
 	 * 				html as first argument, object of variables as second and a callback as third
-	 * 			- options - Object - options to be passed to the engine
+	 * 			- templateDir - string - the directory where all the templates are stored
 	 *
 	 * @return	Array
 	 */

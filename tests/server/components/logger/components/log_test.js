@@ -17,8 +17,8 @@ const LOG_LEVELS	= {
 };
 
 const DEFAULT_LOG_LEVEL			= LOG_LEVELS.error;
-const WRONG_LOG_DEFAULT_LEVEL	= LOG_LEVELS.debug;
-const WRONG_LOG_DEFAULT_MESSAGE	= 'Invalid log message provided, could not be parsed';
+const WRONG_LOG_DEFAULT_LEVEL	= LOG_LEVELS.error;
+const WRONG_LOG_DEFAULT_MESSAGE	= '';
 
 test({
 	message	: 'Log.constructor on default',
@@ -54,10 +54,7 @@ test({
 	test	: ( done )=>{
 		let logMessage	= 'test';
 		let logLevel	= LOG_LEVELS.error;
-		let log			= new Log({
-			message	: logMessage,
-			level	: logLevel
-		});
+		let log			= new Log( logMessage, logLevel );
 
 		assert.equal( log.message, logMessage );
 		assert.equal( log.level, logLevel );
@@ -71,9 +68,7 @@ test({
 test({
 	message	: 'Log.constructor on invalid',
 	test	: ( done )=>{
-		let log			= new Log({
-			key	: 'value'
-		});
+		let log			= new Log();
 
 		assert.equal( log.message, WRONG_LOG_DEFAULT_MESSAGE );
 		assert.equal( log.level, WRONG_LOG_DEFAULT_LEVEL );
@@ -88,9 +83,7 @@ test({
 	message	: 'Log.constructor on object message',
 	test	: ( done )=>{
 		let logMessage	= { key	: 'value' };
-		let log			= new Log({
-			message	: logMessage
-		});
+		let log			= new Log( logMessage );
 
 		assert.equal( log.message, JSON.stringify( logMessage ) );
 		assert.equal( log.level, WRONG_LOG_DEFAULT_LEVEL );

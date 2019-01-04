@@ -117,7 +117,7 @@ test({
 			called			: 0
 		});
 
-		assert.equal( consoleTransport.log( Log.getInstance( { level : LOG_LEVELS.debug } ) ) instanceof Promise, true );
+		assert.equal( consoleTransport.log( Log.getInstance( '', LOG_LEVELS.debug ) ) instanceof Promise, true );
 
 		called === 0 ? done() : done( 'Log should not have been called but it did' );
 	}

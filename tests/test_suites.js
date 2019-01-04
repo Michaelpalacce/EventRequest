@@ -47,6 +47,8 @@ testSuites.pluginsSuite		= ()=>{
 	require( './server/plugins/static_resources_plugin_test' );
 	require( './server/plugins/session_plugin_test' );
 	require( './server/plugins/memory_data_server_plugin_test' );
+	require( './server/plugins/preloaded_plugins_test' );
+	require( './server/plugins/templating_engine_plugin_test' );
 };
 
 module.exports	= testSuites;

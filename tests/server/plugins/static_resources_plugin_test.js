@@ -9,7 +9,7 @@ test({
 	message		: 'StaticResourcesPlugin sets content type to empty if accepts not passed',
 	test		: ( done )=>{
 		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.css' );
-		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { path : 'tests' } );
+		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
 		let router					= new Router();
 		let called					= 0;
 
@@ -27,7 +27,8 @@ test({
 			},
 			with			: [
 				['Content-Type', '*/*']
-			]
+			],
+			called			: 1
 		});
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
@@ -43,7 +44,7 @@ test({
 	message		: 'StaticResourcesPlugin setsHeader for text/css in case of css',
 	test		: ( done )=>{
 		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.css', { accept : 'text/css' } );
-		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { path : 'tests' } );
+		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
 		let router					= new Router();
 		let called					= 0;
 
@@ -77,7 +78,7 @@ test({
 	message		: 'StaticResourcesPlugin setsHeader for text/css in case of js',
 	test		: ( done )=>{
 		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.js', { accept : '*/*' } );
-		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { path : 'tests' } );
+		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
 		let router					= new Router();
 		let called					= 0;
 

@@ -91,12 +91,12 @@ test({
 			logLevels	: { error : 100, notice : 300, verbose : 500 }
 		});
 
-		assert.equal( transport.supports( Log.getInstance( { level : LOG_LEVELS.error } ) ), true );
-		assert.equal( transport.supports( Log.getInstance( { level : LOG_LEVELS.warning } ) ), false );
-		assert.equal( transport.supports( Log.getInstance( { level : LOG_LEVELS.notice } ) ), true );
-		assert.equal( transport.supports( Log.getInstance( { level : LOG_LEVELS.info } ) ), false );
-		assert.equal( transport.supports( Log.getInstance( { level : LOG_LEVELS.verbose } ) ), false );
-		assert.equal( transport.supports( Log.getInstance( { level : LOG_LEVELS.debug } ) ), false );
+		assert.equal( transport.supports( Log.getInstance( '', LOG_LEVELS.error ) ), true );
+		assert.equal( transport.supports( Log.getInstance( '', LOG_LEVELS.warning ) ), false );
+		assert.equal( transport.supports( Log.getInstance( '', LOG_LEVELS.notice ) ), true );
+		assert.equal( transport.supports( Log.getInstance( '', LOG_LEVELS.info ) ), false );
+		assert.equal( transport.supports( Log.getInstance( '', LOG_LEVELS.verbose ) ), false );
+		assert.equal( transport.supports( Log.getInstance( '', LOG_LEVELS.debug ) ), false );
 
 		done();
 	}

@@ -144,6 +144,10 @@ class Server extends EventEmitter
 		{
 			this._attachPlugin( this.pluginManager.getPlugin( plugin ) );
 		}
+		else
+		{
+			throw new Error( 'A PluginInterface or an existing PluginManager pluginId (string) must be added' );
+		}
 	}
 
 	/**

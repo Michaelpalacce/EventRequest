@@ -9,12 +9,22 @@ const fs											= require( 'fs' );
 const path											= require( 'path' );
 const { Loggur }									= require( './../server/components/logger/loggur' );
 const MockLoggur									= Mock( Loggur.constructor );
+const { server }									= require( './test_bootstrap' );
 let { IncomingMessage, ServerResponse, request }	= require( 'http' );
 
 ServerResponse	= Mock( ServerResponse );
 IncomingMessage	= Mock( IncomingMessage );
 
 let helpers	= {};
+
+/**
+ * @brief	Returns the server set up by the test bootstrap
+ *
+ * @return	Server
+ */
+helpers.getServer	= ()=>{
+	return server;
+};
 
 /**
  * @brief	Sets up the test namespace for the given caching server
