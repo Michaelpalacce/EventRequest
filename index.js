@@ -2,7 +2,6 @@
 
 // Dependencies
 const Router					= require( './server/components/routing/router' );
-const ErrorHandler				= require( './server/components/error/error_handler' );
 const SessionHandler			= require( './server/components/session/session_handler' );
 const BodyParserHandler			= require( './server/components/body_parsers/body_parser_handler' );
 const PluginInterface			= require( './server/plugins/plugin_interface' );
@@ -15,9 +14,9 @@ const { Loggur, LOG_LEVELS }	= Logging;
 
 module.exports			= {
 	Server,				Router,
-	ErrorHandler,		DataServer,
+	DataServer,			PluginManager,
 	SessionHandler,		BodyParserHandler,
 	Testing,			PluginInterface,
 	Logging,			Loggur,
-	LOG_LEVELS,			PluginManager
+	LOG_LEVELS
 };

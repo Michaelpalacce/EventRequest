@@ -1,8 +1,8 @@
 'use strict';
 
-const PluginInterface			= require( './plugin_interface' );
-const { Loggur, LOG_LEVELS }	= require( './../components/logger/loggur' );
-const MemoryDataServer			= require( './../components/caching/memory/memory_data_server' );
+const PluginInterface			= require( '../plugin_interface' );
+const { Loggur, LOG_LEVELS }	= require( '../../components/logger/loggur' );
+const MemoryDataServer			= require( '../../components/caching/memory/memory_data_server' );
 
 class MemoryDataServerPlugin extends PluginInterface
 {

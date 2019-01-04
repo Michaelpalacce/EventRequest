@@ -1,10 +1,10 @@
 'use strict';
 
 // Dependencies
-const os				= require( 'os' );
-const path				= require( 'path' );
-const fs				= require( 'fs' );
-const BodyParser		= require( './body_parser' );
+const os			= require( 'os' );
+const path			= require( 'path' );
+const fs			= require( 'fs' );
+const BodyParser	= require( './body_parser' );
 
 /**
  * @brief	Constants

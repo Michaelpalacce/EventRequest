@@ -8,7 +8,6 @@ const { EventEmitter }			= require( 'events' );
 const Router					= require( './components/routing/router' );
 const PluginInterface			= require( './plugins/plugin_interface' );
 const PluginManager				= require( './plugins/preloaded_plugins' );
-const middlewaresContainer		= require( './middleware_container' );
 const Logging					= require( './components/logger/loggur' );
 const { Loggur, LOG_LEVELS }	= Logging;
 
@@ -102,26 +101,6 @@ class Server extends EventEmitter
 		this.emit( 'addRoute', route );
 
 		this.router.add( route );
-	};
-
-	/**
-	 * @brief	Use a predefined middleware from middlewaresContainer
-	 *
-	 * @todo	MAKE THIS DEPRECATED WHEN THE PLUGINS ARE IMPLEMENTED
-	 *
-	 * @deprecated
-	 *
-	 * @param	String name
-	 * @param	Object options
-	 *
-	 * @return	void
-	 */
-	use( name, options )
-	{
-		if ( typeof name === 'string' && typeof middlewaresContainer[name] === 'function' )
-		{
-			this.add( middlewaresContainer[name]( options ) );
-		}
 	};
 
 	/**
@@ -239,6 +218,10 @@ class Server extends EventEmitter
 				if ( eventRequest.logger === null )
 				{
 					Loggur.log( error, LOG_LEVELS.error );
+				}
+				else
+				{
+					eventRequest.logger.log( error, LOG_LEVELS.error );
 				}
 			});
 

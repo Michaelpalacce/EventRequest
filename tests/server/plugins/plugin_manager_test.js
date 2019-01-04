@@ -1,10 +1,10 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers }	= require( './../../test_helper' );
-const PluginManager						= require( './../../../server/plugins/plugin_manager' );
-const TimeoutPlugin						= require( './../../../server/plugins/timeout_plugin' );
-const PluginInterface					= require( '../../../server/plugins/plugin_interface' );
+const { assert, test }	= require( './../../test_helper' );
+const PluginManager		= require( './../../../server/plugins/plugin_manager' );
+const TimeoutPlugin		= require( '../../../server/plugins/available_plugins/timeout_plugin' );
+const PluginInterface	= require( '../../../server/plugins/plugin_interface' );
 
 test({
 	message	: 'PluginManager addPlugin',

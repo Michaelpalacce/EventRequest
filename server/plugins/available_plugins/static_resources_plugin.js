@@ -1,6 +1,6 @@
 'use strict';
 
-const PluginInterface	= require( './plugin_interface' );
+const PluginInterface	= require( '../plugin_interface' );
 const fs				= require( 'fs' );
 const path				= require( 'path' );
 

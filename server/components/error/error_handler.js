@@ -37,18 +37,22 @@ class ErrorHandler
 	 */
 	handleError( event, error, code )
 	{
+		let errorToSend	= error;
+		let errorToEmit	= error;
+
 		if ( error instanceof Error )
 		{
-			error	= error.stack;
+			errorToEmit	= error.stack;
+			errorToSend	= error.message;
 		}
 
-		event.emit( 'error', error );
+		event.emit( 'error', errorToEmit );
 
-		error	= this.formatError( error );
+		errorToSend	= this.formatError( errorToSend );
 
 		if ( ! event.isFinished() )
 		{
-			event.send( error, code );
+			event.send( errorToSend, code );
 		}
 	}
 }

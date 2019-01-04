@@ -3,7 +3,6 @@
 // Dependencies
 const url									= require( 'url' );
 const { EventEmitter }						= require( 'events' );
-const { FileStreamHandler, FileStream }		= require( './components/file_streams/file_stream_handler' );
 const ErrorHandler							= require( './components/error/error_handler' );
 const Streams								= require( 'stream' );
 const { Logger }							= require( './components/logger/loggur' );
@@ -57,40 +56,21 @@ class EventRequest extends EventEmitter
 			writable	: false
 		});
 
+		let list	= {},
+			rc		= this.headers.cookie;
+
+		rc && rc.split( ';' ).forEach( function( cookie ) {
+			let parts					= cookie.split( '=' );
+			list[parts.shift().trim()]	= decodeURI( parts.join( '=' ) );
+		});
+
 		this.request			= request;
 		this.response			= response;
+		this.cookies			= list;
 
-		this.templateDir		= null;
-		this.templatingEngine	= null;
 		this.extra				= {};
-		this.cookies			= {};
 		this.params				= {};
-		this.body				= {};
 		this.block				= {};
-
-		let fileStreamHandler	= null;
-		Object.defineProperty( this, 'fileStreamHandler', {
-			enumerable	: true,
-			set			: ( arg ) =>{
-				if ( arg == null )
-				{
-					fileStreamHandler	= arg;
-					return;
-				}
-
-				if ( arg instanceof FileStreamHandler )
-				{
-					fileStreamHandler	= arg;
-				}
-				else
-				{
-					throw new Error( 'File stream handler must be an instance of FileStreamHandler' );
-				}
-			},
-			get			: () =>{
-				return fileStreamHandler;
-			}
-		});
 
 		let errorHandler	= null;
 		Object.defineProperty( this, 'errorHandler', {
@@ -154,14 +134,10 @@ class EventRequest extends EventEmitter
 	{
 		this.emit( 'cleanUp' );
 
-		this.extra				= undefined;
-		this.body				= undefined;
-		this.templatingEngine	= undefined;
-		this.templateDir		= undefined;
-		this.fileStreamHandler	= undefined;
-		this.errorHandler		= undefined;
-		this.cookies			= undefined;
-		this.params				= undefined;
+		this.extra			= undefined;
+		this.errorHandler	= undefined;
+		this.cookies		= undefined;
+		this.params			= undefined;
 
 		this.emit( 'finished' );
 		this.removeAllListeners();

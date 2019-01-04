@@ -59,7 +59,6 @@ It contains the following properties:
 * params - Object - request url params that are set by the router
 * body - Object - the body of the request set by the body parsers
 * block - Array - The execution block of middlewares
-* errorHandler - ErrorHandler - set by the server. This is used to handle errors and format the messages
 * logger - Logger - Logs data
 
 Functions exported by the event request:
@@ -84,7 +83,6 @@ if the event is stopped and the response has not been set then send a server err
 # Properties exported by the Server:
 	Server,				// The actual server to be used
 	Router,				// The router. Can be used to add routes to it and then to the main server route
-	ErrorHandler,		// Error handler to extend if you want to create a custom error handler
 	SessionHandler,		// Session handler to be extended by other security modules
 	BodyParserHandler,	// Body parser handler that contains the different body parsers
 	DataServer,			// Instance to be extended to implement your own DataServer
@@ -109,8 +107,6 @@ The server constructor accepts the following options:
 **httpsOptions** - Object - Options that will be given to the https webserver -> Defaults to {}
 
 **port** - Number - The port to run the webserver/s on -> Defaults to 3000
-
-**errorHandler** - ErrorHandler - The error handler to be called when an error occurs inside of the EventRequest -> Defaults to base errorHandler
 
 ## The server is started by calling server.start();
 ~~~javascript
@@ -138,7 +134,7 @@ The server emits the following events:
 * eventRequestThrow - ( EventRequest eventRequest, Error error ) - called when an error is thrown from the eventRequest
 
 ***
-The server has 3 ways of adding routes/middleware
+The server has 2 ways of adding routes/middleware
 
 When adding a Route the **server.add(route)** can be used
 
@@ -176,25 +172,6 @@ server.apply( 'event_request_timeout' ); // This is also valid.
 Read down to the Plugin section for more information
 
 ***
-
-// Getting deprecated
-Middlewares can be added by **server.use('middlewareName', middlewareOptions)**
-
-Available middleware:
-* logger -> Sets up the logger
-* * Accepted options:
-* * - logger - Logger - which must be provided in order for the logger to be added and must be an instance of Logger
-
-* errorHandler -> Sets the error handler if not uses the event's default
-* * Accepted options:
-* * - errorHandler - ErrorHandler - The error handler to use -> Defaults to ErrorHandler
-
-* bodyParser -> Adds one or many BodyParser descendants
-* * Accepted options:
-* * - parsers - Array - Array of BodyParser descendants. If the array has a key default these parsers will be added:  { instance : FormBodyParser }, { instance : MultipartFormParser }, { instance : JsonBodyParser }
-
-* parseCookies -> Parses cookies and saves them to event.cookies
-
 # Logging
 
 The Loggur can be accessed by directly from the server { Loggur }
@@ -753,11 +730,77 @@ server.apply( templatingEnginePlugin );
 
 * event_request_file_stream -> Adds a file streaming plugin to the site allowing different MIME types to be streamed
 
-
 ~~~javascript
 const PluginManager		= server.getPluginManager();
 let fileStreamPlugin	= PluginManager.getPlugin( 'event_request_file_stream' );
 server.apply( fileStreamPlugin );
+~~~
+##
+
+
+##
+* event_request_logger -> Adds a logger to the eventRequest
+## 
+    * Accepted options: 
+    * - logger - Object - Instance of Logger, if incorrect object provided, defaults to the default logger from the Loggur
+
+~~~javascript
+const PluginManager		= server.getPluginManager();
+let loggerPlugin    	= PluginManager.getPlugin( 'event_request_logger' );
+server.apply( loggerPlugin );
+~~~
+
+##
+
+##
+* event_request_body_parser, event_request_body_parser_json, event_request_body_parser_form, event_request_body_parser_multipart 
+        -> Adds an Empty bodyParser that can be set up, JsonBodyParser, FormBodyParser and MultipartBodyParser respectively
+## 
+    * event_request_body_parser -> Adds one or many BodyParser descendants
+    * * Accepted options:
+    * * - parsers - Array - Array of BodyParser descendants. If the array has a key default these parsers will be added:  
+            { instance : FormBodyParser }, { instance : MultipartFormParser }, { instance : JsonBodyParser }
+            
+    *** MiltipartFormParser Accepted options:
+    - maxPayload - Number - Maximum payload in bytes to parse if set to 0 means infinite - Defaults to 0
+    - tempDir - String - The directory where to keep the uploaded files before moving - Defaults to the tmp dir of the os
+            
+    *** JsonBodyParser Accepted options:
+    - maxPayloadLength - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
+    - strict - Boolean - Whether the received payload must match the content-length - Defaults to true
+            
+    *** FormBodyParser Accepted options:
+    - maxPayloadLength - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
+    - strict - Boolean - Whether the received payload must match the content-length - Defaults to true
+
+~~~javascript
+const PluginManager		= server.getPluginManager();
+let loggerPlugin    	= PluginManager.getPlugin( 'event_request_logger' );
+server.apply( loggerPlugin );
+~~~
+
+Example Setup:
+~~~javascript
+let bodyParserJsonPlugin		= new BodyParserPlugin(
+	'event_request_body_parser_json',
+	{
+		parsers	: [{ instance : JsonBodyParser }]
+	}
+);
+
+let bodyParserFormPlugin		= new BodyParserPlugin(
+	'event_request_body_parser_form',
+	{
+		parsers	: [{ instance : FormBodyParser }]
+	}
+);
+
+let bodyParserMultipartPlugin	= new BodyParserPlugin(
+	'event_request_body_parser_multipart',
+	{
+		parsers	: [{ instance : MultipartFormParser, options : { tempDir : path.join( PROJECT_ROOT, '/Uploads' ) } }]
+	}
+);
 ~~~
 
 ##

@@ -1,6 +1,6 @@
 'use strict';
 
-const PluginInterface	= require( './plugin_interface' );
+const PluginInterface	= require( '../plugin_interface' );
 const fs				= require( 'fs' );
 const path				= require( 'path' );
 
@@ -92,6 +92,11 @@ class TemplatingEnginePlugin extends PluginInterface
 			handler	: ( event ) =>{
 				event.templateDir		= templateDir;
 				event.templatingEngine	= templatingEngine;
+
+				event.on( 'cleanUp', ()=>{
+					event.templateDir		= undefined;
+					event.templatingEngine	= undefined;
+				} );
 
 				this.attachRenderFunction( event );
 				event.next();

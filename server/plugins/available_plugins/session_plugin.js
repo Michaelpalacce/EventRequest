@@ -1,7 +1,7 @@
 'use strict';
 
-const PluginInterface	    = require( './plugin_interface' );
-const { SessionHandler }	= require( './../components/session/session_handler' );
+const PluginInterface	    = require( '../plugin_interface' );
+const { SessionHandler }	= require( '../../components/session/session_handler' );
 
 /**
  * @brief	Session plugin responsible for managing the security and session

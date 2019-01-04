@@ -68,23 +68,6 @@ test({
 });
 
 test({
-	message	: 'EventRequest fileStreamHandler can only be an instance of FileStreamHandler',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-
-		assert.doesNotThrow( () =>{
-			eventRequest.fileStreamHandler	= new FileStreamHandler()
-		});
-
-		assert.throws( () => {
-			eventRequest.fileStreamHandler	= {};
-		});
-
-		done();
-	}
-});
-
-test({
 	message	: 'EventRequest errorHandler can only be an instance of ErrorHandler',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
