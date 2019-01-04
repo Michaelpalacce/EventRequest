@@ -15,7 +15,6 @@ const { MultipartFormParser, JsonBodyParser, FormBodyParser }	= require( './../c
 /**
  * @brief	Constants
  */
-const PROJECT_ROOT				= path.parse( require.main.filename ).dir;
 let PluginManager				= new PluginManagerClass();
 
 let bodyParserJsonPlugin		= new BodyParserPlugin(
@@ -35,7 +34,7 @@ let bodyParserFormPlugin		= new BodyParserPlugin(
 let bodyParserMultipartPlugin	= new BodyParserPlugin(
 	'event_request_body_parser_multipart',
 	{
-		parsers	: [{ instance : MultipartFormParser, options : { tempDir : path.join( PROJECT_ROOT, '/Uploads' ) } }]
+		parsers	: [{ instance : MultipartFormParser }]
 	}
 );
 

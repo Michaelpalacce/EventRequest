@@ -1,8 +1,8 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers }	= require( './../../test_helper' );
-const PreLoadedPluginManager			= require( './../../../server/plugins/preloaded_plugins' );
+const { assert, test }			= require( './../../test_helper' );
+const PreLoadedPluginManager	= require( './../../../server/plugins/preloaded_plugins' );
 
 test({
 	message	: '',
