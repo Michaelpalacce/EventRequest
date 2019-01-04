@@ -1,6 +1,5 @@
 'use strict';
 
-const path														= require( 'path' );
 const PluginManagerClass										= require( './plugin_manager' );
 const TimeoutPlugin												= require( './available_plugins/timeout_plugin' );
 const StaticResourcesPlugin										= require( './available_plugins/static_resources_plugin' );

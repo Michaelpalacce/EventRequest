@@ -21,7 +21,7 @@ Includes:
 - Input Validation
 - Plugin Manager
 
-~~~ecmascript 6
+~~~javascript
 const { Server, Loggur }	= require( 'event_request' );
 
 /**
@@ -98,7 +98,9 @@ if the event is stopped and the response has not been set then send a server err
 
 The server is exported from the main module:
 
->     const { Server } = require( 'event_request' )
+~~~javascript
+    const { Server } = require( 'event_request' )
+~~~
 
 The server constructor accepts the following options:
 
@@ -249,7 +251,9 @@ let logger	= Loggur.createLogger({
 # Validation
 
 The validation is done by using:
->     event.validationHandler.validate( objectToValidate, skeleton )
+~~~javascript
+    event.validationHandler.validate( objectToValidate, skeleton )
+~~~
 
 skeleton must have the keys that are to be validated that point to a string of rules separated by ||
 
@@ -281,10 +285,12 @@ When validation is done a ValidationResult is returned. It has 2 main methods:
 
 Example:
 
->     let body = { stringToValidate: 'str', emailToValidate: 'example@test.com' };
->     event.validationHandler.handle( body, { stringToValidate: 'filled||string||range:2-3',
->                                       emailToValidate: 'optional||email' }
->                                   );
+~~~javascript
+     let body = { stringToValidate: 'str', emailToValidate: 'example@test.com' };
+     event.validationHandler.handle( body, { stringToValidate: 'filled||string||range:2-3',
+                                       emailToValidate: 'optional||email' }
+                                   );
+~~~
 
 The example will validate that the stringToValidate is filled is a string and is within a range of 2-3 characters
 It will also validate that the emailToValidate in case it is provided is an actual email.
@@ -296,35 +302,43 @@ In case there is no error False will be returned
 
 If you need to test your project, then you can use the Testing tools included in the project.
 
->     const { TestingTools }  = require( 'event_request' );
-
+~~~javascript
+     const { TestingTools }  = require( 'event_request' );
+~~~
 The testing tools include a mocker. The mocker class can be retrieved with:
 
->     const { Mock }    = TestingTools;
-
+~~~javascript
+     const { Mock }    = TestingTools;
+~~~
 The exported Mock is a Function that should be used directly on the constructor of the class you want to mock. For example:
 
->     class Test { mockThis(){} };  
->     let MockedTest    = Mock( Test );  
+~~~javascript
+     class Test { mockThis(){} };  
+     let MockedTest    = Mock( Test );  
+~~~
 
 This will return the same class but with an extra _mock function added directly to it so make sure your original class does NOT
 have a _mock function otherwise it will be overwritten. From here you can use the _mock function to mock any other function/parameter
 that is attached to the 'Test' class:
 
->     let testDouble    = new MockedTest();  
->       testDouble._mock({  
->       method        : 'mockThis',  
->       shouldReturn  : ''  
->     });  
+~~~javascript
+     let testDouble    = new MockedTest();  
+       testDouble._mock({  
+       method        : 'mockThis',  
+       shouldReturn  : ''  
+     });  
+~~~
 
 Note: As you can see when you mock a class you MUST specify what it should return from now on. You can also give instructions
 on what should be returned on consecutive calls to this method like so :
 
->     let testDouble    = new MockedTest();  
->       testDouble._mock({  
->       method              : 'mockThis',  
->       onConsecutiveCalls  : ['first', 'secondAndOnwards']  
->     });
+~~~javascript
+     let testDouble    = new MockedTest();  
+       testDouble._mock({  
+       method              : 'mockThis',  
+       onConsecutiveCalls  : ['first', 'secondAndOnwards']  
+     });
+~~~
 
 This will result in the following:
 1. The first time you make a call to mockThis you will get 'first' as a return
@@ -335,13 +349,14 @@ This will result in the following:
 When making a mock of a class you can specify the MAX amount of times an object should be called. Since javascript uses
 an async approach and relies heavily on callbacks, a minimum cannot be set.
 
-
->     let testDouble    = new MockedTest();  
->        testDouble._mock({  
->        method        : 'mockThis',  
->        shouldReturn  : '',  
->        called        : 1  
->     });
+~~~javascript
+     let testDouble    = new MockedTest();  
+        testDouble._mock({  
+        method        : 'mockThis',  
+        shouldReturn  : '',  
+        called        : 1  
+     });
+~~~
 
 This way if the method mockThis is called more than once an error will be thrown.
 
@@ -349,16 +364,18 @@ This way if the method mockThis is called more than once an error will be thrown
 You can also Specify the arguments that should be provided to the mocked method like so:
 
 
->     let testDouble    = new MockedTest();  
->       testDouble._mock({  
->       method        : 'mockThis',  
->       shouldReturn  : '',  
->       called        : 1,  
->       with:         [  
->           [ 'firstArgument', 'secondArgument' ]  
->           [ 'secondCallFirstArgument', 'secondCallSecondArgument' ]  
->        ]  
->     });  
+~~~javascript
+     let testDouble    = new MockedTest();  
+       testDouble._mock({  
+       method        : 'mockThis',  
+       shouldReturn  : '',  
+       called        : 1,  
+       with:         [  
+           [ 'firstArgument', 'secondArgument' ]  
+           [ 'secondCallFirstArgument', 'secondCallSecondArgument' ]  
+        ]  
+     });  
+~~~
 
 The 'with' option accepts an array of arrays where each array in the with array is a call. Again if it's called more than
 the times the with arguments, the last one will be returned. In case of mismatch an Error will be thrown.
@@ -366,7 +383,9 @@ If you do not want the mocker to check one of the arguments, then undefined shou
 
 If you wan an environment to run your tests then you can use the test and runAllTests provided by the testing tools:
 
->     const { test, runAllTests }    = TestingTools;
+~~~javascript
+     const { test, runAllTests }    = TestingTools;
+~~~
 
 The 'runAllTests' function accepts an object that accepts the following options:
 * dieOnFirstError - Boolean - Whether the testing should stop on the first error - Defaults to true
@@ -391,32 +410,38 @@ the testing will stop.
 
 Example:
 
->     test({  
->       message     : 'This test should pass',  
->       dataProvier : [
->           ['first', 2 ],
->           ['firstTwo', 21 ],
->       ]
->       test        : ( done, first, second ) =>{  
->          console.log( first ); this will log 'first', then on the second iterration 'firstTwo'
->          console.log( second ); this will log 2, then on the second iterration 21
->          let one = 1;  
->
->         one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );  
->       }  
->     });  
+~~~javascript
+     test({  
+       message     : 'This test should pass',  
+       dataProvier : [
+           ['first', 2 ],
+           ['firstTwo', 21 ],
+       ]
+       test        : ( done, first, second ) =>{  
+          console.log( first ); this will log 'first', then on the second iterration 'firstTwo'
+          console.log( second ); this will log 2, then on the second iterration 21
+          let one = 1;  
 
+         one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );  
+       }  
+     });  
+~~~
 
 You can also create your own Tester if you want separate test cases:
 
->     const { Tester }    = TestingTools;  
->     let tester          = new Tester();  
+~~~javascript
+     const { Tester }    = TestingTools;  
+     let tester          = new Tester();  
+~~~
 
 The tester has the same functions: 'test', 'runAllTests'
 
 ###Mocker
 You can also use the Mocker class by:
- >      Mocker( classToMock, methodToMockOptions )
+~~~javascript
+       Mocker( classToMock, methodToMockOptions )
+~~~
+ 
  where the methodToMockOptions are the same
 as the _mock function of a testDouble. Note that this can alter a class before it is actually instantiated and WILL alter
 the original class passed so it is suggested to be used ONLY on testDoubles
@@ -437,6 +462,7 @@ There is an built-in in-memory caching server that works with promises
 
 Below are the methods supported by the base DataServer and the in memory data server implements them
 
+~~~javascript
 	/**
 	 * @brief	Gets a instance of the current DataServer
 	 *
@@ -573,6 +599,7 @@ Below are the methods supported by the base DataServer and the in memory data se
 	 * @return	Promise
 	 */
 	getAll( namespace, options = {} );
+~~~
 
 The create, update, read all accept ttl as an options which must be a number in milliseconds stating for how long the entry should be kept within the memory
 
