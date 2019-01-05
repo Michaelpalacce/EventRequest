@@ -2,7 +2,8 @@
 
 // Dependencies
 const { assert, test, helpers }	= require( '../test_helper' );
-const { Server, Router }		= require( './../../index' );
+const Server					= require( './../../server/server' );
+const Router					= require( './../../server/components/routing/router' );
 const PreloadedPluginManager	= require( './../../server/plugins/preloaded_plugins' );
 
 test({

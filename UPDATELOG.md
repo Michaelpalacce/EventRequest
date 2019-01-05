@@ -1,3 +1,6 @@
+3.0.0
+- Changed the way the server is created. Now it is exported as a callback that creates the server
+
 2.0.0
 - Moved the file streaming functionality to a plugin, functionality removed from the eventRequest naturally 
 - Updated the Loggur and Logger to have the log function accept a second level argument instead of passing an object. Passing an object is now deprecated

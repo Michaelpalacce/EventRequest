@@ -27,7 +27,7 @@ const { Server, Loggur }	= require( 'event_request' );
 /**
  * @brief	Instantiate the server
  */
-const server	= new Server();
+const server	= Server();
 
 server.add({
 	route	: '/',
@@ -81,7 +81,7 @@ if the event is stopped and the response has not been set then send a server err
 * sendError - Like send but used to send errors 
 
 # Properties exported by the Server:
-	Server,				// The actual server to be used
+	Server,				// Server callback. Use this to create a new server. The server instance can be retrieved from anywhere by: Server();
 	Router,				// The router. Can be used to add routes to it and then to the main server route
 	SessionHandler,		// Session handler to be extended by other security modules
 	BodyParserHandler,	// Body parser handler that contains the different body parsers
@@ -92,7 +92,7 @@ if the event is stopped and the response has not been set then send a server err
 	Logging,			// Contains helpful logging functions
 	Loggur,				// Easier access to the Logging.Loggur instance
 	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
-	PluginManager		// The plugin manager also injected inside the server
+	PluginManager		// The plugin manager also injected inside the server. This is preloaded with predefined plug ins
 
 # Server Options
 
@@ -102,7 +102,7 @@ The server is exported from the main module:
     const { Server } = require( 'event_request' )
 ~~~
 
-The server constructor accepts the following options:
+The server callback accepts the following options:
 
 **protocol** - String - The protocol to be used ( http || https ) -> Defaults to http
 
@@ -176,7 +176,7 @@ Read down to the Plugin section for more information
 ***
 # Logging
 
-The Loggur can be accessed by directly from the server { Loggur }
+The Loggur can be accessed directly from the server { Loggur }
 
 The Loggur can be used to create Loggers which accept the following options:
 * **serverName** - String - The name of the server to be concatenated with the uniqueId - Defaults to empty
