@@ -167,13 +167,7 @@ class Server extends EventEmitter
 	 */
 	resolve ( request, response )
 	{
-		let eventRequest	= new EventRequest( request, response );
-
-		eventRequest.next	= ( err, code )=>{
-			eventRequest._next( err, code );
-		};
-
-		return eventRequest;
+		return new EventRequest( request, response );
 	};
 
 	/**

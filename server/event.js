@@ -119,6 +119,11 @@ class EventRequest extends EventEmitter
 				return logger;
 			}
 		});
+
+		let self	= this;
+		this.next	= ( err, code )=>{
+			self._next( err, code );
+		};
 	}
 
 	/**
