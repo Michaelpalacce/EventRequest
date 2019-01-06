@@ -45,7 +45,6 @@ class ErrorHandler
 			errorToEmit	= error.stack;
 			errorToSend	= error.message;
 		}
-
 		event.emit( 'error', errorToEmit );
 
 		errorToSend	= this.formatError( errorToSend );

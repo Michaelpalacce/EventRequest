@@ -1,3 +1,6 @@
+3.0.1
+- Bug fix to the next function. Now no need to be binded 
+
 3.0.0
 - Changed the way the server is created. Now it is exported as a callback that creates the server
 

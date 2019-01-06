@@ -257,13 +257,14 @@ class EventRequest extends EventEmitter
 	 *
 	 * @details	If there is nothing else to send and the response has not been sent YET, then send a server error
 	 * 			if the event is stopped and the response has not been set then send a server error
+	 * 			This function is wrapped by the next() function
 	 *
 	 * @param	Error err
 	 * @param	Number code
 	 *
 	 * @return	void
 	 */
-	next( err, code )
+	_next( err, code )
 	{
 		if ( err )
 		{
@@ -272,19 +273,24 @@ class EventRequest extends EventEmitter
 			return;
 		}
 
-		if ( this.block.length <= 0 && ! this.isFinished() )
-		{
-			this.sendError( `Cannot ${this.method} ${this.path}` );
-			return;
-		}
+		let isResponseFinished	= this.isFinished();
 
-		try
+		if ( ! isResponseFinished )
 		{
-			this.block.shift().call( this, this );
-		}
-		catch ( error )
-		{
-			this.next( error );
+			if ( ! this.block.length > 0  )
+			{
+				this.sendError( `Cannot ${this.method} ${this.path}` );
+				return;
+			}
+
+			try
+			{
+				this.block.shift().call( this, this );
+			}
+			catch ( error )
+			{
+				this.next( error );
+			}
 		}
 	}
 

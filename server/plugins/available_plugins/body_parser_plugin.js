@@ -28,7 +28,7 @@ class BodyParserPlugin extends PluginInterface
 				}
 
 				let bodyParserHandler	= new BodyParserHandler( event, this.options );
-				bodyParserHandler.parseBody( event.next.bind( event ) );
+				bodyParserHandler.parseBody( event.next );
 			}
 		};
 

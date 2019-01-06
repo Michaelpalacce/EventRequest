@@ -167,7 +167,13 @@ class Server extends EventEmitter
 	 */
 	resolve ( request, response )
 	{
-		return new EventRequest( request, response );
+		let eventRequest	= new EventRequest( request, response );
+
+		eventRequest.next	= ( err, code )=>{
+			eventRequest._next( err, code );
+		};
+
+		return eventRequest;
 	};
 
 	/**
@@ -218,10 +224,6 @@ class Server extends EventEmitter
 				if ( eventRequest.logger === null )
 				{
 					Loggur.log( error, LOG_LEVELS.error );
-				}
-				else
-				{
-					eventRequest.logger.log( error, LOG_LEVELS.error );
 				}
 			});
 
