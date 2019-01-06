@@ -9,6 +9,7 @@ const TemplatingEnginePlugin									= require( './available_plugins/templating_
 const FileStreamHandlerPlugin									= require( './available_plugins/file_stream_handler_plugin' );
 const LoggerPlugin												= require( './available_plugins/logger_plugin' );
 const BodyParserPlugin											= require( './available_plugins/body_parser_plugin' );
+const ResponseCachePlugin										= require( './available_plugins/response_cache_plugin' );
 const { MultipartFormParser, JsonBodyParser, FormBodyParser }	= require( './../components/body_parsers/body_parser_handler' );
 
 /**
@@ -17,36 +18,68 @@ const { MultipartFormParser, JsonBodyParser, FormBodyParser }	= require( './../c
 let PluginManager				= new PluginManagerClass();
 
 let bodyParserJsonPlugin		= new BodyParserPlugin(
-	'event_request_body_parser_json',
+	'er_body_parser_json',
 	{
 		parsers	: [{ instance : JsonBodyParser }]
 	}
 );
 
 let bodyParserFormPlugin		= new BodyParserPlugin(
-	'event_request_body_parser_form',
+	'er_body_parser_form',
 	{
 		parsers	: [{ instance : FormBodyParser }]
 	}
 );
 
 let bodyParserMultipartPlugin	= new BodyParserPlugin(
-	'event_request_body_parser_multipart',
+	'er_body_parser_multipart',
 	{
 		parsers	: [{ instance : MultipartFormParser }]
 	}
 );
 
-PluginManager.addPlugin( new TimeoutPlugin( 'event_request_timeout' ) );
-PluginManager.addPlugin( new StaticResourcesPlugin( 'event_request_static_resources' ) );
-PluginManager.addPlugin( new MemoryDataServerPlugin( 'cache_server' ) );
-PluginManager.addPlugin( new SessionPlugin( 'event_request_session' ) );
-PluginManager.addPlugin( new TemplatingEnginePlugin( 'event_request_templating_engine' ) );
-PluginManager.addPlugin( new FileStreamHandlerPlugin( 'event_request_file_stream' ) );
-PluginManager.addPlugin( new LoggerPlugin( 'event_request_logger' ) );
-PluginManager.addPlugin( new BodyParserPlugin( 'event_request_body_parser' ));
+PluginManager.addPlugin( new TimeoutPlugin( 'er_timeout' ) );
+PluginManager.addPlugin( new StaticResourcesPlugin( 'er_static_resources' ) );
+PluginManager.addPlugin( new MemoryDataServerPlugin( 'er_cache_server' ) );
+PluginManager.addPlugin( new SessionPlugin( 'er_session' ) );
+PluginManager.addPlugin( new TemplatingEnginePlugin( 'er_templating_engine' ) );
+PluginManager.addPlugin( new FileStreamHandlerPlugin( 'er_file_stream' ) );
+PluginManager.addPlugin( new LoggerPlugin( 'er_logger' ) );
+PluginManager.addPlugin( new BodyParserPlugin( 'er_body_parser' ));
+PluginManager.addPlugin( new ResponseCachePlugin( 'er_response_cache' ));
 PluginManager.addPlugin( bodyParserJsonPlugin );
 PluginManager.addPlugin( bodyParserFormPlugin );
 PluginManager.addPlugin( bodyParserMultipartPlugin );
 
 module.exports	= PluginManager;
+
+
+let server		= Server();
+let cacheServer	= PluginManager.getPlugin( 'er_cache_server' );
+
+cacheServer.startServer(()=>{
+	Loggur.log( 'Caching server is set up' );
+});
+
+server.apply( cacheServer );
+server.apply( PluginManager.getPlugin( 'er_response_cache' ) );
+
+server.add({
+	route	: '/',
+	method	: 'GET',
+	handler	: ( event )=>{
+		event.cacheCurrentRequest();
+	}
+});
+
+server.add({
+	route	: '/',
+	method	: 'GET',
+	handler	: ( event )=>{
+		event.send( '<h1>Hello World</h1>')
+	}
+});
+
+server.start(()=>{
+	Loggur.log( 'Server started' )
+});

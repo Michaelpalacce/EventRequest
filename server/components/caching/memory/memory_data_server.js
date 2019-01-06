@@ -1,12 +1,12 @@
 'use strict';
 
-const DataServer	= require( '../data_server' );
-const path			= require( 'path' );
-const fork			= require( 'child_process' ).fork;
-const net			= require( 'net' );
+const { DataServer, SERVER_STATES }	= require( '../data_server' );
+const path							= require( 'path' );
+const fork							= require( 'child_process' ).fork;
+const net							= require( 'net' );
 
-const PIPE_NAME		= path.join( __dirname, 'memory_data_client.js' );
-const PIPE_PATH		= "\\\\.\\pipe\\" + PIPE_NAME;
+const PIPE_NAME						= path.join( __dirname, 'memory_data_client.js' );
+const PIPE_PATH						= "\\\\.\\pipe\\" + PIPE_NAME;
 
 /**
  * @brief	Simple caching server that stores cache in memory
@@ -39,6 +39,7 @@ class MemoryDataServer extends DataServer
 			});
 
 			spawnedClient.on( 'error', ( err )=>{
+				this.changeServerState( SERVER_STATES.startupError );
 				reject( err );
 			});
 
@@ -46,9 +47,12 @@ class MemoryDataServer extends DataServer
 				if ( ! message.error )
 				{
 					let onFulfilled	= ( data )=>{
+						this.changeServerState( SERVER_STATES.running );
 						resolve( data );
 					};
+
 					let onRejected	= ( err )=>{
+						this.changeServerState( SERVER_STATES.startupError );
 						reject( err );
 					};
 
@@ -56,6 +60,8 @@ class MemoryDataServer extends DataServer
 				}
 				else
 				{
+					this.changeServerState( SERVER_STATES.startupError );
+
 					reject( message.error );
 				}
 			});
@@ -112,6 +118,8 @@ class MemoryDataServer extends DataServer
 	 */
 	setUp( options = {} )
 	{
+		this.changeServerState( SERVER_STATES.starting );
+
 		return this.forkClient();
 	}
 
@@ -137,7 +145,7 @@ class MemoryDataServer extends DataServer
 
 				if ( response.error !== false )
 				{
-					reject( response.error );
+					reject( response.error, response.data );
 				}
 				else
 				{
@@ -232,7 +240,23 @@ class MemoryDataServer extends DataServer
 	 */
 	exit( options = {} )
 	{
-		return this.doCommand( 'exit', { options } );
+		this.changeServerState( SERVER_STATES.stopping );
+
+		return new Promise( ( resolve, reject )=>{
+			let onFulfilled	= ( data )=>{
+				this.changeServerState( SERVER_STATES.stopped );
+
+				resolve( data );
+			};
+
+			let onRejected	= ( err )=>{
+				this.changeServerState( SERVER_STATES.stoppingError );
+
+				reject( err );
+			};
+
+			this.doCommand( 'exit', { options } ).then( onFulfilled, onRejected )
+		});
 	}
 }
 

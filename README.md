@@ -164,11 +164,11 @@ plugin all you have to do is do: plugin.apply( 'pluginId' )
 
 ~~~javascript
 const PluginManager	= server.getPluginManager();
-let timeoutPlugin	= PluginManager.getPlugin( 'event_request_timeout' );
+let timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
 
 timeoutPlugin.setOptions( { timeout : 10 * 1000 } );
 server.apply( timeoutPlugin );
-server.apply( 'event_request_timeout' ); // This is also valid.
+server.apply( 'er_timeout' ); // This is also valid.
 ~~~
 
 Read down to the Plugin section for more information
@@ -460,6 +460,19 @@ The TestingTools export:
 # Caching
 There is an built-in in-memory caching server that works with promises
 
+The data servers have several states:
+~~~javascript
+const SERVER_STATES		= {
+	inactive		: 0,
+	starting		: 1,
+	running			: 2,
+	stopping		: 3,
+	stopped			: 4,
+	startupError	: 5,
+	stoppingError	: 6,
+};
+~~~
+
 Below are the methods supported by the base DataServer and the in memory data server implements them
 
 ~~~javascript
@@ -476,6 +489,22 @@ Below are the methods supported by the base DataServer and the in memory data se
 	 * @param	Object options
 	 */
 	sanitize( options );
+	
+	/**
+	 * @brief	Changes the server state and emits an event
+	 *
+	 * @param	Number state
+	 *
+	 * @return	void
+	 */
+	changeServerState( state );
+
+	/**
+	 * @brief	Gets the server state of the data server
+	 *
+	 * @return	Number
+	 */
+	getServerState();
 
 	/**
 	 * @brief	Sets up the data server
@@ -642,7 +671,7 @@ The plugin Manager exports the following functions:
 
 ### Available plugins:
 
-* event_request_timeout -> Adds a timeout to the request
+* er_timeout -> Adds a timeout to the request
 ##
     * Accepted options:
     * - timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
@@ -650,12 +679,12 @@ The plugin Manager exports the following functions:
 
 ~~~javascript
 const PluginManager	= server.getPluginManager();
-let timeoutPlugin	= PluginManager.getPlugin( 'event_request_timeout' );
+let timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
 timeoutPlugin.setOptions( { timeout : envConfig.requestTimeout } );
 server.apply( timeoutPlugin );
 ~~~
 
-* event_request_static_resources -> Adds a static resources path to the request
+* er_static_resources -> Adds a static resources path to the request
 ##
     * Accepted options: 
     * - path - String - The path to the static resources to be served. Defaults to 'public'
@@ -663,29 +692,64 @@ server.apply( timeoutPlugin );
 
 ~~~javascript
 const PluginManager			= server.getPluginManager();
-let staticResourcesPlugin	= PluginManager.getPlugin( 'event_request_static_resources' );
+let staticResourcesPlugin	= PluginManager.getPlugin( 'er_static_resources' );
 staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
 server.apply( staticResourcesPlugin );
 ~~~
 
-* cache_server -> Adds a memory cache server
+* er_cache_server -> Adds a memory cache server
+
+##
+    * Exported Functions:
+    * startServer( callback ) -> starts the caching server and calls the callback when done. The first argument is a boolean with
+        a negative return. False if everything went correctly, true on failure. The second argument will be the server if returned false
+        callback( false, MemoryDataServer );
+        callback( true );
+    * getServer -> retruns the MemoryDataServer or null if not started
+    * stopServer( callback ) -> stops the server and has the same behaviour as startServer but without a second argument
 
 ~~~javascript
 const { Loggur }		= require( 'event_request' );
 const PluginManager		= server.getPluginManager();
-let cacheServerPlugin	= PluginManager.getPlugin( 'cache_server' );
-cacheServerPlugin.startServer( ()=>{
-	Loggur.log( 'Caching server started' );
+let cacheServerPlugin	= PluginManager.getPlugin( 'er_cache_server' );
+cacheServerPlugin.startServer( ( err, server )=>{
+	if ( err === false )
+    {
+        Loggur.log( 'Caching server started' );
+        Loggur.log( server );
+        Loggur.log( cacheServerPlugin.getServer ); // same as Loggur.log( server );
+        
+        cacheServerPlugin.stopServer(()=>{
+        	if ( err === false )
+            {
+                Loggur.log( 'Caching server stopped' );
+                Loggur.log( server ); // null
+                Loggur.log( cacheServerPlugin.getServer ); // same as Loggur.log( server );
+            }
+            else
+            {
+                Loggur.log( 'Caching server stop failure' );
+                Loggur.log( cacheServerPlugin.getServer ); // will still return an instance of MemoryDataServer
+            }
+        });
+    }
+	else
+    {
+        Loggur.log( 'Caching server start failure' );
+        Loggur.log( cacheServerPlugin.getServer ); // will return null
+    }
 });
+
+
 server.apply( cacheServerPlugin );
 ~~~
 
 ##
 
-* event_request_session -> Handles sessions and security
+* er_session -> Handles sessions and security
 ##
     * DEPENDENCIES:
-    * cache_server
+    * er_cache_server
 ##
     * Accepted options:
     * - sessionName - String - the session name ( aka cookie name ) - Defaults to DEFAULT_SESSION_NAME
@@ -708,7 +772,7 @@ const authenticationCallback	= ( event )=>{
 	return username === 'test' && password === 'test';
 };
 
-let sessionPlugin	= PluginManager.getPlugin( 'event_request_session' );
+let sessionPlugin	= PluginManager.getPlugin( 'er_session' );
 
 sessionPlugin.setOptions({
 	tokenExpiration			: 10000,
@@ -736,7 +800,7 @@ server.apply( sessionPlugin );
 
 ##
 
-* event_request_templating_engine -> adds a templating engine to the event request ( the templating engine is not included this just adds the functionality )
+* er_templating_engine -> adds a templating engine to the event request ( the templating engine is not included this just adds the functionality )
 If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
 
 ## 
@@ -748,42 +812,42 @@ If you want to add a templating engine you have to set the engine parameters in 
 
 ~~~javascript
 const PluginManager			= server.getPluginManager();
-let templatingEnginePlugin	= PluginManager.getPlugin( 'event_request_templating_engine' );
+let templatingEnginePlugin	= PluginManager.getPlugin( 'er_templating_engine' );
 templatingEnginePlugin.setOptions( { templateDir : path.join( __dirname, './templates' ), engine : someEngineConstructor } ); 
 server.apply( templatingEnginePlugin );
 ~~~
 
 ##
 
-* event_request_file_stream -> Adds a file streaming plugin to the site allowing different MIME types to be streamed
+* er_file_stream -> Adds a file streaming plugin to the site allowing different MIME types to be streamed
 
 ~~~javascript
 const PluginManager		= server.getPluginManager();
-let fileStreamPlugin	= PluginManager.getPlugin( 'event_request_file_stream' );
+let fileStreamPlugin	= PluginManager.getPlugin( 'er_file_stream' );
 server.apply( fileStreamPlugin );
 ~~~
 ##
 
 
 ##
-* event_request_logger -> Adds a logger to the eventRequest
+* er_logger -> Adds a logger to the eventRequest
 ## 
     * Accepted options: 
     * - logger - Object - Instance of Logger, if incorrect object provided, defaults to the default logger from the Loggur
 
 ~~~javascript
 const PluginManager		= server.getPluginManager();
-let loggerPlugin    	= PluginManager.getPlugin( 'event_request_logger' );
+let loggerPlugin    	= PluginManager.getPlugin( 'er_logger' );
 server.apply( loggerPlugin );
 ~~~
 
 ##
 
 ##
-* event_request_body_parser, event_request_body_parser_json, event_request_body_parser_form, event_request_body_parser_multipart 
+* er_body_parser, er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
         -> Adds an Empty bodyParser that can be set up, JsonBodyParser, FormBodyParser and MultipartBodyParser respectively
 ## 
-    * event_request_body_parser -> Adds one or many BodyParser descendants
+    * er_body_parser -> Adds one or many BodyParser descendants
     * * Accepted options:
     * * - parsers - Array - Array of BodyParser descendants. If the array has a key default these parsers will be added:  
             { instance : FormBodyParser }, { instance : MultipartFormParser }, { instance : JsonBodyParser }
@@ -802,32 +866,72 @@ server.apply( loggerPlugin );
 
 ~~~javascript
 const PluginManager		= server.getPluginManager();
-let loggerPlugin    	= PluginManager.getPlugin( 'event_request_logger' );
+let loggerPlugin    	= PluginManager.getPlugin( 'er_logger' );
 server.apply( loggerPlugin );
 ~~~
 
 Example Setup:
 ~~~javascript
 let bodyParserJsonPlugin		= new BodyParserPlugin(
-	'event_request_body_parser_json',
+	'er_body_parser_json',
 	{
 		parsers	: [{ instance : JsonBodyParser }]
 	}
 );
 
 let bodyParserFormPlugin		= new BodyParserPlugin(
-	'event_request_body_parser_form',
+	'er_body_parser_form',
 	{
 		parsers	: [{ instance : FormBodyParser }]
 	}
 );
 
 let bodyParserMultipartPlugin	= new BodyParserPlugin(
-	'event_request_body_parser_multipart',
+	'er_body_parser_multipart',
 	{
 		parsers	: [{ instance : MultipartFormParser, options : { tempDir : path.join( PROJECT_ROOT, '/Uploads' ) } }]
 	}
 );
+~~~
+##
+
+##
+* er_response_cache -> Adds a response caching mechanism
+
+~~~javascript
+const PluginManager		= server.getPluginManager();
+let cacheServer			= PluginManager.getPlugin( 'er_cache_server' );
+
+cacheServer.startServer(()=>{
+	Loggur.log( 'Caching server is set up' );
+});
+
+server.apply( cacheServer );
+server.apply( PluginManager.getPlugin( 'er_response_cache' ) );
+
+// call event.cacheCurrentRequest() where you want to cache.
+server.add({
+	route	: '/',
+	method	: 'GET',
+	handler	: ( event )=>{
+		event.cacheCurrentRequest();
+	}
+});
+
+// OR  You can create your own middleware that will be added to all requests
+// you want to cache, no need to do it separately
+server.add({
+	handler	: ( event )=>{
+		let pathsToCache    = ['/', '/sth', 'test'];
+		if ( pathsToCache.indexOf( event.path ) !== -1 )
+        {
+            event.cacheCurrentRequest();
+        }
+		
+		// Or use the router to match RegExp
+	}
+});
+
 ~~~
 
 ##

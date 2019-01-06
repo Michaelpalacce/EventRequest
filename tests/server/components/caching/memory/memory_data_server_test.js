@@ -320,7 +320,7 @@ test({
 });
 
 test({
-	message	: 'MemoryDataServer.getAll returns all data',
+	message	: 'MemoryDataServer.exit exits',
 	test	: ( done )=>{
 		helpers.setUpTestNamespace( testServer, ( err )=>{
 			if ( err )
@@ -329,7 +329,7 @@ test({
 				return;
 			}
 
-			testServer.exit().then(( data )=>{
+			testServer.exit().then( function( data ){
 				assert.equal( data, 'ok' );
 				done();
 			}).catch( done );

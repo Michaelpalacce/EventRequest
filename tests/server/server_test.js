@@ -117,10 +117,10 @@ test({
 		let server			= new Server();
 
 		let PluginManager	= server.getPluginManager();
-		let staticResources	= PluginManager.getPlugin( 'event_request_static_resources' );
+		let staticResources	= PluginManager.getPlugin( 'er_static_resources' );
 
 		server.apply( staticResources );
-		server.apply( 'event_request_static_resources' );
+		server.apply( 'er_static_resources' );
 
 		assert.throws(()=>{
 			server.apply( 'wrong' );

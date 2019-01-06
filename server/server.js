@@ -139,11 +139,12 @@ class Server extends EventEmitter
 	_attachPlugin( plugin )
 	{
 		let pluginDependencies	= plugin.getPluginDependencies();
+		let pluginId			= plugin.getPluginId();
 
 		pluginDependencies.forEach(( dependency )=>{
-			if ( ! this.plugins.includes( dependency ) )
+			if ( ! this.hasPlugin( dependency ) )
 			{
-				throw new Error( 'The plugin ' + plugin.getPluginId() + ' requires ' + dependency + ' which is missing.' );
+				throw new Error( 'The plugin ' + pluginId + ' requires ' + dependency + ' which is missing.' );
 			}
 		});
 
@@ -155,7 +156,40 @@ class Server extends EventEmitter
 
 		plugin.setServerOnRuntime( this );
 
-		this.plugins.push( plugin.getPluginId() );
+		this.plugins[pluginId]	= plugin;
+	}
+
+	/**
+	 * @brief	Gets a plugin attached to the server
+	 *
+	 * @details	Will throw if the plugin is not attached
+	 *
+	 * @param	String pluginId
+	 *
+	 * @return	PluginInterface
+	 */
+	getPlugin( pluginId )
+	{
+		if ( this.hasPlugin( pluginId ) )
+		{
+			return this.plugins[pluginId];
+		}
+		else
+		{
+			throw new Error( `The plugin ${pluginId} is not attached to the server` );
+		}
+	}
+
+	/**
+	 * @brief	Checks whether the server has a plugin with the given id
+	 *
+	 * @param	String pluginId
+	 *
+	 * @return	Boolean
+	 */
+	hasPlugin( pluginId )
+	{
+		return typeof this.plugins[pluginId] !== 'undefined';
 	}
 
 	/**

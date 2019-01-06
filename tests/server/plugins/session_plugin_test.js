@@ -24,11 +24,11 @@ class TestDataServer extends MemoryDataServer
 }
 
 test({
-	message	: 'SessionPlugin getPluginDependencies returns cache_server as a dependency',
+	message	: 'SessionPlugin getPluginDependencies returns er_cache_server as a dependency',
 	test	: ( done )=>{
 		let sessionPlugin	= new SessionPlugin( 'id', {} );
 
-		assert.deepEqual( ['cache_server'], sessionPlugin.getPluginDependencies() );
+		assert.deepEqual( ['er_cache_server'], sessionPlugin.getPluginDependencies() );
 
 		done();
 	}

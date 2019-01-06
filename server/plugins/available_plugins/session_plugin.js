@@ -34,7 +34,7 @@ class SessionPlugin extends PluginInterface
 	 */
 	getPluginDependencies()
 	{
-		return	['cache_server'];
+		return	['er_cache_server'];
 	}
 }
 

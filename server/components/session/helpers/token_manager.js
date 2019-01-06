@@ -1,8 +1,8 @@
 'use strict';
 
-const stringHelper	= require( '../../helpers/unique_id' );
-const EventRequest	= require( '../../../event' );
-const DataServer	= require( './../../caching/data_server' );
+const stringHelper		= require( '../../helpers/unique_id' );
+const EventRequest		= require( '../../../event' );
+const { DataServer }	= require( './../../caching/data_server' );
 
 /**
  * @brief	Constants

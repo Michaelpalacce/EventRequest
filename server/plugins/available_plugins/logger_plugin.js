@@ -70,6 +70,10 @@ class LoggerPlugin extends PluginInterface
 			logger.info( `Redirect to: ${redirect.redirectUrl} with status code: ${redirect.statusCode}` )
 		});
 
+		event.on( 'cachedResponse', () =>{
+			logger.info( `Response to ${requestURL} send from cache` )
+		});
+
 		event.on( 'stop', () =>{
 			logger.verbose( 'Event stopped' )
 		});

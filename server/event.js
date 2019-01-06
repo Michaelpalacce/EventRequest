@@ -184,7 +184,7 @@ class EventRequest extends EventEmitter
 			this.response.end( response );
 		}
 
-		this.emit( 'send', { code, raw } );
+		this.emit( 'send', { code, raw, response, headers: this.response.getHeaders() } );
 
 		this.cleanUp();
 	}

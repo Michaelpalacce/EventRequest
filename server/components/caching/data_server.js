@@ -1,16 +1,31 @@
 'use strict';
 
+const { EventEmitter }	= require( 'events' );
+
+const SERVER_STATES		= {
+	inactive		: 0,
+	starting		: 1,
+	running			: 2,
+	stopping		: 3,
+	stopped			: 4,
+	startupError	: 5,
+	stoppingError	: 6,
+};
+
 /**
  * @brief	DataServer class extended by all data servers used by the EventRequest Server
  */
-class DataServer
+class DataServer extends EventEmitter
 {
 	/**
 	 * @param	Object options
 	 */
 	constructor( options = {} )
 	{
-		this.options	= options;
+		super();
+
+		this.options		= options;
+		this.serverState	= SERVER_STATES.inactive;
 		this.sanitize( options );
 	}
 
@@ -34,6 +49,29 @@ class DataServer
 	sanitize( options )
 	{
 		throw new Error( 'Invalid configuration provided' );
+	}
+
+	/**
+	 * @brief	Changes the server state and emits an event
+	 *
+	 * @param	Number state
+	 *
+	 * @return	void
+	 */
+	changeServerState( state )
+	{
+		this.serverState	= state;
+		this.emit( 'state_changed', state );
+	}
+
+	/**
+	 * @brief	Gets the server state of the data server
+	 *
+	 * @return	Number
+	 */
+	getServerState()
+	{
+		return this.serverState;
 	}
 
 	/**
@@ -195,4 +233,4 @@ class DataServer
 	}
 }
 
-module.exports	= DataServer;
+module.exports	= { DataServer, SERVER_STATES };

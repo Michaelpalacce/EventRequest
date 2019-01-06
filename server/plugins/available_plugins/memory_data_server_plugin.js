@@ -4,6 +4,9 @@ const PluginInterface			= require( '../plugin_interface' );
 const { Loggur, LOG_LEVELS }	= require( '../../components/logger/loggur' );
 const MemoryDataServer			= require( '../../components/caching/memory/memory_data_server' );
 
+/**
+ * @brief	MemoryDataServerPlugin responsible for starting and stopping the caching server
+ */
 class MemoryDataServerPlugin extends PluginInterface
 {
 	constructor( pluginId, options = {} )
@@ -28,12 +31,13 @@ class MemoryDataServerPlugin extends PluginInterface
 			let onFulfilled	= ( data )=>{
 				Loggur.log( data, LOG_LEVELS.info );
 
-				callback( this.server );
+				callback( false, this.server );
 			};
 			let onRejected	= ( err )=>{
 				Loggur.log( err, LOG_LEVELS.error );
+				this.server	= null;
 
-				callback( this.server );
+				callback( false );
 			};
 
 			this.server.setUp( this.options ).then( onFulfilled, onRejected );
@@ -57,17 +61,23 @@ class MemoryDataServerPlugin extends PluginInterface
 	/**
 	 * @brief	Stops the server if it is started
 	 *
+	 * @param	Function callback
+	 *
 	 * @return	void
 	 */
-	stopServer()
+	stopServer( callback = ()=>{} )
 	{
 		if ( this.server !== null )
 		{
 			let onFulfilled	= ()=>{
 				this.server	= null;
+
+				callback( false );
 			};
 			let onRejected	= ( err )=>{
 				Loggur.log( err, LOG_LEVELS.error );
+
+				callback( err );
 			};
 
 			this.server.exit( {} ).then( onFulfilled, onRejected );

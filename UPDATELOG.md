@@ -1,5 +1,13 @@
+3.1.0
+- Big improvements to the memory data server. Improved functionality of it
+- Introduced SERVER_STATES to the Data servers
+- Improved the plugin application in the server, now you can get applied plugins for cross plugin interactions.
+- Memory Data Cache plugin now accepts callback for start and stop of the server and also returns better info
+- Added response cache plugin, ( BETA )
+- Preloaded plugin ids have changed
+
 3.0.1
-- Bug fix to the next function. Now no need to be binded 
+- Bug fix to the next function. Now no need to be bound 
 
 3.0.0
 - Changed the way the server is created. Now it is exported as a callback that creates the server

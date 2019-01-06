@@ -3,7 +3,7 @@
 /**
  * @brief	Constants
  */
-const LOG_LEVELS	= {
+const LOG_LEVELS		= {
 	error	: 100,
 	warning	: 200,
 	notice	: 300,
@@ -11,7 +11,7 @@ const LOG_LEVELS	= {
 	verbose	: 500,
 	debug	: 600
 };
-const DEFAULT_LOG_LEVEL			= LOG_LEVELS.error;
+const DEFAULT_LOG_LEVEL	= LOG_LEVELS.error;
 
 /**
  * @brief	Log object used to transport information inside the loggur

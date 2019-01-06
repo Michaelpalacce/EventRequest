@@ -9,17 +9,18 @@ test({
 	test	: ( done )=>{
 
 		assert.doesNotThrow(()=>{
-			PreLoadedPluginManager.getPlugin( 'event_request_timeout' );
-			PreLoadedPluginManager.getPlugin( 'event_request_static_resources' );
-			PreLoadedPluginManager.getPlugin( 'cache_server' );
-			PreLoadedPluginManager.getPlugin( 'event_request_session' );
-			PreLoadedPluginManager.getPlugin( 'event_request_templating_engine' );
-			PreLoadedPluginManager.getPlugin( 'event_request_file_stream' );
-			PreLoadedPluginManager.getPlugin( 'event_request_logger' );
-			PreLoadedPluginManager.getPlugin( 'event_request_body_parser' );
-			PreLoadedPluginManager.getPlugin( 'event_request_body_parser_json' );
-			PreLoadedPluginManager.getPlugin( 'event_request_body_parser_form' );
-			PreLoadedPluginManager.getPlugin( 'event_request_body_parser_multipart' );
+			PreLoadedPluginManager.getPlugin( 'er_timeout' );
+			PreLoadedPluginManager.getPlugin( 'er_static_resources' );
+			PreLoadedPluginManager.getPlugin( 'er_cache_server' );
+			PreLoadedPluginManager.getPlugin( 'er_session' );
+			PreLoadedPluginManager.getPlugin( 'er_templating_engine' );
+			PreLoadedPluginManager.getPlugin( 'er_file_stream' );
+			PreLoadedPluginManager.getPlugin( 'er_logger' );
+			PreLoadedPluginManager.getPlugin( 'er_body_parser' );
+			PreLoadedPluginManager.getPlugin( 'er_body_parser_json' );
+			PreLoadedPluginManager.getPlugin( 'er_body_parser_form' );
+			PreLoadedPluginManager.getPlugin( 'er_body_parser_multipart' );
+			PreLoadedPluginManager.getPlugin( 'er_response_cache' );
 		});
 
 		done();
