@@ -1,3 +1,6 @@
+3.1.1
+- Removed error
+
 3.1.0
 - Big improvements to the memory data server. Improved functionality of it
 - Introduced SERVER_STATES to the Data servers
