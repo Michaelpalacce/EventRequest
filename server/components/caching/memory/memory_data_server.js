@@ -28,9 +28,11 @@ class MemoryDataServer extends DataServer
 	/**
 	 * @brief	Creates a new instance of the memory_data_client if needed
 	 *
+	 * @param	Object options
+	 *
 	 * @return	Promise
 	 */
-	forkClient()
+	forkClient( options )
 	{
 		return new Promise( ( resolve, reject )=>{
 			let spawnedClient	= fork( path.join( __dirname, './memory_data_client.js' ), [], {
@@ -56,7 +58,7 @@ class MemoryDataServer extends DataServer
 						reject( err );
 					};
 
-					this.doCommand( 'setUp', {} ).then( onFulfilled, onRejected );
+					this.doCommand( 'setUp', options ).then( onFulfilled, onRejected );
 				}
 				else
 				{
@@ -120,7 +122,7 @@ class MemoryDataServer extends DataServer
 	{
 		this.changeServerState( SERVER_STATES.starting );
 
-		return this.forkClient();
+		return this.forkClient( options );
 	}
 
 	/**

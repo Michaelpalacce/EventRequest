@@ -52,34 +52,3 @@ PluginManager.addPlugin( bodyParserFormPlugin );
 PluginManager.addPlugin( bodyParserMultipartPlugin );
 
 module.exports	= PluginManager;
-
-
-let server		= Server();
-let cacheServer	= PluginManager.getPlugin( 'er_cache_server' );
-
-cacheServer.startServer(()=>{
-	Loggur.log( 'Caching server is set up' );
-});
-
-server.apply( cacheServer );
-server.apply( PluginManager.getPlugin( 'er_response_cache' ) );
-
-server.add({
-	route	: '/',
-	method	: 'GET',
-	handler	: ( event )=>{
-		event.cacheCurrentRequest();
-	}
-});
-
-server.add({
-	route	: '/',
-	method	: 'GET',
-	handler	: ( event )=>{
-		event.send( '<h1>Hello World</h1>')
-	}
-});
-
-server.start(()=>{
-	Loggur.log( 'Server started' )
-});

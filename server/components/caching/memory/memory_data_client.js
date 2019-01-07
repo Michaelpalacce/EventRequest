@@ -30,8 +30,9 @@ class MemoryWorker
 {
 	constructor()
 	{
-		this.data		= {};
-		this.timeouts	= {};
+		this.data			= {};
+		this.timeouts		= {};
+		this.memoryLimit	= 0;
 		this.setUpServer();
 	}
 
@@ -134,6 +135,11 @@ class MemoryWorker
 		switch ( command )
 		{
 			case SET_UP:
+				if ( typeof args.memoryLimit === 'number' )
+				{
+					this.memoryLimit	= args.memoryLimit;
+				}
+
 				callback( false, 'Caching server is set up' );
 				break;
 
@@ -473,4 +479,11 @@ class MemoryWorker
 	}
 }
 
-new MemoryWorker();
+let memoryWorker	= new MemoryWorker();
+
+setInterval(()=>{
+	let memoryLimit		= memoryWorker.memoryLimit;
+	let currentMemory	= process.memoryUsage();
+	// console.log(currentMemory);
+	// console.log(memoryLimit);
+}, 1000 );
