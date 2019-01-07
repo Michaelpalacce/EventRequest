@@ -106,7 +106,7 @@ class MemoryWorker
 	 *
 	 * @return	void
 	 */
-	executeInternalCommand( command, args, callback )
+	executeInternalCommand( command, args, callback =()=>{} )
 	{
 		command	= typeof command === 'string' ? command : false;
 		args	= typeof args === 'object' ? args : false;
@@ -128,7 +128,7 @@ class MemoryWorker
 	 *
 	 * @return	void
 	 */
-	processCommand( data, callback )
+	processCommand( data, callback =()=>{} )
 	{
 		let { command, args }	= data;
 
@@ -201,7 +201,7 @@ class MemoryWorker
 	 * @param args
 	 * @param callback
 	 */
-	getAll( args, callback )
+	getAll( args, callback =()=>{} )
 	{
 		this.executeInternalCommand( 'existsNamespace', args, ( err, exists ) =>{
 			let { namespace }	= args;
@@ -220,7 +220,7 @@ class MemoryWorker
 	/**
 	 * @see	DataServer::delete()
 	 */
-	delete( args, callback )
+	delete( args, callback =()=>{} )
 	{
 		this.executeInternalCommand( 'exists', args, ( err, exists ) => {
 			if ( ! err && exists )
@@ -241,7 +241,7 @@ class MemoryWorker
 	/**
 	 * @see	DataServer::update()
 	 */
-	read( args, callback )
+	read( args, callback =()=>{} )
 	{
 		this.executeInternalCommand( 'touch', args, ( err ) => {
 			if ( ! err )
@@ -260,7 +260,7 @@ class MemoryWorker
 	/**
 	 * @see	DataServer::update()
 	 */
-	update( args, callback )
+	update( args, callback =()=>{} )
 	{
 		this.executeInternalCommand( 'touch', args, ( err ) => {
 			if ( ! err )
@@ -279,7 +279,7 @@ class MemoryWorker
 	/**
 	 * @see	DataServer::exists()
 	 */
-	exists( args, callback )
+	exists( args, callback =()=>{} )
 	{
 		let { namespace, recordName }	= args;
 		if ( typeof recordName !== 'string' )
@@ -303,7 +303,7 @@ class MemoryWorker
 	/**
 	 * @see	DataServer::touch()
 	 */
-	touch( args, callback )
+	touch( args, callback =()=>{} )
 	{
 		this.executeInternalCommand( 'exists', args, ( err, exists ) => {
 			if ( ! err && exists )
@@ -323,7 +323,7 @@ class MemoryWorker
 	/**
 	 * @see	DataServer::create()
 	 */
-	create( args, callback )
+	create( args, callback =()=>{} )
 	{
 		this.executeInternalCommand( 'existsNamespace', args, ( err, exists ) => {
 			if ( ! err && exists )
@@ -359,7 +359,7 @@ class MemoryWorker
 	/**
 	 * @see	DataServer::existsNamespace()
 	 */
-	existsNamespace( args, callback )
+	existsNamespace( args, callback =()=>{} )
 	{
 		let { namespace }	= args;
 
@@ -375,7 +375,7 @@ class MemoryWorker
 	/**
 	 * @see	DataServer::createNamespace()
 	 */
-	createNamespace( args, callback )
+	createNamespace( args, callback =()=>{} )
 	{
 		let { namespace }	= args;
 
@@ -393,7 +393,7 @@ class MemoryWorker
 	/**
 	 * @see	DataServer::removeNamespace()
 	 */
-	removeNamespace( args, callback )
+	removeNamespace( args, callback =()=>{} )
 	{
 		let { namespace }	= args;
 
@@ -434,18 +434,21 @@ class MemoryWorker
 	{
 		this.clearTimeoutFromData( namespace, recordName );
 
-		if ( ttl > 0 )
+		if ( ttl <= 0 )
 		{
-			let keyPair	= namespace + recordName;
-			this.timeouts[keyPair]	= setTimeout( () => {
-				if ( typeof this.data[namespace] !== 'undefined' )
-				{
-					delete this.data[namespace][recordName];
-				}
-
-				delete this.timeouts[keyPair]
-			}, ttl );
+			ttl	= 24 * 60 * 60 * 1000;
 		}
+
+
+		let keyPair	= namespace + '||' + recordName;
+		this.timeouts[keyPair]	= setTimeout( () => {
+			if ( typeof this.data[namespace] !== 'undefined' )
+			{
+				delete this.data[namespace][recordName];
+			}
+
+			delete this.timeouts[keyPair]
+		}, ttl );
 	}
 
 	/**
@@ -458,7 +461,7 @@ class MemoryWorker
 	 */
 	clearTimeoutFromData( namespace, recordName )
 	{
-		let keyPair	= namespace + recordName;
+		let keyPair	= namespace + '||' + recordName;
 
 		clearTimeout( this.timeouts[keyPair] );
 		delete this.timeouts[keyPair];
@@ -481,9 +484,38 @@ class MemoryWorker
 
 let memoryWorker	= new MemoryWorker();
 
-setInterval(()=>{
+/**
+ * @brief	Checks if the memory is full
+ *
+ * @return	Boolean
+ */
+let isMemoryFull	= ()=>{
 	let memoryLimit		= memoryWorker.memoryLimit;
 	let currentMemory	= process.memoryUsage();
-	// console.log(currentMemory);
-	// console.log(memoryLimit);
-}, 1000 );
+	const used			= currentMemory.heapUsed;
+
+	return memoryLimit < used && memoryLimit !== 0;
+};
+
+/**
+ * @brief	Frees memory if needed. This will delete the oldest data added
+ *
+ * @return	void
+ */
+let freeMemory		= ()=>{
+	let latestData	= Object.keys( memoryWorker.timeouts )[0];
+
+	if ( isMemoryFull() && latestData != null )
+	{
+		let data		= latestData.split( '||' );
+
+		let namespace	= data[0];
+		let recordName	= data[1];
+
+		memoryWorker.delete( { namespace, recordName }, freeMemory );
+	}
+};
+
+setInterval(()=>{
+	freeMemory();
+}, 20 * 1000 );
