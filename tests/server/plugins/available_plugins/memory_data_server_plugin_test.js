@@ -11,7 +11,8 @@ test({
 	test	: ( done )=>{
 		let memoryDataServerPlugin	= new MemoryDataServerPlugin( 'id' );
 
-		memoryDataServerPlugin.startServer( ( server )=>{
+		memoryDataServerPlugin.startServer( ( error, server )=>{
+			assert.equal( false, error );
 			server.createNamespace( 'test' ).then( ( data )=>{ done(); }, done );
 		});
 	}

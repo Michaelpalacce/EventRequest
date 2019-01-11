@@ -37,14 +37,14 @@ class MemoryDataServerPlugin extends PluginInterface
 				Loggur.log( err, LOG_LEVELS.error );
 				this.server	= null;
 
-				callback( false );
+				callback( true );
 			};
 
 			this.server.setUp( this.options ).then( onFulfilled, onRejected );
 		}
 		else
 		{
-			callback( this.server );
+			callback( false, this.server );
 		}
 	}
 

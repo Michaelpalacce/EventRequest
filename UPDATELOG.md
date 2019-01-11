@@ -1,3 +1,6 @@
+3.1.2
+- Fix to the memory data server plugin where it did not return the correct information. Test fixed as well
+
 3.1.1
 - Removed error
 
