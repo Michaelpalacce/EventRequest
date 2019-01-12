@@ -25,10 +25,10 @@ class JsonBodyParser extends BodyParser
 	{
 		super( options );
 
-		// Defaults to 10 MB
+		// Defaults to 100 MB
 		this.maxPayloadLength	= typeof options.maxPayloadLength === 'number'
 								? options.maxPayloadLength
-								: 10 * 1048576;
+								: 100 * 1048576;
 
 		this.strict				= typeof options.strict === 'boolean'
 								? options.strict

@@ -30,26 +30,28 @@ class ResponseCachePlugin extends PluginInterface
 	 *
 	 * @return	void
 	 */
-	setUpNamespace( cachingServer )
+	setUpNamespace( cachingServer, callback = ()=>{} )
 	{
-		let throwOnRejected	= ( err )=>{
-			throw new Error( err );
+		let onRejected		= ( err )=>{
+			Loggur.log( 'Error setting up the caching server', LOG_LEVELS.notice );
+			callback( err );
 		};
 
-		let logOnSuccess	= ()=>{
+		let onResolved	= ()=>{
 			Loggur.log( 'Response Cache Plugin created namespace successfully', LOG_LEVELS.notice );
+			callback( false );
 		};
 
 		cachingServer.existsNamespace( NAMESPACE ).then( ( exists )=>{
 			if ( ! exists )
 			{
-				cachingServer.createNamespace( NAMESPACE ).then( logOnSuccess ).catch( throwOnRejected );
+				cachingServer.createNamespace( NAMESPACE ).then( onResolved ).catch( onRejected );
 			}
 			else
 			{
-				logOnSuccess();
+				onResolved();
 			}
-		} ).catch( throwOnRejected );
+		} ).catch( onRejected );
 	}
 
 	/**
@@ -62,6 +64,9 @@ class ResponseCachePlugin extends PluginInterface
 	setServerOnRuntime( server )
 	{
 		let cachingServer	= server.getPlugin( 'er_cache_server' ).getServer();
+		let callback		= typeof this.options === 'object' && typeof this.options.callback === 'function'
+							? this.options.callback
+							: ()=>{};
 
 		if ( cachingServer === null )
 		{
@@ -70,14 +75,14 @@ class ResponseCachePlugin extends PluginInterface
 
 		if ( cachingServer.getServerState() === SERVER_STATES.running )
 		{
-			this.setUpNamespace( cachingServer );
+			this.setUpNamespace( cachingServer, callback );
 		}
 		else
 		{
 			cachingServer.on( 'state_changed', ( state )=>{
 				if ( state === SERVER_STATES.running )
 				{
-					this.setUpNamespace( cachingServer );
+					this.setUpNamespace( cachingServer, callback );
 				}
 			} );
 		}
