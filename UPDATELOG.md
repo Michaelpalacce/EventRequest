@@ -1,3 +1,8 @@
+3.3.0
+- Added headers Plugin in 
+- Tested Headers plug in
+- Removed headers from the eventRequest
+
 3.2.0
 - Fully tested the response cache
 - Added ability to cache by IP and to set expiration of the response cached in memory.
