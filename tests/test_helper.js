@@ -9,7 +9,7 @@ const fs											= require( 'fs' );
 const path											= require( 'path' );
 const { Loggur }									= require( './../server/components/logger/loggur' );
 const MockLoggur									= Mock( Loggur.constructor );
-const { server }									= require( './test_bootstrap' );
+const { server, cachingServer }						= require( './test_bootstrap' );
 let { IncomingMessage, ServerResponse, request }	= require( 'http' );
 
 ServerResponse	= Mock( ServerResponse );
@@ -24,6 +24,15 @@ let helpers	= {};
  */
 helpers.getServer	= ()=>{
 	return server;
+};
+
+/**
+ * @brief	Returns the caching server set up by the test bootstrap
+ *
+ * @return	Server
+ */
+helpers.getCachingServer	= ()=>{
+	return cachingServer;
 };
 
 /**
