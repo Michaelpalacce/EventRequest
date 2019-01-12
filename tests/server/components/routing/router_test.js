@@ -99,8 +99,8 @@ test({
 test({
 	message	: 'Router.matchRoute matches String requestedRoute and String route',
 	test	: ( done )=>{
-		assert.deepStrictEqual( Router.matchRoute( '/test', '/test' ), { matched : true, params: {} } );
-		assert.deepStrictEqual( Router.matchRoute( '/test', '/notTest' ), { matched : false, params: {} } );
+		assert.deepStrictEqual( Router.matchRoute( '/test', '/test' ), true );
+		assert.deepStrictEqual( Router.matchRoute( '/test', '/notTest' ), false );
 
 		done();
 	}
@@ -109,8 +109,8 @@ test({
 test({
 	message	: 'Router.matchRoute matches String requestedRoute and RegExp route',
 	test	: ( done )=>{
-		assert.deepStrictEqual( Router.matchRoute( '/test', new RegExp( '\/test' ) ), { matched : true, params: {} } );
-		assert.deepStrictEqual( Router.matchRoute( '/notTest', new RegExp( '\/test' ) ), { matched : false, params: {} } );
+		assert.deepStrictEqual( Router.matchRoute( '/test', new RegExp( '\/test' ) ), true );
+		assert.deepStrictEqual( Router.matchRoute( '/notTest', new RegExp( '\/test' ) ), false );
 
 		done();
 	}
@@ -119,8 +119,8 @@ test({
 test({
 	message	: 'Router.matchRoute matches String requestedRoute and Route route',
 	test	: ( done )=>{
-		assert.deepStrictEqual( Router.matchRoute( '/test', new Route( { route: '/test' } ) ), { matched : true, params: {} } );
-		assert.deepStrictEqual( Router.matchRoute( '/notTest', new Route( { route: '/test' } ) ), { matched : false, params: {} } );
+		assert.deepStrictEqual( Router.matchRoute( '/test', new Route( { route: '/test' } ) ), true );
+		assert.deepStrictEqual( Router.matchRoute( '/notTest', new Route( { route: '/test' } ) ), false );
 
 		done();
 	}

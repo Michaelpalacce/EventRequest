@@ -4,6 +4,10 @@ const PluginInterface			= require( '../plugin_interface' );
 const { Loggur, LOG_LEVELS }	= require( '../../components/logger/loggur' );
 const { SERVER_STATES }			= require( '../../components/caching/data_server' );
 
+// Defaults for the plugin
+const DEFAULT_TTL		= 60 * 5000;
+const DEFAULT_USE_IP	= false;
+const NAMESPACE			= 'rcp';
 /**
  * @brief	Plugin responsible for caching requests to the cache server.
  */
@@ -36,10 +40,10 @@ class ResponseCachePlugin extends PluginInterface
 			Loggur.log( 'Response Cache Plugin created namespace successfully', LOG_LEVELS.notice );
 		};
 
-		cachingServer.existsNamespace( 'rcp' ).then( ( exists )=>{
+		cachingServer.existsNamespace( NAMESPACE ).then( ( exists )=>{
 			if ( ! exists )
 			{
-				cachingServer.createNamespace( 'rcp' ).then( logOnSuccess ).catch( throwOnRejected );
+				cachingServer.createNamespace( NAMESPACE ).then( logOnSuccess ).catch( throwOnRejected );
 			}
 			else
 			{
@@ -93,9 +97,60 @@ class ResponseCachePlugin extends PluginInterface
 
 			if ( typeof response === 'string' )
 			{
-				event.cachingServer.create( 'rcp', event.path, { response, code, headers }, { ttl: 60 * 5000 } ).then();
+				event.cachingServer.create(
+					'rcp',
+					this.getCacheId( event ),
+					{ response, code, headers },
+					{ ttl: this.getTimeToLive( event ) }
+				).then();
 			}
 		} );
+	}
+
+	/**
+	 * @brief	Gets the cache id for the current response that is going to be cached
+	 *
+	 * @details	This will check if this request should be cached using the client's ip or not
+	 *
+	 * @param	EventRequest event
+	 *
+	 * @return	String
+	 */
+	getCacheId( event )
+	{
+		let cacheId	= event.path;
+		let config	= event.currentResponseCacheConfig;
+
+		let useIp	= typeof config !== 'undefined' && typeof config['useIp'] === 'boolean'
+					? config['useIp']
+					: typeof this.options !== 'undefined' && typeof this.options['useIp'] === 'boolean'
+					? this.options['useIp']
+					: DEFAULT_USE_IP;
+
+		if ( useIp === true )
+		{
+			cacheId	+= event.clientIp;
+		}
+
+		return cacheId;
+	}
+
+	/**
+	 * @brief	Gets the time to live from the config passed or not from the options set
+	 *
+	 * @param	EventRequest event
+	 *
+	 * @return	Number
+	 */
+	getTimeToLive( event )
+	{
+		let config	= event.currentResponseCacheConfig;
+
+		return typeof config !== 'undefined' && typeof config['ttl'] === 'number'
+				? config['ttl']
+				: typeof this.options !== 'undefined' && typeof this.options['ttl'] === 'number'
+				? this.options['ttl']
+				: DEFAULT_TTL;
 	}
 
 	/**
@@ -104,15 +159,16 @@ class ResponseCachePlugin extends PluginInterface
 	getPluginMiddleware()
 	{
 		let pluginMiddleware	= {
-			handler	: ( event ) =>{
-				event.cacheCurrentRequest	= ( errCallback )=>{
-					errCallback	= typeof errCallback === 'function' ? errCallback : event.next;
+			handler	: ( event )	=>{
+				event.cacheCurrentRequest	= ( options = {}, errCallback = event.next )=>{
+					errCallback							= typeof errCallback === 'function' ? errCallback : event.next;
+					event.currentResponseCacheConfig	= options;
+					let cacheId							= this.getCacheId( event );
 
-					event.cachingServer.exists( 'rcp', event.path ).then( ( exists )=>{
-
+					event.cachingServer.exists( NAMESPACE, cacheId ).then( ( exists )=>{
 						if ( exists )
 						{
-							event.cachingServer.read( 'rcp', event.path, { ttl: 60 * 5000 } ).then( ( data )=>{
+							event.cachingServer.read( NAMESPACE, cacheId, { ttl: this.getTimeToLive( event ) } ).then( ( data )=>{
 
 								let { response, code, headers }	= data;
 								let headersKeys					= Object.keys( headers );

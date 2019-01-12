@@ -171,6 +171,21 @@ server.apply( timeoutPlugin );
 server.apply( 'er_timeout' ); // This is also valid.
 ~~~
 
+#PRE-INSTALLED PLUGINS
+These plugins are automatically added to the eventRequest. They can be preconfigured before calling server.start() the same
+as other plugins by fetching them and configuring them as you wish. They can not be removed:
+
+
+er_static_resources
+
+er_timeout
+
+er_body_parser_json
+
+er_body_parser_form
+
+
+ 
 Read down to the Plugin section for more information
 
 ***
@@ -719,7 +734,7 @@ cacheServerPlugin.startServer( ( err, server )=>{
         Loggur.log( server );
         Loggur.log( cacheServerPlugin.getServer ); // same as Loggur.log( server );
         
-        cacheServerPlugin.stopServer(()=>{
+        cacheServerPlugin.stopServer(( err )=>{
         	if ( err === false )
             {
                 Loggur.log( 'Caching server stopped' );
@@ -897,6 +912,10 @@ let bodyParserMultipartPlugin	= new BodyParserPlugin(
 
 ##
 * er_response_cache -> Adds a response caching mechanism
+##
+    * Accepted Options:
+        useIp -> wether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
+        ttl -> time to live for the record. Defaults to 60 * 5000 ms
 
 ~~~javascript
 const PluginManager		= server.getPluginManager();
@@ -929,6 +948,14 @@ server.add({
         }
 		
 		// Or use the router to match RegExp
+	}
+});
+
+// When setting a request to be cached, ttl and useIp may be passed that will overwrite the default options
+server.add({
+	handler	: ( event )=>{
+		let pathsToCache    = ['/', '/sth', 'test'];
+        event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } );
 	}
 });
 

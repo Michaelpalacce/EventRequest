@@ -36,6 +36,11 @@ class EventRequest extends EventEmitter
 			writable	: false
 		});
 
+		Object.defineProperty( this, 'clientIp', {
+			value		: request.connection === undefined ? false : request.connection.remoteAddress,
+			writable	: false
+		});
+
 		Object.defineProperty( this, 'path', {
 			value		: parsedUrl.pathname.trim(),
 			writable	: false

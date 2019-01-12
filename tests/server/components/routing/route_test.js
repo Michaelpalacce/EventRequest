@@ -116,62 +116,81 @@ test({
 });
 
 test({
-	message	: 'Route.matchRoute matches String',
-	test	: ( done ) => {
-		let route	= getRoute( undefined, '/' );
+	message			: 'Route.matchRoute matches String',
+	dataProvider	: [
+		['', false, {}],
+		['/', true, {}],
+		['/path', false, {}],
+		['/path/test/', false, {}],
+		['/path/valueToMatch', false, {}]
+	],
+	test			: ( done, path, matched, params ) => {
+		let route			= getRoute( undefined, '/' );
+		let matchedParams	= {};
 
-		assert.deepEqual( route.matchPath( '' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/' ), { matched: true, params: {} } );
-		assert.deepEqual( route.matchPath( '/path' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/path/test' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/path/valueToMatch' ), { matched: false, params: {} } );
-
-		done();
-	}
-});
-
-test({
-	message	: 'Route.matchRoute matches Regex',
-	test	: ( done ) => {
-		let route	= getRoute( undefined, new RegExp( '/pa' ) );
-
-		assert.deepEqual( route.matchPath( '' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/path' ), { matched: true, params: {} } );
-		assert.deepEqual( route.matchPath( '/path/test' ), { matched: true, params: {} } );
-		assert.deepEqual( route.matchPath( '/path/valueToMatch' ), { matched: true, params: {} } );
+		assert.deepEqual( route.matchPath( path, matchedParams ), matched );
+		assert.deepEqual( matchedParams, params );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Route.matchRoute matches all, BESIDES empty request path, in case of empty route provided',
-	test	: ( done ) => {
-		let route	= getRoute( undefined, '' );
+	message			: 'Route|.matchRoute matches Regex',
+	dataProvider	: [
+		['', false, []],
+		['/', false, []],
+		['/path', true, []],
+		['/path/test', true, []],
+		['/path/valueToMatch', true, []],
+	],
+	test			: ( done, path, matched, params ) => {
+		let route			= getRoute( undefined, new RegExp( '/pa' ) );
+		let matchedParams	= [];
 
-		assert.deepEqual( route.matchPath( '' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/' ), { matched: true, params: {} } );
-		assert.deepEqual( route.matchPath( '/path' ), { matched: true, params: {} } );
-		assert.deepEqual( route.matchPath( '/path/test' ), { matched: true, params: {} } );
-		assert.deepEqual( route.matchPath( '/path/valueToMatch' ), { matched: true, params: {} } );
+		assert.deepEqual( route.matchPath( path, matchedParams ), matched );
+		assert.deepEqual( matchedParams, params );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Route.matchRoute matches params',
-	test	: ( done ) => {
-		let route	= getRoute( undefined, '/path/:test:' );
+	message			: 'Route.matchRoute matches all, BESIDES empty request path, in case of empty route provided',
+	dataProvider	: [
+		['', false, []],
+		['/', true, []],
+		['/path', true, []],
+		['/path/test', true, []],
+		['/path/valueToMatch', true, []],
+	],
+	test			: ( done, path, matched, params ) => {
+		let route			= getRoute( undefined, '' );
+		let matchedParams	= [];
 
-		assert.deepEqual( route.matchPath( '' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/path' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/path/test' ), { matched: true, params: { test: 'test' } } );
-		assert.deepEqual( route.matchPath( '/path/test/sth' ), { matched: false, params: {} } );
-		assert.deepEqual( route.matchPath( '/path/valueToMatch' ), { matched: true, params: { test: 'valueToMatch' } } );
+		assert.deepEqual( route.matchPath( path, matchedParams ), matched );
+		assert.deepEqual( matchedParams, params );
 
+		done();
+	}
+});
+
+test({
+	message			: 'Route.matchRoute matches params',
+	dataProvider	: [
+		['', false, []],
+		['/', false, []],
+		['/path', false, []],
+		['/path/test', true, [['value', 'test']]],
+		['/path/test/sth', false, []],
+		['/path/valueToMatch', true, [['value', 'valueToMatch']]],
+	],
+	test			: ( done, path, matched, params ) => {
+		let route			= getRoute( undefined, '/path/:value:' );
+		let matchedParams	= [];
+
+		assert.deepEqual( route.matchPath( path, matchedParams ), matched );
+		assert.deepEqual( matchedParams, params );
 		done();
 	}
 });

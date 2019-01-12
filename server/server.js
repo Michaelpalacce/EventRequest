@@ -215,7 +215,13 @@ class Server extends EventEmitter
 	serverCallback( request, response )
 	{
 		let eventRequest	= this.resolve( request, response );
+		eventRequest.setMaxListeners( 0 );
 		this.emit( 'eventRequestResolved', { eventRequest, request, response  } );
+
+		this.apply( 'er_static_resources' );
+		this.apply( 'er_timeout' );
+		this.apply( 'er_body_parser_json' );
+		this.apply( 'er_body_parser_form' );
 
 		request.on( 'close', ()=> {
 			this.emit( 'eventRequestRequestClosed', { eventRequest, request } );

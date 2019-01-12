@@ -117,30 +117,28 @@ class Route
 	/**
 	 * @brief	Matches this route with the requested path
 	 *
-	 * @details	Returns an object with the matched parameters and whether the route actually matches
+	 * @details	Sets the matchedParams with any parameters found
+	 *
+	 * @param	String requestedRoute
+	 * @param	Array matchedParams
 	 *
 	 * @return	Object
 	 */
-	matchPath( requestedRoute )
+	matchPath( requestedRoute, matchedParams )
 	{
-		let matchResult	= Route.getMatchObject();
-
 		if ( requestedRoute === '' )
 		{
-			return matchResult;
+			return false;
 		}
 
 		if ( this.route === '' )
 		{
-			matchResult.matched	= true;
-			return matchResult;
+			return true;
 		}
 
 		if ( this.route instanceof RegExp )
 		{
-			matchResult.matched	= this.route.test( requestedRoute );
-
-			return matchResult;
+			return this.route.test( requestedRoute );
 		}
 
 		let routeRe		= /\/:([^:]+):/g;
@@ -156,18 +154,18 @@ class Route
 			matched	= true;
 			matchedKeys.push( capturingGroupOne );
 
-			return '/([^\\/]*)$';
+			return '/([^\\/]*)';
 		});
 
 		if ( ! matched && typeof requestedRoute === 'string' )
 		{
-			matchResult.matched	= requestedRoute === route;
-			return matchResult;
+			return requestedRoute === route;
 		}
 
 		if ( matched && typeof requestedRoute === 'string' )
 		{
-			route				= route.replace( new RegExp( '\/', 'g' ), '\\/');
+			route				+= '$';
+			route				= route.replace( new RegExp( '\/', 'g' ), '\\/' );
 			let matchPathKeys	= requestedRoute.match( route );
 			let match			= {};
 
@@ -177,16 +175,16 @@ class Route
 
 				for ( let index in matchedKeys )
 				{
-					let key	= matchedKeys[index];
-					match[key]	= matchPathKeys[index]
+					let key		= matchedKeys[index];
+					match[key]	= matchPathKeys[index];
+					matchedParams.push( [key, matchPathKeys[index]] );
 				}
 
-				matchResult.matched	= true;
-				matchResult.params	= match;
+				return true;
 			}
 		}
 
-		return matchResult;
+		return false;
 	}
 }
 

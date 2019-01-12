@@ -1,3 +1,9 @@
+3.2.0
+- Fully tested the response cache
+- Added ability to cache by IP and to set expiration of the response cached in memory.
+- Fixed the routing and the way requests are matched. Now no longer will there be Objects that are returned. Instead Booleans are returned
+- Fixed Routing tests that got affected by this change and security components.
+
 3.1.2
 - Fix to the memory data server plugin where it did not return the correct information. Test fixed as well
 

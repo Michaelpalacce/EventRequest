@@ -14,7 +14,7 @@ testSuites.pluginsSuite();
 
 runAllTests({
 	dieOnFirstError	: true,
-	debug			: true,
+	debug			: false,
 	silent			: true,
 	filter			: '',
 	callback		: ( err )=>{

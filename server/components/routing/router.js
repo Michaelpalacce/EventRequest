@@ -63,14 +63,21 @@ class Router
 
 		for ( let index in this.middleware )
 		{
-			let route	= this.middleware[index];
-			let match	= Router.matchRoute( event.path, route );
+			let route			= this.middleware[index];
+			let matchedParams	= [];
+			let matched			= Router.matchRoute( event.path, route, matchedParams );
 
-			if ( match.matched )
+			if ( matched )
 			{
 				if ( Router.matchMethod( event.method, route ) )
 				{
-					event.params	= Object.assign( event.params, match.params );
+					let params	= {};
+
+					matchedParams.forEach(( param )=>{
+						params[param[0]]	= param[1];
+					});
+
+					event.params	= Object.assign( event.params, params );
 					block.push( route.getHandler() );
 				}
 			}
@@ -118,10 +125,11 @@ class Router
 	 *
 	 * @param	String requestedRoute
 	 * @param	String|RegExp|Route eventPath
+	 * @param	Array matchedParams
 	 *
-	 * @return	Object
+	 * @return	Boolean
 	 */
-	static matchRoute( requestedRoute, route )
+	static matchRoute( requestedRoute, route, matchedParams = [] )
 	{
 		if ( typeof route === 'string' || route instanceof RegExp )
 		{
@@ -132,10 +140,10 @@ class Router
 
 		if ( ! ( route instanceof Route ) )
 		{
-			return Route.getMatchObject();
+			return false;
 		}
 
-		return route.matchPath( requestedRoute );
+		return route.matchPath( requestedRoute, matchedParams );
 	}
 }
 

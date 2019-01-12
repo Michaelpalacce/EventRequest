@@ -182,7 +182,7 @@ class SessionHandler
 			let currentManager	= this.securityManagers.shift();
 
 			if (
-				Router.matchRoute( this.event.path, currentManager.getPath() ).matched !== false
+				Router.matchRoute( this.event.path, currentManager.getPath() ) !== false
 				&& Router.matchMethod( this.event.method, currentManager.getMethods() )
 			) {
 				currentManager.handle( this.event, this.next.bind( this ), this.terminate.bind( this ) );

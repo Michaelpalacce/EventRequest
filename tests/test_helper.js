@@ -118,7 +118,12 @@ helpers.getEmptyMiddleware	= ()=>{
  * @return	EventRequest
  */
 helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} ) => {
-	let request	= new IncomingMessage();
+	let request			= new IncomingMessage();
+	let connectionMock	= {
+		remoteAddress	: '127.0.0.1'
+	};
+
+	request.connection	= connectionMock;
 	request._mock( { method : 'method', shouldReturn : requestMethod } );
 	request._mock( { method : 'url', shouldReturn : requestUrl, } );
 	request._mock( { method : 'headers', shouldReturn : headers, } );

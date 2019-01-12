@@ -27,9 +27,7 @@
     "name": "Stefan Genov"
   },
   "bundleDependencies": false,
-  "dependencies": {
-    "npm": "^6.5.0"
-  },
+  "dependencies": {},
   "deprecated": false,
   "description": "A Backend Server",
   "license": "GPL-3.0",
@@ -63,5 +61,5 @@
   "scripts": {
     "test": "node ./test_script.js"
   },
-  "version": "3.1.2"
+  "version": "3.2.0"
 }
