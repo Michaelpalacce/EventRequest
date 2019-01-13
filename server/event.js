@@ -206,7 +206,29 @@ class EventRequest extends EventEmitter
 	 */
 	getHeaderValue( key, defaultValue = null )
 	{
-		return typeof this.headers[key] === 'undefined' ? defaultValue : key;
+		return ! this.hasHeader( key ) ? defaultValue : key;
+	}
+
+	/**
+	 * @brief	Return all the headers for the current request
+	 *
+	 * @return	Object
+	 */
+	getHeaders()
+	{
+		return this.headers;
+	}
+
+	/**
+	 * @brief	Checks if the desired header exists
+	 *
+	 * @param	String key
+	 *
+	 * @return	Boolean
+	 */
+	hasHeader( key )
+	{
+		return typeof this.headers[key] !== 'undefined';
 	}
 
 	/**
