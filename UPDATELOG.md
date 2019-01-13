@@ -1,7 +1,5 @@
 3.3.0
-- Added headers Plugin in 
-- Tested Headers plug in
-- Removed headers from the eventRequest
+- Improved on the headers functionality
 
 3.2.0
 - Fully tested the response cache

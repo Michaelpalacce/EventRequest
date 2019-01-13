@@ -5,7 +5,6 @@ const url									= require( 'url' );
 const { EventEmitter }						= require( 'events' );
 const ErrorHandler							= require( './components/error/error_handler' );
 const Streams								= require( 'stream' );
-const { Logger }							= require( './components/logger/loggur' );
 const ValidationHandler						= require( './components/validation/validation_handler' );
 const { IncomingMessage, ServerResponse }	= require( 'http' );
 
@@ -101,30 +100,7 @@ class EventRequest extends EventEmitter
 			}
 		});
 
-		let logger	= null;
-		Object.defineProperty( this, 'logger', {
-			enumerable	: true,
-			set			: ( arg ) =>{
-				if ( arg == null )
-				{
-					logger	= arg;
-					return;
-				}
-
-				if ( arg instanceof Logger )
-				{
-					logger	= arg;
-				}
-				else
-				{
-					throw new Error( 'Logger must be an instance of Logger' );
-				}
-			},
-			get			: () =>{
-				return logger;
-			}
-		});
-
+		// We do this so we can pass the event.next function by reference
 		let self	= this;
 		this.next	= ( err, code )=>{
 			self._next( err, code );

@@ -165,6 +165,9 @@ class ResponseCachePlugin extends PluginInterface
 	{
 		let pluginMiddleware	= {
 			handler	: ( event )	=>{
+				event.on( 'cleanUp', ()=>{
+					event.cacheCurrentRequest	= undefined;
+				} );
 				event.cacheCurrentRequest	= ( options = {}, errCallback = event.next )=>{
 					errCallback							= typeof errCallback === 'function' ? errCallback : event.next;
 					event.currentResponseCacheConfig	= options;

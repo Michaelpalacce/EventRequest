@@ -158,9 +158,9 @@ route accepts 3 parameters:
 
 ***
 
-Plugins can be added by using **server.apply( pluginContainerInstance )**
+Plugins can be added by using **server.apply( pluginContainerInstance||'pluginId' )**
 Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
-plugin all you have to do is do: plugin.apply( 'pluginId' )
+plugin all you have to do is do: server.apply( 'pluginId' )
 
 ~~~javascript
 const PluginManager	= server.getPluginManager();
