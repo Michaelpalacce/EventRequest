@@ -195,6 +195,21 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
+	 * @brief	Retrieve a header value
+	 *
+	 * @details	If the key does not exist, then return the default value if passed. Defaults to NULL
+	 *
+	 * @param	String key
+	 * @param	String defaultValue
+	 *
+	 * @return	Mixed
+	 */
+	getHeaderValue( key, defaultValue = null )
+	{
+		return typeof this.headers[key] === 'undefined' ? defaultValue : key;
+	}
+
+	/**
 	 * @brief	Used to send a redirect response to a given redirectUrl
 	 *
 	 * @param	String redirectUrl
