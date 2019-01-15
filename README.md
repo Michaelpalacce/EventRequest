@@ -178,8 +178,6 @@ as other plugins by fetching them and configuring them as you wish. They can not
 
 er_static_resources
 
-er_timeout
-
 er_body_parser_json
 
 er_body_parser_form

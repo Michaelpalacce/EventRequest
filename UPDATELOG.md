@@ -1,3 +1,6 @@
+3.3.1
+- Fix with the preinstalled plugins
+
 3.3.0
 - Improved on the headers functionality
 

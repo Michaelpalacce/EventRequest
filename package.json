@@ -1,28 +1,27 @@
 {
-  "_from": "event_request@1.6.6",
-  "_id": "event_request@1.6.6",
+  "_from": "event_request@3.3.0",
+  "_id": "event_request@3.3.0",
   "_inBundle": false,
-  "_integrity": "sha512-oYT91gPkQr0gDXas3qfL9ek9fCmro0sDOx2VS4VC3rbbcEMDGFTroACqoFki4Yo+D7ltMXCCZaFlUo/8K7/NCQ==",
+  "_integrity": "sha512-XH89GgmA2Vlx+mycW3OIxXEcOuwxWhXwqWyp2tKtHmu35PWSsAkpwZcyXGEw4sh1DtafhtCfq+qU9JDuC2nmqw==",
   "_location": "/event_request",
   "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "event_request@1.6.6",
+    "raw": "event_request@3.3.0",
     "name": "event_request",
     "escapedName": "event_request",
-    "rawSpec": "1.6.6",
+    "rawSpec": "3.3.0",
     "saveSpec": null,
-    "fetchSpec": "1.6.6"
+    "fetchSpec": "3.3.0"
   },
   "_requiredBy": [
-    "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/event_request/-/event_request-1.6.6.tgz",
-  "_shasum": "45610dfc1480c231ae29977c057f3b158cf4c2c5",
-  "_spec": "event_request@1.6.6",
-  "_where": "D:\\JS\\Storage",
+  "_resolved": "https://registry.npmjs.org/event_request/-/event_request-3.3.0.tgz",
+  "_shasum": "ad96d56a6bd1cfcb703dde1a10d90d6040881947",
+  "_spec": "event_request@3.3.0",
+  "_where": "C:\\UserFiles\\Projects\\Js\\Server",
   "author": {
     "name": "Stefan Genov"
   },
@@ -30,9 +29,6 @@
   "dependencies": {},
   "deprecated": false,
   "description": "A Backend Server",
-  "license": "GPL-3.0",
-  "main": "server.js",
-  "name": "event_request",
   "keywords": [
     "server",
     "api",
@@ -58,8 +54,11 @@
     "error-handling",
     "input-validation"
   ],
+  "license": "GPL-3.0",
+  "main": "server.js",
+  "name": "event_request",
   "scripts": {
     "test": "node ./test_script.js"
   },
-  "version": "3.3.0"
+  "version": "3.3.1"
 }

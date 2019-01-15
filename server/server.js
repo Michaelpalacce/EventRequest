@@ -46,6 +46,20 @@ class Server extends EventEmitter
 		this.router			= new Router();
 		this.pluginManager	= PluginManager;
 		this.plugins		= [];
+
+		this.setUpDefaultPlugins();
+	}
+
+	/**
+	 * @brief	Sets up the default plugins
+	 *
+	 * @return	void
+	 */
+	setUpDefaultPlugins()
+	{
+		this.apply( 'er_static_resources' );
+		this.apply( 'er_body_parser_json' );
+		this.apply( 'er_body_parser_form' );
 	}
 
 	/**
@@ -217,11 +231,6 @@ class Server extends EventEmitter
 		let eventRequest	= this.resolve( request, response );
 		eventRequest.setMaxListeners( 0 );
 		this.emit( 'eventRequestResolved', { eventRequest, request, response  } );
-
-		this.apply( 'er_static_resources' );
-		this.apply( 'er_timeout' );
-		this.apply( 'er_body_parser_json' );
-		this.apply( 'er_body_parser_form' );
 
 		request.on( 'close', ()=> {
 			this.emit( 'eventRequestRequestClosed', { eventRequest, request } );
