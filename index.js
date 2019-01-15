@@ -33,3 +33,52 @@ module.exports	= {
 	Logging,		Loggur,
 	LOG_LEVELS
 };
+
+let server		= Server();
+
+let cacheServer	= server.getPluginManager().getPlugin( 'er_cache_server' );
+
+cacheServer.startServer(()=>{
+	server.apply( 'er_cache_server' );
+	server.apply( 'er_new_session' );
+
+	server.add({
+		handler	: ( event )=>{
+			event.session.hasSession( ( hasSession )=>{
+				if ( ! hasSession )
+				{
+					event.session.newSession( event.next );
+				}
+				else
+				{
+					event.session.fetchSession( event.next );
+				}
+			});
+		}
+	});
+	
+	server.add({
+		handler	: ( event )=>{
+			console.log( event.session.session );
+			if ( ! event.session.hasSessionVariable( 'authenticated' ) )
+			{
+				event.session.addSessionVariable( 'authenticated', true );
+			}
+			console.log( event.session.session );
+
+			event.session.saveSession( event.next );
+		}
+	});
+
+	server.add({
+		route	: '/',
+		handler	: ( event )=>{
+			event.send( 'Hello World!' );
+		}
+	});
+
+	server.start(()=>{
+		Loggur.log( 'Server started' )
+	});
+});
+

@@ -130,6 +130,19 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
+	 * @brief	Sets a new cookie
+	 *
+	 * @param	String name
+	 * @param	String value
+	 *
+	 * @return	void
+	 */
+	setCookie( name, value )
+	{
+		this.setHeader( 'Set-Cookie', [name + '=' + value] )
+	}
+
+	/**
 	 * @brief	Sends the response to the user
 	 *
 	 * @details	Raw is a flag to tell the eventRequest how to send the data

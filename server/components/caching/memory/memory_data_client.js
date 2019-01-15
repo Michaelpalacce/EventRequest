@@ -62,7 +62,7 @@ class MemoryWorker
 				this.processCommand( chunk, ( error, data ) => {
 					error			= typeof error !== 'undefined' ? error : 'Internal error';
 					error			= error instanceof Error ? error.stack : error;
-					data			= typeof data !== 'undefined' ? data : {};
+					data			= typeof data !== 'undefined' ? data : false;
 
 					let response	= { error, data };
 
