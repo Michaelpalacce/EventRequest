@@ -14,7 +14,7 @@ const SESSIONS_NAMESPACE	= 'er_session';
  */
 class Session
 {
-	constructor( event, options )
+	constructor( event, options = {} )
 	{
 		this.event				= event;
 		this.cachingServer		= event.cachingServer;
@@ -145,6 +145,11 @@ class Session
 	 */
 	saveSession( callback, sessionId = this.getSessionId() )
 	{
+		if ( sessionId === null )
+		{
+			callback( false );
+			return;
+		}
 		this.cachingServer.create( SESSIONS_NAMESPACE, sessionId, this.session, { ttl : this.ttl } ).then( ()=>{
 			callback( false );
 		} ).catch( callback );

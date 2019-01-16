@@ -9,6 +9,16 @@ const { Session, SESSIONS_NAMESPACE }	= require( '../../components/session/sessi
 class SessionPlugin extends PluginInterface
 {
 	/**
+	 * @brief	This plugin depends on having a cache
+	 *
+	 * @return	Array
+	 */
+	getPluginDependencies()
+	{
+		return ['er_cache_server'];
+	}
+
+	/**
 	 * @brief	Adds a session to the event request
 	 *
 	 * @return	Array
