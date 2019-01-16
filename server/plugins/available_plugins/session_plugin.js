@@ -2,6 +2,7 @@
 
 const PluginInterface					= require( './../plugin_interface' );
 const { Session, SESSIONS_NAMESPACE }	= require( '../../components/session/session' );
+const { SERVER_STATES }					= require( '../../components/caching/data_server' );
 
 /**
  * @brief	Adds session the the event request
