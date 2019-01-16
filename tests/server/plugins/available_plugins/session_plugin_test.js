@@ -3,6 +3,7 @@
 // Dependencies
 const { assert, test, helpers, Mock }	= require( '../../../test_helper' );
 const SessionPlugin						= require( './../../../../server/plugins/available_plugins/session_plugin' );
+const CachingServerPlugin				= require( '../../../../server/plugins/available_plugins/memory_data_server_plugin' );
 const { Session, SESSIONS_NAMESPACE }	= require( './../../../../server/components/session/session' );
 const Router							= require( '../../../../server/components/routing/router' );
 
@@ -167,5 +168,38 @@ test({
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
+	}
+});
+
+test({
+	message	: 'SessionPlugin initSession fetches a session if it exists',
+	test	: ( done )=>{
+		let MockServer					= Mock( helpers.getServer().constructor );
+		let MockCachingServerPlugin		= Mock( CachingServerPlugin );
+		let cachingServer				= helpers.getCachingServer();
+		let cachingServerPlugin			= new MockCachingServerPlugin();
+		let server						= new MockServer();
+
+		cachingServerPlugin._mock({
+			method			: 'getServer',
+			shouldReturn	: cachingServer
+		});
+
+		server._mock({
+			method			: 'getPlugin',
+			with			: [['er_cache_server']],
+			shouldReturn	: cachingServerPlugin
+		});
+
+		let namespace			= 'er_session';
+		let callback			= ()=>{
+			cachingServer.existsNamespace( namespace ).then( ( exists )=>{
+				exists === true ? done() : done( `The namespace ${namespace} does not exist` );
+			} ).catch( done );
+		};
+
+		let sessionPlugin	= new SessionPlugin( 'id', { callback } );
+
+		sessionPlugin.setServerOnRuntime( server );
 	}
 });

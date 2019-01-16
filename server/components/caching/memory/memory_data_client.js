@@ -87,7 +87,7 @@ class MemoryWorker
 			let isNotInUse	= err.message.indexOf( 'EADDRINUSE' ) === -1;
 
 			process.send({
-				error	: isNotInUse,
+				error	: isNotInUse ? err : false,
 				data	: isNotInUse ? err : PIPE_PATH
 			});
 

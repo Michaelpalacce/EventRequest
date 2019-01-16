@@ -68,16 +68,16 @@ test({
 			shouldReturn	: cachingServerPlugin
 		});
 
-		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 		let namespace			= 'rcp';
-
-		responseCachePlugin.setServerOnRuntime( server );
-
-		setTimeout(()=>{
+		let callback			= ()=>{
 			cachingServer.existsNamespace( namespace ).then( ( exists )=>{
 				exists === true ? done() : done( `The namespace ${namespace} does not exist` );
-			} ).catch( done )
-		}, 250 );
+			} ).catch( done );
+		};
+
+		let responseCachePlugin	= new ResponseCachePlugin( 'id', { callback } );
+
+		responseCachePlugin.setServerOnRuntime( server );
 	}
 });
 

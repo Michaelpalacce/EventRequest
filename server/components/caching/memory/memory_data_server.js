@@ -142,12 +142,12 @@ class MemoryDataServer extends DataServer
 
 		return new Promise( ( resolve, reject )=>{
 			this.command( command, ( response ) =>{
-				response.error	= typeof response.error !== 'undefined' ? response.error : true;
+				response.error	= typeof response.error !== 'undefined' ? response.error : 'An error has occurred';
 				response.data	= typeof response.data !== 'undefined' ? response.data : {};
 
 				if ( response.error !== false )
 				{
-					reject( response.error, response.data );
+					reject( response.error );
 				}
 				else
 				{

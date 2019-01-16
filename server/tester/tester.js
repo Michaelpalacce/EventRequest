@@ -212,7 +212,7 @@ class Tester
 
 		let logPromises		= [];
 
-		logPromises.push( this.consoleLogger.info( `Finished in: ${ ( Date.now() - this.start ) / 1000 }` ) );
+		logPromises.push( this.consoleLogger.error( `Finished in: ${ ( Date.now() - this.start ) / 1000 }` ) );
 		logPromises.push( this.consoleLogger.success( `There were ${this.successes.length} successful tests` ) );
 		logPromises.push( this.consoleLogger.error( `There were ${this.errors.length} unsuccessful tests` ) );
 		logPromises.push( this.consoleLogger.warning( `There were ${this.skipped.length} skipped tests` ) );
@@ -344,7 +344,7 @@ class Tester
 	runAllTests( options = {} )
 	{
 		this.initialize( options );
-		this.consoleLogger.info( `Running ${this.tests.length} tests.` );
+		this.consoleLogger.error( `Running ${this.tests.length} tests.` );
 
 		this.done();
 	}

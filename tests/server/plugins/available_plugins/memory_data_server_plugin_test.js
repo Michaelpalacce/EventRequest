@@ -9,12 +9,15 @@ const Router					= require( '../../../../server/components/routing/router' );
 test({
 	message	: 'MemoryDataServerPlugin startServer starts the server',
 	test	: ( done )=>{
-		let memoryDataServerPlugin	= new MemoryDataServerPlugin( 'id' );
+		// Set a timeout because there are too many components creating and destroying the memory data client
+		setTimeout(()=>{
+			let memoryDataServerPlugin	= new MemoryDataServerPlugin( 'id' );
 
-		memoryDataServerPlugin.startServer( ( error, server )=>{
-			assert.equal( false, error );
-			server.createNamespace( 'test' ).then( ( data )=>{ done(); }, done );
-		});
+			memoryDataServerPlugin.startServer( ( error, server )=>{
+				assert.equal( false, error );
+				server.createNamespace( 'test' ).then( ( data )=>{ done(); }, done );
+			});
+		}, 1000 );
 	}
 });
 
@@ -68,7 +71,7 @@ test({
 
 		memoryDataServerPlugin.getServer().existsNamespace( 'test' ).then( ()=>{ done( 'Server should be dead' ) }, ( err )=>{
 			// assert that there is an error ( existsNamespace returns true in case of error )
-			assert.equal( true, err );
+			assert.equal( true, err !== false );
 
 			memoryDataServerPlugin.startServer( done );
 		} );

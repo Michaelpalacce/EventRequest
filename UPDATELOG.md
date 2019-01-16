@@ -5,7 +5,8 @@
 - Session Module can now be used to implement security, but own logic must be used
 - Added ability to apply plugin options when applying the plugin to the server via a second argument
 - no longer emitting error event in eventRequest on sendError, now emitting on_error
-- 
+- Improved error return consistency from the memory data server
+- Improved the tester to display a BIT more info on silent like how many tests are being ran and how long it took to finish
 
 3.3.1
 - Fix with the preinstalled plugins
