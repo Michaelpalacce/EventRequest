@@ -25,6 +25,10 @@ class SessionPlugin extends PluginInterface
 					event.on( 'cleanUp', ()=>{
 						event.session	= undefined;
 					} );
+
+					event.on( 'send', ()=>{
+						event.session.saveSession( ()=>{} );
+					} )
 				}
 
 				event.cachingServer.existsNamespace( SESSIONS_NAMESPACE ).then( ( exist )=>{
@@ -40,8 +44,26 @@ class SessionPlugin extends PluginInterface
 			}
 		};
 
+		let initSessionForPathMiddleware	= {
+			handler	: ( event )=>{
+				event.initSession	= ( callback )=>{
+					event.session.hasSession( ( hasSession )=>{
+						if ( ! hasSession )
+						{
+							event.session.newSession( callback );
+						}
+						else
+						{
+							event.session.fetchSession( callback );
+						}
+					});
+				};
 
-		return [setUpPluginMiddleware];
+				event.next();
+			}
+		};
+
+		return [setUpPluginMiddleware, initSessionForPathMiddleware];
 	}
 }
 

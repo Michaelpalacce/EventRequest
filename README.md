@@ -158,7 +158,7 @@ route accepts 3 parameters:
 
 ***
 
-Plugins can be added by using **server.apply( pluginContainerInstance||'pluginId' )**
+Plugins can be added by using **server.apply( pluginContainerInstance||'pluginId', options )**
 Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
 plugin all you have to do is do: server.apply( 'pluginId' )
 
@@ -168,7 +168,9 @@ let timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
 
 timeoutPlugin.setOptions( { timeout : 10 * 1000 } );
 server.apply( timeoutPlugin );
+server.apply( timeoutPlugin, {  timeout : 10 * 1000 } );// This will accomplish the same thing as the rows above
 server.apply( 'er_timeout' ); // This is also valid.
+server.apply( 'er_timeout', {  timeout : 10 * 1000 } ); // This is also valid.
 ~~~
 
 #PRE-INSTALLED PLUGINS

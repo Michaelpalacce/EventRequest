@@ -127,20 +127,26 @@ class Server extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	apply( plugin )
+	apply( plugin, options = null )
 	{
 		if ( plugin instanceof PluginInterface )
 		{
-			this._attachPlugin( plugin );
 		}
 		else if ( typeof plugin === 'string' )
 		{
-			this._attachPlugin( this.pluginManager.getPlugin( plugin ) );
+			plugin	= this.pluginManager.getPlugin( plugin );
 		}
 		else
 		{
 			throw new Error( 'A PluginInterface or an existing PluginManager pluginId (string) must be added' );
 		}
+
+		if ( options != null )
+		{
+			plugin.setOptions( options );
+		}
+
+		this._attachPlugin( plugin );
 	}
 
 	/**

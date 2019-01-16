@@ -39,11 +39,23 @@ class Session
 		}
 	}
 
+	/**
+	 * @brief	Creates a new SessionId
+	 *
+	 * @return	String
+	 */
 	makeNewSessionId()
 	{
 		return uniqueId.makeId( this.sessionIdLength );
 	}
 
+	/**
+	 * @brief	Checks if the user has a session
+	 *
+	 * @param	Function callback
+	 *
+	 * @return	void
+	 */
 	hasSession( callback )
 	{
 		if ( this.sessionId === null )
@@ -81,26 +93,56 @@ class Session
 		}, sessionId );
 	}
 
+	/**
+	 * @brief	Adds a new variable to the session
+	 *
+	 * @param	String name
+	 * @param	Mixed value
+	 *
+	 * @return	void
+	 */
 	addSessionVariable( name, value )
 	{
 		this.session[name]	= value;
 	}
 
+	/**
+	 * @brief	Deletes a variable from teh session
+	 *
+	 * @param	String name
+	 *
+	 * @return	void
+	 */
 	deleteSessionVariable( name )
 	{
 		delete this.session[name];
 	}
 
+	/**
+	 * @brief	Checks if a variable exists in the session
+	 *
+	 * @param	String name
+	 *
+	 * @return	Boolean
+	 */
 	hasSessionVariable( name )
 	{
 		typeof this.session[name] !== 'undefined';
 	}
 
+	/**
+	 * @brief	Save the session to the memory storage
+	 *
+	 * @param	Function callback
+	 * @param	String sessionId
+	 *
+	 * @return	void
+	 */
 	saveSession( callback, sessionId = this.getSessionId() )
 	{
 		this.cachingServer.create( SESSIONS_NAMESPACE, sessionId, this.session, { ttl : this.ttl } ).then( ()=>{
 			callback( false );
-		} ).catch( callback )
+		} ).catch( callback );
 	}
 
 	/**
@@ -126,16 +168,6 @@ class Session
 	getSessionId()
 	{
 		return this.sessionId;
-	}
-
-	/**
-	 * @brief	Gets the session for the current client
-	 *
-	 * @return	Object
-	 */
-	getSession()
-	{
-		return this.session;
 	}
 }
 
