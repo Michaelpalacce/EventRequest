@@ -58,6 +58,15 @@ class LoggerPlugin extends PluginInterface
 			logger.error( `Error : ${error}` );
 		});
 
+		event.on( 'on_error', ( error ) =>{
+			if ( error instanceof Error )
+			{
+				error	= error.stack;
+			}
+
+			logger.error( `Error : ${error}` );
+		});
+
 		event.on( 'finished', () =>{
 			logger.info( 'Event finished' )
 		});

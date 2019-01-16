@@ -140,7 +140,10 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
 	let response			= new ServerResponse( request );
 	let MockedEventRequest	= Mock( EventRequest );
 
-	return new MockedEventRequest( request, response );
+	let eventRequest		= new MockedEventRequest( request, response );
+	eventRequest.setMaxListeners( 0 );
+
+	return eventRequest;
 };
 
 /**

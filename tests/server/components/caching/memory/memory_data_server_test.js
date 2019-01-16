@@ -141,24 +141,6 @@ test({
 });
 
 test({
-	message	: 'MemoryDataServer.create creates a record',
-	test	: ( done )=>{
-		helpers.setUpTestNamespace( testServer, ( err )=>{
-			if ( err )
-			{
-				done( err );
-				return;
-			}
-
-			testServer.create( 'test', 'testRecord', { testKey: 'testValue' }, { ttl: 10 } ).then(( data )=>{
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-
-test({
 	message	: 'MemoryDataServer.exists returns false if record does not exist',
 	test	: ( done )=>{
 		helpers.setUpTestNamespace( testServer, ( err )=>{

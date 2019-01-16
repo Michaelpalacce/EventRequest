@@ -19,6 +19,62 @@ class SessionPlugin extends PluginInterface
 	}
 
 	/**
+	 * @brief	creates the namespace when attaching to the server
+	 *
+	 * @param	Server server
+	 *
+	 * @return	void
+	 */
+	setServerOnRuntime( server )
+	{
+		let cachingServer	= server.getPlugin( 'er_cache_server' ).getServer();
+		let callback		= typeof this.options === 'object' && typeof this.options.callback === 'function'
+							? this.options.callback
+							: ()=>{};
+
+		if ( cachingServer === null )
+		{
+			throw new Error( `Before adding ${this.getPluginId()}, make sure to start the caching server from 'er_cache_server'` )
+		}
+
+		if ( cachingServer.getServerState() === SERVER_STATES.running )
+		{
+			this.setUpNamespace( cachingServer, callback );
+		}
+		else
+		{
+			cachingServer.on( 'state_changed', ( state )=>{
+				if ( state === SERVER_STATES.running )
+				{
+					this.setUpNamespace( cachingServer, callback );
+				}
+			} );
+		}
+	}
+
+	/**
+	 * @brief	Sets up the namespace of the current server
+	 *
+	 * @param	DataServer cachingServer
+	 * @param	Function callback
+	 *
+	 * @return	void
+	 */
+	setUpNamespace( cachingServer, callback )
+	{
+		cachingServer.existsNamespace( SESSIONS_NAMESPACE ).then( ( exist )=>{
+			if ( ! exist )
+			{
+				cachingServer.createNamespace( SESSIONS_NAMESPACE ).then( callback ).catch( callback );
+			}
+			else
+			{
+				callback( false );
+			}
+		} ).catch( callback );
+	}
+
+	/**
 	 * @brief	Adds a session to the event request
 	 *
 	 * @return	Array
@@ -41,16 +97,7 @@ class SessionPlugin extends PluginInterface
 					} );
 				}
 
-				event.cachingServer.existsNamespace( SESSIONS_NAMESPACE ).then( ( exist )=>{
-					if ( ! exist )
-					{
-						event.cachingServer.createNamespace( SESSIONS_NAMESPACE ).then( event.next ).catch( event.next );
-					}
-					else
-					{
-						event.next();
-					}
-				} ).catch( event.next );
+				event.next();
 			}
 		};
 

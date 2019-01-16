@@ -764,6 +764,11 @@ server.apply( cacheServerPlugin );
     * DEPENDENCIES:
     * er_cache_server
 
+## 
+    * Accepted options: 
+    * - callback - Function - Callback that should be called when the plugin is finished setting up
+    
+
 ~~~javascript
 let server		= Server();
 
@@ -786,11 +791,12 @@ cacheServer.startServer(()=>{
 	// FIll the session
 	server.add({
 		handler	: ( event )=>{
+			// NOTE: add and delete will NOT call save of the session. That must be done manually
 			if ( ! event.session.has( 'authenticated' ) )
 			{
 				event.session.add( 'authenticated', true );
 			}
-			
+
 			console.log( event.session.get( 'authenticated' ) );
 
 			event.session.delete( 'authenticated' );

@@ -74,6 +74,19 @@ class Session
 	}
 
 	/**
+	 * @brief	Removes the session from the caching server
+	 *
+	 * @param	Function callback
+	 * @param	String sessionId
+	 *
+	 * @return	void
+	 */
+	removeSession( callback, sessionId = this.getSessionId() )
+	{
+		this.cachingServer.delete( SESSIONS_NAMESPACE, sessionId ).then( callback ).catch( callback );
+	}
+
+	/**
 	 * @brief	Starts a new session
 	 *
 	 * @param	Function callback
@@ -106,19 +119,19 @@ class Session
 	 *
 	 * @return	void
 	 */
-	addSessionVariable( name, value )
+	add( name, value )
 	{
 		this.session[name]	= value;
 	}
 
 	/**
-	 * @brief	Deletes a variable from teh session
+	 * @brief	Deletes a variable from the session
 	 *
 	 * @param	String name
 	 *
 	 * @return	void
 	 */
-	deleteSessionVariable( name )
+	delete( name )
 	{
 		delete this.session[name];
 	}
@@ -130,9 +143,26 @@ class Session
 	 *
 	 * @return	Boolean
 	 */
-	hasSessionVariable( name )
+	has( name )
 	{
-		typeof this.session[name] !== 'undefined';
+		return typeof this.session[name] !== 'undefined';
+	}
+
+	/**
+	 * @brief	Gets a session variable, will throw if that variable does not exist
+	 *
+	 * @param	String name
+	 *
+	 * @return	Mixed
+	 */
+	get( name )
+	{
+		if ( ! this.has( name ) )
+		{
+			throw new Error( `The session does not have a value set for: ${name}` );
+		}
+
+		return this.session[name];
 	}
 
 	/**

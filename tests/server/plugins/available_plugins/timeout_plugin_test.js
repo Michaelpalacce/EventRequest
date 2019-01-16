@@ -20,7 +20,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.on('error', ( err )=>{
+		eventRequest.on( 'on_error', ( err )=>{
 			assert.equal( typeof err === 'string', true );
 			error	= true;
 		});

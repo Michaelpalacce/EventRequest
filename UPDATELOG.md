@@ -1,9 +1,11 @@
 4.0.0
 - Removed security module
-- Started working on new session plugin that will actually have a session and a session only, not worry about security. Security will be removed
+- Created new session plugin that will actually have a session and a session only, not worry about security. Security will be removed
 - Added Session module tests
 - Session Module can now be used to implement security, but own logic must be used
 - Added ability to apply plugin options when applying the plugin to the server via a second argument
+- no longer emitting error event in eventRequest on sendError, now emitting on_error
+- 
 
 3.3.1
 - Fix with the preinstalled plugins

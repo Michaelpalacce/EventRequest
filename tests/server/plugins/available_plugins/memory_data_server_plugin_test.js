@@ -70,7 +70,7 @@ test({
 			// assert that there is an error ( existsNamespace returns true in case of error )
 			assert.equal( true, err );
 
-			done();
+			memoryDataServerPlugin.startServer( done );
 		} );
 	}
 });

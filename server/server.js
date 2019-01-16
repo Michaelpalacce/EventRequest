@@ -267,14 +267,17 @@ class Server extends EventEmitter
 			eventRequest.setBlock( block );
 			this.emit( 'eventRequestBlockSet', { eventRequest, block } );
 
-			eventRequest.on( 'error', ( error ) =>{
+			let onErrorCallback	= ( error ) =>{
 				this.emit( 'eventRequestError', { eventRequest, error } );
 
 				if ( eventRequest.logger === null )
 				{
 					Loggur.log( error, LOG_LEVELS.error );
 				}
-			});
+			};
+
+			eventRequest.on( 'error', onErrorCallback );
+			eventRequest.on( 'on_error', onErrorCallback );
 
 			eventRequest.next();
 		}

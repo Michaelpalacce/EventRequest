@@ -44,6 +44,7 @@ test({
 			},
 			with			: [
 				['error', undefined],
+				['on_error', undefined],
 				['finished', undefined],
 				['send', undefined],
 				['redirect', undefined],
@@ -53,7 +54,7 @@ test({
 				['cleanUp', undefined],
 				['clearTimeout', undefined],
 			],
-			called			: 9
+			called			: 10
 		});
 
 		router.add( middleware[0] );
@@ -64,7 +65,7 @@ test({
 
 		// DO this to wait for the log to complete
 		setImmediate(()=>{
-			assert.equal( 9, called );
+			assert.equal( 10, called );
 			assert.equal( 1, calledLog );
 			assert.equal( true, eventRequest.logger instanceof Logger );
 
