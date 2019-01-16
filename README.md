@@ -7,7 +7,7 @@ Includes:
 2) Multipart Body Parser
 3) Json Body Parser
 - Cookie parser
-- Session security
+- Session
 - File streams
 - Easy Routing
 - Middlewares
@@ -19,7 +19,7 @@ Includes:
 - Error handling
 - Caching ( in memory )
 - Input Validation
-- Plugin Manager
+- Plugin support
 
 ~~~javascript
 const { Server, Loggur }	= require( 'event_request' );
@@ -57,12 +57,12 @@ It contains the following properties:
 * extra - Object - an object that holds extra data that is passed between middlewares
 * cookies - Object - the current cookies
 * params - Object - request url params that are set by the router
-* body - Object - the body of the request set by the body parsers
 * block - Array - The execution block of middlewares
 * logger - Logger - Logs data
 
 Functions exported by the event request:
 
+* setCookie( name, value ) - > sets a new cookie
 * cleanUp - cleans up the event request. Usually called at the end of the request. Emits a cleanUp event and a finished event
     This also removes all other event listeners and sets all the properties to undefined
 * send( response, statusCode, raw ) - sends the response to the user with the specified statusCode
@@ -73,8 +73,6 @@ a string or if it is not a sting it will be JSON stringified. Emits a 'send' eve
 * redirect( redirectUrl, statusCode ) - redirect to the given url with the specified status code (defaults to 302 ). 
 Emits a 'redirect' event. If the response is finished then an error will be set to the next middleware
 * isFinished - checks if the response is finished
-* render( templateName, variables, callback ) - this will try to render a template given that a templatingEngine is provided.
-This emits a 'render' event
 * setBlock - sets the middleware execution block for the event_request
 * next - Calls the next middleware in the execution block. If there is nothing else to send and the response has not been sent YET, then send a server error
 if the event is stopped and the response has not been set then send a server error
@@ -83,16 +81,16 @@ if the event is stopped and the response has not been set then send a server err
 # Properties exported by the Server:
 	Server,				// Server callback. Use this to create a new server. The server instance can be retrieved from anywhere by: Server();
 	Router,				// The router. Can be used to add routes to it and then to the main server route
-	SessionHandler,		// Session handler to be extended by other security modules
-	BodyParserHandler,	// Body parser handler that contains the different body parsers
-	DataServer,			// Instance to be extended to implement your own DataServer
+	Development,		// Holds Development tools
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
-	PluginInterface,	// Used to add plugins to the system
 	Logging,			// Contains helpful logging functions
 	Loggur,				// Easier access to the Logging.Loggur instance
 	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
-	PluginManager		// The plugin manager also injected inside the server. This is preloaded with predefined plug ins
+
+# Properties exported by Development:
+	PluginInterface,	// Used to add plugins to the system
+	DataServer,			// Instance to be extended to implement your own DataServer
 
 # Server Options
 
@@ -761,56 +759,60 @@ server.apply( cacheServerPlugin );
 
 ##
 
-* er_session -> Handles sessions and security
+* er_session -> Session container
 ##
     * DEPENDENCIES:
     * er_cache_server
-##
-    * Accepted options:
-    * - sessionName - String - the session name ( aka cookie name ) - Defaults to DEFAULT_SESSION_NAME
-    * - authenticationRoute - String - The route on which authentication should happen
-    * - tokenExpiration - Number - The Time to keep the tokens before they expire - Defaults to DEFAULT_TOKEN_EXPIRATION_TIME
-    * - authenticationCallback - Function - The callback to be called when authentication has to happen
-    * 						This callback must return a boolean	- Defaults to DEFAULT_AUTHENTICATION_CALLBACK
-    * - managers - Array - The managers to be added to the security ( they have 2 parameters : instance which
-    * 					must be an instance of SecurityManager and options which are options to be passed
-    * 					to that specific manager only
 
 ~~~javascript
+let server		= Server();
 
-// Authentication callback that will authenticated the request if the user has permissions
-// this can be changed to anything you want but must return a boolean at the end
-const authenticationCallback	= ( event )=>{
-	let username	= typeof event.body.username === 'string' ? event.body.username : false;
-	let password	= typeof event.body.password === 'string' ? event.body.password : false;
+let cacheServer	= server.getPluginManager().getPlugin( 'er_cache_server' );
 
-	return username === 'test' && password === 'test';
-};
+cacheServer.startServer(()=>{
+	server.apply( 'er_cache_server' );
+	// attach session helpers
+	server.apply( 'er_session' );
 
-let sessionPlugin	= PluginManager.getPlugin( 'er_session' );
-
-sessionPlugin.setOptions({
-	tokenExpiration			: 10000,
-	authenticationRoute		: '/login',
-	authenticationCallback	: authenticationCallback,
-	managers				: [
-		'default',
-		{
-			instance	: AuthenticationManager, // Some instance to an external manager
-			options		: { indexRoute : '/browse' }
+	// Initialize the session
+	server.add({
+		handler	: ( event )=>{
+			// This will create a session in the cache server if it does not exist, if it exists,
+			// then the session data will be fetched from the cache server
+			event.initSession( event.next );
 		}
-	]
-});
-server.add({
-	route	: '/',
-	method	: 'GET',
-	handler	: ( event ) => {
-		Loggur.log( event.session ); // This will hold session data and will be saved to the given cache server. Any data stored here will be stored later if the default session managers are used
-		event.next( '<h1>Hello World!</h1>' )
-	}
+	});
+
+	// FIll the session
+	server.add({
+		handler	: ( event )=>{
+			if ( ! event.session.has( 'authenticated' ) )
+			{
+				event.session.add( 'authenticated', true );
+			}
+			
+			console.log( event.session.get( 'authenticated' ) );
+
+			event.session.delete( 'authenticated' );
+
+			console.log( event.session.get( 'authenticated' ) );
+
+			event.session.saveSession( event.next );
+		}
+	});
+
+	server.add({
+		route	: '/',
+		handler	: ( event )=>{
+			event.send( 'Hello World!' );
+		}
+	});
+
+	server.start(()=>{
+		Loggur.log( 'Server started' )
+	});
 });
 
-server.apply( sessionPlugin );
 ~~~
 
 ##

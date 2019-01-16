@@ -2,6 +2,11 @@
 
 const uniqueId				= require( './../helpers/unique_id' );
 
+/**
+ * @brief	The namespace in which the sessions should be stored
+ *
+ * @var		String SESSIONS_NAMESPACE
+ */
 const SESSIONS_NAMESPACE	= 'er_session';
 
 /**

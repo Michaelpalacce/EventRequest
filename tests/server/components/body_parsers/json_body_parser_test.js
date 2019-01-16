@@ -7,7 +7,7 @@ test({
 	message	: 'JsonBodyParser.constructor on defaults does not die',
 	test	: ( done )=>{
 		let jsonBodyParser	= new JsonBodyParser();
-		assert.equal( jsonBodyParser.maxPayloadLength, 10 * 1048576 );
+		assert.equal( jsonBodyParser.maxPayloadLength, 100 * 1048576 );
 		assert.equal( jsonBodyParser.strict, true );
 
 		done();
@@ -35,7 +35,7 @@ test({
 		let strict				= 'test';
 
 		let jsonBodyParser	= new JsonBodyParser( { maxPayloadLength, strict } );
-		assert.equal( jsonBodyParser.maxPayloadLength, 10 * 1048576 );
+		assert.equal( jsonBodyParser.maxPayloadLength, 100 * 1048576 );
 		assert.equal( jsonBodyParser.strict, true );
 
 		done();

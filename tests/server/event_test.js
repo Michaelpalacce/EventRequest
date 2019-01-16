@@ -84,23 +84,6 @@ test({
 });
 
 test({
-	message	: 'EventRequest logger can only be an instance of Logger',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-
-		assert.doesNotThrow( () =>{
-			eventRequest.logger	= Loggur.createLogger();
-		});
-
-		assert.throws( () => {
-			eventRequest.logger	= {};
-		});
-
-		done();
-	}
-});
-
-test({
 	message	: 'EventRequest cleanUp emits event: cleanUp',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();

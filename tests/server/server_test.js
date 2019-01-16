@@ -20,9 +20,9 @@ test({
 	message	: 'Server.constructor instantiates a router and has a pluginManager',
 	test	: ( done )=>{
 		let server	= new Server();
-		assert.deepStrictEqual( server.router, new Router() );
+		assert.equal( true, server.router instanceof Router );
+		assert.equal( 3, server.router.middleware.length );
 		assert.deepStrictEqual( server.pluginManager, PreloadedPluginManager );
-		assert.deepStrictEqual( server.plugins, [] );
 		done();
 	}
 });
@@ -104,7 +104,8 @@ test({
 			method	: 'GET'
 		});
 
-		assert.equal( 5, server.router.middleware.length );
+		// 5 added 3 preloaded
+		assert.equal( 8, server.router.middleware.length );
 
 		done();
 	}
@@ -130,7 +131,8 @@ test({
 			server.apply( {} );
 		});
 
-		assert.equal( 2, server.router.middleware.length );
+		// 2 added 3 pre loaded
+		assert.equal( 5, server.router.middleware.length );
 
 		done();
 	}

@@ -2,10 +2,8 @@
 
 // Dependencies
 const Router					= require( './server/components/routing/router' );
-const SessionHandler			= require( './server/components/session/session_handler' );
 const BodyParserHandler			= require( './server/components/body_parsers/body_parser_handler' );
 const PluginInterface			= require( './server/plugins/plugin_interface' );
-const PluginManager				= require( './server/plugins/preloaded_plugins' );
 const Logging					= require( './server/components/logger/loggur' );
 const DataServer				= require( './server/components/caching/data_server' );
 const Testing					= require( './server/tester/tester' );
@@ -25,11 +23,14 @@ let Server	= ( options )=>{
 	return serverInstance;
 };
 
+// Holds tools for third party tools
+let Development	= {
+	PluginInterface, DataServer
+};
+
 module.exports	= {
-	Server,			Router,
-	DataServer,		PluginManager,
-	SessionHandler,	BodyParserHandler,
-	Testing,		PluginInterface,
-	Logging,		Loggur,
-	LOG_LEVELS
+	Server,		Router,
+	Testing,	BodyParserHandler,
+	Logging,	Loggur,
+	LOG_LEVELS,	Development
 };

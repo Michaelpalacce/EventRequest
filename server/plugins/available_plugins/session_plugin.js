@@ -1,40 +1,69 @@
 'use strict';
 
-const PluginInterface	    = require( '../plugin_interface' );
-const { SessionHandler }	= require( '../../components/session/session_handler' );
+const PluginInterface					= require( './../plugin_interface' );
+const { Session, SESSIONS_NAMESPACE }	= require( '../../components/session/session' );
 
 /**
- * @brief	Session plugin responsible for managing the security and session
+ * @brief	Adds session the the event request
  */
 class SessionPlugin extends PluginInterface
 {
 	/**
-	 * @brief	Attaches the session to the event_request
+	 * @brief	Adds a session to the event request
 	 *
 	 * @return	Array
 	 */
 	getPluginMiddleware()
 	{
-		let pluginMiddleware	= {
-			handler	: ( event ) =>{
-				let sessionHandler	= new SessionHandler( event, this.options );
-				sessionHandler.handle( ( err ) =>{
-					event.next();
-				});
+		let setUpPluginMiddleware	= {
+			handler	: ( event ) =>
+			{
+				if ( event.session == null )
+				{
+					event.session	= new Session( event, this.options );
+
+					event.on( 'cleanUp', ()=>{
+						event.session	= undefined;
+					} );
+
+					event.on( 'send', ()=>{
+						event.session.saveSession( ()=>{} );
+					} );
+				}
+
+				event.cachingServer.existsNamespace( SESSIONS_NAMESPACE ).then( ( exist )=>{
+					if ( ! exist )
+					{
+						event.cachingServer.createNamespace( SESSIONS_NAMESPACE ).then( event.next ).catch( event.next );
+					}
+					else
+					{
+						event.next();
+					}
+				} ).catch( event.next );
 			}
 		};
 
-		return [pluginMiddleware];
-	}
+		let initSessionForPathMiddleware	= {
+			handler	: ( event )=>{
+				event.initSession	= ( callback )=>{
+					event.session.hasSession( ( hasSession )=>{
+						if ( ! hasSession )
+						{
+							event.session.newSession( callback );
+						}
+						else
+						{
+							event.session.fetchSession( callback );
+						}
+					});
+				};
 
-	/**
-	 * @brief	Requires the event_request_memory_cache to work
-	 *
-	 * @return	Array
-	 */
-	getPluginDependencies()
-	{
-		return	['er_cache_server'];
+				event.next();
+			}
+		};
+
+		return [setUpPluginMiddleware, initSessionForPathMiddleware];
 	}
 }
 
