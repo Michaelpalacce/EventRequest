@@ -36,13 +36,15 @@ test({
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 		let namespace			= 'rcp';
 
-		responseCachePlugin.setUpNamespace( cachingServer );
+		cachingServer.setUp().then(()=>{
+			responseCachePlugin.setUpNamespace( cachingServer );
 
-		setTimeout(()=>{
-			cachingServer.existsNamespace( namespace ).then( ( exists )=>{
-				exists === true ? done() : done( `The namespace ${namespace} does not exist` );
-			} ).catch( done )
-		}, 250 );
+			setTimeout(()=>{
+				cachingServer.existsNamespace( namespace ).then( ( exists )=>{
+					exists === true ? done() : done( `The namespace ${namespace} does not exist` );
+				} ).catch( done )
+			}, 250 );
+		});
 	}
 });
 

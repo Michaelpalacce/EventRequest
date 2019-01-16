@@ -15,7 +15,7 @@ test({
 			cachingServer.createNamespace( SESSIONS_NAMESPACE ).then( ( err )=>{
 				done();
 			}).catch( done );
-		})
+		});
 	}
 });
 
