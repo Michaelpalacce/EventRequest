@@ -1,7 +1,7 @@
 4.1.0
 - Added new .env processor plugin that will load variables from a .env file to the process.env. This is done only when the plugin is first attached to the server
 - Added tests for the environment processor plugin
-- If the .env file changes then the environment will be loaded once MORE into the process.env the plugin will detect any changes
+- If the .env file changes then the environment will be loaded once MORE into the process.env the plugin will detect any changes ( planned for a future version )
 
 4.0.0
 - Removed security module
