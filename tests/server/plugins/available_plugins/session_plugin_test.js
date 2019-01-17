@@ -8,7 +8,7 @@ const { Session, SESSIONS_NAMESPACE }	= require( './../../../../server/component
 const Router							= require( '../../../../server/components/routing/router' );
 
 test({
-	message	: 'setUp to create namespace',
+	message	: 'SessionPlugin setUp to create namespace',
 	test	: ( done )=>{
 		let cachingServer	= helpers.getCachingServer();
 

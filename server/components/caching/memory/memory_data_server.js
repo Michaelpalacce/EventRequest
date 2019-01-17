@@ -90,8 +90,7 @@ class MemoryDataServer extends DataServer
 
 		socket.on( 'error', ( error )=>{
 			callback({
-				error	: true,
-				data	: error
+				error	: error
 			});
 		});
 

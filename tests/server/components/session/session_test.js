@@ -7,7 +7,7 @@ const EventRequest						= require( './../../../../server/event' );
 const { DataServer }					= require( './../../../../server/components/caching/data_server' );
 
 test({
-	message	: 'setUp to create namespace',
+	message	: 'Session setUp to create namespace',
 	test	: ( done )=>{
 		let cachingServer	= helpers.getCachingServer();
 

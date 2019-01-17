@@ -5,7 +5,7 @@ const fs	= require( 'fs' );
 
 // If it is windows then create a named pipe if not use UNIX sockets
 const isWinOs	= process.platform === 'win32';
-const PIPE_PATH	= isWinOs ? "\\\\.\\pipe\\" + __dirname : '/tmp/memory_data_client.sock';
+const PIPE_PATH	= isWinOs ? "\\\\.\\pipe\\" + __filename : '/tmp/memory_data_client.sock';
 
 /**
  * @brief	Constants
