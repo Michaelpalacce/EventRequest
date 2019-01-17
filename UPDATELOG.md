@@ -1,3 +1,7 @@
+4.2.0
+- Major fixes to the memory data server
+- Added Linux support
+
 4.1.0
 - Added new .env processor plugin that will load variables from a .env file to the process.env. This is done only when the plugin is first attached to the server
 - Added tests for the environment processor plugin
