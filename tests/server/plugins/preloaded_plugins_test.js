@@ -10,6 +10,7 @@ test({
 
 		assert.doesNotThrow(()=>{
 			PreLoadedPluginManager.getPlugin( 'er_timeout' );
+			PreLoadedPluginManager.getPlugin( 'er_env' );
 			PreLoadedPluginManager.getPlugin( 'er_static_resources' );
 			PreLoadedPluginManager.getPlugin( 'er_cache_server' );
 			PreLoadedPluginManager.getPlugin( 'er_session' );

@@ -971,3 +971,26 @@ server.add({
 ~~~
 
 ##
+
+##
+* er_env -> loads .env file into the process.env
+##
+    * Accepted Options:
+        callback -> This is a negative error callback that returns false if there was no problem setting up the plugin, true if there was
+        fileLocation -> Where the .env file is. This must be an absolute path to the file, defaults to
+            The directory from where the node process was run and searches for a .env file there
+
+~~~javascript
+let server	= Server();
+
+server.apply( 'er_env', {
+	callback	: ()=>{
+		console.log( process.env.KEY ); // PROVIDED THAT THERE WAS AN .env FILE THEN THIS WILL DISPLAY THE VALUE OF IT
+	}
+});
+
+server.start();
+
+~~~
+
+##

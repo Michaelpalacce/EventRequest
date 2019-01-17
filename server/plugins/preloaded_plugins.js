@@ -2,6 +2,7 @@
 
 const PluginManagerClass										= require( './plugin_manager' );
 const TimeoutPlugin												= require( './available_plugins/timeout_plugin' );
+const EnvPlugin													= require( './available_plugins/env_plugin' );
 const StaticResourcesPlugin										= require( './available_plugins/static_resources_plugin' );
 const MemoryDataServerPlugin									= require( './available_plugins/memory_data_server_plugin' );
 const TemplatingEnginePlugin									= require( './available_plugins/templating_engine_plugin' );
@@ -39,6 +40,7 @@ let bodyParserMultipartPlugin	= new BodyParserPlugin(
 );
 
 PluginManager.addPlugin( new TimeoutPlugin( 'er_timeout' ) );
+PluginManager.addPlugin( new EnvPlugin( 'er_env' ) );
 PluginManager.addPlugin( new StaticResourcesPlugin( 'er_static_resources' ) );
 PluginManager.addPlugin( new MemoryDataServerPlugin( 'er_cache_server' ) );
 PluginManager.addPlugin( new TemplatingEnginePlugin( 'er_templating_engine' ) );
