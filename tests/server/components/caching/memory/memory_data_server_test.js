@@ -174,10 +174,12 @@ test({
 			}
 
 			testServer.create( 'test', 'testRecord', { testKey: 'testValue' }, { ttl : 1 } ).then(()=>{
-				testServer.exists( 'test', 'testRecord', {} ).then(( exists )=>{
-					assert.equal( exists, false );
-					done();
-				}).catch( done );
+				setTimeout(()=>{
+					testServer.exists( 'test', 'testRecord', {} ).then(( exists )=>{
+						assert.equal( exists, false );
+						done();
+					}).catch( done );
+				}, 100 );
 			}).catch( done );
 		});
 	}

@@ -34,7 +34,7 @@ class MemoryDataServerPlugin extends PluginInterface
 				callback( false, this.server );
 			};
 			let onRejected	= ( err )=>{
-				Loggur.log( err, LOG_LEVELS.error );
+				Loggur.log( `Non false returned when trying to setUp caching server: ${err}`, LOG_LEVELS.error );
 				this.server	= null;
 
 				callback( err );

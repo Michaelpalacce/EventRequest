@@ -49,6 +49,7 @@ class Tester
 		this.successes		= [];
 		this.skipped		= [];
 		this.incomplete		= [];
+		Loggur.disableDefault();
 		this.consoleLogger	= Loggur.createLogger({
 			serverName	: 'Tester',
 			logLevel	: DEFAULT_LOG_LEVEL,

@@ -1,9 +1,11 @@
 'use strict';
 
 const net	= require( 'net' );
+const fs	= require( 'fs' );
 
-// Test if it works on linux?
-const PIPE_PATH	= "\\\\.\\pipe\\" + __filename;
+// If it is windows then create a named pipe if not use UNIX sockets
+const isWinOs	= process.platform === 'win32';
+const PIPE_PATH	= isWinOs ? "\\\\.\\pipe\\" + __dirname : '/tmp/memory_data_client.sock';
 
 /**
  * @brief	Constants
@@ -33,7 +35,50 @@ class MemoryWorker
 		this.data			= {};
 		this.timeouts		= {};
 		this.memoryLimit	= 0;
-		this.setUpServer();
+		this.connections	= {};
+
+		if ( ! isWinOs )
+		{
+			fs.stat( PIPE_PATH, ( err, stats )=> {
+				if ( err )
+				{
+					this.setUpServer();
+					return;
+				}
+
+				fs.unlink( PIPE_PATH, ( err )=> {
+					if( err )
+					{
+						process.send({
+							error	: true,
+							data	: 'Could not unlink socket file'
+						});
+						process.exit( 0 );
+					}
+
+					this.setUpServer();
+				});
+			});
+		}
+		else
+		{
+			this.setUpServer();
+		}
+
+		process.on( 'SIGINT', ()=>{
+			if( Object.keys( this.connections ).length )
+			{
+				let clients	= Object.keys( this.connections );
+				while( clients.length )
+				{
+					let client	= clients.pop();
+					this.connections[client].write( '__disconnect' );
+					this.connections[client].end();
+				}
+			}
+			this.server.close();
+			process.exit( 0 );
+		});
 	}
 
 	/**
@@ -45,6 +90,12 @@ class MemoryWorker
 	{
 		// Create a new server
 		this.server	= net.createServer( ( stream ) => {
+			let self	= Date.now();
+			this.connections[self] = (stream);
+			stream.on( 'end', ()=>{
+				delete this.connections[self];
+			});
+
 			// Listen for incoming data
 			stream.on( 'data', ( chunk ) => {
 				chunk	= chunk.toString( 'utf8' );

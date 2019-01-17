@@ -15,17 +15,37 @@ class Loggur
 {
 	constructor()
 	{
-		this.loggers		= {};
-		this.defaultLogger	= null;
-
-		let uniqueId		= cluster.isMaster
-							? 'Master'
-							: 'Worker/' + process.pid;
+		this.loggers				= {};
+		this.defaultLogger			= null;
+		this.enableDefaultLogger	= true;
+		let uniqueId				= cluster.isMaster
+									? 'Master'
+									: 'Worker/' + process.pid;
 
 		Object.defineProperty( this, 'uniqueId', {
 			writable	: false,
 			value		: uniqueId
 		});
+	}
+
+	/**
+	 * @brief	Enables the default logger
+	 *
+	 * @return	void
+	 */
+	enableDefault()
+	{
+		this.enableDefaultLogger	= true;
+	}
+
+	/**
+	 * @brief	Disables the default logger
+	 *
+	 * @return	void
+	 */
+	disableDefault()
+	{
+		this.enableDefaultLogger	= false;
 	}
 
 	/**
@@ -66,6 +86,7 @@ class Loggur
 	getLogger( loggerId )
 	{
 		let logger	= this.loggers[loggerId];
+		if ( logger === undefined )
 		if ( logger === undefined )
 		{
 			return false;
@@ -124,7 +145,10 @@ class Loggur
 		}
 		else
 		{
-			loggersPromises.push( this.getDefaultLogger().log( data, level ) );
+			if ( this.enableDefaultLogger )
+			{
+				loggersPromises.push( this.getDefaultLogger().log( data, level ) );
+			}
 		}
 
 		return Promise.all( loggersPromises );

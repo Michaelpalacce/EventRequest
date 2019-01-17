@@ -20,6 +20,7 @@ Includes:
 - Caching ( in memory )
 - Input Validation
 - Plugin support
+- Env Loader
 
 ~~~javascript
 const { Server, Loggur }	= require( 'event_request' );
@@ -190,6 +191,8 @@ Read down to the Plugin section for more information
 # Logging
 
 The Loggur can be accessed directly from the server { Loggur }
+It has a default logger attached to it that will log to the console. it can be enabled or disabled by calling
+Loggur.enableDefault() or Loggur.disableDefault()
 
 The Loggur can be used to create Loggers which accept the following options:
 * **serverName** - String - The name of the server to be concatenated with the uniqueId - Defaults to empty
@@ -967,29 +970,6 @@ server.add({
         event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } );
 	}
 });
-
-~~~
-
-##
-
-##
-* er_env -> loads .env file into the process.env
-##
-    * Accepted Options:
-        callback -> This is a negative error callback that returns false if there was no problem setting up the plugin, true if there was
-        fileLocation -> Where the .env file is. This must be an absolute path to the file, defaults to
-            The directory from where the node process was run and searches for a .env file there
-
-~~~javascript
-let server	= Server();
-
-server.apply( 'er_env', {
-	callback	: ()=>{
-		console.log( process.env.KEY ); // PROVIDED THAT THERE WAS AN .env FILE THEN THIS WILL DISPLAY THE VALUE OF IT
-	}
-});
-
-server.start();
 
 ~~~
 

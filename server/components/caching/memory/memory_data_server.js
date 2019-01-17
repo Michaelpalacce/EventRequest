@@ -6,7 +6,7 @@ const fork							= require( 'child_process' ).fork;
 const net							= require( 'net' );
 
 const PIPE_NAME						= path.join( __dirname, 'memory_data_client.js' );
-const PIPE_PATH						= "\\\\.\\pipe\\" + PIPE_NAME;
+const PIPE_PATH						= process.platform === 'win32' ? "\\\\.\\pipe\\" + PIPE_NAME : '/tmp/memory_data_client.sock';
 
 /**
  * @brief	Simple caching server that stores cache in memory
