@@ -1,3 +1,7 @@
+4.2.1
+- Added the file system watcher on the .env file
+- Old environment variables will be removed when the event is triggered
+
 4.2.0
 - Major fixes to the memory data server
 - Added Linux support

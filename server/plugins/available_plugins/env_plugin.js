@@ -8,12 +8,75 @@ const { Loggur }		= require( '../../components/logger/loggur' );
 
 const ENV_FILENAME	= '.env';
 const ENV_SEPARATOR	= '=';
+const CHANGE_EVENT	= 'change';
 
 /**
  * @brief	Env Plugin responsible for parsing .env file and adding those variables to the process.env
  */
-class Env_plugin extends PluginInterface
+class EnvPlugin extends PluginInterface
 {
+	constructor( id, options )
+	{
+		super( id, options );
+
+		this.envVariableKeys	= [];
+	}
+
+	/**
+	 * @brief	Removes the old environment variables so new ones can be set
+	 *
+	 * @return	void
+	 */
+	removeOldEnvVariables()
+	{
+		this.envVariableKeys.forEach(( envKey )=>{
+			delete process.env[envKey];
+		})
+	}
+
+	/**
+	 * @brief	Loads the file to the process.env
+	 *
+	 * @param	Function callback
+	 *
+	 * @return	void
+	 */
+	loadFileInEnv( callback = ()=>{} )
+	{
+		let absFilePath		= this.getEnvFileAbsPath();
+		let fileExists		= fs.existsSync( absFilePath );
+		if ( fileExists )
+		{
+			this.removeOldEnvVariables();
+			// Reset the env variables array so we can populate it anew
+			this.envVariableKeys	= [];
+
+			let lineReader	= readline.createInterface({
+				input	: fs.createReadStream( absFilePath )
+			});
+
+			lineReader.on( 'line', ( line )=>{
+
+				let parts	= line.split( ENV_SEPARATOR );
+				let key		= parts.shift();
+
+				this.envVariableKeys.push( key );
+
+				process.env[key]	= parts.join( ENV_SEPARATOR );
+			});
+
+			lineReader.on( 'close', ()=>{
+				callback( false );
+			} );
+		}
+		else
+		{
+			let errorMessage	= `Trying to load .env file from ${absFilePath} but it doesn't exist`;
+			Loggur.log( errorMessage );
+			callback( errorMessage );
+		}
+	}
+
 	/**
 	 * @brief	Loads the env variables on runtime
 	 *
@@ -23,38 +86,44 @@ class Env_plugin extends PluginInterface
 	 */
 	setServerOnRuntime( server )
 	{
-		let fileLocation	= typeof this.options.fileLocation === 'string'
-							? this.options.fileLocation
-							: path.join( path.parse( require.main.filename ).dir, ENV_FILENAME );
-
 		let callback		= typeof this.options.callback === 'function'
 							? this.options.callback
 							: ()=>{};
 
-		let fileExists		= fs.existsSync( fileLocation );
-		if ( fileExists )
-		{
-			let lineReader	= readline.createInterface({
-				input	: fs.createReadStream( fileLocation )
-			});
+		this.loadFileInEnv( callback );
+		this.attachFileWatcherToEnvFile();
+	}
 
-			lineReader.on( 'line', ( line )=>{
+	/**
+	 * @brief	Gets the absolute file path to the .env file
+	 *
+	 * @return	String
+	 */
+	getEnvFileAbsPath()
+	{
+		return typeof this.options.fileLocation === 'string'
+			? this.options.fileLocation
+			: path.join( path.parse( require.main.filename ).dir, ENV_FILENAME )
+	}
 
-				let parts	= line.split( ENV_SEPARATOR );
+	/**
+	 * @brief	Attach a file watcher to the env file to reload the env variables on change
+	 *
+	 * @param	String absFilePath
+	 *
+	 * @return	void
+	 */
+	attachFileWatcherToEnvFile()
+	{
+		let absFilePath		= this.getEnvFileAbsPath();
 
-				process.env[parts.shift()]	= parts.join( ENV_SEPARATOR );
-			});
-
-			lineReader.on( 'close', ()=>{
-				callback( false );
-			} );
-		}
-		else
-		{
-			Loggur.log( `Trying to load .env file from ${fileLocation} but it doesn't exist` );
-			callback( true );
-		}
+		fs.watch( absFilePath, ( eventType )=>{
+			if ( eventType === CHANGE_EVENT )
+			{
+				this.loadFileInEnv();
+			}
+		});
 	}
 }
 
-module.exports	= Env_plugin;
+module.exports	= EnvPlugin;
