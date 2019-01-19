@@ -34,7 +34,7 @@ test({
 });
 
 test({
-	message	: 'PluginManager addPlugin throws if plugin id exists',
+	message	: 'PluginManager addPlugin does not throw if plugin id exists',
 	test	: ( done )=>{
 		let pluginManager		= new PluginManager();
 		let timeoutPluginOne	= new TimeoutPlugin( 'id', {} );
@@ -42,7 +42,7 @@ test({
 
 		pluginManager.addPlugin( timeoutPluginOne );
 
-		assert.throws(()=>{
+		assert.doesNotThrow( ()=>{
 			pluginManager.addPlugin( timeoutPluginTwo );
 		});
 

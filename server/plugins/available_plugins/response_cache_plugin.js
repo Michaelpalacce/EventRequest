@@ -33,7 +33,7 @@ class ResponseCachePlugin extends PluginInterface
 	setUpNamespace( cachingServer, callback = ()=>{} )
 	{
 		let onRejected		= ( err )=>{
-			Loggur.log( 'Error setting up the caching server', LOG_LEVELS.notice );
+			Loggur.log( 'Error setting up the namespace', LOG_LEVELS.notice );
 			callback( err );
 		};
 

@@ -21,7 +21,7 @@ class PluginManager
 	 */
 	addPlugin( plugin )
 	{
-		if ( plugin instanceof PluginInterface && ! this.hasPlugin( plugin.getPluginId() ) )
+		if ( plugin instanceof PluginInterface )
 		{
 			this.plugins[plugin.getPluginId()]	= plugin;
 		}

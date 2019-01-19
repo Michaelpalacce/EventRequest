@@ -34,3 +34,9 @@ module.exports	= {
 	Logging,	Loggur,
 	LOG_LEVELS,	Development
 };
+
+const server	= Server();
+
+server.apply( 'er_rate_limits' );
+
+server.start();
