@@ -118,10 +118,10 @@ class Loggur
 		{
 			this.defaultLogger	= this.createLogger({
 				serverName	: 'DefaultLogger',
-				logLevel	: LOG_LEVELS.error
+				logLevel	: LOG_LEVELS.warning
 			});
 		}
-		
+
 		return this.defaultLogger;
 	}
 

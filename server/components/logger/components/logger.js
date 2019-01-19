@@ -83,7 +83,10 @@ class Logger
 
 		if ( this.transports.length === 0 )
 		{
-			this.transports.push( new Console() );
+			this.transports.push( new Console({
+				logLevel	: this.logLevel,
+				logLevels	: this.logLevels
+			}) );
 		}
 
 		this.attachLogLevelsToLogger();

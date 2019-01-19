@@ -73,3 +73,25 @@ test({
 		});
 	}
 });
+
+test({
+	message	: 'LoggerPlugin setServerOnRuntime attaches process',
+	test	: ( done )=>{
+		let MockServer		= Mock( helpers.getServer().constructor );
+		let server			= new MockServer();
+		let noAttachPlugin	= new LoggerPlugin( 'id', {} );
+		let attachPlugin	= new LoggerPlugin( 'id' );
+
+		noAttachPlugin.setServerOnRuntime( server );
+
+		assert.equal( 'undefined', typeof process.dumpStack );
+		assert.equal( 'undefined', typeof process.log );
+
+		attachPlugin.setServerOnRuntime( server );
+
+		assert.equal( 'function', typeof process.dumpStack );
+		assert.equal( 'function', typeof process.log );
+
+		done();
+	}
+});

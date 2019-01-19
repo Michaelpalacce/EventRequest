@@ -1,19 +1,40 @@
 'use strict';
 
-const PluginInterface		= require( '../plugin_interface' );
-const Logging				= require( './../../components/logger/loggur' );
-const { Logger, Loggur }	= Logging;
+const PluginInterface			= require( '../plugin_interface' );
+const Logging					= require( './../../components/logger/loggur' );
+const { Logger, Loggur, Log }	= Logging;
 
 /**
  * @brief	Logger plugin used to attach logs at different levels in the app
  */
 class LoggerPlugin extends PluginInterface
 {
-	constructor( pluginId, options = {} )
+	constructor( pluginId, options = { attachToProcess: true } )
 	{
 		super( pluginId, options );
 
 		this.logger	= null;
+	}
+
+	/**
+	 * @brief	Attaches a process.dumpStack and process.log function for easier use
+	 *
+	 * @param	Server server
+	 *
+	 * @return	void
+	 */
+	setServerOnRuntime( server )
+	{
+		if ( this.options.attachToProcess === true )
+		{
+			process.dumpStack	= ()=>{
+				console.log( Log.getStackTrace() );
+			};
+
+			process.log			= ( log, level )=>{
+				this.getLogger().log( log, level );
+			};
+		}
 	}
 
 	/**

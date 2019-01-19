@@ -988,15 +988,18 @@ const PluginManager		= server.getPluginManager();
 let fileStreamPlugin	= PluginManager.getPlugin( 'er_file_stream' );
 server.apply( fileStreamPlugin );
 ~~~
-##
 
+***
 
-##
-* er_logger -> Adds a logger to the eventRequest
-## 
-    * Accepted options: 
-    * - logger - Object - Instance of Logger, if incorrect object provided, defaults to the default logger from the Loggur
-
+###er_logger 
+Adds a logger to the eventRequest
+Attaches a dumpStack() function as well as log( data, level ) function to the process for easier access
+This can be controlled and turned off. The process.log( data, level ) calls the given logger
+ 
+    Accepted options: 
+    **logger** - Object - Instance of Logger, if incorrect object provided, defaults to the default logger from the Loggur
+    **attachToProcess** - Object - Boolean whether the plugin should attach dumpStack and log to the process
+***
 ~~~javascript
 const PluginManager		= server.getPluginManager();
 let loggerPlugin    	= PluginManager.getPlugin( 'er_logger' );
@@ -1133,3 +1136,6 @@ server.start();
 ~~~
 
 ***
+
+### er_rate_limits
+Adds a Rate limits plugin to the server. The rate limits plugin can monitor incoming requests and stop them if they are too many

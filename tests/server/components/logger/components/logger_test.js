@@ -13,7 +13,7 @@ test({
 	message	: 'Logger.constructor on valid arguments',
 	test	: ( done )=>{
 		let serverName				= 'Test';
-		let logLevel				= LOG_LEVELS.error;
+		let logLevel				= LOG_LEVELS.debug;
 		let logLevels				= LOG_LEVELS;
 		let capture					= false;
 		let dieOnCapture			= true;
@@ -78,6 +78,7 @@ test({
 		assert.deepStrictEqual( logger.dieOnCapture, true );
 		assert.deepStrictEqual( logger.unhandledExceptionLevel, LOG_LEVELS.error );
 		assert.deepStrictEqual( logger.transports, [new Console()] );
+		assert.deepStrictEqual( logger.transports[0].logLevel, LOGGER_DEFAULT_LOG_LEVEL );
 		assert.deepStrictEqual( logger.uniqueId, 'id' );
 		assert.deepStrictEqual( typeof logger.error, 'function' );
 		assert.deepStrictEqual( typeof logger.warning, 'function' );

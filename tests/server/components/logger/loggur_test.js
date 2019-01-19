@@ -119,7 +119,7 @@ test({
 		let defaultLogger	= loggur.getDefaultLogger();
 
 		assert.equal( defaultLogger.serverName, 'DefaultLogger' );
-		assert.equal( defaultLogger.logLevel, LOG_LEVELS.error );
+		assert.equal( defaultLogger.logLevel, LOG_LEVELS.warning );
 
 		done();
 	}

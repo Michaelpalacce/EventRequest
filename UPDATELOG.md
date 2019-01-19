@@ -1,3 +1,11 @@
+4.3.0
+- Fix so the default logger will have a higher Log level
+- Fix so by default the console created in case of no transports in the logger will have the same log level and logLevels as the Logger
+- Added Log.getStackTrace() that returns a string with a sanitized stack trace for debugging
+- Modified the logger plugin to modify the process global object by adding dumpStack() and log functions
+- Added rate limits Plugin 
+- Added tests for rate limits plugin
+
 4.2.3 
 - You can now choose to disable all the pre-installed plugins
 - Added new tests to the server as well as tests to test the applyPlugins functionality.
