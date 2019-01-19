@@ -130,7 +130,6 @@ test({
 	}
 });
 
-
 test({
 	message	: 'Server.apply applies only a PluginInterface and a valid string',
 	test	: ( done ) =>{
@@ -152,6 +151,98 @@ test({
 
 		// 2 added 3 pre loaded
 		assert.equal( 5, server.router.middleware.length );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.get works as intended',
+	test	: ( done ) =>{
+		let server			= new Server( { plugins: false } );
+		let eventRequest	= helpers.getEventRequest( 'GET', '/' );
+
+		server.get( '/', ( event )=>{
+			event.next();
+		});
+
+		server.get( '/test', ( event )=>{
+			event.next();
+		});
+
+		let router	= server.router;
+		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
+
+		assert.equal( 1, block.length );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.post works as intended',
+	test	: ( done ) =>{
+		let server			= new Server( { plugins: false } );
+		let eventRequest	= helpers.getEventRequest( 'POST', '/' );
+
+		server.post( '/', ( event )=>{
+			event.next();
+		});
+
+		server.post( '/test', ( event )=>{
+			event.next();
+		});
+
+		let router	= server.router;
+		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
+
+		assert.equal( 1, block.length );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.delete works as intended',
+	test	: ( done ) =>{
+		let server			= new Server( { plugins: false } );
+		let eventRequest	= helpers.getEventRequest( 'DELETE', '/' );
+
+		server.delete( '/', ( event )=>{
+			event.next();
+		});
+
+		server.delete( '/test', ( event )=>{
+			event.next();
+		});
+
+		let router	= server.router;
+		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
+
+		assert.equal( 1, block.length );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.put works as intended',
+	test	: ( done ) =>{
+		let server			= new Server( { plugins: false } );
+		let eventRequest	= helpers.getEventRequest( 'PUT', '/' );
+
+		server.put( '/', ( event )=>{
+			event.next();
+		});
+
+		server.put( '/test', ( event )=>{
+			event.next();
+		});
+
+		let router	= server.router;
+		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
+
+		assert.equal( 1, block.length );
 
 		done();
 	}

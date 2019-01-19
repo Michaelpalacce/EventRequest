@@ -155,7 +155,7 @@ class EventRequest extends EventEmitter
 	 */
 	send( response, code = 200, raw = false )
 	{
-		this.response.statusCode	= typeof code === 'number' ? code : 200;
+		this.setStatusCode( code );
 
 		if ( typeof response.pipe === 'function' && response instanceof Streams.Readable )
 		{
@@ -242,6 +242,18 @@ class EventRequest extends EventEmitter
 	hasHeader( key )
 	{
 		return typeof this.headers[key] !== 'undefined';
+	}
+
+	/**
+	 * @brief	Sets the status code of the response
+	 *
+	 * @param	Number code
+	 *
+	 * @return	void
+	 */
+	setStatusCode( code )
+	{
+		this.response.statusCode	= typeof code === 'number' ? code : 200
 	}
 
 	/**

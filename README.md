@@ -10,11 +10,8 @@ const { Server, Loggur }	= require( 'event_request' );
 const server	= Server();
 
 // Add a new Route
-server.add({
-	route	: '/',
-	handler	: ( event ) => {
-		event.send( '<h1>Hello World!</h1>' )
-	}
+server.get( '/', ( event ) => {
+	event.send( '<h1>Hello World!</h1>' );
 });
 
 server.start( ()=>{
@@ -22,42 +19,7 @@ server.start( ()=>{
 });
 ~~~
 
-# Event Request
-
-The event request is an object that is created by the server and passed through every single middleware.
-It contains the following properties:
-* queryString - Object - the query string
-* path - String - the current path
-* response - Response - the response to be sent to the user 
-* request - Request - the request send by the user
-* method - String - the current method ( GET, POST, DELETE, PUT, etc)
-* headers - Object - the current headers 
-* validationHandler - ValidationHandler - A handler used to do input validation
-* extra - Object - an object that holds extra data that is passed between middlewares
-* cookies - Object - the current cookies
-* params - Object - request url params that are set by the router
-* block - Array - The execution block of middlewares
-* logger - Logger - Logs data
-
-Functions exported by the event request:
-
-* setCookie( name, value ) - > sets a new cookie
-* cleanUp - cleans up the event request. Usually called at the end of the request. Emits a cleanUp event and a finished event
-    This also removes all other event listeners and sets all the properties to undefined
-* send( response, statusCode, raw ) - sends the response to the user with the specified statusCode
-* * if response is a stream then the stream will be piped to the response
-* * if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be 
-a string or if it is not a sting it will be JSON stringified. Emits a 'send' event and calls cleanUp
-* setHeader( key, value ) - sets a new header to the response and emits a 'setHeader' event. If the response is finished then an error will be set to the next middleware
-* redirect( redirectUrl, statusCode ) - redirect to the given url with the specified status code (defaults to 302 ). 
-Emits a 'redirect' event. If the response is finished then an error will be set to the next middleware
-* isFinished - checks if the response is finished
-* setBlock - sets the middleware execution block for the event_request
-* next - Calls the next middleware in the execution block. If there is nothing else to send and the response has not been sent YET, then send a server error
-if the event is stopped and the response has not been set then send a server error
-* sendError - Like send but used to send errors 
-
-# Properties exported by the Server:
+#Properties exported by the Module:
 	Server,				// Server callback. Use this to create a new server. The server instance can be retrieved from anywhere by: Server();
 	Router,				// The router. Can be used to add routes to it and then to the main server route
 	Development,		// Holds Development tools
@@ -66,20 +28,107 @@ if the event is stopped and the response has not been set then send a server err
 	Logging,			// Contains helpful logging functions
 	Loggur,				// Easier access to the Logging.Loggur instance
 	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
-
-# Properties exported by Development:
+### Properties exported by Development:
 	PluginInterface,	// Used to add plugins to the system
 	DataServer,			// Instance to be extended to implement your own DataServer
 
-# Server Options
+***
+***
+***
 
-The server is exported from the main module:
+# Event Request
+The event request is an object that is created by the server and passed through every single middleware.
 
+### Properties of eventRequest
+**queryString** - Object - the query string
+
+**path** - String - the current path
+
+**response** - Response - the response to be sent to the user 
+
+**request** - Request - the request send by the user
+
+**method** - String - the current method ( GET, POST, DELETE, PUT, etc)
+
+**headers** - Object - the current headers 
+
+**validationHandler** - ValidationHandler - A handler used to do input validation
+
+**extra** - Object - an object that holds extra data that is passed between middlewares
+
+**cookies** - Object - the current cookies
+
+**params** - Object - request url params that are set by the router
+
+**block** - Array - The execution block of middlewares
+
+**logger** - Logger - Logs data
+
+
+###Functions exported by the event request:
+
+**setCookie( name, value )** - > sets a new cookie
+
+**setStatusCode( Number code )** - > sets the status code of the response
+
+**cleanUp** - cleans up the event request. Usually called at the end of the request. Emits a cleanUp event and a finished event. This also removes all other event listeners and sets all the properties to undefined
+
+**send( response, statusCode, raw )** - sends the response to the user with the specified statusCode
+* if response is a stream then the stream will be piped to the response
+* if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. Emits a 'send' event and calls cleanUp
+
+**setHeader( key, value )** - sets a new header to the response and emits a 'setHeader' event. If the response is finished then an error will be set to the next middleware
+
+**redirect( redirectUrl, statusCode )** - redirect to the given url with the specified status code (defaults to 302 ). Emits a 'redirect' event. If the response is finished then an error will be set to the next middleware
+
+**isFinished()** - returns a Boolean. Checks if the response is finished
+
+**next** - Calls the next middleware in the execution block. If there is nothing else to send and the response has not been sent YET, then send a server error. If the event is stopped and the response has not been set then send a server error
+
+**sendError( error = '', code = 500 )** - Like send but used to send errors. This will emit an 'on_error' event as well as the usual send events 
+
+### Events emitted by the EventRequest
+
+**cleanUp** - no arguments - Emitted when the event request is cleaning up after finishing
+
+**finished** - no arguments - Emitted when even cleaning up has finished and the eventRequest is completed
+
+**send** - ( Object sendData ) - Emitted when a response has been sent.
+sendData contains: 
+    
+    **code** - Number - the status code returned
+    **raw** - Boolean - Whether the response was tried to be sent raw without parsing it to string first
+    **response** - Mixed - The response that was returned
+    **headers** - Object - The headers that were sent
+
+**setHeader** - ( Object headerData ) - Emitted when a new header was added to the response
+headerData contains:
+    
+    **key** - String - The header name
+    **value** - String - The header value
+
+**redirect** - ( Object redirectData ) - Emitted when a redirect response was sent
+redirectData contains:
+    
+    **redirectUrl** - String - the url to which the redirect response was sent
+    **statusCode** - String - the status code returned
+
+
+***
+***
+***
+
+# Server
+The main object of the framework. Holds the server that is listening for incoming requests, router  and the pluginManager. Can be configured.
+The Server exported from the event_request module is created like :
 ~~~javascript
-    const { Server } = require( 'event_request' )
+const { Server } = require( 'event_request' );
+let server = Server();
 ~~~
+No more than one server can be created, so every time Server() is called it will return the same instance.
+When creating the first instance, make sure to pass the desired options.
 
-The server callback accepts the following options:
+### The server callback accepts the following options:
 
 **protocol** - String - The protocol to be used ( http || https ) -> Defaults to http
 
@@ -89,34 +138,81 @@ The server callback accepts the following options:
 
 **plugins** - Boolean - A flag that determines if the pre-installed plugins should be enabled or not -> Defaults to true
 
-## The server is started by calling server.start();
+### Functions exported by the server:
+**getPluginManager()** - returns PluginManager - Returns an instance of the plugin manager attached to the server
+
+**add( Object|Route route )** - Adds a new route to the server
+
+**apply( String|Object plugin, Object options )** - Applies a new plugin with the specified options
+
+**getPlugin( String pluginId )** - PluginInterface returns the desired plugin
+
+**hasPlugin( String pluginId )** - Boolean - Checks whether a plugin has been added to the server. Note this does not work with the plugin manager
+
+**start( Function callback )** - Starts the server. Uses a negative callback. If there were no errors then false will be returned as well as the created server as a second argument
+
+**stop()** - Stops the server
+
+### Events emitted by the server
+**addRoute** - ( mixed route ) - When a new route is being added
+
+**serverStart** - no arguments - When the server is being started
+
+**serverStop** - no arguments - When the server is being stopped
+
+**serverCreationSuccess** - ( net.Server server, Number port ) - When the server is successfully started
+
+**serverCreationError** - ( net.Server server, Error error ) - When an error occurs while starting the server
+
+**eventRequestResolved** - ( EventRequest eventRequest, IncomingMessage request, ServerResponse response ) - When the event request is first created
+
+**eventRequestRequestClosed** - ( EventRequest eventRequest, IncomingMessage request ) - When the request gets closed
+
+**eventRequestResponseFinish** - ( EventRequest eventRequest, ServerResponse response ) - When the response is finished
+
+**eventRequestResponseError** - ( EventRequest eventRequest, ServerResponse response, Error error ) - When there is an error with the response
+
+**eventRequestBlockSetting** - ( EventRequest eventRequest, Array block ) - called when the block is retrieved from the router
+
+**eventRequestBlockSet** - ( EventRequest eventRequest, Array block ) - called when the block is set in the eventRequest
+
+**eventRequestError** - ( EventRequest eventRequest, Error error ) - called when there is an error event emitted by the eventRequest
+
+**eventRequestThrow** - ( EventRequest eventRequest, Error error ) - called when an error is thrown from the eventRequest
+
+***
+### Ways to add routes:
+The server has 2 ways of adding routes/middleware
+
+You can use .post, .put, .get, .delete methods from the server that accept Required parameters: ( String|RegExp route, Function handler )
+
+**route** -> String or RegExp -> the route to witch the middleware should be attached
+
+**handler** -> Function -> the middleware to be added
+
 ~~~javascript
-server.start( ()=>{
-	Loggur.log( 'Server started' );
-});
+let server	= Server();
+
+server.get( '/', ( event )=>{
+	event.send( '<h1>Hello World!</h1>');
+} );
+
+server.post( '/', ( event )=>{
+	event.send( ['ok']);
+} );
+
+server.delete( '/', ( event )=>{
+	event.send( ['ok']);
+} );
+
+server.put( '/', ( event )=>{
+	event.send( ['ok']);
+} );
+
+server.start();
 ~~~
 
 ***
-
-The server emits the following events:
-
-* addRoute - ( mixed route ) - When a new route is being added
-* serverStart - no arguments - When the server is being started
-* serverStop - no arguments - When the server is being stopped
-* serverCreationSuccess - ( net.Server server, Number port ) - When the server is successfully started
-* serverCreationError - ( net.Server server, Error error ) - When an error occurs while starting the server
-* eventRequestResolved - ( EventRequest eventRequest, IncomingMessage request, ServerResponse response ) - When the event request is first created
-* eventRequestRequestClosed - ( EventRequest eventRequest, IncomingMessage request ) - When the request gets closed
-* eventRequestResponseFinish - ( EventRequest eventRequest, ServerResponse response ) - When the response is finished
-* eventRequestResponseError - ( EventRequest eventRequest, ServerResponse response, Error error ) - When there is an error with the response
-* eventRequestBlockSetting - ( EventRequest eventRequest, Array block ) - called when the block is retrieved from the router
-* eventRequestBlockSet - ( EventRequest eventRequest, Array block ) - called when the block is set in the eventRequest
-* eventRequestError - ( EventRequest eventRequest, Error error ) - called when there is an error event emitted by the eventRequest
-* eventRequestThrow - ( EventRequest eventRequest, Error error ) - called when an error is thrown from the eventRequest
-
-***
-The server has 2 ways of adding routes/middleware
-
 When adding a Route the **server.add(route)** can be used
 
 ~~~javascript
@@ -124,19 +220,18 @@ server.add({
 	route	: '/',
 	method	: 'GET',
 	handler	: ( event ) => {
-		Loggur.log( 'Hello From the Loggur' );
 		event.next( '<h1>Hello World!</h1>' )
 	}
 });
 ~~~
+**handler** - Function - The callback function ! Required
 
-route accepts 3 parameters:
-* handler - Function - The callback function ! Required
-* route - String|RegExp - The route to match - optional if omitted the handler will be called on every request
-* method - String|Array - The method(s) to be matched for the route - optional if omitted the handler will be called on every request as long as the route matches
+**route** - String|RegExp - The route to match - optional if omitted the handler will be called on every request
+
+**method** - String|Array - The method(s) to be matched for the route - optional if omitted the handler will be called on every request as long as the route matches
 
 ***
-
+### Plugins
 Plugins can be added by using **server.apply( pluginContainerInstance||'pluginId', options )**
 Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
 plugin all you have to do is do: server.apply( 'pluginId' )
@@ -152,22 +247,23 @@ server.apply( 'er_timeout' ); // This is also valid.
 server.apply( 'er_timeout', {  timeout : 10 * 1000 } ); // This is also valid.
 ~~~
 
-#PRE-INSTALLED PLUGINS
+###PRE-INSTALLED PLUGINS
 These plugins are automatically added to the eventRequest. They can be preconfigured before calling server.start() the same
 as other plugins by fetching them and configuring them as you wish. They can not be removed:
 
+**er_static_resources**
 
-er_static_resources
+**er_body_parser_json**
 
-er_body_parser_json
-
-er_body_parser_form
+**er_body_parser_form**
 
 
- 
-Read down to the Plugin section for more information
+###Read down to the Plugin section for more information
 
 ***
+***
+***
+
 # Logging
 
 The Loggur can be accessed directly from the server { Loggur }
@@ -175,15 +271,32 @@ It has a default logger attached to it that will log to the console. it can be e
 Loggur.enableDefault() or Loggur.disableDefault()
 
 The Loggur can be used to create Loggers which accept the following options:
-* **serverName** - String - The name of the server to be concatenated with the uniqueId - Defaults to empty
-* **transports** - Array - Array of the transports to be added to the logger - Defaults to empty
-* **logLevel** - Number - The log severity level -> Defaults to error
-* **logLevels** - Object - JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
-* **capture** - Boolean - Whether to attach event listeners for process.on uncaughtException and unhandledRejection - Defaults to false
-* **dieOnCapture** - Boolean - If the process should exit in case of a caught exception -> Defaults to true
-* **unhandledExceptionLevel** - Number - What level should the unhandled exceptions be logged at -> Defaults to error
+
+**serverName** - String - The name of the server to be concatenated with the uniqueId - Defaults to empty
+
+**transports** - Array - Array of the transports to be added to the logger - Defaults to empty
+
+**logLevel** - Number - The log severity level -> Defaults to error
+
+**logLevels** - Object - JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
+
+**capture** - Boolean - Whether to attach event listeners for process.on uncaughtException and unhandledRejection - Defaults to false
+
+**dieOnCapture** - Boolean - If the process should exit in case of a caught exception -> Defaults to true
+
+**unhandledExceptionLevel** - Number - What level should the unhandled exceptions be logged at -> Defaults to error
 
 Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log and will call all added Loggers
+~~~javascript
+let logger	= Loggur.createLogger({
+	transports	: [
+		new Console( { logLevel : LOG_LEVELS.notice } ),
+	]
+});
+
+Loggur.addLogger( 'logger_id', logger );
+~~~
+
 Logger.log accepts 2 parameters: 
 ~~~javascript
     logger.log( 'Log' ); // This logs by default to an error level
@@ -192,21 +305,23 @@ Logger.log accepts 2 parameters:
 
 Each Logger can have it's own transport layers.
 There are 2 predefined transport layers:
-* **Console**
-* * Accepted options:
-* * - color - Boolean - Whether the log should be colored -> Defaults to true
-* * - logColors - Object - The colors to use -> Defaults to
-* *  [LOG_LEVELS.error]		: 'red',
-* *  [LOG_LEVELS.warning]	: 'yellow',
-* *  [LOG_LEVELS.notice]	: 'green',
-* *  [LOG_LEVELS.info]		: 'blue',
-* *  [LOG_LEVELS.verbose]	: 'cyan',
-* *  [LOG_LEVELS.debug]		: 'white'
 
-* **File**
-* * Accepted options:
-* * - filePath - String - the location of the file to log to -> if it is not provided the transport will not log
+**Console**
+    
+    Accepted options:
+    **color** - Boolean - Whether the log should be colored -> Defaults to true
+    **logColors** - Object - The colors to use -> Defaults to
+        [LOG_LEVELS.error]		: 'red',
+        [LOG_LEVELS.warning]	: 'yellow',
+        [LOG_LEVELS.notice]	: 'green',
+        [LOG_LEVELS.info]		: 'blue',
+        [LOG_LEVELS.verbose]	: 'cyan',
+        [LOG_LEVELS.debug]		: 'white'
 
+**File**
+    
+    Accepted options:
+    **filePath** - String - the location of the file to log to -> if it is not provided the transport will not log
 
 ~~~javascript
 const { Logging }							= require( 'event_request' );
@@ -244,42 +359,63 @@ let logger	= Loggur.createLogger({
 	verbose	: 500,
 	debug	: 600
 
-# Validation
+***
+***
+***
 
+# Validation
 The validation is done by using:
+
 ~~~javascript
     event.validationHandler.validate( objectToValidate, skeleton )
 ~~~
 
 skeleton must have the keys that are to be validated that point to a string of rules separated by ||
 
-## Possible rules are:
+### Possible rules are:
 
-* rules - if malformed rules string is passed
-* optional - if set as long as the input is empty it will always be valid. if not empty other possible rules will be called
-* filled - checks if the input is filled
-* string - checks if the input is a string
-* notString - checks if the input is NOT a string
-* range - Is followed by min and max aka: range:1-2 where 1 is the minimum and 2 maximum.
-* min - minimum input length
-* max - maximum input length
-* email - checks if the input is a valid email
-* isTrue - checks if the input evaluates to true
-* isFalse - checks if the input evaluates to false
-* boolean - checks if the input is a boolean
-* notBoolean - checks if the input is not a boolean
-* numeric - checks if the input is a number
-* notNumeric  - checks if the input is not a number
-* date  - checks if the input is a date
-* same  - checks if the input is the same as another input aka: same:emailInput
-* different  - checks if the input is different from another input aka: different:emailInput
-* equals  - checks if the input equals another given string: equals:makeSureToEqualToThis
+**rules** - if malformed rules string is passed
+
+**optional** - if set as long as the input is empty it will always be valid. if not empty other possible rules will be called
+
+**filled** - checks if the input is filled
+
+**string** - checks if the input is a string
+
+**notString** - checks if the input is NOT a string
+
+**range** - Is followed by min and max aka: range:1-2 where 1 is the minimum and 2 maximum.
+
+**min** - minimum input length
+
+**max** - maximum input length
+
+**email** - checks if the input is a valid email
+
+**isTrue** - checks if the input evaluates to true
+
+**isFalse** - checks if the input evaluates to false
+
+**boolean** - checks if the input is a boolean
+
+**notBoolean** - checks if the input is not a boolean
+
+**numeric** - checks if the input is a number
+
+**notNumeric** - checks if the input is not a number
+
+**date** - checks if the input is a date
+
+**same** - checks if the input is the same as another input aka: same:emailInput
+
+**different** - checks if the input is different from another input aka: different:emailInput
+
+**equals** - checks if the input equals another given string: equals:makeSureToEqualToThis
+
 
 When validation is done a ValidationResult is returned. It has 2 main methods:
     getValidationResult that will return an array of error keys eg: ['string','min','max','range','filled']
     hasValidationFailed that returns a boolean whether there is an error
-
-Example:
 
 ~~~javascript
      let body = { stringToValidate: 'str', emailToValidate: 'example@test.com' };
@@ -294,8 +430,11 @@ It will also validate that the emailToValidate in case it is provided is an actu
 In case there is no error False will be returned
 
 
-# Testing
+***
+***
+***
 
+# Testing
 If you need to test your project, then you can use the Testing tools included in the project.
 
 ~~~javascript
@@ -356,10 +495,7 @@ an async approach and relies heavily on callbacks, a minimum cannot be set.
 
 This way if the method mockThis is called more than once an error will be thrown.
 
-
 You can also Specify the arguments that should be provided to the mocked method like so:
-
-
 ~~~javascript
      let testDouble    = new MockedTest();  
        testDouble._mock({  
@@ -384,27 +520,34 @@ If you wan an environment to run your tests then you can use the test and runAll
 ~~~
 
 The 'runAllTests' function accepts an object that accepts the following options:
-* dieOnFirstError - Boolean - Whether the testing should stop on the first error - Defaults to true
-* debug - Boolean - Whether errors thrown should show their entire stack or just the message - Defaults to false
-* silent - Boolean - This will set the consoleLogger logLevel to error, meaning only errors will be displayed - Defaults to false
-* filter - String - the string to search for and filter by when testing - Defaults to false
+
+**dieOnFirstError** - Boolean - Whether the testing should stop on the first error - Defaults to true
+
+**debug** - Boolean - Whether errors thrown should show their entire stack or just the message - Defaults to false
+
+**silent** - Boolean - This will set the consoleLogger logLevel to error, meaning only errors will be displayed - Defaults to false
+
+**filter** - String - the string to search for and filter by when testing - Defaults to false
+
+**callback** - Function - Callback to be called when testing is complete
 
 The run all tests will run all tests added by the test function.
 
 The 'test' function accepts an object with the following options:
 
-* message - String - the name of the test
-* skipped - Boolean - defaults to false - If this is set to true the test will be skipped
-* incomplete - Boolean - defaults to false - If this is set to true the test will be marked as incomplete
-* dataProvider - Array - Optional - If this is provided then an Array of Arrays must be supplied.
-* * For each Array supplied, a new test will be created and called with the Array elements set as arguments to the test callback
-* test - Function - the callback to execute.
-* * the tester provides a done function as the first argument to the test callback. The done should be called just ONCE
-and only when the test finishes. If done is called twice within the same test then that will be seen as an error and
-the testing will stop.
-* * If any arguments that evaluate to true are provided to done then the test will be seen as failed.
+**message** - String - the name of the test
+**skipped** - Boolean - defaults to false - If this is set to true the test will be skipped
+**incomplete** - Boolean - defaults to false - If this is set to true the test will be marked as incomplete
+**dataProvider** - Array - Optional - If this is provided then an Array of Arrays must be supplied.
+    
+    For each Array supplied, a new test will be created and called with the Array elements set as arguments to the test callback
+    
+**test** - Function - the callback to execute.
 
-Example:
+    the tester provides a done function as the first argument to the test callback. The done should be called just ONCE
+    and only when the test finishes. If done is called twice within the same test then that will be seen as an error and
+    the testing will stop.
+    If any arguments that evaluate to true are provided to done then the test will be seen as failed.
 
 ~~~javascript
      test({  
@@ -438,8 +581,7 @@ You can also use the Mocker class by:
        Mocker( classToMock, methodToMockOptions )
 ~~~
  
- where the methodToMockOptions are the same
-as the _mock function of a testDouble. Note that this can alter a class before it is actually instantiated and WILL alter
+Where the methodToMockOptions are the same as the _mock function of a testDouble. Note that this can alter a class before it is actually instantiated and WILL alter
 the original class passed so it is suggested to be used ONLY on testDoubles
 
 
@@ -452,6 +594,10 @@ The TestingTools export:
 	logger		: tester.consoleLogger, -> Predefined logger that has 3 log levels: error, success, info
 	test		: tester.addTest.bind( tester ),
 	runAllTests	: tester.runAllTests.bind( tester )
+
+***
+***
+***
 
 # Caching
 There is an built-in in-memory caching server that works with promises
@@ -633,6 +779,10 @@ The caching server is added to every event: event.cachingServer and can be used 
 ### Again this caching server should not be used in production and is solely for development purposes.
 
 
+***
+***
+***
+
 # PluginInterface
 The PluginInterface has a getPluginMiddleware method that must return normal middleware objects implementing handler,
 route, method keys or instances of Route. 
@@ -658,21 +808,25 @@ if you want the bootstrap of the project to be in a different place.
 
 The plugin Manager exports the following functions:
 
-* addPlugin( plugin ) - accepts only a plugin of instance PluginInterface and only if it does not exist already otherwise throws
-    an exception
-* hasPlugin( id ) - checks if a plugin with the specified id exist
-* removePlugin( id ) - removes a plugin 
-* getAllPluginIds - returns an array with all the possible plugins
-* getPlugin( id ) - returns a PluginInterface otherwise throw
+**addPlugin( plugin )** - accepts only a plugin of instance PluginInterface and only if it does not exist already otherwise throws an exception
 
-### Available plugins:
+**hasPlugin( id )** - checks if a plugin with the specified id exist
 
-* er_timeout -> Adds a timeout to the request
-##
+**removePlugin( id )** - removes a plugin 
+
+**getAllPluginIds()** - returns an array with all the possible plugins
+
+**getPlugin( id )** - returns a PluginInterface otherwise throw
+
+## Available plugins:
+
+
+###er_timeout
+Adds a timeout to the request
+
     * Accepted options:
-    * - timeout - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
-##
-
+    **timeout** - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
+***
 ~~~javascript
 const PluginManager	= server.getPluginManager();
 let timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
@@ -680,12 +834,14 @@ timeoutPlugin.setOptions( { timeout : envConfig.requestTimeout } );
 server.apply( timeoutPlugin );
 ~~~
 
-* er_static_resources -> Adds a static resources path to the request
-##
-    * Accepted options: 
-    * - path - String - The path to the static resources to be served. Defaults to 'public'
-##
+***
 
+###er_static_resources
+Adds a static resources path to the request
+
+    * Accepted options: 
+    **path** - String - The path to the static resources to be served. Defaults to 'public'
+***
 ~~~javascript
 const PluginManager			= server.getPluginManager();
 let staticResourcesPlugin	= PluginManager.getPlugin( 'er_static_resources' );
@@ -693,17 +849,19 @@ staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
 server.apply( staticResourcesPlugin );
 ~~~
 
-* er_cache_server -> Adds a memory cache server
+***
 
-##
+###er_cache_server
+Adds a memory cache server
+
     * Exported Functions:
-    * startServer( callback ) -> starts the caching server and calls the callback when done. The first argument is a boolean with
+    **startServer( callback )** -> starts the caching server and calls the callback when done. The first argument is a boolean with
         a negative return. False if everything went correctly, true on failure. The second argument will be the server if returned false
         callback( false, MemoryDataServer );
         callback( true );
-    * getServer -> retruns the MemoryDataServer or null if not started
-    * stopServer( callback ) -> stops the server and has the same behaviour as startServer but without a second argument
-
+    **getServer()** -> retruns the MemoryDataServer or null if not started
+    **stopServer( callback )** -> stops the server and has the same behaviour as startServer but without a second argument
+***
 ~~~javascript
 const { Loggur }		= require( 'event_request' );
 const PluginManager		= server.getPluginManager();
@@ -740,18 +898,17 @@ cacheServerPlugin.startServer( ( err, server )=>{
 server.apply( cacheServerPlugin );
 ~~~
 
-##
+***
 
-* er_session -> Session container
-##
+###er_session 
+Session container
+
     * DEPENDENCIES:
     * er_cache_server
-
-## 
+    
     * Accepted options: 
     * - callback - Function - Callback that should be called when the plugin is finished setting up
-    
-
+***
 ~~~javascript
 let server		= Server();
 
@@ -801,21 +958,19 @@ cacheServer.startServer(()=>{
 		Loggur.log( 'Server started' )
 	});
 });
-
 ~~~
 
-##
+***
 
-* er_templating_engine -> adds a templating engine to the event request ( the templating engine is not included this just adds the functionality )
+###er_templating_engine
+Adds a templating engine to the event request ( the templating engine is not included this just adds the functionality )
 If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
 
-## 
     * Accepted options: 
     * - engine - Object - Instance of a templating engine that has a method render defined that accepts
     *       html as first argument, object of variables as second and a callback as third
     * - options - Object - options to be passed to the engine
-    
-
+***
 ~~~javascript
 const PluginManager			= server.getPluginManager();
 let templatingEnginePlugin	= PluginManager.getPlugin( 'er_templating_engine' );
@@ -823,10 +978,11 @@ templatingEnginePlugin.setOptions( { templateDir : path.join( __dirname, './temp
 server.apply( templatingEnginePlugin );
 ~~~
 
-##
+***
 
-* er_file_stream -> Adds a file streaming plugin to the site allowing different MIME types to be streamed
-
+###er_file_stream 
+Adds a file streaming plugin to the site allowing different MIME types to be streamed
+***
 ~~~javascript
 const PluginManager		= server.getPluginManager();
 let fileStreamPlugin	= PluginManager.getPlugin( 'er_file_stream' );
@@ -847,29 +1003,29 @@ let loggerPlugin    	= PluginManager.getPlugin( 'er_logger' );
 server.apply( loggerPlugin );
 ~~~
 
-##
+***
 
-##
-* er_body_parser, er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
-        -> Adds an Empty bodyParser that can be set up, JsonBodyParser, FormBodyParser and MultipartBodyParser respectively
-## 
-    * er_body_parser -> Adds one or many BodyParser descendants
-    * * Accepted options:
-    * * - parsers - Array - Array of BodyParser descendants. If the array has a key default these parsers will be added:  
-            { instance : FormBodyParser }, { instance : MultipartFormParser }, { instance : JsonBodyParser }
+###er_body_parser, er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
+Adds an Empty bodyParser that can be set up, JsonBodyParser, FormBodyParser and MultipartBodyParser respectively
+
+    **er_body_parser**
+        Adds one or many BodyParser descendants
+        **Accepted options:
+            **parsers** - Array - Array of BodyParser descendants. If the array has a key default these parsers will be added:  
+                { instance : FormBodyParser }, { instance : MultipartFormParser }, { instance : JsonBodyParser }
             
     *** MiltipartFormParser Accepted options:
-    - maxPayload - Number - Maximum payload in bytes to parse if set to 0 means infinite - Defaults to 0
-    - tempDir - String - The directory where to keep the uploaded files before moving - Defaults to the tmp dir of the os
+    **maxPayload** - Number - Maximum payload in bytes to parse if set to 0 means infinite - Defaults to 0
+    **tempDir** - String - The directory where to keep the uploaded files before moving - Defaults to the tmp dir of the os
             
     *** JsonBodyParser Accepted options:
-    - maxPayloadLength - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
-    - strict - Boolean - Whether the received payload must match the content-length - Defaults to true
+    **maxPayloadLength** - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
+    **strict** - Boolean - Whether the received payload must match the content-length - Defaults to true
             
     *** FormBodyParser Accepted options:
-    - maxPayloadLength - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
-    - strict - Boolean - Whether the received payload must match the content-length - Defaults to true
-
+    *maxPayloadLength** - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
+    **strict** - Boolean - Whether the received payload must match the content-length - Defaults to true
+***
 ~~~javascript
 const PluginManager		= server.getPluginManager();
 let loggerPlugin    	= PluginManager.getPlugin( 'er_logger' );
@@ -899,16 +1055,17 @@ let bodyParserMultipartPlugin	= new BodyParserPlugin(
 	}
 );
 ~~~
-##
 
-##
-* er_response_cache -> Adds a response caching mechanism
-##
-    * Accepted Options:
-        callback -> This is a negative error callback that returns false if there was no problem setting up the server, true or Error if there was
-        useIp -> wether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
-        ttl -> time to live for the record. Defaults to 60 * 5000 ms
+***
 
+###er_response_cache 
+Adds a response caching mechanism
+
+    Accepted Options:
+        **callback** -> This is a negative error callback that returns false if there was no problem setting up the server, true or Error if there was
+        **useIp** -> wether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
+        **ttl** -> time to live for the record. Defaults to 60 * 5000 ms
+***
 ~~~javascript
 const PluginManager		= server.getPluginManager();
 let cacheServer			= PluginManager.getPlugin( 'er_cache_server' );
@@ -950,19 +1107,18 @@ server.add({
         event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } );
 	}
 });
-
 ~~~
 
-##
+***
 
-##
-* er_env -> Adds environment variables from a .env file to the process.env Object. In case the .env file changes
-        this plugin will automatically update the process.env and will delete the old environment variables.
-##
-    * Accepted Options:
-        callback -> This is a negative error callback that returns false if there was no problem setting up the env loader
-        fileLocation -> The absolute path to the .env file you want to use
+###er_env 
+Adds environment variables from a .env file to the process.env Object. In case the .env file changes
+this plugin will automatically update the process.env and will delete the old environment variables.
 
+    Accepted Options:
+        **callback** -> This is a negative error callback that returns false if there was no problem setting up the env loader
+        **fileLocation** -> The absolute path to the .env file you want to use
+***
 ~~~javascript
 let server  = Server();
 server.apply( 'er_env' );
@@ -976,4 +1132,4 @@ server.add({
 server.start();
 ~~~
 
-##
+***

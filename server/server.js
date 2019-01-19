@@ -50,6 +50,8 @@ class Server extends EventEmitter
 		this.pluginManager	= PluginManager;
 		this.plugins		= [];
 
+		this.setUpHttpMethods();
+
 		if ( this.applyPlugins === true )
 		{
 			this.setUpDefaultPlugins();
@@ -72,6 +74,29 @@ class Server extends EventEmitter
 		pluginsToApply.forEach(( pluginConfig )=>{
 			this.apply( pluginConfig.plugin, pluginConfig.options );
 		});
+	}
+
+	/**
+	 * @brief	Adds .post, .put, .get, .delete methods to the server
+	 *
+	 * @details	Accepts "route" as first param that can be the the usual string or regex but MUST be given
+	 * 			and function "handler" to be called
+	 *
+	 * @return	void
+	 */
+	setUpHttpMethods()
+	{
+		let methods	= ['POST', 'PUT', 'GET', 'DELETE'];
+
+		methods.forEach(( method )=>{
+			this[method.toLocaleLowerCase()]	= ( route, handler )=>{
+				this.add({
+					method,
+					route,
+					handler
+				})
+			}
+		})
 	}
 
 	/**
@@ -186,13 +211,13 @@ class Server extends EventEmitter
 			}
 		});
 
+		plugin.setServerOnRuntime( this );
+
 		let pluginMiddleware	= plugin.getPluginMiddleware();
 
 		pluginMiddleware.forEach( ( route )=>{
 			this.add( route );
 		});
-
-		plugin.setServerOnRuntime( this );
 
 		this.plugins[pluginId]	= plugin;
 	}

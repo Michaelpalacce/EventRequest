@@ -4,7 +4,6 @@
 const { Mock, assert, test, helpers }	= require( '../test_helper' );
 const EventRequest						= require( './../../server/event' );
 const ErrorHandler						= require( '../../server/components/error/error_handler' );
-const { Loggur }						= require( './../../server/components/logger/loggur' );
 
 const MockedErrorHandler				= Mock( ErrorHandler );
 
@@ -245,6 +244,20 @@ test({
 		eventRequest.setHeader( 'key', 'value' );
 
 		setHeader	? done() : done( 'EventRequest setHeader event not emitted' );
+	}
+});
+
+test({
+	message	: 'EventRequest setStatusCode changes the status code',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		eventRequest.setStatusCode( 500 );
+
+		assert.equal( 500, eventRequest.response.statusCode );
+		eventRequest.setStatusCode( 'wrong' );
+		assert.equal( 200, eventRequest.response.statusCode );
+
+		done();
 	}
 });
 

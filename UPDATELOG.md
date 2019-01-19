@@ -3,6 +3,9 @@
 - Added new tests to the server as well as tests to test the applyPlugins functionality.
 - Updated readme with the new functionality
 - Fix a bug in the env_plugin_test
+- Added new way to add routes. get,post,put,delete
+- Refactored README to be more consistent and easier to understand. Added missing documentation as well
+- setStatusCode added as a function in the EventRequest
 
 4.2.2 
 - Updated the README
