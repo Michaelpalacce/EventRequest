@@ -1,3 +1,6 @@
+4.2.2 
+- Updated the README
+
 4.2.1
 - Added the file system watcher on the .env file
 - Old environment variables will be removed when the event is triggered

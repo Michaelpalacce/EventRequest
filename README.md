@@ -1,26 +1,5 @@
 # EventRequest
-A backend server in NodeJs
-
-Includes:
-- Body parsers
-1) Form Body Parser
-2) Multipart Body Parser
-3) Json Body Parser
-- Cookie parser
-- Session
-- File streams
-- Easy Routing
-- Middlewares
-- Logging
-1) Console
-2) File
-- Static Routes
-- Request timeout
-- Error handling
-- Caching ( in memory )
-- Input Validation
-- Plugin support
-- Env Loader
+A highly customizable backend server in NodeJs
 
 ~~~javascript
 const { Server, Loggur }	= require( 'event_request' );
@@ -30,12 +9,11 @@ const { Server, Loggur }	= require( 'event_request' );
  */
 const server	= Server();
 
+// Add a new Route
 server.add({
 	route	: '/',
-	method	: 'GET',
 	handler	: ( event ) => {
-		Loggur.log( 'Hello From the Loggur' );
-		event.next( '<h1>Hello World!</h1>' )
+		event.send( '<h1>Hello World!</h1>' )
 	}
 });
 
@@ -971,6 +949,29 @@ server.add({
 	}
 });
 
+~~~
+
+##
+
+##
+* er_env -> Adds environment variables from a .env file to the process.env Object. In case the .env file changes
+        this plugin will automatically update the process.env and will delete the old environment variables.
+##
+    * Accepted Options:
+        callback -> This is a negative error callback that returns false if there was no problem setting up the env loader
+        fileLocation -> The absolute path to the .env file you want to use
+
+~~~javascript
+let server  = Server();
+server.apply( 'er_env' );
+server.add({
+    handler : ( event )=>{
+    	console.log( process.env );
+    	
+    	event.send( 'Done' );
+    }
+});
+server.start();
 ~~~
 
 ##
