@@ -35,8 +35,18 @@ module.exports	= {
 	LOG_LEVELS,	Development
 };
 
-const server	= Server();
-
-server.apply( 'er_rate_limits' );
-
-server.start();
+// const InMemoryDataServer	= require( './server/components/caching/in_memory/in_memory_data_server' );
+//
+// let server	= new InMemoryDataServer();
+//
+// server.setUp().then(()=>{
+// 	server.createNamespace( 'test' ).then(()=>{
+// 		server.existsNamespace( 'test' ).then(( exists )=>{
+// 			server.create( 'test', 'key', { value: 1 }, { ttl: 1 } ).then( ()=>{
+// 				setTimeout(()=>{
+// 					console.log( process.dataServer );
+// 				}, 100 );
+// 			});
+// 		});
+// 	});
+// });

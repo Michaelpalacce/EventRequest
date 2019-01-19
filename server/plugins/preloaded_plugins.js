@@ -45,6 +45,7 @@ PluginManager.addPlugin( new EnvPlugin( 'er_env' ) );
 PluginManager.addPlugin( new RateLimitsPlugin( 'er_rate_limits' ) );
 PluginManager.addPlugin( new StaticResourcesPlugin( 'er_static_resources' ) );
 PluginManager.addPlugin( new MemoryDataServerPlugin( 'er_cache_server' ) );
+// PluginManager.addPlugin( new InMemoryDataServerPlugin( 'er_memory_cache_server' ) );
 PluginManager.addPlugin( new TemplatingEnginePlugin( 'er_templating_engine' ) );
 PluginManager.addPlugin( new FileStreamHandlerPlugin( 'er_file_stream' ) );
 PluginManager.addPlugin( new LoggerPlugin( 'er_logger' ) );
