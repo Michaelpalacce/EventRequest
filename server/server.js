@@ -23,6 +23,9 @@ const OPTIONS_PARAM_PROTOCOL_DEFAULT				= PROTOCOL_HTTP;
 const OPTIONS_PARAM_HTTPS							= 'httpsOptions';
 const OPTIONS_PARAM_HTTPS_DEFAULT					= {};
 
+const OPTIONS_PARAM_PLUGINS							= 'plugins';
+const OPTIONS_PARAM_PLUGINS_DEFAULT					= true;
+
 const POSSIBLE_PROTOCOL_OPTIONS						= {};
 POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]			= http;
 POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTPS]			= https;
@@ -47,7 +50,10 @@ class Server extends EventEmitter
 		this.pluginManager	= PluginManager;
 		this.plugins		= [];
 
-		this.setUpDefaultPlugins();
+		if ( this.applyPlugins === true )
+		{
+			this.setUpDefaultPlugins();
+		}
 	}
 
 	/**
@@ -57,9 +63,15 @@ class Server extends EventEmitter
 	 */
 	setUpDefaultPlugins()
 	{
-		this.apply( 'er_static_resources' );
-		this.apply( 'er_body_parser_json' );
-		this.apply( 'er_body_parser_form' );
+		let pluginsToApply	= [
+			{ plugin : 'er_static_resources' },
+			{ plugin : 'er_body_parser_json' },
+			{ plugin : 'er_body_parser_form' }
+		];
+
+		pluginsToApply.forEach(( pluginConfig )=>{
+			this.apply( pluginConfig.plugin, pluginConfig.options );
+		});
 	}
 
 	/**
@@ -78,7 +90,8 @@ class Server extends EventEmitter
 	 * @details	Accepted options:
 	 * 			- protocol - String - The protocol to be used ( http || https ) -> Defaults to http
 	 * 			- httpsOptions - Object - Options that will be given to the https webserver -> Defaults to {}
-	 * 			- port - Number - The port to run the webserver/s on -> Defaults to 3000
+	 * 			- port - Number - The port to run the web-server on -> Defaults to 3000
+	 * 			- plugins - Boolean - A flag that determines if the pre-installed plugins should be enabled or not -> Defaults to true
 	 *
 	 * 	@param	Object options
 	 *
@@ -101,6 +114,11 @@ class Server extends EventEmitter
 		this.port			= typeof this.port === 'number'
 							? this.port
 							: OPTIONS_PARAM_PORT_DEFAULT;
+
+		this.applyPlugins	= options[OPTIONS_PARAM_PLUGINS];
+		this.applyPlugins	= typeof this.applyPlugins === 'boolean'
+							? this.applyPlugins
+							: OPTIONS_PARAM_PLUGINS_DEFAULT;
 	}
 
 	/**

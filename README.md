@@ -85,7 +85,9 @@ The server callback accepts the following options:
 
 **httpsOptions** - Object - Options that will be given to the https webserver -> Defaults to {}
 
-**port** - Number - The port to run the webserver/s on -> Defaults to 3000
+**port** - Number - The port to run the web-server on -> Defaults to 3000
+
+**plugins** - Boolean - A flag that determines if the pre-installed plugins should be enabled or not -> Defaults to true
 
 ## The server is started by calling server.start();
 ~~~javascript

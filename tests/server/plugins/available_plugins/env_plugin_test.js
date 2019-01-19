@@ -14,6 +14,9 @@ test({
 		let server			= new MockServer();
 		let fileLocation	= path.join( __dirname, '/fixture/.env');
 
+		let originalContent	= fs.readFileSync( fileLocation );
+		originalContent		= originalContent.toString( 'utf-8' );
+
 		let envPlugin		= new EnvPlugin( 'id', {
 			fileLocation,
 			callback		: ( error )=>{
@@ -31,6 +34,10 @@ test({
 					assert.equal( 'VALUE', process.env.TEST );
 					assert.equal( true, typeof process.env.TESTKEY === 'undefined' );
 					assert.equal( true, typeof process.env.TESTKEYTWO === 'undefined' );
+
+					let writeStream	= fs.createWriteStream( fileLocation );
+					writeStream.write( originalContent );
+					writeStream.end();
 					done();
 				}, 250 );
 			}

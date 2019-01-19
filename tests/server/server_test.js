@@ -7,10 +7,29 @@ const Router					= require( './../../server/components/routing/router' );
 const PreloadedPluginManager	= require( './../../server/plugins/preloaded_plugins' );
 
 test({
-	message	: 'Server.constructor starts without crashing',
+	message	: 'Server.constructor starts without crashing with defaults',
 	test	: ( done )=>{
 		assert.doesNotThrow( ()=>{
-			new Server();
+			let server	= new Server();
+
+			assert.equal( 'http', server.protocol );
+			assert.deepStrictEqual( {}, server.httpsOptions );
+			assert.equal( 3000, server.port );
+			assert.equal( true, server.applyPlugins );
+			assert.equal( 3, server.router.middleware.length );
+		});
+		done();
+	}
+});
+
+test({
+	message	: 'Server.constructor does not apply plugins if passed',
+	test	: ( done )=>{
+		assert.doesNotThrow( ()=>{
+			let server	= new Server( { plugins: false });
+
+			assert.equal( false, server.applyPlugins );
+			assert.equal( 0, server.router.middleware.length );
 		});
 		done();
 	}

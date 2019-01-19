@@ -1,3 +1,9 @@
+4.2.3 
+- You can now choose to disable all the pre-installed plugins
+- Added new tests to the server as well as tests to test the applyPlugins functionality.
+- Updated readme with the new functionality
+- Fix a bug in the env_plugin_test
+
 4.2.2 
 - Updated the README
 
