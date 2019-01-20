@@ -35,6 +35,10 @@ class InMemoryDataServer extends DataServer
 				this.timeouts		= {};
 				this.isSetUp		= true;
 			}
+			else if ( this.isSetUp === true )
+			{
+				resolve( false );
+			}
 			else
 			{
 				reject( 'There is another instance of the data server running.' );
@@ -127,10 +131,7 @@ class InMemoryDataServer extends DataServer
 					return;
 				}
 
-				if ( exists )
-				{
-					this.clearTimeoutFromData( namespace, recordName );
-				}
+				this.clearTimeoutFromData( namespace, recordName );
 
 				process.dataServer[namespace][recordName]	= data;
 				this.addTimeoutToData( namespace, recordName, this.getTTL( options ) );
@@ -169,12 +170,6 @@ class InMemoryDataServer extends DataServer
 	{
 		this.clearTimeoutFromData( namespace, recordName );
 
-		if ( ttl <= 0 )
-		{
-			// Introduce a constant
-			ttl	= 24 * 60 * 60 * 1000;
-		}
-
 		let keyPair	= namespace + '||' + recordName;
 		this.timeouts[keyPair]	= setTimeout( () => {
 			if ( typeof process.dataServer[namespace] !== 'undefined' )
@@ -197,7 +192,7 @@ class InMemoryDataServer extends DataServer
 	{
 		return ( typeof options === 'object' && typeof options.ttl === 'number' && options.ttl > 0 )
 			? options.ttl
-			: 0;
+			: 24 * 60 * 60 * 1000;
 	}
 }
 

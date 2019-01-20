@@ -11,18 +11,11 @@ test({
 	test	: ( done )=>{
 		let cachingServer	= helpers.getCachingServer();
 
-		cachingServer.existsNamespace( SESSIONS_NAMESPACE ).then( ( exists )=>{
-			if ( ! exists )
-			{
-				cachingServer.createNamespace( SESSIONS_NAMESPACE ).then( ()=>{
-					done();
-				}).catch( done );
-			}
-			else
-			{
+		cachingServer.setUp().then(()=>{
+			cachingServer.createNamespace( SESSIONS_NAMESPACE ).then( ()=>{
 				done();
-			}
-		}).catch( done );
+			}).catch( done );
+		});
 	}
 });
 

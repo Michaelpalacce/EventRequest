@@ -6,10 +6,10 @@ const { server, cachingServer }		= require( './tests/test_bootstrap' );
 
 let startTests	= ()=>{
 	testSuites.eventSuite();
+	testSuites.cachingSuite();
 	testSuites.securitySuite();
 	testSuites.routingSuite();
 	testSuites.loggingSuite();
-	testSuites.cachingSuite();
 	testSuites.bodyParserSuite();
 	testSuites.validationSuite();
 	testSuites.pluginsSuite();
