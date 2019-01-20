@@ -1,6 +1,7 @@
 'use strict';
 
 const { EventEmitter }	= require( 'events' );
+const createModel		= require( './data_server_model_creator' );
 
 const SERVER_STATES		= {
 	inactive		: 0,
@@ -42,8 +43,6 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Creates a new model to be used for the given namespace.
 	 *
-	 * @todo	IMPLEMENT
-	 *
 	 * @param	String namespace
 	 * @param	Object options
 	 *
@@ -51,6 +50,7 @@ class DataServer extends EventEmitter
 	 */
 	model( namespace, options )
 	{
+		return createModel( this, namespace, options );
 	}
 
 	/**

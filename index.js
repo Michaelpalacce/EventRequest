@@ -14,7 +14,7 @@ const { Loggur, LOG_LEVELS }	= Logging;
 let serverInstance	= null;
 
 // Callback to create a new Server
-let Server	= ( options )=>{
+let Server			= ( options )=>{
 	if ( serverInstance == null )
 	{
 		serverInstance	= new ServerClass( options );
@@ -24,13 +24,44 @@ let Server	= ( options )=>{
 };
 
 // Holds tools for third party tools
-let Development	= {
+let Development		= {
 	PluginInterface, DataServer
 };
 
-module.exports	= {
+module.exports		= {
 	Server,		Router,
 	Testing,	BodyParserHandler,
 	Logging,	Loggur,
 	LOG_LEVELS,	Development
 };
+
+const InMemoryDataServer	= require( './server/components/caching/in_memory/in_memory_data_server' );
+
+//
+// let server				= new InMemoryDataServer();
+//
+// server.setUp().then(()=>{
+// 	Loggur.log( 'In Memory Data Server started' );
+// 	const Person	= server.model( 'Person' );
+//
+// 	Person.createNamespaceIfNotExists().then(()=>{
+// 		let firstPerson			= new Person();
+// 		firstPerson.recordName	= 'Stefan';
+// 		firstPerson.recordData	= { name: 'Stefan', age: 25 };
+//
+// 		firstPerson.save();
+//
+// 		firstPerson.recordName	= 'Ady';
+// 		firstPerson.recordData	= { name: 'Ady', age: 27 };
+//
+// 		firstPerson.save();
+//
+// 		Person.find( 'Stefan' ).then(( person )=>{
+// 			person.recordData.age	= 26;
+//
+// 			person.save().then(()=>{
+// 				console.log(process.dataServer.data);
+// 			})
+// 		})
+// 	});
+// });
