@@ -35,8 +35,8 @@ module.exports		= {
 	LOG_LEVELS,	Development
 };
 
-const InMemoryDataServer	= require( './server/components/caching/in_memory/in_memory_data_server' );
-
+// const InMemoryDataServer	= require( './server/components/caching/in_memory/in_memory_data_server' );
+//
 //
 // let server				= new InMemoryDataServer();
 //

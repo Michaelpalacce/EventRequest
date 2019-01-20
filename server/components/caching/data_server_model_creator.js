@@ -39,7 +39,7 @@ module.exports	= function ( dataServer, namespace, options = {} )
 		static createNamespaceIfNotExists()
 		{
 			return new Promise(( resolve, reject )=>{
-				dataServer.existsNamespace().then(( exists )=>{
+				dataServer.existsNamespace( namespace ).then(( exists )=>{
 					if ( ! exists )
 					{
 						dataServer.createNamespace( namespace ).then(()=>{
@@ -57,7 +57,7 @@ module.exports	= function ( dataServer, namespace, options = {} )
 		static createNamespace()
 		{
 			return new Promise(( resolve, reject )=>{
-				dataServer.existsNamespace().then(( exists )=>{
+				dataServer.existsNamespace( namespace ).then(( exists )=>{
 					if ( ! exists )
 					{
 						dataServer.createNamespace( namespace ).then(()=>{
