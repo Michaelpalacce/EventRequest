@@ -2,6 +2,7 @@
 
 const { Mock, assert, test, Mocker }	= require( '../../../../test_helper' );
 const InMemoryDataServer				= require( './../../../../../server/components/caching/in_memory/in_memory_data_server' );
+const { SERVER_STATES }					= require( './../../../../../server/components/caching/data_server' );
 
 test({
 	message	: 'InMemoryDataServer.constructor on default',
@@ -21,7 +22,9 @@ test({
 
 		server.setUp().then(()=>{
 			assert.equal( 'object', typeof process.dataServer );
-			assert.equal( true, server.isSetUp );
+			assert.equal( 'object', typeof process.dataServer.data );
+			assert.equal( 'object', typeof process.dataServer.timeouts );
+			assert.equal( SERVER_STATES.running, server.getServerState() );
 
 			delete process.dataServer;
 
@@ -38,30 +41,14 @@ test({
 		server.setUp().then(()=>{
 			server.setUp().then(()=>{
 				assert.equal( 'object', typeof process.dataServer );
-				assert.equal( true, server.isSetUp );
+				assert.equal( 'object', typeof process.dataServer.data );
+				assert.equal( 'object', typeof process.dataServer.timeouts );
+				assert.equal( SERVER_STATES.running, server.getServerState() );
 
 				delete process.dataServer;
 
 				done();
 			}).catch( done );
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'InMemoryDataServer.setUp twice does not throw',
-	test	: ( done )=>{
-		let server	= new InMemoryDataServer();
-		let server2	= new InMemoryDataServer();
-
-		server.setUp().then(()=>{
-			server2.setUp().then(()=> done( 'The second server should not have been set up' ) ).catch(( err )=>{
-				assert.equal( true, err !== false );
-
-				delete process.dataServer;
-
-				done();
-			});
 		}).catch( done );
 	}
 });
@@ -73,7 +60,7 @@ test({
 		let namespace	= 'testNamespace';
 		server.setUp().then(()=>{
 			server.createNamespace( namespace ).then(()=>{
-				assert.equal( 'object', typeof process.dataServer[namespace] );
+				assert.equal( 'object', typeof process.dataServer.data[namespace] );
 
 				delete process.dataServer;
 
@@ -166,7 +153,7 @@ test({
 			server.createNamespace( namespace ).then(()=>{
 				server.removeNamespace( namespace ).then( ( error )=>{
 					assert.equal( false, error );
-					assert.equal( true, typeof process.dataServer[namespace] === 'undefined' );
+					assert.equal( true, typeof process.dataServer.data[namespace] === 'undefined' );
 
 					delete process.dataServer;
 
@@ -208,7 +195,7 @@ test({
 		server.setUp().then(()=>{
 			server.createNamespace( namespace ).then( ()=>{
 				server.create( namespace, recordName, recordData ).then( ()=>{
-					assert.equal( 'object', typeof process.dataServer[namespace][recordName] );
+					assert.equal( 'object', typeof process.dataServer.data[namespace][recordName] );
 
 					delete process.dataServer;
 
@@ -231,10 +218,10 @@ test({
 		server.setUp().then(()=>{
 			server.createNamespace( namespace ).then( ()=>{
 				server.create( namespace, recordName, recordData, { ttl } ).then( ()=>{
-					assert.equal( 'object', typeof process.dataServer[namespace][recordName] );
+					assert.equal( 'object', typeof process.dataServer.data[namespace][recordName] );
 
 					setTimeout(()=>{
-						assert.equal( 'undefined', typeof process.dataServer[namespace][recordName] );
+						assert.equal( 'undefined', typeof process.dataServer.data[namespace][recordName] );
 
 						delete process.dataServer;
 
@@ -257,15 +244,15 @@ test({
 		server.setUp().then(()=>{
 			server.createNamespace( namespace ).then( ()=>{
 				server.create( namespace, recordName, recordData, { ttl } ).then( ()=>{
-					assert.equal( 'object', typeof process.dataServer[namespace][recordName] );
+					assert.equal( 'object', typeof process.dataServer.data[namespace][recordName] );
 
 					server.create( namespace, recordName, recordData, { ttl: ttl * 2 } ).then( ()=>{
-						assert.equal( 'object', typeof process.dataServer[namespace][recordName] );
+						assert.equal( 'object', typeof process.dataServer.data[namespace][recordName] );
 
-						setTimeout(()=>{ assert.equal( 'object', typeof process.dataServer[namespace][recordName] ); }, ttl + 10 );
+						setTimeout(()=>{ assert.equal( 'object', typeof process.dataServer.data[namespace][recordName] ); }, ttl + 10 );
 
 						setTimeout(()=>{
-							assert.equal( 'undefined', typeof process.dataServer[namespace][recordName] );
+							assert.equal( 'undefined', typeof process.dataServer.data[namespace][recordName] );
 
 							delete process.dataServer;
 
@@ -273,7 +260,6 @@ test({
 						}, ttl * 3 );
 
 					} ).catch( done );
-
 				} ).catch( done );
 			}).catch( done )
 		}).catch( done );

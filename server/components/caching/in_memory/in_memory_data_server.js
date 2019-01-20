@@ -11,9 +11,7 @@ class InMemoryDataServer extends DataServer
 	{
 		super( options );
 
-		this.timeouts		= {};
 		this.memoryLimit	= 0;
-		this.isSetUp		= false;
 	}
 
 	/**
@@ -28,22 +26,16 @@ class InMemoryDataServer extends DataServer
 	 */
 	setUp( options = {} )
 	{
+		this.changeServerState( SERVER_STATES.starting );
 		return new Promise( ( resolve, reject )=>{
 			if ( typeof process.dataServer === 'undefined' )
 			{
-				process.dataServer	= {};
-				this.timeouts		= {};
-				this.isSetUp		= true;
-			}
-			else if ( this.isSetUp === true )
-			{
-				resolve( false );
-			}
-			else
-			{
-				reject( 'There is another instance of the data server running.' );
+				process.dataServer			= {};
+				process.dataServer.data		= {};
+				process.dataServer.timeouts	= {};
 			}
 
+			this.changeServerState( SERVER_STATES.running );
 			resolve( false );
 		});
 	}
@@ -54,7 +46,7 @@ class InMemoryDataServer extends DataServer
 	createNamespace( namespace, options = {} )
 	{
 		return new Promise( ( resolve, reject ) =>{
-			if ( this.isSetUp !== true )
+			if ( this.getServerState() !== SERVER_STATES.running )
 			{
 				reject( 'Server not set up' );
 				return;
@@ -63,7 +55,7 @@ class InMemoryDataServer extends DataServer
 			this.existsNamespace( namespace, options ).then( ( exists )=>{
 				if ( ! exists )
 				{
-					process.dataServer[namespace]	= {};
+					process.dataServer.data[namespace]	= {};
 
 					resolve( false );
 				}
@@ -81,13 +73,13 @@ class InMemoryDataServer extends DataServer
 	existsNamespace( namespace, options = {} )
 	{
 		return new Promise( ( resolve, reject )=>{
-			if ( this.isSetUp !== true )
+			if ( this.getServerState() !== SERVER_STATES.running )
 			{
 				reject( 'Server not set up' );
 				return;
 			}
 
-			resolve( typeof process.dataServer[namespace] !== 'undefined' );
+			resolve( typeof process.dataServer.data[namespace] !== 'undefined' );
 		});
 	}
 
@@ -97,7 +89,7 @@ class InMemoryDataServer extends DataServer
 	removeNamespace( namespace, options = {} )
 	{
 		return new Promise( ( resolve, reject )=>{
-			if ( this.isSetUp !== true )
+			if ( this.getServerState() !== SERVER_STATES.running )
 			{
 				reject( 'Server not set up' );
 				return;
@@ -110,7 +102,7 @@ class InMemoryDataServer extends DataServer
 				}
 				else
 				{
-					delete process.dataServer[namespace];
+					delete process.dataServer.data[namespace];
 
 					resolve( false );
 				}
@@ -124,6 +116,12 @@ class InMemoryDataServer extends DataServer
 	create( namespace, recordName, data = {}, options = {} )
 	{
 		return new Promise( ( resolve, reject ) => {
+			if ( this.getServerState() !== SERVER_STATES.running )
+			{
+				reject( 'Server not set up' );
+				return;
+			}
+
 			this.existsNamespace( namespace ).then( ( exists )=>{
 				if ( ! exists )
 				{
@@ -133,7 +131,7 @@ class InMemoryDataServer extends DataServer
 
 				this.clearTimeoutFromData( namespace, recordName );
 
-				process.dataServer[namespace][recordName]	= data;
+				process.dataServer.data[namespace][recordName]	= data;
 				this.addTimeoutToData( namespace, recordName, this.getTTL( options ) );
 
 				resolve( false );
@@ -153,8 +151,8 @@ class InMemoryDataServer extends DataServer
 	{
 		let keyPair	= namespace + '||' + recordName;
 
-		clearTimeout( this.timeouts[keyPair] );
-		delete this.timeouts[keyPair];
+		clearTimeout( process.dataServer.timeouts[keyPair] );
+		delete process.dataServer.timeouts[keyPair];
 	}
 
 	/**
@@ -171,13 +169,13 @@ class InMemoryDataServer extends DataServer
 		this.clearTimeoutFromData( namespace, recordName );
 
 		let keyPair	= namespace + '||' + recordName;
-		this.timeouts[keyPair]	= setTimeout( () => {
-			if ( typeof process.dataServer[namespace] !== 'undefined' )
+		process.dataServer.timeouts[keyPair]	= setTimeout( () => {
+			if ( typeof process.dataServer.data[namespace] !== 'undefined' )
 			{
-				delete process.dataServer[namespace][recordName];
+				delete process.dataServer.data[namespace][recordName];
 			}
 
-			delete this.timeouts[keyPair];
+			delete process.dataServer.timeouts[keyPair];
 		}, ttl );
 	}
 
