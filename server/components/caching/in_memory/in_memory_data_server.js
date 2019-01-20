@@ -48,7 +48,7 @@ class InMemoryDataServer extends DataServer
 		return new Promise( ( resolve, reject ) =>{
 			if ( this.getServerState() !== SERVER_STATES.running )
 			{
-				reject( 'Server not set up' );
+				reject( new Error( 'Server not set up' ) );
 				return;
 			}
 
@@ -61,7 +61,7 @@ class InMemoryDataServer extends DataServer
 				}
 				else
 				{
-					reject( 'Namespace already exists' );
+					reject( new Error( 'Namespace already exists' ) );
 				}
 			} ).catch( reject );
 		})
@@ -75,7 +75,8 @@ class InMemoryDataServer extends DataServer
 		return new Promise( ( resolve, reject )=>{
 			if ( this.getServerState() !== SERVER_STATES.running )
 			{
-				reject( 'Server not set up' );
+				reject( new Error( 'Server not set up' ) );
+
 				return;
 			}
 
@@ -91,14 +92,15 @@ class InMemoryDataServer extends DataServer
 		return new Promise( ( resolve, reject )=>{
 			if ( this.getServerState() !== SERVER_STATES.running )
 			{
-				reject( 'Server not set up' );
+				reject( new Error( 'Server not set up' ) );
+
 				return;
 			}
 
 			this.existsNamespace( namespace, options ).then( ( exists )=>{
 				if ( ! exists )
 				{
-					reject( 'Namespace does not exists' );
+					reject( new Error( 'Namespace does not exists' ) );
 				}
 				else
 				{
@@ -118,14 +120,16 @@ class InMemoryDataServer extends DataServer
 		return new Promise( ( resolve, reject ) => {
 			if ( this.getServerState() !== SERVER_STATES.running )
 			{
-				reject( 'Server not set up' );
+				reject( new Error( 'Server not set up' ) );
+
 				return;
 			}
 
 			this.existsNamespace( namespace ).then( ( exists )=>{
 				if ( ! exists )
 				{
-					reject( 'Namespace does not exist' );
+					reject( new Error( 'Namespace does not exist' ) );
+
 					return;
 				}
 
@@ -138,6 +142,152 @@ class InMemoryDataServer extends DataServer
 			}).catch( reject );
 		})
 	}
+
+	/**
+	 * @copydoc	DataServer::exists
+	 */
+	exists( namespace, recordName, options = {} )
+	{
+		return new Promise( ( resolve, reject ) => {
+			if ( this.getServerState() !== SERVER_STATES.running )
+			{
+				reject( new Error( 'Server not set up' ) );
+				return;
+			}
+
+			this.existsNamespace( namespace ).then( ( exists )=>{
+				if ( exists )
+				{
+					resolve( typeof process.dataServer.data[namespace][recordName] !== 'undefined' )
+				}
+				else
+				{
+					resolve( false );
+				}
+			}).catch( reject );
+		})
+	}
+
+	/**
+	 * @copydoc	DataServer::delete
+	 */
+	delete( namespace, recordName, options = {} )
+	{
+		return new Promise( ( resolve, reject ) =>{
+			this.exists( namespace, recordName, options ).then(( exists )=>{
+				if ( exists )
+				{
+					this.clearTimeoutFromData( namespace, recordName );
+
+					delete process.dataServer.data[namespace][recordName];
+
+					resolve( false );
+				}
+				else
+				{
+					reject( new Error( 'Record does not exist' ) );
+				}
+			})
+		} );
+	}
+
+	/**
+	 * @copydoc	DataServer::getAll
+	 */
+	getAll( namespace, options = {} )
+	{
+		return new Promise( ( resolve, reject ) =>{
+			this.existsNamespace( namespace, options ).then(( exists )=>{
+				if ( exists )
+				{
+					resolve( process.dataServer.data[namespace] );
+				}
+				else
+				{
+					reject( new Error( `The namespace ${namespace} does not exist` ) );
+				}
+			})
+		} );
+	}
+
+	/**
+	 * @copydoc	DataServer::read
+	 */
+	read( namespace, recordName, options = {} )
+	{
+		return new Promise( ( resolve, reject ) =>{
+			this.exists( namespace, recordName, options ).then(( exists )=>{
+				if ( exists )
+				{
+					resolve( process.dataServer.data[namespace][recordName] );
+				}
+				else
+				{
+					reject( new Error( `The record ${recordName} does not exist` ) );
+				}
+			})
+		} );
+	}
+
+	/**
+	 * @copydoc	DataServer::touch
+	 */
+	touch( namespace, recordName, options = {} )
+	{
+		return new Promise( ( resolve, reject ) =>{
+			this.exists( namespace, recordName, options ).then(( exists )=>{
+				if ( exists )
+				{
+					this.addTimeoutToData( namespace, recordName, this.getTTL( options ) );
+					resolve( false );
+				}
+				else
+				{
+					reject( new Error( `The record ${recordName} does not exist` ) );
+				}
+			})
+		} );
+	}
+
+	/**
+	 * @copydoc	DataServer::update
+	 */
+	update( namespace, recordName, recordData, options = {} )
+	{
+		return new Promise( ( resolve, reject ) =>{
+			this.touch( namespace, recordName, options ).then(()=>{
+				process.dataServer.data[namespace][recordName]	= recordData;
+				resolve( false );
+			}).catch( reject );
+		} );
+	}
+
+	/**
+	 * @see	DataServer::exit()
+	 */
+	exit( options = {} )
+	{
+		this.changeServerState( SERVER_STATES.stopping );
+
+		return new Promise( ( resolve, reject )=>{
+			let timeouts	= process.dataServer.timeouts;
+			let keys		= Object.keys( timeouts );
+
+			keys.forEach( ( timeoutEntry )=>{
+				let timeout	= timeouts[timeoutEntry];
+
+				clearTimeout( timeout );
+				delete process.dataServer.timeouts[timeoutEntry];
+			});
+
+			delete process.dataServer;
+
+			this.changeServerState( SERVER_STATES.stopped );
+			resolve( false );
+		});
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * @brief	Clears up the timeout from the data
@@ -170,12 +320,15 @@ class InMemoryDataServer extends DataServer
 
 		let keyPair	= namespace + '||' + recordName;
 		process.dataServer.timeouts[keyPair]	= setTimeout( () => {
-			if ( typeof process.dataServer.data[namespace] !== 'undefined' )
+			if ( typeof process.dataServer !== 'undefined' )
 			{
-				delete process.dataServer.data[namespace][recordName];
-			}
+				if ( typeof process.dataServer.data[namespace] !== 'undefined' )
+				{
+					delete process.dataServer.data[namespace][recordName];
+				}
 
-			delete process.dataServer.timeouts[keyPair];
+				delete process.dataServer.timeouts[keyPair];
+			}
 		}, ttl );
 	}
 

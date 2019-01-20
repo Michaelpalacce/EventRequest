@@ -40,6 +40,20 @@ class DataServer extends EventEmitter
 	}
 
 	/**
+	 * @brief	Creates a new model to be used for the given namespace.
+	 *
+	 * @todo	IMPLEMENT
+	 *
+	 * @param	String namespace
+	 * @param	Object options
+	 *
+	 * @return	Object
+	 */
+	model( namespace, options )
+	{
+	}
+
+	/**
 	 * @brief	Sanitizes the configuration
 	 *
 	 * @param	Object options

@@ -1,8 +1,8 @@
 'use strict';
 
-const { runAllTests }				= require( './tests/test_helper' );
-const testSuites					= require( './tests/test_suites' );
-const { server, cachingServer }		= require( './tests/test_bootstrap' );
+const { runAllTests }	= require( './tests/test_helper' );
+const testSuites		= require( './tests/test_suites' );
+const { server }		= require( './tests/test_bootstrap' );
 
 let startTests	= ()=>{
 	testSuites.eventSuite();

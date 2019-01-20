@@ -4,6 +4,7 @@ const { Mock, assert, test, Mocker }	= require( '../../../../test_helper' );
 const InMemoryDataServer				= require( './../../../../../server/components/caching/in_memory/in_memory_data_server' );
 const { SERVER_STATES }					= require( './../../../../../server/components/caching/data_server' );
 
+
 test({
 	message	: 'InMemoryDataServer.constructor on default',
 	test	: ( done )=>{
@@ -26,7 +27,7 @@ test({
 			assert.equal( 'object', typeof process.dataServer.timeouts );
 			assert.equal( SERVER_STATES.running, server.getServerState() );
 
-			delete process.dataServer;
+			server.exit();
 
 			done();
 		}).catch( done );
@@ -45,7 +46,7 @@ test({
 				assert.equal( 'object', typeof process.dataServer.timeouts );
 				assert.equal( SERVER_STATES.running, server.getServerState() );
 
-				delete process.dataServer;
+				server.exit();
 
 				done();
 			}).catch( done );
@@ -62,7 +63,7 @@ test({
 			server.createNamespace( namespace ).then(()=>{
 				assert.equal( 'object', typeof process.dataServer.data[namespace] );
 
-				delete process.dataServer;
+				server.exit();
 
 				done();
 			}).catch( done );
@@ -82,7 +83,7 @@ test({
 				).catch( ( err )=>{
 					assert.equal( true, err !== false );
 
-					delete process.dataServer;
+					server.exit();
 
 					done();
 				} );
@@ -100,7 +101,7 @@ test({
 			server.existsNamespace( namespace ).then( ( exists )=>{
 				assert.equal( exists, false );
 
-				delete process.dataServer;
+				server.exit();
 
 				done();
 			}).catch( done );
@@ -118,7 +119,7 @@ test({
 				server.existsNamespace( namespace ).then( ( exists )=>{
 					assert.equal( exists, true );
 
-					delete process.dataServer;
+					server.exit();
 
 					done();
 				}).catch( done );
@@ -136,7 +137,7 @@ test({
 			server.removeNamespace( namespace ).then( ()=> done( 'removeNamespace should have rejected' ) ).catch( ( err )=>{
 				assert.equal( true, err !== false );
 
-				delete process.dataServer;
+				server.exit();
 
 				done();
 			} );
@@ -155,7 +156,7 @@ test({
 					assert.equal( false, error );
 					assert.equal( true, typeof process.dataServer.data[namespace] === 'undefined' );
 
-					delete process.dataServer;
+					server.exit();
 
 					done();
 				} ).catch( done );
@@ -176,7 +177,7 @@ test({
 			server.create( namespace, recordName, recordData ).then( ()=> done( 'create should have been rejected' ) ).catch(( err )=>{
 				assert.equal( true, err !== false );
 
-				delete process.dataServer;
+				server.exit();
 
 				done();
 			});
@@ -196,8 +197,9 @@ test({
 			server.createNamespace( namespace ).then( ()=>{
 				server.create( namespace, recordName, recordData ).then( ()=>{
 					assert.equal( 'object', typeof process.dataServer.data[namespace][recordName] );
+					assert.equal( 1, Object.keys( process.dataServer.timeouts ).length );
 
-					delete process.dataServer;
+					server.exit();
 
 					done();
 				} ).catch( done );
@@ -223,7 +225,7 @@ test({
 					setTimeout(()=>{
 						assert.equal( 'undefined', typeof process.dataServer.data[namespace][recordName] );
 
-						delete process.dataServer;
+						server.exit();
 
 						done();
 					}, ttl * 2);
@@ -232,6 +234,7 @@ test({
 		}).catch( done );
 	}
 });
+
 test({
 	message	: 'InMemoryDataServer.create twice extends timeout',
 	test	: ( done )=>{
@@ -254,14 +257,436 @@ test({
 						setTimeout(()=>{
 							assert.equal( 'undefined', typeof process.dataServer.data[namespace][recordName] );
 
-							delete process.dataServer;
+							server.exit();
 
 							done();
 						}, ttl * 3 );
-
 					} ).catch( done );
 				} ).catch( done );
 			}).catch( done )
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.exists if record exists',
+	test	: ( done )=>{
+		let server		= new InMemoryDataServer();
+		let namespace	= 'testNamespace';
+		let recordName	= 'testRecord';
+		let recordData	= { key: 'test' };
+		let ttl			= 100;
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then( ()=>{
+				server.create( namespace, recordName, recordData, { ttl } ).then( ()=>{
+					server.exists( namespace, recordName ).then( ( exists )=>{
+						assert.equal( true, exists );
+
+						server.exit();
+
+						done();
+					}).catch( done );
+				} ).catch( done );
+			}).catch( done )
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.exists if record does not exists',
+	test	: ( done )=>{
+		let server		= new InMemoryDataServer();
+		let namespace	= 'testNamespace';
+		let recordName	= 'testRecord';
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then( ()=>{
+				server.exists( namespace, recordName ).then( ( exists )=>{
+					server.exit();
+
+					exists ? done( 'Record exists but it shouldn\'t' ) : done();
+				}).catch( done );
+			}).catch( done )
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.exists if namespace does not exists',
+	test	: ( done )=>{
+		let server		= new InMemoryDataServer();
+		let namespace	= 'testNamespace';
+		let recordName	= 'testRecord';
+
+		server.setUp().then(()=>{
+			server.exists( namespace, recordName ).then( ( exists )=>{
+				server.exit();
+
+				exists ? done( 'Record exists but it shouldn\'t' ) : done();
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.getAll if namespace does not exists',
+	test	: ( done )=>{
+		let server		= new InMemoryDataServer();
+		let namespace	= 'testNamespace';
+		let recordName	= 'testRecord';
+
+		server.setUp().then(()=>{
+			server.getAll( namespace, recordName ).then( ()=> done( 'Namespace exists but it shouldn\'t' ) ).catch( ( err )=>{
+				assert.equal( true, err !== false );
+
+				server.exit();
+
+				done();
+			} );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.getAll if namespace exists',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+		let recordData		= { key: 'value' };
+
+		let expectedData	= {
+			[recordName]	: recordData
+		};
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.create( namespace, recordName, recordData ).then(()=>{
+					server.getAll( namespace, recordName ).then( ( data )=>{
+						assert.deepStrictEqual( expectedData, data );
+
+						server.exit();
+
+						done();
+					} ).catch( done );
+				}).catch( done );
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.read if record exists',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+		let recordData		= { key: 'value' };
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.create( namespace, recordName, recordData ).then(()=>{
+					server.read( namespace, recordName ).then(( data )=>{
+						assert.deepStrictEqual( recordData, data );
+
+						server.exit();
+
+						done();
+					}).catch( done );
+				}).catch( done );
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.read if record does not exist',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.read( namespace, recordName ).then( ()=> done( 'Record exists but shouldn\'t' ) ).catch( ( err )=>{
+					assert.equal( true, err !== false );
+
+					server.exit();
+
+					done();
+				} );
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.read if namespace does not exist',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+
+		server.setUp().then(()=>{
+			server.read( namespace, recordName ).then( ()=> done( 'Record exists but shouldn\'t' ) ).catch( ( err )=>{
+				assert.equal( true, err !== false );
+
+				server.exit();
+
+				done();
+			} );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.touch if record exists',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+		let recordData		= { key: 'value' };
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.create( namespace, recordName, recordData ).then(()=>{
+					server.touch( namespace, recordName ).then(()=>{
+						assert.deepStrictEqual( process.dataServer.data[namespace][recordName], recordData );
+
+						server.exit();
+
+						done();
+					}).catch( done );
+				}).catch( done );
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.touch if record does not exists',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.touch( namespace, recordName ).then(()=> done( 'Record exists but it should not' ) ).catch( ( err )=>{
+					assert.equal( true, err !== false );
+
+					server.exit();
+
+					done();
+				} );
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.touch if namespace does not exists',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+
+		server.setUp().then(()=>{
+			server.touch( namespace, recordName ).then(()=> done( 'Record exists but it should not' ) ).catch( ( err )=>{
+				assert.equal( true, err !== false );
+
+				server.exit();
+
+				done();
+			} );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.touch updates ttl',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+		let recordData		= { key: 'value' };
+		let ttl				= 100;
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.create( namespace, recordName, recordData ).then(()=>{
+					server.touch( namespace, recordName, { ttl: ttl * 3 } ).then(()=>{
+						setTimeout(()=>{
+							assert.deepStrictEqual( process.dataServer.data[namespace][recordName], recordData );
+
+							server.exit();
+
+							done();
+						}, ttl * 2 );
+					}).catch( done );
+				}).catch( done );
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.update updates',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+		let recordData		= { key: 'value' };
+		let newRecordData	= { key: 'value2' };
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.create( namespace, recordName, recordData ).then(()=>{
+					server.update( namespace, recordName, newRecordData ).then(()=>{
+						assert.deepStrictEqual( process.dataServer.data[namespace][recordName], newRecordData );
+
+						server.exit();
+
+						done();
+					}).catch( done );
+				}).catch( done );
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.update if record does not exist',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+		let newRecordData	= { key: 'value2' };
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.update( namespace, recordName, newRecordData ).then(()=> done( 'Record exists but it should not' )).catch( ( err )=>{
+					assert.equal( true, err !== false );
+
+					server.exit();
+
+					done();
+				} );
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.update if namespace does not exist',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+		let newRecordData	= { key: 'value2' };
+
+		server.setUp().then(()=>{
+			server.update( namespace, recordName, newRecordData ).then(()=> done( 'Record exists but it should not' )).catch( ( err )=>{
+				assert.equal( true, err !== false );
+
+				server.exit();
+
+				done();
+			} );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.update updates ttl',
+	test	: ( done )=>{
+		let server			= new InMemoryDataServer();
+		let namespace		= 'testNamespace';
+		let recordName		= 'testRecord';
+		let recordData		= { key: 'value' };
+		let newRecordData	= { key: 'value2' };
+		let ttl				= 100;
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.create( namespace, recordName, recordData ).then(()=>{
+					server.update( namespace, recordName, newRecordData, { ttl: ttl * 3 } ).then(()=>{
+						setTimeout(()=>{
+							assert.deepStrictEqual( process.dataServer.data[namespace][recordName], newRecordData );
+
+							server.exit();
+
+							done();
+						}, ttl * 2 );
+					}).catch( done );
+				}).catch( done );
+			}).catch( done );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.delete if record exists',
+	test	: ( done )=>{
+		let server		= new InMemoryDataServer();
+		let namespace	= 'testNamespace';
+		let recordName	= 'testRecord';
+		let recordData	= { key: 'test' };
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then( ()=>{
+				server.create( namespace, recordName, recordData ).then( ()=>{
+					server.delete( namespace, recordName ).then(()=>{
+						assert.equal( true, typeof process.dataServer.data[namespace][recordName] === 'undefined' );
+						assert.equal( 0, Object.keys( process.dataServer.timeouts ).length );
+
+						server.exit();
+
+						done();
+					}).catch( done );
+				} ).catch( done );
+			}).catch( done )
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'InMemoryDataServer.delete if record does not exists',
+	test	: ( done )=>{
+		let server		= new InMemoryDataServer();
+		let namespace	= 'testNamespace';
+		let recordName	= 'testRecord';
+
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then( ()=>{
+				server.delete( namespace, recordName ).then(()=> done( 'Record was deleted but it should not have, it does not exist' ) ).catch( ( err )=>{
+					assert.equal( true, typeof process.dataServer.data[namespace][recordName] === 'undefined' );
+					assert.equal( 0, Object.keys( process.dataServer.timeouts ).length );
+					assert.equal( true, err !== false );
+
+					server.exit();
+
+					done();
+				} );
+			}).catch( done )
+		}).catch( done );
+	}
+});
+
+
+test({
+	message	: 'InMemoryDataServer.exit exits',
+	test	: ( done )=>{
+		let server		= new InMemoryDataServer();
+
+		server.setUp().then(()=>{
+			server.exit().then(()=>{
+				assert.equal( 'undefined', typeof process.dataServer );
+				assert.equal( SERVER_STATES.stopped, server.getServerState() );
+
+				done();
+			}).catch( done );
 		}).catch( done );
 	}
 });

@@ -1,10 +1,15 @@
-4.3.0
+5.0.0
 - Fix so the default logger will have a higher Log level
 - Fix so by default the console created in case of no transports in the logger will have the same log level and logLevels as the Logger
 - Added Log.getStackTrace() that returns a string with a sanitized stack trace for debugging
 - Modified the logger plugin to modify the process global object by adding dumpStack() and log functions
 - Added rate limits Plugin 
 - Added tests for rate limits plugin
+- Added new in memory plugin
+- Added new in memory server
+- Data servers can now create MODELS that provide helpful functions and can be used instead of using the data server directly
+- Added tests for the in memory plugin and the in memory server
+- Added tests for the DataModels
 
 4.2.3 
 - You can now choose to disable all the pre-installed plugins
