@@ -2,16 +2,7 @@
 
 const { EventEmitter }	= require( 'events' );
 const createModel		= require( './data_server_model_creator' );
-
-const SERVER_STATES		= {
-	inactive		: 0,
-	starting		: 1,
-	running			: 2,
-	stopping		: 3,
-	stopped			: 4,
-	startupError	: 5,
-	stoppingError	: 6,
-};
+const SERVER_STATES		= require( './server_states' );
 
 /**
  * @brief	DataServer class extended by all data servers used by the EventRequest Server

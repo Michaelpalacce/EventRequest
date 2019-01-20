@@ -35,33 +35,28 @@ module.exports		= {
 	LOG_LEVELS,	Development
 };
 
-// const InMemoryDataServer	= require( './server/components/caching/in_memory/in_memory_data_server' );
-//
-//
-// let server				= new InMemoryDataServer();
-//
-// server.setUp().then(()=>{
-// 	Loggur.log( 'In Memory Data Server started' );
-// 	const Person	= server.model( 'Person' );
-//
-// 	Person.createNamespaceIfNotExists().then(()=>{
-// 		let firstPerson			= new Person();
-// 		firstPerson.recordName	= 'Stefan';
-// 		firstPerson.recordData	= { name: 'Stefan', age: 25 };
-//
-// 		firstPerson.save();
-//
-// 		firstPerson.recordName	= 'Ady';
-// 		firstPerson.recordData	= { name: 'Ady', age: 27 };
-//
-// 		firstPerson.save();
-//
-// 		Person.find( 'Stefan' ).then(( person )=>{
-// 			person.recordData.age	= 26;
-//
-// 			person.save().then(()=>{
-// 				console.log(process.dataServer.data);
-// 			})
-// 		})
-// 	});
-// });
+const InMemoryDataServer	= require( './server/components/caching/in_memory/in_memory_data_server' );
+
+let server				= new InMemoryDataServer();
+
+server.setUp().then(()=>{
+	Loggur.log( 'In Memory Data Server started' );
+	const Person	= server.model( 'Person' );
+
+	Person.createNamespaceIfNotExists().then(()=>{
+		let firstPerson			= new Person();
+		firstPerson.recordName	= 'Stefan';
+		firstPerson.recordData	= { name: 'Stefan', age: 25 };
+
+		firstPerson.save();
+
+		firstPerson.recordName	= 'Stefcho';
+		firstPerson.recordData	= { name: 'Ady', age: 27 };
+
+		firstPerson.save();
+
+		Person.searchAndRemove( 'Stef' ).then(( models )=>{
+			console.log( process.dataServer.data );
+		});
+	});
+});

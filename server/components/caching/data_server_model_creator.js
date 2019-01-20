@@ -1,5 +1,7 @@
 'use strict';
 
+const SERVER_STATES	= require( './server_states' );
+
 /**
  * @brief	Creates a new Data Server model
  *
@@ -11,6 +13,12 @@
  */
 module.exports	= function ( dataServer, namespace, validationSchema = {} )
 {
+	let isServerRunning	= dataServer.getServerState() === SERVER_STATES.running;
+
+	dataServer.on( 'state_change', ( state )=>{
+		isServerRunning	= state === SERVER_STATES.running;
+	} );
+
 	/**
 	 * @brief	Data server model that is attached to a specific namespace and can easily create and save data there.
 	 */
@@ -29,6 +37,16 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		}
 
 		/**
+		 * @brief	Returns the instance of the DataServer that this module was created from
+		 *
+		 * @return	DataServer
+		 */
+		static getDataServer()
+		{
+			return dataServer;
+		}
+
+		/**
 		 * @brief	Saves the data of the current Model
 		 *
 		 * @details	This will save the current state of the object and will attempt to save that.
@@ -44,7 +62,63 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 			let recordOptions	= this.recordOptions;
 
 			return new Promise(( resolve, reject )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
 				dataServer.create( namespace, recordName, recordData, recordOptions ).then(()=>{
+					resolve( false );
+				}).catch( reject );
+			});
+		}
+
+		/**
+		 * @brief	Deletes the current record
+		 *
+		 * @return	Promise
+		 */
+		delete()
+		{
+			let recordName	= this.recordName;
+
+			return new Promise(( resolve, reject )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
+				dataServer.delete( namespace, recordName ).then(()=>{
+					resolve( false );
+				}).catch( reject );
+			});
+		}
+
+		/**
+		 * @brief	Updates the ttl of the record
+		 *
+		 * @details	If not TTL is specified then the default TTL of the server is used
+		 *
+		 * @param	Number ttl
+		 * @param	Object options
+		 *
+		 * @return	Promise
+		 */
+		touch( ttl = 0, options = {} )
+		{
+			let recordName	= this.recordName;
+			options.ttl		= ttl;
+
+			return new Promise(( resolve, reject )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
+				dataServer.touch( namespace, recordName, options ).then(()=>{
 					resolve( false );
 				}).catch( reject );
 			});
@@ -58,7 +132,13 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static removeNamespaceIfExists()
 		{
 			return new Promise(( resolve, reject )=>{
-				dataServer.existsNamespace( namespace ).then(( exists )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
+				ModelClass.existsNamespace().then(( exists )=>{
 					if ( ! exists )
 					{
 						dataServer.removeNamespace( namespace ).then(()=>{
@@ -83,7 +163,13 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static createNamespaceIfNotExists()
 		{
 			return new Promise(( resolve, reject )=>{
-				dataServer.existsNamespace( namespace ).then(( exists )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
+				ModelClass.existsNamespace().then(( exists )=>{
 					if ( ! exists )
 					{
 						dataServer.createNamespace( namespace ).then(()=>{
@@ -108,7 +194,13 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static createNamespace()
 		{
 			return new Promise(( resolve, reject )=>{
-				dataServer.existsNamespace( namespace ).then(( exists )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
+				ModelClass.existsNamespace().then(( exists )=>{
 					if ( ! exists )
 					{
 						dataServer.createNamespace( namespace ).then(()=>{
@@ -128,6 +220,18 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		}
 
 		/**
+		 * @brief	Checks if the namespace exists
+		 *
+		 * @param	Object options
+		 *
+		 * @return	Promise
+		 */
+		static existsNamespace( options = {} )
+		{
+			return dataServer.existsNamespace( namespace );
+		}
+
+		/**
 		 * @brief	Finds one entry in the data server
 		 *
 		 * @details	The promise will resolve to either a ModelClass or null if nothing is found
@@ -139,12 +243,103 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static find( recordName )
 		{
 			return new Promise( ( resolve, reject )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
 				dataServer.read( namespace, recordName ).then(( data )=>{
 					resolve( new ModelClass( recordName, data ) );
 				}).catch(()=>{
 					resolve( null );
 				});
-			})
+			});
+		}
+
+		/**
+		 * @brief	Searches for all the records containing the query
+		 *
+		 * @details	This operation may take a long time
+		 * 			The promise resolves in an array of elements. Empty array if nothing was found
+		 *
+		 * @param	String searchQuery
+		 *
+		 * @return	Promise
+		 */
+		static search( searchQuery )
+		{
+			return new Promise( ( resolve, reject )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
+				dataServer.getAll( namespace ).then(( data )=>{
+					let keys	= Object.keys( data );
+					let models	= [];
+
+					keys.forEach( ( recordName )=>{
+						if ( recordName.indexOf( searchQuery ) !== -1 )
+						{
+							models.push( new ModelClass( recordName, data[recordName] ) );
+						}
+					});
+
+					resolve( models );
+				}).catch( reject );
+			});
+		}
+
+		/**
+		 * @brief	Finds and removes a single entry
+		 *
+		 * @return	Promise
+		 */
+		static findAndRemove()
+		{
+			return new Promise( ( resolve, reject )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
+				dataServer.read( namespace, recordName ).then(( data )=>{
+					resolve( new ModelClass( recordName, data ).delete() );
+				}).catch(()=>{
+					resolve( null );
+				});
+			});
+		}
+
+		static searchAndRemove( searchQuery )
+		{
+			return new Promise( ( resolve, reject )=>{
+				if ( ! isServerRunning )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
+				dataServer.getAll( namespace ).then(( data )=>{
+					let keys		= Object.keys( data );
+					let promises	= [];
+
+					keys.forEach( ( recordName )=>{
+						if ( recordName.indexOf( searchQuery ) !== -1 )
+						{
+							let model	= new ModelClass( recordName, data[recordName] );
+							promises.push( model.delete() );
+						}
+					});
+
+					Promise.all( promises ).then(()=>{
+						resolve( false );
+					}).catch( reject );
+				}).catch( reject );
+			});
 		}
 	}
 
