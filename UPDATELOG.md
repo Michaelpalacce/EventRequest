@@ -10,6 +10,8 @@
 - Data servers can now create MODELS that provide helpful functions and can be used instead of using the data server directly
 - Added tests for the in memory plugin and the in memory server
 - Added tests for the DataModels
+- Can now set the data server to use in the memory_data_server_plugin with the use
+- Updated README
 
 4.2.3 
 - You can now choose to disable all the pre-installed plugins
