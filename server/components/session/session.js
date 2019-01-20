@@ -38,6 +38,8 @@ class Session
 
 		this.session			= {};
 
+		this.model				= this.cachingServer.model( SESSIONS_NAMESPACE );
+
 		if ( typeof this.cachingServer === 'undefined' )
 		{
 			throw new Error( 'Could not create session. No caching container is set in the event' );
@@ -68,9 +70,9 @@ class Session
 			callback( false );
 		}
 
-		this.cachingServer.exists( SESSIONS_NAMESPACE, this.sessionId ).then( callback ).catch( ()=>{
-			callback( false );
-		} )
+		this.model	.find( this.sessionId )
+					.then( ( record )=> callback( record !== null ) )
+					.catch( ()=> callback( false ) );
 	}
 
 	/**
@@ -83,7 +85,7 @@ class Session
 	 */
 	removeSession( callback, sessionId = this.getSessionId() )
 	{
-		this.cachingServer.delete( SESSIONS_NAMESPACE, sessionId ).then( callback ).catch( callback );
+		this.model.findAndRemove( sessionId ).then( callback ).catch( callback );
 	}
 
 	/**
@@ -180,7 +182,8 @@ class Session
 			callback( false );
 			return;
 		}
-		this.cachingServer.create( SESSIONS_NAMESPACE, sessionId, this.session, { ttl : this.ttl } ).then( ()=>{
+
+		this.model.make( sessionId, this.session, { ttl : this.ttl } ).then( ()=>{
 			callback( false );
 		} ).catch( callback );
 	}

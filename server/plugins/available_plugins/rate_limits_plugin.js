@@ -2,7 +2,7 @@
 
 const PluginInterface		= require( './../plugin_interface' );
 
-const DEFAULT_RATE_LIMIT	= 5;
+const DEFAULT_RATE_LIMIT	= 50;
 const DEFAULT_INTERVAL		= 10 * 1000;
 
 /**
@@ -29,8 +29,6 @@ class RateLimitsPlugin extends PluginInterface
 		server.on( 'eventRequestResolved', ( eventData )=>{
 			let { eventRequest }	= eventData;
 			let shouldPass			= this.getRequestRate( eventRequest );
-
-			console.log( shouldPass );
 
 			if ( ! shouldPass )
 			{

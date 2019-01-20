@@ -35,28 +35,26 @@ module.exports		= {
 	LOG_LEVELS,	Development
 };
 
-const InMemoryDataServer	= require( './server/components/caching/in_memory/in_memory_data_server' );
-
-let server				= new InMemoryDataServer();
-
-server.setUp().then(()=>{
-	Loggur.log( 'In Memory Data Server started' );
-	const Person	= server.model( 'Person' );
-
-	Person.createNamespaceIfNotExists().then(()=>{
-		let firstPerson			= new Person();
-		firstPerson.recordName	= 'Stefan';
-		firstPerson.recordData	= { name: 'Stefan', age: 25 };
-
-		firstPerson.save();
-
-		firstPerson.recordName	= 'Stefcho';
-		firstPerson.recordData	= { name: 'Ady', age: 27 };
-
-		firstPerson.save();
-
-		Person.searchAndRemove( 'Stef' ).then(( models )=>{
-			console.log( process.dataServer.data );
-		});
-	});
-});
+// let responseCache	= Server().getPluginManager().getPlugin( 'er_response_cache' );
+// let cacheServer		= Server().getPluginManager().getPlugin( 'er_cache_server' );
+//
+// cacheServer.startServer(( err )=>{
+// 	console.log( 'started' );
+// 	console.log( err );
+// });
+//
+// Server().apply( cacheServer );
+// Server().apply( responseCache );
+//
+// Server().add({
+// 	handler	: ( event )=>{
+// 		event.cacheCurrentRequest();
+// 	}
+// });
+//
+// Server().get( '/', ( event )=>{
+// 	console.log( 'here' );
+// 	event.send( '<h1>Hello</h1>' );
+// });
+//
+// Server().start();

@@ -9,6 +9,13 @@ const { SERVER_STATES }					= require( '../../components/caching/data_server' );
  */
 class SessionPlugin extends PluginInterface
 {
+	constructor( props )
+	{
+		super( props );
+
+		this.model	= null;
+	}
+
 	/**
 	 * @brief	This plugin depends on having a cache
 	 *
@@ -38,41 +45,21 @@ class SessionPlugin extends PluginInterface
 			throw new Error( `Before adding ${this.getPluginId()}, make sure to start the caching server from 'er_cache_server'` )
 		}
 
+		this.model	= cachingServer.model( SESSIONS_NAMESPACE );
+
 		if ( cachingServer.getServerState() === SERVER_STATES.running )
 		{
-			this.setUpNamespace( cachingServer, callback );
+			this.model.createNamespaceIfNotExists().then( callback ).catch( callback );
 		}
 		else
 		{
 			cachingServer.on( 'state_changed', ( state )=>{
 				if ( state === SERVER_STATES.running )
 				{
-					this.setUpNamespace( cachingServer, callback );
+					this.model.createNamespaceIfNotExists().then( callback ).catch( callback )
 				}
 			} );
 		}
-	}
-
-	/**
-	 * @brief	Sets up the namespace of the current server
-	 *
-	 * @param	DataServer cachingServer
-	 * @param	Function callback
-	 *
-	 * @return	void
-	 */
-	setUpNamespace( cachingServer, callback )
-	{
-		cachingServer.existsNamespace( SESSIONS_NAMESPACE ).then( ( exist )=>{
-			if ( ! exist )
-			{
-				cachingServer.createNamespace( SESSIONS_NAMESPACE ).then( callback ).catch( callback );
-			}
-			else
-			{
-				callback( false );
-			}
-		} ).catch( callback );
 	}
 
 	/**

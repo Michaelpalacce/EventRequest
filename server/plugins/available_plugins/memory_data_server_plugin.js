@@ -2,7 +2,8 @@
 
 const PluginInterface			= require( '../plugin_interface' );
 const { Loggur, LOG_LEVELS }	= require( '../../components/logger/loggur' );
-const MemoryDataServer			= require( '../../components/caching/memory/memory_data_server' );
+const InMemoryDataServer		= require( '../../components/caching/in_memory/in_memory_data_server' );
+const { DataServer }			= require( '../../components/caching/data_server' );
 
 /**
  * @brief	MemoryDataServerPlugin responsible for starting and stopping the caching server
@@ -16,6 +17,23 @@ class MemoryDataServerPlugin extends PluginInterface
 	}
 
 	/**
+	 * @brief	Use the server given to this function
+	 *
+	 * @details	The server constructor must be passed
+	 *
+	 * @param	DataServer server
+	 *
+	 * @return	void
+	 */
+	use( server )
+	{
+		if ( server instanceof DataServer )
+		{
+			this.server	= server;
+		}
+	}
+
+	/**
 	 * @brief	Starts the memory server
 	 *
 	 * @param	function callback
@@ -26,7 +44,7 @@ class MemoryDataServerPlugin extends PluginInterface
 	{
 		if ( this.server === null )
 		{
-			this.server	= new MemoryDataServer();
+			this.server	= new InMemoryDataServer();
 
 			let onFulfilled	= ( data )=>{
 				Loggur.log( data, LOG_LEVELS.info );
@@ -49,9 +67,9 @@ class MemoryDataServerPlugin extends PluginInterface
 	}
 
 	/**
-	 * @brief	Returns the MemoryDataServer
+	 * @brief	Returns the DataServer
 	 *
-	 * @returns	MemoryDataServer|false
+	 * @returns	DataServer|false
 	 */
 	getServer()
 	{

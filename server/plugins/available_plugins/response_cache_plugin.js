@@ -1,8 +1,7 @@
 'use strict';
 
-const PluginInterface			= require( '../plugin_interface' );
-const { Loggur, LOG_LEVELS }	= require( '../../components/logger/loggur' );
-const { SERVER_STATES }			= require( '../../components/caching/data_server' );
+const PluginInterface	= require( '../plugin_interface' );
+const { SERVER_STATES }	= require( '../../components/caching/data_server' );
 
 // Defaults for the plugin
 const DEFAULT_TTL		= 60 * 5000;
@@ -13,6 +12,13 @@ const NAMESPACE			= 'rcp';
  */
 class ResponseCachePlugin extends PluginInterface
 {
+	constructor( props )
+	{
+		super( props );
+
+		this.model	= null;
+	}
+
 	/**
 	 * @brief	Dependent on a cache server created by the event request
 	 *
@@ -21,37 +27,6 @@ class ResponseCachePlugin extends PluginInterface
 	getPluginDependencies()
 	{
 		return ['er_cache_server'];
-	}
-
-	/**
-	 * @brief	Sets up a new namespace
-	 *
-	 * @param	DataServer cachingServer
-	 *
-	 * @return	void
-	 */
-	setUpNamespace( cachingServer, callback = ()=>{} )
-	{
-		let onRejected		= ( err )=>{
-			Loggur.log( 'Error setting up the namespace', LOG_LEVELS.notice );
-			callback( err );
-		};
-
-		let onResolved	= ()=>{
-			Loggur.log( 'Response Cache Plugin created namespace successfully', LOG_LEVELS.notice );
-			callback( false );
-		};
-
-		cachingServer.existsNamespace( NAMESPACE ).then( ( exists )=>{
-			if ( ! exists )
-			{
-				cachingServer.createNamespace( NAMESPACE ).then( onResolved ).catch( onRejected );
-			}
-			else
-			{
-				onResolved();
-			}
-		} ).catch( onRejected );
 	}
 
 	/**
@@ -73,16 +48,18 @@ class ResponseCachePlugin extends PluginInterface
 			throw new Error( `Before adding ${this.getPluginId()}, make sure to start the caching server from 'er_cache_server'` )
 		}
 
+		this.model	= cachingServer.model( NAMESPACE );
+
 		if ( cachingServer.getServerState() === SERVER_STATES.running )
 		{
-			this.setUpNamespace( cachingServer, callback );
+			this.model.createNamespaceIfNotExists().then( callback ).catch( callback );
 		}
 		else
 		{
 			cachingServer.on( 'state_changed', ( state )=>{
 				if ( state === SERVER_STATES.running )
 				{
-					this.setUpNamespace( cachingServer, callback );
+					this.model.createNamespaceIfNotExists().then( callback ).catch( callback );
 				}
 			} );
 		}
@@ -102,12 +79,10 @@ class ResponseCachePlugin extends PluginInterface
 
 			if ( typeof response === 'string' )
 			{
-				event.cachingServer.create(
-					'rcp',
-					this.getCacheId( event ),
-					{ response, code, headers },
-					{ ttl: this.getTimeToLive( event ) }
-				).then();
+				let ttl				= this.getTimeToLive( event );
+				let recordName		= this.getCacheId( event );
+
+				this.model.make( recordName, { response, code, headers }, { ttl } );
 			}
 		} );
 	}
@@ -168,17 +143,24 @@ class ResponseCachePlugin extends PluginInterface
 				event.on( 'cleanUp', ()=>{
 					event.cacheCurrentRequest	= undefined;
 				} );
+
 				event.cacheCurrentRequest	= ( options = {}, errCallback = event.next )=>{
 					errCallback							= typeof errCallback === 'function' ? errCallback : event.next;
 					event.currentResponseCacheConfig	= options;
 					let cacheId							= this.getCacheId( event );
 
-					event.cachingServer.exists( NAMESPACE, cacheId ).then( ( exists )=>{
-						if ( exists )
+					this.model.find( cacheId ).then(( model )=>{
+						if ( model === null )
 						{
-							event.cachingServer.read( NAMESPACE, cacheId, { ttl: this.getTimeToLive( event ) } ).then( ( data )=>{
+							this.attachCachingEvent( event );
+							event.next();
+						}
+						else
+						{
+							let ttl	= this.getTimeToLive( event );
 
-								let { response, code, headers }	= data;
+							model.touch( ttl ).then(()=>{
+								let { response, code, headers }	= model.recordData;
 								let headersKeys					= Object.keys( headers );
 
 								headersKeys.forEach(( headerKey )=>{
@@ -189,14 +171,9 @@ class ResponseCachePlugin extends PluginInterface
 
 								event.emit( 'cachedResponse' );
 								event.send( response, code );
-							} ).catch( errCallback );
+							}).catch( errCallback );
 						}
-						else
-						{
-							this.attachCachingEvent( event );
-							event.next();
-						}
-					}).catch( errCallback );
+					});
 				};
 
 				event.next();

@@ -7,7 +7,7 @@ const SERVER_STATES	= require( './server_states' );
  *
  * @param	DataServer dataServer
  * @param	String namespace
- * @param	Object options
+ * @param	Object validationSchema
  *
  * @return	Object
  */
@@ -55,11 +55,10 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 *
 		 * @return	Promise
 		 */
-		save()
+		save( recordOptions = this.recordOptions )
 		{
 			let recordName		= this.recordName;
 			let recordData		= this.recordData;
-			let recordOptions	= this.recordOptions;
 
 			return new Promise(( resolve, reject )=>{
 				if ( ! isServerRunning )
@@ -295,9 +294,11 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		/**
 		 * @brief	Finds and removes a single entry
 		 *
+		 * @param	String recordName
+		 *
 		 * @return	Promise
 		 */
-		static findAndRemove()
+		static findAndRemove( recordName )
 		{
 			return new Promise( ( resolve, reject )=>{
 				if ( ! isServerRunning )
@@ -306,14 +307,28 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				dataServer.read( namespace, recordName ).then(( data )=>{
-					resolve( new ModelClass( recordName, data ).delete() );
-				}).catch(()=>{
-					resolve( null );
-				});
+				this.find( recordName ).then(( model )=>{
+					if ( model !== null )
+					{
+						model.delete().then(()=>{
+							resolve( false );
+						}).catch( reject );
+					}
+					else
+					{
+						resolve( false );
+					}
+				}).catch( reject );
 			});
 		}
 
+		/**
+		 * @brief	Searches for a query and removes all the data
+		 *
+		 * @param	String searchQuery
+		 *
+		 * @return	Promise
+		 */
 		static searchAndRemove( searchQuery )
 		{
 			return new Promise( ( resolve, reject )=>{
@@ -323,21 +338,36 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				dataServer.getAll( namespace ).then(( data )=>{
-					let keys		= Object.keys( data );
+				this.search( searchQuery ).then(( models )=>{
 					let promises	= [];
 
-					keys.forEach( ( recordName )=>{
-						if ( recordName.indexOf( searchQuery ) !== -1 )
-						{
-							let model	= new ModelClass( recordName, data[recordName] );
-							promises.push( model.delete() );
-						}
+					models.forEach(( model )=>{
+						promises.push( model.delete() );
 					});
 
 					Promise.all( promises ).then(()=>{
 						resolve( false );
 					}).catch( reject );
+				})
+			});
+		}
+
+		/**
+		 * @brief	Creates a new record and returns a promise that resolve with the new record
+		 *
+		 * @param	String recordName
+		 * @param	Object recordData
+		 * @param	Object recordOptions
+		 *
+		 * @return	Promise
+		 */
+		static make( recordName, recordData, recordOptions )
+		{
+			let model	= new ModelClass( recordName, recordData, recordOptions );
+
+			return new Promise(( resolve, reject )=>{
+				model.save().then(()=>{
+					resolve( model );
 				}).catch( reject );
 			});
 		}
