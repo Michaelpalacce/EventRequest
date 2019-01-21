@@ -161,7 +161,6 @@ test({
 
 		eventRequest.cachingServer.setUp().then(()=>{
 			session.model.createNamespaceIfNotExists().then(()=>{
-				console.log('TES');
 				session.hasSession(( hasSession )=>{
 					if ( ! hasSession )
 					{

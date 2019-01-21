@@ -133,8 +133,6 @@ class InMemoryDataServer extends DataServer
 					return;
 				}
 
-				this.clearTimeoutFromData( namespace, recordName );
-
 				process.dataServer.data[namespace][recordName]	= data;
 				this.addTimeoutToData( namespace, recordName, this.getTTL( options ) );
 
@@ -216,11 +214,16 @@ class InMemoryDataServer extends DataServer
 	read( namespace, recordName, options = {} )
 	{
 		return new Promise( ( resolve, reject ) =>{
-			this.touch( namespace, recordName, options ).then(
-				()=> resolve( process.dataServer.data[namespace][recordName] )
-			).catch(
-				( error )=> reject( error )
-			)
+			this.exists( namespace, recordName, options ).then( ( exists )=>{
+				if ( exists )
+				{
+					resolve( process.dataServer.data[namespace][recordName] );
+				}
+				else
+				{
+					reject( new Error( 'Record does not exist' ) );
+				}
+			}).catch( reject );
 		} );
 	}
 

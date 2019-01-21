@@ -294,8 +294,8 @@ class MemoryWorker
 	 */
 	read( args, callback =()=>{} )
 	{
-		this.executeInternalCommand( 'touch', args, ( err ) => {
-			if ( ! err )
+		this.executeInternalCommand( 'exists', args, ( err, exists ) => {
+			if ( ! err && exists )
 			{
 				let { namespace, recordName }	= args;
 
@@ -303,7 +303,7 @@ class MemoryWorker
 			}
 			else
 			{
-				callback( err );
+				callback( null );
 			}
 		});
 	}
@@ -489,7 +489,6 @@ class MemoryWorker
 		{
 			ttl	= 24 * 60 * 60 * 1000;
 		}
-
 
 		let keyPair	= namespace + '||' + recordName;
 		this.timeouts[keyPair]	= setTimeout( () => {

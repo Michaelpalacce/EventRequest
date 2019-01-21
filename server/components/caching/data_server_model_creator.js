@@ -255,7 +255,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				dataServer.read( namespace, recordName, options ).then(( data )=>{
+				dataServer.read( namespace, recordName, options ).then( ( data  )=>{
 					resolve( new ModelClass( recordName, data ) );
 				}).catch(()=>{
 					resolve( null );
