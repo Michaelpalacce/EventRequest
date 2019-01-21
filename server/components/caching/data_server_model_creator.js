@@ -29,7 +29,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 * @param	Object recordData
 		 * @param	Options recordOptions
 		 */
-		constructor( recordName, recordData = {}, recordOptions = {} )
+		constructor( recordName = '', recordData = {}, recordOptions = {} )
 		{
 			this.recordName		= recordName;
 			this.recordData		= recordData;
@@ -49,13 +49,15 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		/**
 		 * @brief	Saves the data of the current Model
 		 *
+		 * @param	Object options
+		 *
 		 * @details	This will save the current state of the object and will attempt to save that.
 		 * 			This is done so you can change it immediately after and save the new model
 		 * 			This will not create the namespace if it does not exist
 		 *
 		 * @return	Promise
 		 */
-		save( recordOptions = this.recordOptions )
+		save( options = this.recordOptions )
 		{
 			let recordName		= this.recordName;
 			let recordData		= this.recordData;
@@ -67,7 +69,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				dataServer.create( namespace, recordName, recordData, recordOptions ).then(()=>{
+				dataServer.create( namespace, recordName, recordData, options ).then(()=>{
 					resolve( false );
 				}).catch( reject );
 			});
@@ -76,9 +78,11 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		/**
 		 * @brief	Deletes the current record
 		 *
+		 * @param	Object options
+		 *
 		 * @return	Promise
 		 */
-		delete()
+		delete( options = this.recordOptions )
 		{
 			let recordName	= this.recordName;
 
@@ -89,7 +93,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				dataServer.delete( namespace, recordName ).then(()=>{
+				dataServer.delete( namespace, recordName, options ).then(()=>{
 					resolve( false );
 				}).catch( reject );
 			});
@@ -105,7 +109,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 *
 		 * @return	Promise
 		 */
-		touch( ttl = 0, options = {} )
+		touch( ttl = 0, options = this.recordOptions )
 		{
 			let recordName	= this.recordName;
 			options.ttl		= ttl;
@@ -126,9 +130,11 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		/**
 		 * @brief	Removes the namespace if it exists
 		 *
+		 * @param	Object options
+		 *
 		 * @return	Promise
 		 */
-		static removeNamespaceIfExists()
+		static removeNamespaceIfExists( options = {} )
 		{
 			return new Promise(( resolve, reject )=>{
 				if ( ! isServerRunning )
@@ -137,10 +143,10 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				ModelClass.existsNamespace().then(( exists )=>{
+				ModelClass.existsNamespace( options ).then(( exists )=>{
 					if ( ! exists )
 					{
-						dataServer.removeNamespace( namespace ).then(()=>{
+						dataServer.removeNamespace( namespace, options ).then(()=>{
 							resolve( false );
 						}).catch( reject );
 					}
@@ -159,7 +165,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 *
 		 * @return	Promise
 		 */
-		static createNamespaceIfNotExists()
+		static createNamespaceIfNotExists( options = {} )
 		{
 			return new Promise(( resolve, reject )=>{
 				if ( ! isServerRunning )
@@ -168,10 +174,10 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				ModelClass.existsNamespace().then(( exists )=>{
+				ModelClass.existsNamespace( options ).then(( exists )=>{
 					if ( ! exists )
 					{
-						dataServer.createNamespace( namespace ).then(()=>{
+						dataServer.createNamespace( namespace, options ).then(()=>{
 							resolve( false );
 						}).catch( reject );
 					}
@@ -186,11 +192,13 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		/**
 		 * @brief	Always creates a new namespace
 		 *
+		 * @param	Object options
+		 *
 		 * @details	Will remove it if it already exists
 		 *
 		 * @return	Promise
 		 */
-		static createNamespace()
+		static createNamespace( options = {} )
 		{
 			return new Promise(( resolve, reject )=>{
 				if ( ! isServerRunning )
@@ -199,17 +207,17 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				ModelClass.existsNamespace().then(( exists )=>{
+				ModelClass.existsNamespace( options ).then(( exists )=>{
 					if ( ! exists )
 					{
-						dataServer.createNamespace( namespace ).then(()=>{
+						dataServer.createNamespace( namespace, options ).then(()=>{
 							resolve( false );
 						}).catch( reject );
 					}
 					else
 					{
-						dataServer.removeNamespace( namespace ).then(()=>{
-							dataServer.createNamespace( namespace ).then(()=>{
+						dataServer.removeNamespace( namespace, options ).then(()=>{
+							dataServer.createNamespace( namespace, options ).then(()=>{
 								resolve( false );
 							}).catch( reject );
 						}).catch( reject );
@@ -227,7 +235,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 */
 		static existsNamespace( options = {} )
 		{
-			return dataServer.existsNamespace( namespace );
+			return dataServer.existsNamespace( namespace, options );
 		}
 
 		/**
@@ -236,6 +244,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 * @details	The promise will resolve to either a ModelClass or null if nothing is found
 		 *
 		 * @param	String recordName
+		 * @param	Object options
 		 *
 		 * @return	Promise
 		 */
@@ -263,10 +272,11 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 * 			The promise resolves in an array of elements. Empty array if nothing was found
 		 *
 		 * @param	String searchQuery
+		 * @param	Object options
 		 *
 		 * @return	Promise
 		 */
-		static search( searchQuery )
+		static search( searchQuery, options = {} )
 		{
 			return new Promise( ( resolve, reject )=>{
 				if ( ! isServerRunning )
@@ -275,7 +285,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				dataServer.getAll( namespace ).then(( data )=>{
+				dataServer.getAll( namespace, options ).then(( data )=>{
 					let keys	= Object.keys( data );
 					let models	= [];
 
@@ -295,10 +305,11 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 * @brief	Finds and removes a single entry
 		 *
 		 * @param	String recordName
+		 * @param	Object options
 		 *
 		 * @return	Promise
 		 */
-		static findAndRemove( recordName )
+		static findAndRemove( recordName, options = {} )
 		{
 			return new Promise( ( resolve, reject )=>{
 				if ( ! isServerRunning )
@@ -307,10 +318,10 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				this.find( recordName ).then(( model )=>{
+				this.find( recordName, options ).then(( model )=>{
 					if ( model !== null )
 					{
-						model.delete().then(()=>{
+						model.delete( options ).then(()=>{
 							resolve( false );
 						}).catch( reject );
 					}
@@ -326,10 +337,11 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 * @brief	Searches for a query and removes all the data
 		 *
 		 * @param	String searchQuery
+		 * @param	Object options
 		 *
 		 * @return	Promise
 		 */
-		static searchAndRemove( searchQuery )
+		static searchAndRemove( searchQuery, options = {} )
 		{
 			return new Promise( ( resolve, reject )=>{
 				if ( ! isServerRunning )
@@ -338,11 +350,11 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				this.search( searchQuery ).then(( models )=>{
+				this.search( searchQuery, options ).then(( models )=>{
 					let promises	= [];
 
 					models.forEach(( model )=>{
-						promises.push( model.delete() );
+						promises.push( model.delete( options ) );
 					});
 
 					Promise.all( promises ).then(()=>{
@@ -361,12 +373,12 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 *
 		 * @return	Promise
 		 */
-		static make( recordName, recordData, recordOptions )
+		static make( recordName = '', recordData = {}, recordOptions = {} )
 		{
 			let model	= new ModelClass( recordName, recordData, recordOptions );
 
 			return new Promise(( resolve, reject )=>{
-				model.save().then(()=>{
+				model.save( recordOptions ).then(()=>{
 					resolve( model );
 				}).catch( reject );
 			});

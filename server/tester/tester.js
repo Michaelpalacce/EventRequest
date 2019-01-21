@@ -125,9 +125,9 @@ class Tester
 				newTest.status	= test.status;
 
 				newTest.test	= ( done )=>{
-					data.unshift( done );
+					let newData	= [done].concat( data );
 
-					test.test.apply( this, data );
+					test.test.apply( this, newData );
 				};
 
 				tests.push( newTest );

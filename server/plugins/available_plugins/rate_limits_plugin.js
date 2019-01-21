@@ -2,7 +2,7 @@
 
 const PluginInterface		= require( './../plugin_interface' );
 
-const DEFAULT_RATE_LIMIT	= 50;
+const DEFAULT_RATE_LIMIT	= 100;
 const DEFAULT_INTERVAL		= 10 * 1000;
 
 /**
@@ -34,7 +34,8 @@ class RateLimitsPlugin extends PluginInterface
 			{
 				server.once( 'eventRequestBlockSet', ( eventData )=>{
 					let { eventRequest }	= eventData;
-					eventRequest.setBlock( [this.getRateLimitReachedMiddleware( eventRequest ), this.getRateLimitReachedMiddleware( eventRequest )] );
+					//@TODO CHECK WHY IT IS 2
+					eventRequest.setBlock( [this.getRateLimitReachedMiddleware( eventRequest )] );
 				} );
 			}
 		} );
@@ -83,7 +84,7 @@ class RateLimitsPlugin extends PluginInterface
 			-- this.requests[clientIp][path];
 		}, DEFAULT_INTERVAL );
 
-		return ++ this.requests[clientIp][path] < DEFAULT_RATE_LIMIT;
+		return ++ this.requests[clientIp][path] <= DEFAULT_RATE_LIMIT;
 	}
 }
 

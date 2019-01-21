@@ -6,9 +6,8 @@
 - Added rate limits Plugin 
 - Added tests for rate limits plugin
 - Added new in memory plugin
-- Added new in memory server
-- Data servers can now create MODELS that provide helpful functions and can be used instead of using the data server directly
 - Added tests for the in memory plugin and the in memory server
+- Data servers can now create MODELS that provide helpful functions and can be used instead of using the data server directly
 - Added tests for the DataModels
 - Can now set the data server to use in the memory_data_server_plugin with the use
 - Updated README

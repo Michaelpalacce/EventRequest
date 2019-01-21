@@ -4,6 +4,8 @@
 const { assert, test, helpers }	= require( '../../../test_helper' );
 const MemoryDataServerPlugin	= require( '../../../../server/plugins/available_plugins/memory_data_server_plugin' );
 const { DataServer }			= require( '../../../../server/components/caching/data_server' );
+const MemoryDataServer			= require( '../../../../server/components/caching/memory/memory_data_server' );
+const InMemoryDataServer		= require( '../../../../server/components/caching/in_memory/in_memory_data_server' );
 const Router					= require( '../../../../server/components/routing/router' );
 
 test({
@@ -116,6 +118,7 @@ test({
 		});
 	}
 });
+
 test({
 	message	: 'MemoryDataServerPlugin sets false to cachingServer if the server is not started',
 	test	: ( done )=>{
@@ -134,6 +137,32 @@ test({
 		eventRequest.next();
 
 		assert.equal( true, eventRequest.cachingServer === false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'MemoryDataServerPlugin.use switches the server to be used',
+	test	: ( done )=>{
+		let memoryDataServerPlugin	= new MemoryDataServerPlugin( 'id', { timeout: 0 } );
+		assert.equal( InMemoryDataServer, memoryDataServerPlugin.serverConstructor );
+		memoryDataServerPlugin.use( 'memory' );
+		assert.equal( MemoryDataServer, memoryDataServerPlugin.serverConstructor );
+		memoryDataServerPlugin.use( 'in_memory' );
+		assert.equal( InMemoryDataServer, memoryDataServerPlugin.serverConstructor );
+
+		done();
+	}
+});
+
+test({
+	message	: 'MemoryDataServerPlugin.use with an instantiated DataServer',
+	test	: ( done )=>{
+		let memoryDataServerPlugin	= new MemoryDataServerPlugin( 'id', { timeout: 0 } );
+		assert.equal( null, memoryDataServerPlugin.server );
+		memoryDataServerPlugin.use( new InMemoryDataServer() );
+		assert.equal( true, memoryDataServerPlugin.server instanceof InMemoryDataServer );
 
 		done();
 	}

@@ -34,27 +34,3 @@ module.exports		= {
 	Logging,	Loggur,
 	LOG_LEVELS,	Development
 };
-
-// let responseCache	= Server().getPluginManager().getPlugin( 'er_response_cache' );
-// let cacheServer		= Server().getPluginManager().getPlugin( 'er_cache_server' );
-//
-// cacheServer.startServer(( err )=>{
-// 	console.log( 'started' );
-// 	console.log( err );
-// });
-//
-// Server().apply( cacheServer );
-// Server().apply( responseCache );
-//
-// Server().add({
-// 	handler	: ( event )=>{
-// 		event.cacheCurrentRequest();
-// 	}
-// });
-//
-// Server().get( '/', ( event )=>{
-// 	console.log( 'here' );
-// 	event.send( '<h1>Hello</h1>' );
-// });
-//
-// Server().start();
