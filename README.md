@@ -42,56 +42,102 @@ The event request is an object that is created by the server and passed through 
 ### Properties of eventRequest
 **queryString** - Object - the query string
 
+***
+
 **path** - String - the current path
+
+***
 
 **response** - Response - the response to be sent to the user 
 
+***
+
 **request** - Request - the request send by the user
+
+***
 
 **method** - String - the current method ( GET, POST, DELETE, PUT, etc)
 
+***
+
 **headers** - Object - the current headers 
+
+***
 
 **validationHandler** - ValidationHandler - A handler used to do input validation
 
+***
+
 **extra** - Object - an object that holds extra data that is passed between middlewares
+
+***
 
 **cookies** - Object - the current cookies
 
+***
+
 **params** - Object - request url params that are set by the router
+
+***
 
 **block** - Array - The execution block of middlewares
 
+***
+
 **logger** - Logger - Logs data
+
+***
 
 
 ###Functions exported by the event request:
 
 **setCookie( name, value )** - > sets a new cookie
 
+***
+
 **setStatusCode( Number code )** - > sets the status code of the response
 
+***
+
 **cleanUp** - cleans up the event request. Usually called at the end of the request. Emits a cleanUp event and a finished event. This also removes all other event listeners and sets all the properties to undefined
+
+***
 
 **send( response, statusCode, raw )** - sends the response to the user with the specified statusCode
 * if response is a stream then the stream will be piped to the response
 * if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. Emits a 'send' event and calls cleanUp
 
+***
+
 **setHeader( key, value )** - sets a new header to the response and emits a 'setHeader' event. If the response is finished then an error will be set to the next middleware
+
+***
 
 **redirect( redirectUrl, statusCode )** - redirect to the given url with the specified status code (defaults to 302 ). Emits a 'redirect' event. If the response is finished then an error will be set to the next middleware
 
+***
+
 **isFinished()** - returns a Boolean. Checks if the response is finished
+
+***
 
 **next** - Calls the next middleware in the execution block. If there is nothing else to send and the response has not been sent YET, then send a server error. If the event is stopped and the response has not been set then send a server error
 
+***
+
 **sendError( error = '', code = 500 )** - Like send but used to send errors. This will emit an 'on_error' event as well as the usual send events 
+
+***
 
 ### Events emitted by the EventRequest
 
 **cleanUp** - no arguments - Emitted when the event request is cleaning up after finishing
 
+***
+
 **finished** - no arguments - Emitted when even cleaning up has finished and the eventRequest is completed
+
+***
 
 **send** - ( Object sendData ) - Emitted when a response has been sent.
 sendData contains: 
@@ -101,17 +147,23 @@ sendData contains:
     **response** - Mixed - The response that was returned
     **headers** - Object - The headers that were sent
 
+***
+
 **setHeader** - ( Object headerData ) - Emitted when a new header was added to the response
 headerData contains:
     
     **key** - String - The header name
     **value** - String - The header value
 
+***
+
 **redirect** - ( Object redirectData ) - Emitted when a redirect response was sent
 redirectData contains:
     
     **redirectUrl** - String - the url to which the redirect response was sent
     **statusCode** - String - the status code returned
+
+***
 
 
 ***
@@ -132,53 +184,100 @@ When creating the first instance, make sure to pass the desired options.
 
 **protocol** - String - The protocol to be used ( http || https ) -> Defaults to http
 
+***
+
 **httpsOptions** - Object - Options that will be given to the https webserver -> Defaults to {}
+
+***
 
 **port** - Number - The port to run the web-server on -> Defaults to 3000
 
+***
+
 **plugins** - Boolean - A flag that determines if the pre-installed plugins should be enabled or not -> Defaults to true
+
+***
 
 ### Functions exported by the server:
 **getPluginManager()** - returns PluginManager - Returns an instance of the plugin manager attached to the server
 
+***
+
 **add( Object|Route route )** - Adds a new route to the server
+
+***
 
 **apply( String|Object plugin, Object options )** - Applies a new plugin with the specified options
 
+***
+
 **getPlugin( String pluginId )** - PluginInterface returns the desired plugin
+
+***
 
 **hasPlugin( String pluginId )** - Boolean - Checks whether a plugin has been added to the server. Note this does not work with the plugin manager
 
+***
+
 **start( Function callback )** - Starts the server. Uses a negative callback. If there were no errors then false will be returned as well as the created server as a second argument
 
+***
+
 **stop()** - Stops the server
+
+***
 
 ### Events emitted by the server
 **addRoute** - ( mixed route ) - When a new route is being added
 
+***
+
 **serverStart** - no arguments - When the server is being started
+
+***
 
 **serverStop** - no arguments - When the server is being stopped
 
+***
+
 **serverCreationSuccess** - ( net.Server server, Number port ) - When the server is successfully started
+
+***
 
 **serverCreationError** - ( net.Server server, Error error ) - When an error occurs while starting the server
 
+***
+
 **eventRequestResolved** - ( EventRequest eventRequest, IncomingMessage request, ServerResponse response ) - When the event request is first created
+
+***
 
 **eventRequestRequestClosed** - ( EventRequest eventRequest, IncomingMessage request ) - When the request gets closed
 
+***
+
 **eventRequestResponseFinish** - ( EventRequest eventRequest, ServerResponse response ) - When the response is finished
+
+***
 
 **eventRequestResponseError** - ( EventRequest eventRequest, ServerResponse response, Error error ) - When there is an error with the response
 
+***
+
 **eventRequestBlockSetting** - ( EventRequest eventRequest, Array block ) - called when the block is retrieved from the router
+
+***
 
 **eventRequestBlockSet** - ( EventRequest eventRequest, Array block ) - called when the block is set in the eventRequest
 
+***
+
 **eventRequestError** - ( EventRequest eventRequest, Error error ) - called when there is an error event emitted by the eventRequest
 
+***
+
 **eventRequestThrow** - ( EventRequest eventRequest, Error error ) - called when an error is thrown from the eventRequest
+***
 
 ***
 ### Ways to add routes:
@@ -188,7 +287,11 @@ You can use .post, .put, .get, .delete methods from the server that accept Requi
 
 **route** -> String or RegExp -> the route to witch the middleware should be attached
 
+***
+
 **handler** -> Function -> the middleware to be added
+
+***
 
 ~~~javascript
 let server	= Server();
@@ -226,9 +329,15 @@ server.add({
 ~~~
 **handler** - Function - The callback function ! Required
 
+***
+
 **route** - String|RegExp - The route to match - optional if omitted the handler will be called on every request
 
+***
+
 **method** - String|Array - The method(s) to be matched for the route - optional if omitted the handler will be called on every request as long as the route matches
+
+***
 
 ***
 ### Plugins
@@ -253,9 +362,15 @@ as other plugins by fetching them and configuring them as you wish. They can not
 
 **er_static_resources**
 
+***
+
 **er_body_parser_json**
 
+***
+
 **er_body_parser_form**
+
+***
 
 
 ###Read down to the Plugin section for more information
@@ -274,17 +389,31 @@ The Loggur can be used to create Loggers which accept the following options:
 
 **serverName** - String - The name of the server to be concatenated with the uniqueId - Defaults to empty
 
+***
+
 **transports** - Array - Array of the transports to be added to the logger - Defaults to empty
+
+***
 
 **logLevel** - Number - The log severity level -> Defaults to error
 
+***
+
 **logLevels** - Object - JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
+
+***
 
 **capture** - Boolean - Whether to attach event listeners for process.on uncaughtException and unhandledRejection - Defaults to false
 
+***
+
 **dieOnCapture** - Boolean - If the process should exit in case of a caught exception -> Defaults to true
 
+***
+
 **unhandledExceptionLevel** - Number - What level should the unhandled exceptions be logged at -> Defaults to error
+
+***
 
 Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log and will call all added Loggers
 ~~~javascript
@@ -376,41 +505,79 @@ skeleton must have the keys that are to be validated that point to a string of r
 
 **rules** - if malformed rules string is passed
 
+***
+
 **optional** - if set as long as the input is empty it will always be valid. if not empty other possible rules will be called
+
+***
 
 **filled** - checks if the input is filled
 
+***
+
 **string** - checks if the input is a string
+
+***
 
 **notString** - checks if the input is NOT a string
 
+***
+
 **range** - Is followed by min and max aka: range:1-2 where 1 is the minimum and 2 maximum.
+
+***
 
 **min** - minimum input length
 
+***
+
 **max** - maximum input length
+
+***
 
 **email** - checks if the input is a valid email
 
+***
+
 **isTrue** - checks if the input evaluates to true
+
+***
 
 **isFalse** - checks if the input evaluates to false
 
+***
+
 **boolean** - checks if the input is a boolean
+
+***
 
 **notBoolean** - checks if the input is not a boolean
 
+***
+
 **numeric** - checks if the input is a number
+
+***
 
 **notNumeric** - checks if the input is not a number
 
+***
+
 **date** - checks if the input is a date
+
+***
 
 **same** - checks if the input is the same as another input aka: same:emailInput
 
+***
+
 **different** - checks if the input is different from another input aka: different:emailInput
 
+***
+
 **equals** - checks if the input equals another given string: equals:makeSureToEqualToThis
+
+***
 
 
 When validation is done a ValidationResult is returned. It has 2 main methods:
@@ -523,22 +690,44 @@ The 'runAllTests' function accepts an object that accepts the following options:
 
 **dieOnFirstError** - Boolean - Whether the testing should stop on the first error - Defaults to true
 
+***
+
 **debug** - Boolean - Whether errors thrown should show their entire stack or just the message - Defaults to false
+
+***
 
 **silent** - Boolean - This will set the consoleLogger logLevel to error, meaning only errors will be displayed - Defaults to false
 
+***
+
 **filter** - String - the string to search for and filter by when testing - Defaults to false
 
+***
+
 **callback** - Function - Callback to be called when testing is complete
+
+***
 
 The run all tests will run all tests added by the test function.
 
 The 'test' function accepts an object with the following options:
 
 **message** - String - the name of the test
+
+***
+
 **skipped** - Boolean - defaults to false - If this is set to true the test will be skipped
+
+***
+
 **incomplete** - Boolean - defaults to false - If this is set to true the test will be marked as incomplete
+
+***
+
 **dataProvider** - Array - Optional - If this is provided then an Array of Arrays must be supplied.
+
+***
+
     
     For each Array supplied, a new test will be created and called with the Array elements set as arguments to the test callback
     
@@ -555,7 +744,7 @@ The 'test' function accepts an object with the following options:
        dataProvier : [
            ['first', 2 ],
            ['firstTwo', 21 ],
-       ]
+       ],
        test        : ( done, first, second ) =>{  
           console.log( first ); this will log 'first', then on the second iterration 'firstTwo'
           console.log( second ); this will log 2, then on the second iterration 21
@@ -600,11 +789,15 @@ The TestingTools export:
 ***
 
 # Caching
-There is an built-in in-memory caching server that works with promises
+There is an built-in in-memory and memory caching server that works with promises
 
-The data servers have several states:
+Both data servers have the same functionality 
+The in-memory data server is loaded in the process.dataServer and is faster that the memory one 
+which is an external service.
+
+The data servers have several states that can be retrieved with getServerState():
 ~~~javascript
-const SERVER_STATES		= {
+const SERVER_STATES	= {
 	inactive		: 0,
 	starting		: 1,
 	running			: 2,
@@ -615,169 +808,118 @@ const SERVER_STATES		= {
 };
 ~~~
 
-Below are the methods supported by the base DataServer and the in memory data server implements them
+NOTICE: resolving with err will always be false. This is done so the negative callback is supported.
 
-~~~javascript
-	/**
-	 * @brief	Gets a instance of the current DataServer
-	 *
-	 * @return	DataServer
-	 */
-	static getInstance( options = {} );
+**getServerState()** -> Number, Returns the current server state
 
-	/**
-	 * @brief	Sanitizes the configuration
-	 *
-	 * @param	Object options
-	 */
-	sanitize( options );
-	
-	/**
-	 * @brief	Changes the server state and emits an event
-	 *
-	 * @param	Number state
-	 *
-	 * @return	void
-	 */
-	changeServerState( state );
+***
 
-	/**
-	 * @brief	Gets the server state of the data server
-	 *
-	 * @return	Number
-	 */
-	getServerState();
+**setUp( Object options = {} )** -> Promise, resolve( false, status ), does not reject
+memory_data_server:
+    
+    AcceptedOptions
+        **memoryLimit** -> Number, the amount of bytes of data to be allocated to the server in bytes
 
-	/**
-	 * @brief	Sets up the data server
-	 *
-	 * @details	Any connections to external sources should be done here if needed
-	 *
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	setUp( options = {} );
+***
 
-	/**
-	 * @brief	Disconnects from the data server
-	 *
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	exit( options = {} );
+**exit( Object options = {} )** -> Promise, resolve( false ), does not reject
 
-	/**
-	 * @brief	Create the namespace
-	 *
-	 * @details	If the Data Server supports namespaces ( folders on the file system, tables in CQL/SQl, etc )
-	 *
-	 * @param	String namespace
-	 * @param	String options
-	 *
-	 * @return	Promise
-	 */
-	createNamespace( namespace, options = {} );
+***
 
-	/**
-	 * @brief	Checks whether the namespace exists
-	 *
-	 * @details	Returns true if the namespace exists
-	 *
-	 * @param	String namespace
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	existsNamespace( namespace, options = {} );
+**createNamespace( String namespace, Object options = {} )** -> Promise, resolve( false ), reject( err )
 
-	/**
-	 * @brief	Deletes the namespace if it exists
-	 *
-	 * @details	Returns true if the namespace was deleted
-	 *
-	 * @param	String namespace
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	removeNamespace( namespace, options = {} );
+***
 
-	/**
-	 * @brief	Create the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	mixed data
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	create( namespace, recordName, data = {}, options = {} );
+**existsNamespace( String namespace, Object options = {} )** -> Promise, resolve( Boolean exists ), reject( err ). 
+ If the promise is rejected it would be in case of an error, not in case of the namespace not existing
 
-	/**
-	 * @brief	Checks whether the record exists
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	exists( namespace, recordName, options = {} );
+***
 
-	/**
-	 * @brief	Update the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	mixed data
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	update( namespace, recordName, data = {}, options = {} );
+**removeNamespace( String namespace, Object options = {} )** -> Promise, resolve( false ), reject( err ).
+ This will reject if the namespace does not exist, so always do existsNamespace before hand.
 
-	/**
-	 * @brief	Read the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	read( namespace, recordName, options = {} );
+***
+ 
+**create( String namespace, String recordName, Object data = {}, Object options = {} )** -> Promise, resolve( false ), reject( err )
+ This will reject if the namespace does not exist. 
+ 
+    Accepted options:
+        **ttl** -> Number, after how many milliseconds should the record be deleted
 
-	/**
-	 * @brief	Delete the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	delete( namespace, recordName, options = {} );
+***
 
-	/**
-	 * @brief	Get all records from the namespace
-	 *
-	 * @param	String namespace
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	getAll( namespace, options = {} );
-~~~
+**exists( String namespace, String recordName, Object options = {} )** -> Promise, resolve( exists ), reject( err )
+ This will resolve even if the namespace does not exist
 
-The create, update, read all accept ttl as an options which must be a number in milliseconds stating for how long the entry should be kept within the memory
+***
 
-The caching server is added to every event: event.cachingServer and can be used anywhere
+**delete( String namespace, String recordName, Object options = {} )** -> Promise, resolve( false ), reject( err )
+ This will reject if the namespace or if the record does not exist
 
-### Again this caching server should not be used in production and is solely for development purposes.
+***
 
+**getAll( String namespace, Object options = {} )** -> Promise, resolve( Object data ), reject( err )
+ Resolves with the entire namespace as an object. Rejects if the namespace does not exist
+
+***
+
+**read( String namespace, String recordName, Object options = {} )** -> Promise, resolve( Object data ), reject( err )
+ Resolves with one record containing an object of the data stored with create or null if not found, Rejects on errors, does not reject if not found!
+
+***
+
+**touch( String namespace, String recordName, Object options = {} )** -> Promise, resolve( false ), reject( err )
+ Rejects if the record does not exist
+ 
+    Accepted options
+        **ttl** -> Number, time to live
+
+***
+
+**update( String namespace, String recordName, Object recordData = {}, Object options = {} )** -> Promise, resolve( false ), reject ( err )
+ Rejects if the record does not exist
+ 
+    Accepted options
+        **ttl** -> Number, time to live
+
+# DataServerModel
+Any Data Server created using the DataServer class exported by the module has access to a 
+
+**model( String namespace, Object options )** -> ModelClass
+
+method that creates a new class that can be used to interact with the Data Servers.
+ Options are intended for future implementations
+
+The model class constructor accepts recordName, recordData, recordOptions. 
+
+**recordName** -> String, The name under which the recordData will be stored
+
+***
+
+**recordData** -> Object, The data to be stored
+
+***
+
+**recordOptions** -> Object, The default options for the model. **NOTE** these should be set again if the model is retrieved from the data server
+
+    Accepted options:
+        **ttl** - Time for the data to live
+
+***
+
+### Function exported by the class:
+**static getDataServer()** -> DataServer, the data server attached to the model
+
+***
+
+**save( Object options = {} )** -> Promise, resolve( false ), reject( err ) Saves the data to DataServer
+ Will reject if the namespace is not created. This is a save return so even if the name is changed immediately or the data is, 
+ the old one will still be saved
+
+***
+
+**delete( Object options = {} )** -> Promise, resolve( false ), reject( err ), Deletes the record if it exists
+ Will not reject if it does not exist
 
 ***
 ***
@@ -859,6 +1001,10 @@ Adds a memory cache server
         a negative return. False if everything went correctly, true on failure. The second argument will be the server if returned false
         callback( false, MemoryDataServer );
         callback( true );
+    **use( server )** -> sets the server to be used. 
+                        Passing memory will use the external memory server ( slower but works with clusters )
+                        Passing in_memory will use the internal memory server ( faster and by default but does not work with clusters )
+                        Passing an instance of DataServer will use the server passed and will skip setting it up.
     **getServer()** -> retruns the MemoryDataServer or null if not started
     **stopServer( callback )** -> stops the server and has the same behaviour as startServer but without a second argument
 ***

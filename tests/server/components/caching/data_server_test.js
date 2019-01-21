@@ -31,18 +31,3 @@ test({
 		called === 1 ? done() : done( 'Sanitize should have been called but it was not' );
 	}
 });
-
-test({
-	message	: 'DataServer.getInstance returns an instance of DataServer',
-	test	: ( done )=>{
-		let MockedDataServer	= Mock( DataServer );
-		Mocker( MockedDataServer, {
-			method			: 'sanitize',
-			shouldReturn	: ()=>{}
-		} );
-
-		assert.deepStrictEqual( new MockedDataServer(), MockedDataServer.getInstance() );
-
-		done();
-	}
-});

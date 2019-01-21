@@ -36,7 +36,7 @@ class InMemoryDataServer extends DataServer
 			}
 
 			this.changeServerState( SERVER_STATES.running );
-			resolve( false );
+			resolve( false, 'Caching server is set up' );
 		});
 	}
 
@@ -221,7 +221,7 @@ class InMemoryDataServer extends DataServer
 				}
 				else
 				{
-					reject( new Error( 'Record does not exist' ) );
+					resolve( null );
 				}
 			}).catch( reject );
 		} );

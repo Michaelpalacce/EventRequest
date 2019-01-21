@@ -27,9 +27,7 @@ test({
 			assert.equal( 'object', typeof process.dataServer.timeouts );
 			assert.equal( SERVER_STATES.running, server.getServerState() );
 
-			server.exit();
-
-			done();
+			server.exit().then( done ).catch( done );
 		}).catch( done );
 	}
 });
@@ -46,9 +44,7 @@ test({
 				assert.equal( 'object', typeof process.dataServer.timeouts );
 				assert.equal( SERVER_STATES.running, server.getServerState() );
 
-				server.exit();
-
-				done();
+				server.exit().then( done ).catch( done );
 			}).catch( done );
 		}).catch( done );
 	}
@@ -63,9 +59,7 @@ test({
 			server.createNamespace( namespace ).then(()=>{
 				assert.equal( 'object', typeof process.dataServer.data[namespace] );
 
-				server.exit();
-
-				done();
+				server.exit().then( done ).catch( done );
 			}).catch( done );
 		}).catch( done );
 	}
@@ -83,9 +77,7 @@ test({
 				).catch( ( err )=>{
 					assert.equal( true, err !== false );
 
-					server.exit();
-
-					done();
+					server.exit().then( done ).catch( done );
 				} );
 			}).catch( done );
 		}).catch( done );
@@ -101,9 +93,7 @@ test({
 			server.existsNamespace( namespace ).then( ( exists )=>{
 				assert.equal( exists, false );
 
-				server.exit();
-
-				done();
+				server.exit().then( done ).catch( done );
 			}).catch( done );
 		}).catch( done );
 	}
@@ -119,9 +109,7 @@ test({
 				server.existsNamespace( namespace ).then( ( exists )=>{
 					assert.equal( exists, true );
 
-					server.exit();
-
-					done();
+					server.exit().then( done ).catch( done );
 				}).catch( done );
 			}).catch( done );
 		}).catch( done );
@@ -137,9 +125,7 @@ test({
 			server.removeNamespace( namespace ).then( ()=> done( 'removeNamespace should have rejected' ) ).catch( ( err )=>{
 				assert.equal( true, err !== false );
 
-				server.exit();
-
-				done();
+				server.exit().then( done ).catch( done );
 			} );
 		}).catch( done );
 	}
@@ -156,9 +142,7 @@ test({
 					assert.equal( false, error );
 					assert.equal( true, typeof process.dataServer.data[namespace] === 'undefined' );
 
-					server.exit();
-
-					done();
+					server.exit().then( done ).catch( done );
 				} ).catch( done );
 			}).catch( done );
 		}).catch( done );
@@ -177,9 +161,7 @@ test({
 			server.create( namespace, recordName, recordData ).then( ()=> done( 'create should have been rejected' ) ).catch(( err )=>{
 				assert.equal( true, err !== false );
 
-				server.exit();
-
-				done();
+				server.exit().then( done ).catch( done );
 			});
 		}).catch( done );
 	}
@@ -199,9 +181,7 @@ test({
 					assert.equal( 'object', typeof process.dataServer.data[namespace][recordName] );
 					assert.equal( 1, Object.keys( process.dataServer.timeouts ).length );
 
-					server.exit();
-
-					done();
+					server.exit().then( done ).catch( done );
 				} ).catch( done );
 			}).catch( done )
 		}).catch( done );
@@ -225,9 +205,7 @@ test({
 					setTimeout(()=>{
 						assert.equal( 'undefined', typeof process.dataServer.data[namespace][recordName] );
 
-						server.exit();
-
-						done();
+						server.exit().then( done ).catch( done );
 					}, ttl * 2);
 				} ).catch( done );
 			}).catch( done )
@@ -257,9 +235,7 @@ test({
 						setTimeout(()=>{
 							assert.equal( 'undefined', typeof process.dataServer.data[namespace][recordName] );
 
-							server.exit();
-
-							done();
+							server.exit().then( done ).catch( done );
 						}, ttl * 3 );
 					} ).catch( done );
 				} ).catch( done );
@@ -283,9 +259,7 @@ test({
 					server.exists( namespace, recordName ).then( ( exists )=>{
 						assert.equal( true, exists );
 
-						server.exit();
-
-						done();
+						server.exit().then( done ).catch( done );
 					}).catch( done );
 				} ).catch( done );
 			}).catch( done )
@@ -303,9 +277,9 @@ test({
 		server.setUp().then(()=>{
 			server.createNamespace( namespace ).then( ()=>{
 				server.exists( namespace, recordName ).then( ( exists )=>{
-					server.exit();
+					assert.equal( false, exists );
 
-					exists ? done( 'Record exists but it shouldn\'t' ) : done();
+					server.exit().then( done ).catch( done );
 				}).catch( done );
 			}).catch( done )
 		}).catch( done );
@@ -321,9 +295,9 @@ test({
 
 		server.setUp().then(()=>{
 			server.exists( namespace, recordName ).then( ( exists )=>{
-				server.exit();
+				assert.equal( false, exists );
 
-				exists ? done( 'Record exists but it shouldn\'t' ) : done();
+				server.exit().then( done ).catch( done );
 			}).catch( done );
 		}).catch( done );
 	}
@@ -340,9 +314,7 @@ test({
 			server.getAll( namespace, recordName ).then( ()=> done( 'Namespace exists but it shouldn\'t' ) ).catch( ( err )=>{
 				assert.equal( true, err !== false );
 
-				server.exit();
-
-				done();
+				server.exit().then( done ).catch( done );
 			} );
 		}).catch( done );
 	}
@@ -366,9 +338,7 @@ test({
 					server.getAll( namespace, recordName ).then( ( data )=>{
 						assert.deepStrictEqual( expectedData, data );
 
-						server.exit();
-
-						done();
+						server.exit().then( done ).catch( done );
 					} ).catch( done );
 				}).catch( done );
 			}).catch( done );
@@ -390,9 +360,7 @@ test({
 					server.read( namespace, recordName ).then(( data )=>{
 						assert.deepStrictEqual( recordData, data );
 
-						server.exit();
-
-						done();
+						server.exit().then( done ).catch( done );
 					}).catch( done );
 				}).catch( done );
 			}).catch( done );
@@ -407,19 +375,15 @@ test({
 		let namespace		= 'testNamespace';
 		let recordName		= 'testRecord';
 
-		setTimeout(()=>{
-			server.setUp().then(()=>{
-				server.createNamespace( namespace ).then(()=>{
-					server.read( namespace, recordName ).then( ()=> done( 'Record exists but shouldn\'t' ) ).catch( ( err )=>{
-						assert.equal( true, err !== false );
+		server.setUp().then(()=>{
+			server.createNamespace( namespace ).then(()=>{
+				server.read( namespace, recordName ).then( ( record )=>{
+					assert.equal( null, record );
 
-						server.exit();
-
-						done();
-					} );
-				}).catch( done );
+					server.exit().then( done ).catch( done );
+				} ).catch( done );
 			}).catch( done );
-		}, 500 );
+		}).catch( done );
 	}
 });
 
@@ -431,13 +395,11 @@ test({
 		let recordName		= 'testRecord';
 
 		server.setUp().then(()=>{
-			server.read( namespace, recordName ).then( ()=> done( 'Record exists but shouldn\'t' ) ).catch( ( err )=>{
-				assert.equal( true, err !== false );
+			server.read( namespace, recordName ).then( ( record )=>{
+				assert.equal( null, record );
 
-				server.exit();
-
-				done();
-			} );
+				server.exit().then( done ).catch( done );
+			} ).catch( done );
 		}).catch( done );
 	}
 });
@@ -456,9 +418,7 @@ test({
 					server.touch( namespace, recordName ).then(()=>{
 						assert.deepStrictEqual( process.dataServer.data[namespace][recordName], recordData );
 
-						server.exit();
-
-						done();
+						server.exit().then( done ).catch( done );
 					}).catch( done );
 				}).catch( done );
 			}).catch( done );
@@ -478,9 +438,7 @@ test({
 				server.touch( namespace, recordName ).then(()=> done( 'Record exists but it should not' ) ).catch( ( err )=>{
 					assert.equal( true, err !== false );
 
-					server.exit();
-
-					done();
+					server.exit().then( done ).catch( done );
 				} );
 			}).catch( done );
 		}).catch( done );
@@ -498,9 +456,7 @@ test({
 			server.touch( namespace, recordName ).then(()=> done( 'Record exists but it should not' ) ).catch( ( err )=>{
 				assert.equal( true, err !== false );
 
-				server.exit();
-
-				done();
+				server.exit().then( done ).catch( done );
 			} );
 		}).catch( done );
 	}
@@ -522,9 +478,7 @@ test({
 						setTimeout(()=>{
 							assert.deepStrictEqual( process.dataServer.data[namespace][recordName], recordData );
 
-							server.exit();
-
-							done();
+							server.exit().then( done ).catch( done );
 						}, ttl * 2 );
 					}).catch( done );
 				}).catch( done );
@@ -548,9 +502,7 @@ test({
 					server.update( namespace, recordName, newRecordData ).then(()=>{
 						assert.deepStrictEqual( process.dataServer.data[namespace][recordName], newRecordData );
 
-						server.exit();
-
-						done();
+						server.exit().then( done ).catch( done );
 					}).catch( done );
 				}).catch( done );
 			}).catch( done );
@@ -571,9 +523,7 @@ test({
 				server.update( namespace, recordName, newRecordData ).then(()=> done( 'Record exists but it should not' )).catch( ( err )=>{
 					assert.equal( true, err !== false );
 
-					server.exit();
-
-					done();
+					server.exit().then( done ).catch( done );
 				} );
 			}).catch( done );
 		}).catch( done );
@@ -592,9 +542,7 @@ test({
 			server.update( namespace, recordName, newRecordData ).then(()=> done( 'Record exists but it should not' )).catch( ( err )=>{
 				assert.equal( true, err !== false );
 
-				server.exit();
-
-				done();
+				server.exit().then( done ).catch( done );
 			} );
 		}).catch( done );
 	}
@@ -617,9 +565,7 @@ test({
 						setTimeout(()=>{
 							assert.deepStrictEqual( process.dataServer.data[namespace][recordName], newRecordData );
 
-							server.exit();
-
-							done();
+							server.exit().then( done ).catch( done );
 						}, ttl * 2 );
 					}).catch( done );
 				}).catch( done );
@@ -643,9 +589,7 @@ test({
 						assert.equal( true, typeof process.dataServer.data[namespace][recordName] === 'undefined' );
 						assert.equal( 0, Object.keys( process.dataServer.timeouts ).length );
 
-						server.exit();
-
-						done();
+						server.exit().then( done ).catch( done );
 					}).catch( done );
 				} ).catch( done );
 			}).catch( done )
@@ -667,9 +611,7 @@ test({
 					assert.equal( 0, Object.keys( process.dataServer.timeouts ).length );
 					assert.equal( true, err !== false );
 
-					server.exit();
-
-					done();
+					server.exit().then( done ).catch( done );
 				} );
 			}).catch( done )
 		}).catch( done );

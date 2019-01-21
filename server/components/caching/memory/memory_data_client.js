@@ -303,7 +303,7 @@ class MemoryWorker
 			}
 			else
 			{
-				callback( null );
+				callback( false, null );
 			}
 		});
 	}
@@ -379,26 +379,17 @@ class MemoryWorker
 		this.executeInternalCommand( 'existsNamespace', args, ( err, exists ) => {
 			if ( ! err && exists )
 			{
-				this.executeInternalCommand( 'exists', args, ( err, exists ) => {
-					if ( err )
-					{
-						callback( err )
-					}
-					else
-					{
-						let { namespace, data, recordName }	= args;
+				let { namespace, data, recordName }	= args;
 
-						if ( exists )
-						{
-							this.clearTimeoutFromData( namespace, recordName );
-						}
+				if ( exists )
+				{
+					this.clearTimeoutFromData( namespace, recordName );
+				}
 
-						this.data[namespace][recordName]	= data;
-						this.addTimeoutToData( namespace, recordName, this.getTTL( args ) );
+				this.data[namespace][recordName]	= data;
+				this.addTimeoutToData( namespace, recordName, this.getTTL( args ) );
 
-						callback( false );
-					}
-				});
+				callback( false );
 			}
 			else
 			{

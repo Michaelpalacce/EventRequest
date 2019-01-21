@@ -5,14 +5,14 @@ const testSuites		= require( './tests/test_suites' );
 const { server }		= require( './tests/test_bootstrap' );
 
 let startTests	= ()=>{
-	// testSuites.eventSuite();
+	testSuites.eventSuite();
 	testSuites.cachingSuite();
-	// testSuites.securitySuite();
-	// testSuites.routingSuite();
-	// testSuites.loggingSuite();
-	// testSuites.bodyParserSuite();
-	// testSuites.validationSuite();
-	// testSuites.pluginsSuite();
+	testSuites.securitySuite();
+	testSuites.routingSuite();
+	testSuites.loggingSuite();
+	testSuites.bodyParserSuite();
+	testSuites.validationSuite();
+	testSuites.pluginsSuite();
 
 	runAllTests({
 		dieOnFirstError	: true,

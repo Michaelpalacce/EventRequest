@@ -23,16 +23,6 @@ class DataServer extends EventEmitter
 	}
 
 	/**
-	 * @brief	Gets a instance of the current DataServer
-	 *
-	 * @return	DataServer
-	 */
-	static getInstance( options = {} )
-	{
-		return new this( options );
-	}
-
-	/**
 	 * @brief	Creates a new model to be used for the given namespace.
 	 *
 	 * @param	String namespace

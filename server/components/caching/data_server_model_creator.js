@@ -91,8 +91,17 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				dataServer.delete( namespace, recordName, options ).then(()=>{
-					resolve( false );
+				dataServer.exists( namespace, recordName ).then(( exists )=>{
+					if ( ! exists )
+					{
+						resolve( false );
+					}
+					else
+					{
+						dataServer.delete( namespace, recordName, options ).then(()=>{
+							resolve( false );
+						}).catch( reject );
+					}
 				}).catch( reject );
 			});
 		}
@@ -142,7 +151,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 				}
 
 				ModelClass.existsNamespace( options ).then(( exists )=>{
-					if ( ! exists )
+					if ( exists )
 					{
 						dataServer.removeNamespace( namespace, options ).then(()=>{
 							resolve( false );
@@ -255,8 +264,15 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				dataServer.read( namespace, recordName, options ).then( ( data  )=>{
-					resolve( new ModelClass( recordName, data ) );
+				dataServer.read( namespace, recordName, options ).then( ( data )=>{
+					if ( data === null )
+					{
+						resolve( null );
+					}
+					else
+					{
+						resolve( new ModelClass( recordName, data ) );
+					}
 				}).catch(()=>{
 					resolve( null );
 				});
