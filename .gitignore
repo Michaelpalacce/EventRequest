@@ -3,3 +3,4 @@ node_modules
 /package-lock.json
 /server/components/logger/components/transport_types/fixtures/*.log
 /tests/server/components/body_parsers/fixture/testUploads/*
+/rate_limits.json

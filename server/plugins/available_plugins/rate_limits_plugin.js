@@ -1,9 +1,16 @@
 'use strict';
 
 const PluginInterface		= require( './../plugin_interface' );
+const fs					= require( 'fs' );
+const path					= require( 'path' );
 
+const RATE_LIMIT_KEY		= 'rate_limit';
+const INTERVAL_KEY			= 'interval';
+const RULES_KEY				= 'rules';
 const DEFAULT_RATE_LIMIT	= 100;
-const DEFAULT_INTERVAL		= 10 * 1000;
+const DEFAULT_INTERVAL		= 60 * 1000;
+const PROJECT_ROOT			= path.parse( require.main.filename ).dir;
+const FILE_LOCATION			= path.join( PROJECT_ROOT, 'rate_limits.json' );
 
 /**
  * @brief	Plugin used to limit user's requests
@@ -15,6 +22,46 @@ class RateLimitsPlugin extends PluginInterface
 		super( id, options );
 
 		this.requests	= {};
+		this.config		= {};
+	}
+
+	/**
+	 * @brief	Loads the config into memory and uses the configuration set there to set rules for the server
+	 *
+	 * @return	void
+	 */
+	loadConfig()
+	{
+		if ( ! fs.existsSync( FILE_LOCATION ) )
+		{
+			let writeStream	= fs.createWriteStream( FILE_LOCATION );
+
+			this.config			= {
+				[RATE_LIMIT_KEY]	: DEFAULT_RATE_LIMIT,
+				[INTERVAL_KEY]		: DEFAULT_INTERVAL,
+				[RULES_KEY]			: []
+			};
+
+			writeStream.write( JSON.stringify( this.config ) );
+			writeStream.end();
+		}
+		else
+		{
+			let readStream	= fs.createReadStream( FILE_LOCATION );
+			let chunks		= [];
+
+			readStream.on( 'error', ( err ) => {
+				throw new Error( err );
+			});
+
+			readStream.on( 'data', ( chunk ) => {
+				chunks.push( chunk );
+			});
+
+			readStream.on( 'close', () => {
+				this.config	= JSON.parse( Buffer.concat( chunks ).toString( 'utf-8' ) );
+			});
+		}
 	}
 
 	/**
@@ -26,6 +73,8 @@ class RateLimitsPlugin extends PluginInterface
 	 */
 	setServerOnRuntime( server )
 	{
+		this.loadConfig();
+
 		server.on( 'eventRequestResolved', ( eventData )=>{
 			let { eventRequest }	= eventData;
 			let shouldPass			= this.getRequestRate( eventRequest );
