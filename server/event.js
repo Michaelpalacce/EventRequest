@@ -21,6 +21,7 @@ class EventRequest extends EventEmitter
 	constructor( request, response )
 	{
 		super();
+		this.setMaxListeners( 0 );
 
 		if ( ! ( request instanceof IncomingMessage ) || ! ( response instanceof ServerResponse ) )
 		{

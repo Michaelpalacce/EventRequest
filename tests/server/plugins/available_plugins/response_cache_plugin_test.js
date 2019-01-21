@@ -30,25 +30,6 @@ test({
 });
 
 test({
-	message		: 'ResponseCachePlugin setNamespace creates namespace',
-	test		: ( done )=>{
-		let cachingServer		= helpers.getCachingServer();
-		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
-		let namespace			= 'rcp';
-
-		cachingServer.setUp().then(()=>{
-			responseCachePlugin.setUpNamespace( cachingServer );
-
-			setTimeout(()=>{
-				cachingServer.existsNamespace( namespace ).then( ( exists )=>{
-					exists === true ? done() : done( `The namespace ${namespace} does not exist` );
-				} ).catch( done )
-			}, 250 );
-		});
-	}
-});
-
-test({
 	message		: 'ResponseCachePlugin setServerOnRuntime sets up namespace',
 	test		: ( done )=>{
 		let MockServer					= Mock( helpers.getServer().constructor );

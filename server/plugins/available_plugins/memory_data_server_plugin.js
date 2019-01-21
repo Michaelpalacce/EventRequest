@@ -1,9 +1,9 @@
 'use strict';
 
-const PluginInterface			= require( '../plugin_interface' );
-const { Loggur, LOG_LEVELS }	= require( '../../components/logger/loggur' );
-const InMemoryDataServer		= require( '../../components/caching/in_memory/in_memory_data_server' );
-const { DataServer }			= require( '../../components/caching/data_server' );
+const PluginInterface		= require( '../plugin_interface' );
+const InMemoryDataServer	= require( '../../components/caching/in_memory/in_memory_data_server' );
+const MemoryDataServer		= require( '../../components/caching/memory/memory_data_server' );
+const { DataServer }		= require( '../../components/caching/data_server' );
 
 /**
  * @brief	MemoryDataServerPlugin responsible for starting and stopping the caching server
@@ -14,14 +14,16 @@ class MemoryDataServerPlugin extends PluginInterface
 	{
 		super( pluginId, options );
 		this.server	= null;
+		this.serverConstructor	= InMemoryDataServer;
 	}
 
 	/**
-	 * @brief	Use the server given to this function
+	 * @brief	Use the server given
 	 *
-	 * @details	The server constructor must be passed
+	 * @details	Supports memory and in_memory servers which will both be set up.
+	 * 			If an instance of DataServer is given then that one will be used but it must be already set up
 	 *
-	 * @param	DataServer server
+	 * @param	String|DataServer server
 	 *
 	 * @return	void
 	 */
@@ -30,6 +32,18 @@ class MemoryDataServerPlugin extends PluginInterface
 		if ( server instanceof DataServer )
 		{
 			this.server	= server;
+			return;
+		}
+
+		switch ( server )
+		{
+			case 'memory':
+				this.serverConstructor	= MemoryDataServer;
+				break;
+
+			case 'in_memory':
+			default:
+				this.serverConstructor	= InMemoryDataServer;
 		}
 	}
 
@@ -44,15 +58,12 @@ class MemoryDataServerPlugin extends PluginInterface
 	{
 		if ( this.server === null )
 		{
-			this.server	= new InMemoryDataServer();
+			this.server	= new this.serverConstructor();
 
-			let onFulfilled	= ( data )=>{
-				Loggur.log( data, LOG_LEVELS.info );
-
+			let onFulfilled	= ()=>{
 				callback( false, this.server );
 			};
 			let onRejected	= ( err )=>{
-				Loggur.log( `Non false returned when trying to setUp caching server: ${err}`, LOG_LEVELS.error );
 				this.server	= null;
 
 				callback( err );
@@ -93,8 +104,6 @@ class MemoryDataServerPlugin extends PluginInterface
 				callback( false );
 			};
 			let onRejected	= ( err )=>{
-				Loggur.log( err, LOG_LEVELS.error );
-
 				callback( err );
 			};
 

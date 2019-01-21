@@ -43,6 +43,7 @@ class Server extends EventEmitter
 	constructor( options	= {} )
 	{
 		super();
+		this.setMaxListeners( 0 );
 
 		this.sanitizeConfig( options );
 
@@ -278,7 +279,6 @@ class Server extends EventEmitter
 	serverCallback( request, response )
 	{
 		let eventRequest	= this.resolve( request, response );
-		eventRequest.setMaxListeners( 0 );
 		this.emit( 'eventRequestResolved', { eventRequest, request, response  } );
 
 		request.on( 'close', ()=> {

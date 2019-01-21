@@ -4,7 +4,6 @@ const fs				= require( 'fs' );
 const readline			= require( 'readline' );
 const path				= require( 'path' );
 const PluginInterface	= require( '../plugin_interface' );
-const { Loggur }		= require( '../../components/logger/loggur' );
 
 const ENV_FILENAME	= '.env';
 const ENV_SEPARATOR	= '=';
@@ -72,7 +71,6 @@ class EnvPlugin extends PluginInterface
 		else
 		{
 			let errorMessage	= `Trying to load .env file from ${absFilePath} but it doesn't exist`;
-			Loggur.log( errorMessage );
 			callback( errorMessage );
 		}
 	}

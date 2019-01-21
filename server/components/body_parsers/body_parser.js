@@ -15,6 +15,7 @@ class BodyParser extends EventEmitter
 	{
 		super();
 		this.options	= options;
+		this.setMaxListeners( 0 );
 	}
 
 	/**

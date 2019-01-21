@@ -239,7 +239,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		 *
 		 * @return	Promise
 		 */
-		static find( recordName )
+		static find( recordName, options = {} )
 		{
 			return new Promise( ( resolve, reject )=>{
 				if ( ! isServerRunning )
@@ -248,7 +248,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					return;
 				}
 
-				dataServer.read( namespace, recordName ).then(( data )=>{
+				dataServer.read( namespace, recordName, options ).then(( data )=>{
 					resolve( new ModelClass( recordName, data ) );
 				}).catch(()=>{
 					resolve( null );

@@ -15,6 +15,7 @@ class DataServer extends EventEmitter
 	constructor( options = {} )
 	{
 		super();
+		this.setMaxListeners( 0 );
 
 		this.options		= options;
 		this.serverState	= SERVER_STATES.inactive;

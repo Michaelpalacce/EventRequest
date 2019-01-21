@@ -12,9 +12,9 @@ const NAMESPACE			= 'rcp';
  */
 class ResponseCachePlugin extends PluginInterface
 {
-	constructor( props )
+	constructor( id, options = {} )
 	{
-		super( props );
+		super( id, options );
 
 		this.model	= null;
 	}

@@ -3,7 +3,7 @@
 // Dependencies
 const { assert, test, helpers }	= require( '../../../test_helper' );
 const MemoryDataServerPlugin	= require( '../../../../server/plugins/available_plugins/memory_data_server_plugin' );
-const MemoryDataServer			= require( '../../../../server/components/caching/memory/memory_data_server' );
+const { DataServer }			= require( '../../../../server/components/caching/data_server' );
 const Router					= require( '../../../../server/components/routing/router' );
 
 test({
@@ -53,11 +53,11 @@ test({
 
 		assert.equal( false, memoryDataServerPlugin.getServer() );
 
-		memoryDataServerPlugin.startServer();
+		memoryDataServerPlugin.startServer(()=>{
+			assert.equal( true, memoryDataServerPlugin.getServer() instanceof DataServer );
+			done();
 
-		assert.equal( true, memoryDataServerPlugin.getServer() instanceof MemoryDataServer );
-
-		done();
+		});
 	}
 });
 
@@ -110,7 +110,7 @@ test({
 			eventRequest.next();
 
 			assert.equal( true, typeof eventRequest.cachingServer !== 'undefined' );
-			assert.equal( true, eventRequest.cachingServer instanceof MemoryDataServer );
+			assert.equal( true, eventRequest.cachingServer instanceof DataServer );
 
 			done();
 		});

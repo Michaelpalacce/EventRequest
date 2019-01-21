@@ -407,17 +407,19 @@ test({
 		let namespace		= 'testNamespace';
 		let recordName		= 'testRecord';
 
-		server.setUp().then(()=>{
-			server.createNamespace( namespace ).then(()=>{
-				server.read( namespace, recordName ).then( ()=> done( 'Record exists but shouldn\'t' ) ).catch( ( err )=>{
-					assert.equal( true, err !== false );
+		setTimeout(()=>{
+			server.setUp().then(()=>{
+				server.createNamespace( namespace ).then(()=>{
+					server.read( namespace, recordName ).then( ()=> done( 'Record exists but shouldn\'t' ) ).catch( ( err )=>{
+						assert.equal( true, err !== false );
 
-					server.exit();
+						server.exit();
 
-					done();
-				} );
+						done();
+					} );
+				}).catch( done );
 			}).catch( done );
-		}).catch( done );
+		}, 500 );
 	}
 });
 

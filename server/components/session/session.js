@@ -17,7 +17,6 @@ class Session
 	constructor( event, options = {} )
 	{
 		this.event				= event;
-		this.cachingServer		= event.cachingServer;
 		this.options			= options;
 
 		this.ttl				= typeof this.options.ttl === 'number'
@@ -38,12 +37,12 @@ class Session
 
 		this.session			= {};
 
-		this.model				= this.cachingServer.model( SESSIONS_NAMESPACE );
-
-		if ( typeof this.cachingServer === 'undefined' )
+		if ( typeof event.cachingServer === 'undefined' )
 		{
 			throw new Error( 'Could not create session. No caching container is set in the event' );
 		}
+
+		this.model				= event.cachingServer.model( SESSIONS_NAMESPACE );
 	}
 
 	/**
@@ -197,8 +196,15 @@ class Session
 	 */
 	fetchSession( callback )
 	{
-		this.cachingServer.read( SESSIONS_NAMESPACE, this.getSessionId(), { ttl : this.ttl } ).then( ( entry )=>{
-			this.session	= entry;
+		let recordName	= this.getSessionId();
+		this.model.find( recordName, { ttl : this.ttl } ).then( ( entry )=>{
+			if ( entry === null )
+			{
+				callback( new Error( `There was no session for ${recordName}` ) );
+				return;
+			}
+
+			this.session	= entry.recordData;
 			callback( false );
 		}).catch( callback );
 	}

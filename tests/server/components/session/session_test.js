@@ -41,7 +41,7 @@ test({
 		});
 
 		assert.equal( true, session.event instanceof EventRequest );
-		assert.equal( true, session.cachingServer instanceof DataServer );
+		assert.equal( true, typeof session.model !== 'undefined' );
 		assert.equal( true, typeof session.options === 'object' );
 		assert.equal( 0, session.ttl );
 		assert.equal( 'sid', session.sessionKey );
@@ -73,7 +73,7 @@ test({
 		});
 
 		assert.equal( true, session.event instanceof EventRequest );
-		assert.equal( true, session.cachingServer instanceof DataServer );
+		assert.equal( true, typeof session.model !== 'undefined' );
 		assert.equal( true, typeof session.options === 'object' );
 		assert.equal( ttl, session.ttl );
 		assert.equal( sessionKey, session.sessionKey );
@@ -234,8 +234,8 @@ test({
 			session	= new Session( eventRequest );
 		});
 		
-		session.fetchSession(( err )=>{
-			err !== false ? done() : done( 'There should be no session to fetch' );
+		session.fetchSession(( error )=>{
+			error !== false ? done() : done( 'There should be no session to fetch' );
 		});
 	}
 });
