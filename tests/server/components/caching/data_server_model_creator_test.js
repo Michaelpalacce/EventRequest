@@ -60,3 +60,51 @@ test({
 		done();
 	}
 });
+
+test({
+	message			: 'DataServerModel.getDataServer returns an instance of DataServer',
+	dataProvider	: TEST_SUITE_DATA_PROVIDER,
+	test			: ( done, ServerClass )=>{
+		let server			= new ServerClass();
+		let namespace		= 'Test';
+		let recordName		= 'TestName';
+		let recordData		= { key: 'value' };
+		let recordOptions	= { ttl: 50 };
+
+		let ModelClass		= server.model( namespace );
+		let model			= new ModelClass( recordName, recordData, recordOptions );
+
+		assert.deepStrictEqual( recordName, model.recordName );
+		assert.deepStrictEqual( recordData, model.recordData );
+		assert.deepStrictEqual( recordOptions, model.recordOptions );
+
+		done();
+	}
+});
+
+test({
+	message			: 'DataServerModel.save saves the record',
+	dataProvider	: TEST_SUITE_DATA_PROVIDER,
+	test			: ( done, ServerClass )=>{
+		let server			= new ServerClass();
+		let namespace		= 'Test';
+		let recordName		= 'TestName';
+		let recordData		= { key: 'value' };
+		let recordOptions	= { ttl: 0 };
+
+		let ModelClass		= server.model( namespace );
+		let model			= new ModelClass( recordName, recordData, recordOptions );
+
+		server.setUp().then(()=>{
+			ModelClass.createNamespaceIfNotExists().then(()=>{
+				model.save().then(()=>{
+					ModelClass.find( recordName ).then(( newRecord )=>{
+						assert.deepStrictEqual( newRecord.recordName, model.recordName );
+						assert.deepStrictEqual( newRecord.recordData, model.recordData );
+						server.exit().then( done ).catch( done );
+					}).catch( done );
+				}).catch( done );
+			}).catch( done );
+		}).catch( done );
+	}
+});

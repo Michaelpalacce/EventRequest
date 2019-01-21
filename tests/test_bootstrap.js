@@ -1,7 +1,7 @@
 'use strict';
 
 const { Server }				= require( '../index' );
-const MemoryDataServer			= require( '../server/components/caching/memory/memory_data_server' );
+const MemoryDataServer			= require( '../server/components/caching/in_memory/in_memory_data_server' );
 const { Loggur, LOG_LEVELS }	= require( '../server/components/logger/loggur' );
 
 let server			= Server({

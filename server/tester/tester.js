@@ -121,7 +121,7 @@ class Tester
 			test.dataProvider.forEach( ( data )=>{
 				let newTest	= {};
 
-				newTest.message	= test.message + '#' + i + ' with: ' + data;
+				newTest.message	= test.message + '#' + i;
 				newTest.status	= test.status;
 
 				newTest.test	= ( done )=>{

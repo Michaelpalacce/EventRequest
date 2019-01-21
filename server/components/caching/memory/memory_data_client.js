@@ -196,7 +196,7 @@ class MemoryWorker
 
 			case EXIT:
 				this.server.close();
-				callback( false, 'ok' );
+				callback( false, false );
 				process.exit( 1 );
 				break;
 

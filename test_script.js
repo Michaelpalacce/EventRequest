@@ -16,8 +16,8 @@ let startTests	= ()=>{
 
 	runAllTests({
 		dieOnFirstError	: true,
-		debug			: false,
-		silent			: true,
+		debug			: true,
+		silent			: false,
 		filter			: '',
 		callback		: ( err )=>{
 			server.stop();

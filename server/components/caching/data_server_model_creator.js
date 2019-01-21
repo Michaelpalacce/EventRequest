@@ -13,11 +13,9 @@ const SERVER_STATES	= require( './server_states' );
  */
 module.exports	= function ( dataServer, namespace, validationSchema = {} )
 {
-	let isServerRunning	= dataServer.getServerState() === SERVER_STATES.running;
-
-	dataServer.on( 'state_change', ( state )=>{
-		isServerRunning	= state === SERVER_STATES.running;
-	} );
+	let isServerRunning	= ()=>{
+		return dataServer.getServerState() === SERVER_STATES.running;
+	};
 
 	/**
 	 * @brief	Data server model that is attached to a specific namespace and can easily create and save data there.
@@ -63,7 +61,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 			let recordData		= this.recordData;
 
 			return new Promise(( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -87,7 +85,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 			let recordName	= this.recordName;
 
 			return new Promise(( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -115,7 +113,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 			options.ttl		= ttl;
 
 			return new Promise(( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -137,7 +135,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static removeNamespaceIfExists( options = {} )
 		{
 			return new Promise(( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -168,7 +166,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static createNamespaceIfNotExists( options = {} )
 		{
 			return new Promise(( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -201,7 +199,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static createNamespace( options = {} )
 		{
 			return new Promise(( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -251,7 +249,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static find( recordName, options = {} )
 		{
 			return new Promise( ( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -279,7 +277,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static search( searchQuery, options = {} )
 		{
 			return new Promise( ( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -312,7 +310,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static findAndRemove( recordName, options = {} )
 		{
 			return new Promise( ( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -344,7 +342,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		static searchAndRemove( searchQuery, options = {} )
 		{
 			return new Promise( ( resolve, reject )=>{
-				if ( ! isServerRunning )
+				if ( ! isServerRunning() )
 				{
 					reject( 'Server is not running' );
 					return;
@@ -360,7 +358,7 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 					Promise.all( promises ).then(()=>{
 						resolve( false );
 					}).catch( reject );
-				})
+				});
 			});
 		}
 

@@ -80,7 +80,7 @@ class InMemoryDataServer extends DataServer
 				return;
 			}
 
-			resolve( typeof process.dataServer.data[namespace] !== 'undefined' );
+			resolve( typeof process.dataServer !== 'undefined' && typeof process.dataServer.data[namespace] !== 'undefined' );
 		});
 	}
 
@@ -158,7 +158,7 @@ class InMemoryDataServer extends DataServer
 			this.existsNamespace( namespace ).then( ( exists )=>{
 				if ( exists )
 				{
-					resolve( typeof process.dataServer.data[namespace][recordName] !== 'undefined' )
+					resolve( typeof process.dataServer !== 'undefined' && typeof process.dataServer.data[namespace][recordName] !== 'undefined' )
 				}
 				else
 				{

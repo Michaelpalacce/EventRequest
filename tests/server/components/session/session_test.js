@@ -159,41 +159,46 @@ test({
 			session	= new Session( eventRequest );
 		});
 
-		session.hasSession(( hasSession )=>{
-			if ( ! hasSession )
-			{
-				session.newSession(( err )=>{
-					if ( err )
+		eventRequest.cachingServer.setUp().then(()=>{
+			session.model.createNamespaceIfNotExists().then(()=>{
+				console.log('TES');
+				session.hasSession(( hasSession )=>{
+					if ( ! hasSession )
 					{
-						done( err );
-					}
-					else
-					{
-						if ( setCookie === true )
-						{
-							session.hasSession(( hasSession )=>{
-								if ( hasSession )
+						session.newSession(( err )=>{
+							if ( err )
+							{
+								done( err );
+							}
+							else
+							{
+								if ( setCookie === true )
 								{
-									session.removeSession( done );
+									session.hasSession(( hasSession )=>{
+										if ( hasSession )
+										{
+											session.removeSession( done );
+										}
+										else
+										{
+											done( 'There is no session where there should have been' );
+										}
+									})
 								}
 								else
 								{
-									done( 'There is no session where there should have been' );
+									done( 'Set cookie should have been called when creating a new session but was not' );
 								}
-							})
-						}
-						else
-						{
-							done( 'Set cookie should have been called when creating a new session but was not' );
-						}
+							}
+						});
+					}
+					else
+					{
+						done( 'There is a session but there shouldn\'t be one' );
 					}
 				});
-			}
-			else
-			{
-				done( 'There is a session but there shouldn\'t be one' );
-			}
-		});
+			}).catch( done );
+		}).catch( done );
 	}
 });
 

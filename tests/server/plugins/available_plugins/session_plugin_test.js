@@ -8,19 +8,6 @@ const { Session, SESSIONS_NAMESPACE }	= require( './../../../../server/component
 const Router							= require( '../../../../server/components/routing/router' );
 
 test({
-	message	: 'SessionPlugin setUp to create namespace',
-	test	: ( done )=>{
-		let cachingServer	= helpers.getCachingServer();
-
-		cachingServer.setUp().then(()=>{
-			cachingServer.createNamespace( SESSIONS_NAMESPACE ).then( ( err )=>{
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
 	message	: 'SessionPlugin getPluginDependencies returns er_cache_server',
 	test	: ( done )=>{
 		let plugin	= new SessionPlugin( 'id' );

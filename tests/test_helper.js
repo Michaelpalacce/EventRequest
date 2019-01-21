@@ -66,9 +66,20 @@ helpers.setUpTestNamespace	= ( server, callback )=>{
  * @return	void
  */
 helpers.removeTestNamespace	= ( server, callback )=>{
-	server.removeNamespace( 'test', {} ).then( ()=>{
-		callback( false )
-	}).catch( callback );
+	server.setUp().then(()=>{
+		server.existsNamespace( 'test' ).then(( exists )=>{
+			if ( exists === true )
+			{
+				server.removeNamespace( 'test' ).then( ()=>{
+					callback( false )
+				}).catch( callback );
+			}
+			else
+			{
+				callback( false );
+			}
+		}).catch( callback );
+	}).catch( callback )
 };
 
 /**
