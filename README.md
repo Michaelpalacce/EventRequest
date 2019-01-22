@@ -922,6 +922,59 @@ The model class constructor accepts recordName, recordData, recordOptions.
  Will not reject if it does not exist
 
 ***
+
+**touch( Number ttl = 0, Object options = {} )** -> Promise, resolve( false ), reject( err ), Updates the records ttl if it exists
+ Will reject if it does not exist
+
+***
+
+**static removeNamespaceIfExists( Object options = {} )** -> Promise, resolve( false ), reject( err ), Removes the namespace of the model if it exists
+ Will not reject if it does not exist
+
+***
+
+**static createNamespaceIfNotExists( Object options = {} )** -> Promise, resolve( false ), reject( err ), Creates the namespace of the model if it exists
+ Will not reject if it exists
+
+***
+
+**static createNamespace( Object options = {} )** -> Promise, resolve( false ), reject( err ), Creates the namespace of the model, deleting it if it exists
+ Will not reject if it exists
+
+***
+
+**static existsNamespace( Object options = {} )** -> Promise, resolve( exists ), reject( err ), Returns whether the namespace exists
+
+***
+
+**static find( String recordName, Object options = {} )** -> Promise, resolve( Model|null model ), reject( err ), 
+Returns a new model ( WITHOUT THE OPTIONS ) given the EXACT name. If it does not exist, null will be returned.
+This does not reject if the namespace does not exist or the record does not exist
+
+***
+
+**static search( String searchQuery, Object options = {} )** -> Promise, resolve( [Model model] ), reject( err ), 
+Returns all the records( WITHOUT THE OPTIONS ) given part of their name. Empty array is returned if none are found
+This does not reject if the namespace does not exist or the record does not exist
+
+***
+
+**static findAndRemove( String recordName, Object options = {} )** -> Promise, resolve( false ), reject( err ), 
+Finds and removes the EXACT record
+This does not reject if the namespace does not exist or the record does not exist
+
+***
+
+**static searchAndRemove( String searchQuery, Object options = {} )** -> Promise, resolve( false ), reject( err ), 
+DELETES all the records given part of their name.
+This does not reject if the namespace does not exist or the record does not exist
+
+***
+
+**static make( String recordName = '', Object recordData = {}, Object recordOptions = {} )** -> Promise, resolve( Model model ), reject( err ), 
+Creates and RETURNS a model. This will reject if the namespace does not exist
+
+***
 ***
 ***
 
@@ -1284,4 +1337,59 @@ server.start();
 ***
 
 ### er_rate_limits
-Adds a Rate limits plugin to the server. The rate limits plugin can monitor incoming requests and stop them if they are too many
+Adds a Rate limits plugin to the server. 
+The rate limits plugin can monitor incoming requests and stop them if they are too many
+
+The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
+If one exists, then the existing one's configuration will be taken. 
+
+**Example configuration:**
+
+~~~json
+{
+  "rate_limit" : 100, 
+  "interval":60000,
+  "message":"Too many requests",
+  "status_code":403,
+  "rules":[{
+    "path": "/",
+    "method": "GET",
+    "rate_limit": 0,
+    "interval": 10000
+  },{
+      "path": "/test",
+      "method": ["POST","GET"],
+      "rate_limit": 10,
+      "interval": 10000
+  }]
+}
+~~~
+
+**"rate_limit" : 100,** -> The default rate limit which is 100 requests. If this is set to zero 
+then the request will not be rate limited by default. Defaults to 100
+
+***
+
+**"interval":60000,** -> The interval of time in milliseconds for which the rate limit should be kept.
+So in this case in one minute maximum 100 requests can be made. Defaults to 1 minute
+
+***
+
+**"message":"Too many requests",** -> The message to be sent if the request should be rate limited. Defaults to: **'Rate limit reached'**
+
+***
+
+**"status_code":403,** -> The status code to be returned if the request should be rate limited. Defaults to 403 FORBIDDEN
+
+***
+
+**"rules":** -> Holds an array of objects with PATH + METHOD specific rate limit rules
+These rules take priority from the general ones. Regular expressions are not supported.
+
+**IF you want to use RegExp, then change the .rules of the plugin programmatically.**
+
+~~~javascript
+server.getPluginManager().getPlugin( 'er_rate_limits' ).rules   = {};
+~~~
+
+***

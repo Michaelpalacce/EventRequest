@@ -97,27 +97,53 @@ test({
 });
 
 test({
-	message	: 'SessionPlugin initSession initializes a session if it doesn\'t exist',
+	message	: 'SessionPlugin.serServerOnRuntime and initSession initializes a session if it doesn\'t exist',
 	test	: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		eventRequest.cachingServer	= helpers.getCachingServer();
+		let MockServer					= Mock( helpers.getServer().constructor );
+		let MockCachingServerPlugin		= Mock( CachingServerPlugin );
+		let MockCachingServer			= Mock( helpers.getCachingServer().constructor );
+		let cachingServer				= new MockCachingServer();
+		let cachingServerPlugin			= new MockCachingServerPlugin();
+		let server						= new MockServer();
+
+		cachingServerPlugin._mock({
+			method			: 'getServer',
+			shouldReturn	: cachingServer
+		});
+
+		server._mock({
+			method			: 'getPlugin',
+			with			: [['er_cache_server']],
+			shouldReturn	: cachingServerPlugin
+		});
+
 		let sessionPlugin			= new SessionPlugin( 'id' );
-		let router					= new Router();
 
-		let pluginMiddlewares		= sessionPlugin.getPluginMiddleware();
+		sessionPlugin.setOptions({
+			callback	: ( err )=>{
+				let router					= new Router();
+				let eventRequest			= helpers.getEventRequest();
+				eventRequest.cachingServer	= cachingServer;
+				let pluginMiddlewares		= sessionPlugin.getPluginMiddleware();
 
-		router.add( pluginMiddlewares[0] );
-		router.add( pluginMiddlewares[1] );
-		router.add({
-			handler	: ( event )=>{
-				event.initSession( ( error )=>{
-					error === false ? done() : done( 'Error while initializing the session' );
+				router.add( pluginMiddlewares[0] );
+				router.add( pluginMiddlewares[1] );
+				router.add({
+					handler	: ( event )=>{
+						event.initSession( ( error )=>{
+							error === false ? done() : done( 'Error while initializing the session' );
+						});
+					}
 				});
+
+				eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+				eventRequest.next();
 			}
 		});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		eventRequest.next();
+		cachingServer.setUp().then(()=>{
+			sessionPlugin.setServerOnRuntime( server );
+		});
 	}
 });
 
@@ -159,7 +185,7 @@ test({
 });
 
 test({
-	message	: 'SessionPlugin initSession fetches a session if it exists',
+	message	: 'SessionPlugin initSession creates a session if it does not exists',
 	test	: ( done )=>{
 		let MockServer					= Mock( helpers.getServer().constructor );
 		let MockCachingServerPlugin		= Mock( CachingServerPlugin );
@@ -178,14 +204,17 @@ test({
 			shouldReturn	: cachingServerPlugin
 		});
 
-		let namespace			= 'er_session';
-		let callback			= ()=>{
-			cachingServer.existsNamespace( namespace ).then( ( exists )=>{
-				exists === true ? done() : done( `The namespace ${namespace} does not exist` );
-			} ).catch( done );
-		};
+		let namespace		= 'er_session';
 
-		let sessionPlugin	= new SessionPlugin( 'id', { callback } );
+		let sessionPlugin	= new SessionPlugin( 'id',
+			{
+				callback : ()=>{
+					cachingServer.existsNamespace( namespace ).then( ( exists )=>{
+						exists === true ? done() : done( `The namespace ${namespace} does not exist` );
+					} ).catch( done );
+				}
+			}
+		);
 
 		sessionPlugin.setServerOnRuntime( server );
 	}

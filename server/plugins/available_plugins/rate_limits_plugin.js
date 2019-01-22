@@ -6,9 +6,10 @@ const fs					= require( 'fs' );
 const path					= require( 'path' );
 
 const RATE_LIMIT_KEY				= 'rate_limit';
+const FILE_PATH						= 'file';
 const INTERVAL_KEY					= 'interval';
 const RULES_KEY						= 'rules';
-const MESSAGE_KEY					= 'message_key';
+const MESSAGE_KEY					= 'message';
 const STATUS_CODE_KEY				= 'status_code';
 const PATH_KEY						= 'path';
 const METHOD_KEY					= 'method';
@@ -25,7 +26,7 @@ const FILE_LOCATION					= path.join( PROJECT_ROOT, 'rate_limits.json' );
  */
 class RateLimitsPlugin extends PluginInterface
 {
-	constructor( id, options )
+	constructor( id, options = {} )
 	{
 		super( id, options );
 
@@ -33,9 +34,11 @@ class RateLimitsPlugin extends PluginInterface
 		this.rules					= DEFAULT_RULES;
 		this.rateLimit				= DEFAULT_RATE_LIMIT;
 		this.interval				= DEFAULT_INTERVAL;
-		this.fileLocation			= FILE_LOCATION;
 		this.limitReachedMessage	= DEFAULT_MESSAGE;
 		this.limitReachedStatusCode	= DEFAULT_MESSAGE_STATUS_CODE;
+		this.fileLocation			= typeof options[FILE_PATH] === 'string'
+									? options[FILE_PATH]
+									: FILE_LOCATION;
 	}
 
 	/**
@@ -45,11 +48,11 @@ class RateLimitsPlugin extends PluginInterface
 	 */
 	loadConfig()
 	{
-		if ( ! fs.existsSync( FILE_LOCATION ) )
+		if ( ! fs.existsSync( this.fileLocation ) )
 		{
 			let writeStream	= fs.createWriteStream( this.fileLocation );
 
-			this.config			= {
+			this.config		= {
 				[RATE_LIMIT_KEY]	: this.rateLimit,
 				[INTERVAL_KEY]		: this.interval,
 				[MESSAGE_KEY]		: this.limitReachedMessage,
@@ -163,15 +166,16 @@ class RateLimitsPlugin extends PluginInterface
 		let path		= eventRequest.path;
 		let method		= eventRequest.method;
 		let clientIp	= eventRequest.clientIp;
+		let key			= path + method;
 
 		if ( typeof this.requests[clientIp] === 'undefined' )
 		{
 			this.requests[clientIp]	= {};
 		}
 
-		if ( typeof this.requests[clientIp][path] === 'undefined' )
+		if ( typeof this.requests[clientIp][key] === 'undefined' )
 		{
-			this.requests[clientIp][path]	= 0;
+			this.requests[clientIp][key]	= 0;
 		}
 
 		let limit		= this.rateLimit;
@@ -196,10 +200,10 @@ class RateLimitsPlugin extends PluginInterface
 		}
 
 		setTimeout(()=>{
-			-- this.requests[clientIp][path];
+			-- this.requests[clientIp][key];
 		}, interval );
 
-		return ++ this.requests[clientIp][path] <= limit;
+		return ++ this.requests[clientIp][key] <= limit;
 	}
 }
 

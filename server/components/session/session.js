@@ -67,6 +67,7 @@ class Session
 		if ( this.sessionId === null )
 		{
 			callback( false );
+			return;
 		}
 
 		this.model	.find( this.sessionId )

@@ -34,19 +34,3 @@ module.exports		= {
 	Logging,	Loggur,
 	LOG_LEVELS,	Development
 };
-//
-// let server	= Server();
-//
-// server.apply( 'er_rate_limits' );
-//
-// server.get( '/', ( event )=>{
-// 	console.log('HERE');
-// 	event.send( '<h1>Test</h1>' )
-// } );
-//
-// server.get( '/test', ( event )=>{
-// 	console.log('HERE2');
-// 	event.send( '<h1>Test</h1>' )
-// } );
-//
-// server.start();

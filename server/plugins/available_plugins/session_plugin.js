@@ -9,9 +9,9 @@ const { SERVER_STATES }					= require( '../../components/caching/data_server' );
  */
 class SessionPlugin extends PluginInterface
 {
-	constructor( props )
+	constructor( id, options = {} )
 	{
-		super( props );
+		super( id, options );
 
 		this.model	= null;
 	}

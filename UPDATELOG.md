@@ -1,3 +1,7 @@
+5.1.0
+- Added rules to the rate limits plugin and improved some old tests. Fixed some small bugs with the session
+- Updated the README with the new and some missing documentation
+
 5.0.0
 - Fix so the default logger will have a higher Log level
 - Fix so by default the console created in case of no transports in the logger will have the same log level and logLevels as the Logger

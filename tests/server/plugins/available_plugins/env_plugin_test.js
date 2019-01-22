@@ -35,9 +35,8 @@ test({
 					assert.equal( true, typeof process.env.TESTKEY === 'undefined' );
 					assert.equal( true, typeof process.env.TESTKEYTWO === 'undefined' );
 
-					let writeStream	= fs.createWriteStream( fileLocation );
-					writeStream.write( originalContent );
-					writeStream.end();
+					fs.writeFileSync( fileLocation, originalContent );
+
 					done();
 				}, 250 );
 			}
