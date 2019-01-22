@@ -1318,7 +1318,6 @@ Adds environment variables from a .env file to the process.env Object. In case t
 this plugin will automatically update the process.env and will delete the old environment variables.
 
     Accepted Options:
-        **callback** -> This is a negative error callback that returns false if there was no problem setting up the env loader
         **fileLocation** -> The absolute path to the .env file you want to use
 ***
 ~~~javascript

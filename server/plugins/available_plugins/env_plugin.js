@@ -35,11 +35,9 @@ class EnvPlugin extends PluginInterface
 	/**
 	 * @brief	Loads the file to the process.env
 	 *
-	 * @param	Function callback
-	 *
 	 * @return	void
 	 */
-	loadFileInEnv( callback = ()=>{} )
+	loadFileInEnv()
 	{
 		let absFilePath		= this.getEnvFileAbsPath();
 		let fileExists		= fs.existsSync( absFilePath );
@@ -59,11 +57,6 @@ class EnvPlugin extends PluginInterface
 				process.env[key]	= parts.join( ENV_SEPARATOR ).replace( '\r', '' ).replace( '\n', '' );
 			})
 		}
-		else
-		{
-			let errorMessage	= `Trying to load .env file from ${absFilePath} but it doesn't exist`;
-			callback( errorMessage );
-		}
 	}
 
 	/**
@@ -75,11 +68,7 @@ class EnvPlugin extends PluginInterface
 	 */
 	setServerOnRuntime( server )
 	{
-		let callback		= typeof this.options.callback === 'function'
-							? this.options.callback
-							: ()=>{};
-
-		this.loadFileInEnv( callback );
+		this.loadFileInEnv();
 		this.attachFileWatcherToEnvFile();
 	}
 
