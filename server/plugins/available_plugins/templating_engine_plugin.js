@@ -27,7 +27,7 @@ class TemplatingEnginePlugin extends PluginInterface
 		 *
 		 * @return	String
 		 */
-		eventRequest.render	= function( templateName, variables, callback )
+		eventRequest.render	= function( templateName, variables = {}, callback = ()=>{} )
 		{
 			this.emit( 'render', { templateName, variables, callback } );
 
