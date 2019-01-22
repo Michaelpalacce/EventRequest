@@ -2,6 +2,9 @@
   "author": {
     "name": "Stefan Genov"
   },
+  "bin": {
+    "event_request": "./cli.js"
+  },
   "bundleDependencies": false,
   "dependencies": {},
   "deprecated": false,
