@@ -17,31 +17,23 @@ test({
 		let originalContent	= fs.readFileSync( fileLocation );
 		originalContent		= originalContent.toString( 'utf-8' );
 
-		let envPlugin		= new EnvPlugin( 'id', {
-			fileLocation,
-			callback		: ( error )=>{
-				assert.equal( false, error );
-				assert.equal( 'TESTVALUE', process.env.TESTKEY );
-				assert.equal( 'TESTVALUE=WITH=ENTER', process.env.TESTKEYTWO );
-
-				let writeStream	= fs.createWriteStream( fileLocation );
-
-				writeStream.write( 'TEST=VALUE' );
-				writeStream.end();
-
-				// Wait for the file system watcher to find the changes
-				setTimeout(()=>{
-					assert.equal( 'VALUE', process.env.TEST );
-					assert.equal( true, typeof process.env.TESTKEY === 'undefined' );
-					assert.equal( true, typeof process.env.TESTKEYTWO === 'undefined' );
-
-					fs.writeFileSync( fileLocation, originalContent );
-
-					done();
-				}, 250 );
-			}
-		} );
+		let envPlugin		= new EnvPlugin( 'id', { fileLocation } );
 
 		envPlugin.setServerOnRuntime( server );
+
+		assert.equal( 'TESTVALUE', process.env.TESTKEY );
+		assert.equal( 'TESTVALUE=WITH=ENTER', process.env.TESTKEYTWO );
+
+		fs.writeFileSync( fileLocation, 'TEST=VALUE' );
+
+		setTimeout(()=>{
+			assert.equal( 'VALUE', process.env.TEST );
+			assert.equal( true, typeof process.env.TESTKEY === 'undefined' );
+			assert.equal( true, typeof process.env.TESTKEYTWO === 'undefined' );
+
+			fs.writeFileSync( fileLocation, originalContent );
+
+			done();
+		}, 200 );
 	}
 });

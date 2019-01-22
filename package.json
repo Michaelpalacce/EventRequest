@@ -1,27 +1,4 @@
 {
-  "_from": "event_request@3.3.0",
-  "_id": "event_request@3.3.0",
-  "_inBundle": false,
-  "_integrity": "sha512-XH89GgmA2Vlx+mycW3OIxXEcOuwxWhXwqWyp2tKtHmu35PWSsAkpwZcyXGEw4sh1DtafhtCfq+qU9JDuC2nmqw==",
-  "_location": "/event_request",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "event_request@3.3.0",
-    "name": "event_request",
-    "escapedName": "event_request",
-    "rawSpec": "3.3.0",
-    "saveSpec": null,
-    "fetchSpec": "3.3.0"
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/event_request/-/event_request-3.3.0.tgz",
-  "_shasum": "ad96d56a6bd1cfcb703dde1a10d90d6040881947",
-  "_spec": "event_request@3.3.0",
-  "_where": "C:\\UserFiles\\Projects\\Js\\Server",
   "author": {
     "name": "Stefan Genov"
   },
@@ -60,5 +37,5 @@
   "scripts": {
     "test": "node ./test_script.js"
   },
-  "version": "5.1.0"
+  "version": "5.1.1"
 }

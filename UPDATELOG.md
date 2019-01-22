@@ -1,3 +1,6 @@
+5.1.1
+- Bugfix: The env plugin now loads synchronously
+
 5.1.0
 - Added rules to the rate limits plugin and improved some old tests. Fixed some small bugs with the session
 - Updated the README with the new and some missing documentation

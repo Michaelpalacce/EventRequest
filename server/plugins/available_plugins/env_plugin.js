@@ -1,7 +1,6 @@
 'use strict';
 
 const fs				= require( 'fs' );
-const readline			= require( 'readline' );
 const path				= require( 'path' );
 const PluginInterface	= require( '../plugin_interface' );
 
@@ -50,23 +49,15 @@ class EnvPlugin extends PluginInterface
 			// Reset the env variables array so we can populate it anew
 			this.envVariableKeys	= [];
 
-			let lineReader	= readline.createInterface({
-				input	: fs.createReadStream( absFilePath )
-			});
-
-			lineReader.on( 'line', ( line )=>{
-
+			let lines				= fs.readFileSync( absFilePath, 'utf-8' ).split( '\n' );
+			lines.forEach(( line )=>{
 				let parts	= line.split( ENV_SEPARATOR );
 				let key		= parts.shift();
 
 				this.envVariableKeys.push( key );
 
-				process.env[key]	= parts.join( ENV_SEPARATOR );
-			});
-
-			lineReader.on( 'close', ()=>{
-				callback( false );
-			} );
+				process.env[key]	= parts.join( ENV_SEPARATOR ).replace( '\r', '' ).replace( '\n', '' );
+			})
 		}
 		else
 		{
