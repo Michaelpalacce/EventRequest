@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-console.log( 'hey2' );
+console.log( __dirname );
