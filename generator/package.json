@@ -1,9 +1,14 @@
 {
-  "name": "event_request",
+  "name": "event_request_generated_app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "setUp": "npm install"
+  },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "event_request": "6.0.0"
+  }
 }

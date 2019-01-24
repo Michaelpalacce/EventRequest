@@ -1,6 +1,15 @@
 # EventRequest
 A highly customizable backend server in NodeJs
 
+# Installation
+~~~bash
+npm i event_request --save -g
+
+event_request install ./NewProject
+~~~
+
+
+# Set up
 ~~~javascript
 const { Server, Loggur }	= require( 'event_request' );
 
