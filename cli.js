@@ -77,13 +77,7 @@ else
 			}
 
 			copyRecursiveSync( projectDir, dest );
-
-			exec( 'npm run setUp', { cwd: dest }, ( err, stdOut, stdErr )=>{
-				err != null ? console.log( err ) : err;
-				console.log( stdErr );
-				console.log( stdOut );
-			} );
-
+			console.log( 'Project set up. Happy coding' );
 			break;
 		case 'help':
 		default:
