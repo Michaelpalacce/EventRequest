@@ -1,9 +1,9 @@
 'use strict';
 
-const PluginInterface		= require( './../plugin_interface' );
-const Router				= require( './../../components/routing/router' );
-const fs					= require( 'fs' );
-const path					= require( 'path' );
+const PluginInterface	= require( './../plugin_interface' );
+const Router			= require( './../../components/routing/router' );
+const fs				= require( 'fs' );
+const path				= require( 'path' );
 
 const RATE_LIMIT_KEY				= 'rate_limit';
 const FILE_PATH						= 'file';

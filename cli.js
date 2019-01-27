@@ -4,7 +4,6 @@
 const path			= require( 'path' );
 const fs			= require( 'fs' );
 const projectDir	= path.resolve( __dirname, './generator' );
-const { exec }		= require( 'child_process' );
 
 /**
  * @brief	Copies the folder recursively
