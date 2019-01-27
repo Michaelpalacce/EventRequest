@@ -47,11 +47,11 @@ class Server extends EventEmitter
 
 		this.sanitizeConfig( options );
 
-		this.router			= new Router();
+		this.router			= this.Router();
 		this.pluginManager	= PluginManager;
 		this.plugins		= [];
 
-		this.setUpHttpMethods();
+		this.apply( this.router );
 
 		if ( this.applyPlugins === true )
 		{
@@ -75,29 +75,6 @@ class Server extends EventEmitter
 		pluginsToApply.forEach(( pluginConfig )=>{
 			this.apply( pluginConfig.plugin, pluginConfig.options );
 		});
-	}
-
-	/**
-	 * @brief	Adds .post, .put, .get, .delete methods to the server
-	 *
-	 * @details	Accepts "route" as first param that can be the the usual string or regex but MUST be given
-	 * 			and function "handler" to be called
-	 *
-	 * @return	void
-	 */
-	setUpHttpMethods()
-	{
-		let methods	= ['POST', 'PUT', 'GET', 'DELETE'];
-
-		methods.forEach(( method )=>{
-			this[method.toLocaleLowerCase()]	= ( route, handler )=>{
-				this.add({
-					method,
-					route,
-					handler
-				})
-			}
-		})
 	}
 
 	/**
@@ -148,18 +125,14 @@ class Server extends EventEmitter
 	}
 
 	/**
-	 * @brief	Function that adds a middleware to the block chain of the router
+	 * @brief	Creates a new router
 	 *
-	 * @param	Object|Router route
-	 *
-	 * @returns	void
+	 * @return	Router
 	 */
-	add( route )
+	Router()
 	{
-		this.emit( 'addRoute', route );
-
-		this.router.add( route );
-	};
+		return new Router();
+	}
 
 	/**
 	 * @brief	This is used to apply a new PluginInterface
@@ -169,7 +142,7 @@ class Server extends EventEmitter
 	 *
 	 * @param	PluginInterface|String plugin
 	 *
-	 * @return	void
+	 * @return	Server
 	 */
 	apply( plugin, options = null )
 	{
@@ -191,6 +164,8 @@ class Server extends EventEmitter
 		}
 
 		this._attachPlugin( plugin );
+
+		return this;
 	}
 
 	/**
@@ -373,7 +348,7 @@ class Server extends EventEmitter
 	 *
 	 * @param	Function callback
 	 *
-	 * @return	void
+	 * @return	Server
 	 */
 	start( callback )
 	{
@@ -383,6 +358,8 @@ class Server extends EventEmitter
 
 			this.httpServer	= this.setUpNewServer( typeof callback === 'function' ? callback : ()=>{} );
 		}
+
+		return this;
 	}
 
 	/**

@@ -30,7 +30,6 @@ server.start( ()=>{
 
 #Properties exported by the Module:
 	Server,				// Server callback. Use this to create a new server. The server instance can be retrieved from anywhere by: Server();
-	Router,				// The router. Can be used to add routes to it and then to the main server route
 	Development,		// Holds Development tools
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
@@ -289,12 +288,31 @@ When creating the first instance, make sure to pass the desired options.
 ***
 
 ***
-### Ways to add routes:
+### Ways to add routes using the Router or the Server:
+When adding routes you have to use the Router class.
+
+~~~javascript
+let { Server } = require( 'event_request' );
+
+// You can create your own router
+let router  = Server().Router();
+router.add(...);
+
+// To attach a router to the server simply call the add function of th server.
+// Just like you would do to add a normal route.
+Server().add( router );
+
+// You can also get the router attached to the Server and use that directly
+let serverRouter    = Server().router;
+serverRouter.add(...);
+~~~
+
 The server has 2 ways of adding routes/middleware
 
+***
 You can use .post, .put, .get, .delete methods from the server that accept Required parameters: ( String|RegExp route, Function handler )
 
-**route** -> String or RegExp -> the route to witch the middleware should be attached
+**route** -> String|RegExp-> the route to witch the middleware should be attached
 
 ***
 
@@ -325,7 +343,9 @@ server.start();
 ~~~
 
 ***
-When adding a Route the **server.add(route)** can be used
+When adding a Route the **server.add(route)** can be used. This can be used to attach another router
+to the current one: server.add( router );
+
 
 ~~~javascript
 server.add({

@@ -6,9 +6,9 @@ const { server }		= require( './tests/test_bootstrap' );
 
 let startTests	= ()=>{
 	testSuites.eventSuite();
+	testSuites.routingSuite();
 	testSuites.cachingSuite();
 	testSuites.securitySuite();
-	testSuites.routingSuite();
 	testSuites.loggingSuite();
 	testSuites.bodyParserSuite();
 	testSuites.validationSuite();

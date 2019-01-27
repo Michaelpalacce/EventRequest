@@ -29,8 +29,8 @@ let Development		= {
 };
 
 module.exports		= {
-	Server,		Router,
+	Server,		Development,
 	Testing,	BodyParserHandler,
 	Logging,	Loggur,
-	LOG_LEVELS,	Development
+	LOG_LEVELS
 };

@@ -1,20 +1,76 @@
 'use strict';
 
 // Dependencies
-const EventRequest	= require( '../../event' );
-const Route			= require( './route' );
+const EventRequest		= require( '../../event' );
+const Route				= require( './route' );
+const PluginInterface	= require( './../../plugins/plugin_interface' );
 
 /**
  * @brief	Handler used to return all the needed middleware for the given event
  */
-class Router
+class Router extends PluginInterface
 {
 	/**
 	 * @brief	Initializes the router with an empty middleware object
 	 */
 	constructor()
 	{
+		super( 'er_router', {} );
+
 		this.middleware	= [];
+		this.setUpHttpMethodsToObject( this );
+	}
+
+	/**
+	 * @brief	Attaches methods to the server on runtime
+	 *
+	 * @param	Server server
+	 *
+	 * @return	void
+	 */
+	setServerOnRuntime( server )
+	{
+		this.setUpHttpMethodsToObject( server );
+
+		/**
+		 * @brief	Function that adds a middleware to the block chain of the router
+		 *
+		 * @param	Object|Router route
+		 *
+		 * @returns	Server
+		 */
+		server.add	= ( route )=>{
+			server.emit( 'addRoute', route );
+
+			this.add( route );
+
+			return server;
+		};
+	}
+
+	/**
+	 * @brief	Adds .post, .put, .get, .delete methods to the object
+	 *
+	 * @details	Accepts "route" as first param that can be the the usual string or regex but MUST be given
+	 * 			and function "handler" to be called
+	 *
+	 * @return	void
+	 */
+	setUpHttpMethodsToObject( object )
+	{
+		let methods	= ['POST', 'PUT', 'GET', 'DELETE'];
+
+		methods.forEach(( method )=>{
+			object[method.toLocaleLowerCase()]	= ( route, handler )=>{
+				this.add({
+					method,
+					route,
+					handler
+				});
+
+				return object;
+			}
+		});
 	}
 
 	/**

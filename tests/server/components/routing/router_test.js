@@ -58,7 +58,7 @@ test({
 
 		routerTwo.add( routerOne );
 
-		assert.deepStrictEqual( routerOne, routerTwo );
+		assert.deepStrictEqual( routerOne.middleware, routerTwo.middleware );
 
 		done();
 	}
