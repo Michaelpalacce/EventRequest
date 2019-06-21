@@ -47,9 +47,10 @@ class Server extends EventEmitter
 
 		this.sanitizeConfig( options );
 
-		this.router			= this.Router();
-		this.pluginManager	= PluginManager;
 		this.plugins		= [];
+		this.pluginManager	= PluginManager;
+		this.router			= this.Router();
+		this.apply( this.router );
 
 		if ( this.applyPlugins === true )
 		{
@@ -129,11 +130,7 @@ class Server extends EventEmitter
 	 */
 	Router()
 	{
-		const router	= new Router();
-
-		this.apply( router );
-
-		return router;
+		return new Router();
 	}
 
 	/**

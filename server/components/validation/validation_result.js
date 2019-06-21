@@ -42,6 +42,11 @@ class ValidationResult
 		{
 			this.result	= [];
 
+			if ( this.attributes.length === 0 )
+			{
+				this.validationFailed	= true;
+			}
+
 			this.attributes.forEach( ( attribute ) => {
 				let validation				= attribute.validateSelf();
 				this.result[attribute.key]	= validation;
