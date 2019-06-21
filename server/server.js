@@ -51,8 +51,6 @@ class Server extends EventEmitter
 		this.pluginManager	= PluginManager;
 		this.plugins		= [];
 
-		this.apply( this.router );
-
 		if ( this.applyPlugins === true )
 		{
 			this.setUpDefaultPlugins();
@@ -131,7 +129,11 @@ class Server extends EventEmitter
 	 */
 	Router()
 	{
-		return new Router();
+		const router	= new Router();
+
+		this.apply( router );
+
+		return router;
 	}
 
 	/**

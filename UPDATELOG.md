@@ -1,3 +1,7 @@
+6.2.1 
+- Added a project generator
+- Now router doesn't need to be updated
+
 5.1.1
 - Bugfix: The env plugin now loads synchronously
 
