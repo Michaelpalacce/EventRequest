@@ -289,7 +289,9 @@ When creating the first instance, make sure to pass the desired options.
 
 ***
 ### Ways to add routes using the Router or the Server:
-When adding routes you have to use the Router class.
+When adding routes you have to use the Router class. 
+The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
+
 
 ~~~javascript
 let { Server } = require( 'event_request' );
@@ -336,6 +338,11 @@ server.delete( '/', ( event )=>{
 } );
 
 server.put( '/', ( event )=>{
+	event.send( ['ok']);
+} );
+
+server.get( '/users/:user:', ( event )=>{
+	console.log( event.params.user ); // Will print out whatever is passed in the url ( /users/John => 'John' )
 	event.send( ['ok']);
 } );
 
@@ -828,6 +835,7 @@ The TestingTools export:
 # Caching
 There is an built-in in-memory and memory caching server that works with promises
 
+NOTE: Memory caching server is deprecated
 Both data servers have the same functionality 
 The in-memory data server is loaded in the process.dataServer and is faster that the memory one 
 which is an external service.
@@ -1085,6 +1093,9 @@ server.apply( staticResourcesPlugin );
 
 ###er_cache_server
 Adds a memory cache server
+
+    * Attaches itself on the event_request :
+        ** event.cachingServer
 
     * Exported Functions:
     **startServer( callback )** -> starts the caching server and calls the callback when done. The first argument is a boolean with
