@@ -161,7 +161,8 @@ assert.assertNotNumeric		= ( actual ) => {
  * @return	Boolean
  */
 assert.assertIsEmpty		= ( actual ) => {
-	return actual === ''
+	return actual == null
+		|| actual === ''
 		|| ( getType( actual ) === 'object' && Object.keys( actual ).length === 0 )
 		|| ( Array.isArray( actual ) && actual.length === 0 );
 };

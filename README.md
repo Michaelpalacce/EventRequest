@@ -610,14 +610,22 @@ skeleton must have the keys that are to be validated that point to a string of r
 
 
 When validation is done a ValidationResult is returned. It has 2 main methods:
-    getValidationResult that will return an array of error keys eg: ['string','min','max','range','filled']
+    getValidationResult that will return an object with the fields tested mapped to the errors found. Otherwise 
+                        it will be an object with the fields tested mapped to the values ( done only if no errors found )
     hasValidationFailed that returns a boolean whether there is an error
 
 ~~~javascript
-     let body = { stringToValidate: 'str', emailToValidate: 'example@test.com' };
-     event.validationHandler.handle( body, { stringToValidate: 'filled||string||range:2-3',
-                                       emailToValidate: 'optional||email' }
-                                   );
+     let result	= event.validationHandler.validate(
+        event.body,
+        { username : 'filled||string', password : 'filled||string' } 
+     );
+
+    console.log( result.hasValidationFailed() );
+    console.log( result.getValidationResult() );
+    
+    // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
+    // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
+    // { 'username':'username', 'password': 'password'}
 ~~~
 
 The example will validate that the stringToValidate is filled is a string and is within a range of 2-3 characters

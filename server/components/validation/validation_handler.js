@@ -27,7 +27,7 @@ class ValidationHandler
 			validationAttribute,
 			validationResult	= new ValidationResult();
 
-		for ( key in validationInput )
+		for ( key in skeleton )
 		{
 			value				= validationInput[key];
 			rules				= skeleton[key];

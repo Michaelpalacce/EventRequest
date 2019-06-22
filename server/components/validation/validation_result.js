@@ -56,6 +56,13 @@ class ValidationResult
 					this.validationFailed	= true;
 				}
 			});
+
+			if ( ! this.validationFailed )
+			{
+				this.attributes.forEach( ( attribute ) => {
+					this.result[attribute.key]	= attribute.value;
+				})
+			}
 		}
 	}
 
@@ -72,9 +79,10 @@ class ValidationResult
 	}
 
 	/**
-	 * @brief	Gets the reason if any of validation failure
+	 * @brief	Gets the reason if any of validation failure otherwise the returned
+	 * 			object will have the values mapped to the keys that were being validated
 	 *
-	 * @return	Array|Boolean
+	 * @return	Array
 	 */
 	getValidationResult()
 	{
