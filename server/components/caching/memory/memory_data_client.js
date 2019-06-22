@@ -476,9 +476,9 @@ class MemoryWorker
 	{
 		this.clearTimeoutFromData( namespace, recordName );
 
-		if ( ttl <= 0 )
+		if ( ttl === 0 )
 		{
-			ttl	= 24 * 60 * 60 * 1000;
+			return;
 		}
 
 		let keyPair	= namespace + '||' + recordName;
@@ -517,9 +517,9 @@ class MemoryWorker
 	 */
 	getTTL( args )
 	{
-		return ( typeof args.options === 'object' && typeof args.options.ttl === 'number' && args.options.ttl > 0 )
+		return ( typeof args.options === 'object' && typeof args.options.ttl === 'number' && args.options.ttl >= 0 )
 				? args.options.ttl
-				: 0;
+				: 24 * 60 * 60 * 1000;
 	}
 }
 

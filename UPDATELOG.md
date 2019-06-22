@@ -1,3 +1,7 @@
+6.4.0
+- Fixed Validations, now they show better, fixed bug in them
+- New, now you can set an entry in the in memoryData to never expire, which is dangerous but can be done
+
 6.2.1 
 - Added a project generator
 - Now router doesn't need to be updated

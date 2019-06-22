@@ -136,6 +136,7 @@ class InMemoryDataServer extends DataServer
 				process.dataServer.data[namespace][recordName]	= data;
 				this.addTimeoutToData( namespace, recordName, this.getTTL( options ) );
 
+				console.log( process.dataServer.data );
 				resolve( false );
 			}).catch( reject );
 		})
@@ -316,6 +317,11 @@ class InMemoryDataServer extends DataServer
 	{
 		this.clearTimeoutFromData( namespace, recordName );
 
+		if ( ttl === 0 )
+		{
+			return;
+		}
+
 		let keyPair	= namespace + '||' + recordName;
 		process.dataServer.timeouts[keyPair]	= setTimeout( () => {
 			if ( typeof process.dataServer !== 'undefined' )
@@ -339,7 +345,7 @@ class InMemoryDataServer extends DataServer
 	 */
 	getTTL( options )
 	{
-		return ( typeof options === 'object' && typeof options.ttl === 'number' && options.ttl > 0 )
+		return ( typeof options === 'object' && typeof options.ttl === 'number' && options.ttl >= 0 )
 			? options.ttl
 			: 24 * 60 * 60 * 1000;
 	}

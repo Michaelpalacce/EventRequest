@@ -1303,7 +1303,7 @@ Adds a response caching mechanism
     Accepted Options:
         **callback** -> This is a negative error callback that returns false if there was no problem setting up the server, true or Error if there was
         **useIp** -> wether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
-        **ttl** -> time to live for the record. Defaults to 60 * 5000 ms
+        **ttl** -> time to live for the record. Defaults to infinity
 ***
 ~~~javascript
 const PluginManager		= server.getPluginManager();
