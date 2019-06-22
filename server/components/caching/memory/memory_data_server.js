@@ -1,5 +1,6 @@
 'use strict';
 
+//@DEPRECATED
 const { DataServer, SERVER_STATES }	= require( '../data_server' );
 const path							= require( 'path' );
 const fork							= require( 'child_process' ).fork;
@@ -10,6 +11,8 @@ const PIPE_PATH						= process.platform === 'win32' ? "\\\\.\\pipe\\" + PIPE_NAM
 
 /**
  * @brief	Simple caching server that stores cache in memory
+ *
+ * @deprecated
  */
 class MemoryDataServer extends DataServer
 {

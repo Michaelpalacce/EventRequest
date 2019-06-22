@@ -38,6 +38,7 @@ class MemoryDataServerPlugin extends PluginInterface
 		switch ( server )
 		{
 			case 'memory':
+				console.log( 'The MemoryDataServer is DEPRECATED, use InMemoryDataServer Instead' );
 				this.serverConstructor	= MemoryDataServer;
 				break;
 
