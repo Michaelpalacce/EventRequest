@@ -136,7 +136,6 @@ class InMemoryDataServer extends DataServer
 				process.dataServer.data[namespace][recordName]	= data;
 				this.addTimeoutToData( namespace, recordName, this.getTTL( options ) );
 
-				console.log( process.dataServer.data );
 				resolve( false );
 			}).catch( reject );
 		})

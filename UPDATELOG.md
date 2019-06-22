@@ -1,3 +1,6 @@
+6.4.1
+- Removed forgotten log
+
 6.4.0
 - Fixed Validations, now they show better, fixed bug in them
 - New, now you can set an entry in the in memoryData to never expire, which is dangerous but can be done
