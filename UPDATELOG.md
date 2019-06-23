@@ -1,3 +1,6 @@
+6.6.0
+- Added new getAll functionality for the DataServerModel
+
 6.5.2
 - Now DataModels are cached
 - Improvements

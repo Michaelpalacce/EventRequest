@@ -316,6 +316,38 @@ module.exports	= function ( dataServer, namespace, validationSchema = {} )
 		}
 
 		/**
+		 * @brief	Gets all records for the namespace
+		 *
+		 * @details	This operation may take a long time
+		 * 			The promise resolves in an array of elements
+		 *
+		 * @param	Object options
+		 *
+		 * @return	Promise
+		 */
+		static getAll( options = {} )
+		{
+			return new Promise( ( resolve, reject )=>{
+				if ( ! isServerRunning() )
+				{
+					reject( 'Server is not running' );
+					return;
+				}
+
+				dataServer.getAll( namespace, options ).then(( data )=>{
+					let keys	= Object.keys( data );
+					let models	= [];
+
+					keys.forEach( ( recordName )=>{
+						models.push( new ModelClass( recordName, data[recordName] ) );
+					});
+
+					resolve( models );
+				}).catch( reject );
+			});
+		}
+
+		/**
 		 * @brief	Finds and removes a single entry
 		 *
 		 * @param	String recordName

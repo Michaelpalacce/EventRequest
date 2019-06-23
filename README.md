@@ -1021,6 +1021,12 @@ This does not reject if the namespace does not exist or the record does not exis
 Creates and RETURNS a model. This will reject if the namespace does not exist
 
 ***
+
+**static getAll( Object options = {} )** -> Promise, resolve( [Model model] ), reject( err ), 
+Returns all the records( WITHOUT THE OPTIONS ) for the namespace.
+This does not reject if the namespace does not exist.
+
+***
 ***
 ***
 
