@@ -1,3 +1,7 @@
+6.5.2
+- Now DataModels are cached
+- Improvements
+
 6.4.1
 - Removed forgotten log
 

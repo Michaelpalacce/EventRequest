@@ -928,6 +928,7 @@ memory_data_server:
         **ttl** -> Number, time to live
 
 # DataServerModel
+Any Data Server created using the DataServer class will be cached and will be returned directly next time the model function is called
 Any Data Server created using the DataServer class exported by the module has access to a 
 
 **model( String namespace, Object options )** -> ModelClass

@@ -18,6 +18,7 @@ class DataServer extends EventEmitter
 		this.setMaxListeners( 0 );
 
 		this.options		= options;
+		this.dataModels		= {};
 		this.serverState	= SERVER_STATES.inactive;
 		this.sanitize( options );
 	}
@@ -32,7 +33,12 @@ class DataServer extends EventEmitter
 	 */
 	model( namespace, options )
 	{
-		return createModel( this, namespace, options );
+		if ( typeof this.dataModels[namespace] !== 'undefined' )
+		{
+			return this.dataModels[namespace];
+		}
+
+		return this.dataModels[namespace]	= createModel( this, namespace, options );
 	}
 
 	/**
