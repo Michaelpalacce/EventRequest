@@ -53,6 +53,7 @@ class Mp4FileStream extends FileStream
 		let range		= this.event.headers.range;
 
 		this.event.emit( 'stream_start' );
+		this.event.setHeader( 'Content-Type', 'video/mp4' );
 		if ( range )
 		{
 			let parts	= range.replace( /bytes=/, "" ).split( "-" );
@@ -64,20 +65,18 @@ class Mp4FileStream extends FileStream
 			this.event.setHeader( 'Content-Range', `bytes ${start}-${end}/${fileSize}` );
 			this.event.setHeader( 'Accept-Ranges', 'bytes' );
 			this.event.setHeader( 'Content-Length', ( end - start ) + 1 );
-			this.event.setHeader( 'Content-Type', 'video/mp4' );
 			this.event.response.statusCode	= 206;
 
 			file	= fs.createReadStream( file, { start: start, end: end } );
-			file.pipe( this.event.response );
+			this.event.send( file );
 		}
 		else
 		{
 			this.event.setHeader( 'Content-Length', fileSize );
-			this.event.setHeader( 'Content-Type', 'video/mp4' );
 			this.event.response.statusCode	= 200;
 
 			file	= fs.createReadStream( file );
-			file.pipe( this.event.response );
+			this.event.send( file );
 		}
 	}
 }

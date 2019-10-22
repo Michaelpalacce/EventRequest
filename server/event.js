@@ -147,6 +147,8 @@ class EventRequest extends EventEmitter
 	 * @brief	Sends the response to the user
 	 *
 	 * @details	Raw is a flag to tell the eventRequest how to send the data
+	 * 			If set to false, then the response passed will be returned in a JSON format if is not already a valid string
+	 * 			If it is a valid string, then it will be returned as is
 	 *
 	 * @param	mixed response
 	 * @param	Number code

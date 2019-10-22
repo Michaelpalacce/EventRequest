@@ -78,7 +78,7 @@ class JsonBodyParser extends BodyParser
 
 		try
 		{
-			let payload			= JSON.parse( rawPayload.toString() );
+			let payload	= JSON.parse( rawPayload.toString() );
 			for ( let index in payload )
 			{
 				payload[index]	= decodeURIComponent( payload[index] );

@@ -14,21 +14,21 @@ const { Loggur, LOG_LEVELS }	= Logging;
 /**
  * @brief	Constants
  */
-const PROTOCOL_HTTP									= 'http';
-const PROTOCOL_HTTPS								= 'https';
-const OPTIONS_PARAM_PORT							= 'port';
-const OPTIONS_PARAM_PORT_DEFAULT					= 3000;
-const OPTIONS_PARAM_PROTOCOL						= 'protocol';
-const OPTIONS_PARAM_PROTOCOL_DEFAULT				= PROTOCOL_HTTP;
-const OPTIONS_PARAM_HTTPS							= 'httpsOptions';
-const OPTIONS_PARAM_HTTPS_DEFAULT					= {};
+const PROTOCOL_HTTP							= 'http';
+const PROTOCOL_HTTPS						= 'https';
+const OPTIONS_PARAM_PORT					= 'port';
+const OPTIONS_PARAM_PORT_DEFAULT			= 3000;
+const OPTIONS_PARAM_PROTOCOL				= 'protocol';
+const OPTIONS_PARAM_PROTOCOL_DEFAULT		= PROTOCOL_HTTP;
+const OPTIONS_PARAM_HTTPS					= 'httpsOptions';
+const OPTIONS_PARAM_HTTPS_DEFAULT			= {};
 
-const OPTIONS_PARAM_PLUGINS							= 'plugins';
-const OPTIONS_PARAM_PLUGINS_DEFAULT					= true;
+const OPTIONS_PARAM_PLUGINS					= 'plugins';
+const OPTIONS_PARAM_PLUGINS_DEFAULT			= true;
 
-const POSSIBLE_PROTOCOL_OPTIONS						= {};
-POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]			= http;
-POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTPS]			= https;
+const POSSIBLE_PROTOCOL_OPTIONS				= {};
+POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]	= http;
+POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTPS]	= https;
 
 /**
  * @brief	Server class responsible for receiving requests and sending responses
