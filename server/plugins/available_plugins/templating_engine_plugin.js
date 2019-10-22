@@ -40,7 +40,7 @@ class TemplatingEnginePlugin extends PluginInterface
 				let templatePath	= path.join( this.templateDir, templateName );
 
 				fs.readFile( templatePath, 'utf8', ( err, html ) => {
-					if ( ! err && html && html.length > 0 )
+					if ( ! err && html && html.length > 0  && ! this.isFinished() )
 					{
 						let result	= this.templatingEngine.render( html, variables );
 						this.send( result, 200, true );

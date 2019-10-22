@@ -72,6 +72,7 @@ class EventRequest extends EventEmitter
 		this.request			= request;
 		this.response			= response;
 		this.cookies			= list;
+		this.finished			= false;
 
 		this.extra				= {};
 		this.params				= {};
@@ -125,6 +126,7 @@ class EventRequest extends EventEmitter
 		this.errorHandler	= undefined;
 		this.cookies		= undefined;
 		this.params			= undefined;
+		this.finished		= true;
 
 		this.emit( 'finished' );
 		this.removeAllListeners();
@@ -288,7 +290,7 @@ class EventRequest extends EventEmitter
 	 */
 	isFinished()
 	{
-		return this.response.finished;
+		return this.response.finished || this.finished === true;
 	}
 
 	/**

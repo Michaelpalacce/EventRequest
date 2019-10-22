@@ -1,3 +1,8 @@
+6.6.1
+- Small mp4 file improvements
+- Documentation fixes
+- Added better isFinished detection
+
 6.6.0
 - Added new getAll functionality for the DataServerModel
 
