@@ -43,10 +43,10 @@ test({
 				called	++;
 			},
 			with			: [
+				['send', undefined],
 				['error', undefined],
 				['on_error', undefined],
 				['finished', undefined],
-				['send', undefined],
 				['redirect', undefined],
 				['cachedResponse', undefined],
 				['stop', undefined],
@@ -66,7 +66,6 @@ test({
 		// DO this to wait for the log to complete
 		setImmediate(()=>{
 			assert.equal( 10, called );
-			assert.equal( 1, calledLog );
 			assert.equal( true, eventRequest.logger instanceof Logger );
 
 			done();

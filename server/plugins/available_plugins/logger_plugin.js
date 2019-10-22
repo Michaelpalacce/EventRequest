@@ -129,10 +129,12 @@ class LoggerPlugin extends PluginInterface
 		let pluginMiddleware	= {
 			handler	: ( event ) =>{
 				let requestURL	= event.request.url;
+
 				event.on( 'send', ( response ) =>{
 					const userAgent	= typeof event.headers['user-agent'] === 'undefined' ? 'UNKNOWN' : event.headers['user-agent'];
 					logger.notice( `${event.method} ${requestURL} ${response.code} ||| ${event.clientIp} ||| ${event.headers['user-agent']}` );
 				});
+
 				logger.verbose( 'Headers: ' + JSON.stringify( event.headers ) );
 				logger.verbose( 'Cookies: ' + JSON.stringify( event.cookies ) );
 

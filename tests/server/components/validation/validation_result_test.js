@@ -109,7 +109,9 @@ test({
 		result.addAttribute( attribute );
 		result.validateAllAttributes();
 
-		assert.deepEqual( { key: false }, result.getValidationResult() );
+		console.log( result.getValidationResult() );
+
+		assert.deepEqual( { key: 'value' }, result.getValidationResult() );
 
 		done();
 	}
