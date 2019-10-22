@@ -1,3 +1,7 @@
+6.6.2
+- Fixed the logger a bit by adding more information
+- Reverted the mp4 file stream
+
 6.6.1
 - Small mp4 file improvements
 - Documentation fixes

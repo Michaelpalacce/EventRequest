@@ -68,7 +68,7 @@ class Mp4FileStream extends FileStream
 			this.event.response.statusCode	= 206;
 
 			file	= fs.createReadStream( file, { start: start, end: end } );
-			this.event.send( file );
+			file.pipe( this.event.response );
 		}
 		else
 		{
@@ -76,7 +76,7 @@ class Mp4FileStream extends FileStream
 			this.event.response.statusCode	= 200;
 
 			file	= fs.createReadStream( file );
-			this.event.send( file );
+			file.pipe( this.event.response );
 		}
 	}
 }

@@ -49,8 +49,8 @@ class LoggerPlugin extends PluginInterface
 		if ( this.logger == null )
 		{
 			this.logger	= this.options.logger instanceof Logger
-						? this.options.logger
-						: Loggur.getDefaultLogger()
+				? this.options.logger
+				: Loggur.getDefaultLogger()
 		}
 
 		return this.logger;
@@ -92,10 +92,6 @@ class LoggerPlugin extends PluginInterface
 			logger.info( 'Event finished' )
 		});
 
-		event.on( 'send', ( response ) =>{
-			logger.info( `Responded with: ${response.code} to ${requestURL}` )
-		});
-
 		event.on( 'redirect', ( redirect ) =>{
 			logger.info( `Redirect to: ${redirect.redirectUrl} with status code: ${redirect.statusCode}` )
 		});
@@ -117,7 +113,7 @@ class LoggerPlugin extends PluginInterface
 		});
 
 		event.on( 'clearTimeout', () =>{
-			logger.debug( 'Timeout cleared' )
+			logger.verbose( 'Timeout cleared' )
 		});
 	}
 
@@ -133,9 +129,12 @@ class LoggerPlugin extends PluginInterface
 		let pluginMiddleware	= {
 			handler	: ( event ) =>{
 				let requestURL	= event.request.url;
-				logger.notice( event.method + ': ' + requestURL );
-				logger.verbose( event.headers );
-				logger.verbose( event.cookies );
+				event.on( 'send', ( response ) =>{
+					const userAgent	= typeof event.headers['user-agent'] === 'undefined' ? 'UNKNOWN' : event.headers['user-agent'];
+					logger.notice( `${event.method} ${requestURL} ${response.code} ||| ${event.clientIp} ||| ${event.headers['user-agent']}` );
+				});
+				logger.verbose( 'Headers: ' + JSON.stringify( event.headers ) );
+				logger.verbose( 'Cookies: ' + JSON.stringify( event.cookies ) );
 
 				this.attachEventsToEventRequest( event );
 
