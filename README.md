@@ -1392,58 +1392,86 @@ server.start();
 
 ### er_rate_limits
 Adds a Rate limits plugin to the server. 
-The rate limits plugin can monitor incoming requests and stop them if they are too many
+The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
+
+
+    Accepted Options:
+        **file** -> The absolute path to the rate limits json file. Defaults to ROOT DIR / rate_limits.json
 
 The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
 If one exists, then the existing one's configuration will be taken. 
 
-**Example configuration:**
+If you want to create custom rate limiting you can get er_rate_limits plugin and use getNewBucketFromOptions to get a new bucket, given options for it
+options['maxAmount']
+options['refillTime']
+options['refillAmount']
+
+
+Rate limit can be applied to different routes and different HTTP methods
+Rate limit rule options:
+
+** path -> String - the url path to rate limit ( blank for ALL )
+
+** methods -> Array - the methods to rate limit ( blank for ALL )
+
+**maxAmount -> Number - The maximum amount of tokens to hold
+
+**refillTime -> Number - the time taken to refill the refillAmount of tokens
+
+**refillAmount -> Number - the amount of tokens to refill when refilling happens
+
+**policy -> String - The type of rate limiting to be applied
+
+**delayTime -> Number - must be given if policy is connection_delay. After what time in seconds should we retry
+
+**delayRetries -> Number - must be given if policy is connection_delay. How many retries to attempt
+
+**stopPropagation -> Boolean - Whether to stop if the rate limiting rule matches and ignore other rules
+
+**ipLimit -> Boolean - whether the rate limiting should be done per ip
+
+*** POLICIES:
+
+*PERMISSIVE_POLICY	= 'permissive';
+
+This policy will let the client connect freely but a flag will be set that it was rate limited
+
+
+*CONNECTION_DELAY_POLICY	= 'connection_delay';
+
+This policy will rate limit normally the request and will hold the connection until a token is freed
+If this is the policy specified then delayTime and delayRetries must be given. This will be the time after
+a check should be made if there is a free token.
+The first connection delay policy hit in the case of many will be used to determine the delay time but
+all buckets affected by such a connection delay will be affected
+
+
+* STRICT_POLICY	= 'strict';
+
+This policy will instantly reject if there are not enough tokens and return an empty response with a 429 header.
+This will also include a Retry-After header. If this policy is triggered, stopPropagation will be ignored and
+the request will be immediately canceled
 
 ~~~json
-{
-  "rate_limit" : 100, 
-  "interval":60000,
-  "message":"Too many requests",
-  "status_code":403,
-  "rules":[{
-    "path": "/",
-    "method": "GET",
-    "rate_limit": 0,
-    "interval": 10000
-  },{
-      "path": "/test",
-      "method": ["POST","GET"],
-      "rate_limit": 10,
-      "interval": 10000
-  }]
-}
+[
+  {
+    "path": "",
+    "methods": [],
+    "maxAmount": 10000,
+    "refillTime": 10,
+    "refillAmount": 1000,
+    "policy": "connection_delay",
+    "delayTime": 3,
+    "delayRetries": 5,
+    "stopPropagation": false,
+    "ipLimit": false
+  }
+]
 ~~~
 
-**"rate_limit" : 100,** -> The default rate limit which is 100 requests. If this is set to zero 
-then the request will not be rate limited by default. Defaults to 100
-
-***
-
-**"interval":60000,** -> The interval of time in milliseconds for which the rate limit should be kept.
-So in this case in one minute maximum 100 requests can be made. Defaults to 1 minute
-
-***
-
-**"message":"Too many requests",** -> The message to be sent if the request should be rate limited. Defaults to: **'Rate limit reached'**
-
-***
-
-**"status_code":403,** -> The status code to be returned if the request should be rate limited. Defaults to 403 FORBIDDEN
-
-***
-
-**"rules":** -> Holds an array of objects with PATH + METHOD specific rate limit rules
-These rules take priority from the general ones. Regular expressions are not supported.
-
-**IF you want to use RegExp, then change the .rules of the plugin programmatically.**
-
 ~~~javascript
-server.getPluginManager().getPlugin( 'er_rate_limits' ).rules   = {};
+let server  = Server();
+server.apply( 'er_rate_limits' )
 ~~~
 
 ***

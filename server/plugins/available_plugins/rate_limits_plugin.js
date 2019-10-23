@@ -1,28 +1,69 @@
 'use strict';
 
+const Bucket			= require( './../../components/rate_limiter/bucket' );
 const PluginInterface	= require( './../plugin_interface' );
 const Router			= require( './../../components/routing/router' );
 const fs				= require( 'fs' );
 const path				= require( 'path' );
 
-const RATE_LIMIT_KEY				= 'rate_limit';
-const FILE_PATH						= 'file';
-const INTERVAL_KEY					= 'interval';
-const RULES_KEY						= 'rules';
-const MESSAGE_KEY					= 'message';
-const STATUS_CODE_KEY				= 'status_code';
-const PATH_KEY						= 'path';
-const METHOD_KEY					= 'method';
-const DEFAULT_RATE_LIMIT			= 100;
-const DEFAULT_INTERVAL				= 60 * 1000;
-const DEFAULT_MESSAGE				= `Rate limit reached`;
-const DEFAULT_MESSAGE_STATUS_CODE	= 403;
-const DEFAULT_RULES					= [];
-const PROJECT_ROOT					= path.parse( require.main.filename ).dir;
-const FILE_LOCATION					= path.join( PROJECT_ROOT, 'rate_limits.json' );
+/**
+ * @brief	Status code send during strict policy in case of rate limit reached
+ *
+ * @var		Number TOO_MANY_REQUESTS_STATUS_CODE
+ */
+const TOO_MANY_REQUESTS_STATUS_CODE		= 429;
 
 /**
- * @brief	Plugin used to limit user's requests
+ * @brief	Permissive policy of client requests
+ *
+ * @details	This policy will let the client connect freely but a flag will be set that it was rate limited
+ *
+ * @var		String PERMISSIVE_POLICY
+ */
+const PERMISSIVE_POLICY					= 'permissive';
+
+/**
+ * @brief	Connection delay policy of client requests
+ *
+ * @details	This policy will rate limit normally the request and will hold the connection until a token is freed
+ * 			If this is the policy specified then delayTime and delayRetries must be given. This will be the time after
+ * 			a check should be made if there is a free token.
+ * 			The first connection delay policy hit in the case of many will be used to determine the delay time but
+ * 			all buckets affected by such a connection delay will be affected
+ *
+ * @var		String CONNECTION_DELAY_POLICY
+ */
+const CONNECTION_DELAY_POLICY			= 'connection_delay';
+
+/**
+ * @brief	Strict policy of client requests
+ *
+ * @details	This policy will instantly reject if there are not enough tokens and return an empty response with a 429 header.
+ * 			This will also include a Retry-After header. If this policy is triggered, stopPropagation will be ignored and
+ * 			the request will be immediately canceled
+ *
+ * @var		String STRICT_POLICY
+ */
+const STRICT_POLICY						= 'strict';
+
+const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
+const DEFAULT_FILE_LOCATION				= path.join( PROJECT_ROOT, 'rate_limits.json' );
+const OPTIONS_FILE_PATH					= 'path';
+const DEFAULT_RULE						= {
+	"path":"",
+	"methods":[],
+	"maxAmount":10000,
+	"refillTime":10,
+	"refillAmount":1000,
+	"policy": CONNECTION_DELAY_POLICY,
+	"delayTime": 3,
+	"delayRetries": 5,
+	"stopPropagation": false,
+	"ipLimit": false
+};
+
+/**
+ * @brief	Plugin used to limit the rate of clients requests
  */
 class RateLimitsPlugin extends PluginInterface
 {
@@ -30,15 +71,10 @@ class RateLimitsPlugin extends PluginInterface
 	{
 		super( id, options );
 
-		this.requests				= {};
-		this.rules					= DEFAULT_RULES;
-		this.rateLimit				= DEFAULT_RATE_LIMIT;
-		this.interval				= DEFAULT_INTERVAL;
-		this.limitReachedMessage	= DEFAULT_MESSAGE;
-		this.limitReachedStatusCode	= DEFAULT_MESSAGE_STATUS_CODE;
-		this.fileLocation			= typeof options[FILE_PATH] === 'string'
-									? options[FILE_PATH]
-									: FILE_LOCATION;
+		this.rules			= [];
+		this.fileLocation	= typeof options[OPTIONS_FILE_PATH] === 'string'
+							? options[OPTIONS_FILE_PATH]
+							: DEFAULT_FILE_LOCATION;
 	}
 
 	/**
@@ -51,17 +87,11 @@ class RateLimitsPlugin extends PluginInterface
 		if ( ! fs.existsSync( this.fileLocation ) )
 		{
 			let writeStream	= fs.createWriteStream( this.fileLocation );
+			let config		= [DEFAULT_RULE];
 
-			this.config		= {
-				[RATE_LIMIT_KEY]	: this.rateLimit,
-				[INTERVAL_KEY]		: this.interval,
-				[MESSAGE_KEY]		: this.limitReachedMessage,
-				[STATUS_CODE_KEY]	: this.limitReachedStatusCode,
-				[RULES_KEY]			: this.rules
-			};
-
-			writeStream.write( JSON.stringify( this.config ) );
+			writeStream.write( JSON.stringify( config ) );
 			writeStream.end();
+			this.sanitizeConfig( config )
 		}
 		else
 		{
@@ -79,46 +109,76 @@ class RateLimitsPlugin extends PluginInterface
 			readStream.on( 'close', () => {
 				let config	= JSON.parse( Buffer.concat( chunks ).toString( 'utf-8' ) );
 
-				this.parseConfig( config );
+				this.sanitizeConfig( config );
 			});
 		}
 	}
 
 	/**
-	 * @brief	Parses the configuration retrieved from the file
+	 * @brief	Parses and sanitizes the config
 	 *
-	 * @param	Object config
+	 * @param	Array config
 	 *
 	 * @return	void
 	 */
-	parseConfig( config = {} )
+	sanitizeConfig( config = [] )
 	{
-		let interval				= parseInt( config[INTERVAL_KEY] );
-		this.interval				= typeof interval === 'number' && ! isNaN( interval )
-									? interval
-									: DEFAULT_INTERVAL;
+		config.forEach( ( options )=>{
+			if (
+				typeof options['maxAmount'] === 'number'
+				&& typeof options['refillTime'] === 'number'
+				&& typeof options['refillAmount'] === 'number'
+				&& typeof options['methods'] !== 'undefined'
+				&& Array.isArray( options['methods'] )
+				&& typeof options['path'] === 'string'
+				&& typeof options['policy'] === 'string'
+				&& typeof options['stopPropagation'] === 'boolean'
+				&& typeof options['ipLimit'] === 'boolean'
+			) {
+				const policy	= options['policy'];
+				const ipLimit	= options['ipLimit'];
 
-		let rateLimit				= parseInt( config[RATE_LIMIT_KEY] );
-		this.rateLimit				= typeof rateLimit === 'number' && ! isNaN( rateLimit )
-									? rateLimit
-									: DEFAULT_RATE_LIMIT;
+				if (
+					policy === CONNECTION_DELAY_POLICY
+					&& typeof options['delayTime'] !== 'number'
+					&& typeof options['delayRetries'] !== 'number'
+				) {
+					throw new Error( `Rate limit with ${CONNECTION_DELAY_POLICY} must have delayTime set` );
+				}
+				const buckets	= ipLimit === true
+								? {}
+								: { [options['path']]: this.getNewBucketFromOptions( options ) };
 
-		this.rules					= Array.isArray( config[RULES_KEY] )
-									? config[RULES_KEY]
-									: DEFAULT_RULES;
+				this.rules.push( { buckets, options } );
+			}
+			else
+			{
+				throw new Error( 'Invalid rate limit options set: ' + JSON.stringify( options ) );
+			}
+		});
+	}
 
-		this.limitReachedMessage	= typeof config[MESSAGE_KEY] === 'string'
-									? config[MESSAGE_KEY]
-									: DEFAULT_MESSAGE;
+	/**
+	 * @brief	Gets a new Bucket from the rule options
+	 *
+	 * @param	Object options
+	 *
+	 * @return	Bucket
+	 */
+	getNewBucketFromOptions( options )
+	{
+		const maxAmount		= options['maxAmount'];
+		const refillTime	= options['refillTime'];
+		const refillAmount	= options['refillAmount'];
 
-		let statusCode				= parseInt( config[STATUS_CODE_KEY] );
-		this.limitReachedStatusCode	= typeof statusCode === 'number' && ! isNaN( statusCode )
-									? statusCode
-									: DEFAULT_MESSAGE_STATUS_CODE;
+		return new Bucket( refillAmount, refillTime, maxAmount );
 	}
 
 	/**
 	 * @brief	Attaches the listener
+	 *
+	 * @details	Loads the config, attaches a process that will clear the IP based buckets if they are full once every 15 minutes,
+	 * 			attaches a middleware that will handle the rate limiting
 	 *
 	 * @param	Server server
 	 *
@@ -128,30 +188,35 @@ class RateLimitsPlugin extends PluginInterface
 	{
 		this.loadConfig();
 
-		server.on( 'eventRequestResolved', ( eventData )=>{
-			let { eventRequest }	= eventData;
-			let shouldPass			= this.getRequestRate( eventRequest );
-
-			if ( ! shouldPass )
+		setInterval(()=>{
+			for ( let i = 0; i < this.rules.length; ++ i )
 			{
-				server.once( 'eventRequestBlockSet', ( eventData )=>{
-					let { eventRequest }	= eventData;
-					eventRequest.setBlock( [this.getRateLimitReachedMiddleware( eventRequest )] );
-				} );
-			}
-		} );
-	}
+				const options	= this.rules[i]['options'];
 
-	/**
-	 * @brief	Gets a middleware that is supposed to send a response that the rate of requests have been reached
-	 *
-	 * @return	Object
-	 */
-	getRateLimitReachedMiddleware()
-	{
-		return ( event )=>{
-			event.send( this.limitReachedMessage, this.limitReachedStatusCode );
-		};
+				if ( options['ipLimit'] === true )
+				{
+					const buckets	= this.rules[i]['buckets'];
+
+					for ( let path in buckets )
+					{
+						let bucket	= buckets[path];
+
+						if ( bucket instanceof Bucket && bucket.isFull() )
+						{
+							delete this.rules[i]['buckets'][path];
+						}
+					}
+				}
+			}
+		}, 60 * 60 * 1000 );
+
+		server.on( 'eventRequestBlockSet', ( eventData )=>{
+			let { eventRequest, block }	= eventData;
+			eventRequest.rateLimited	= false;
+			let newBlock				= [this.rateLimit.bind( this )].concat( block );
+
+			eventRequest.setBlock( newBlock );
+		} );
 	}
 
 	/**
@@ -159,51 +224,137 @@ class RateLimitsPlugin extends PluginInterface
 	 *
 	 * @param	EventRequest eventRequest
 	 *
-	 * @return	Boolean
+	 * @return	void
 	 */
-	getRequestRate( eventRequest )
+	rateLimit( eventRequest )
 	{
-		let path		= eventRequest.path;
-		let method		= eventRequest.method;
-		let clientIp	= eventRequest.clientIp;
-		let key			= path + method;
-
-		if ( typeof this.requests[clientIp] === 'undefined' )
+		if ( eventRequest.isFinished() )
 		{
-			this.requests[clientIp]	= {};
+			return;
 		}
 
-		if ( typeof this.requests[clientIp][key] === 'undefined' )
+		let path							= eventRequest.path;
+		let method							= eventRequest.method;
+		let clientIp						= eventRequest.clientIp;
+
+		let hasConnectionDelayPolicy		= false;
+		let connectionDelayPolicyOptions	= null;
+		let bucketsHit						= [];
+
+		for ( let i = 0; i < this.rules.length; ++ i )
 		{
-			this.requests[clientIp][key]	= 0;
-		}
-
-		let limit		= this.rateLimit;
-		let interval	= this.interval;
-
-		this.rules.forEach(( rule )=>{
-			let ruleRateLimit	= rule[RATE_LIMIT_KEY];
-			let ruleInterval	= rule[INTERVAL_KEY];
-			let rulePath		= rule[PATH_KEY];
-			let ruleMethod		= rule[METHOD_KEY];
+			const options		= this.rules[i]['options'];
+			const ruleMethod	= options['methods'];
+			const rulePath		= options['path'];
 
 			if ( Router.matchMethod( method, ruleMethod ) && Router.matchRoute( path, rulePath ) )
 			{
-				limit		= ruleRateLimit;
-				interval	= ruleInterval;
-			}
-		});
+				const ipLimit	= options['ipLimit'];
+				let bucketKey	= '';
 
-		if ( limit === 0 )
-		{
-			return true;
+				if ( ipLimit === true )
+				{
+					const ipLimitKey	= rulePath + clientIp;
+
+					if ( typeof this.rules[i]['buckets'][ipLimitKey] === 'undefined' )
+					{
+						this.rules[i]['buckets'][ipLimitKey]	= this.getNewBucketFromOptions( options );
+					}
+
+					bucketKey	= ipLimitKey;
+				}
+				else
+				{
+					bucketKey	= rulePath;
+				}
+
+				const bucket	= this.rules[i]['buckets'][bucketKey];
+				const hasToken	= bucket.reduce();
+
+				if ( ! hasToken )
+				{
+					const policy				= options['policy'];
+					const refillTime			= options['refillTime'];
+					eventRequest.rateLimited	= true;
+					bucketsHit.push( bucket );
+
+					switch( policy )
+					{
+						case PERMISSIVE_POLICY:
+							break;
+
+						case CONNECTION_DELAY_POLICY:
+							if ( ! hasConnectionDelayPolicy )
+							{
+								hasConnectionDelayPolicy		= true;
+								connectionDelayPolicyOptions	= options;
+							}
+
+							break;
+
+						case STRICT_POLICY:
+							this.sendRetryAfterRequest( eventRequest, refillTime );
+							return;
+					}
+
+					if ( options['stopPropagation'] === true )
+					{
+						break;
+					}
+				}
+			}
 		}
 
-		setTimeout(()=>{
-			-- this.requests[clientIp][key];
-		}, interval );
+		if ( hasConnectionDelayPolicy )
+		{
+			const options		= connectionDelayPolicyOptions;
+			const buckets		= bucketsHit;
+			const delayTime		= options['delayTime'];
+			const delayRetries	= options['delayRetries'];
+			const refillTime	= options['refillTime'];
 
-		return ++ this.requests[clientIp][key] <= limit;
+			let tries			= 0;
+
+			const interval		= setInterval(()=>{
+				if ( ++ tries >= delayRetries )
+				{
+					clearInterval( interval );
+					this.sendRetryAfterRequest( eventRequest, refillTime );
+					return;
+				}
+
+				for ( let b = 0; b < buckets.length; ++ b )
+				{
+					const bucket	= buckets[b];
+
+					if ( ! bucket.reduce() )
+					{
+						return;
+					}
+				}
+
+				clearInterval( interval );
+				eventRequest.next();
+			}, delayTime * 1000 );
+
+			return;
+		}
+
+		eventRequest.next();
+	}
+
+	/**
+	 * @brief	Sends a 429 response
+	 *
+	 * @param	EventRequest eventRequest
+	 * @param	Number retryAfterTime
+	 *
+	 * @return	void
+	 */
+	sendRetryAfterRequest( eventRequest, retryAfterTime )
+	{
+		eventRequest.setHeader( 'Retry-After', retryAfterTime );
+		eventRequest.sendError( 'Too many requests', TOO_MANY_REQUESTS_STATUS_CODE );
 	}
 }
 

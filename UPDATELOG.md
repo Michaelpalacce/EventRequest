@@ -1,3 +1,11 @@
+7.0.0
+- Rate Limit Reworked to use Leaky Bucket Strategy
+- Rate Limiting tests have not been written yet.
+- Now you can use setStatusCode and be sure that sending will not overwrite it UNLESS u specifically point a different status code then
+
+6.6.3
+- Fixed some tests
+
 6.6.2
 - Fixed the logger a bit by adding more information
 - Reverted the mp4 file stream

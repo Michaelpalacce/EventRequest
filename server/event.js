@@ -160,7 +160,10 @@ class EventRequest extends EventEmitter
 	 */
 	send( response, code = 200, raw = false )
 	{
-		this.setStatusCode( code );
+		if ( code !== 200 )
+		{
+			this.setStatusCode( code );
+		}
 
 		if ( typeof response.pipe === 'function' && response instanceof Streams.Readable )
 		{

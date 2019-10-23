@@ -164,7 +164,7 @@ class Router extends PluginInterface
 		}
 		else
 		{
-			// Its should be a route object
+			// It should be a route object
 			route	= method;
 		}
 
