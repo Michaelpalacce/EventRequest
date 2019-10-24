@@ -1,13 +1,6 @@
 'use strict';
 
-const uniqueId				= require( './../helpers/unique_id' );
-
-/**
- * @brief	The namespace in which the sessions should be stored
- *
- * @var		String SESSIONS_NAMESPACE
- */
-const SESSIONS_NAMESPACE	= 'er_session';
+const uniqueId	= require( './../helpers/unique_id' );
 
 /**
  * @brief	Session container
@@ -42,7 +35,7 @@ class Session
 			throw new Error( 'Could not create session. No caching container is set in the event' );
 		}
 
-		this.model				= event.cachingServer.model( SESSIONS_NAMESPACE );
+		this.server				= event.cachingServer;
 	}
 
 	/**
@@ -58,59 +51,53 @@ class Session
 	/**
 	 * @brief	Checks if the user has a session
 	 *
-	 * @param	Function callback
-	 *
-	 * @return	void
+	 * @return	Boolean
 	 */
-	hasSession( callback )
+	hasSession()
 	{
 		if ( this.sessionId === null )
 		{
-			callback( false );
-			return;
+			return false;
 		}
 
-		this.model	.find( this.sessionId )
-					.then( ( record )=> callback( record !== null ) )
-					.catch( ()=> callback( false ) );
+		return this.server.get( this.sessionId ) !== null
 	}
 
 	/**
 	 * @brief	Removes the session from the caching server
 	 *
-	 * @param	Function callback
 	 * @param	String sessionId
 	 *
 	 * @return	void
 	 */
-	removeSession( callback, sessionId = this.getSessionId() )
+	removeSession( sessionId = this.getSessionId() )
 	{
-		this.model.findAndRemove( sessionId ).then( callback ).catch( callback );
+		this.server.delete( sessionId );
 	}
 
 	/**
 	 * @brief	Starts a new session
 	 *
-	 * @param	Function callback
-	 *
-	 * @return	void
+	 * @return	String|Boolean
 	 */
-	newSession( callback )
+	newSession()
 	{
 		let sessionId	= this.makeNewSessionId();
 		this.session	= {
 			id	: sessionId
 		};
 
-		this.saveSession( ( err )=>{
-			if ( ! err )
-			{
-				this.sessionId	= sessionId;
-				this.event.setCookie( this.sessionKey, this.sessionId );
-			}
+		if ( ! this.saveSession( sessionId ) )
+		{
+			return false;
+		}
+		else
+		{
+			this.sessionId	= sessionId;
+			this.event.setCookie( this.sessionKey, this.sessionId );
 
-			callback( err );
-		}, sessionId );
+			return sessionId;
+		}
 	}
 
 	/**
@@ -170,44 +157,44 @@ class Session
 	/**
 	 * @brief	Save the session to the memory storage
 	 *
-	 * @param	Function callback
+	 * @details	Returns true if the session was saved successfully
+	 *
 	 * @param	String sessionId
 	 *
-	 * @return	void
+	 * @return	Boolean
 	 */
-	saveSession( callback, sessionId = this.getSessionId() )
+	saveSession( sessionId = this.getSessionId() )
 	{
 		if ( sessionId === null )
 		{
-			callback( false );
-			return;
+			return false;
 		}
 
-		this.model.make( sessionId, this.session, { ttl : this.ttl } ).then( ()=>{
-			callback( false );
-		} ).catch( callback );
+		this.server.set( sessionId, this.session, this.ttl );
+
+		return true;
 	}
 
 	/**
 	 * @brief	Fetches the session if it exists
 	 *
-	 * @param	Function callback
+	 * @details	Returns true if it was successfully fetched and false on error
 	 *
-	 * @return	void
+	 * @return	Boolean
 	 */
-	fetchSession( callback )
+	fetchSession()
 	{
-		let recordName	= this.getSessionId();
-		this.model.find( recordName, { ttl : this.ttl } ).then( ( entry )=>{
-			if ( entry === null )
-			{
-				callback( new Error( `There was no session for ${recordName}` ) );
-				return;
-			}
+		let sessionId	= this.getSessionId();
 
-			this.session	= entry.recordData;
-			callback( false );
-		}).catch( callback );
+		if ( ! this.server.touch( sessionId ) )
+		{
+			return false;
+		}
+
+		const dataSet	= this.server.get( sessionId );
+		this.session	= dataSet.value;
+
+		return true;
 	}
 
 	/**
@@ -221,4 +208,4 @@ class Session
 	}
 }
 
-module.exports	= { Session, SESSIONS_NAMESPACE };
+module.exports	= Session;

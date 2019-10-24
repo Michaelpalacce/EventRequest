@@ -4,7 +4,7 @@
 const { assert, test, helpers, Mock }	= require( '../../../test_helper' );
 const SessionPlugin						= require( './../../../../server/plugins/available_plugins/session_plugin' );
 const CachingServerPlugin				= require( '../../../../server/plugins/available_plugins/memory_data_server_plugin' );
-const { Session, SESSIONS_NAMESPACE }	= require( './../../../../server/components/session/session' );
+const Session							= require( './../../../../server/components/session/session' );
 const Router							= require( '../../../../server/components/routing/router' );
 
 test({
@@ -141,9 +141,10 @@ test({
 			}
 		});
 
-		cachingServer.setUp().then(()=>{
+		assert.doesNotThrow(()=>{
 			sessionPlugin.setServerOnRuntime( server );
 		});
+		done();
 	}
 });
 
@@ -163,59 +164,24 @@ test({
 			handler	: ( event )=>{
 				event.session.sessionId	= 'testSessionId';
 				event.session.add( 'test', 'value' );
-				event.session.saveSession(( error )=>{
-					if ( error !== false )
-					{
-						done( error );
-						return;
-					}
-
+				if ( ! event.session.saveSession() )
+				{
+					done( 'Could not save session' );
+					return;
+				}
+				else
+				{
 					event.initSession( ()=>{
 						assert.equal( true, event.session.has( 'test' ) );
 						assert.equal( 'value', event.session.get( 'test' ) );
 						done();
 					});
-				});
+					return;
+				}
 			}
 		});
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
-	}
-});
-
-test({
-	message	: 'SessionPlugin initSession creates a session if it does not exists',
-	test	: ( done )=>{
-		let MockServer					= Mock( helpers.getServer().constructor );
-		let MockCachingServerPlugin		= Mock( CachingServerPlugin );
-		let cachingServer				= helpers.getCachingServer();
-		let cachingServerPlugin			= new MockCachingServerPlugin();
-		let server						= new MockServer();
-
-		cachingServerPlugin._mock({
-			method			: 'getServer',
-			shouldReturn	: cachingServer
-		});
-
-		server._mock({
-			method			: 'getPlugin',
-			with			: [['er_cache_server']],
-			shouldReturn	: cachingServerPlugin
-		});
-
-		let namespace		= 'er_session';
-
-		let sessionPlugin	= new SessionPlugin( 'id',
-			{
-				callback : ()=>{
-					cachingServer.existsNamespace( namespace ).then( ( exists )=>{
-						exists === true ? done() : done( `The namespace ${namespace} does not exist` );
-					} ).catch( done );
-				}
-			}
-		);
-
-		sessionPlugin.setServerOnRuntime( server );
 	}
 });

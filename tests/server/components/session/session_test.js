@@ -1,23 +1,9 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers }			= require( '../../../test_helper' );
-const { Session, SESSIONS_NAMESPACE }	= require( './../../../../server/components/session/session' );
-const EventRequest						= require( './../../../../server/event' );
-const { DataServer }					= require( './../../../../server/components/caching/data_server' );
-
-test({
-	message	: 'Session setUp to create namespace',
-	test	: ( done )=>{
-		let cachingServer	= helpers.getCachingServer();
-
-		cachingServer.setUp().then(()=>{
-			cachingServer.createNamespace( SESSIONS_NAMESPACE ).then( ()=>{
-				done();
-			}).catch( done );
-		});
-	}
-});
+const { assert, test, helpers }	= require( '../../../test_helper' );
+const Session					= require( './../../../../server/components/session/session' );
+const EventRequest				= require( './../../../../server/event' );
 
 test({
 	message	: 'Session constructor on default throws',
@@ -41,7 +27,7 @@ test({
 		});
 
 		assert.equal( true, session.event instanceof EventRequest );
-		assert.equal( true, typeof session.model !== 'undefined' );
+		assert.equal( true, typeof session.server !== 'undefined' );
 		assert.equal( true, typeof session.options === 'object' );
 		assert.equal( 0, session.ttl );
 		assert.equal( 'sid', session.sessionKey );
@@ -73,7 +59,7 @@ test({
 		});
 
 		assert.equal( true, session.event instanceof EventRequest );
-		assert.equal( true, typeof session.model !== 'undefined' );
+		assert.equal( true, typeof session.server !== 'undefined' );
 		assert.equal( true, typeof session.options === 'object' );
 		assert.equal( ttl, session.ttl );
 		assert.equal( sessionKey, session.sessionKey );
@@ -130,10 +116,7 @@ test({
 
 		assert.doesNotThrow(()=>{
 			session	= new Session( eventRequest );
-		});
-
-		session.hasSession(( hasSession )=>{
-			hasSession ? done( 'There is a sesion but there shouldn\'t be one' ) : done();
+			session.hasSession() ? done( 'There is a sesion but there shouldn\'t be one' ) : done();
 		});
 	}
 });
@@ -144,7 +127,7 @@ test({
 		let sessionId				= 'sessionId';
 		let eventRequest			= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
 		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
+		let session					= new Session( eventRequest );
 		let setCookie				= false;
 
 		eventRequest._mock({
@@ -155,49 +138,42 @@ test({
 			called			: 1
 		});
 
-		assert.doesNotThrow(()=>{
-			session	= new Session( eventRequest );
-		});
+		let hasSession	= session.hasSession();
 
-		eventRequest.cachingServer.setUp().then(()=>{
-			session.model.createNamespaceIfNotExists().then(()=>{
-				session.hasSession(( hasSession )=>{
-					if ( ! hasSession )
+		if ( ! hasSession )
+		{
+			const sessionId	= session.newSession();
+
+			if ( sessionId === false )
+			{
+				done( 'Could not create a new session' );
+			}
+			else
+			{
+				if ( setCookie === true )
+				{
+					hasSession	= session.hasSession();
+					if ( hasSession === true )
 					{
-						session.newSession(( err )=>{
-							if ( err )
-							{
-								done( err );
-							}
-							else
-							{
-								if ( setCookie === true )
-								{
-									session.hasSession(( hasSession )=>{
-										if ( hasSession )
-										{
-											session.removeSession( done );
-										}
-										else
-										{
-											done( 'There is no session where there should have been' );
-										}
-									})
-								}
-								else
-								{
-									done( 'Set cookie should have been called when creating a new session but was not' );
-								}
-							}
-						});
+						session.removeSession();
+
+						done();
 					}
 					else
 					{
-						done( 'There is a session but there shouldn\'t be one' );
+						done( 'There is no session where there should have been' );
 					}
-				});
-			}).catch( done );
-		}).catch( done );
+				}
+				else
+				{
+					done( 'Set cookie should have been called when creating a new session but was not' );
+				}
+			}
+		}
+		else
+		{
+			done( 'There is a session but there shouldn\'t be one' );
+		}
 	}
 });
 
@@ -206,11 +182,7 @@ test({
 	test	: ( done )=>{
 		let eventRequest			= helpers.getEventRequest();
 		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
-
-		assert.doesNotThrow(()=>{
-			session	= new Session( eventRequest );
-		});
+		let session					= new Session( eventRequest );
 
 		assert.deepStrictEqual( {}, session.session );
 		session.add( 'key', 'value' );
@@ -232,15 +204,9 @@ test({
 		let sessionId				= 'sessionId2';
 		let eventRequest			= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
 		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
+		let session					= new Session( eventRequest );
 
-		assert.doesNotThrow(()=>{
-			session	= new Session( eventRequest );
-		});
-		
-		session.fetchSession(( error )=>{
-			error !== false ? done() : done( 'There should be no session to fetch' );
-		});
+		session.fetchSession() === false ? done() : done( 'There should be no session to fetch' );
 	}
 });
 
@@ -250,17 +216,10 @@ test({
 		let sessionId				= 'sessionId2';
 		let eventRequest			= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
 		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
+		let session					= new Session( eventRequest );
 
-		assert.doesNotThrow(()=>{
-			session	= new Session( eventRequest );
-		});
-
-		session.saveSession(()=>{
-			session.fetchSession(( err )=>{
-				err === false ? done() : done( 'There should be a session to fetch' );
-			});
-		}, sessionId );
+		session.saveSession();
+		session.fetchSession() !== false ? done() : done( 'There should be a session to fetch' );
 	}
 });
 
@@ -270,11 +229,7 @@ test({
 		let sessionId				= 'sessionId2';
 		let eventRequest			= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
 		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
-
-		assert.doesNotThrow(()=>{
-			session	= new Session( eventRequest );
-		});
+		let session					= new Session( eventRequest );
 
 		assert.equal( sessionId, session.getSessionId() );
 

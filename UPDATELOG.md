@@ -1,3 +1,10 @@
+8.0.0
+- Completely reworked the in-memory caching server
+- Removed the Memory caching server completely 
+- A LOT OF PLUGINS CHANGED. RELEASE IS NOT STABLE
+- DOCUMENTATION IS MISSING.
+- TESTS ARE MISSING
+
 7.0.0
 - Rate Limit Reworked to use Leaky Bucket Strategy
 - Rate Limiting tests have not been written yet.

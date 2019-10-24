@@ -15,7 +15,7 @@ let startTests	= ()=>{
 	testSuites.pluginsSuite();
 
 	runAllTests({
-		dieOnFirstError	: true,
+		dieOnFirstError	: false,
 		debug			: true,
 		silent			: false,
 		filter			: '',

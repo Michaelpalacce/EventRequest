@@ -26,10 +26,6 @@ testSuites.loggingSuite		= ()=>{
 };
 
 testSuites.cachingSuite		= ()=>{
-	require( './server/components/caching/data_server_test' );
-	require( './server/components/caching/memory/memory_data_server_test' );
-	require( './server/components/caching/in_memory/in_memory_data_server_test' );
-	require( './server/components/caching/data_server_model_creator_test' );
 };
 
 testSuites.bodyParserSuite	= ()=>{
@@ -52,7 +48,6 @@ testSuites.pluginsSuite		= ()=>{
 	require( './server/plugins/plugin_manager_test' );
 	require( './server/plugins/available_plugins/static_resources_plugin_test' );
 	require( './server/plugins/available_plugins/session_plugin_test' );
-	require( './server/plugins/available_plugins/memory_data_server_plugin_test' );
 	require( './server/plugins/preloaded_plugins_test' );
 	require( './server/plugins/available_plugins/templating_engine_plugin_test' );
 	require( './server/plugins/available_plugins/logger_plugin_test' );

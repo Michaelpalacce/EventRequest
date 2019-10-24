@@ -1,8 +1,7 @@
 'use strict';
 
-const { Server }				= require( '../index' );
-const MemoryDataServer			= require( '../server/components/caching/in_memory/in_memory_data_server' );
-const { Loggur, LOG_LEVELS }	= require( '../server/components/logger/loggur' );
+const { Server }	= require( '../index' );
+const DataServer	= require( '../server/components/caching/data_server' );
 
 let server			= Server({
 	port	: 3333
@@ -19,17 +18,7 @@ server.add({
 server.start(()=>{});
 
 // Set up a memory server to be used by the tests
-let cachingServer	= new MemoryDataServer();
-
-let onFulfilled		= ( data )=>{
-	Loggur.log( data, LOG_LEVELS.info );
-};
-
-let onRejected		= ( err )=>{
-	Loggur.log( err, LOG_LEVELS.error );
-};
-
-cachingServer.setUp( {} ).then( onFulfilled, onRejected );
+let cachingServer	= new DataServer({ persist: false });
 
 module.exports	= {
 	server, cachingServer

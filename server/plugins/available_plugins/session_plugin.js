@@ -1,8 +1,7 @@
 'use strict';
 
-const PluginInterface					= require( './../plugin_interface' );
-const { Session, SESSIONS_NAMESPACE }	= require( '../../components/session/session' );
-const { SERVER_STATES }					= require( '../../components/caching/data_server' );
+const PluginInterface	= require( './../plugin_interface' );
+const Session		= require( '../../components/session/session' );
 
 /**
  * @brief	Adds session the the event request
@@ -13,7 +12,7 @@ class SessionPlugin extends PluginInterface
 	{
 		super( id, options );
 
-		this.model	= null;
+		this.server	= null;
 	}
 
 	/**
@@ -35,31 +34,7 @@ class SessionPlugin extends PluginInterface
 	 */
 	setServerOnRuntime( server )
 	{
-		let cachingServer	= server.getPlugin( 'er_cache_server' ).getServer();
-		let callback		= typeof this.options === 'object' && typeof this.options.callback === 'function'
-							? this.options.callback
-							: ()=>{};
-
-		if ( cachingServer === null )
-		{
-			throw new Error( `Before adding ${this.getPluginId()}, make sure to start the caching server from 'er_cache_server'` )
-		}
-
-		this.model	= cachingServer.model( SESSIONS_NAMESPACE );
-
-		if ( cachingServer.getServerState() === SERVER_STATES.running )
-		{
-			this.model.createNamespaceIfNotExists().then( callback ).catch( callback );
-		}
-		else
-		{
-			cachingServer.on( 'state_changed', ( state )=>{
-				if ( state === SERVER_STATES.running )
-				{
-					this.model.createNamespaceIfNotExists().then( callback ).catch( callback )
-				}
-			} );
-		}
+		this.cachingServer	= server.getPlugin( 'er_cache_server' ).getServer();
 	}
 
 	/**
@@ -92,16 +67,16 @@ class SessionPlugin extends PluginInterface
 		let initSessionForPathMiddleware	= {
 			handler	: ( event )=>{
 				event.initSession	= ( callback )=>{
-					event.session.hasSession( ( hasSession )=>{
-						if ( ! hasSession )
-						{
-							event.session.newSession( callback );
-						}
-						else
-						{
-							event.session.fetchSession( callback );
-						}
-					});
+					const hasSession	= event.session.hasSession();
+
+					if ( ! hasSession )
+					{
+						callback( event.session.newSession() === false );
+					}
+					else
+					{
+						callback( event.session.fetchSession() === false );
+					}
 				};
 
 				event.next();

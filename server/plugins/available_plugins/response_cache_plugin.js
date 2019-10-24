@@ -1,12 +1,10 @@
 'use strict';
 
 const PluginInterface	= require( '../plugin_interface' );
-const { SERVER_STATES }	= require( '../../components/caching/data_server' );
 
 // Defaults for the plugin
 const DEFAULT_TTL		= 60 * 5000;
 const DEFAULT_USE_IP	= false;
-const NAMESPACE			= 'rcp';
 /**
  * @brief	Plugin responsible for caching requests to the cache server.
  */
@@ -15,8 +13,7 @@ class ResponseCachePlugin extends PluginInterface
 	constructor( id, options = {} )
 	{
 		super( id, options );
-
-		this.model	= null;
+		this.cachingServer	= null;
 	}
 
 	/**
@@ -38,31 +35,7 @@ class ResponseCachePlugin extends PluginInterface
 	 */
 	setServerOnRuntime( server )
 	{
-		let cachingServer	= server.getPlugin( 'er_cache_server' ).getServer();
-		let callback		= typeof this.options === 'object' && typeof this.options.callback === 'function'
-							? this.options.callback
-							: ()=>{};
-
-		if ( cachingServer === null )
-		{
-			throw new Error( `Before adding ${this.getPluginId()}, make sure to start the caching server from 'er_cache_server'` )
-		}
-
-		this.model	= cachingServer.model( NAMESPACE );
-
-		if ( cachingServer.getServerState() === SERVER_STATES.running )
-		{
-			this.model.createNamespaceIfNotExists().then( callback ).catch( callback );
-		}
-		else
-		{
-			cachingServer.on( 'state_changed', ( state )=>{
-				if ( state === SERVER_STATES.running )
-				{
-					this.model.createNamespaceIfNotExists().then( callback ).catch( callback );
-				}
-			} );
-		}
+		this.cachingServer	= server.getPlugin( 'er_cache_server' ).getServer();
 	}
 
 	/**
@@ -82,7 +55,7 @@ class ResponseCachePlugin extends PluginInterface
 				let ttl				= this.getTimeToLive( event );
 				let recordName		= this.getCacheId( event );
 
-				this.model.make( recordName, { response, code, headers }, { ttl } );
+				this.cachingServer.set( recordName, { response, code, headers }, ttl );
 			}
 		} );
 	}
@@ -144,36 +117,39 @@ class ResponseCachePlugin extends PluginInterface
 					event.cacheCurrentRequest	= undefined;
 				} );
 
-				event.cacheCurrentRequest	= ( options = {}, errCallback = event.next )=>{
-					errCallback							= typeof errCallback === 'function' ? errCallback : event.next;
+				event.cacheCurrentRequest	= ( options = {} )=>{
 					event.currentResponseCacheConfig	= options;
 					let cacheId							= this.getCacheId( event );
+					const cachedDataSet					= this.cachingServer.get( cacheId );
 
-					this.model.find( cacheId ).then(( model )=>{
-						if ( model === null )
+					if ( cachedDataSet === null )
+					{
+						this.attachCachingEvent( event );
+						event.next();
+					}
+					else
+					{
+						let ttl			= this.getTimeToLive( event );
+
+						const status	= this.cachingServer.touch( cachedDataSet.key, ttl );
+
+						if ( ! status )
 						{
-							this.attachCachingEvent( event );
-							event.next();
+							this.cachingServer.set( cachedDataSet.key, cachedDataSet.value, cachedDataSet.ttl );
 						}
-						else
-						{
-							let ttl	= this.getTimeToLive( event );
 
-							model.touch( ttl ).then(()=>{
-								let { response, code, headers }	= model.recordData;
-								let headersKeys					= Object.keys( headers );
+						let { response, code, headers }	= cachedDataSet.value;
+						let headersKeys					= Object.keys( headers );
 
-								headersKeys.forEach(( headerKey )=>{
-									let headerValue	= headers[headerKey];
+						headersKeys.forEach(( headerKey )=>{
+							let headerValue	= headers[headerKey];
 
-									event.setHeader( headerKey, headerValue );
-								});
+							event.setHeader( headerKey, headerValue );
+						});
 
-								event.emit( 'cachedResponse' );
-								event.send( response, code );
-							}).catch( errCallback );
-						}
-					});
+						event.emit( 'cachedResponse' );
+						event.send( response, code );
+					}
 				};
 
 				event.next();

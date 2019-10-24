@@ -1,238 +1,272 @@
 'use strict';
 
-const { EventEmitter }	= require( 'events' );
-const createModel		= require( './data_server_model_creator' );
-const SERVER_STATES		= require( './server_states' );
+const path	= require( 'path' );
+const fs	= require( 'fs' );
 
 /**
- * @brief	DataServer class extended by all data servers used by the EventRequest Server
+ * @var	Number
  */
-class DataServer extends EventEmitter
+const DEFAULT_TTL						= 5 * 60;
+const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
+
+const DEFAULT_PERSIST_FILE				= path.join( PROJECT_ROOT, 'cache' );
+const DEFAULT_PERSIST_RULE				= true;
+const DEFAULT_PERSIST_INTERVAL			= 2 * 1000;
+const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60 * 1000;
+
+/**
+ * @brief	A standard in memory data server
+ *
+ * @details	This acts as a data store
+ */
+class DataServer
 {
-	/**
-	 * @param	Object options
-	 */
 	constructor( options = {} )
 	{
-		super();
-		this.setMaxListeners( 0 );
+		this.server				= {};
 
-		this.options		= options;
-		this.dataModels		= {};
-		this.serverState	= SERVER_STATES.inactive;
-		this.sanitize( options );
+		this.defaultTtl			= typeof options['ttl'] === 'number'
+								? options['ttl']
+								: DEFAULT_TTL;
+
+		this.persistPath		= typeof options['persistPath'] === 'string'
+								? options['persistPath']
+								: DEFAULT_PERSIST_FILE;
+
+		this.persistInterval	= typeof options['persistInterval'] === 'number'
+								? options['persistInterval'] * 1000
+								: DEFAULT_PERSIST_INTERVAL;
+
+		const gcInterval		= typeof options['gcInterval'] === 'number'
+								? options['gcInterval'] * 1000
+								: DEFAULT_GARBAGE_COLLECT_INTERVAL;
+
+		const persist			= typeof options['persist'] === 'boolean'
+								? options['persist']
+								: DEFAULT_PERSIST_RULE;
+
+		if ( persist )
+		{
+			if ( fs.existsSync( this.persistPath ) )
+			{
+				this.loadData();
+				this.garbageCollect();
+			}
+
+			setInterval(()=>{
+				this.garbageCollect();
+				this.saveData();
+			}, this.persistInterval )
+		}
+
+		setInterval(()=>{
+			this.garbageCollect();
+		}, gcInterval );
 	}
 
 	/**
-	 * @brief	Creates a new model to be used for the given namespace.
+	 * @brief	Gets the value from the server
 	 *
-	 * @param	String namespace
-	 * @param	Object options
+	 * @param	String key
+	 *
+	 * @return	Object|null
+	 */
+	get( key )
+	{
+		return this._get( key );
+	}
+
+	/**
+	 * @brief	Gets the data
+	 *
+	 * @param	String key
+	 *
+	 * @return	Object|null
+	 */
+	_get( key )
+	{
+		return this._prune( key );
+	}
+
+	/**
+	 * @brief	Removes the dataSet if it is expired, otherwise returns it. Returns true if removed
+	 *
+	 * @param	string key
+	 *
+	 * @return	Object|null
+	 */
+	_prune( key )
+	{
+		const now		= new Date().getTime() / 1000;
+		const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate === 'number'
+						? this.server[key]
+						: null;
+
+		if ( dataSet === null || now > dataSet.expirationDate )
+		{
+			this.delete( key );
+
+			return null;
+		}
+
+		return dataSet;
+	}
+
+	/**
+	 * @brief	Sets the value to the data server
+	 *
+	 * @param	String key
+	 * @param	mixed value
+	 * @param	Number ttl
 	 *
 	 * @return	Object
 	 */
-	model( namespace, options )
+	set( key, value, ttl = 0 )
 	{
-		if ( typeof this.dataModels[namespace] !== 'undefined' )
+		return this._set( key, value, ttl )
+	}
+
+	/**
+	 * @brief	Sets the data
+	 *
+	 * @param	String key
+	 * @param	mixed value
+	 * @param	Number ttl
+	 *
+	 * @return	Object
+	 */
+	_set( key, value, ttl )
+	{
+		const dataSet	= this._makeDataSet( key, value, ttl );
+		return this.server[key]	= dataSet;
+	}
+
+	/**
+	 * @brief	Makes a new dataSet from the data
+	 *
+	 * @param	String key
+	 * @param	mixed value
+	 * @param	Number ttl
+	 *
+	 * @return	Object
+	 */
+	_makeDataSet( key, value, ttl )
+	{
+		const expirationDate	= this._getExpirationDateFromTtl( ttl );
+
+		return { key, value, ttl, expirationDate };
+	}
+
+	/**
+	 * @brief	Touches the given key
+	 *
+	 * @param	String key
+	 * @param	Number ttl
+	 *
+	 * @return	Boolean
+	 */
+	touch( key, ttl = 0 )
+	{
+		const dataSet	= this.get( key );
+
+		if ( dataSet === null )
 		{
-			return this.dataModels[namespace];
+			return false;
 		}
 
-		return this.dataModels[namespace]	= createModel( this, namespace, options );
+		ttl						= ttl === 0 ? dataSet.ttl : ttl;
+		dataSet.expirationDate	= this._getExpirationDateFromTtl( ttl );
+
+		return true;
 	}
 
 	/**
-	 * @brief	Sanitizes the configuration
+	 * @brief	Completely removes the key from the cache
 	 *
-	 * @param	Object options
+	 * @param	String key
 	 *
 	 * @return	void
 	 */
-	sanitize( options )
+	delete( key )
 	{
-		throw new Error( 'Invalid configuration provided' );
+		this.server[key]	= undefined;
+		delete this.server[key];
 	}
 
 	/**
-	 * @brief	Changes the server state and emits an event
-	 *
-	 * @param	Number state
-	 *
-	 * @return	void
-	 */
-	changeServerState( state )
-	{
-		this.serverState	= state;
-		this.emit( 'state_changed', state );
-	}
-
-	/**
-	 * @brief	Gets the server state of the data server
+	 * @brief	Returns how many keys there are
 	 *
 	 * @return	Number
 	 */
-	getServerState()
+	length()
 	{
-		return this.serverState;
+		return Object.keys( this.server ).length;
 	}
 
 	/**
-	 * @brief	Sets up the data server
+	 * @brief	Performs Garbage collection to free up memory
 	 *
-	 * @details	Any connections to external sources should be done here if needed
-	 *
-	 * @param	Object options
-	 *
-	 * @return	Promise
+	 * @return	void
 	 */
-	setUp( options = {} )
+	garbageCollect()
 	{
+		for ( let key in this.server )
+		{
+			this._prune( key );
+		}
 	}
 
 	/**
-	 * @brief	Disconnects from the data server
+	 * @brief	Saves the data to a file periodically
 	 *
-	 * @param	Object options
-	 *
-	 * @return	Promise
+	 * @return	void
 	 */
-	exit( options = {} )
+	saveData()
 	{
+		const writeStream	= fs.createWriteStream( this.persistPath );
+		writeStream.setDefaultEncoding( 'utf-8' );
+
+		writeStream.write( JSON.stringify( this.server ) );
+		writeStream.end();
 	}
 
 	/**
-	 * @brief	Create the namespace
+	 * @brief	Merge server data from file
 	 *
-	 * @details	If the Data Server supports namespaces ( folders on the file system, tables in CQL/SQl, etc )
-	 *
-	 * @param	String namespace
-	 * @param	String options
-	 *
-	 * @return	Promise
+	 * @return	void
 	 */
-	createNamespace( namespace, options = {} )
+	loadData()
 	{
+		const buffer	= fs.readFileSync( this.persistPath );
+		this.loadServerData( JSON.parse( buffer.toString() ) );
 	}
 
 	/**
-	 * @brief	Checks whether the namespace exists
+	 * @brief	Loads a dumped data to the caching server
 	 *
-	 * @details	Returns true if the namespace exists
+	 * @param	object serverData
 	 *
-	 * @param	String namespace
-	 * @param	Object options
-	 *
-	 * @return	Promise
+	 * @return	void
 	 */
-	existsNamespace( namespace, options = {} )
+	loadServerData( serverData )
 	{
+		const currentServerData	= this.server;
+
+		this.server	= { ...currentServerData, ...serverData };
 	}
 
 	/**
-	 * @brief	Deletes the namespace if it exists
+	 * @brief	Gets the expiration date of the record given the ttl
 	 *
-	 * @details	Returns true if the namespace was deleted
+	 * @param	Number ttl
 	 *
-	 * @param	String namespace
-	 * @param	Object options
-	 *
-	 * @return	Promise
+	 * @return	Number
 	 */
-	removeNamespace( namespace, options = {} )
+	_getExpirationDateFromTtl( ttl = 0 )
 	{
-	}
-
-	/**
-	 * @brief	Create the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	mixed data
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	create( namespace, recordName, data = {}, options = {} )
-	{
-	}
-
-	/**
-	 * @brief	Checks whether the record exists
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	exists( namespace, recordName, options = {} )
-	{
-	}
-
-	/**
-	 * @brief	Touches ( aka updates the ttl ) of the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	touch( namespace, recordName, options = {} )
-	{
-	}
-
-	/**
-	 * @brief	Update the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	mixed data
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	update( namespace, recordName, data = {}, options = {} )
-	{
-	}
-
-	/**
-	 * @brief	Read the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	read( namespace, recordName, options = {} )
-	{
-	}
-
-	/**
-	 * @brief	Delete the record
-	 *
-	 * @param	String namespace
-	 * @param	String recordName
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	delete( namespace, recordName, options = {} )
-	{
-	}
-
-	/**
-	 * @brief	Get all records from the namespace
-	 *
-	 * @param	String namespace
-	 * @param	Object options
-	 *
-	 * @return	Promise
-	 */
-	getAll( namespace, options = {} )
-	{
+		ttl	= ttl > 0 ? ttl : this.defaultTtl;
+		return new Date().getTime() / 1000 + ttl;
 	}
 }
 
-module.exports	= { DataServer, SERVER_STATES };
+module.exports	= DataServer;
