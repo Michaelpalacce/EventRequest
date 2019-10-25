@@ -40,5 +40,5 @@
   "scripts": {
     "test": "node ./test_script.js"
   },
-  "version": "9.0.0"
+  "version": "9.0.1"
 }
