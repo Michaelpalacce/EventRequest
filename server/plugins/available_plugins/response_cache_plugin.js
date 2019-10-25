@@ -55,7 +55,7 @@ class ResponseCachePlugin extends PluginInterface
 				let ttl				= this.getTimeToLive( event );
 				let recordName		= this.getCacheId( event );
 
-				this.cachingServer.set( recordName, { response, code, headers }, ttl );
+				this.cachingServer.set( recordName, { response, code, headers }, ttl, false );
 			}
 		} );
 	}

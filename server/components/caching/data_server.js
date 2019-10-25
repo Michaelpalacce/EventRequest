@@ -123,19 +123,22 @@ class DataServer
 	 * @param	String key
 	 * @param	mixed value
 	 * @param	Number ttl
+	 * @param	Boolean persist
 	 *
 	 * @return	Object
 	 */
-	set( key, value, ttl = 0 )
+	set( key, value, ttl = 0, persist = true )
 	{
 		if (
 			typeof key !== 'string'
 			&& typeof value !== 'object'
+			&& typeof ttl !== 'number'
+			&& typeof persist !== 'boolean'
 		) {
 			return null;
 		}
 
-		return this._set( key, value, ttl )
+		return this._set( key, value, ttl, persist )
 	}
 
 	/**
@@ -144,12 +147,13 @@ class DataServer
 	 * @param	String key
 	 * @param	mixed value
 	 * @param	Number ttl
+	 * @param	Boolean persist
 	 *
 	 * @return	Object
 	 */
-	_set( key, value, ttl )
+	_set( key, value, ttl, persist )
 	{
-		const dataSet	= this._makeDataSet( key, value, ttl );
+		const dataSet	= this._makeDataSet( key, value, ttl, persist );
 		return this.server[key]	= dataSet;
 	}
 
@@ -162,11 +166,11 @@ class DataServer
 	 *
 	 * @return	Object
 	 */
-	_makeDataSet( key, value, ttl )
+	_makeDataSet( key, value, ttl, persist )
 	{
 		const expirationDate	= this._getExpirationDateFromTtl( ttl );
 
-		return { key, value, ttl, expirationDate };
+		return { key, value, ttl, expirationDate, persist };
 	}
 
 	/**
@@ -235,10 +239,21 @@ class DataServer
 	 */
 	saveData()
 	{
+		let serverData	= {};
+		for ( const key in this.server )
+		{
+			const dataSet	= this.server[key];
+
+			if ( dataSet.persist === true )
+			{
+				serverData[key]	= dataSet;
+			}
+		}
+
 		const writeStream	= fs.createWriteStream( this.persistPath );
 		writeStream.setDefaultEncoding( 'utf-8' );
 
-		writeStream.write( JSON.stringify( this.server ) );
+		writeStream.write( JSON.stringify( serverData ) );
 		writeStream.end();
 	}
 
