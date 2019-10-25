@@ -258,23 +258,31 @@ class Server extends EventEmitter
 		request.on( 'close', ()=> {
 			this.emit( 'eventRequestRequestClosed', { eventRequest, request } );
 
-			eventRequest.cleanUp();
-			eventRequest	= null;
+			if ( eventRequest != null )
+			{
+				eventRequest.cleanUp();
+				eventRequest	= null;
+			}
 		});
 
 		response.on( 'finish', () => {
 			this.emit( 'eventRequestResponseFinish', { eventRequest, response } );
 
-			eventRequest.cleanUp();
-			eventRequest	= null;
+			if ( eventRequest != null )
+			{
+				eventRequest.cleanUp();
+				eventRequest	= null;
+			}
 		});
 
 		response.on( 'error', ( error ) => {
 			this.emit( 'eventRequestResponseError', { eventRequest, response, error } );
 
-			eventRequest.next( error );
-			eventRequest.cleanUp();
-			eventRequest	= null;
+			if ( eventRequest != null )
+			{
+				eventRequest.next( error );
+				eventRequest	= null;
+			}
 		});
 
 		try
@@ -318,11 +326,11 @@ class Server extends EventEmitter
 		// Create the server
 		let protocol	= this.protocol;
 		let server		= protocol === PROTOCOL_HTTPS
-						? https.createServer( this.httpsOptions, this.serverCallback.bind( this ) )
-						: http.createServer( this.serverCallback.bind( this ) );
+			? https.createServer( this.httpsOptions, this.serverCallback.bind( this ) )
+			: http.createServer( this.serverCallback.bind( this ) );
 
 		server.listen( this.port, () => {
-			this.emit( 'serverCreationSuccess', { server, port: this.port } );
+				this.emit( 'serverCreationSuccess', { server, port: this.port } );
 
 				Loggur.log( `Server successfully started and listening on port: ${this.port}`, LOG_LEVELS.warning );
 				callback( false, server );

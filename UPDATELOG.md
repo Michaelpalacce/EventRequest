@@ -1,3 +1,6 @@
+9.0.0
+- Fixed to work with latest NODEJS version
+
 8.1.0
 - Fixed the memory caching. 
 - Fixed the session 
