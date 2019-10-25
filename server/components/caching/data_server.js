@@ -11,7 +11,7 @@ const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
 
 const DEFAULT_PERSIST_FILE				= path.join( PROJECT_ROOT, 'cache' );
 const DEFAULT_PERSIST_RULE				= true;
-const DEFAULT_PERSIST_INTERVAL			= 2 * 1000;
+const DEFAULT_PERSIST_INTERVAL			= 10 * 1000;
 const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60 * 1000;
 
 /**
@@ -98,9 +98,14 @@ class DataServer
 	_prune( key )
 	{
 		const now		= new Date().getTime() / 1000;
-		const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate === 'number'
+		const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate !== 'undefined'
 						? this.server[key]
 						: null;
+
+		if ( dataSet !== null && this.server[key].expirationDate === null )
+		{
+			this.server[key].expirationDate	= Infinity;
+		}
 
 		if ( dataSet === null || now > dataSet.expirationDate )
 		{
@@ -123,6 +128,13 @@ class DataServer
 	 */
 	set( key, value, ttl = 0 )
 	{
+		if (
+			typeof key !== 'string'
+			&& typeof value !== 'object'
+		) {
+			return null;
+		}
+
 		return this._set( key, value, ttl )
 	}
 
@@ -262,8 +274,12 @@ class DataServer
 	 *
 	 * @return	Number
 	 */
-	_getExpirationDateFromTtl( ttl = 0 )
+	_getExpirationDateFromTtl( ttl = -1 )
 	{
+		if ( ttl === -1 )
+		{
+			return Infinity;
+		}
 		ttl	= ttl > 0 ? ttl : this.defaultTtl;
 		return new Date().getTime() / 1000 + ttl;
 	}

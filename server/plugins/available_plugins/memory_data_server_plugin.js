@@ -1,7 +1,7 @@
 'use strict';
 
-const PluginInterface		= require( '../plugin_interface' );
-const DataServer			= require( '../../components/caching/data_server' );
+const PluginInterface	= require( '../plugin_interface' );
+const DataServer		= require( '../../components/caching/data_server' );
 
 /**
  * @brief	MemoryDataServerPlugin responsible for

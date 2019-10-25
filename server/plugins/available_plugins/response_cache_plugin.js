@@ -130,7 +130,6 @@ class ResponseCachePlugin extends PluginInterface
 					else
 					{
 						let ttl			= this.getTimeToLive( event );
-
 						const status	= this.cachingServer.touch( cachedDataSet.key, ttl );
 
 						if ( ! status )

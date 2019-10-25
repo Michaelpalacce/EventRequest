@@ -56,7 +56,7 @@ class SessionPlugin extends PluginInterface
 					} );
 
 					event.on( 'send', ()=>{
-						event.session.saveSession( ()=>{} );
+						event.session.saveSession();
 					} );
 				}
 
