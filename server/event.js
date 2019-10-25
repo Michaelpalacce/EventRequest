@@ -335,7 +335,7 @@ class EventRequest extends EventEmitter
 		{
 			if ( ! this.block.length > 0  )
 			{
-				this.sendError( `Cannot ${this.method} ${this.path}` );
+				this.sendError( `Cannot ${this.method} ${this.path}`, 404 );
 				return;
 			}
 

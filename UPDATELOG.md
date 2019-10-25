@@ -1,3 +1,6 @@
+9.0.1
+- Now 404 have the correct status code
+
 9.0.0
 - Fixed to work with latest NODEJS version
 

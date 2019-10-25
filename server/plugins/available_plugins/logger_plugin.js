@@ -49,8 +49,8 @@ class LoggerPlugin extends PluginInterface
 		if ( this.logger == null )
 		{
 			this.logger	= this.options.logger instanceof Logger
-				? this.options.logger
-				: Loggur.getDefaultLogger()
+						? this.options.logger
+						: Loggur.getDefaultLogger()
 		}
 
 		return this.logger;
