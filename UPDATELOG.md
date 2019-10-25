@@ -1,3 +1,9 @@
+8.1.0
+- Fixed the memory caching. 
+- Fixed the session 
+- Fixed the Response cache
+- Added improvements to the data server
+
 8.0.0
 - Completely reworked the in-memory caching server
 - Removed the Memory caching server completely 
