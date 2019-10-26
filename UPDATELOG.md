@@ -1,3 +1,7 @@
+9.1.0
+- Fixes to the Multipart uploader so that it will delete the files after a second of two AFTER the request has finished to prevent race conditions when uploading a LOT of files
+- Fixed to logger to log at a later date
+
 9.0.1
 - Now 404 have the correct status code
 

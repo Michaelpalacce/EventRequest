@@ -24,7 +24,7 @@ const SYSTEM_EOL_LENGTH							= SYSTEM_EOL.length;
 const DEFAULT_BUFFER_ENCODING					= 'utf8';
 const DEFAULT_BOUNDARY_PREFIX					= '--';
 const MULTIPART_PARSER_SUPPORTED_TYPE			= 'multipart/form-data';
-const RANDOM_NAME_LENGTH						= 20;
+const RANDOM_NAME_LENGTH						= 128;
 const DATA_TYPE_FILE							= 'file';
 const DATA_TYPE_PARAMETER						= 'parameter';
 
@@ -90,7 +90,6 @@ class MultipartFormParser extends BodyParser
 	{
 		this.cleanUpItems();
 		this.removeAllListeners();
-		this.parts			= null;
 		this.parsingError	= false;
 		this.ended			= false;
 
@@ -482,7 +481,7 @@ class MultipartFormParser extends BodyParser
 	 */
 	hasFinished()
 	{
-		return this.event.isFinished() || this.parsingError === true || this.ended === true;
+		return this.event === null || this.event.isFinished() || this.parsingError === true || this.ended === true;
 	}
 
 	/**
@@ -654,29 +653,37 @@ class MultipartFormParser extends BodyParser
 	 */
 	cleanUpItems()
 	{
-		if ( typeof this.parts.files !== 'undefined' )
-		{
-			this.parts.files.forEach( ( part ) =>{
-				if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
-				{
-					fs.unlinkSync( part.path )
-				}
-			});
-		}
-		else
-		{
-			this.parts.forEach( ( part ) =>{
-				if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
-				{
-					if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
+		setTimeout(()=>{
+			if ( typeof this.parts.files !== 'undefined' )
+			{
+				this.parts.files.forEach( ( part ) =>{
+					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
 					{
-						part.file.end();
+						try
+						{
+							fs.unlinkSync( part.path )
+						}
+						catch (e) {}
 					}
+				});
+			}
+			else
+			{
+				this.parts.forEach( ( part ) =>{
+					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
+					{
+						if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
+						{
+							part.file.end();
+						}
 
-					fs.unlinkSync( part.path )
-				}
-			});
-		}
+						fs.unlinkSync( part.path )
+					}
+				});
+			}
+
+			this.parts	= null;
+		}, 2000 );
 	}
 
 	/**

@@ -49,8 +49,8 @@ class LoggerPlugin extends PluginInterface
 		if ( this.logger == null )
 		{
 			this.logger	= this.options.logger instanceof Logger
-						? this.options.logger
-						: Loggur.getDefaultLogger()
+				? this.options.logger
+				: Loggur.getDefaultLogger()
 		}
 
 		return this.logger;
@@ -130,9 +130,9 @@ class LoggerPlugin extends PluginInterface
 			handler	: ( event ) =>{
 				let requestURL	= event.request.url;
 
-				event.on( 'send', ( response ) =>{
+				event.on( 'cleanUp', () =>{
 					const userAgent	= typeof event.headers['user-agent'] === 'undefined' ? 'UNKNOWN' : event.headers['user-agent'];
-					logger.notice( `${event.method} ${requestURL} ${response.code} ||| ${event.clientIp} ||| ${event.headers['user-agent']}` );
+					logger.notice( `${event.method} ${requestURL} ${event.response.statusCode} ||| ${event.clientIp} ||| ${event.headers['user-agent']}` );
 				});
 
 				logger.verbose( 'Headers: ' + JSON.stringify( event.headers ) );
