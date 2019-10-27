@@ -209,14 +209,18 @@ class RateLimitsPlugin extends PluginInterface
 				}
 			}
 		}, 60 * 60 * 1000 );
+	}
 
-		server.on( 'eventRequestBlockSet', ( eventData )=>{
-			let { eventRequest, block }	= eventData;
-			eventRequest.rateLimited	= false;
-			let newBlock				= [this.rateLimit.bind( this )].concat( block );
-
-			eventRequest.setBlock( newBlock );
-		} );
+	/**
+	 * @brief	Gets the plugin middlewares
+	 *
+	 * @returns	Array
+	 */
+	getPluginMiddleware()
+	{
+		return [{
+			handler: this.rateLimit.bind( this )
+		}];
 	}
 
 	/**
@@ -232,6 +236,12 @@ class RateLimitsPlugin extends PluginInterface
 		{
 			return;
 		}
+
+		eventRequest.rateLimited	= false;
+
+		eventRequest.on( 'cleanUp', ()=>{
+			eventRequest.rateLimited	= undefined;
+		} );
 
 		let path							= eventRequest.path;
 		let method							= eventRequest.method;

@@ -1,3 +1,9 @@
+9.1.1
+- Fixed the rate limits plugin to now be attached VIA the getPluginMiddleware. This way you can attach the static resources BEFORE
+ you attach the rate limiter. This way you can decide not to rate limit your statics even if you have site wide rate limiting rules.
+ - Bucket is now exported. This way you can do your own Rate limiter with RegExp for example.
+ - Testing has been moved to Development
+
 9.1.0
 - Fixes to the Multipart uploader so that it will delete the files after a second of two AFTER the request has finished to prevent race conditions when uploading a LOT of files
 - Fixed to logger to log at a later date

@@ -5,6 +5,7 @@ const BodyParserHandler			= require( './server/components/body_parsers/body_pars
 const PluginInterface			= require( './server/plugins/plugin_interface' );
 const Logging					= require( './server/components/logger/loggur' );
 const DataServer				= require( './server/components/caching/data_server' );
+const Bucket					= require( './server/components/rate_limiter/bucket' );
 const Testing					= require( './server/tester/tester' );
 const ServerClass				= require( './server/server' );
 const { Loggur, LOG_LEVELS }	= Logging;
@@ -24,12 +25,11 @@ let Server			= ( options )=>{
 
 // Holds tools for third party tools
 let Development		= {
-	PluginInterface, DataServer
+	PluginInterface, DataServer, Bucket, Testing
 };
 
 module.exports		= {
 	Server,		Development,
-	Testing,	BodyParserHandler,
-	Logging,	Loggur,
-	LOG_LEVELS
+	Logging,	BodyParserHandler,
+	Loggur,		LOG_LEVELS
 };

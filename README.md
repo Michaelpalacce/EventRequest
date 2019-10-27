@@ -31,15 +31,14 @@ server.start( ()=>{
 #Properties exported by the Module:
 	Server,				// Server callback. Use this to create a new server. The server instance can be retrieved from anywhere by: Server();
 	Development,		// Holds Development tools
-	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
-						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
 	Logging,			// Contains helpful logging functions
 	Loggur,				// Easier access to the Logging.Loggur instance
 	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
 ### Properties exported by Development:
 	PluginInterface,	// Used to add plugins to the system
 	DataServer,			// Instance to be extended to implement your own DataServer
-
+	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
+						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
 ***
 ***
 ***
