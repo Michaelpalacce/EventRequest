@@ -4,6 +4,7 @@
 const FileStream		= require( './file_stream' );
 const Mp4FileStream		= require( './mp4_file_stream' );
 const TextFileStream	= require( './text_file_stream' );
+const ImageFileStream	= require( './image_file_stream' );
 
 /**
  * @brief	File streamer used to stream files
@@ -21,6 +22,7 @@ class FileStreamHandler
 		this.options		= {
 			streams	: [
 				{ instance : Mp4FileStream },
+				{ instance : ImageFileStream },
 				{ instance : TextFileStream }
 			]
 		};
