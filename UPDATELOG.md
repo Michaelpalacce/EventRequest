@@ -1,3 +1,6 @@
+9.1.3
+- Added link in readme to GitHub
+
 9.1.2
 - Improved error handling on templating engine
 - Improved error handling when sending a response

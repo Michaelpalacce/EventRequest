@@ -1,6 +1,9 @@
 # EventRequest
 A highly customizable backend server in NodeJs
 
+# GitHub
+https://github.com/Michaelpalacce/EventRequest
+
 # Installation
 ~~~bash
 npm i event_request --save -g
