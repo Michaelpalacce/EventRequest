@@ -19,6 +19,7 @@ class ImageFileStream extends FileStream
 		this.SUPPORTED_FORMATS	= [
 			'.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
 		];
+		this._streamType		= 'image';
 
 		this.sanitize();
 	}
@@ -55,6 +56,14 @@ class ImageFileStream extends FileStream
 		file	= fs.createReadStream( file );
 
 		file.pipe( this.event.response );
+	}
+
+	/**
+	 * @see	FileStream::stream()
+	 */
+	getType()
+	{
+		return this._streamType;
 	}
 }
 

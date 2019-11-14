@@ -17,6 +17,7 @@ class Mp4FileStream extends FileStream
 	{
 		super( event, options );
 		this.SUPPORTED_FORMATS	= ['.mp4'];
+		this._streamType		= 'mp4';
 
 		this.sanitize();
 	}
@@ -78,6 +79,14 @@ class Mp4FileStream extends FileStream
 			file	= fs.createReadStream( file );
 			file.pipe( this.event.response );
 		}
+	}
+
+	/**
+	 * @see	FileStream::stream()
+	 */
+	getType()
+	{
+		return this._streamType;
 	}
 }
 

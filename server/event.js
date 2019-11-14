@@ -146,6 +146,21 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
+	 * @copydoc	EventRequest::__send
+	 */
+	send( response, code = 200, raw = false )
+	{
+		try
+		{
+			this._send( response, code, raw );
+		}
+		catch ( e )
+		{
+			this.sendError( e.toString() );
+		}
+	}
+
+	/**
 	 * @brief	Sends the response to the user
 	 *
 	 * @details	Raw is a flag to tell the eventRequest how to send the data
@@ -158,7 +173,7 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	send( response, code = 200, raw = false )
+	_send( response, code = 200, raw = false )
 	{
 		if ( code !== 200 )
 		{
@@ -335,7 +350,7 @@ class EventRequest extends EventEmitter
 		{
 			if ( ! this.block.length > 0  )
 			{
-				this.sendError( `Cannot ${this.method} ${this.path}`, 404 );
+				this.sendError( `Cannot ${this.method} ${this.path}` );
 				return;
 			}
 

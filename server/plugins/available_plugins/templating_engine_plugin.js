@@ -42,9 +42,17 @@ class TemplatingEnginePlugin extends PluginInterface
 				fs.readFile( templatePath, 'utf8', ( err, html ) => {
 					if ( ! err && html && html.length > 0  && ! this.isFinished() )
 					{
-						let result	= this.templatingEngine.render( html, variables );
-						this.send( result, 200, true );
-						callback( false );
+						try
+						{
+							let result	= this.templatingEngine.render( html, variables );
+							this.send( result, 200, true );
+							callback( false );
+						}
+						catch ( e )
+						{
+							this.sendError( e.toString(), 400 );
+							callback( e );
+						}
 					}
 					else
 					{

@@ -36,6 +36,7 @@ server.start( ()=>{
 	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
 ### Properties exported by Development:
 	PluginInterface,	// Used to add plugins to the system
+	FileStream,			// Class that defines a file stream
 	DataServer,			// Instance to be extended to implement your own DataServer
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test )

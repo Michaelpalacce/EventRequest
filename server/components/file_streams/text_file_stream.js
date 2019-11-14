@@ -6,6 +6,13 @@ const path			= require( 'path' );
 const fs			= require( 'fs' );
 
 /**
+ * @brief	The type of file this stream supports
+ *
+ * @var		String
+ */
+const STREAM_TYPE	= 'text';
+
+/**
  * @brief	Used to stream text files
  */
 class TextFileStream extends FileStream
@@ -19,6 +26,7 @@ class TextFileStream extends FileStream
 		this.SUPPORTED_FORMATS	= [
 			'.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini'
 		];
+		this._streamType		= 'text';
 
 		this.sanitize();
 	}
@@ -55,6 +63,14 @@ class TextFileStream extends FileStream
 		file	= fs.createReadStream( file );
 
 		file.pipe( this.event.response );
+	}
+
+	/**
+	 * @see	FileStream::stream()
+	 */
+	getType()
+	{
+		return this._streamType;
 	}
 }
 

@@ -14,6 +14,7 @@ class FileStream
 		this.event				= event;
 		this.options			= options;
 		this.SUPPORTED_FORMATS	= [];
+		this._streamType		= '';
 	}
 
 	/**
@@ -59,6 +60,16 @@ class FileStream
 	stream( file, options = {} )
 	{
 		return ;
+	}
+
+	/**
+	 * @brief	Gets the type of file this stream supports
+	 *
+	 * @return	String
+	 */
+	getType()
+	{
+		return '';
 	}
 }
 

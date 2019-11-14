@@ -1,3 +1,9 @@
+9.1.2
+- Improved error handling on templating engine
+- Improved error handling when sending a response
+- Exported FileStream from Development
+- Added new function to FileStream's getType that returns the type of stream they are
+
 9.1.1
 - Fixed the rate limits plugin to now be attached VIA the getPluginMiddleware. This way you can attach the static resources BEFORE
  you attach the rate limiter. This way you can decide not to rate limit your statics even if you have site wide rate limiting rules.
