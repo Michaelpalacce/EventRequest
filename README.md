@@ -315,7 +315,7 @@ serverRouter.add(...);
 The server has 2 ways of adding routes/middleware
 
 ***
-You can use .post, .put, .get, .delete methods from the server that accept Required parameters: ( String|RegExp route, Function handler )
+You can use .post, .put, .get, .delete, .head methods from the server that accept Required parameters: ( String|RegExp route, Function handler )
 
 **route** -> String|RegExp-> the route to witch the middleware should be attached
 
@@ -337,6 +337,10 @@ server.post( '/', ( event )=>{
 } );
 
 server.delete( '/', ( event )=>{
+	event.send( ['ok']);
+} );
+
+server.head( '/', ( event )=>{
 	event.send( ['ok']);
 } );
 

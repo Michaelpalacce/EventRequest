@@ -58,7 +58,7 @@ class Router extends PluginInterface
 	 */
 	setUpHttpMethodsToObject( object )
 	{
-		let methods	= ['POST', 'PUT', 'GET', 'DELETE'];
+		let methods	= ['POST', 'PUT', 'GET', 'DELETE', 'HEAD'];
 
 		methods.forEach(( method )=>{
 			object[method.toLocaleLowerCase()]	= ( route, handler )=>{

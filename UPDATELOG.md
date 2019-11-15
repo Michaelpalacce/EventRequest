@@ -1,3 +1,7 @@
+9.1.4
+- Added HEAD to the router
+- Fixed generator a bit
+
 9.1.3
 - Added link in readme to GitHub
 
