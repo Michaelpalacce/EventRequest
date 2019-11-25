@@ -103,10 +103,10 @@ class ValidationAttribute
 				return assert.assertNotString( this.value ) ? false : VALIDATION_ERRORS.notString;
 
 			case VALIDATION_ERRORS.numeric:
-				return assert.assertIsNumeric( this.value ) ? false : VALIDATION_ERRORS.numeric;
+				return assert.assertIsNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.numeric;
 
 			case VALIDATION_ERRORS.notNumeric:
-				return assert.assertNotNumeric( this.value ) ? false : VALIDATION_ERRORS.notNumeric;
+				return assert.assertNotNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.notNumeric;
 
 			case VALIDATION_ERRORS.filled:
 				return assert.assertNotEmpty( this.value ) ? false : VALIDATION_ERRORS.filled;

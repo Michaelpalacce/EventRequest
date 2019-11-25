@@ -1,3 +1,6 @@
+9.1.5
+- Fixed validator
+
 9.1.4
 - Added HEAD to the router
 - Fixed generator a bit
