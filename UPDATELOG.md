@@ -1,3 +1,7 @@
+9.1.6
+- Added ability to give max age to the cookies as well as a domain
+- Updated documentation for the setCookie
+
 9.1.5
 - Fixed validator
 

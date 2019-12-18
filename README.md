@@ -102,7 +102,7 @@ The event request is an object that is created by the server and passed through 
 
 ###Functions exported by the event request:
 
-**setCookie( name, value )** - > sets a new cookie
+**setCookie( name, value, maxAge = -1, domain = '' )** - > sets a new cookie, maxAge defaults to 90 days and the domain defaults to the actual site domain
 
 ***
 

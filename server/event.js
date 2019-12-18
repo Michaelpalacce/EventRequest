@@ -137,12 +137,26 @@ class EventRequest extends EventEmitter
 	 *
 	 * @param	String name
 	 * @param	String value
+	 * @param	Number maxAge
+	 * @param	String domain
 	 *
 	 * @return	void
 	 */
-	setCookie( name, value )
+	setCookie( name, value, maxAge = -1, domain = '' )
 	{
-		this.setHeader( 'Set-Cookie', [name + '=' + value] )
+		let cookie	= name + '=' + value;
+
+		if ( maxAge !== -1 )
+		{
+			cookie	+= '; Max-Age=' + maxAge
+		}
+
+		if ( domain !== '' )
+		{
+			cookie	+= `; Domain=${domain}`
+		}
+
+		this.setHeader( 'Set-Cookie', [cookie] )
 	}
 
 	/**

@@ -3,6 +3,13 @@
 const uniqueId	= require( './../helpers/unique_id' );
 
 /**
+ * @details	Time the session should be kept. Defaults to 90 days
+ *
+ * @var		Number TTK
+ */
+const TTL		= 7776000;
+
+/**
  * @brief	Session container
  */
 class Session
@@ -14,7 +21,7 @@ class Session
 
 		this.ttl				= typeof this.options.ttl === 'number'
 								? this.options.ttl
-								: 0;
+								: TTL ;
 
 		this.sessionKey			= typeof this.options.sessionKey === 'string'
 								? this.options.sessionKey
@@ -94,7 +101,7 @@ class Session
 		else
 		{
 			this.sessionId	= sessionId;
-			this.event.setCookie( this.sessionKey, this.sessionId );
+			this.event.setCookie( this.sessionKey, this.sessionId, this.ttl );
 
 			return sessionId;
 		}
