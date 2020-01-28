@@ -94,6 +94,18 @@ class Logger
 	}
 
 	/**
+	 * @brief	Sets the Log Level of the Logger
+	 *
+	 * @param	Number logLevel
+	 *
+	 * @return	void
+	 */
+	setLogLevel( logLevel )
+	{
+		this.logLevel	= logLevel;
+	}
+
+	/**
 	 * @brief	Attach an event handler to process.on uncaughtException and unhandledRejection
 	 *
 	 * @details	If capture is set to true only. If dieOnCapture is set to false the process won't die but this is

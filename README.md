@@ -382,6 +382,12 @@ server.add({
 
 ***
 
+Router has matchRoute and matchMethod methods that can be used anywhere statically to match routes the same way the Router does.
+
+**matchRoute** - ( String requestedRoute, String|RegExp route, matchedParams ) - Match the given route and returns any route parameters passed in the matchedParams argument. Returns bool if there was a successful match
+
+**matchMethod** - ( String requestedMethod, String|RegExp method ) - Matches the requested method with the ones set in the event and returns if there was a match or no.
+
 ***
 ### Plugins
 Plugins can be added by using **server.apply( pluginContainerInstance||'pluginId', options )**
@@ -457,6 +463,12 @@ The Loggur can be used to create Loggers which accept the following options:
 **unhandledExceptionLevel** - Number - What level should the unhandled exceptions be logged at -> Defaults to error
 
 ***
+
+If you want to change the log level of a logger it can easily be done with .setLogLevel( logLevel )
+
+~~~javascript
+logger.setLogLevel( 600 );
+~~~
 
 Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log and will call all added Loggers
 ~~~javascript
@@ -1001,19 +1013,6 @@ server.apply( loggerPlugin );
 
 Example Setup:
 ~~~javascript
-let bodyParserJsonPlugin		= new BodyParserPlugin(
-	'er_body_parser_json',
-	{
-		parsers	: [{ instance : JsonBodyParser }]
-	}
-);
-
-let bodyParserFormPlugin		= new BodyParserPlugin(
-	'er_body_parser_form',
-	{
-		parsers	: [{ instance : FormBodyParser }]
-	}
-);
 
 let bodyParserMultipartPlugin	= new BodyParserPlugin(
 	'er_body_parser_multipart',
@@ -1021,6 +1020,14 @@ let bodyParserMultipartPlugin	= new BodyParserPlugin(
 		parsers	: [{ instance : MultipartFormParser, options : { tempDir : path.join( PROJECT_ROOT, '/Uploads' ) } }]
 	}
 );
+
+server.apply( 'er_body_parser_json' );
+server.apply( 'er_body_parser_form' );
+server.apply( 
+    'er_body_parser_multipart', {
+        parsers	: [{ instance : MultipartFormParser, options : { tempDir : path.join( PROJECT_ROOT, '/Uploads' ) } }]
+    }
+ );
 ~~~
 
 ***

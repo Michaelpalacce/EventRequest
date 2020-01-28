@@ -17,11 +17,26 @@ const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60 * 1000;
 /**
  * @brief	A standard in memory data server
  *
- * @details	This acts as a data store
+ * @details	This acts as a data store. This should not be used in production! This should be extended for your own needs.
+ * 			Could be implemented with Memcached or another similar Data Store Server.
  */
 class DataServer
 {
 	constructor( options = {} )
+	{
+		this._configure( options );
+	}
+
+	/**
+	 * @brief	Configures the DataServer.
+	 *
+	 * @details	This is intentionally separated from the constructor so that it could be overwritten in any other implementations of the caching.
+	 *
+	 * @param	Object options
+	 *
+	 * @return	void
+	 */
+	_configure( options )
 	{
 		this.server				= {};
 
@@ -49,18 +64,18 @@ class DataServer
 		{
 			if ( fs.existsSync( this.persistPath ) )
 			{
-				this.loadData();
-				this.garbageCollect();
+				this._loadData();
+				this._garbageCollect();
 			}
 
 			setInterval(()=>{
-				this.garbageCollect();
-				this.saveData();
+				this._garbageCollect();
+				this._saveData();
 			}, this.persistInterval )
 		}
 
 		setInterval(()=>{
-			this.garbageCollect();
+			this._garbageCollect();
 		}, gcInterval );
 	}
 
@@ -89,7 +104,7 @@ class DataServer
 	}
 
 	/**
-	 * @brief	Removes the dataSet if it is expired, otherwise returns it. Returns true if removed
+	 * @brief	Removes the dataSet if it is expired, otherwise returns it. Returns null if removed
 	 *
 	 * @param	string key
 	 *
@@ -153,7 +168,7 @@ class DataServer
 	 */
 	_set( key, value, ttl, persist )
 	{
-		const dataSet	= this._makeDataSet( key, value, ttl, persist );
+		const dataSet			= this._makeDataSet( key, value, ttl, persist );
 		return this.server[key]	= dataSet;
 	}
 
@@ -169,7 +184,6 @@ class DataServer
 	_makeDataSet( key, value, ttl, persist )
 	{
 		const expirationDate	= this._getExpirationDateFromTtl( ttl );
-
 		return { key, value, ttl, expirationDate, persist };
 	}
 
@@ -192,7 +206,6 @@ class DataServer
 
 		ttl						= ttl === 0 ? dataSet.ttl : ttl;
 		dataSet.expirationDate	= this._getExpirationDateFromTtl( ttl );
-
 		return true;
 	}
 
@@ -224,7 +237,7 @@ class DataServer
 	 *
 	 * @return	void
 	 */
-	garbageCollect()
+	_garbageCollect()
 	{
 		for ( let key in this.server )
 		{
@@ -237,7 +250,7 @@ class DataServer
 	 *
 	 * @return	void
 	 */
-	saveData()
+	_saveData()
 	{
 		let serverData	= {};
 		for ( const key in this.server )
@@ -262,10 +275,10 @@ class DataServer
 	 *
 	 * @return	void
 	 */
-	loadData()
+	_loadData()
 	{
 		const buffer	= fs.readFileSync( this.persistPath );
-		this.loadServerData( JSON.parse( buffer.toString() ) );
+		this._loadServerData( JSON.parse( buffer.toString() ) );
 	}
 
 	/**
@@ -275,7 +288,7 @@ class DataServer
 	 *
 	 * @return	void
 	 */
-	loadServerData( serverData )
+	_loadServerData(serverData )
 	{
 		const currentServerData	= this.server;
 

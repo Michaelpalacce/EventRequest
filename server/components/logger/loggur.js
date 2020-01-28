@@ -153,6 +153,31 @@ class Loggur
 
 		return Promise.all( loggersPromises );
 	}
+
+	/**
+	 * @brief	Sets the Log Level of all the attached Loggers
+	 *
+	 * @param	Number logLevel
+	 *
+	 * @return	void
+	 */
+	setLogLevel( logLevel )
+	{
+		if ( Object.keys( this.loggers ).length !== 0 )
+		{
+			for ( let loggerId in this.loggers )
+			{
+				this.loggers[loggerId].setLogLevel( logLevel );
+			}
+		}
+		else
+		{
+			if ( this.enableDefaultLogger )
+			{
+				this.getDefaultLogger().setLogLevel( logLevel );
+			}
+		}
+	}
 }
 
 module.exports	= {

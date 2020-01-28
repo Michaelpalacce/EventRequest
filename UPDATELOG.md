@@ -1,3 +1,8 @@
+9.2.0
+- Reworked DataServer a bit to be more extendable ( moved configuration/setup in a private method instead of constructor )
+- Added setLogLevel to Logger and Loggur for easier changing of Log Level
+- process.dumpStack and process.log will now use Loggur to log
+
 9.1.6
 - Added ability to give max age to the cookies as well as a domain
 - Updated documentation for the setCookie

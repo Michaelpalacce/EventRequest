@@ -28,11 +28,11 @@ class LoggerPlugin extends PluginInterface
 		if ( this.options.attachToProcess === true )
 		{
 			process.dumpStack	= ()=>{
-				console.log( Log.getStackTrace() );
+				Loggur.log( Log.getStackTrace() );
 			};
 
 			process.log			= ( log, level )=>{
-				this.getLogger().log( log, level );
+				Loggur.log( log, level );
 			};
 		}
 	}
@@ -49,8 +49,8 @@ class LoggerPlugin extends PluginInterface
 		if ( this.logger == null )
 		{
 			this.logger	= this.options.logger instanceof Logger
-				? this.options.logger
-				: Loggur.getDefaultLogger()
+						? this.options.logger
+						: Loggur.getDefaultLogger()
 		}
 
 		return this.logger;

@@ -143,12 +143,12 @@ class Router extends PluginInterface
 	}
 
 	/**
-	 * @brief	Matches the requested method with the ones set in the event
+	 * @brief	Matches the requested method with the ones set in the event and returns if there was a match or no
 	 *
 	 * @details	If a string or an array is passed, then it will be converted to a Route
 	 *
 	 * @param	String requestedMethod
-	 * @param	Route|Array|String route
+	 * @param	Route|Array|String method
 	 *
 	 * @return	Boolean
 	 */
@@ -177,7 +177,9 @@ class Router extends PluginInterface
 	}
 
 	/**
-	 * @brief	Match the given route and returns any route parameters passed
+	 * @brief	Match the given route and returns any route parameters passed in the matchedParams argument.
+	 *
+	 * @details	Returns bool if there was a successful match
 	 *
 	 * @param	String requestedRoute
 	 * @param	String|RegExp|Route eventPath
