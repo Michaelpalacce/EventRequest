@@ -1,3 +1,6 @@
+9.2.1
+- Added Server project as an example
+
 9.2.0
 - Reworked DataServer a bit to be more extendable ( moved configuration/setup in a private method instead of constructor )
 - Added setLogLevel to Logger and Loggur for easier changing of Log Level
