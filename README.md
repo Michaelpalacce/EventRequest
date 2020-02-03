@@ -434,8 +434,11 @@ as other plugins by fetching them and configuring them as you wish. They can not
 # Logging
 
 The Loggur can be accessed directly from the server { Loggur }
-It has a default logger attached to it that will log to the console. it can be enabled or disabled by calling
-Loggur.enableDefault() or Loggur.disableDefault()
+
+## Default Logger:
+The default logger is attached directly to the Loggur instance. it can be enabled or disabled by calling
+Loggur.enableDefault() or Loggur.disableDefault(). 
+The default Logger has a log level of `300` and logs up until level `600` which is the debug level.
 
 The Loggur can be used to create Loggers which accept the following options:
 

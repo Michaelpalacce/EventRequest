@@ -13,7 +13,7 @@ const LOG_LEVELS		= {
 	verbose	: 500,
 	debug	: 600
 };
-const DEFAULT_LOG_LEVEL	= LOG_LEVELS.error;
+const DEFAULT_LOG_LEVEL	= LOG_LEVELS.notice;
 const PROJECT_ROOT		= path.parse( require.main.filename ).dir + '\\';
 
 /**

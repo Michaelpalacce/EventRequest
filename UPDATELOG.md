@@ -1,3 +1,6 @@
+9.2.2
+- Updated the Logger to be more extensive ( log more )
+
 9.2.1
 - Added Server project as an example
 

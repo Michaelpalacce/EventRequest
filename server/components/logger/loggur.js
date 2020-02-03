@@ -117,8 +117,8 @@ class Loggur
 		if ( this.defaultLogger === null )
 		{
 			this.defaultLogger	= this.createLogger({
-				serverName	: 'DefaultLogger',
-				logLevel	: LOG_LEVELS.warning
+				serverName	: 'Default',
+				logLevel	: LOG_LEVELS.debug
 			});
 		}
 
