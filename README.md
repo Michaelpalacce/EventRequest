@@ -1005,11 +1005,11 @@ Adds an Empty bodyParser that can be set up, JsonBodyParser, FormBodyParser and 
             
     *** JsonBodyParser Accepted options:
     **maxPayloadLength** - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
-    **strict** - Boolean - Whether the received payload must match the content-length - Defaults to true
+    **strict** - Boolean - Whether the received payload must match the content-length - Defaults to false
             
     *** FormBodyParser Accepted options:
     *maxPayloadLength** - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
-    **strict** - Boolean - Whether the received payload must match the content-length - Defaults to true
+    **strict** - Boolean - Whether the received payload must match the content-length - Defaults to false
 ***
 ~~~javascript
 const PluginManager		= server.getPluginManager();

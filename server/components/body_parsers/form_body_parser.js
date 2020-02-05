@@ -6,14 +6,14 @@ const BodyParser	= require( './body_parser' );
 /**
  * @brief	Constants
  */
-const FORM_PARSER_SUPPORTED_TYPE	= 'application/x-www-form-urlencoded';
-const CONTENT_LENGTH_HEADER			= 'content-length';
-const CONTENT_TYPE_HEADER			= 'content-type';
+const JSON_BODY_PARSER_SUPPORTED_TYPE	= 'application/json';
+const CONTENT_LENGTH_HEADER				= 'content-length';
+const CONTENT_TYPE_HEADER				= 'content-type';
 
 /**
- * @brief	FormBodyParser responsible for parsing application/x-www-form-urlencoded forms
+ * @brief	JsonBodyParser responsible for parsing application/json forms
  */
-class FormBodyParser extends BodyParser
+class JsonBodyParser extends BodyParser
 {
 	/**
 	 * @param	Object options
@@ -25,26 +25,26 @@ class FormBodyParser extends BodyParser
 	{
 		super( options );
 
-		// Defaults to 10 MB
+		// Defaults to 100 MB
 		this.maxPayloadLength	= typeof options.maxPayloadLength === 'number'
-								? options.maxPayloadLength
-								: 10 * 1048576;
+			? options.maxPayloadLength
+			: 100 * 1048576;
 
 		this.strict				= typeof options.strict === 'boolean'
-								? options.strict
-								: true;
+			? options.strict
+			: false;
 
 		this.rawPayload			= [];
 		this.payloadLength		= 0;
 	}
 
 	/**
-	 * @see	BodyParser::supports
+	 * @see	BodyParser::supports()
 	 */
 	supports( event )
 	{
 		let contentType	= event.headers[CONTENT_TYPE_HEADER];
-		return typeof contentType === 'string' && contentType.match( FORM_PARSER_SUPPORTED_TYPE ) !== null
+		return typeof contentType === 'string' && contentType.match( JSON_BODY_PARSER_SUPPORTED_TYPE ) !== null
 	}
 
 	/**
@@ -76,32 +76,29 @@ class FormBodyParser extends BodyParser
 			return;
 		}
 
-		let payload			= rawPayload.toString();
-		let body			= {};
-		let payloadParts	= payload.split( '&' );
-
-		for ( let i = 0; i < payloadParts.length; ++ i )
+		if ( rawPayload.length === 0 )
 		{
-			let param	= payloadParts[i].split( '=' );
-
-			if ( param.length !== 2 )
-			{
-				continue;
-			}
-
-			body[param[0]]	= decodeURIComponent( param[1] );
+			return callback( false, {} );
 		}
 
-		callback( false, body );
+		try
+		{
+			let payload	= JSON.parse( rawPayload.toString() );
+			for ( let index in payload )
+			{
+				payload[index]	= decodeURIComponent( payload[index] );
+			}
+
+			callback( false, payload );
+		}
+		catch ( e )
+		{
+			callback( 'Could not parse the body' );
+		}
 	}
 
 	/**
-	 * @brief	Parser the form body if possible and returns an object
-	 *
-	 * @param	Buffer rawPayload
-	 * @param	Function callback
-	 *
-	 * @return	void
+	 * @see	BodyParser::parse()
 	 */
 	parse( event, callback )
 	{
@@ -127,6 +124,7 @@ class FormBodyParser extends BodyParser
 				this.onEndCallback( this.rawPayload, event.headers, ( err, body )=>{
 					if ( ! err )
 					{
+						event.body	= body;
 						callback( false, body );
 					}
 					else
@@ -139,4 +137,4 @@ class FormBodyParser extends BodyParser
 	}
 }
 
-module.exports	= FormBodyParser;
+module.exports	= JsonBodyParser;

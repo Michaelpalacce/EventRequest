@@ -1,3 +1,6 @@
+9.2.4
+- Fixed an issue with sending an empty body and passing JSON. Also set the strict flag to true.
+
 9.2.3
 - Fixed an error with the send. Now calling send without any parameters will return an empty response
 - Fixed an error with the validation result where it wouldn't be JSON.stringified cause of the way it is formed

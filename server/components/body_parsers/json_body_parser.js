@@ -32,7 +32,7 @@ class JsonBodyParser extends BodyParser
 
 		this.strict				= typeof options.strict === 'boolean'
 								? options.strict
-								: true;
+								: false;
 
 		this.rawPayload			= [];
 		this.payloadLength		= 0;
