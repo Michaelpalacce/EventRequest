@@ -1,3 +1,9 @@
+9.2.3
+- Fixed an error with the send. Now calling send without any parameters will return an empty response
+- Fixed an error with the validation result where it wouldn't be JSON.stringified cause of the way it is formed
+- Updated documentation a bit. 
+- Added assert to the Testing suite as stated in the documentation
+
 9.2.2
 - Updated the Logger to be more extensive ( log more )
 

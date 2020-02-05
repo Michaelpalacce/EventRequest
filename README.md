@@ -674,12 +674,12 @@ In case there is no error False will be returned
 If you need to test your project, then you can use the Testing tools included in the project.
 
 ~~~javascript
-     const { TestingTools }  = require( 'event_request' );
+     const { Testing }  = require( 'event_request' );
 ~~~
 The testing tools include a mocker. The mocker class can be retrieved with:
 
 ~~~javascript
-     const { Mock }    = TestingTools;
+     const { Mock }    = Testing;
 ~~~
 The exported Mock is a Function that should be used directly on the constructor of the class you want to mock. For example:
 

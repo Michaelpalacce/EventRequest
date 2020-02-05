@@ -40,7 +40,7 @@ class ValidationResult
 	{
 		if ( this.result === null )
 		{
-			this.result	= [];
+			this.result	= {};
 
 			if ( this.attributes.length === 0 )
 			{

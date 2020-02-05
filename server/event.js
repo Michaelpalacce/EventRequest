@@ -194,7 +194,7 @@ class EventRequest extends EventEmitter
 			this.setStatusCode( code );
 		}
 
-		if ( typeof response.pipe === 'function' && response instanceof Streams.Readable )
+		if ( typeof response !== 'undefined' && typeof response.pipe === 'function' && response instanceof Streams.Readable )
 		{
 			response.pipe( this.response );
 		}

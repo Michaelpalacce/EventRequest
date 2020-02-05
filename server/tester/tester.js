@@ -356,6 +356,7 @@ module.exports	= {
 	Tester,
 	Mock,
 	Mocker,
+	assert,
 	logger			: tester.consoleLogger,
 	test			: tester.addTest.bind( tester ),
 	runAllTests		: tester.runAllTests.bind( tester )
