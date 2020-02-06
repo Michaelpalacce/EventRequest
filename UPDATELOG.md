@@ -1,3 +1,6 @@
+9.2.8
+- Added more RESTFUL methods
+
 9.2.7
 - The server now accepts String as port if it can be typecast to Number
 
