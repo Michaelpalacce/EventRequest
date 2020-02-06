@@ -114,8 +114,8 @@ class Server extends EventEmitter
 							? this.httpsOptions
 							: OPTIONS_PARAM_HTTPS_DEFAULT;
 
-		this.port			= options[OPTIONS_PARAM_PORT];
-		this.port			= typeof this.port === 'number'
+		this.port			= parseInt( options[OPTIONS_PARAM_PORT] );
+		this.port			= typeof this.port === 'number' && ! Number.isNaN( this.port )
 							? this.port
 							: OPTIONS_PARAM_PORT_DEFAULT;
 

@@ -1,3 +1,6 @@
+9.2.7
+- The server now accepts String as port if it can be typecast to Number
+
 9.2.6
 - Fixed event request not returning 404 in case of an route not found.
 - Fixed EventRequest.send to not die in case of null or undefined
