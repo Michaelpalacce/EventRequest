@@ -22,6 +22,8 @@ const OPTIONS_PARAM_PROTOCOL				= 'protocol';
 const OPTIONS_PARAM_PROTOCOL_DEFAULT		= PROTOCOL_HTTP;
 const OPTIONS_PARAM_HTTPS					= 'httpsOptions';
 const OPTIONS_PARAM_HTTPS_DEFAULT			= {};
+const OPTIONS_PARAM_HOSTNAME				= 'host';
+const OPTIONS_PARAM_HOSTNAME_DEFAULT		= 'localhost';
 
 const OPTIONS_PARAM_PLUGINS					= 'plugins';
 const OPTIONS_PARAM_PLUGINS_DEFAULT			= true;
@@ -121,6 +123,11 @@ class Server extends EventEmitter
 		this.applyPlugins	= typeof this.applyPlugins === 'boolean'
 							? this.applyPlugins
 							: OPTIONS_PARAM_PLUGINS_DEFAULT;
+
+		this.host			= options[OPTIONS_PARAM_HOSTNAME];
+		this.host			= typeof this.host === 'string'
+							? this.host
+							: OPTIONS_PARAM_HOSTNAME_DEFAULT;
 	}
 
 	/**
@@ -329,7 +336,7 @@ class Server extends EventEmitter
 			? https.createServer( this.httpsOptions, this.serverCallback.bind( this ) )
 			: http.createServer( this.serverCallback.bind( this ) );
 
-		server.listen( this.port, () => {
+		server.listen( this.port, this.host, () => {
 				this.emit( 'serverCreationSuccess', { server, port: this.port } );
 
 				Loggur.log( `Server successfully started and listening on port: ${this.port}`, LOG_LEVELS.warning );

@@ -162,7 +162,7 @@ class EventRequest extends EventEmitter
 	/**
 	 * @copydoc	EventRequest::__send
 	 */
-	send( response, code = 200, raw = false )
+	send( response = '', code = 200, raw = false )
 	{
 		try
 		{
@@ -187,15 +187,19 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	_send( response, code = 200, raw = false )
+	_send( response = '', code = 200, raw = false )
 	{
 		if ( code !== 200 )
 		{
 			this.setStatusCode( code );
 		}
 
-		if ( typeof response !== 'undefined' && typeof response.pipe === 'function' && response instanceof Streams.Readable )
-		{
+		if (
+			response != null
+			&& typeof response != 'undefined'
+			&& typeof response.pipe === 'function'
+			&& response instanceof Streams.Readable
+		) {
 			response.pipe( this.response );
 		}
 		else
@@ -364,7 +368,7 @@ class EventRequest extends EventEmitter
 		{
 			if ( ! this.block.length > 0  )
 			{
-				this.sendError( `Cannot ${this.method} ${this.path}` );
+				this.sendError( `Cannot ${this.method} ${this.path}`, 404 );
 				return;
 			}
 

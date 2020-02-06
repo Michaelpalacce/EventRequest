@@ -212,6 +212,10 @@ When creating the first instance, make sure to pass the desired options.
 
 ***
 
+**host** - String - The hostname of the server -> Defaults to localhost
+
+***
+
 ### Functions exported by the server:
 **getPluginManager()** - returns PluginManager - Returns an instance of the plugin manager attached to the server
 

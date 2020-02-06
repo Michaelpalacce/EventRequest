@@ -1,3 +1,8 @@
+9.2.6
+- Fixed event request not returning 404 in case of an route not found.
+- Fixed EventRequest.send to not die in case of null or undefined
+- Added new options to the server ( ability to specify host )
+
 9.2.5
 - Fixed a commit where the FormBodyParser was mistakenly replaced
 
