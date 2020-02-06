@@ -1,3 +1,7 @@
+9.2.9
+- Added Ability to set defaults to the validations
+- Updated README.md accordingly
+
 9.2.8
 - Added more RESTFUL methods
 

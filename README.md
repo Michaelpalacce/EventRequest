@@ -669,6 +669,29 @@ It will also validate that the emailToValidate in case it is provided is an actu
 
 In case there is no error False will be returned
 
+###Validation defaults
+
+Validation results can also have defaults set. This is done by instead of passing a string of rules to the skeleton keys,
+an object is passed with two values: rules and default
+
+In case where the parameters have NOT been passed, the default value will be used.
+
+~~~javascript
+     let result	= event.validationHandler.validate(
+        event.body,
+        { 
+            username : { rules: 'filled||string', default: 'root' }, 
+            password : { rules: 'filled||string', default: 'toor' } 
+        } 
+     );
+
+    console.log( result.hasValidationFailed() );
+    console.log( result.getValidationResult() );
+    
+    // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
+    // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
+    // { 'username':'username', 'password': 'password'}
+~~~
 
 ***
 ***

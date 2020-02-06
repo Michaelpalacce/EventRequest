@@ -35,10 +35,11 @@ class ValidationAttribute
 {
 	constructor( key, value, rules, data )
 	{
-		this.key	= key;
-		this.value	= value;
-		this.rules	= rules;
-		this.data	= data;
+		this.key		= key;
+		this.value		= value;
+		this.rules		= rules;
+		this.data		= data;
+		this.default	= undefined;
 	}
 
 	/**
@@ -48,6 +49,12 @@ class ValidationAttribute
 	 */
 	validateSelf()
 	{
+		if ( typeof this.rules === 'object' && typeof this.rules['default'] !== 'undefined' && typeof this.rules['rules'] === 'string')
+		{
+			this.default	= this.rules['default'];
+			this.rules		= this.rules['rules'];
+		}
+
 		if ( this.rules === undefined || typeof this.rules !== 'string' )
 		{
 			return VALIDATION_ERRORS.rules;

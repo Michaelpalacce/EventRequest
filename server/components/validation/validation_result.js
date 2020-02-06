@@ -60,7 +60,10 @@ class ValidationResult
 			if ( ! this.validationFailed )
 			{
 				this.attributes.forEach( ( attribute ) => {
-					this.result[attribute.key]	= attribute.value;
+					this.result[attribute.key]	= typeof attribute.value === 'undefined'
+												|| attribute.value === null
+												? attribute.default
+												: attribute.value;
 				})
 			}
 		}
