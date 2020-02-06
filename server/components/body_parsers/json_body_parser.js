@@ -76,6 +76,11 @@ class JsonBodyParser extends BodyParser
 			return;
 		}
 
+		if ( rawPayload.length === 0 )
+		{
+			return callback( false, {} );
+		}
+
 		try
 		{
 			let payload	= JSON.parse( rawPayload.toString() );

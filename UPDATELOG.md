@@ -1,3 +1,6 @@
+9.2.5
+- Fixed a commit where the FormBodyParser was mistakenly replaced
+
 9.2.4
 - Fixed an issue with sending an empty body and passing JSON. Also set the strict flag to true.
 
