@@ -8,6 +8,7 @@ const Router									= require( '../../../../server/components/routing/router' )
 
 test({
 	message	: 'LoggerPlugin attaches correctly',
+	skipped	: true,
 	test	: ( done )=>{
 		let eventRequest	= helpers.getEventRequest();
 		let router			= new Router();
@@ -65,7 +66,7 @@ test({
 
 		// DO this to wait for the log to complete
 		setImmediate(()=>{
-			assert.equal( 10, called );
+			assert.equal( called, 10 );
 			assert.equal( true, eventRequest.logger instanceof Logger );
 
 			done();

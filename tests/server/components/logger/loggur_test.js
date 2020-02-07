@@ -118,8 +118,8 @@ test({
 		let loggur			= helpers.getMockedLoggur();
 		let defaultLogger	= loggur.getDefaultLogger();
 
-		assert.equal( defaultLogger.serverName, 'DefaultLogger' );
-		assert.equal( defaultLogger.logLevel, LOG_LEVELS.warning );
+		assert.equal( defaultLogger.serverName, 'Default' );
+		assert.equal( defaultLogger.logLevel, LOG_LEVELS.debug );
 
 		done();
 	}

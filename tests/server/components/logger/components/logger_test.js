@@ -147,18 +147,10 @@ test({
 			transports	: [transport],
 		}, 'id' );
 
-		logger.log({
-			message	: 'Error',
-			level	: LOG_LEVELS.error
+		logger.log( 'Error', LOG_LEVELS.error ).then(()=>{
+			return logger.log( 'Warning', LOG_LEVELS.warning );
 		}).then(()=>{
-			logger.log({
-				message	: 'Warning',
-				level	: LOG_LEVELS.warning
-			}).then(()=>{
-				logged === 2 ? done() : done( 'Transport logged called more than once when it should have been called just once' );
-			}).catch(( err )=>{
-				done( err );
-			});
+			logged === 1 ? done() : done( 'Transport logged called more than once when it should have been called just once' );
 		}).catch(( err )=>{
 			done( err );
 		});

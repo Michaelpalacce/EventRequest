@@ -2,9 +2,11 @@
 
 // Dependencies
 const { assert, test, helpers }	= require( '../test_helper' );
-const Server					= require( './../../server/server' );
+let Server					= require( './../../server/server' );
 const Router					= require( './../../server/components/routing/router' );
 const PreloadedPluginManager	= require( './../../server/plugins/preloaded_plugins' );
+Server	= Server.class;
+
 
 test({
 	message	: 'Server.constructor starts without crashing with defaults',
@@ -12,28 +14,12 @@ test({
 		assert.doesNotThrow( ()=>{
 			let server	= new Server();
 
-			assert.equal( 'http', server.protocol );
-			assert.deepStrictEqual( {}, server.httpsOptions );
-			assert.equal( 3000, server.port );
-			assert.equal( true, server.applyPlugins );
 			assert.equal( 3, server.router.middleware.length );
 		});
 		done();
 	}
 });
 
-test({
-	message	: 'Server.constructor does not apply plugins if passed',
-	test	: ( done )=>{
-		assert.doesNotThrow( ()=>{
-			let server	= new Server( { plugins: false });
-
-			assert.equal( false, server.applyPlugins );
-			assert.equal( 0, server.router.middleware.length );
-		});
-		done();
-	}
-});
 
 test({
 	message	: 'Server.constructor instantiates a router and has a pluginManager',
@@ -42,26 +28,6 @@ test({
 		assert.equal( true, server.router instanceof Router );
 		assert.equal( 3, server.router.middleware.length );
 		assert.deepStrictEqual( server.pluginManager, PreloadedPluginManager );
-		done();
-	}
-});
-
-test({
-	message	: 'Server.constructor options when options are correct',
-	test	: ( done )=>{
-		let options	= {};
-		new Server( options );
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.constructor options when options are incorrect',
-	test	: ( done )=>{
-		let options	= new Error();
-		new Server( options );
-
 		done();
 	}
 });
@@ -173,7 +139,7 @@ test({
 		let router	= server.router;
 		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 1, block.length );
+		assert.equal( 3, block.length );
 
 		done();
 	}
@@ -196,7 +162,7 @@ test({
 		let router	= server.router;
 		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 1, block.length );
+		assert.equal( 3, block.length );
 
 		done();
 	}
@@ -219,7 +185,7 @@ test({
 		let router	= server.router;
 		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 1, block.length );
+		assert.equal( 3, block.length );
 
 		done();
 	}
@@ -242,7 +208,7 @@ test({
 		let router	= server.router;
 		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 1, block.length );
+		assert.equal( 3, block.length );
 
 		done();
 	}

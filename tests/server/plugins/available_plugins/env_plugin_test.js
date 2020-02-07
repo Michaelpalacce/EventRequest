@@ -10,7 +10,7 @@ const fs								= require( 'fs' );
 test({
 	message	: 'EnvPlugin setServerOnRuntime',
 	test	: ( done )=>{
-		let MockServer		= Mock( Server );
+		let MockServer		= Mock( Server.class );
 		let server			= new MockServer();
 		let fileLocation	= path.join( __dirname, '/fixture/.env');
 

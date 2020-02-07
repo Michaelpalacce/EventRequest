@@ -3,9 +3,7 @@
 const { Server }	= require( '../index' );
 const DataServer	= require( '../server/components/caching/data_server' );
 
-let server			= Server({
-	port	: 3333
-});
+let server			= Server();
 
 server.add({
 	route	: '/ping',
@@ -15,7 +13,7 @@ server.add({
 	}
 });
 
-server.start(()=>{});
+Server.start( 3333, ()=>{});
 
 // Set up a memory server to be used by the tests
 let cachingServer	= new DataServer({ persist: false });

@@ -8,7 +8,7 @@ test({
 	test	: ( done )=>{
 		let formBodyParser	= new FormBodyParser();
 		assert.equal( formBodyParser.maxPayloadLength, 10 * 1048576 );
-		assert.equal( formBodyParser.strict, true );
+		assert.equal( formBodyParser.strict, false );
 
 		done();
 	}
@@ -36,7 +36,7 @@ test({
 
 		let formBodyParser	= new FormBodyParser( { maxPayloadLength, strict } );
 		assert.equal( formBodyParser.maxPayloadLength, 10 * 1048576 );
-		assert.equal( formBodyParser.strict, true );
+		assert.equal( formBodyParser.strict, false );
 
 		done();
 	}

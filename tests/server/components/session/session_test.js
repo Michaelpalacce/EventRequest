@@ -29,7 +29,7 @@ test({
 		assert.equal( true, session.event instanceof EventRequest );
 		assert.equal( true, typeof session.server !== 'undefined' );
 		assert.equal( true, typeof session.options === 'object' );
-		assert.equal( 0, session.ttl );
+		assert.equal( 7776000, session.ttl );
 		assert.equal( 'sid', session.sessionKey );
 		assert.equal( 32, session.sessionIdLength );
 		assert.equal( null, session.sessionId );

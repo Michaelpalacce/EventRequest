@@ -8,7 +8,7 @@ test({
 	test	: ( done )=>{
 		let jsonBodyParser	= new JsonBodyParser();
 		assert.equal( jsonBodyParser.maxPayloadLength, 100 * 1048576 );
-		assert.equal( jsonBodyParser.strict, true );
+		assert.equal( jsonBodyParser.strict, false );
 
 		done();
 	}
@@ -36,7 +36,7 @@ test({
 
 		let jsonBodyParser	= new JsonBodyParser( { maxPayloadLength, strict } );
 		assert.equal( jsonBodyParser.maxPayloadLength, 100 * 1048576 );
-		assert.equal( jsonBodyParser.strict, true );
+		assert.equal( jsonBodyParser.strict, false );
 
 		done();
 	}

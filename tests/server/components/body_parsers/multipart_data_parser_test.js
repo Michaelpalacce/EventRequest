@@ -78,7 +78,7 @@ test({
 -
 		multipartParser.terminate();
 
-		assert.equal( multipartParser.parts, null );
+		assert.deepEqual( multipartParser.parts, [] );
 		assert.equal( multipartParser.parsingError, false );
 		assert.equal( multipartParser.ended, false );
 		assert.equal( multipartParser.headerData, null );

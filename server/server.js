@@ -2,7 +2,6 @@
 
 // Dependencies
 const http						= require( 'http' );
-const https						= require( 'https' );
 const EventRequest				= require( './event' );
 const { EventEmitter }			= require( 'events' );
 const Router					= require( './components/routing/router' );
@@ -12,52 +11,24 @@ const Logging					= require( './components/logger/loggur' );
 const { Loggur, LOG_LEVELS }	= Logging;
 
 /**
- * @brief	Constants
- */
-const PROTOCOL_HTTP							= 'http';
-const PROTOCOL_HTTPS						= 'https';
-const OPTIONS_PARAM_PORT					= 'port';
-const OPTIONS_PARAM_PORT_DEFAULT			= 3000;
-const OPTIONS_PARAM_PROTOCOL				= 'protocol';
-const OPTIONS_PARAM_PROTOCOL_DEFAULT		= PROTOCOL_HTTP;
-const OPTIONS_PARAM_HTTPS					= 'httpsOptions';
-const OPTIONS_PARAM_HTTPS_DEFAULT			= {};
-const OPTIONS_PARAM_HOSTNAME				= 'host';
-const OPTIONS_PARAM_HOSTNAME_DEFAULT		= 'localhost';
-
-const OPTIONS_PARAM_PLUGINS					= 'plugins';
-const OPTIONS_PARAM_PLUGINS_DEFAULT			= true;
-
-const POSSIBLE_PROTOCOL_OPTIONS				= {};
-POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTP]	= http;
-POSSIBLE_PROTOCOL_OPTIONS[PROTOCOL_HTTPS]	= https;
-
-/**
  * @brief	Server class responsible for receiving requests and sending responses
  */
 class Server extends EventEmitter
 {
 	/**
-	 * @brief	Passes options for server configuration
-	 *
-	 * @param	Object options
+	 * @brief	Initializes the Server
 	 */
-	constructor( options	= {} )
+	constructor()
 	{
 		super();
 		this.setMaxListeners( 0 );
 
-		this.sanitizeConfig( options );
-
 		this.plugins		= [];
 		this.pluginManager	= PluginManager;
+		this.httpServer		= null;
 		this.router			= this.Router();
-		this.apply( this.router );
 
-		if ( this.applyPlugins === true )
-		{
-			this.setUpDefaultPlugins();
-		}
+		this.setUpDefaultPlugins();
 	}
 
 	/**
@@ -67,10 +38,12 @@ class Server extends EventEmitter
 	 */
 	setUpDefaultPlugins()
 	{
+		this.apply( this.router );
+
 		let pluginsToApply	= [
-			{ plugin : 'er_static_resources' },
+			{ plugin : 'er_static_resources', options: ['favicon.ico'] },
 			{ plugin : 'er_body_parser_json' },
-			{ plugin : 'er_body_parser_form' }
+			{ plugin : 'er_body_parser_form' },
 		];
 
 		pluginsToApply.forEach(( pluginConfig )=>{
@@ -86,48 +59,6 @@ class Server extends EventEmitter
 	getPluginManager()
 	{
 		return this.pluginManager;
-	}
-
-	/**
-	 * @brief	Sets defaults for the server options
-	 *
-	 * @details	Accepted options:
-	 * 			- protocol - String - The protocol to be used ( http || https ) -> Defaults to http
-	 * 			- httpsOptions - Object - Options that will be given to the https webserver -> Defaults to {}
-	 * 			- port - Number - The port to run the web-server on -> Defaults to 3000
-	 * 			- plugins - Boolean - A flag that determines if the pre-installed plugins should be enabled or not -> Defaults to true
-	 *
-	 * 	@param	Object options
-	 *
-	 * @return	void
-	 */
-	sanitizeConfig( options )
-	{
-		this.protocol		= options[OPTIONS_PARAM_PROTOCOL];
-		this.protocol		= typeof this.protocol === 'string'
-							&& typeof POSSIBLE_PROTOCOL_OPTIONS[this.protocol] !== 'undefined'
-							? this.protocol
-							: OPTIONS_PARAM_PROTOCOL_DEFAULT;
-
-		this.httpsOptions	= options[OPTIONS_PARAM_HTTPS];
-		this.httpsOptions	= typeof this.httpsOptions === 'object'
-							? this.httpsOptions
-							: OPTIONS_PARAM_HTTPS_DEFAULT;
-
-		this.port			= parseInt( options[OPTIONS_PARAM_PORT] );
-		this.port			= typeof this.port === 'number' && ! Number.isNaN( this.port )
-							? this.port
-							: OPTIONS_PARAM_PORT_DEFAULT;
-
-		this.applyPlugins	= options[OPTIONS_PARAM_PLUGINS];
-		this.applyPlugins	= typeof this.applyPlugins === 'boolean'
-							? this.applyPlugins
-							: OPTIONS_PARAM_PLUGINS_DEFAULT;
-
-		this.host			= options[OPTIONS_PARAM_HOSTNAME];
-		this.host			= typeof this.host === 'string'
-							? this.host
-							: OPTIONS_PARAM_HOSTNAME_DEFAULT;
 	}
 
 	/**
@@ -257,7 +188,7 @@ class Server extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	serverCallback( request, response )
+	_attach( request, response )
 	{
 		let eventRequest	= this.resolve( request, response );
 		this.emit( 'eventRequestResolved', { eventRequest, request, response  } );
@@ -321,77 +252,43 @@ class Server extends EventEmitter
 		}
 	}
 
-	/**
-	 * @brief	Starts a new server
-	 *
-	 * @param	Function successCallback
-	 *
-	 * @return	Server
-	 */
-	setUpNewServer( callback )
-	{
-		// Create the server
-		let protocol	= this.protocol;
-		let server		= protocol === PROTOCOL_HTTPS
-			? https.createServer( this.httpsOptions, this.serverCallback.bind( this ) )
-			: http.createServer( this.serverCallback.bind( this ) );
-
-		server.listen( this.port, this.host, () => {
-				this.emit( 'serverCreationSuccess', { server, port: this.port } );
-
-				Loggur.log( `Server successfully started and listening on port: ${this.port}`, LOG_LEVELS.warning );
-				callback( false, server );
-			}
-		);
-
-		// Add an error handler in case of an error.
-		server.on( 'error', ( error )=>{
-			this.emit( 'serverCreationError', { server, error } );
-
-			Loggur.log( 'Could not start the server on port: ' + this.port, LOG_LEVELS.error );
-			Loggur.log( 'Error Returned was: ' + error.code + this.port, LOG_LEVELS.error );
-
-			callback( error );
-		});
-
-		return server;
-	}
-
-	/**
-	 * @brief	Starts the server on a given port
-	 *
-	 * @param	Function callback
-	 *
-	 * @return	Server
-	 */
-	start( callback )
-	{
-		if ( this.httpServer == null )
-		{
-			this.emit( 'serverStart' );
-
-			this.httpServer	= this.setUpNewServer( typeof callback === 'function' ? callback : ()=>{} );
-		}
-
-		return this;
-	}
-
-	/**
-	 * @brief	Stops the server and the caching server
-	 *
-	 * @return	void
-	 */
-	stop()
-	{
-		if ( this.httpServer != null )
-		{
-			this.emit( 'serverStop' );
-
-			this.httpServer.close();
-			this.httpServer	= null;
-		}
-	}
 }
 
+// Holds the instance of the server class
+let server	= null;
+
+/**
+ * @brief	Creates a new server, or return existing instance
+ *
+ * @returns	Server
+ */
+let App				= ()=>{
+	return server || ( server	= new Server() );
+};
+
+/**
+ * @brief	Returns the attach function of the serve
+ *
+ * @details	This can be used to implement the http/https server
+ *
+ * @returns	Function
+ */
+App.attach			= ()=>{
+	let self	= App();
+	return self._attach.bind( self );
+};
+
+/**
+ * @brief	Starts the server with the given arguments
+ *
+ * @returns	Server
+ */
+App.start			= function(){
+	const httpServer	= http.createServer( App.attach() );
+	return httpServer.listen.apply( httpServer, arguments );
+};
+
+App.class			= Server;
+
 // Export the server module
-module.exports	= Server;
+module.exports	= App;

@@ -20,7 +20,6 @@ let startTests	= ()=>{
 		silent			: false,
 		filter			: '',
 		callback		: ( err )=>{
-			server.stop();
 			process.exit( 0 );
 		}
 	});

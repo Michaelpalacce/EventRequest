@@ -1,6 +1,9 @@
 # EventRequest
 A highly customizable backend server in NodeJs
 
+# BREAKING RELEASE
+v10 is a major BREAKING release
+
 # GitHub
 https://github.com/Michaelpalacce/EventRequest
 
@@ -29,7 +32,7 @@ server.get( '/', ( event ) => {
 	event.send( '<h1>Hello World!</h1>' );
 });
 
-server.start( ()=>{
+Server.start( 80, ()=>{
 	Loggur.log( 'Server started' );
 });
 ~~~
@@ -41,6 +44,7 @@ server.start( ()=>{
 	Loggur,				// Easier access to the Logging.Loggur instance
 	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
 ### Properties exported by Development:
+	BodyParserHandler,	// Used mainly for defining your own custom Body Handlers
 	PluginInterface,	// Used to add plugins to the system
 	FileStream,			// Class that defines a file stream
 	DataServer,			// Instance to be extended to implement your own DataServer
@@ -185,36 +189,37 @@ redirectData contains:
 ***
 
 # Server
-The main object of the framework. Holds the server that is listening for incoming requests, router  and the pluginManager. Can be configured.
-The Server exported from the event_request module is created like :
+The main object of the framework.
+
+To retrieve the Server class do:
 ~~~javascript
 const { Server } = require( 'event_request' );
 let server = Server();
 ~~~
-No more than one server can be created, so every time Server() is called it will return the same instance.
-When creating the first instance, make sure to pass the desired options.
 
-### The server callback accepts the following options:
+To start the Server you can do:
+~~~javascript
+const { Server } = require( 'event_request' );
+const app = Server();
 
-**protocol** - String - The protocol to be used ( http || https ) -> Defaults to http
+Server.start( '80', ()=>{
+	Loggur.log( 'Server is running' );
+});
+~~~
 
-***
+If you want to start the server using your own http/https server:
+~~~javascript
+const { Server } = require( 'event_request' );
 
-**httpsOptions** - Object - Options that will be given to the https webserver -> Defaults to {}
+const server = http.createServer( Server.attach() );
 
-***
+server.listen('80',()=>{
+	console.log( 'Server is UN' )
+});
+~~~
 
-**port** - Number - The port to run the web-server on -> Defaults to 3000
+Calling `Server()` anywhere will return the same instance of the Server.
 
-***
-
-**plugins** - Boolean - A flag that determines if the pre-installed plugins should be enabled or not -> Defaults to true
-
-***
-
-**host** - String - The hostname of the server -> Defaults to localhost
-
-***
 
 ### Functions exported by the server:
 **getPluginManager()** - returns PluginManager - Returns an instance of the plugin manager attached to the server
@@ -235,34 +240,9 @@ When creating the first instance, make sure to pass the desired options.
 
 **hasPlugin( String pluginId )** - Boolean - Checks whether a plugin has been added to the server. Note this does not work with the plugin manager
 
-***
-
-**start( Function callback )** - Starts the server. Uses a negative callback. If there were no errors then false will be returned as well as the created server as a second argument
-
-***
-
-**stop()** - Stops the server
-
-***
 
 ### Events emitted by the server
 **addRoute** - ( mixed route ) - When a new route is being added
-
-***
-
-**serverStart** - no arguments - When the server is being started
-
-***
-
-**serverStop** - no arguments - When the server is being stopped
-
-***
-
-**serverCreationSuccess** - ( net.Server server, Number port ) - When the server is successfully started
-
-***
-
-**serverCreationError** - ( net.Server server, Error error ) - When an error occurs while starting the server
 
 ***
 
@@ -300,15 +280,18 @@ When creating the first instance, make sure to pass the desired options.
 ***
 ### Ways to add routes using the Router or the Server:
 When adding routes you have to use the Router class. 
-The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
-
-
 ~~~javascript
 let { Server } = require( 'event_request' );
 
 // You can create your own router
 let router  = Server().Router();
-router.add(...);
+router.add({
+    method: 'GET',
+    route: '/',
+    handler: ( event)=>{
+        event.send( '<h1>Hello World</h1>' );
+    }
+});
 
 // To attach a router to the server simply call the add function of th server.
 // Just like you would do to add a normal route.
@@ -319,10 +302,28 @@ let serverRouter    = Server().router;
 serverRouter.add(...);
 ~~~
 
+###Router Wildcards
+The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
+~~~javascript
+let { Server } = require( 'event_request' );
+// You can create your own router
+let router  = Server().Router();
+router.add({
+    method: 'GET',
+    route: '/todos/:id:',
+    handler: ( event)=>{
+        console.log( event.params.id );
+
+        event.send( '<h1>Hello World</h1>' );
+    }
+});
+~~~
+
+
 The server has 2 ways of adding routes/middleware
 
 ***
-You can use .post, .put, .get, .delete, .head methods from the server that accept Required parameters: ( String|RegExp route, Function handler )
+You can use .post, .put, .get, .delete, .head, .patch, .copy methods from the server that accept Required parameters: ( String|RegExp route, Function handler )
 
 **route** -> String|RegExp-> the route to witch the middleware should be attached
 
@@ -360,7 +361,7 @@ server.get( '/users/:user:', ( event )=>{
 	event.send( ['ok']);
 } );
 
-server.start();
+Server.start( 80 );
 ~~~
 
 ***

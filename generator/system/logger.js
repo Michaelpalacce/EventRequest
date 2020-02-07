@@ -1,6 +1,7 @@
 'use strict';
 
-const { Server, Logging }					= require( 'event_request' );
+const { Server, Development }				= require( 'event_request' );
+const { Logging }							= Development;
 const { Loggur, Console, File, LOG_LEVELS }	= Logging;
 
 let logger	= Loggur.createLogger({
