@@ -1,8 +1,9 @@
 'use strict';
 
-const PluginInterface	= require( '../plugin_interface' );
-const fs				= require( 'fs' );
-const path				= require( 'path' );
+const PluginInterface			= require( '../plugin_interface' );
+const fs						= require( 'fs' );
+const path						= require( 'path' );
+const DefaultTemplatingEngine	= require( '../../components/templating_engine/default_templating_engine' );
 
 /**
  * @brief	Templating engine plugin that attaches a render functionality to the eventRequest
@@ -85,13 +86,13 @@ class TemplatingEnginePlugin extends PluginInterface
 		let templatingEngine	= typeof this.options.engine !== 'undefined'
 								&& typeof this.options.engine.render !== 'undefined'
 								? this.options.engine
-								: false;
+								: new DefaultTemplatingEngine();
 
 		let templateDir			= typeof this.options.templateDir !== 'undefined'
 								? this.options.templateDir
 								: false;
 
-		if ( templatingEngine === false || templateDir === false )
+		if ( templateDir === false )
 		{
 			throw new Error( 'Invalid templating config provided.' );
 		}

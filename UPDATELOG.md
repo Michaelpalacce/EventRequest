@@ -1,3 +1,6 @@
+10.0.1
+- Introduced a DefaultTemplatingEngine
+
 10.0.0
 - BREAKING RELEASE.
 - Reworked how the server is started

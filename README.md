@@ -978,13 +978,13 @@ If you want to add a templating engine you have to set the engine parameters in 
 
     * Accepted options: 
     * - engine - Object - Instance of a templating engine that has a method render defined that accepts
-    *       html as first argument, object of variables as second and a callback as third
-    * - options - Object - options to be passed to the engine
+    *       html as first argument and object of variables as second -> Defaults to DefaultTemplatingEngine which can be used to serve static HTML
+    * - templateDir - String - Where to draw the templates from
 ***
 ~~~javascript
 const PluginManager			= server.getPluginManager();
 let templatingEnginePlugin	= PluginManager.getPlugin( 'er_templating_engine' );
-templatingEnginePlugin.setOptions( { templateDir : path.join( __dirname, './templates' ), engine : someEngineConstructor } ); 
+templatingEnginePlugin.setOptions( { templateDir : path.join( __dirname, './public' ), engine : someEngineConstructor } ); 
 server.apply( templatingEnginePlugin );
 ~~~
 
