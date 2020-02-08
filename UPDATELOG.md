@@ -1,3 +1,6 @@
+10.0.2
+- Small fix to DefaultTemplatingEngine
+
 10.0.1
 - Introduced a DefaultTemplatingEngine
 

@@ -18,3 +18,5 @@ class TemplatingEngine
 		return html;
 	}
 }
+
+module.exports	= TemplatingEngine;
