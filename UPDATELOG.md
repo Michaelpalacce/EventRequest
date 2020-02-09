@@ -1,3 +1,9 @@
+10.0.3
+- Fixed all the tests
+- Added a few new tests
+- Small changes to the setCookie function in event_request, now does not allow empty value or key 
+- Fixed an issue with the logger plugin to show the user-agent correctly
+
 10.0.2
 - Small fix to DefaultTemplatingEngine
 

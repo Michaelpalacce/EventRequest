@@ -1,7 +1,6 @@
 'use strict';
 
 // Dependencies
-const http						= require( 'http' );
 const BodyParserHandler			= require( './server/components/body_parsers/body_parser_handler' );
 const PluginInterface			= require( './server/plugins/plugin_interface' );
 const Logging					= require( './server/components/logger/loggur' );

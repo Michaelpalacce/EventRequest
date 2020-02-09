@@ -5,7 +5,7 @@ const { assert, test }			= require( './../../test_helper' );
 const PreLoadedPluginManager	= require( './../../../server/plugins/preloaded_plugins' );
 
 test({
-	message	: '',
+	message	: 'PluginManager does not throw when getting plugins',
 	test	: ( done )=>{
 
 		assert.doesNotThrow(()=>{

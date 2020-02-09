@@ -25,7 +25,6 @@ class Server extends EventEmitter
 
 		this.plugins		= [];
 		this.pluginManager	= PluginManager;
-		this.httpServer		= null;
 		this.router			= this.Router();
 
 		this.setUpDefaultPlugins();

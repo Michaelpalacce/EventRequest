@@ -135,28 +135,44 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Sets a new cookie
 	 *
+	 * @details	Return false if name or value are not set
+	 *
 	 * @param	String name
 	 * @param	String value
 	 * @param	Number maxAge
 	 * @param	String domain
 	 *
-	 * @return	void
+	 * @return	Boolean
 	 */
-	setCookie( name, value, maxAge = -1, domain = '' )
+	setCookie( name, value, maxAge = null, domain = null )
 	{
-		let cookie	= name + '=' + value;
+		const result	= this.validationHandler.validate(
+			{ name, value },
+			{
+				name: 'filled',
+				value: 'filled'
+			}
+		);
 
-		if ( maxAge !== -1 )
+		if ( result.hasValidationFailed() )
 		{
-			cookie	+= '; Max-Age=' + maxAge
+			return false;
 		}
 
-		if ( domain !== '' )
+		let cookie	= name + '=' + value;
+
+		if ( maxAge !== null )
+		{
+			cookie	+= `; Max-Age=${maxAge}`
+		}
+
+		if ( domain !== null )
 		{
 			cookie	+= `; Domain=${domain}`
 		}
 
-		this.setHeader( 'Set-Cookie', [cookie] )
+		this.setHeader( 'Set-Cookie', [cookie] );
+		return true;
 	}
 
 	/**

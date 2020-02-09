@@ -120,6 +120,7 @@ class ResponseCachePlugin extends PluginInterface
 				event.cacheCurrentRequest	= ( options = {} )=>{
 					event.currentResponseCacheConfig	= options;
 					let cacheId							= this.getCacheId( event );
+
 					const cachedDataSet					= this.cachingServer.get( cacheId );
 
 					if ( cachedDataSet === null )

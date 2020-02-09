@@ -3,7 +3,6 @@
 // Dependencies
 const { assert, test, helpers, Mock, Mocker }	= require( '../../../test_helper' );
 const ResponseCachePlugin						= require( '../../../../server/plugins/available_plugins/response_cache_plugin' );
-const CachingServerPlugin						= require( '../../../../server/plugins/available_plugins/memory_data_server_plugin' );
 const Router									= require( '../../../../server/components/routing/router' );
 
 test({
@@ -31,23 +30,20 @@ test({
 
 test({
 	message		: 'ResponseCachePlugin doesn\'t cache if already exists',
-	skipped		: true,
 	test		: ( done )=>{
 		let eventRequest		= helpers.getEventRequest( 'GET', '/test/responseCachePlugin/attachesEvent' );
 		let eventRequest2		= helpers.getEventRequest( 'GET', '/test/responseCachePlugin/attachesEvent' );
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 		let cachingServer		= helpers.getCachingServer();
 		let router				= new Router();
-		let called				= false;
+		let cached				= false;
 
-		let pluginMiddlewares	= responseCachePlugin.getPluginMiddleware();
+		responseCachePlugin.cachingServer	= cachingServer;
+		let pluginMiddlewares				= responseCachePlugin.getPluginMiddleware();
 
-		eventRequest2._mock({
-			method	: 'send',
-			shouldReturn	: ()=>{
-				called	= true;
-			}
-		});
+		eventRequest2.on( 'cachedResponse', ()=>{
+			cached	= true;
+		} );
 
 		assert.equal( 1, pluginMiddlewares.length );
 
@@ -57,6 +53,7 @@ test({
 		router.add({
 			route	: '/test/responseCachePlugin/attachesEvent',
 			handler	: ( event )=>{
+
 				event.cacheCurrentRequest();
 			}
 		});
@@ -74,7 +71,7 @@ test({
 		eventRequest2.next();
 
 		setTimeout(()=>{
-			called === true ? done( 'Send was called but it shouldn\'t have been' ) : done();
+			cached === false ? done( 'Response was not cached but it should have been' ) : done();
 		}, 250 );
 	}
 });

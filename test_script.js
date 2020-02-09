@@ -2,7 +2,7 @@
 
 const { runAllTests }	= require( './tests/test_helper' );
 const testSuites		= require( './tests/test_suites' );
-const { server }		= require( './tests/test_bootstrap' );
+require( './tests/test_bootstrap' )
 
 let startTests	= ()=>{
 	testSuites.eventSuite();
@@ -15,7 +15,7 @@ let startTests	= ()=>{
 	testSuites.pluginsSuite();
 
 	runAllTests({
-		dieOnFirstError	: false,
+		dieOnFirstError	: true,
 		debug			: true,
 		silent			: false,
 		filter			: '',

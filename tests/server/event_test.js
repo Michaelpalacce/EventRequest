@@ -96,7 +96,6 @@ test({
 	}
 });
 
-
 test({
 	message	: 'EventRequest cleanUp emits event: finished',
 	test	: ( done ) => {
@@ -519,5 +518,67 @@ test({
 		eventRequest.sendError( errorToThrow );
 
 		error ? done() : done( 'Send error did not emit an error' );
+	}
+});
+
+test({
+	message: 'EventRequest should have a validation handler',
+	test: ( done )=>{
+		const eventRequest	= helpers.getEventRequest();
+		const ValidationHandlerClass	= require( '../../server/components/validation/validation_handler' );
+
+		assert.equal( typeof eventRequest.validationHandler, 'object' );
+		assert.equal( eventRequest.validationHandler instanceof ValidationHandlerClass, true );
+
+		done();
+	}
+});
+
+test({
+	message: 'EventRequest setCookie should add a header with the cookie',
+	dataProvider: [
+		['key', 'value', null, null, true],
+		['key', 123, null, null, true],
+		[123, 'value', null, null, true],
+		['key', 'value', 10, null, true],
+		['key', 'value', 10, 'test.com', true],
+		[123, 123, 10, 'test.com', true],
+		['key', null, null, null, false],
+		[null, 'value', null, null, false],
+		[null, null, null, null, false],
+		['key', undefined, null, null, false],
+		[undefined, 'value', null, null, false],
+		[undefined, undefined, null, null, false],
+	],
+	test: ( done, name, value, maxAge, domain, shouldReturnTrue )=>{
+		const eventRequest		= helpers.getEventRequest();
+		let setCookieArguments	= [name, value];
+		let wasCalled			= false;
+		let cookieSet			= '';
+
+		if ( maxAge !== null )
+			setCookieArguments.push( maxAge );
+
+		if ( domain !== null )
+			setCookieArguments.push( domain );
+
+		eventRequest._mock({
+			method			: 'setHeader',
+			shouldReturn	: ( headerName, cookie )=>{
+				wasCalled	= true;
+				cookieSet	= cookie[0];
+			}
+		});
+
+		assert.equal( eventRequest.setCookie.apply( eventRequest, setCookieArguments ), shouldReturnTrue );
+		assert.equal( wasCalled, shouldReturnTrue );
+
+		if ( maxAge !== null )
+			assert.equal( cookieSet.includes( `Max-Age=${maxAge}`), true );
+
+		if ( domain !== null )
+			assert.equal( cookieSet.includes( `Domain=${domain}`), true );
+
+		done();
 	}
 });

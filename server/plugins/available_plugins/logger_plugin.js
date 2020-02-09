@@ -132,7 +132,7 @@ class LoggerPlugin extends PluginInterface
 
 				event.on( 'cleanUp', () =>{
 					const userAgent	= typeof event.headers['user-agent'] === 'undefined' ? 'UNKNOWN' : event.headers['user-agent'];
-					logger.notice( `${event.method} ${requestURL} ${event.response.statusCode} ||| ${event.clientIp} ||| ${event.headers['user-agent']}` );
+					logger.notice( `${event.method} ${requestURL} ${event.response.statusCode} ||| ${event.clientIp} ||| ${userAgent}` );
 				});
 
 				logger.verbose( 'Headers: ' + JSON.stringify( event.headers ) );

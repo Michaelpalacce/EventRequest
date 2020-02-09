@@ -8,7 +8,6 @@ const Router									= require( '../../../../server/components/routing/router' )
 
 test({
 	message	: 'LoggerPlugin attaches correctly',
-	skipped	: true,
 	test	: ( done )=>{
 		let eventRequest	= helpers.getEventRequest();
 		let router			= new Router();
@@ -44,7 +43,7 @@ test({
 				called	++;
 			},
 			with			: [
-				['send', undefined],
+				['cleanUp', undefined],
 				['error', undefined],
 				['on_error', undefined],
 				['finished', undefined],
