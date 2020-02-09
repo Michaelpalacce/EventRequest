@@ -4,7 +4,7 @@ let IndexModel	= {};
 
 // Called on index action
 IndexModel.index	= ( event )=>{
-	event.send( '<h1>Hello World!</h1>' )
+	event.render( 'index' )
 };
 
 module.exports	= IndexModel;

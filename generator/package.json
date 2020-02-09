@@ -7,6 +7,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "event_request": "*"
+    "event_request": "latest"
   }
 }

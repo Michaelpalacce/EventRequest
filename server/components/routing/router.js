@@ -17,8 +17,30 @@ class Router extends PluginInterface
 	{
 		super( 'er_router', {} );
 
-		this.middleware	= [];
+		this.middleware			= [];
+		this.globalMiddlewares	= {};
 		this.setUpHttpMethodsToObject( this );
+	}
+
+	/**
+	 * @brief	Defines a middleware to be used globally
+	 *
+	 * @param	String middlewareName
+	 * @param	Function middleware
+	 *
+	 * @return	void
+	 */
+	define( middlewareName, middleware )
+	{
+		if (
+			typeof middlewareName !== 'string'
+			|| typeof middleware !== 'function'
+			|| typeof this.globalMiddlewares[middlewareName] !== 'undefined'
+		) {
+			throw new Error( 'Invalid middleware definition or middleware already exists' );
+		}
+
+		this.globalMiddlewares[middlewareName]	= middleware;
 	}
 
 	/**
@@ -61,11 +83,12 @@ class Router extends PluginInterface
 		let methods	= ['POST', 'PUT', 'GET', 'DELETE', 'HEAD', 'PATCH', 'COPY'];
 
 		methods.forEach(( method )=>{
-			object[method.toLocaleLowerCase()]	= ( route, handler )=>{
+			object[method.toLocaleLowerCase()]	= ( route, handler, middlewares = [] )=>{
 				this.add({
 					method,
 					route,
-					handler
+					handler,
+					middlewares
 				});
 
 				return object;
@@ -89,7 +112,14 @@ class Router extends PluginInterface
 	{
 		if ( route instanceof Router )
 		{
-			this.middleware	= this.middleware.concat( route.middleware );
+			this.middleware			= this.middleware.concat( route.middleware );
+			const routerMiddlewares	= route.globalMiddlewares;
+
+			for ( const [key, value] of Object.entries( routerMiddlewares ) )
+			{
+				this.define( key, value );
+			}
+
 			return;
 		}
 
@@ -112,7 +142,7 @@ class Router extends PluginInterface
 	{
 		if ( ! ( event instanceof EventRequest ) )
 		{
-			throw new Error( 'Invalid Event provided' );
+			throw new Error( 'Invalid EventRequest provided' );
 		}
 
 		let block	= [];
@@ -134,6 +164,17 @@ class Router extends PluginInterface
 					});
 
 					event.params	= Object.assign( event.params, params );
+
+					for ( const middlewareName of route.getMiddlewares() )
+					{
+						if ( typeof this.globalMiddlewares[middlewareName] !== 'function' )
+						{
+							throw new Error( `Could not find middleware ${middlewareName}` );
+						}
+
+						block.push( this.globalMiddlewares[middlewareName] );
+					}
+
 					block.push( route.getHandler() );
 				}
 			}

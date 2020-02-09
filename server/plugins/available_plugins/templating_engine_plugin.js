@@ -4,6 +4,8 @@ const PluginInterface			= require( '../plugin_interface' );
 const fs						= require( 'fs' );
 const path						= require( 'path' );
 const DefaultTemplatingEngine	= require( '../../components/templating_engine/default_templating_engine' );
+const PROJECT_ROOT				= path.parse( require.main.filename ).dir;
+const DEFAULT_TEMPLATING_DIR	= path.join( PROJECT_ROOT, './public' );
 
 /**
  * @brief	Templating engine plugin that attaches a render functionality to the eventRequest
@@ -38,14 +40,14 @@ class TemplatingEnginePlugin extends PluginInterface
 
 			if ( templateName !== false )
 			{
-				let templatePath	= path.join( this.templateDir, templateName );
+				const templatePath	= path.join( this.templateDir, templateName );
 
 				fs.readFile( templatePath, 'utf8', ( err, html ) => {
 					if ( ! err && html && html.length > 0  && ! this.isFinished() )
 					{
 						try
 						{
-							let result	= this.templatingEngine.render( html, variables );
+							const result	= this.templatingEngine.render( html, variables );
 							this.send( result, 200, true );
 							callback( false );
 						}
@@ -83,19 +85,14 @@ class TemplatingEnginePlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let templatingEngine	= typeof this.options.engine !== 'undefined'
+		const templatingEngine	= typeof this.options.engine !== 'undefined'
 								&& typeof this.options.engine.render !== 'undefined'
 								? this.options.engine
 								: new DefaultTemplatingEngine();
 
-		let templateDir			= typeof this.options.templateDir !== 'undefined'
+		const templateDir		= typeof this.options.templateDir !== 'undefined'
 								? this.options.templateDir
-								: false;
-
-		if ( templateDir === false )
-		{
-			throw new Error( 'Invalid templating config provided.' );
-		}
+								: DEFAULT_TEMPLATING_DIR;
 
 		let pluginMiddleware	= {
 			handler	: ( event ) =>{

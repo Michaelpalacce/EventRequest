@@ -19,9 +19,10 @@ class Route
 {
 	constructor( routeConfig )
 	{
-		this.handler	= null;
-		this.route		= null;
-		this.method		= null;
+		this.handler		= null;
+		this.route			= null;
+		this.method			= null;
+		this.middlewares	= [];
 		this.sanitize( routeConfig );
 	}
 
@@ -52,17 +53,23 @@ class Route
 			throw new Error( 'Invalid middleware added!' );
 		}
 
-		this.route		= typeof routeConfig.route === 'string' || routeConfig.route instanceof RegExp
-						? routeConfig.route
-						: '';
+		this.route			= typeof routeConfig.route === 'string' || routeConfig.route instanceof RegExp
+							? routeConfig.route
+							: '';
 
-		this.method		= typeof routeConfig.method === 'string' || routeConfig.method instanceof Array
-						? routeConfig.method
-						: '';
+		this.method			= typeof routeConfig.method === 'string' || routeConfig.method instanceof Array
+							? routeConfig.method
+							: '';
 
-		this.handler	= routeConfig.handler instanceof Function
-						? routeConfig.handler
-						: DEFAULT_ROUTE_HANDLER;
+		this.handler		= routeConfig.handler instanceof Function
+							? routeConfig.handler
+							: DEFAULT_ROUTE_HANDLER;
+
+		this.middlewares	= Array.isArray( routeConfig.middlewares )
+							? routeConfig.middlewares
+							: typeof routeConfig.middlewares === 'string'
+							? [routeConfig.middlewares]
+							: [];
 
 		if ( this.handler === null )
 		{
@@ -98,6 +105,16 @@ class Route
 	getMethod()
 	{
 		return this.method;
+	}
+
+	/**
+	 * @brief	Returns the middlewares set for the current route
+	 *
+	 * @return	Array
+	 */
+	getMiddlewares()
+	{
+		return this.middlewares;
 	}
 
 	/**

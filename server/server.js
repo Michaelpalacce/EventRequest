@@ -31,6 +31,19 @@ class Server extends EventEmitter
 	}
 
 	/**
+	 * @brief	Adds a new middleware to the router
+	 *
+	 * @param	String middlewareName
+	 * @param	Function middleware
+	 *
+	 * @return	void
+	 */
+	define()
+	{
+		this.router.define.apply( this.router, arguments );
+	}
+
+	/**
 	 * @brief	Sets up the default plugins
 	 *
 	 * @return	void
@@ -48,6 +61,22 @@ class Server extends EventEmitter
 		pluginsToApply.forEach(( pluginConfig )=>{
 			this.apply( pluginConfig.plugin, pluginConfig.options );
 		});
+
+		// attached like this to enable smart autocomplete in IDE's
+		this.er_timeout					= 'er_timeout';
+		this.er_env						= 'er_env';
+		this.er_rate_limits				= 'er_rate_limits';
+		this.er_static_resources		= 'er_static_resources';
+		this.er_cache_server			= 'er_cache_server';
+		this.er_templating_engine		= 'er_templating_engine';
+		this.er_file_stream				= 'er_file_stream';
+		this.er_logger					= 'er_logger';
+		this.er_body_parser				= 'er_body_parser';
+		this.er_session					= 'er_session';
+		this.er_response_cache			= 'er_response_cache';
+		this.er_body_parser_json		= 'er_body_parser_json';
+		this.er_body_parser_form		= 'er_body_parser_form';
+		this.er_body_parser_multipart	= 'er_body_parser_multipart';
 	}
 
 	/**
@@ -262,7 +291,7 @@ let server	= null;
  * @returns	Server
  */
 let App				= ()=>{
-	return server || ( server	= new Server() );
+	return server || ( server = new Server() );
 };
 
 /**

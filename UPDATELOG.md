@@ -1,3 +1,9 @@
+10.1.0
+- Added Route middlewares
+- Added all the plugins in the PluginManager to the server
+- Improvements to the TemplatingEnginePlugin to not throw an error with empty options ( now accepts default templates path to /public )
+- Updates to the default generated script
+
 10.0.3
 - Fixed all the tests
 - Added a few new tests

@@ -3,6 +3,6 @@
 const { Server }	= require( 'event_request' );
 const Model			= require( './../model/index' );
 
-let server	= Server();
+const app			= Server();
 
-server.get( '/', event => Model.index( event ) );
+app.get( '/', event => Model.index( event ) );

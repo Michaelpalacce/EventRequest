@@ -319,6 +319,47 @@ router.add({
 });
 ~~~
 
+###Router global middlewares
+You can `define` middlewares in any router or the server. Middlewares will be merged if you add a router to another router.
+These global middlewares can be used to call a function before another step in the chain.You can add multiple middlewares per route.
+ 
+When adding middlewares to routes it can either be a single string or multiple strings in an array.
+They are added as a final value in .app, .get, .post, etc, or using the key `middlewares` if using the .add method
+~~~javascript
+const app		= Server();
+const router	= app.Router();
+
+router.define( 'test', ( event )=>{
+	Loggur.log( 'Middleware One!' );
+	event.next();
+} );
+
+app.define( 'test2', ( event )=>{
+	Loggur.log( 'Middleware Two!' );
+	event.next();
+} );
+
+app.get( '/', ( event )=>{
+	event.send( 'TEST' );
+}, ['test','test2'] );
+
+app.add({
+	method: 'GET',
+	route: '/test',
+	middlewares: 'test',
+	handler: ( event )=>{
+		Loggur.log( 'Test!' );
+		event.send( 'Test2' );
+	}
+});
+
+app.add( router );
+
+Server.start( 80, ()=>{
+	Loggur.log( 'Server started' );
+});
+~~~
+
 
 The server has 2 ways of adding routes/middleware
 
@@ -402,6 +443,30 @@ Plugins can be added by using **server.apply( pluginContainerInstance||'pluginId
 Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
 plugin all you have to do is do: server.apply( 'pluginId' )
 
+To enable IDE's smart autocomplete to work in your favor all the plugins
+available in the pluginManager are exported as values in the server:
+
+~~~
+Server {
+  ...
+  er_timeout: 'er_timeout',
+  er_env: 'er_env',
+  er_rate_limits: 'er_rate_limits',
+  er_static_resources: 'er_static_resources',
+  er_cache_server: 'er_cache_server',
+  er_templating_engine: 'er_templating_engine',
+  er_file_stream: 'er_file_stream',
+  er_logger: 'er_logger',
+  er_body_parser: 'er_body_parser',
+  er_session: 'er_session',
+  er_response_cache: 'er_response_cache',
+  er_body_parser_json: 'er_body_parser_json',
+  er_body_parser_form: 'er_body_parser_form',
+  er_body_parser_multipart: 'er_body_parser_multipart'
+}
+~~~
+- Generally all the integrated plug-ins begin with `er_`
+
 ~~~javascript
 const PluginManager	= server.getPluginManager();
 let timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
@@ -411,6 +476,8 @@ server.apply( timeoutPlugin );
 server.apply( timeoutPlugin, {  timeout : 10 * 1000 } );// This will accomplish the same thing as the rows above
 server.apply( 'er_timeout' ); // This is also valid.
 server.apply( 'er_timeout', {  timeout : 10 * 1000 } ); // This is also valid.
+server.apply( server.er_timeout ); // This is also valid.
+server.apply( server.er_timeout, {  timeout : 10 * 1000 } ); // This is also valid.
 ~~~
 
 ###PRE-INSTALLED PLUGINS
@@ -973,13 +1040,13 @@ server.apply( staticResourcesPlugin );
 ***
 
 ###er_templating_engine
-Adds a templating engine to the event request ( the templating engine is not included this just adds the functionality )
+Adds a templating engine to the event request ( the default templating engine is used just to render static HTML )
 If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
 
     * Accepted options: 
     * - engine - Object - Instance of a templating engine that has a method render defined that accepts
     *       html as first argument and object of variables as second -> Defaults to DefaultTemplatingEngine which can be used to serve static HTML
-    * - templateDir - String - Where to draw the templates from
+    * - templateDir - String - Where to draw the templates from -> Defaults to PROJECT_ROOT/public
 ***
 ~~~javascript
 const PluginManager			= server.getPluginManager();
