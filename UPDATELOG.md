@@ -1,6 +1,9 @@
 10.1.2
 - Added EventRequest tests
+- Added Server tests
 - Fixed getHeaderValue
+- Added Server.cleanUp()
+- Updated README.md
 
 10.1.1
 - Added Middleware tests

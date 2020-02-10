@@ -258,7 +258,7 @@ class Server extends EventEmitter
 			eventRequest.setBlock( block );
 			this.emit( 'eventRequestBlockSet', { eventRequest, block } );
 
-			let onErrorCallback	= ( error ) =>{
+			const onErrorCallback	= ( error ) =>{
 				this.emit( 'eventRequestError', { eventRequest, error } );
 
 				if ( eventRequest.logger === null )
@@ -292,6 +292,15 @@ let server	= null;
  */
 let App				= ()=>{
 	return server || ( server = new Server() );
+};
+
+/**
+ * @brief	Removes the server instance ( this does not stop the httpServer if it was started )
+ *
+ * @return	void
+ */
+App.cleanUp			= ()=>{
+	server	= null;
 };
 
 /**

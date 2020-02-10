@@ -167,12 +167,12 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
  *
  * @return	void
  */
-helpers.sendServerRequest	= ( data, path, method, callback )=>{
+helpers.sendServerRequest	= ( data, path, method, callback, port = 3333 )=>{
 	const postData = querystring.stringify( data );
 
 	const options = {
 		hostname	: 'localhost',
-		port		: 3333,
+		port		: port,
 		path		: path,
 		method		: method,
 		headers		: {

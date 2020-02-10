@@ -215,6 +215,23 @@ Server.start( '80', ()=>{
 });
 ~~~
 
+To clean up the server instance you can do:
+~~~javascript
+const { Server } = require( 'event_request' );
+const app = Server();
+
+Server.start( '80', ()=>{
+	Loggur.log( 'Server is running' );
+});
+
+Server().cleanUp();
+~~~
+NOTES: 
+- This will NOT stop the httpServer, just set the internal variable of server to null
+- You may need to do  `app = Server()` again since they app variable is still a pointer to the old server
+
+#
+
 If you want to start the server using your own http/https server:
 ~~~javascript
 const { Server } = require( 'event_request' );
