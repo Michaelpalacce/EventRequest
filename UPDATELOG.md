@@ -1,3 +1,7 @@
+10.1.2
+- Added EventRequest tests
+- Fixed getHeaderValue
+
 10.1.1
 - Added Middleware tests
 

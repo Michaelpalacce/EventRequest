@@ -276,7 +276,7 @@ class EventRequest extends EventEmitter
 	 */
 	getHeaderValue( key, defaultValue = null )
 	{
-		return ! this.hasHeader( key ) ? defaultValue : key;
+		return ! this.hasHeader( key ) ? defaultValue : this.headers[key];
 	}
 
 	/**

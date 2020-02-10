@@ -135,6 +135,14 @@ The event request is an object that is created by the server and passed through 
 
 ***
 
+**getHeaderValue( key, defaultValue )** - Retrieves a header ( if exists ). If it doesn't exist the defaultValue will be taken
+
+***
+
+**hasHeader( key )** - Checks if a header exists. Returns Boolean
+
+***
+
 **isFinished()** - returns a Boolean. Checks if the response is finished
 
 ***

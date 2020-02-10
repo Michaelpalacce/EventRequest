@@ -582,3 +582,101 @@ test({
 		done();
 	}
 });
+
+test({
+	message	: 'EventRequest.getHeaderValue should return header',
+	test	: ( done )=>{
+		const headerName	= 'test';
+		const headerValue	= 'TestHeader';
+
+		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
+
+		assert.equal( eventRequest.getHeaderValue( headerName ), headerValue );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.getHeaderValue should return default if header is not set',
+	test	: ( done )=>{
+		const headerName	= 'test';
+		const headerValue	= 'TestHeader';
+
+		const eventRequest	= helpers.getEventRequest();
+
+		assert.equal( eventRequest.getHeaderValue( headerName ), null );
+		assert.equal( eventRequest.getHeaderValue( headerName, headerValue ), headerValue );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.hasHeader returns false if header does not exist',
+	test	: ( done )=>{
+		const headerName	= 'test';
+
+		const eventRequest	= helpers.getEventRequest();
+
+		assert.equal( eventRequest.hasHeader( headerName ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.hasHeader returns true if header exists',
+	test	: ( done )=>{
+		const headerName	= 'test';
+		const headerValue	= 'TestHeader';
+
+		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
+
+		assert.equal( eventRequest.hasHeader( headerName ), true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.getHeaders returns all headers',
+	test	: ( done )=>{
+		const headers	= {
+			headerOne: 'valueOne',
+			headerTwo: 'valueTwo',
+			headerThree: 'valueThree'
+		};
+
+		const eventRequest	= helpers.getEventRequest( '', '/', headers );
+
+		assert.equal( eventRequest.getHeaders(), headers );
+
+		done();
+	}
+});
+
+
+test({
+	message	: 'EventRequest.next sends 404 if route does not exist',
+	test	: ( done )=>{
+
+		const eventRequest	= helpers.getEventRequest( '/', 'GET' );
+		let called			= false;
+
+		eventRequest._mock({
+			method: 'send',
+			shouldReturn: ( one, two )=> {
+				assert.deepStrictEqual( { error: 'Cannot / GET' }, one );
+				assert.equal( 404, two );
+				called	= true;
+			}
+		});
+
+		eventRequest.next();
+
+		assert.equal( called, true );
+
+		done();
+	}
+});

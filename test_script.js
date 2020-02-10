@@ -2,7 +2,7 @@
 
 const { runAllTests }	= require( './tests/test_helper' );
 const testSuites		= require( './tests/test_suites' );
-require( './tests/test_bootstrap' )
+require( './tests/test_bootstrap' );
 
 let startTests	= ()=>{
 	testSuites.eventSuite();
@@ -25,7 +25,4 @@ let startTests	= ()=>{
 	});
 };
 
-// start the tests after we make sure the caching server is started
-setTimeout(()=>{
-	startTests();
-}, 500 );
+startTests();
