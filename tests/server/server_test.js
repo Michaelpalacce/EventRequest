@@ -279,7 +279,7 @@ test({
 });
 
 test({
-	message	: 'Server().cleanUp() cleans up',
+	message	: 'Server.cleanUp() cleans up',
 	test	: ( done )=>{
 		let server		= App();
 
