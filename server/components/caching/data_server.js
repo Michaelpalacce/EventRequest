@@ -6,11 +6,11 @@ const fs	= require( 'fs' );
 /**
  * @var	Number
  */
-const DEFAULT_TTL						= 5 * 60;
 const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
 
 const DEFAULT_PERSIST_FILE				= path.join( PROJECT_ROOT, 'cache' );
 const DEFAULT_PERSIST_RULE				= true;
+const DEFAULT_TTL						= 5 * 60;
 const DEFAULT_PERSIST_INTERVAL			= 10 * 1000;
 const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60 * 1000;
 
@@ -66,6 +66,10 @@ class DataServer
 			{
 				this._loadData();
 				this._garbageCollect();
+			}
+			else
+			{
+				this._saveData();
 			}
 
 			setInterval(()=>{
@@ -277,8 +281,17 @@ class DataServer
 	 */
 	_loadData()
 	{
-		const buffer	= fs.readFileSync( this.persistPath );
-		this._loadServerData( JSON.parse( buffer.toString() ) );
+		let serverData	= {};
+		try
+		{
+			const buffer		= fs.readFileSync( this.persistPath );
+			serverData	= JSON.parse( buffer.toString() );
+		}
+		catch ( e )
+		{
+		}
+
+		this._loadServerData( serverData );
 	}
 
 	/**

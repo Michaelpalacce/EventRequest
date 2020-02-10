@@ -18,10 +18,7 @@ let startTests	= ()=>{
 		dieOnFirstError	: true,
 		debug			: true,
 		silent			: true,
-		filter			: '',
-		callback		: ( err )=>{
-			process.exit( 0 );
-		}
+		filter			: ''
 	});
 };
 

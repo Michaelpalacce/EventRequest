@@ -898,6 +898,7 @@ The 'runAllTests' function accepts an object that accepts the following options:
 ***
 
 The run all tests will run all tests added by the test function.
+If there is an err or an Error is thrown then the process with exit with code 1 otherwise it will exit with code 0
 
 The 'test' function accepts an object with the following options:
 

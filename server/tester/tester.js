@@ -74,7 +74,7 @@ class Tester
 		this.silent				= typeof options.silent === 'boolean' ? options.silent : false;
 		this.filter				= typeof options.filter === 'string' ? options.filter : false;
 		this.callback			= typeof options.callback === 'function' ? options.callback : ( err )=>{
-			process.exit( 0 );
+			process.exit( err ? 1 : 0 );
 		};
 		this.stop			= false;
 		this.index			= 0;

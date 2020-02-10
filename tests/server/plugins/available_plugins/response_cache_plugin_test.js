@@ -1,9 +1,9 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers, Mock, Mocker }	= require( '../../../test_helper' );
-const ResponseCachePlugin						= require( '../../../../server/plugins/available_plugins/response_cache_plugin' );
-const Router									= require( '../../../../server/components/routing/router' );
+const { assert, test, helpers }	= require( '../../../test_helper' );
+const ResponseCachePlugin		= require( '../../../../server/plugins/available_plugins/response_cache_plugin' );
+const Router					= require( '../../../../server/components/routing/router' );
 
 test({
 	message		: 'ResponseCachePlugin adds a cacheCurrentRequest method',

@@ -4,6 +4,12 @@
 - Fixed getHeaderValue
 - Added Server.cleanUp()
 - Updated README.md
+- Added Empty Test Folders for future tests
+- Started working on the DataServer tests
+- Added deploy script
+- Tester now exits with not a 1 in case of error
+- Tester now exits with 1 in case of error
+- DataServer will not die in case of invalid cache data
 
 10.1.1
 - Added Middleware tests
