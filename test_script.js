@@ -17,7 +17,7 @@ let startTests	= ()=>{
 	runAllTests({
 		dieOnFirstError	: true,
 		debug			: true,
-		silent			: false,
+		silent			: true,
 		filter			: '',
 		callback		: ( err )=>{
 			process.exit( 0 );

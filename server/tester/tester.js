@@ -118,7 +118,9 @@ class Tester
 		if ( Array.isArray( test.dataProvider ) )
 		{
 			let i	= 0;
-			test.dataProvider.forEach( ( data )=>{
+
+			for ( const data of test.dataProvider )
+			{
 				let newTest	= {};
 
 				newTest.message	= test.message + '#' + i;
@@ -133,7 +135,7 @@ class Tester
 				tests.push( newTest );
 
 				++ i;
-			});
+			}
 		}
 		else
 		{

@@ -37,7 +37,6 @@ test({
 			router.add({});
 		});
 
-
 		assert.deepStrictEqual( [defaultRoute], router.middleware );
 		done();
 	}
@@ -167,6 +166,152 @@ test({
 		let expectedExecutionBlockCount	= 4;
 
 		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.define adds a new global middleware',
+	test	: ( done )=>{
+		const middlewareName	= 'test';
+		const router			= new Router();
+		assert.deepStrictEqual( router.globalMiddlewares, {} );
+		assert.equal( Object.keys( router.globalMiddlewares ).length, 0 );
+
+		router.define( middlewareName, ( event )=>{} );
+		const globalMiddlewareKeys	= Object.keys( router.globalMiddlewares );
+
+		assert.equal( globalMiddlewareKeys.length, 1 );
+		assert.equal( globalMiddlewareKeys[0], middlewareName );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.define throws if trying to define a middleware with the same name',
+	test	: ( done )=>{
+		const middlewareName	= 'test';
+		const router			= new Router();
+
+		assert.doesNotThrow( ()=>{
+			router.define( middlewareName, ( event )=>{} );
+		});
+
+		assert.throws( ()=>{
+			router.define( middlewareName, ( event )=>{} );
+		});
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.define throws if middlewareName has invalid name',
+	test	: ( done )=>{
+		const router	= new Router();
+
+		assert.throws( ()=>{
+			router.define( 123, ( event )=>{} );
+		});
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.define throws if middleware is not a function',
+	test	: ( done )=>{
+		const router	= new Router();
+
+		assert.throws( ()=>{
+			router.define( 'test', 'bad' );
+		});
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.getExecutionBlockForCurrentEvent adds global middlewares',
+	test	: ( done )=>{
+		const eventRequest				= helpers.getEventRequest( 'GET', '/test', {} );
+		const expectedExecutionBlockCount	= 3;
+		const router						= new Router();
+		const routeWIthRouteTestAndGet	= new Route(
+			{
+				route: '/test',
+				method: 'GET',
+				handler: ()=>{},
+				middlewares: ['test', 'test2']
+			}
+		);
+
+		router.define( 'test', ()=>{} );
+		router.define( 'test2', ()=>{} );
+		router.add( routeWIthRouteTestAndGet );
+
+		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.getExecutionBlockForCurrentEvent fails if route has a non existing global middleware',
+	test	: ( done )=>{
+		let router						= new Router();
+		let eventRequest				= helpers.getEventRequest( 'GET', '/test', {} );
+
+		let routeWIthRouteTestAndGet	= new Route(
+			{
+				route: '/test',
+				method: 'GET',
+				handler: ()=>{},
+				middlewares: ['test', 'test2']
+			}
+		);
+
+		router.add( routeWIthRouteTestAndGet );
+
+		assert.throws( ()=>{
+			router.getExecutionBlockForCurrentEvent( eventRequest );
+		} );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add adds another router\'s GLOBAL middleware if passed',
+	test	: ( done )=>{
+		let routerOne	= new Router();
+		let routerTwo	= new Router();
+
+		routerOne.define( 'test1', ()=>{} );
+		routerTwo.define( 'test2', ()=>{} );
+
+		routerOne.add( routerTwo );
+
+		assert.equal( Object.keys( routerOne.globalMiddlewares ).length, 2 );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add doesn\'t add another router\'s GLOBAL middleware if it has duplicates',
+	test	: ( done )=>{
+		let routerOne	= new Router();
+		let routerTwo	= new Router();
+
+		routerOne.define( 'test', ()=>{} );
+		routerTwo.define( 'test', ()=>{} );
+
+		assert.throws(()=>{
+			routerOne.add( routerTwo );
+		});
 
 		done();
 	}

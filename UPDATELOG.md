@@ -1,3 +1,6 @@
+10.1.1
+- Added Middleware tests
+
 10.1.0
 - Added Route middlewares
 - Added all the plugins in the PluginManager to the server

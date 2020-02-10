@@ -10,15 +10,17 @@ const Route				= require( '../../../../server/components/routing/route' );
  * @param	Function handler
  * @param	mixed route
  * @param	mixed method
+ * @param	Array middlewares
  *
  * @return	Route
  */
-function getRoute( handler = ()=>{}, route, method )
+function getRoute( handler = ()=>{}, route = '', method = '', middlewares = [] )
 {
 	return new Route({
 		handler,
 		route,
-		method
+		method,
+		middlewares
 	});
 }
 
@@ -50,6 +52,7 @@ test({
 		assert.equal( typeof route.getHandler() === 'function', true );
 		assert.equal( route.getMethod() === '', true );
 		assert.equal( route.getRoute() === '', true );
+		assert.deepEqual( route.getMiddlewares(), [] );
 
 		done();
 	}
@@ -136,7 +139,7 @@ test({
 });
 
 test({
-	message			: 'Route|.matchRoute matches Regex',
+	message			: 'Route.matchRoute matches Regex',
 	dataProvider	: [
 		['', false, []],
 		['/', false, []],
@@ -191,6 +194,37 @@ test({
 
 		assert.deepEqual( route.matchPath( path, matchedParams ), matched );
 		assert.deepEqual( matchedParams, params );
+		done();
+	}
+});
+
+test({
+	message			: 'Route sets middlewares correctly',
+	dataProvider	: [
+		[ 'test', ['test'] ],
+		[ ['test'], ['test'] ],
+		[ ['test', 'test2'], ['test', 'test2'] ],
+		[ 123, [] ],
+		[ '123', ['123'] ],
+	],
+	test			: ( done, middleware, expectedStructure )=>{
+		const route	= getRoute( undefined, undefined, undefined, middleware );
+
+		assert.deepStrictEqual( route.getMiddlewares(), expectedStructure );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Route.getMiddlewares returns an array of middlewares',
+	test	: ( done )=>{
+		const middlewares	= ['test', 'test2'];
+		const route			= getRoute( undefined, undefined, undefined, middlewares );
+
+		assert.deepStrictEqual( route.getMiddlewares(), middlewares );
+		assert.equal( Array.isArray( route.getMiddlewares() ), true );
+
 		done();
 	}
 });
