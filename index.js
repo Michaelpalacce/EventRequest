@@ -11,7 +11,7 @@ const FileStream				= require( './server/components/file_streams/file_stream' );
 const { Loggur, LOG_LEVELS }	= Logging;
 
 // Holds tools for third party tools
-let Development		= {
+const Development	= {
 	PluginInterface, DataServer, FileStream, BodyParserHandler, Testing
 };
 

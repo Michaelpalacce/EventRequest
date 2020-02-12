@@ -10,9 +10,9 @@ const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
 
 const DEFAULT_PERSIST_FILE				= path.join( PROJECT_ROOT, 'cache' );
 const DEFAULT_PERSIST_RULE				= true;
-const DEFAULT_TTL						= 5 * 60;
-const DEFAULT_PERSIST_INTERVAL			= 10 * 1000;
-const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60 * 1000;
+const DEFAULT_TTL						= 300;
+const DEFAULT_PERSIST_INTERVAL			= 10;
+const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60;
 
 /**
  * @brief	A standard in memory data server
@@ -49,16 +49,21 @@ class DataServer
 								: DEFAULT_PERSIST_FILE;
 
 		this.persistInterval	= typeof options['persistInterval'] === 'number'
-								? options['persistInterval'] * 1000
+								? options['persistInterval']
 								: DEFAULT_PERSIST_INTERVAL;
+		this.persistInterval	= this.persistInterval * 1000;
 
-		const gcInterval		= typeof options['gcInterval'] === 'number'
-								? options['gcInterval'] * 1000
+		let gcInterval			= typeof options['gcInterval'] === 'number'
+								? options['gcInterval']
 								: DEFAULT_GARBAGE_COLLECT_INTERVAL;
+
+		gcInterval				= gcInterval * 1000;
 
 		const persist			= typeof options['persist'] === 'boolean'
 								? options['persist']
 								: DEFAULT_PERSIST_RULE;
+
+		this.intervals			= [];
 
 		if ( persist )
 		{
@@ -72,15 +77,34 @@ class DataServer
 				this._saveData();
 			}
 
-			setInterval(()=>{
+			const persistInterval	= setInterval(()=>{
 				this._garbageCollect();
 				this._saveData();
-			}, this.persistInterval )
+			}, this.persistInterval );
+
+
+			this.intervals.push( persistInterval );
 		}
 
-		setInterval(()=>{
+		const garbageCollectInterval	= setInterval(()=>{
 			this._garbageCollect();
 		}, gcInterval );
+
+		this.intervals.push( garbageCollectInterval );
+	}
+
+	/**
+	 * @brief	Flushes data from memory, deletes the Cache file and stops all the intervals
+	 */
+	stop()
+	{
+		for ( const interval of this.intervals )
+			clearInterval( interval );
+
+		if ( fs.existsSync( this.persistPath ) )
+			fs.unlinkSync( this.persistPath );
+
+		this.server	= {};
 	}
 
 	/**
@@ -92,6 +116,11 @@ class DataServer
 	 */
 	get( key )
 	{
+		if ( typeof key !== 'string' )
+		{
+			return null;
+		}
+
 		return this._get( key );
 	}
 
@@ -150,9 +179,9 @@ class DataServer
 	{
 		if (
 			typeof key !== 'string'
-			&& typeof value !== 'object'
-			&& typeof ttl !== 'number'
-			&& typeof persist !== 'boolean'
+			|| value == null
+			|| typeof ttl !== 'number'
+			|| typeof persist !== 'boolean'
 		) {
 			return null;
 		}
@@ -162,6 +191,8 @@ class DataServer
 
 	/**
 	 * @brief	Sets the data
+	 *
+	 * @details	Returns the data if it was correctly set, otherwise returns null
 	 *
 	 * @param	String key
 	 * @param	mixed value
@@ -229,6 +260,8 @@ class DataServer
 	/**
 	 * @brief	Returns how many keys there are
 	 *
+	 * @details	THIS IS USED FOR TESTING PURPOSES ONLY
+	 *
 	 * @return	Number
 	 */
 	length()
@@ -284,25 +317,13 @@ class DataServer
 		let serverData	= {};
 		try
 		{
-			const buffer		= fs.readFileSync( this.persistPath );
-			serverData	= JSON.parse( buffer.toString() );
+			const buffer	= fs.readFileSync( this.persistPath );
+			serverData		= JSON.parse( buffer.toString() );
 		}
 		catch ( e )
 		{
 		}
 
-		this._loadServerData( serverData );
-	}
-
-	/**
-	 * @brief	Loads a dumped data to the caching server
-	 *
-	 * @param	object serverData
-	 *
-	 * @return	void
-	 */
-	_loadServerData(serverData )
-	{
 		const currentServerData	= this.server;
 
 		this.server	= { ...currentServerData, ...serverData };

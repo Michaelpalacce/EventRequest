@@ -1,3 +1,10 @@
+10.2.0
+- Added DataServer tests
+- Added Caching documentation
+- Fixed the DataServer class by adding a few checks and implemented a stop() functionality
+- Fixed the DataServer class's intervals
+- Improved the MemoryDataPlugin and the way it is implemented to better facilitate specifying a DataServer as store
+
 10.1.2
 - Added EventRequest tests
 - Added Server tests

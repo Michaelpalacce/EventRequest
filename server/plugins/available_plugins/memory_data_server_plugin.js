@@ -11,32 +11,25 @@ class MemoryDataServerPlugin extends PluginInterface
 	constructor( pluginId, options = {} )
 	{
 		super( pluginId, options );
-		this.server	= new DataServer();
-	}
-
-	/**
-	 * @brief	Use the server given
-	 *
-	 * @param	DataServer server
-	 *
-	 * @return	void
-	 */
-	use( server )
-	{
-		if ( server instanceof DataServer )
-		{
-			this.server	= server;
-		}
 	}
 
 	/**
 	 * @brief	Returns the DataServer
 	 *
-	 * @returns	DataServer|false
+	 * @returns	DataServer
 	 */
 	getServer()
 	{
-		return this.server === null ? false : this.server;
+		if ( this.server )
+			return this.server;
+
+		this.dataServerOptions	= typeof options['dataServerOptions'] === 'object'
+								? options['dataServerOptions']
+								: {};
+
+		return this.server		= options['dataServer'] instanceof DataServer
+								? options['dataServer']
+								: new DataServer( this.dataServerOptions );
 	}
 
 	/**
@@ -48,7 +41,7 @@ class MemoryDataServerPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let pluginMiddleware	= {
+		const pluginMiddleware	= {
 			handler	: ( event )=>{
 				event.cachingServer	= this.getServer();
 

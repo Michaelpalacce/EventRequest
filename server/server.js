@@ -106,6 +106,7 @@ class Server extends EventEmitter
 	 * 			giving their plugin ids
 	 *
 	 * @param	PluginInterface|String plugin
+	 * @param	Object options
 	 *
 	 * @return	Server
 	 */

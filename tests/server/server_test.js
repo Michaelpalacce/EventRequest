@@ -311,7 +311,7 @@ test({
 	test	: ( done )=>{
 		const httpServer	= require( 'http' );
 		const body			= '<h1>Hello World!</h1>';
-		const port			= 3334;
+		const port			= 1234;
 		const app			= App();
 
 		app.get( '/testRoute', ( event ) => {
@@ -322,19 +322,20 @@ test({
 
 		server.listen( port );
 
-		helpers.sendServerRequest( '', '/testRoute', 'GET', ( err, response )=>{
-			if ( err )
-			{
-				done( err );
-			}
-			else
-			{
-				response.statusCode === 201 ? done() : done( 'Wrong status code returned' );
-			}
-		}, port );
+		server.on( 'listening', ()=>{
+			helpers.sendServerRequest( '', '/testRoute', 'GET', ( err, response )=>{
+				if ( err )
+				{
+					done( err );
+				}
+				else
+				{
+					server.close();
 
-		server.close();
+					response.statusCode === 201 ? done() : done( 'Wrong status code returned' );
+				}
+			}, port );
+		} );
 
-		done();
 	}
 });
