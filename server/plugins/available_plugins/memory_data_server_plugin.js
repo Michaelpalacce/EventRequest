@@ -23,12 +23,12 @@ class MemoryDataServerPlugin extends PluginInterface
 		if ( this.server )
 			return this.server;
 
-		this.dataServerOptions	= typeof options['dataServerOptions'] === 'object'
-								? options['dataServerOptions']
+		this.dataServerOptions	= typeof this.options['dataServerOptions'] === 'object'
+								? this.options['dataServerOptions']
 								: {};
 
-		return this.server		= options['dataServer'] instanceof DataServer
-								? options['dataServer']
+		return this.server		= this.options['dataServer'] instanceof DataServer
+								? this.options['dataServer']
 								: new DataServer( this.dataServerOptions );
 	}
 

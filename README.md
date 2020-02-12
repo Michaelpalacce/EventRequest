@@ -1177,7 +1177,7 @@ const { Server, Loggur }	= require( 'event_request' );
  */
 const server	= Server();
 
-server.apply( 'er_caching_server', { persist: false } );
+server.apply( 'er_cache_server', { persist: false } );
  
 // Add a new Route
 server.get( '/', ( event ) => {

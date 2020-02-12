@@ -41,5 +41,5 @@
     "test": "node ./test_script.js",
     "deploy": "npm run test && npm publish"
   },
-  "version": "10.2.0"
+  "version": "10.2.1"
 }
