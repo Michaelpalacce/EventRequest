@@ -46,6 +46,7 @@ Server.start( 80, ()=>{
 ### Properties exported by Development:
 	BodyParserHandler,	// Used mainly for defining your own custom Body Handlers
 	PluginInterface,	// Used to add plugins to the system
+	LeakyBucket,		// An implementation of the Leaky Bucket algorithm: https://en.wikipedia.org/wiki/Leaky_bucket
 	FileStream,			// Class that defines a file stream
 	DataServer,			// Instance to be extended to implement your own DataServer
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
@@ -789,6 +790,21 @@ In case where the parameters have NOT been passed, the default value will be use
 ***
 ***
 ***
+
+# LeakyBucket
+This class can be used to limit data in one way or another.
+The constructor accepts three parameters: `refillAmount = 100, refillTime = 60, maxAmount = 1000` where:
+ - Refill Amount is how many tokens to refill after the refillTime
+ - Refill Time is how often tokens should be renewed
+ - Max Amount is the max amount of tokens to be kept
+ 
+The class has the following functions:
+
+**reset()** - Resets the tokens to full
+**get()** - Returns the currently available tokens
+**reduce( tokens = 1 ): Boolean** - How many tokens should be taken. This function returns Boolean whether there were enough tokens to be reduced or not
+
+
 
 # Testing
 If you need to test your project, then you can use the Testing tools included in the project.

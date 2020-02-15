@@ -1,3 +1,12 @@
+10.3.0
+- Renamed some Bucket functions, Bucket has been exported as LeakyBucket
+- Added Error tests
+- Added Unique Id tests
+- Added LeakyBucket tests
+- Added Default Templating Engine tests
+- Fixed some other tests
+- The ErrorHandler now has a default code of 500
+
 10.2.1
 - Small Documentation fix
 - Fix of the caching plugin

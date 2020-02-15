@@ -201,7 +201,7 @@ class RateLimitsPlugin extends PluginInterface
 					{
 						let bucket	= buckets[path];
 
-						if ( bucket instanceof Bucket && bucket.isFull() )
+						if ( bucket instanceof Bucket && bucket._isFull() )
 						{
 							delete this.rules[i]['buckets'][path];
 						}
@@ -243,9 +243,9 @@ class RateLimitsPlugin extends PluginInterface
 			eventRequest.rateLimited	= undefined;
 		} );
 
-		let path							= eventRequest.path;
-		let method							= eventRequest.method;
-		let clientIp						= eventRequest.clientIp;
+		const path							= eventRequest.path;
+		const method						= eventRequest.method;
+		const clientIp						= eventRequest.clientIp;
 
 		let hasConnectionDelayPolicy		= false;
 		let connectionDelayPolicyOptions	= null;

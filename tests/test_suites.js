@@ -29,6 +29,22 @@ testSuites.cachingSuite		= ()=>{
 	require( './server/components/caching/data_server_test' );
 };
 
+testSuites.templatingEngine		= ()=>{
+	require( './server/components/templating_engine/default_templating_engine_test' );
+};
+
+testSuites.rateLimiterSuite		= ()=>{
+	require( './server/components/rate_limiter/bucket_test' );
+};
+
+testSuites.errorSuite		= ()=>{
+	require( './server/components/error/error_handler_test' );
+};
+
+testSuites.helpersSuite		= ()=>{
+	require( './server/components/helpers/unique_id_test' );
+};
+
 testSuites.bodyParserSuite	= ()=>{
 	require( './server/components/body_parsers/body_parser_handler_test' );
 	require( './server/components/body_parsers/body_parser_test' );

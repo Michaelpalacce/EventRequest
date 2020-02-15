@@ -14,7 +14,7 @@ class ErrorHandler
 	 */
 	formatError( error )
 	{
-		if ( typeof error === 'string' )
+		if ( error && typeof error !== 'object' )
 		{
 			error	= { 'error' : error };
 		}
@@ -35,7 +35,7 @@ class ErrorHandler
 	 *
 	 * @return	void
 	 */
-	handleError( event, error, code )
+	handleError( event, error, code = 500 )
 	{
 		let errorToSend	= error;
 		let errorToEmit	= error;

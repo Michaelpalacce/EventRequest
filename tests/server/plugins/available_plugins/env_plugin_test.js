@@ -1,14 +1,14 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers }	= require( '../../../test_helper' );
-const EnvPlugin							= require( '../../../../server/plugins/available_plugins/env_plugin' );
-const Server							= require( '../../../../server/server' );
-const path								= require( 'path' );
-const fs								= require( 'fs' );
+const { Mock, assert, test }	= require( '../../../test_helper' );
+const EnvPlugin					= require( '../../../../server/plugins/available_plugins/env_plugin' );
+const Server					= require( '../../../../server/server' );
+const path						= require( 'path' );
+const fs						= require( 'fs' );
 
 test({
-	message	: 'EnvPlugin setServerOnRuntime',
+	message	: 'EnvPlugin setServerOnRuntime and test file watcher',
 	test	: ( done )=>{
 		let MockServer		= Mock( Server.class );
 		let server			= new MockServer();

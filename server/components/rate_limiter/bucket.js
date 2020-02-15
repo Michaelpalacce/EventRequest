@@ -6,11 +6,15 @@
 class Bucket
 {
 	/**
+	 * @details	Refill Amount is how many tokens to refill after the refillTime
+	 * 			Refill Time is how often tokens should be renewed
+	 * 			Max Amount is the max amount of tokens to be kept
+	 *
 	 * @param	Number refillAmount
 	 * @param	Number refillTime
 	 * @param	Number maxAmount
 	 */
-	constructor( refillAmount, refillTime, maxAmount )
+	constructor( refillAmount = 100, refillTime = 60, maxAmount = 1000 )
 	{
 		this.refillAmount	= refillAmount;
 		this.refillTime		= refillTime;
@@ -30,7 +34,7 @@ class Bucket
 	reset()
 	{
 		this.value		= this.maxAmount;
-		this.lastUpdate	= Bucket.getCurrentTime();
+		this.lastUpdate	= this._getCurrentTime();
 	}
 
 	/**
@@ -40,29 +44,10 @@ class Bucket
 	 */
 	get()
 	{
-		return Math.min( this.maxAmount, this.value + this.refillAmount );
-	}
+		const refillCount	= this._refillCount();
+		this.value			+= refillCount * this.refillAmount;
 
-	/**
-	 * @brief	How much should be refilled given the last update
-	 *
-	 * @return	Number
-	 */
-	refillCount()
-	{
-		return Math.round( ( Bucket.getCurrentTime() - this.lastUpdate ) / this.refillTime );
-	}
-
-	/**
-	 * @brief	Checks if the bucket has all tokens available
-	 *
-	 * @return	Boolean
-	 */
-	isFull()
-	{
-		this.reduce( 0 );
-
-		return this.value	=== this.maxAmount;
+		return this.value = Math.min( this.maxAmount, this.value );
 	}
 
 	/**
@@ -76,15 +61,10 @@ class Bucket
 	 */
 	reduce( tokens = 1 )
 	{
-		const refillCount	= this.refillCount();
-		this.value			+= refillCount * this.refillAmount;
-		this.lastUpdate		+= refillCount * this.refillTime;
-		
-		if ( this.value >= this.maxAmount )
-		{
-			this.reset();
-		}
+		this.get();
 
+		this.lastUpdate	+= this._refillCount() * this.refillTime;
+		
 		if ( tokens > this.value )
 		{
 			return false;
@@ -96,11 +76,33 @@ class Bucket
 	}
 
 	/**
+	 * @brief	How much should be refilled given the last update
+	 *
+	 * @return	Number
+	 */
+	_refillCount()
+	{
+		return Math.round( ( this._getCurrentTime() - this.lastUpdate ) / this.refillTime );
+	}
+
+	/**
+	 * @brief	Checks if the bucket has all tokens available
+	 *
+	 * @return	Boolean
+	 */
+	_isFull()
+	{
+		this.reduce( 0 );
+
+		return this.value	=== this.maxAmount;
+	}
+
+	/**
 	 * @brief	Gets the current timestamp in seconds
 	 *
 	 * @return	Number
 	 */
-	static getCurrentTime()
+	_getCurrentTime()
 	{
 		return Math.floor( Date.now() / 1000 );
 	}
