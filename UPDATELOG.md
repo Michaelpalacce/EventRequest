@@ -1,3 +1,6 @@
+10.3.2
+- Added the Chat App as an example Project
+
 10.3.1
 - Added Travis Build Image
 

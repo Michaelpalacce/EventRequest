@@ -6,8 +6,10 @@ A highly customizable backend server in NodeJs
 # GitHub
 https://github.com/Michaelpalacce/EventRequest
 
-# Example Project:
-https://github.com/Michaelpalacce/Server
+# Example Projects:
+https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc. As well as stream videos directly from your browser
+
+https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
 
 # Installation
 ~~~bash
