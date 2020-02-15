@@ -1,3 +1,9 @@
+10.3.3
+- Removed console.log
+
+10.3.3
+- Fix that will prevent the session to be saved if it was not initialized
+
 10.3.2
 - Added the Chat App as an example Project
 

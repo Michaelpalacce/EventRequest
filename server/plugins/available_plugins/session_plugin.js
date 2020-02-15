@@ -56,7 +56,10 @@ class SessionPlugin extends PluginInterface
 					} );
 
 					event.on( 'send', ()=>{
-						event.session.saveSession();
+						if ( Object.keys( event.session.session ).length !== 0 )
+						{
+							event.session.saveSession();
+						}
 					} );
 				}
 

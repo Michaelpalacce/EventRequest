@@ -59,7 +59,7 @@ test({
 });
 
 test({
-	message	: 'SessionPlugin saves session on send',
+	message	: 'SessionPlugin does not save session on send if not inited',
 	test	: ( done )=>{
 		let eventRequest			= helpers.getEventRequest();
 		eventRequest.cachingServer	= helpers.getCachingServer();
@@ -84,6 +84,47 @@ test({
 			handler	: ( event )=>{
 				eventRequest.session	= session;
 				event.send( 'Test' );
+			}
+		});
+
+		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest.next();
+
+		assert.equal( false, called );
+
+		done();
+	}
+});
+
+test({
+	message	: 'SessionPlugin saves session on send',
+	test	: ( done )=>{
+		let eventRequest			= helpers.getEventRequest();
+		eventRequest.cachingServer	= helpers.getCachingServer();
+		let sessionPlugin			= new SessionPlugin( 'id' );
+		let MockSession				= Mock( Session );
+		let session					= new MockSession( eventRequest );
+		let router					= new Router();
+		let called					= false;
+
+		let pluginMiddlewares		= sessionPlugin.getPluginMiddleware();
+
+		session._mock({
+			method			: 'saveSession',
+			shouldReturn	: ()=>{
+				called	= true;
+			},
+			called			: 1
+		});
+
+		router.add( pluginMiddlewares[0] );
+		router.add( pluginMiddlewares[1] );
+		router.add({
+			handler	: ( event )=>{
+				event.session	= session;
+				event.initSession( ()=>{
+					event.send( 'test' );
+				} );
 			}
 		});
 
