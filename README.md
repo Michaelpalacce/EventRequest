@@ -3,8 +3,6 @@ A highly customizable backend server in NodeJs
 
 [![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest)
 
-[![Coverage Status](https://coveralls.io/repos/github/Michaelpalacce/EventRequest/badge.svg?branch=master)](https://coveralls.io/github/Michaelpalacce/EventRequest?branch=master)
-
 # GitHub
 https://github.com/Michaelpalacce/EventRequest
 
