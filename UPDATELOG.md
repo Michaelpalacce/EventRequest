@@ -1,3 +1,6 @@
+10.3.1
+- Added Travis Build Image
+
 10.3.0
 - Renamed some Bucket functions, Bucket has been exported as LeakyBucket
 - Added Error tests

@@ -1,8 +1,7 @@
 # EventRequest
 A highly customizable backend server in NodeJs
 
-# BREAKING RELEASE
-v10 is a major BREAKING release
+[![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest)
 
 # GitHub
 https://github.com/Michaelpalacce/EventRequest
