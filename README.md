@@ -13,9 +13,7 @@ https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combi
 
 # Installation
 ~~~bash
-npm i event_request --save -g
-
-event_request install ./NewProject
+npm i event_request --save
 ~~~
 
 

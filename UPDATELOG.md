@@ -1,3 +1,6 @@
+10.3.5
+- Removed the generator from the README as it does not work currently.
+
 10.3.3
 - Removed console.log
 
