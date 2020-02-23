@@ -375,6 +375,31 @@ test({
 });
 
 test({
+	message	: 'DataServer.delete removes key and returns true but returns false if it does not exist or not string',
+	test	: ( done )=>{
+		removeCache();
+
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( ()=>{
+			const dataServer	= new DataServer();
+			const key			= 'key';
+			const value			= { test: 'value' };
+
+			dataServer.set( key, value );
+
+			assert.equal( dataServer.delete( 123 ), false );
+			assert.equal( dataServer.delete( key ), true );
+			assert.equal( dataServer.delete( key ), false );
+
+			dataServer.stop();
+
+			removeCache( dataServer );
+			done();
+		}, 50 );
+	}
+});
+
+test({
 	message			: 'DataServer.set does not set if invalid data',
 	dataProvider	: [
 		[null, 'value', 100, true],

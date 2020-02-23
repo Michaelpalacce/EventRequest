@@ -1044,6 +1044,7 @@ integrated with other plugins.
       - If ttl is > 0 then the value will be used
       - persist is a flag that will override the global persist value. You can set a key to not be persisted. 
                 However if the global persist is set to false, this will not work
+      - Calls _set() after checking the arguments if they are valid
                
                 
 - **_set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Object|null** 
@@ -1059,11 +1060,24 @@ integrated with other plugins.
 - **touch( String key, Number ttl = 0 ): Boolean**
 
       - Retruns a Boolean whether the data was successfully touched
-      - If ttl = 0 then the dataSet will be updated with it's own ttl
+      - Retruns a false if key is not String or ttl is not Number
+      - Calls _touch after checkinf if arguments are valid
+      
+- **_touch( String key, Number ttl = 0 ): Boolean**
 
-- **delete( String key ): void**
+      - Implement for development. No need to do checks of the values of the parameter as that is done in the touch() function
+      - Retruns a Boolean whether the data was successfully touched
+      - If ttl = 0 then the dataSet will be updated with it's own ttl
+      - This function actually touches the data
+
+- **delete( String key ): Boolean**
 
       - Deletes the given data
+
+- **_delete( String key ): Boolean**
+
+      - Implement for development. No need to do checks of the values of the parameter as that is done in the delete() function
+      - This function deletes the actual data
       
 - **_garbageCollect(): void**
 

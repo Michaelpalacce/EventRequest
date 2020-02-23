@@ -1,3 +1,8 @@
+10.4.0
+- DataServer delete now checks if key is string and calls a _delete method. Also returns Boolean
+- DataServer touch now checks if key is string and ttl is a number and calls a _touch method. Also returns Boolean
+- Updated README.md accordingly
+
 10.3.5
 - Removed the generator from the README as it does not work currently.
 

@@ -19,6 +19,7 @@ const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60;
  *
  * @details	This acts as a data store. This should not be used in production! This should be extended for your own needs.
  * 			Could be implemented with Memcached or another similar Data Store Server.
+ * 			All operations are internally done asynchronous 
  */
 class DataServer
 {
@@ -225,12 +226,32 @@ class DataServer
 	/**
 	 * @brief	Touches the given key
 	 *
+	 * @details	Checks if the arguments are correct
+	 *
 	 * @param	String key
 	 * @param	Number ttl
 	 *
 	 * @return	Boolean
 	 */
 	touch( key, ttl = 0 )
+	{
+		if ( typeof key !== 'string' || typeof ttl !== 'number' )
+		{
+			return false;
+		}
+
+		return this._touch( key, ttl );
+	}
+
+	/**
+	 * @brief	Touches the key
+	 *
+	 * @param	String key
+	 * @param	Number ttl
+	 *
+	 * @return	Boolean
+	 */
+	_touch( key, ttl = 0 )
 	{
 		const dataSet	= this.get( key );
 
@@ -245,16 +266,42 @@ class DataServer
 	}
 
 	/**
-	 * @brief	Completely removes the key from the cache
+	 * @brief	Completely removes the key from the server
+	 *
+	 * @details	Returns true on success and false on failure. If the key does not exist, false will be returned
 	 *
 	 * @param	String key
 	 *
-	 * @return	void
+	 * @return	Boolean
 	 */
 	delete( key )
 	{
+		if ( typeof key === 'string' )
+		{
+			return this._delete( key );
+		}
+
+		return false;
+	}
+
+	/**
+	 * @brief	Deletes the key from the server
+	 *
+	 * @param	String key
+	 *
+	 * @return	Boolean
+	 */
+	_delete( key )
+	{
+		if ( typeof this.server[key] === 'undefined' )
+		{
+			return false;
+		}
+
 		this.server[key]	= undefined;
 		delete this.server[key];
+
+		return true;
 	}
 
 	/**
