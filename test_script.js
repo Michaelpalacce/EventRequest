@@ -5,6 +5,7 @@ const testSuites		= require( './tests/test_suites' );
 require( './tests/test_bootstrap' );
 
 let startTests	= ()=>{
+	testSuites.securitySuite();
 	testSuites.templatingEngine();
 	testSuites.rateLimiterSuite();
 	testSuites.helpersSuite();
@@ -12,7 +13,6 @@ let startTests	= ()=>{
 	testSuites.eventSuite();
 	testSuites.routingSuite();
 	testSuites.cachingSuite();
-	testSuites.securitySuite();
 	testSuites.loggingSuite();
 	testSuites.bodyParserSuite();
 	testSuites.validationSuite();

@@ -1,3 +1,10 @@
+10.5.0
+- The DataServer now does operations async.
+- The ResponseCache.cacheCurrentRequest is now async
+- The SessionPlugin.initSession is now async
+- Most Session functions are now async
+- The Logger now has the LOG_LEVELS attached to it
+
 10.4.0
 - DataServer delete now checks if key is string and calls a _delete method. Also returns Boolean
 - DataServer touch now checks if key is string and ttl is a number and calls a _touch method. Also returns Boolean

@@ -40,6 +40,10 @@ class SessionPlugin extends PluginInterface
 	/**
 	 * @brief	Adds a session to the event request
 	 *
+	 * @details	Even tho the cleanUp will remove the event.session
+	 * 			the event.session.saveSession() in the send
+	 * 			has already queued up the session save so it will still execute
+	 *
 	 * @return	Array
 	 */
 	getPluginMiddleware()
@@ -55,10 +59,10 @@ class SessionPlugin extends PluginInterface
 						event.session	= undefined;
 					} );
 
-					event.on( 'send', ()=>{
+					event.on( 'send', async ()=>{
 						if ( Object.keys( event.session.session ).length !== 0 )
 						{
-							event.session.saveSession();
+							await event.session.saveSession();
 						}
 					} );
 				}
@@ -69,16 +73,16 @@ class SessionPlugin extends PluginInterface
 
 		let initSessionForPathMiddleware	= {
 			handler	: ( event )=>{
-				event.initSession	= ( callback )=>{
-					const hasSession	= event.session.hasSession();
+				event.initSession	= async ( callback )=>{
+					const hasSession	= await event.session.hasSession();
 
 					if ( ! hasSession )
 					{
-						callback( event.session.newSession() === false );
+						callback( await event.session.newSession() === false );
 					}
 					else
 					{
-						callback( event.session.fetchSession() === false );
+						callback( await event.session.fetchSession() === false );
 					}
 				};
 

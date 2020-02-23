@@ -47,7 +47,7 @@ class ResponseCachePlugin extends PluginInterface
 	 */
 	attachCachingEvent( event )
 	{
-		event.on( 'send', ( responseData )=>{
+		event.on( 'send', async ( responseData )=>{
 			let { response, code, headers }	= responseData;
 
 			if ( typeof response === 'string' )
@@ -55,7 +55,7 @@ class ResponseCachePlugin extends PluginInterface
 				let ttl				= this.getTimeToLive( event );
 				let recordName		= this.getCacheId( event );
 
-				this.cachingServer.set( recordName, { response, code, headers }, ttl, false );
+				await this.cachingServer.set( recordName, { response, code, headers }, ttl, false );
 			}
 		} );
 	}
@@ -117,11 +117,11 @@ class ResponseCachePlugin extends PluginInterface
 					event.cacheCurrentRequest	= undefined;
 				} );
 
-				event.cacheCurrentRequest	= ( options = {} )=>{
+				event.cacheCurrentRequest	= async ( options = {} )=>{
 					event.currentResponseCacheConfig	= options;
 					let cacheId							= this.getCacheId( event );
 
-					const cachedDataSet					= this.cachingServer.get( cacheId );
+					const cachedDataSet					= await this.cachingServer.get( cacheId );
 
 					if ( cachedDataSet === null )
 					{
@@ -131,11 +131,11 @@ class ResponseCachePlugin extends PluginInterface
 					else
 					{
 						let ttl			= this.getTimeToLive( event );
-						const status	= this.cachingServer.touch( cachedDataSet.key, ttl );
+						const status	= await this.cachingServer.touch( cachedDataSet.key, ttl );
 
 						if ( ! status )
 						{
-							this.cachingServer.set( cachedDataSet.key, cachedDataSet.value, cachedDataSet.ttl );
+							await this.cachingServer.set( cachedDataSet.key, cachedDataSet.value, cachedDataSet.ttl );
 						}
 
 						let { response, code, headers }	= cachedDataSet.value;

@@ -16,6 +16,7 @@ class Loggur
 	constructor()
 	{
 		this.loggers				= {};
+		this.LOG_LEVELS				= LOG_LEVELS;
 		this.defaultLogger			= null;
 		this.enableDefaultLogger	= true;
 		let uniqueId				= cluster.isMaster

@@ -1,7 +1,8 @@
 'use strict';
 
-const path	= require( 'path' );
-const fs	= require( 'fs' );
+const path			= require( 'path' );
+const fs			= require( 'fs' );
+const { Loggur }	= require( '../logger/loggur' );
 
 /**
  * @var	Number
@@ -19,7 +20,7 @@ const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60;
  *
  * @details	This acts as a data store. This should not be used in production! This should be extended for your own needs.
  * 			Could be implemented with Memcached or another similar Data Store Server.
- * 			All operations are internally done asynchronous 
+ * 			All operations are internally done asynchronous
  */
 class DataServer
 {
@@ -115,14 +116,24 @@ class DataServer
 	 *
 	 * @return	Object|null
 	 */
-	get( key )
+	async get( key )
 	{
 		if ( typeof key !== 'string' )
 		{
 			return null;
 		}
 
-		return this._get( key );
+		return this._get( key ).catch( this._handleServerDown ) || null;
+	}
+
+	/**
+	 * @brief	Any operations with the data server should reject if the data server is not responding
+	 *
+	 * @return	mixed
+	 */
+	_handleServerDown()
+	{
+		Loggur.log( 'The data server is not responding', Loggur.LOG_LEVELS.error )
 	}
 
 	/**
@@ -130,9 +141,9 @@ class DataServer
 	 *
 	 * @param	String key
 	 *
-	 * @return	Object|null
+	 * @return	Promise
 	 */
-	_get( key )
+	async _get( key )
 	{
 		return this._prune( key );
 	}
@@ -142,28 +153,30 @@ class DataServer
 	 *
 	 * @param	string key
 	 *
-	 * @return	Object|null
+	 * @return	Promise
 	 */
-	_prune( key )
+	async _prune( key )
 	{
-		const now		= new Date().getTime() / 1000;
-		const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate !== 'undefined'
-						? this.server[key]
-						: null;
+		return new Promise( async ( resolve )=>{
+			const now		= new Date().getTime() / 1000;
+			const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate !== 'undefined'
+							? this.server[key]
+							: null;
 
-		if ( dataSet !== null && this.server[key].expirationDate === null )
-		{
-			this.server[key].expirationDate	= Infinity;
-		}
+			if ( dataSet !== null && this.server[key].expirationDate === null )
+			{
+				this.server[key].expirationDate	= Infinity;
+			}
 
-		if ( dataSet === null || now > dataSet.expirationDate )
-		{
-			this.delete( key );
+			if ( dataSet === null || now > dataSet.expirationDate )
+			{
+				await this.delete( key );
 
-			return null;
-		}
+				return resolve( null );
+			}
 
-		return dataSet;
+			return resolve( dataSet );
+		});
 	}
 
 	/**
@@ -176,7 +189,7 @@ class DataServer
 	 *
 	 * @return	Object
 	 */
-	set( key, value, ttl = 0, persist = true )
+	async set( key, value, ttl = 0, persist = true )
 	{
 		if (
 			typeof key !== 'string'
@@ -187,25 +200,27 @@ class DataServer
 			return null;
 		}
 
-		return this._set( key, value, ttl, persist )
+		return this._set( key, value, ttl, persist ).catch( this._handleServerDown );
 	}
 
 	/**
 	 * @brief	Sets the data
 	 *
-	 * @details	Returns the data if it was correctly set, otherwise returns null
+	 * @details	Resolves the data if it was correctly set, otherwise resolves to null
 	 *
 	 * @param	String key
 	 * @param	mixed value
 	 * @param	Number ttl
 	 * @param	Boolean persist
 	 *
-	 * @return	Object
+	 * @return	Promise
 	 */
-	_set( key, value, ttl, persist )
+	async _set( key, value, ttl, persist )
 	{
-		const dataSet			= this._makeDataSet( key, value, ttl, persist );
-		return this.server[key]	= dataSet;
+		return new Promise(( resolve )=>{
+			const dataSet	= this._makeDataSet( key, value, ttl, persist );
+			resolve( this.server[key] = dataSet );
+		})
 	}
 
 	/**
@@ -231,16 +246,16 @@ class DataServer
 	 * @param	String key
 	 * @param	Number ttl
 	 *
-	 * @return	Boolean
+	 * @return	Promise
 	 */
-	touch( key, ttl = 0 )
+	async touch( key, ttl = 0 )
 	{
 		if ( typeof key !== 'string' || typeof ttl !== 'number' )
 		{
 			return false;
 		}
 
-		return this._touch( key, ttl );
+		return this._touch( key, ttl ).catch( this._handleServerDown );
 	}
 
 	/**
@@ -249,20 +264,22 @@ class DataServer
 	 * @param	String key
 	 * @param	Number ttl
 	 *
-	 * @return	Boolean
+	 * @return	Promise
 	 */
-	_touch( key, ttl = 0 )
+	async _touch( key, ttl = 0 )
 	{
-		const dataSet	= this.get( key );
+		return new Promise( async ( resolve )=>{
+			const dataSet	= await this.get( key );
 
-		if ( dataSet === null )
-		{
-			return false;
-		}
+			if ( dataSet === null )
+			{
+				return resolve( false );
+			}
 
-		ttl						= ttl === 0 ? dataSet.ttl : ttl;
-		dataSet.expirationDate	= this._getExpirationDateFromTtl( ttl );
-		return true;
+			ttl						= ttl === 0 ? dataSet.ttl : ttl;
+			dataSet.expirationDate	= this._getExpirationDateFromTtl( ttl );
+			resolve( true );
+		});
 	}
 
 	/**
@@ -274,11 +291,11 @@ class DataServer
 	 *
 	 * @return	Boolean
 	 */
-	delete( key )
+	async delete( key )
 	{
 		if ( typeof key === 'string' )
 		{
-			return this._delete( key );
+			return this._delete( key ).catch( this._handleServerDown );
 		}
 
 		return false;
@@ -289,19 +306,21 @@ class DataServer
 	 *
 	 * @param	String key
 	 *
-	 * @return	Boolean
+	 * @return	Promise
 	 */
 	_delete( key )
 	{
-		if ( typeof this.server[key] === 'undefined' )
-		{
-			return false;
-		}
+		return new Promise(( resolve )=>{
+			if ( typeof this.server[key] === 'undefined' )
+			{
+				return resolve( false );
+			}
 
-		this.server[key]	= undefined;
-		delete this.server[key];
+			this.server[key]	= undefined;
+			delete this.server[key];
 
-		return true;
+			resolve( true );
+		})
 	}
 
 	/**
@@ -325,7 +344,7 @@ class DataServer
 	{
 		for ( let key in this.server )
 		{
-			this._prune( key );
+			this._prune( key ).catch( this._handleServerDown );
 		}
 	}
 

@@ -60,14 +60,14 @@ class Session
 	 *
 	 * @return	Boolean
 	 */
-	hasSession()
+	async hasSession()
 	{
 		if ( this.sessionId === null )
 		{
 			return false;
 		}
 
-		return this.server.get( this.sessionId ) !== null
+		return await this.server.get( this.sessionId ) !== null
 	}
 
 	/**
@@ -77,9 +77,9 @@ class Session
 	 *
 	 * @return	void
 	 */
-	removeSession( sessionId = this.getSessionId() )
+	async removeSession( sessionId = this.getSessionId() )
 	{
-		this.server.delete( sessionId );
+		await this.server.delete( sessionId );
 	}
 
 	/**
@@ -87,14 +87,14 @@ class Session
 	 *
 	 * @return	String|Boolean
 	 */
-	newSession()
+	async newSession()
 	{
 		let sessionId	= this.makeNewSessionId();
 		this.session	= {
 			id	: sessionId
 		};
 
-		if ( ! this.saveSession( sessionId ) )
+		if ( ! await this.saveSession( sessionId ) )
 		{
 			return false;
 		}
@@ -170,16 +170,14 @@ class Session
 	 *
 	 * @return	Boolean
 	 */
-	saveSession( sessionId = this.getSessionId() )
+	async saveSession( sessionId = this.getSessionId() )
 	{
 		if ( sessionId === null )
 		{
 			return false;
 		}
 
-		this.server.set( sessionId, this.session, this.ttl );
-
-		return true;
+		return await this.server.set( sessionId, this.session, this.ttl ) !== null;
 	}
 
 	/**
@@ -189,16 +187,16 @@ class Session
 	 *
 	 * @return	Boolean
 	 */
-	fetchSession()
+	async fetchSession()
 	{
 		let sessionId	= this.getSessionId();
 
-		if ( ! this.server.touch( sessionId ) )
+		if ( ! await this.server.touch( sessionId ) )
 		{
 			return false;
 		}
 
-		const dataSet	= this.server.get( sessionId );
+		const dataSet	= await this.server.get( sessionId );
 		this.session	= dataSet.value;
 
 		return true;

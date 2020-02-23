@@ -114,16 +114,16 @@ test({
 		eventRequest.cachingServer	= helpers.getCachingServer();
 		let session					= null;
 
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow( async ()=>{
 			session	= new Session( eventRequest );
-			session.hasSession() ? done( 'There is a sesion but there shouldn\'t be one' ) : done();
+			await session.hasSession() ? done( 'There is a sesion but there shouldn\'t be one' ) : done();
 		});
 	}
 });
 
 test({
 	message	: 'Session hasSession, newSession and removeSession when there is a session',
-	test	: ( done )=>{
+	test	: async ( done )=>{
 		let sessionId				= 'sessionId';
 		let eventRequest			= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
 		eventRequest.cachingServer	= helpers.getCachingServer();
@@ -138,11 +138,11 @@ test({
 			called			: 1
 		});
 
-		let hasSession	= session.hasSession();
+		let hasSession	= await session.hasSession();
 
 		if ( ! hasSession )
 		{
-			const sessionId	= session.newSession();
+			const sessionId	= await session.newSession();
 
 			if ( sessionId === false )
 			{
@@ -152,10 +152,10 @@ test({
 			{
 				if ( setCookie === true )
 				{
-					hasSession	= session.hasSession();
+					hasSession	= await session.hasSession();
 					if ( hasSession === true )
 					{
-						session.removeSession();
+						await session.removeSession();
 
 						done();
 					}
@@ -200,26 +200,26 @@ test({
 
 test({
 	message	: 'Session fetchSession if session does not exist',
-	test	: ( done )=>{
+	test	: async ( done )=>{
 		let sessionId				= 'sessionId2';
 		let eventRequest			= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
 		eventRequest.cachingServer	= helpers.getCachingServer();
 		let session					= new Session( eventRequest );
 
-		session.fetchSession() === false ? done() : done( 'There should be no session to fetch' );
+		await session.fetchSession() === false ? done() : done( 'There should be no session to fetch' );
 	}
 });
 
 test({
 	message	: 'Session fetchSession if session exists',
-	test	: ( done )=>{
+	test	: async ( done )=>{
 		let sessionId				= 'sessionId2';
 		let eventRequest			= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
 		eventRequest.cachingServer	= helpers.getCachingServer();
 		let session					= new Session( eventRequest );
 
-		session.saveSession();
-		session.fetchSession() !== false ? done() : done( 'There should be a session to fetch' );
+		await session.saveSession();
+		await session.fetchSession() !== false ? done() : done( 'There should be a session to fetch' );
 	}
 });
 

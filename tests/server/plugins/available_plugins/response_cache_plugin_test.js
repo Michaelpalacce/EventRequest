@@ -42,7 +42,7 @@ test({
 		let pluginMiddlewares				= responseCachePlugin.getPluginMiddleware();
 
 		eventRequest2.on( 'cachedResponse', ()=>{
-			cached	= true;
+			done();
 		} );
 
 		assert.equal( 1, pluginMiddlewares.length );
@@ -67,12 +67,12 @@ test({
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
-		eventRequest2.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest2 ) );
-		eventRequest2.next();
+
 
 		setTimeout(()=>{
-			cached === false ? done( 'Response was not cached but it should have been' ) : done();
-		}, 250 );
+			eventRequest2.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest2 ) );
+			eventRequest2.next();
+		}, 10 );
 	}
 });
 

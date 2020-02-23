@@ -1016,25 +1016,25 @@ integrated with other plugins.
 
       - This will stop the connection of the DataServer. ( Delete all the files, flush memory and stop gc and persistence )
      
-- **get( String key ): Object|null** 
+- **get( String key ): Promise: Object|null** 
 
       - Retrieves the value given a key. Returns null if the key does not exist.
       - This function is a 'public' method to be used by users.
       - In the case that you want to implement your own DataServer, you should override **_get( String key )**
       
-- **_get( String key ): Object|null** 
+- **_get( String key ): Promise: Object|null** 
 
       - This method is the protected method that should be implemented in case extension of the DataServer should be done
       - This method currently calls this._prune( key ) directly
       - No need to check if key is a String, that has been done in the _get method already.
       
-- **_prune( String key ): Object|null** 
+- **_prune( String key ): Promise: Object|null** 
 
       - Removes the DataSet if it is expired, otherwise returns it. Returns null if the data is removed.
       - This method also sets the expiration of the DataSet to Infinity if it is null.
                             
                             
-- **set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Object|null** 
+- **set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Promise: Object|null** 
 
       - Returns the data if it was set, otherwise returns null
       - Sets the given key with the given value. 
@@ -1047,7 +1047,7 @@ integrated with other plugins.
       - Calls _set() after checking the arguments if they are valid
                
                 
-- **_set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Object|null** 
+- **_set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Promise: Object|null** 
 
       - Implement for development. No need to do checks of the values of the parameter as that is done in the set() function
       - This function commits the key/value to memory with all it's attributes
@@ -1057,24 +1057,24 @@ integrated with other plugins.
 
       - Forms the dataSet object and returns it in the following format: `{ key, value, ttl, expirationDate, persist };`
       
-- **touch( String key, Number ttl = 0 ): Boolean**
+- **touch( String key, Number ttl = 0 ): Promise: Boolean**
 
       - Retruns a Boolean whether the data was successfully touched
       - Retruns a false if key is not String or ttl is not Number
       - Calls _touch after checkinf if arguments are valid
       
-- **_touch( String key, Number ttl = 0 ): Boolean**
+- **_touch( String key, Number ttl = 0 ): Promise: Boolean**
 
       - Implement for development. No need to do checks of the values of the parameter as that is done in the touch() function
       - Retruns a Boolean whether the data was successfully touched
       - If ttl = 0 then the dataSet will be updated with it's own ttl
       - This function actually touches the data
 
-- **delete( String key ): Boolean**
+- **delete( String key ): Promise: Boolean**
 
       - Deletes the given data
 
-- **_delete( String key ): Boolean**
+- **_delete( String key ): Promise: Boolean**
 
       - Implement for development. No need to do checks of the values of the parameter as that is done in the delete() function
       - This function deletes the actual data
@@ -1097,14 +1097,11 @@ integrated with other plugins.
 
       - Gets the the correct ttl according to the rules described in **set()**
 
-**Mainly used for development purposes:**
+**Used for development purposes:**
 - **length(): Number**
 
       - Returns how many keys there are
 
-                            
-                         
-                         
 
 ***
 ***
@@ -1352,11 +1349,11 @@ server.add({
 // OR  You can create your own middleware that will be added to all requests
 // you want to cache, no need to do it separately
 server.add({
-	handler	: ( event )=>{
+	handler	: async ( event )=>{
 		let pathsToCache    = ['/', '/sth', 'test'];
 		if ( pathsToCache.indexOf( event.path ) !== -1 )
         {
-            event.cacheCurrentRequest();
+            await event.cacheCurrentRequest();
         }
 		
 		// Or use the router to match RegExp
@@ -1366,7 +1363,6 @@ server.add({
 // When setting a request to be cached, ttl and useIp may be passed that will overwrite the default options
 server.add({
 	handler	: ( event )=>{
-		let pathsToCache    = ['/', '/sth', 'test'];
         event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } );
 	}
 });

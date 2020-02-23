@@ -176,8 +176,9 @@ test({
 test({
 	message	: 'DataServer.get gets data',
 	test	: ( done )=>{
+		removeCache();
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( async ()=>{
 			const dataServer	= new DataServer();
 			const key			= 'key';
 			const value			= 'value';
@@ -188,12 +189,11 @@ test({
 			assert.equal( dataServer.intervals.length, 2 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			dataServer.set( key, value, ttl, persist );
+			await dataServer.set( key, value, ttl, persist );
 
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 
-			const dataSet	= dataServer.get( key );
-
+			const dataSet	= await dataServer.get( key );
 			assert.equal( dataSet.ttl, expected[key].ttl );
 			assert.equal( dataSet.persist, expected[key].persist );
 			assert.equal( dataSet.key, key );
@@ -210,7 +210,7 @@ test({
 	message	: 'DataServer.get prunes',
 	test	: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( async ()=>{
 			const dataServer	= new DataServer();
 			const key			= 'key';
 			const value			= 'value';
@@ -220,12 +220,12 @@ test({
 			assert.equal( dataServer.intervals.length, 2 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			dataServer.set( key, value, ttl, persist );
+			await dataServer.set( key, value, ttl, persist );
 
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 
-			setTimeout(()=>{
-				const dataSet	= dataServer.get( key );
+			setTimeout( async ()=>{
+				const dataSet	= await dataServer.get( key );
 
 				assert.equal( dataSet, null );
 
@@ -240,7 +240,7 @@ test({
 	message	: 'DataServer.touch updates expirationDate',
 	test	: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( async ()=>{
 			const dataServer	= new DataServer();
 			const key			= 'key';
 			const value			= 'value';
@@ -250,14 +250,14 @@ test({
 			assert.equal( dataServer.intervals.length, 2 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			dataServer.set( key, value, ttl, persist );
+			await dataServer.set( key, value, ttl, persist );
 
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 			const { expirationDate }	= dataServer.server[key];
 
-			setTimeout(()=>{
-				dataServer.touch( key );
-				const dataSet	= dataServer.get( key );
+			setTimeout( async ()=>{
+				await dataServer.touch( key );
+				const dataSet	= await dataServer.get( key );
 
 				assert.equal( typeof dataSet === 'object', true );
 				const currentExpirationDate	= dataSet.expirationDate;
@@ -266,7 +266,7 @@ test({
 
 				removeCache( dataServer );
 				done();
-			}, 10 );
+			}, 100 );
 		}, 50 );
 	}
 });
@@ -295,15 +295,15 @@ test({
 		removeCache();
 
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( async ()=>{
 			const key	= 'key';
 			const dataServer	= new DataServer( { gcInterval: 1, ttl: 1 } );
-			dataServer.set( key, 'value' );
+			await dataServer.set( key, 'value' );
 
-			assert.notEqual( dataServer.get( key ), null );
+			assert.notEqual( await dataServer.get( key ), null );
 
-			setTimeout(()=>{
-				assert.equal( dataServer.get( key ), null );
+			setTimeout( async ()=>{
+				assert.equal( await dataServer.get( key ), null );
 
 				removeCache( dataServer );
 				done();
@@ -380,16 +380,16 @@ test({
 		removeCache();
 
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( async ()=>{
 			const dataServer	= new DataServer();
 			const key			= 'key';
 			const value			= { test: 'value' };
 
-			dataServer.set( key, value );
+			await dataServer.set( key, value );
 
-			assert.equal( dataServer.delete( 123 ), false );
-			assert.equal( dataServer.delete( key ), true );
-			assert.equal( dataServer.delete( key ), false );
+			assert.equal( await dataServer.delete( 123 ), false );
+			assert.equal( await dataServer.delete( key ), true );
+			assert.equal( await dataServer.delete( key ), false );
 
 			dataServer.stop();
 
@@ -412,13 +412,13 @@ test({
 	],
 	test			: ( done, key, value, ttl, persist )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( async ()=>{
 			const dataServer	= new DataServer();
 
 			assert.equal( dataServer.intervals.length, 2 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			assert.equal( dataServer.set( key, value, ttl, persist ), null );
+			assert.equal( await dataServer.set( key, value, ttl, persist ), null );
 
 			removeCache( dataServer );
 			done();

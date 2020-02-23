@@ -123,17 +123,15 @@ test({
 			handler	: ( event )=>{
 				event.session	= session;
 				event.initSession( ()=>{
-					event.send( 'test' );
+					assert.equal( true, called );
+
+					done();
 				} );
 			}
 		});
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
-
-		assert.equal( true, called );
-
-		done();
 	}
 });
 
