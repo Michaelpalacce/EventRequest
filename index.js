@@ -1,7 +1,6 @@
 'use strict';
 
 // Dependencies
-const BodyParserHandler			= require( './server/components/body_parsers/body_parser_handler' );
 const PluginInterface			= require( './server/plugins/plugin_interface' );
 const Logging					= require( './server/components/logger/loggur' );
 const DataServer				= require( './server/components/caching/data_server' );
@@ -13,7 +12,7 @@ const { Loggur, LOG_LEVELS }	= Logging;
 
 // Holds tools for third party tools
 const Development	= {
-	PluginInterface, DataServer, FileStream, BodyParserHandler, Testing, LeakyBucket
+	PluginInterface, DataServer, FileStream, Testing, LeakyBucket
 };
 
 module.exports		= {

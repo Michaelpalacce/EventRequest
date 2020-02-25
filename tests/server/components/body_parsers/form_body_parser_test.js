@@ -1,7 +1,7 @@
 'use strict';
 
 const { assert, test, helpers }	= require( '../../../test_helper' );
-const { FormBodyParser }		= require( '../../../../server/components/body_parsers/body_parser_handler' );
+const FormBodyParser			= require( '../../../../server/components/body_parsers/form_body_parser' );
 
 test({
 	message	: 'FormBodyParser.constructor on defaults does not die',
@@ -91,11 +91,10 @@ test({
 		});
 		let formBodyParser	= new FormBodyParser( { strict: false } );
 
-		formBodyParser.parse( eventRequest, ( err, body )=>{
-			assert.equal( err, false );
+		formBodyParser.parse( eventRequest ).then(( body )=>{
 			assert.deepStrictEqual( body, expectedBody );
 			done();
-		} );
+		}).catch( done );
 	}
 });
 
@@ -126,10 +125,12 @@ test({
 		});
 		let formBodyParser	= new FormBodyParser( { strict: false, maxPayloadLength : 1 } );
 
-		formBodyParser.parse( eventRequest, ( err, body )=>{
+		formBodyParser.parse( eventRequest ).then(()=>{
+			done( 'Should have rejected' )
+		}).catch(( err )=>{
 			assert.equal( err !== false, true );
 			done();
-		} );
+		});
 	}
 });
 
@@ -146,9 +147,11 @@ test({
 		);
 		let formBodyParser	= new FormBodyParser();
 
-		formBodyParser.parse( eventRequest, ( err, body )=>{
+		formBodyParser.parse( eventRequest ).then(()=>{
+			done( 'Should have rejected' )
+		}).catch(( err )=>{
 			assert.equal( err !== false, true );
 			done();
-		} );
+		});
 	}
 });

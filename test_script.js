@@ -21,7 +21,7 @@ let startTests	= ()=>{
 	runAllTests({
 		dieOnFirstError	: true,
 		debug			: true,
-		silent			: true,
+		silent			: false,
 		filter			: ''
 	});
 };

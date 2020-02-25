@@ -12,33 +12,14 @@ const LoggerPlugin												= require( './available_plugins/logger_plugin' );
 const BodyParserPlugin											= require( './available_plugins/body_parser_plugin' );
 const ResponseCachePlugin										= require( './available_plugins/response_cache_plugin' );
 const SessionPlugin												= require( './available_plugins/session_plugin' );
-const { MultipartFormParser, JsonBodyParser, FormBodyParser }	= require( './../components/body_parsers/body_parser_handler' );
+const JsonBodyParser											= require( './../components/body_parsers/json_body_parser' );
+const MultipartDataParser										= require( './../components/body_parsers/multipart_data_parser' );
+const FormBodyParser											= require( './../components/body_parsers/form_body_parser' );
 
 /**
  * @brief	Constants
  */
 let PluginManager				= new PluginManagerClass();
-
-let bodyParserJsonPlugin		= new BodyParserPlugin(
-	'er_body_parser_json',
-	{
-		parsers	: [{ instance : JsonBodyParser }]
-	}
-);
-
-let bodyParserFormPlugin		= new BodyParserPlugin(
-	'er_body_parser_form',
-	{
-		parsers	: [{ instance : FormBodyParser }]
-	}
-);
-
-let bodyParserMultipartPlugin	= new BodyParserPlugin(
-	'er_body_parser_multipart',
-	{
-		parsers	: [{ instance : MultipartFormParser }]
-	}
-);
 
 PluginManager.addPlugin( new TimeoutPlugin( 'er_timeout' ) );
 PluginManager.addPlugin( new EnvPlugin( 'er_env' ) );
@@ -48,11 +29,10 @@ PluginManager.addPlugin( new MemoryDataServerPlugin( 'er_cache_server' ) );
 PluginManager.addPlugin( new TemplatingEnginePlugin( 'er_templating_engine' ) );
 PluginManager.addPlugin( new FileStreamHandlerPlugin( 'er_file_stream' ) );
 PluginManager.addPlugin( new LoggerPlugin( 'er_logger' ) );
-PluginManager.addPlugin( new BodyParserPlugin( 'er_body_parser' ));
-PluginManager.addPlugin( new SessionPlugin( 'er_session' ));
-PluginManager.addPlugin( new ResponseCachePlugin( 'er_response_cache' ));
-PluginManager.addPlugin( bodyParserJsonPlugin );
-PluginManager.addPlugin( bodyParserFormPlugin );
-PluginManager.addPlugin( bodyParserMultipartPlugin );
+PluginManager.addPlugin( new SessionPlugin( 'er_session' ) );
+PluginManager.addPlugin( new ResponseCachePlugin( 'er_response_cache' )) ;
+PluginManager.addPlugin( new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' ) );
+PluginManager.addPlugin( new BodyParserPlugin( FormBodyParser, 'er_body_parser_form' ) );
+PluginManager.addPlugin( new BodyParserPlugin( MultipartDataParser, 'er_body_parser_multipart' ) );
 
 module.exports	= PluginManager;

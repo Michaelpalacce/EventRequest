@@ -28,14 +28,14 @@ const RANDOM_NAME_LENGTH						= 128;
 const DATA_TYPE_FILE							= 'file';
 const DATA_TYPE_PARAMETER						= 'parameter';
 
-let STATE_START									= 0;
-let STATE_START_BOUNDARY						= 1;
-let STATE_HEADER_FIELD_START					= 2;
-let STATE_HEADERS_DONE							= 3;
-let STATE_PART_DATA_START						= 4;
-let STATE_PART_DATA								= 5;
-let STATE_CLOSE_BOUNDARY						= 6;
-let STATE_END									= 7;
+const STATE_START								= 0;
+const STATE_START_BOUNDARY						= 1;
+const STATE_HEADER_FIELD_START					= 2;
+const STATE_HEADERS_DONE						= 3;
+const STATE_PART_DATA_START						= 4;
+const STATE_PART_DATA							= 5;
+const STATE_CLOSE_BOUNDARY						= 6;
+const STATE_END									= 7;
 
 const ERROR_INVALID_STATE						= 101;
 const ERROR_INCORRECT_END_OF_STREAM				= 102;
@@ -48,7 +48,7 @@ const ERROR_RESOURCE_TAKEN						= 106;
  *
  * @TODO	Figure out how to get the offset of the buffer value without regex
  */
-class MultipartFormParser extends BodyParser
+class MultipartDataParser extends BodyParser
 {
 	/**
 	 * @param	BodyParser bodyParser
@@ -74,7 +74,6 @@ class MultipartFormParser extends BodyParser
 		this.ended			= false;
 
 		this.event			= null;
-		this.callback		= null;
 		this.headerData		= null;
 		this.boundary		= null;
 
@@ -94,7 +93,6 @@ class MultipartFormParser extends BodyParser
 		this.ended			= false;
 
 		this.event			= null;
-		this.callback		= null;
 		this.headerData		= null;
 		this.boundary		= null;
 	}
@@ -565,33 +563,43 @@ class MultipartFormParser extends BodyParser
 	}
 
 	/**
-	 * @brief	Parse the payload
-	 *
-	 * @param	Object headers
-	 * @param	Buffer rawPayload
-	 * @param	Function callback
-	 *
-	 * @return	void
+	 * @see	BodyParser::parse()
 	 */
-	parse( event, callback )
+	parse( event )
 	{
-		this.event		= event;
-		this.callback	= callback;
+		return new Promise(( resolve, reject ) => {
+			this.event		= event;
 
-		this.integrityCheck( ( err, headerData ) =>{
-			if ( ! err && headerData )
-			{
-				this.headerData	= headerData;
-				this.boundary	= DEFAULT_BOUNDARY_PREFIX + this.headerData.boundary;
+			this.integrityCheck( ( err, headerData ) =>{
+				if ( ! err && headerData )
+				{
+					this.headerData	= headerData;
+					this.boundary	= DEFAULT_BOUNDARY_PREFIX + this.headerData.boundary;
 
-				this.attachEvents();
-				this.absorbStream();
-			}
-			else
-			{
-				this.callback( err );
-				this.terminate();
-			}
+					this.on( 'onError', ( err )=>{
+						this.parsingError	= true;
+						reject( err );
+					});
+
+					this.on( 'end', ()=>{
+						this.ended	= true;
+						this.stripDataFromParts();
+						this.separateParts();
+						resolve( this.parts );
+					});
+
+					this.event.on( 'cleanUp', () => {
+						this.terminate();
+					});
+
+					this.absorbStream();
+				}
+				else
+				{
+					this.callback( err );
+					this.terminate();
+				}
+			});
 		});
 	}
 
@@ -607,7 +615,7 @@ class MultipartFormParser extends BodyParser
 	integrityCheck( callback )
 	{
 		let headerData;
-		if ( ! ( headerData = MultipartFormParser.getHeaderData( this.event.headers ) ) )
+		if ( ! ( headerData = MultipartDataParser.getHeaderData( this.event.headers ) ) )
 		{
 			callback( 'Could not retrieve the header data' );
 			return;
@@ -629,21 +637,7 @@ class MultipartFormParser extends BodyParser
 	 */
 	attachEvents()
 	{
-		this.on( 'onError', ( err )=>{
-			this.parsingError	= true;
-			this.callback( err );
-		});
 
-		this.on( 'end', ()=>{
-			this.ended	= true;
-			this.stripDataFromParts();
-			this.separateParts();
-			this.callback( false, this.parts );
-		});
-
-		this.event.on( 'cleanUp', () => {
-			this.terminate();
-		});
 	}
 
 	/**
@@ -756,4 +750,4 @@ class MultipartFormParser extends BodyParser
 }
 
 // Export the module
-module.exports	= MultipartFormParser;
+module.exports	= MultipartDataParser;

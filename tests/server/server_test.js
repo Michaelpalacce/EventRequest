@@ -12,9 +12,9 @@ test({
 	message	: 'Server.constructor starts without crashing with defaults',
 	test	: ( done )=>{
 		assert.doesNotThrow( ()=>{
-			let server	= new Server();
+			const server	= new Server();
 
-			assert.equal( 3, server.router.middleware.length );
+			assert.equal( 1, server.router.middleware.length );
 		});
 		done();
 	}
@@ -26,8 +26,9 @@ test({
 	test	: ( done )=>{
 		let server	= new Server();
 		assert.equal( true, server.router instanceof Router );
-		assert.equal( 3, server.router.middleware.length );
-		assert.equal( 4, Object.keys( server.plugins ).length );
+		assert.equal( 1, server.router.middleware.length );
+		assert.equal( 2, Object.keys( server.plugins ).length );
+		assert.equal( typeof server.pluginBag === 'object', true );
 		assert.deepStrictEqual( server.pluginManager, PreloadedPluginManager );
 
 		assert.equal( typeof server.er_timeout === 'string', true );
@@ -38,7 +39,6 @@ test({
 		assert.equal( typeof server.er_templating_engine === 'string', true );
 		assert.equal( typeof server.er_file_stream === 'string', true );
 		assert.equal( typeof server.er_logger === 'string', true );
-		assert.equal( typeof server.er_body_parser === 'string', true );
 		assert.equal( typeof server.er_session === 'string', true );
 		assert.equal( typeof server.er_response_cache === 'string', true );
 		assert.equal( typeof server.er_body_parser_json === 'string', true );
@@ -106,8 +106,8 @@ test({
 			method	: 'GET'
 		});
 
-		// 5 added 3 preloaded
-		assert.equal( 8, server.router.middleware.length );
+		// 5 added 1 pre loaded
+		assert.equal( 6, server.router.middleware.length );
 
 		done();
 	}
@@ -132,8 +132,8 @@ test({
 			server.apply( {} );
 		});
 
-		// 2 added 3 pre loaded
-		assert.equal( 5, server.router.middleware.length );
+		// 2 added 1 pre loaded
+		assert.equal( 3, server.router.middleware.length );
 
 		done();
 	}
@@ -156,7 +156,7 @@ test({
 		let router	= server.router;
 		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 3, block.length );
+		assert.equal( 1, block.length );
 
 		done();
 	}
@@ -179,7 +179,7 @@ test({
 		let router	= server.router;
 		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 3, block.length );
+		assert.equal( 1, block.length );
 
 		done();
 	}
@@ -202,7 +202,7 @@ test({
 		let router	= server.router;
 		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 3, block.length );
+		assert.equal( 1, block.length );
 
 		done();
 	}
@@ -225,7 +225,7 @@ test({
 		let router	= server.router;
 		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 3, block.length );
+		assert.equal( 1, block.length );
 
 		done();
 	}

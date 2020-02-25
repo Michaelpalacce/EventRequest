@@ -25,6 +25,7 @@ class Server extends EventEmitter
 
 		this.plugins		= [];
 		this.pluginManager	= PluginManager;
+		this.pluginBag		= {};
 		this.router			= this.Router();
 
 		this.setUpDefaultPlugins();
@@ -54,8 +55,6 @@ class Server extends EventEmitter
 
 		let pluginsToApply	= [
 			{ plugin : 'er_static_resources', options: ['favicon.ico'] },
-			{ plugin : 'er_body_parser_json' },
-			{ plugin : 'er_body_parser_form' },
 		];
 
 		pluginsToApply.forEach(( pluginConfig )=>{
@@ -71,7 +70,6 @@ class Server extends EventEmitter
 		this.er_templating_engine		= 'er_templating_engine';
 		this.er_file_stream				= 'er_file_stream';
 		this.er_logger					= 'er_logger';
-		this.er_body_parser				= 'er_body_parser';
 		this.er_session					= 'er_session';
 		this.er_response_cache			= 'er_response_cache';
 		this.er_body_parser_json		= 'er_body_parser_json';

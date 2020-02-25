@@ -1,21 +1,12 @@
 'use strict';
 
 const { assert, test, helpers }	= require( '../../../test_helper' );
-const { BodyParser }			= require( '../../../../server/components/body_parsers/body_parser_handler' );
+const BodyParser				= require( '../../../../server/components/body_parsers/body_parser' );
 
 test({
 	message	: 'BodyParser.constructor on defaults does not die',
 	test	: ( done )=>{
 		new BodyParser();
-
-		done();
-	}
-});
-
-test({
-	message	: 'BodyParser.getInstance returns the same as constructor',
-	test	: ( done )=>{
-		assert.deepStrictEqual( new BodyParser(), BodyParser.getInstance() );
 
 		done();
 	}
@@ -33,10 +24,9 @@ test({
 test({
 	message	: 'BodyParser.parse callbacks error: Not implemented',
 	test	: ( done )=>{
-		new BodyParser().parse( helpers.getEventRequest(), ( err )=>{
+		new BodyParser().parse( helpers.getEventRequest() ).then( done ).catch(( err )=>{
 			assert.equal( err, 'Not implemented' );
-		} );
-
-		done();
+			done();
+		});
 	}
 });

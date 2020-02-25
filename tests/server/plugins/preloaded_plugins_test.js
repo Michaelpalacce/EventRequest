@@ -17,7 +17,6 @@ test({
 			PreLoadedPluginManager.getPlugin( 'er_templating_engine' );
 			PreLoadedPluginManager.getPlugin( 'er_file_stream' );
 			PreLoadedPluginManager.getPlugin( 'er_logger' );
-			PreLoadedPluginManager.getPlugin( 'er_body_parser' );
 			PreLoadedPluginManager.getPlugin( 'er_body_parser_json' );
 			PreLoadedPluginManager.getPlugin( 'er_body_parser_form' );
 			PreLoadedPluginManager.getPlugin( 'er_body_parser_multipart' );

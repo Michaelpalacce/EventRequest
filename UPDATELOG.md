@@ -1,3 +1,11 @@
+11.0.0
+- Added a pluginBag to the server where plugins may persist data
+- Reworked the BodyParsers to use Promises
+- The Body parser plugins are now more or less connected by using only a single BodyParserHandler and only one of them adds a middleware
+- Removed default json and form body parsers
+- Removed the BodyParserHandler suite entirely 
+- Refactored the Body Parser plugin to work with only one specific parser
+
 10.5.0
 - The DataServer now does operations async.
 - The ResponseCache.cacheCurrentRequest is now async

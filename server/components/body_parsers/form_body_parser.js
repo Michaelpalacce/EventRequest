@@ -28,7 +28,7 @@ class FormBodyParser extends BodyParser
 		// Defaults to 10 MB
 		this.maxPayloadLength	= typeof options.maxPayloadLength === 'number'
 								? options.maxPayloadLength
-								: 10 * 1048576;
+								: 10485760;
 
 		this.strict				= typeof options.strict === 'boolean'
 								? options.strict
@@ -43,8 +43,8 @@ class FormBodyParser extends BodyParser
 	 */
 	supports( event )
 	{
-		let contentType	= event.headers[CONTENT_TYPE_HEADER];
-		return typeof contentType === 'string' && contentType.match( FORM_PARSER_SUPPORTED_TYPE ) !== null
+		const contentType	= event.getHeaderValue( CONTENT_TYPE_HEADER );
+		return typeof contentType === 'string' && contentType.match( FORM_PARSER_SUPPORTED_TYPE ) !== null;
 	}
 
 	/**
@@ -101,46 +101,44 @@ class FormBodyParser extends BodyParser
 	}
 
 	/**
-	 * @brief	Parser the form body if possible and returns an object
-	 *
-	 * @param	Buffer rawPayload
-	 * @param	Function callback
-	 *
-	 * @return	void
+	 * @see	BodyParser::parse()
 	 */
-	parse( event, callback )
+	parse( event )
 	{
-		if ( ! this.supports( event ) )
-		{
-			callback( 'Body type not supported' );
-			return;
-		}
-
-		event.request.on( 'data', ( data ) =>
-		{
-			if ( ! event.isFinished() )
+		return new Promise(( resolve, reject ) => {
+			if ( ! this.supports( event ) )
 			{
-				this.rawPayload.push( data );
-				this.payloadLength	+= data.length;
+				reject( 'Body type not supported' );
+				return;
 			}
-		});
 
-		event.request.on( 'end', () => {
-			if ( ! event.isFinished() )
+			event.request.on( 'data', ( data ) =>
 			{
-				this.rawPayload	= Buffer.concat( this.rawPayload, this.payloadLength );
-				this.onEndCallback( this.rawPayload, event.headers, ( err, body )=>{
-					if ( ! err )
-					{
-						callback( false, body );
-					}
-					else
-					{
-						callback( 'Could not parse the body' );
-					}
-				});
-			}
-		});
+				if ( ! event.isFinished() )
+				{
+					this.rawPayload.push( data );
+					this.payloadLength	+= data.length;
+				}
+			});
+
+			event.request.on( 'end', () => {
+				if ( ! event.isFinished() )
+				{
+					const rawPayload	= Buffer.concat( this.rawPayload, this.payloadLength );
+					this.onEndCallback( rawPayload, event.headers, ( err, body )=>{
+						if ( ! err )
+						{
+							event.body	= body;
+							resolve( body );
+						}
+						else
+						{
+							reject( 'Could not parse the body' );
+						}
+					});
+				}
+			});
+		})
 	}
 }
 

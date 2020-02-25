@@ -19,16 +19,6 @@ class BodyParser extends EventEmitter
 	}
 
 	/**
-	 * @brief	Gets an instance of the body parser
-	 *
-	 * @return	BodyParser
-	 */
-	static getInstance( options = {} )
-	{
-		return new this( options );
-	}
-
-	/**
 	 * @brief	Returns a boolean whether this parser supports the given event
 	 *
 	 * @param	EventRequest event
@@ -43,14 +33,15 @@ class BodyParser extends EventEmitter
 	/**
 	 * @brief	Parses the given event body
 	 *
-	 * @param	RequesEvent event
-	 * @param	Function callback
+	 * @param	EventRequest event
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	parse( event, callback )
+	parse( event )
 	{
-		callback( 'Not implemented' );
+		return new Promise(( resolve, reject ) =>{
+			reject( 'Not implemented' );
+		});
 	}
 }
 

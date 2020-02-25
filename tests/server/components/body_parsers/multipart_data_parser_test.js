@@ -1,7 +1,7 @@
 'use strict';
 
 const { Mock, Mocker, assert, test, helpers }	= require( '../../../test_helper' );
-const { MultipartFormParser }					= require( '../../../../server/components/body_parsers/body_parser_handler' );
+const MultipartDataParser						= require( '../../../../server/components/body_parsers/multipart_data_parser' );
 const os										= require( 'os' );
 const fs										= require( 'fs' );
 const path										= require( 'path' );
@@ -9,25 +9,25 @@ const path										= require( 'path' );
 let platformSpecificMultipartData				= process.platform === 'win32' ? 'multipart_data_windows' : 'multipart_data';
 let multipartData								= fs.readFileSync( path.join( __dirname, `./fixture/${platformSpecificMultipartData}` ) );
 
-let MockMultipartFormParser						= Mocker( Mock( MultipartFormParser ), {
+let MockMultipartDataParser						= Mocker( Mock( MultipartDataParser ), {
 	method	: 'setUpTempDir'
 } );
 
 test({
-	message	: 'MultipartFormParser.constructor does not throw on defaults',
+	message	: 'MultipartDataParser.constructor does not throw on defaults',
 	test	: ( done )=>{
-		new MockMultipartFormParser();
+		new MockMultipartDataParser();
 
 		done();
 	}
 });
 
 test({
-	message	: 'MultipartFormParser.constructor on correct arguments',
+	message	: 'MultipartDataParser.constructor on correct arguments',
 	test	: ( done )=>{
 		let tempDir			= '/test';
 		let maxPayload		= 100;
-		let multipartParser	= new MockMultipartFormParser({
+		let multipartParser	= new MockMultipartDataParser({
 			tempDir,
 			maxPayload
 		});
@@ -40,11 +40,11 @@ test({
 });
 
 test({
-	message	: 'MultipartFormParser.constructor on incorrect arguments',
+	message	: 'MultipartDataParser.constructor on incorrect arguments',
 	test	: ( done )=>{
 		let tempDir			= [];
 		let maxPayload		= [];
-		let multipartParser	= new MockMultipartFormParser({
+		let multipartParser	= new MockMultipartDataParser({
 			tempDir,
 			maxPayload
 		});
@@ -57,11 +57,11 @@ test({
 });
 
 test({
-	message	: 'MultipartFormParser.terminate terminates the parser',
+	message	: 'MultipartDataParser.terminate terminates the parser',
 	test	: ( done )=>{
 		let tempDir			= '/test';
 		let maxPayload		= 10;
-		let multipartParser	= new MockMultipartFormParser({
+		let multipartParser	= new MockMultipartDataParser({
 			tempDir,
 			maxPayload
 		});
@@ -90,10 +90,10 @@ test({
 });
 
 test({
-	message		: 'MultipartFormParser.parse parses multipart data',
+	message		: 'MultipartDataParser.parse parses multipart data',
 	test		: ( done )=>{
 		let tempDir			= path.join( __dirname, './fixture/testUploads');
-		let multipartParser	= new MockMultipartFormParser( { tempDir } );
+		let multipartParser	= new MockMultipartDataParser( { tempDir } );
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
 			undefined,
@@ -121,10 +121,10 @@ test({
 			}
 		});
 
-		multipartParser.parse( eventRequest, ( err, body )=>{
+		multipartParser.parse( eventRequest ).then(( body )=>{
+
 			// Sync delay
 			setTimeout(()=>{
-				assert.equal( err, false );
 				assert.equal( fs.readFileSync( body.files[0].path ).toString(), 'Content of a.txt.' + os.EOL );
 				assert.equal( body.files[0].name, 'a.txt' );
 				assert.equal( body.files[0].contentType, 'text/plain' );
@@ -135,6 +135,7 @@ test({
 				multipartParser.terminate();
 				done();
 			}, 1000 );
-		});
+
+		}).catch( done );
 	}
 });

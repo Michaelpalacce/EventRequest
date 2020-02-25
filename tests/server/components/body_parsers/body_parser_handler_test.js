@@ -1,111 +1,90 @@
 'use strict';
 
 const { Mock, Mocker, assert, test, helpers }	= require( '../../../test_helper' );
-const {
-	BodyParserHandler,
-	BodyParser,
-	MultipartFormParser,
-	JsonBodyParser,
-	FormBodyParser
-}												= require( '../../../../server/components/body_parsers/body_parser_handler' );
-
-test({
-	message	: 'BodyParserHandler.constructor on defaults throws because EventRequest is invalid',
-	test	: ( done )=>{
-		assert.throws(()=>{
-			new BodyParserHandler();
-		});
-
-		done();
-	}
-});
+const BodyParserHandler							= require( '../../../../server/components/body_parsers/body_parser_handler' );
+const BodyParser								= require( '../../../../server/components/body_parsers/body_parser' );
+const MultipartDataParser						= require( '../../../../server/components/body_parsers/multipart_data_parser' );
 
 test({
 	message	: 'BodyParserHandler.constructor does not throw with valid arguments',
 	test	: ( done )=>{
 		assert.doesNotThrow(()=>{
-			new BodyParserHandler( helpers.getEventRequest() );
+			new BodyParserHandler();
 		});
 		done();
 	}
 });
 
 test({
-	message	: 'BodyParserHandler.constructor sets default parsers if they are not set',
+	message	: 'BodyParserHandler.addParser does not throw with valid parser',
 	test	: ( done )=>{
-		let bodyParserHandler	= new BodyParserHandler( helpers.getEventRequest() );
-		let expectedParsers		= [];
-		expectedParsers.push( FormBodyParser.getInstance() );
-		expectedParsers.push( MultipartFormParser.getInstance() );
-		expectedParsers.push( JsonBodyParser.getInstance() );
+		assert.doesNotThrow(()=>{
+			const bodyParserHandler	= new BodyParserHandler();
 
-		assert.deepStrictEqual( bodyParserHandler.parsers, expectedParsers );
-
+			bodyParserHandler.addParser( new MultipartDataParser() );
+		});
 		done();
 	}
 });
 
 test({
-	message	: 'BodyParserHandler.constructor does not set default parsers if any others are passed',
+	message	: 'BodyParserHandler.addParser throws with invalid parser',
 	test	: ( done )=>{
-		let parsers				= [{ instance: JsonBodyParser, options : {} }];
-		let bodyParserHandler	= new BodyParserHandler( helpers.getEventRequest(), { parsers } );
-		let expectedParsers		= [];
-		expectedParsers.push( JsonBodyParser.getInstance( {} ) );
+		assert.throws(()=>{
+			const bodyParserHandler	= new BodyParserHandler();
 
-		assert.deepStrictEqual( bodyParserHandler.parsers, expectedParsers );
-
+			bodyParserHandler.addParser( new Error() );
+		});
 		done();
 	}
 });
 
 test({
-	message	: 'BodyParserHandler.constructor sets defaults if default is passed as an array key',
+	message	: 'BodyParserHandler.parseBody if no parsers support it',
 	test	: ( done )=>{
-		let parsers				= [{ instance: JsonBodyParser, options : {} }, 'default'];
-		let bodyParserHandler	= new BodyParserHandler( helpers.getEventRequest(), { parsers } );
-		let expectedParsers		= [];
-		expectedParsers.push( JsonBodyParser.getInstance( {} ) );
-		expectedParsers.push( FormBodyParser.getInstance() );
-		expectedParsers.push( MultipartFormParser.getInstance() );
-		expectedParsers.push( JsonBodyParser.getInstance() );
+		assert.doesNotThrow(()=>{
+			const bodyParserHandler	= new BodyParserHandler();
 
-		assert.deepStrictEqual( bodyParserHandler.parsers, expectedParsers );
-
-		done();
+			bodyParserHandler.parseBody( helpers.getEventRequest() ).then(( body )=>{
+				assert.deepStrictEqual( body, {} );
+				done();
+			});
+		});
 	}
 });
 
 test({
-	message	: 'BodyParserHandler.parseBody sets an event body if it is supported',
+	message	: 'BodyParserHandler.parseBody calls BodyParser parse if supported',
 	test	: ( done )=>{
-		let MockBodyParser		= Mock( BodyParser );
-		let testBody			= 'Test';
+		const MockBodyParser		= Mock( BodyParser );
+		const testBody			= 'Test';
 		Mocker( MockBodyParser, {
 			method			: 'supports',
 			shouldReturn	: true
 		} );
 		Mocker( MockBodyParser, {
 			method			: 'parse',
-			shouldReturn	: ( event, callback )=>{
-				callback( false, testBody );
+			shouldReturn	: ()=>{
+				return new Promise(( resolve, reject )=>{
+					resolve( testBody );
+				})
 			}
 		} );
-		let parsers				= [{ instance: MockBodyParser, options : {} }];
-		let event				= helpers.getEventRequest();
-		let bodyParserHandler	= new BodyParserHandler( event, { parsers } );
-		bodyParserHandler.parseBody(( err )=>{
-			assert.equal( err, false );
-			assert.equal( event.body, testBody );
+		const event				= helpers.getEventRequest();
+		const bodyParserHandler	= new BodyParserHandler();
+
+		bodyParserHandler.addParser( new MockBodyParser() );
+		bodyParserHandler.parseBody( event ).then(( data )=>{
+			assert.equal( data, testBody );
 			done();
-		});
+		}).catch( done );
 	}
 });
 
 test({
 	message	: 'BodyParserHandler.parseBody does not parse if not supports and does not return an error',
 	test	: ( done )=>{
-		let MockBodyParser		= Mock( BodyParser );
+		const MockBodyParser		= Mock( BodyParser );
 
 		Mocker( MockBodyParser, {
 			method			: 'supports',
@@ -117,22 +96,23 @@ test({
 			called	: 0
 		} );
 
-		let parsers				= [{ instance: MockBodyParser, options : {} }];
-		let bodyParserHandler	= new BodyParserHandler( helpers.getEventRequest(), { parsers } );
-		bodyParserHandler.parseBody(( err )=>{
-			assert.equal( err, false );
+		const event				= helpers.getEventRequest();
+		const bodyParserHandler	= new BodyParserHandler();
+
+		bodyParserHandler.addParser( new MockBodyParser() );
+		bodyParserHandler.parseBody( event ).then(( data )=>{
+			assert.deepStrictEqual( {}, data );
 			done();
-		});
+		}).catch( done );
 	}
 });
 
 test({
 	message	: 'BodyParserHandler.parseBody calls only the first one that supports it',
 	test	: ( done )=>{
-		let MockBodyParser		= Mock( BodyParser );
-		let MockBodyParserTwo	= Mock( BodyParser );
-		let testBody			= 'Test';
-		let testBodyTwo			= 'TestTwo';
+		const MockBodyParser		= Mock( BodyParser );
+		const MockBodyParserTwo	= Mock( BodyParser );
+		const testBody			= 'Test';
 		Mocker( MockBodyParserTwo, {
 			method			: 'supports',
 			shouldReturn	: true
@@ -151,27 +131,29 @@ test({
 		Mocker( MockBodyParser, {
 			method			: 'parse',
 			shouldReturn	: ( event, callback )=>{
-				callback( false, testBody );
+				return new Promise(( resolve )=>{
+					resolve( testBody)
+				});
 			}
 		} );
 
-		let parsers				= [{ instance: MockBodyParser, options : {} }, { instance: MockBodyParserTwo, options : {} } ];
-		let event				= helpers.getEventRequest();
-		let bodyParserHandler	= new BodyParserHandler( event, { parsers } );
-		bodyParserHandler.parseBody(( err )=>{
-			assert.equal( err, false );
-			assert.equal( event.body, testBody );
+		const event				= helpers.getEventRequest();
+		const bodyParserHandler	= new BodyParserHandler();
 
+		bodyParserHandler.addParser( new MockBodyParser() );
+		bodyParserHandler.addParser( new MockBodyParserTwo() );
+		bodyParserHandler.parseBody( event ).then(( body )=>{
+			assert.equal( body, testBody );
 			done();
-		});
+		}).catch( done );
 	}
 });
 
 test({
 	message	: 'BodyParserHandler.parseBody returns an error in case of an error in the body parser',
 	test	: ( done )=>{
-		let MockBodyParser	= Mock( BodyParser );
-		let error			= 'Not supported';
+		const MockBodyParser	= Mock( BodyParser );
+		const error			= 'Not supported';
 		Mocker( MockBodyParser, {
 			method			: 'supports',
 			shouldReturn	: true
@@ -180,15 +162,21 @@ test({
 		Mocker( MockBodyParser, {
 			method			: 'parse',
 			shouldReturn	: ( event, callback )=>{
-				callback( error );
+				return new Promise(( resolve, reject )=>{
+					reject( error )
+				});
 			}
 		} );
 
-		let parsers				= [{ instance: MockBodyParser, options : {} }];
-		let bodyParserHandler	= new BodyParserHandler( helpers.getEventRequest(), { parsers } );
-		bodyParserHandler.parseBody(( err )=>{
+		const event				= helpers.getEventRequest();
+		const bodyParserHandler	= new BodyParserHandler();
+
+		bodyParserHandler.addParser( new MockBodyParser() );
+		bodyParserHandler.parseBody( event ).then(()=>{
+			done( 'Should have rejected!' );
+		}).catch( ( err )=>{
 			assert.equal( err, error );
 			done();
-		});
+		} );
 	}
 });

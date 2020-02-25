@@ -3,6 +3,8 @@ A highly customizable backend server in NodeJs
 
 [![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest)
 
+# v11 Is a breaking release
+
 # GitHub
 https://github.com/Michaelpalacce/EventRequest
 
@@ -43,7 +45,6 @@ Server.start( 80, ()=>{
 	Loggur,				// Easier access to the Logging.Loggur instance
 	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
 ### Properties exported by Development:
-	BodyParserHandler,	// Used mainly for defining your own custom Body Handlers
 	PluginInterface,	// Used to add plugins to the system
 	LeakyBucket,		// An implementation of the Leaky Bucket algorithm: https://en.wikipedia.org/wiki/Leaky_bucket
 	FileStream,			// Class that defines a file stream
@@ -482,7 +483,6 @@ Server {
   er_templating_engine: 'er_templating_engine',
   er_file_stream: 'er_file_stream',
   er_logger: 'er_logger',
-  er_body_parser: 'er_body_parser',
   er_session: 'er_session',
   er_response_cache: 'er_response_cache',
   er_body_parser_json: 'er_body_parser_json',
@@ -1274,15 +1274,20 @@ server.apply( loggerPlugin );
 
 ***
 
-###er_body_parser, er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
-Adds an Empty bodyParser that can be set up, JsonBodyParser, FormBodyParser and MultipartBodyParser respectively
+###er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
+Adds a JsonBodyParser, FormBodyParser or MultipartBodyParser bodyParsers respectively that can be set up
 
-    **er_body_parser**
-        Adds one or many BodyParser descendants
-        **Accepted options:
-            **parsers** - Array - Array of BodyParser descendants. If the array has a key default these parsers will be added:  
-                { instance : FormBodyParser }, { instance : MultipartFormParser }, { instance : JsonBodyParser }
-            
+~~~javascript
+// Add Body Parsers
+server.apply( 'er_body_parser_json' );
+server.apply( 'er_body_parser_form' );
+server.apply( 'er_body_parser_multipart' );
+
+// Add body parsers with custom options
+server.apply( 'er_body_parser_json', { maxPayloadLength: 104857600, strict: false } );
+server.apply( 'er_body_parser_form', { maxPayloadLength: 10485760, strict: false } );
+server.apply( 'er_body_parser_multipart', { maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
+~~~
     *** MiltipartFormParser Accepted options:
     **maxPayload** - Number - Maximum payload in bytes to parse if set to 0 means infinite - Defaults to 0
     **tempDir** - String - The directory where to keep the uploaded files before moving - Defaults to the tmp dir of the os
@@ -1294,32 +1299,6 @@ Adds an Empty bodyParser that can be set up, JsonBodyParser, FormBodyParser and 
     *** FormBodyParser Accepted options:
     *maxPayloadLength** - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
     **strict** - Boolean - Whether the received payload must match the content-length - Defaults to false
-***
-~~~javascript
-const PluginManager		= server.getPluginManager();
-let loggerPlugin    	= PluginManager.getPlugin( 'er_logger' );
-server.apply( loggerPlugin );
-~~~
-
-Example Setup:
-~~~javascript
-
-let bodyParserMultipartPlugin	= new BodyParserPlugin(
-	'er_body_parser_multipart',
-	{
-		parsers	: [{ instance : MultipartFormParser, options : { tempDir : path.join( PROJECT_ROOT, '/Uploads' ) } }]
-	}
-);
-
-server.apply( 'er_body_parser_json' );
-server.apply( 'er_body_parser_form' );
-server.apply( 
-    'er_body_parser_multipart', {
-        parsers	: [{ instance : MultipartFormParser, options : { tempDir : path.join( PROJECT_ROOT, '/Uploads' ) } }]
-    }
- );
-~~~
-
 ***
 
 ###er_response_cache 

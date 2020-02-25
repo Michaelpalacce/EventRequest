@@ -1,7 +1,7 @@
 'use strict';
 
 const { assert, test, helpers }	= require( '../../../test_helper' );
-const { JsonBodyParser }		= require( '../../../../server/components/body_parsers/body_parser_handler' );
+const JsonBodyParser			= require( '../../../../server/components/body_parsers/json_body_parser' );
 
 test({
 	message	: 'JsonBodyParser.constructor on defaults does not die',
@@ -92,11 +92,10 @@ test({
 		});
 		let jsonBodyParser	= new JsonBodyParser( { strict: false } );
 
-		jsonBodyParser.parse( eventRequest, ( err, body )=>{
-			assert.equal( err, false );
+		jsonBodyParser.parse( eventRequest ).then(( body )=>{
 			assert.deepStrictEqual( body, expectedBody );
 			done();
-		} );
+		}).catch( done );
 	}
 });
 
@@ -127,10 +126,10 @@ test({
 		});
 		let jsonBodyParser	= new JsonBodyParser( { strict: false, maxPayloadLength : 1 } );
 
-		jsonBodyParser.parse( eventRequest, ( err, body )=>{
+		jsonBodyParser.parse( eventRequest ).then(()=>{ done( 'Should have rejected' ); } ).catch(( err )=>{
 			assert.equal( err !== false, true );
 			done();
-		} );
+		});
 	}
 });
 
@@ -161,10 +160,10 @@ test({
 		});
 		let jsonBodyParser	= new JsonBodyParser( { strict: true } );
 
-		jsonBodyParser.parse( eventRequest, ( err, body )=>{
+		jsonBodyParser.parse( eventRequest ).then(()=>{ done( 'Should have rejected' ); } ).catch(( err )=>{
 			assert.equal( err !== false, true );
 			done();
-		} );
+		});
 	}
 });
 
@@ -181,9 +180,9 @@ test({
 		);
 		let jsonBodyParser	= new JsonBodyParser( { strict: false } );
 
-		jsonBodyParser.parse( eventRequest, ( err, body )=>{
+		jsonBodyParser.parse( eventRequest ).then(()=>{ done( 'Should have rejected' ); } ).catch(( err )=>{
 			assert.equal( err !== false, true );
 			done();
-		} );
+		});
 	}
 });
