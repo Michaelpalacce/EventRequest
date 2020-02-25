@@ -1,3 +1,6 @@
+11.0.1
+- Body Parser Plugin bugfix
+
 11.0.0
 - Added a pluginBag to the server where plugins may persist data
 - Reworked the BodyParsers to use Promises

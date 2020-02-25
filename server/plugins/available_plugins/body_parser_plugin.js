@@ -15,8 +15,7 @@ class BodyParserPlugin extends PluginInterface
 		super( pluginId, options );
 
 		this.parserClass		= parser;
-		this.parser				= null;
-		this.bodyParserHandler	= null;
+		this.parserOptions		= options;
 		this.shouldAttach		= false;
 
 		this.setOptions( options );
@@ -33,7 +32,7 @@ class BodyParserPlugin extends PluginInterface
 	{
 		super.setOptions( options );
 
-		this.parser	= new this.parserClass( options );
+		this.parserOptions	= options;
 	}
 
 	/**
@@ -47,21 +46,16 @@ class BodyParserPlugin extends PluginInterface
 	{
 		this.server	= server;
 
-		if ( typeof this.server.pluginBag.bodyParserHandler === 'undefined' )
+		if ( typeof this.server.pluginBag.parsers === 'undefined' )
 		{
-			this.bodyParserHandler					= new BodyParserHandler();
-			this.server.pluginBag.bodyParserHandler	= this.bodyParserHandler;
-			this.shouldAttach	= true;
-		}
-		else
-		{
-			this.bodyParserHandler	= this.server.pluginBag.bodyParserHandler;
+			this.server.pluginBag.parsers	= [];
+			this.shouldAttach				= true;
 		}
 
-		if ( this.parser )
-		{
-			this.bodyParserHandler.addParser( this.parser );
-		}
+		this.server.pluginBag.parsers.push({
+			parserClass:		this.parserClass,
+			parserOptions:		this.parserOptions
+		});
 	}
 
 	/**
@@ -86,7 +80,17 @@ class BodyParserPlugin extends PluginInterface
 					} );
 				}
 
-				this.bodyParserHandler.parseBody( event ).then(( data )=>{
+				const bodyParserHandler	= new BodyParserHandler();
+
+				for ( const index in this.server.pluginBag.parsers )
+				{
+					const parser							= this.server.pluginBag.parsers[index];
+					const { parserOptions, parserClass }	= parser;
+
+					bodyParserHandler.addParser( new parserClass( parserOptions ) );
+				}
+
+				bodyParserHandler.parseBody( event ).then(( data )=>{
 					event.body	= data;
 					event.next();
 				}).catch( event.next );
