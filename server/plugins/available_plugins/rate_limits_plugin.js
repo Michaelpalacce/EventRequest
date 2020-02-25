@@ -177,7 +177,7 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Attaches the listener
 	 *
-	 * @details	Loads the config, attaches a process that will clear the IP based buckets if they are full once every 15 minutes,
+	 * @details	Loads the config, attaches a process that will clear the IP based buckets if they are full once every 60 minutes,
 	 * 			attaches a middleware that will handle the rate limiting
 	 *
 	 * @param	Server server

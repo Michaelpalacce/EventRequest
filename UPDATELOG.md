@@ -1,3 +1,6 @@
+11.1.0
+- Added cache.request middleware when attaching er_response_cache
+
 11.0.1
 - Body Parser Plugin bugfix
 

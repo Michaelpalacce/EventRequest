@@ -36,6 +36,10 @@ class ResponseCachePlugin extends PluginInterface
 	setServerOnRuntime( server )
 	{
 		this.cachingServer	= server.getPlugin( 'er_cache_server' ).getServer();
+
+		server.define( 'cache.request', ( event )=>{
+			event.cacheCurrentRequest();
+		} );
 	}
 
 	/**

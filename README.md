@@ -1302,12 +1302,12 @@ server.apply( 'er_body_parser_multipart', { maxPayload: 0, tempDir: path.join( P
 ***
 
 ###er_response_cache 
-Adds a response caching mechanism
+Adds a response caching mechanism.
 
-    Accepted Options:
-        **callback** -> This is a negative error callback that returns false if there was no problem setting up the server, true or Error if there was
-        **useIp** -> wether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
-        **ttl** -> time to live for the record. Defaults to 60 * 5000 ms
+Attaches a `cacheCurrentRequest` method to the EventRequest.
+
+Defines a `cache.request` middleware that can be attached to any route for caching .
+
 ***
 ~~~javascript
 const PluginManager		= server.getPluginManager();
@@ -1342,9 +1342,20 @@ server.add({
 // When setting a request to be cached, ttl and useIp may be passed that will overwrite the default options
 server.add({
 	handler	: ( event )=>{
+        //**useIp** -> whether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
+        //**ttl** -> time to live for the record. Defaults to 60 * 5000 ms
+
         event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } );
 	}
 });
+
+// You can add it via a middleware to a specific route
+server.get( '/', ( event )=> 
+	{
+		event.send( 'Hello World!' );
+	}, 
+	'cache.request'
+);
 ~~~
 
 ***
