@@ -43,7 +43,7 @@ class FormBodyParser extends BodyParser
 	 */
 	supports( event )
 	{
-		const contentType	= event.getHeaderValue( CONTENT_TYPE_HEADER );
+		const contentType	= event.getHeader( CONTENT_TYPE_HEADER );
 		return typeof contentType === 'string' && contentType.match( FORM_PARSER_SUPPORTED_TYPE ) !== null;
 	}
 

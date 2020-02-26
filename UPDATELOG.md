@@ -1,3 +1,10 @@
+12.0.0
+- Removed the generator completely
+- Renamed getHeaderValue to getHeader
+- Made most of the EventRequest variables writable again, expanded the cleanUp to include them
+- Updated the documentation on the Plugins and the Loggers as well as some other minor improvements
+- Removed LOG_LEVELS from the exported modules
+
 11.1.0
 - Added cache.request middleware when attaching er_response_cache
 

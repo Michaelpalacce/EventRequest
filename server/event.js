@@ -28,52 +28,26 @@ class EventRequest extends EventEmitter
 			throw new Error( 'Invalid parameters passed to EventRequest' );
 		}
 
-		// Define read only properties of the Request Event
-		let parsedUrl	= url.parse( request.url, true );
-
-		Object.defineProperty( this, 'queryString', {
-			value		: parsedUrl.query,
-			writable	: false
-		});
-
-		Object.defineProperty( this, 'clientIp', {
-			value		: request.connection === undefined ? false : request.connection.remoteAddress,
-			writable	: false
-		});
-
-		Object.defineProperty( this, 'path', {
-			value		: parsedUrl.pathname.trim(),
-			writable	: false
-		});
-
-		Object.defineProperty( this, 'method', {
-			value		: request.method.toUpperCase(),
-			writable	: false
-		});
-
-		Object.defineProperty( this, 'headers', {
-			value		: request.headers,
-			writable	: false
-		});
-
-		Object.defineProperty( this, 'validationHandler', {
-			value		: new ValidationHandler(),
-			writable	: false
-		});
-
-		let list	= {},
-			rc		= this.headers.cookie;
+		const parsedUrl			= url.parse( request.url, true );
+		const list	= {},
+			rc		= request.headers.cookie;
 
 		rc && rc.split( ';' ).forEach( function( cookie ) {
-			let parts					= cookie.split( '=' );
+			const parts					= cookie.split( '=' );
 			list[parts.shift().trim()]	= decodeURI( parts.join( '=' ) );
 		});
 
+
+		this.queryString		= parsedUrl.query;
+		this.clientIp			= request.connection === undefined ? false : request.connection.remoteAddress;
+		this.path				= parsedUrl.pathname.trim();
+		this.method				= request.method.toUpperCase();
+		this.headers			= request.headers;
+		this.validationHandler	= new ValidationHandler();
 		this.request			= request;
 		this.response			= response;
 		this.cookies			= list;
 		this.finished			= false;
-
 		this.extra				= {};
 		this.params				= {};
 		this.block				= {};
@@ -103,7 +77,7 @@ class EventRequest extends EventEmitter
 		});
 
 		// We do this so we can pass the event.next function by reference
-		let self	= this;
+		const self	= this;
 		this.next	= ( err, code )=>{
 			self._next( err, code );
 		};
@@ -122,11 +96,22 @@ class EventRequest extends EventEmitter
 	{
 		this.emit( 'cleanUp' );
 
-		this.extra			= undefined;
-		this.errorHandler	= undefined;
-		this.cookies		= undefined;
-		this.params			= undefined;
-		this.finished		= true;
+		this.next				= undefined;
+		this.block				= undefined;
+		this.errorHandler		= undefined;
+		this.queryString		= undefined;
+		this.headers			= undefined;
+		this.method				= undefined;
+		this.path				= undefined;
+		this.validationHandler	= undefined;
+		this.request			= undefined;
+		this.respose			= undefined;
+		this.extra				= undefined;
+		this.errorHandler		= undefined;
+		this.cookies			= undefined;
+		this.params				= undefined;
+		this.clientIp			= undefined;
+		this.finished			= true;
 
 		this.emit( 'finished' );
 		this.removeAllListeners();
@@ -176,7 +161,7 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-	 * @copydoc	EventRequest::__send
+	 * @copydoc	EventRequest::_send
 	 */
 	send( response = '', code = 200, raw = false )
 	{
@@ -274,7 +259,7 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	Mixed
 	 */
-	getHeaderValue( key, defaultValue = null )
+	getHeader( key, defaultValue = null )
 	{
 		return ! this.hasHeader( key ) ? defaultValue : this.headers[key];
 	}
@@ -327,7 +312,7 @@ class EventRequest extends EventEmitter
 		if ( ! this.isFinished() )
 		{
 			this.setHeader( 'Location', redirectUrl );
-			this.send( { redirectURL : redirectUrl }, statusCode );
+			this.send( { redirectUrl }, statusCode );
 		}
 		else
 		{
@@ -378,7 +363,7 @@ class EventRequest extends EventEmitter
 			return;
 		}
 
-		let isResponseFinished	= this.isFinished();
+		const isResponseFinished	= this.isFinished();
 
 		if ( ! isResponseFinished )
 		{

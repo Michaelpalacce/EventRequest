@@ -521,7 +521,7 @@ class MultipartDataParser extends BodyParser
 	 */
 	supports( event )
 	{
-		let contentType	= event.headers[CONTENT_TYPE_HEADER];
+		const contentType	= event.getHeader( CONTENT_TYPE_HEADER );
 		return typeof contentType === 'string' && contentType.match( MULTIPART_PARSER_SUPPORTED_TYPE ) !== null
 	}
 

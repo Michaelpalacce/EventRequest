@@ -2,9 +2,6 @@
   "author": {
     "name": "Stefan Genov"
   },
-  "bin": {
-    "event_request": "./cli.js"
-  },
   "bundleDependencies": false,
   "dependencies": {},
   "deprecated": false,
@@ -41,5 +38,5 @@
     "test": "node ./test_script.js",
     "deploy": "npm run test && npm publish"
   },
-  "version": "11.1.0"
+  "version": "12.0.0"
 }

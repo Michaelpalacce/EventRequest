@@ -53,7 +53,7 @@ class Server extends EventEmitter
 	{
 		this.apply( this.router );
 
-		let pluginsToApply	= [
+		const pluginsToApply	= [
 			{ plugin : 'er_static_resources', options: ['favicon.ico'] },
 		];
 
@@ -141,8 +141,8 @@ class Server extends EventEmitter
 	 */
 	_attachPlugin( plugin )
 	{
-		let pluginDependencies	= plugin.getPluginDependencies();
-		let pluginId			= plugin.getPluginId();
+		const pluginDependencies	= plugin.getPluginDependencies();
+		const pluginId				= plugin.getPluginId();
 
 		pluginDependencies.forEach(( dependency )=>{
 			if ( ! this.hasPlugin( dependency ) )
@@ -153,7 +153,7 @@ class Server extends EventEmitter
 
 		plugin.setServerOnRuntime( this );
 
-		let pluginMiddleware	= plugin.getPluginMiddleware();
+		const pluginMiddleware	= plugin.getPluginMiddleware();
 
 		pluginMiddleware.forEach( ( route )=>{
 			this.add( route );

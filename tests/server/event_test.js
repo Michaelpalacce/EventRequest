@@ -584,29 +584,29 @@ test({
 });
 
 test({
-	message	: 'EventRequest.getHeaderValue should return header',
+	message	: 'EventRequest.getHeader should return header',
 	test	: ( done )=>{
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
 		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
 
-		assert.equal( eventRequest.getHeaderValue( headerName ), headerValue );
+		assert.equal( eventRequest.getHeader( headerName ), headerValue );
 
 		done();
 	}
 });
 
 test({
-	message	: 'EventRequest.getHeaderValue should return default if header is not set',
+	message	: 'EventRequest.getHeader should return default if header is not set',
 	test	: ( done )=>{
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
 		const eventRequest	= helpers.getEventRequest();
 
-		assert.equal( eventRequest.getHeaderValue( headerName ), null );
-		assert.equal( eventRequest.getHeaderValue( headerName, headerValue ), headerValue );
+		assert.equal( eventRequest.getHeader( headerName ), null );
+		assert.equal( eventRequest.getHeader( headerName, headerValue ), headerValue );
 
 		done();
 	}

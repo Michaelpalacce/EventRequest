@@ -3,10 +3,7 @@
 /**
  * @brief	Plugin interface
  *
- * @details	This class should be used to "plugin" functionality to the event_request module. This is used by the
- * 			middleware container by: MiddlewareContainer.use( customPluginContainer );
- * 			When doing this then custom functionality will be added to the system, enabling third party support
- * 			and a unified interface to implementing new functionality
+ * @details	This class should be used to "plugin" functionality to the event_request module.
  */
 class PluginInterface
 {

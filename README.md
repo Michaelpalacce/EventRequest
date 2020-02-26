@@ -3,8 +3,6 @@ A highly customizable backend server in NodeJs
 
 [![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest)
 
-# v11 Is a breaking release
-
 # GitHub
 https://github.com/Michaelpalacce/EventRequest
 
@@ -15,9 +13,8 @@ https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combi
 
 # Installation
 ~~~bash
-npm i event_request --save
+npm i --save event_request 
 ~~~
-
 
 # Set up
 ~~~javascript
@@ -43,7 +40,6 @@ Server.start( 80, ()=>{
 	Development,		// Holds Development tools
 	Logging,			// Contains helpful logging functions
 	Loggur,				// Easier access to the Logging.Loggur instance
-	LOG_LEVELS,			// Easier access to the Logging.LOG_LEVELS object
 ### Properties exported by Development:
 	PluginInterface,	// Used to add plugins to the system
 	LeakyBucket,		// An implementation of the Leaky Bucket algorithm: https://en.wikipedia.org/wiki/Leaky_bucket
@@ -136,7 +132,7 @@ The event request is an object that is created by the server and passed through 
 
 ***
 
-**getHeaderValue( key, defaultValue )** - Retrieves a header ( if exists ). If it doesn't exist the defaultValue will be taken
+**getHeader( key, defaultValue )** - Retrieves a header ( if exists ). If it doesn't exist the defaultValue will be taken
 
 ***
 
@@ -465,7 +461,7 @@ Router has matchRoute and matchMethod methods that can be used anywhere statical
 
 ***
 ### Plugins
-Plugins can be added by using **server.apply( pluginContainerInstance||'pluginId', options )**
+Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**
 Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
 plugin all you have to do is do: server.apply( 'pluginId' )
 
@@ -529,6 +525,16 @@ as other plugins by fetching them and configuring them as you wish. They can not
 ***
 
 # Logging
+
+The `Logging` Suite exported by the module contains the following:
+- Loggur -> instance of Loggur used to log data and create Loggers
+- Logger -> The Logger class
+- Transport -> The interface used by the loggers
+- Console -> Transport that logs to the console
+- File -> Transport that logs to a file
+- Log -> The Log object used by all the internal classes
+- LOG_LEVELS -> The Default log levels
+
 
 The Loggur can be accessed directly from the server { Loggur }
 
@@ -1108,7 +1114,7 @@ integrated with other plugins.
 ***
 
 # PluginInterface
-The PluginInterface has a getPluginMiddleware method that must return normal middleware objects implementing handler,
+The PluginInterface has a getPluginMiddleware method that must return an array of middleware objects implementing handler,
 route, method keys or instances of Route. 
 
 The PluginInterface has a setOptions function that can be used to give instructions to the Plugin when it is being 
@@ -1117,14 +1123,24 @@ created and added to the event request
 The PluginInterface implements a getPluginDependencies method that returns an Array of needed plugins to work.
 These plugins must be installed before the dependant plugin is.
 
-When Using server.apply() you can pass a PluginContainer as well for easier functionality implementation.
-This is also done to make it easier for middleware with options to be implemented as to not spaghetti code that is hard
-to read and understand.
+The PluginInterface implements a setServerOnRuntime method that passes the server as the first and only argument.
+Here the plugin can interact with the server.pluginBag to store any data it seems fit or may modify the server in one way or another.
+
+Generally plugins should not have any business logic in the constructor and rather have that in the setServerOnRuntime or getPluginMiddleware
+functions. This is the case because new options can be given to the plugin when attaching to the server.
+
+This is how the flow of adding a plugin goes:
+
+1. Check if there are any options passed and if so, apply them with setOptions
+2. Check if dependencies are matched
+3. setServerOnRuntime
+4. getPluginMiddleware 
+
 
 # Plugin Manager
 The manager can be extracted from the created Server by:
 ~~~javascript
-let pluginManager   = server.getPluginManager();
+const pluginManager   = server.getPluginManager();
 ~~~
 
 The Plugin manager contains pre loaded plugins. You can add your own plugins to it for easy control over what is used or 
