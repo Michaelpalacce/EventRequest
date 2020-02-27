@@ -5,6 +5,7 @@ const testSuites		= require( './tests/test_suites' );
 require( './tests/test_bootstrap' );
 
 let startTests	= ()=>{
+	testSuites.pluginsSuite();
 	testSuites.securitySuite();
 	testSuites.templatingEngine();
 	testSuites.rateLimiterSuite();
@@ -16,7 +17,6 @@ let startTests	= ()=>{
 	testSuites.loggingSuite();
 	testSuites.bodyParserSuite();
 	testSuites.validationSuite();
-	testSuites.pluginsSuite();
 
 	runAllTests({
 		dieOnFirstError	: true,

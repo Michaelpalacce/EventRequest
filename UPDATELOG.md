@@ -9,6 +9,7 @@
 - Updated the README.md for the file stream plugin and the templating engine plugin
 - Changed when the render event is emitted
 - Changed when the stream_start event is emitted
+- Added Memory Data Server Plugin Tests
 
 11.1.0
 - Added cache.request middleware when attaching er_response_cache
