@@ -1,8 +1,7 @@
 'use strict';
 
-const PluginInterface					= require( '../plugin_interface' );
-const FileStreamHandlers				= require( '../../components/file_streams/file_stream_handler' );
-const { FileStreamHandler, FileStream }	= FileStreamHandlers;
+const PluginInterface		= require( '../plugin_interface' );
+const { FileStreamHandler }	= require( '../../components/file_streams/file_stream_handler' );
 
 /**
  * @brief	File stream handler responsible for attaching FileStreams to the eventRequest
@@ -25,32 +24,54 @@ class FileStreamHandlerPlugin extends PluginInterface
 		 *
 		 * @param	String file
 		 * @param	Object options
+		 * @param	Function errCallback
 		 *
 		 * @return	void
 		 */
-		event.streamFile	= function( file, options )
+		event.streamFile	= function( file, options = {}, errCallback )
 		{
-			let fileStream	= this.fileStreamHandler.getFileStreamerForType( file );
+			const fileStream	= event.getFileStream( file, options );
 
-			if ( fileStream !== null && fileStream instanceof FileStream )
+			if ( fileStream !== null )
 			{
-				fileStream.stream( file, options );
+				fileStream.pipe( event.response );
 			}
 			else
 			{
-				this.next( 'Could not find a FileStream that supports that format' )
+				if ( typeof errCallback !== 'function' )
+				{
+					this.next( 'Could not find a FileStream that supports that format', 400 )
+				}
+				else
+				{
+					errCallback();
+				}
 			}
 		};
 
 		/**
-		 * @brief	Gets the file stream handler
+		 * @brief	Streams files
 		 *
-		 * @return	FileStreamHandler
+		 * @details	The file must be the absolute path to the file to be streamed
+		 *
+		 * @param	String file
+		 * @param	Object options
+		 *
+		 * @return	ReadableStream | null
 		 */
-		event.getFileStreamHandler	= function ()
+		event.getFileStream	= function( file, options = {} )
 		{
-			return this.fileStreamHandler;
-		}
+			const fileStream	= this.fileStreamHandler.getFileStreamerForType( file );
+
+			if ( fileStream !== null )
+			{
+				return fileStream.getFileStream( event, file, options );
+			}
+			else
+			{
+				return null;
+			}
+		};
 	}
 
 	/**
@@ -60,22 +81,21 @@ class FileStreamHandlerPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let pluginMiddleware	= {
+		return [{
 			handler	: ( event ) => {
-				event.fileStreamHandler	= new FileStreamHandler( event );
-
-				event.on( 'cleanUp', ()=>{
-					event.fileStreamHandler		= undefined;
-					event.getFileStreamHandler	= undefined;
-				} );
+				event.fileStreamHandler	= new FileStreamHandler();
 
 				this.attachFunctions( event );
 
+				event.on( 'cleanUp', ()=>{
+					event.fileStreamHandler		= undefined;
+					event.getFileStream			= undefined;
+					event.streamFile			= undefined;
+				} );
+
 				event.next();
 			}
-		};
-
-		return [pluginMiddleware];
+		}];
 	}
 }
 

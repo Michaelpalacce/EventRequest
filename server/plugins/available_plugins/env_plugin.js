@@ -47,7 +47,7 @@ class EnvPlugin extends PluginInterface
 			// Reset the env variables array so we can populate it anew
 			this.envVariableKeys	= [];
 
-			let lines				= fs.readFileSync( absFilePath, 'utf-8' ).split( '\n' );
+			const lines				= fs.readFileSync( absFilePath, 'utf-8' ).split( '\n' );
 			lines.forEach(( line )=>{
 				let parts	= line.split( ENV_SEPARATOR );
 				let key		= parts.shift();

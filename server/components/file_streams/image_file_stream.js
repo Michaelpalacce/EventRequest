@@ -5,6 +5,14 @@ const FileStream	= require( './file_stream' );
 const path			= require( 'path' );
 const fs			= require( 'fs' );
 
+
+/**
+ * @brief	The type of file this stream supports
+ *
+ * @var		String
+ */
+const STREAM_TYPE	= 'image';
+
 /**
  * @brief	Used to stream text files
  */
@@ -13,13 +21,13 @@ class ImageFileStream extends FileStream
 	/**
 	 * @see	FileStream::constructor()
 	 */
-	constructor( event, options )
+	constructor( options )
 	{
-		super( event, options );
+		super( options );
 		this.SUPPORTED_FORMATS	= [
 			'.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
 		];
-		this._streamType		= 'image';
+		this._streamType		= STREAM_TYPE;
 
 		this.sanitize();
 	}
@@ -41,21 +49,20 @@ class ImageFileStream extends FileStream
 	}
 
 	/**
-	 * @see	FileStream::stream()
+	 * @see	FileStream::getFileStream()
 	 */
-	stream( file, options = {} )
+	getFileStream( event, file, options = {} )
 	{
 		if ( ! fs.existsSync( file ) )
 		{
-			this.event.sendError( `File not found: ${file}` );
-			return;
+			return null;
 		}
 
-		this.event.emit( 'stream_start' );
+		const stream	= fs.createReadStream( file, options );
 
-		file	= fs.createReadStream( file );
+		event.emit( 'stream_start', { stream } );
 
-		file.pipe( this.event.response );
+		return stream;
 	}
 
 	/**

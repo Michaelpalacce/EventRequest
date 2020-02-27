@@ -1,25 +1,25 @@
 'use strict';
 
-const PluginManagerClass										= require( './plugin_manager' );
-const TimeoutPlugin												= require( './available_plugins/timeout_plugin' );
-const EnvPlugin													= require( './available_plugins/env_plugin' );
-const RateLimitsPlugin											= require( './available_plugins/rate_limits_plugin' );
-const StaticResourcesPlugin										= require( './available_plugins/static_resources_plugin' );
-const MemoryDataServerPlugin									= require( './available_plugins/memory_data_server_plugin' );
-const TemplatingEnginePlugin									= require( './available_plugins/templating_engine_plugin' );
-const FileStreamHandlerPlugin									= require( './available_plugins/file_stream_handler_plugin' );
-const LoggerPlugin												= require( './available_plugins/logger_plugin' );
-const BodyParserPlugin											= require( './available_plugins/body_parser_plugin' );
-const ResponseCachePlugin										= require( './available_plugins/response_cache_plugin' );
-const SessionPlugin												= require( './available_plugins/session_plugin' );
-const JsonBodyParser											= require( './../components/body_parsers/json_body_parser' );
-const MultipartDataParser										= require( './../components/body_parsers/multipart_data_parser' );
-const FormBodyParser											= require( './../components/body_parsers/form_body_parser' );
+const PluginManagerClass		= require( './plugin_manager' );
+const TimeoutPlugin				= require( './available_plugins/timeout_plugin' );
+const EnvPlugin					= require( './available_plugins/env_plugin' );
+const RateLimitsPlugin			= require( './available_plugins/rate_limits_plugin' );
+const StaticResourcesPlugin		= require( './available_plugins/static_resources_plugin' );
+const MemoryDataServerPlugin	= require( './available_plugins/memory_data_server_plugin' );
+const TemplatingEnginePlugin	= require( './available_plugins/templating_engine_plugin' );
+const FileStreamHandlerPlugin	= require( './available_plugins/file_stream_handler_plugin' );
+const LoggerPlugin				= require( './available_plugins/logger_plugin' );
+const BodyParserPlugin			= require( './available_plugins/body_parser_plugin' );
+const ResponseCachePlugin		= require( './available_plugins/response_cache_plugin' );
+const SessionPlugin				= require( './available_plugins/session_plugin' );
+const JsonBodyParser			= require( './../components/body_parsers/json_body_parser' );
+const MultipartDataParser		= require( './../components/body_parsers/multipart_data_parser' );
+const FormBodyParser			= require( './../components/body_parsers/form_body_parser' );
 
 /**
  * @brief	Constants
  */
-let PluginManager				= new PluginManagerClass();
+const PluginManager				= new PluginManagerClass();
 
 PluginManager.addPlugin( new TimeoutPlugin( 'er_timeout' ) );
 PluginManager.addPlugin( new EnvPlugin( 'er_env' ) );

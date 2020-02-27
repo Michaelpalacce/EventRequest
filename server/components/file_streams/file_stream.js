@@ -11,7 +11,6 @@ class FileStream
 	 */
 	constructor( event, options = {} )
 	{
-		this.event				= event;
 		this.options			= options;
 		this.SUPPORTED_FORMATS	= [];
 		this._streamType		= '';
@@ -32,9 +31,9 @@ class FileStream
 	 *
 	 * @return	FileStream
 	 */
-	static getInstance( event, options )
+	static getInstance( options )
 	{
-		return new this( event, options );
+		return new this( options );
 	}
 
 	/**
@@ -52,12 +51,13 @@ class FileStream
 	/**
 	 * @brief	Stream the file
 	 *
+	 * @param	EventRequest event
 	 * @param	String file
 	 * @param	Object options
 	 *
-	 * @return	void
+	 * @return	ReadableStream
 	 */
-	stream( file, options = {} )
+	getFileStream( event, file, options = {} )
 	{
 		return ;
 	}

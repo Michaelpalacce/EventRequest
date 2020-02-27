@@ -11,13 +11,8 @@ const ImageFileStream	= require( './image_file_stream' );
  */
 class FileStreamHandler
 {
-	/**
-	 * @param	EventRequest event
-	 * @param	Object options
-	 */
-	constructor( event )
+	constructor()
 	{
-		this.event			= event;
 		this.fileStreams	= [];
 		this.options		= {
 			streams	: [
@@ -37,33 +32,26 @@ class FileStreamHandler
 	 */
 	initStreams()
 	{
-		try
+		if ( this.options.streams.constructor === Array )
 		{
-			if ( this.options.streams.constructor === Array )
+			for ( const index in this.options.streams )
 			{
-				for ( let index in this.options.streams )
+				const streamConfig	= this.options.streams[index];
+				const streamOptions	= typeof streamConfig.options === 'object' ? streamConfig.options : [];
+				let stream			= typeof streamConfig.instance === 'function' ? streamConfig.instance : null;
+
+				if ( stream === null )
 				{
-					let streamConfig	= this.options.streams[index];
-					let stream			= typeof streamConfig.instance === 'function' ? streamConfig.instance : null;
-					let streamOptions	= typeof streamConfig.options === 'object' ? streamConfig.options : [];
+					throw new Error( 'Invalid configuration' );
+				}
 
-					if ( stream === null )
-					{
-						throw new Error( 'Invalid configuration' );
-					}
+				stream	= stream.getInstance( streamOptions );
 
-					stream	= stream.getInstance( this.event, streamOptions );
-
-					if ( stream instanceof FileStream )
-					{
-						this.fileStreams.push( stream );
-					}
+				if ( stream instanceof FileStream )
+				{
+					this.fileStreams.push( stream );
 				}
 			}
-		}
-		catch ( e )
-		{
-			this.event.next( 'Invalid configuration provided' );
 		}
 	}
 
@@ -75,10 +63,9 @@ class FileStreamHandler
 	getSupportedTypes()
 	{
 		let formats	= [];
-		for ( let index in this.fileStreams )
+		for ( const index in this.fileStreams )
 		{
-			let fileStream  = this.fileStreams[index];
-			formats	= formats.concat( fileStream.SUPPORTED_FORMATS );
+			formats	= formats.concat( this.fileStreams[index].SUPPORTED_FORMATS );
 		}
 
 		return formats;
@@ -95,9 +82,9 @@ class FileStreamHandler
 	 */
 	getFileStreamerForType( file )
 	{
-		for ( let index in this.fileStreams )
+		for ( const index in this.fileStreams )
 		{
-			let fileStream  = this.fileStreams[index];
+			const fileStream	= this.fileStreams[index];
 			if ( fileStream.supports( file ) )
 			{
 				return fileStream;

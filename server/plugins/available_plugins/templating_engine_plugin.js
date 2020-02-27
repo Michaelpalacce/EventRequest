@@ -32,8 +32,6 @@ class TemplatingEnginePlugin extends PluginInterface
 		 */
 		eventRequest.render	= function( templateName, variables = {}, callback = ()=>{} )
 		{
-			this.emit( 'render', { templateName, variables, callback } );
-
 			templateName	= typeof templateName === 'string' && templateName.length > 0
 							? templateName + '.html'
 							: false;
@@ -48,25 +46,25 @@ class TemplatingEnginePlugin extends PluginInterface
 						try
 						{
 							const result	= this.templatingEngine.render( html, variables );
+
+							this.emit( 'render', { templateName, variables } );
+
 							this.send( result, 200, true );
 							callback( false );
 						}
 						catch ( e )
 						{
-							this.sendError( e.toString(), 400 );
 							callback( e );
 						}
 					}
 					else
 					{
-						this.sendError( 'Error while rendering', 500 );
 						callback( err );
 					}
 				});
 			}
 			else
 			{
-				this.sendError( 'Error while rendering', 500 );
 				callback( 'Error while rendering' )
 			}
 		}

@@ -1252,24 +1252,112 @@ If you want to add a templating engine you have to set the engine parameters in 
     * - engine - Object - Instance of a templating engine that has a method render defined that accepts
     *       html as first argument and object of variables as second -> Defaults to DefaultTemplatingEngine which can be used to serve static HTML
     * - templateDir - String - Where to draw the templates from -> Defaults to PROJECT_ROOT/public
+
+***
+
+###Events:
+
+render ( String templateName, Object variables ) - Emitted in the beginning of the rendering process if everything has been started successfully 
+
+***
+
+The plugin attaches the following functions:
+
+**render( String templateName, Object variables = {}, Function callback = ()=>{} ): void**
+- templateName will be the name of the file without the '.html' extension starting from the tempateDir given as a base ( folders are ok )
+- The variables should be an object that will be given to the templating engine
+- Callback will be called in case of a successful render. Note: you don't have to take any further actions, at this point the html has already been streamed
+- Callback will be called in case of an error too with the error that happened. Note: In case of an error, you will have to handle the error message sent to the user
+- 'render' event will be emitted by the EventRequest in the beginning with details on what is being rendered
+
 ***
 ~~~javascript
 const PluginManager			= server.getPluginManager();
 let templatingEnginePlugin	= PluginManager.getPlugin( 'er_templating_engine' );
 templatingEnginePlugin.setOptions( { templateDir : path.join( __dirname, './public' ), engine : someEngineConstructor } ); 
 server.apply( templatingEnginePlugin );
+
+router.get( '/preview', ( event ) => {
+		// If you have a templating engine that supports parameters:
+		event.render( 'preview', { type: 'test', src: '/data' }, event.next );
+
+		// Otherwise the default one can only render html
+		event.render( 'preview', {}, event.next );
+	}
+);
 ~~~
 
 ***
 
 ###er_file_stream 
 Adds a file streaming plugin to the site allowing different MIME types to be streamed
+Currently supported are :
+- Images: '.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
+- Videos: '.mp4'
+- Text: '.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini', 'ts'
+
 ***
+
+The VideoFileStream can be paired up with an HTML5 video player to stream videos to it
+An 'stream_start' event will be emitted by the EventRequest the moment the stream is going to be started 
+
 ~~~javascript
 const PluginManager		= server.getPluginManager();
 let fileStreamPlugin	= PluginManager.getPlugin( 'er_file_stream' );
 server.apply( fileStreamPlugin );
 ~~~
+
+###Events:
+
+stream_start ( FileStream stream ) - Emitted when the stream is successfully started
+
+***
+
+This plugin attaches the following functions to the EventRequest:
+
+**streamFile( String file, Object options = {}, errCallback ): void** 
+- This function accepts the absolute file name ( file ) and any options that should be given to the file stream ( options )
+- This function may accept an errCallback that will be called if there are no fileStreams that can handle the given file, otherwise call it will call event.next() with an error and a status code of 400
+**getFileStream( file, options = {} ): FileStream | null**
+- This function accepts the absolute file name ( file ) and any options that should be given to the file stream ( options )
+- This function will return null if no file streams were found or in case of another error
+
+~~~javascript
+const fs = require( 'fs' );
+
+app.get( '/data', ( event ) =>{
+		const result	= event.validationHandler.validate( event.queryString, { file: 'filled||string||min:1' } );
+		const file		= ! result.hasValidationFailed() ? result.getValidationResult().file : false;
+
+		if ( ! file || ! fs.existsSync( file ) )
+		{
+			event.next( 'File does not exist' );
+		}
+		else
+		{
+			// You can use this if you want to maybe pipe the file stream to a transformation stream or in general
+			// do something else than piping it to the event.response
+			event.getFileStream( file ).pipe( event.response );
+		}
+	}
+);
+
+app.get( '/dataTwo', ( event ) =>{
+		const result	= event.validationHandler.validate( event.queryString, { file: 'filled||string||min:1' } );
+		const file		= ! result.hasValidationFailed() ? result.getValidationResult().file : false;
+
+		if ( ! file || ! fs.existsSync( file ) )
+		{
+			event.next( 'File does not exist' );
+		}
+		else
+		{
+			event.streamFile( file );
+		}
+	}
+);
+~~~
+
 
 ***
 

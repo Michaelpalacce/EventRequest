@@ -20,13 +20,13 @@ class TextFileStream extends FileStream
 	/**
 	 * @see	FileStream::constructor()
 	 */
-	constructor( event, options )
+	constructor( options )
 	{
-		super( event, options );
+		super( options );
 		this.SUPPORTED_FORMATS	= [
-			'.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini'
+			'.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini', 'ts'
 		];
-		this._streamType		= 'text';
+		this._streamType		= STREAM_TYPE;
 
 		this.sanitize();
 	}
@@ -48,21 +48,18 @@ class TextFileStream extends FileStream
 	}
 
 	/**
-	 * @see	FileStream::stream()
+	 * @see	FileStream::getFileStream()
 	 */
-	stream( file, options = {} )
+	getFileStream( event, file, options = {} )
 	{
 		if ( ! fs.existsSync( file ) )
 		{
-			this.event.sendError( `File not found: ${file}` );
-			return;
+			return null;
 		}
 
-		this.event.emit( 'stream_start' );
+		event.emit( 'stream_start' );
 
-		file	= fs.createReadStream( file );
-
-		file.pipe( this.event.response );
+		return fs.createReadStream( file );
 	}
 
 	/**

@@ -4,6 +4,11 @@
 - Made most of the EventRequest variables writable again, expanded the cleanUp to include them
 - Updated the documentation on the Plugins and the Loggers as well as some other minor improvements
 - Removed LOG_LEVELS from the exported modules
+- Updated FileStreamHandler plugin now has a new function and the old one is slightly modified.
+- Updated all the file stream handlers to accept an event rather than have it set in the constructor
+- Updated the README.md for the file stream plugin and the templating engine plugin
+- Changed when the render event is emitted
+- Changed when the stream_start event is emitted
 
 11.1.0
 - Added cache.request middleware when attaching er_response_cache

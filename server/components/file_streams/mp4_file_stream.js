@@ -6,6 +6,13 @@ const path			= require( 'path' );
 const fs			= require( 'fs' );
 
 /**
+ * @brief	The type of file this stream supports
+ *
+ * @var		String
+ */
+const STREAM_TYPE	= 'mp4';
+
+/**
  * @brief	Used to stream mp4 files
  */
 class Mp4FileStream extends FileStream
@@ -13,11 +20,11 @@ class Mp4FileStream extends FileStream
 	/**
 	 * @see	FileStream::constructor()
 	 */
-	constructor( event, options )
+	constructor( options )
 	{
-		super( event, options );
+		super( options );
 		this.SUPPORTED_FORMATS	= ['.mp4'];
-		this._streamType		= 'mp4';
+		this._streamType		= STREAM_TYPE;
 
 		this.sanitize();
 	}
@@ -39,46 +46,45 @@ class Mp4FileStream extends FileStream
 	}
 
 	/**
-	 * @see	FileStream::stream()
+	 * @see	FileStream::getFileStream()
 	 */
-	stream( file, options = {} )
+	getFileStream( event, file, options = {} )
 	{
 		if ( ! fs.existsSync( file ) )
 		{
-			this.event.sendError( `File not found: ${file}` );
-			return;
+			return null;
 		}
 
-		let stat		= fs.statSync( file );
-		let fileSize	= stat.size;
-		let range		= this.event.headers.range;
+		let stream		= null;
+		const stat		= fs.statSync( file );
+		const fileSize	= stat.size;
+		const range		= event.getHeader( 'range' );
 
-		this.event.emit( 'stream_start' );
-		this.event.setHeader( 'Content-Type', 'video/mp4' );
+		event.setHeader( 'Content-Type', 'video/mp4' );
 		if ( range )
 		{
-			let parts	= range.replace( /bytes=/, "" ).split( "-" );
-			let start	= parseInt( parts[0], 10 );
-			let end		= parts[1]
-						? parseInt(parts[1], 10)
-						: fileSize - 1;
+			const parts	= range.replace( /bytes=/, "" ).split( "-" );
+			const start	= parseInt( parts[0], 10 );
+			const end	= parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
-			this.event.setHeader( 'Content-Range', `bytes ${start}-${end}/${fileSize}` );
-			this.event.setHeader( 'Accept-Ranges', 'bytes' );
-			this.event.setHeader( 'Content-Length', ( end - start ) + 1 );
-			this.event.response.statusCode	= 206;
+			event.setHeader( 'Content-Range', `bytes ${start}-${end}/${fileSize}` );
+			event.setHeader( 'Accept-Ranges', 'bytes' );
+			event.setHeader( 'Content-Length', ( end - start ) + 1 );
+			event.setStatusCode( 206 );
 
-			file	= fs.createReadStream( file, { start: start, end: end } );
-			file.pipe( this.event.response );
+			stream	= fs.createReadStream( file, { start, end } );
 		}
 		else
 		{
-			this.event.setHeader( 'Content-Length', fileSize );
-			this.event.response.statusCode	= 200;
+			event.setHeader( 'Content-Length', fileSize );
+			event.setStatusCode( 200 );
 
-			file	= fs.createReadStream( file );
-			file.pipe( this.event.response );
+			stream	= fs.createReadStream( file );
 		}
+
+		event.emit( 'stream_start', { stream } );
+
+		return stream;
 	}
 
 	/**
