@@ -102,7 +102,7 @@ class TimeoutPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let pluginMiddleware	= {
+		const pluginMiddleware	= {
 			handler	: ( event ) => {
 				this.setTimeout( event, this.getTimeout() );
 				this.addEventFunctionality( event );

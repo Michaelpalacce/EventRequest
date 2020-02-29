@@ -47,7 +47,7 @@ class Bucket
 		const refillCount	= this._refillCount();
 		this.value			+= refillCount * this.refillAmount;
 
-		return this.value = Math.min( this.maxAmount, this.value );
+		return this.value	= Math.min( this.maxAmount, this.value );
 	}
 
 	/**
@@ -82,7 +82,7 @@ class Bucket
 	 */
 	_refillCount()
 	{
-		return Math.round( ( this._getCurrentTime() - this.lastUpdate ) / this.refillTime );
+		return Math.round( ( this._getCurrentTime() - this.lastUpdate ) / 2 / this.refillTime );
 	}
 
 	/**

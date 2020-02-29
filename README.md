@@ -1492,7 +1492,7 @@ The rate limits plugin can monitor incoming requests and stop/delay/allow them i
 
 
     Accepted Options:
-        **file** -> The absolute path to the rate limits json file. Defaults to ROOT DIR / rate_limits.json
+        **fileLocation** -> The absolute path to the rate limits json file. Defaults to ROOT DIR / rate_limits.json
 
 The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
 If one exists, then the existing one's configuration will be taken. 
@@ -1532,11 +1532,13 @@ Rate limit rule options:
 
 This policy will let the client connect freely but a flag will be set that it was rate limited
 
+**eventRequest.rateLimited** will be set to true if the request does not pass by this policy
+
 
 *CONNECTION_DELAY_POLICY	= 'connection_delay';
 
 This policy will rate limit normally the request and will hold the connection until a token is freed
-If this is the policy specified then delayTime and delayRetries must be given. This will be the time after
+If this is the policy specified then **delayTime** and **delayRetries** must be given. This will be the time after
 a check should be made if there is a free token.
 The first connection delay policy hit in the case of many will be used to determine the delay time but
 all buckets affected by such a connection delay will be affected

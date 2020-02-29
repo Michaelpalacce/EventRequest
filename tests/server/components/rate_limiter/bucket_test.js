@@ -108,6 +108,6 @@ test({
 			assert.equal( bucket.reduce(), true );
 			assert.equal( bucket.get(), 9 );
 			done();
-		}, 2100 );
+		}, 1100 );
 	}
 });

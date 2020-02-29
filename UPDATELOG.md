@@ -1,3 +1,8 @@
+12.2.0
+- Added more server tests
+- Added some documentation
+- Fixed the Leaky bucket where it was refilling for twice less the time 
+
 12.1.0
 - Made sure all the possible methods in the server and the router that don't return something else will return either the server or the router instance
 - Added Tests for the http methods for both the server and the router

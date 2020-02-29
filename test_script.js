@@ -5,11 +5,11 @@ const testSuites		= require( './tests/test_suites' );
 require( './tests/test_bootstrap' );
 
 let startTests	= ()=>{
+	testSuites.eventSuite();
 	testSuites.securitySuite();
 	testSuites.templatingEngine();
 	testSuites.helpersSuite();
 	testSuites.errorSuite();
-	testSuites.eventSuite();
 	testSuites.routingSuite();
 	testSuites.loggingSuite();
 	testSuites.bodyParserSuite();

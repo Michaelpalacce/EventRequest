@@ -39,15 +39,15 @@ class EnvPlugin extends PluginInterface
 	 */
 	loadFileInEnv()
 	{
-		let absFilePath		= this.getEnvFileAbsPath();
-		let fileExists		= fs.existsSync( absFilePath );
+		const absFilePath	= this.getEnvFileAbsPath();
+		const fileExists	= fs.existsSync( absFilePath );
 		if ( fileExists )
 		{
 			this.removeOldEnvVariables();
 			// Reset the env variables array so we can populate it anew
 			this.envVariableKeys	= [];
-
 			const lines				= fs.readFileSync( absFilePath, 'utf-8' ).split( '\n' );
+
 			lines.forEach(( line )=>{
 				let parts	= line.split( ENV_SEPARATOR );
 				let key		= parts.shift();
@@ -93,9 +93,7 @@ class EnvPlugin extends PluginInterface
 	 */
 	attachFileWatcherToEnvFile()
 	{
-		let absFilePath		= this.getEnvFileAbsPath();
-
-		fs.watch( absFilePath, ( eventType )=>{
+		fs.watch( this.getEnvFileAbsPath(), ( eventType )=>{
 			if ( eventType === CHANGE_EVENT )
 			{
 				this.loadFileInEnv();

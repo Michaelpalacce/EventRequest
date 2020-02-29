@@ -147,7 +147,7 @@ helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '',
 
 				if ( res.statusCode !== statusCode )
 				{
-					return reject( `Expected StatusCode: ${statusCode} but got ${res.statusCode}`)
+					return reject( `Expected StatusCode: ${statusCode} but got ${res.statusCode} with body: ${res.body}`)
 				}
 
 				return resolve( res );

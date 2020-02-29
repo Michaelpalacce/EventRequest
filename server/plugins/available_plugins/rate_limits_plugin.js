@@ -48,7 +48,7 @@ const STRICT_POLICY						= 'strict';
 
 const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
 const DEFAULT_FILE_LOCATION				= path.join( PROJECT_ROOT, 'rate_limits.json' );
-const OPTIONS_FILE_PATH					= 'path';
+const OPTIONS_FILE_PATH					= 'fileLocation';
 const DEFAULT_RULE						= {
 	"path":"",
 	"methods":[],
@@ -67,10 +67,9 @@ const DEFAULT_RULE						= {
  */
 class RateLimitsPlugin extends PluginInterface
 {
-	constructor( id, options = {} )
+	setOptions( options )
 	{
-		super( id, options );
-
+		super.setOptions( options );
 		this.rules			= [];
 		this.fileLocation	= typeof options[OPTIONS_FILE_PATH] === 'string'
 							? options[OPTIONS_FILE_PATH]
@@ -86,8 +85,8 @@ class RateLimitsPlugin extends PluginInterface
 	{
 		if ( ! fs.existsSync( this.fileLocation ) )
 		{
-			let writeStream	= fs.createWriteStream( this.fileLocation );
-			let config		= [DEFAULT_RULE];
+			const writeStream	= fs.createWriteStream( this.fileLocation );
+			const config		= [DEFAULT_RULE];
 
 			writeStream.write( JSON.stringify( config ) );
 			writeStream.end();
@@ -95,22 +94,9 @@ class RateLimitsPlugin extends PluginInterface
 		}
 		else
 		{
-			let readStream	= fs.createReadStream( this.fileLocation );
-			let chunks		= [];
+			const buffer	= fs.readFileSync( this.fileLocation );
 
-			readStream.on( 'error', ( err ) => {
-				throw new Error( err );
-			});
-
-			readStream.on( 'data', ( chunk ) => {
-				chunks.push( chunk );
-			});
-
-			readStream.on( 'close', () => {
-				let config	= JSON.parse( Buffer.concat( chunks ).toString( 'utf-8' ) );
-
-				this.sanitizeConfig( config );
-			});
+			this.sanitizeConfig( JSON.parse( buffer.toString( 'utf-8' ) ) );
 		}
 	}
 

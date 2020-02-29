@@ -1,0 +1,74 @@
+[
+  {
+	"path": "/testErRateLimitsWithPermissiveLimiting",
+	"methods": [],
+	"maxAmount": 1,
+	"refillTime": 10,
+	"refillAmount": 1,
+	"policy": "permissive",
+	"delayTime": 3,
+	"delayRetries": 5,
+	"stopPropagation": false,
+	"ipLimit": false
+  },
+  {
+	"path": "/testErRateLimitsWithPermissiveLimitingRefills",
+	"methods": [],
+	"maxAmount": 1,
+	"refillTime": 1,
+	"refillAmount": 1,
+	"policy": "permissive",
+	"delayTime": 3,
+	"delayRetries": 5,
+	"stopPropagation": false,
+	"ipLimit": false
+  },
+  {
+	"path": "/testErRateLimitsWithConnectionDelayPolicy",
+	"methods": [],
+	"maxAmount": 1,
+	"refillTime": 3,
+	"refillAmount": 1,
+	"policy": "connection_delay",
+	"delayTime": 1,
+	"delayRetries": 10,
+	"stopPropagation": false,
+	"ipLimit": false
+  },
+  {
+	"path": "/testErRateLimitsWithStrictPolicy",
+	"methods": [],
+	"maxAmount": 1,
+	"refillTime": 3,
+	"refillAmount": 1,
+	"policy": "strict",
+	"delayTime": 1,
+	"delayRetries": 1,
+	"stopPropagation": false,
+	"ipLimit": false
+  },
+  {
+	"path": "/testErRateLimitsWithPropagation",
+	"methods": [],
+	"maxAmount": 1,
+	"refillTime": 3,
+	"refillAmount": 1,
+	"policy": "permissive",
+	"delayTime": 1,
+	"delayRetries": 1,
+	"stopPropagation": true,
+	"ipLimit": false
+  },
+  {
+	"path": "/testErRateLimitsWithPropagation",
+	"methods": [],
+	"maxAmount": 1,
+	"refillTime": 3,
+	"refillAmount": 1,
+	"policy": "strict",
+	"delayTime": 1,
+	"delayRetries": 1,
+	"stopPropagation": false,
+	"ipLimit": false
+  }
+]

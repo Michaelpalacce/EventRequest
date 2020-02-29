@@ -3,6 +3,7 @@
 // Dependencies
 const { assert, test, helpers, Mock }	= require( '../test_helper' );
 const App								= require( './../../server/server' );
+const path								= require( 'path' );
 const Router							= require( './../../server/components/routing/router' );
 const PreloadedPluginManager			= require( './../../server/plugins/preloaded_plugins' );
 const Server							= App.class;
@@ -764,6 +765,238 @@ test({
 			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
 			assert.equal( response.headers[headerNameTwo.toLowerCase()], headerValueTwo );
 			assert.equal( response.body.toString(), body );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test empty middleware',
+	test	: ( done )=>{
+		const body				= 'testEmptyMiddleware';
+		const headerName		= 'testEmptyMiddleware';
+		const headerValue		= 'valueOne';
+
+		app.add({
+			handler	: ( event )=>{
+				event.setHeader( headerName, headerValue );
+				event.next();
+			}
+		});
+
+		app.get( '/testEmptyMiddleware', ( event )=>{
+			event.send( body );
+		} );
+
+		helpers.sendServerRequest( '/testEmptyMiddleware' ).then(( response )=>{
+			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
+			assert.equal( response.body.toString(), body );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_timeout without reaching timeout',
+	test	: ( done )=>{
+		const body		= 'testTimeoutWithoutReachingTimeout';
+		const timeout	= 100;
+
+		if ( ! app.hasPlugin( app.er_timeout ) )
+			app.apply( app.er_timeout, { timeout } );
+
+		app.get( '/testTimeoutWithoutReachingTimeout', ( event )=>{
+			event.send( body );
+		} );
+
+		helpers.sendServerRequest( '/testTimeoutWithoutReachingTimeout' ).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_timeout with reaching timeout',
+	test	: ( done )=>{
+		const timeout	= 100;
+
+		if ( ! app.hasPlugin( app.er_timeout ) )
+			app.apply( app.er_timeout, { timeout } );
+
+		app.get( '/testTimeoutWithReachingTimeout', ( event )=>{} );
+
+		helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 500 ).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: `Request timed out in: ${timeout}`} ) );
+
+			app.add({
+				handler	: ( event )=>{
+					event.clearTimeout();
+					event.next();
+				}
+			});
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_env attaches environment variables to process',
+	test	: ( done )=>{
+		const name			= 'testErEnvAttachesVariablesToProcess';
+		const fileLocation	= path.join( __dirname, './fixture/.env' );
+		app.apply( app.er_env, { fileLocation } );
+
+		assert.equal( process.env.TESTKEY, 'TESTVALUE' );
+
+		app.get( `/${name}`, ( event )=>{
+			assert.equal( process.env.TESTKEY, 'TESTVALUE' );
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits with permissive limiting',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithPermissiveLimiting';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		let called			= 0;
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			called ++;
+
+			if ( called > 1 )
+			{
+				assert.equal( event.rateLimited, true );
+			}
+			else
+			{
+				assert.equal( event.rateLimited, false );
+			}
+
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}` );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits with permissive limiting refills',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithPermissiveLimitingRefills';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			assert.equal( event.rateLimited, false );
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			setTimeout(()=>{
+				helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+					assert.equal( response.body.toString(), name );
+					done();
+				}).catch( done )
+			}, 1000 );
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits with connection delay policy limiting',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithConnectionDelayPolicy';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const now			= Math.floor( new Date().getTime() / 1000 );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}` );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			assert.equal( ( Math.floor( new Date().getTime() / 1000 ) - now ) >= 2, true );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits with strict policy',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithStrictPolicy';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+
+test({
+	message	: 'Server.test er_rate_limits with stopPropagation',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithPropagation';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		let called			= 0;
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			called ++;
+
+			if ( called > 1 )
+			{
+				assert.equal( event.rateLimited, true );
+			}
+			else
+			{
+				assert.equal( event.rateLimited, false );
+			}
+
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}`, 'GET', 200 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
 	}
