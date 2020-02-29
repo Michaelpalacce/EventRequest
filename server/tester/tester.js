@@ -121,13 +121,13 @@ class Tester
 
 			for ( const data of test.dataProvider )
 			{
-				let newTest	= {};
+				const newTest	= {};
 
 				newTest.message	= test.message + '#' + i;
 				newTest.status	= test.status;
 
 				newTest.test	= ( done )=>{
-					let newData	= [done].concat( data );
+					const newData	= [done].concat( data );
 
 					test.test.apply( this, newData );
 				};
@@ -213,7 +213,7 @@ class Tester
 	{
 		this.hasFinished	= true;
 
-		let logPromises		= [];
+		const logPromises	= [];
 
 		logPromises.push( this.consoleLogger.error( `Finished in: ${ ( Date.now() - this.start ) / 1000 }` ) );
 		logPromises.push( this.consoleLogger.success( `There were ${this.successes.length} successful tests` ) );

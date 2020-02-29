@@ -392,6 +392,7 @@ test({
 		assert.equal( typeof router.copy !== 'undefined', true );
 
 		assert.deepStrictEqual( server.add( { handler: ()=>{} } ) instanceof Server, true );
+		assert.deepStrictEqual( server.add( ()=>{} ) instanceof Server, true );
 		assert.deepStrictEqual( server.get( ()=>{} ) instanceof Server, true );
 		assert.deepStrictEqual( server.post( ()=>{} ) instanceof Server, true );
 		assert.deepStrictEqual( server.put( ()=>{} ) instanceof Server, true );
@@ -401,6 +402,7 @@ test({
 		assert.deepStrictEqual( server.copy( ()=>{} ) instanceof Server, true );
 
 		assert.deepStrictEqual( router.add( { handler: ()=>{} } ) instanceof Router, true );
+		assert.deepStrictEqual( router.add( ()=>{} ) instanceof Router, true );
 		assert.deepStrictEqual( router.get( ()=>{} ) instanceof Router, true );
 		assert.deepStrictEqual( router.post( ()=>{} ) instanceof Router, true );
 		assert.deepStrictEqual( router.put( ()=>{} ) instanceof Router, true );

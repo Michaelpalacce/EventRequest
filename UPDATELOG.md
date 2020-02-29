@@ -1,3 +1,8 @@
+12.3.0
+- Added more server tests
+- Made it possible to add handlers directly using app.add or router.add
+- Updated README
+
 12.2.0
 - Added more server tests
 - Added some documentation

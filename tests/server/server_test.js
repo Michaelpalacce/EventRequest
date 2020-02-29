@@ -101,8 +101,10 @@ test({
 			method	: 'GET'
 		});
 
+		server.add(()=>{});
+
 		// 5 added 1 pre loaded
-		assert.equal( 6, server.router.middleware.length );
+		assert.equal( 7, server.router.middleware.length );
 
 		done();
 	}
@@ -148,10 +150,14 @@ test({
 			event.next();
 		});
 
+		server.get( ( event )=>{
+			event.next();
+		});
+
 		const router	= server.router;
 		const block		= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 1, block.length );
+		assert.equal( 2, block.length );
 
 		done();
 	}
@@ -171,10 +177,14 @@ test({
 			event.next();
 		});
 
+		server.post( ( event )=>{
+			event.next();
+		});
+
 		const router	= server.router;
 		const block		= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 1, block.length );
+		assert.equal( 2, block.length );
 
 		done();
 	}
@@ -194,10 +204,14 @@ test({
 			event.next();
 		});
 
+		server.delete( ( event )=>{
+			event.next();
+		});
+
 		const router	= server.router;
 		const block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 1, block.length );
+		assert.equal( 2, block.length );
 
 		done();
 	}
@@ -217,10 +231,14 @@ test({
 			event.next();
 		});
 
+		server.put( ( event )=>{
+			event.next();
+		});
+
 		const router	= server.router;
 		const block		= router.getExecutionBlockForCurrentEvent( eventRequest );
 
-		assert.equal( 1, block.length );
+		assert.equal( 2, block.length );
 
 		done();
 	}
@@ -318,6 +336,35 @@ test({
 				done();
 			}).catch( done );
 		} );
+	}
+});
+
+test({
+	message	: 'Server testGETWithoutRoute ( skipped cause it will fail all the others )',
+	skipped	: true,
+	test	: ( done )=>{
+		const body	= 'testGET';
+		app.get( ( event )=>{
+			event.send( body );
+		});
+
+		helpers.sendServerRequest( '/testGET', 'POST', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
 	}
 });
 
@@ -799,11 +846,21 @@ test({
 test({
 	message	: 'Server.test er_timeout without reaching timeout',
 	test	: ( done )=>{
-		const body		= 'testTimeoutWithoutReachingTimeout';
-		const timeout	= 100;
+		const body			= 'testTimeoutWithoutReachingTimeout';
+		const timeout		= 100;
+		let timeoutCalled	= 0;
 
 		if ( ! app.hasPlugin( app.er_timeout ) )
 			app.apply( app.er_timeout, { timeout } );
+
+		app.add( ( event )=>{
+				event.on( 'clearTimeout', ()=>{
+					timeoutCalled++;
+				});
+
+				event.next();
+			}
+		);
 
 		app.get( '/testTimeoutWithoutReachingTimeout', ( event )=>{
 			event.send( body );
@@ -811,6 +868,7 @@ test({
 
 		helpers.sendServerRequest( '/testTimeoutWithoutReachingTimeout' ).then(( response )=>{
 			assert.equal( response.body.toString(), body );
+			assert.equal( timeoutCalled, 1 );
 			done();
 		}).catch( done );
 	}
@@ -820,14 +878,26 @@ test({
 	message	: 'Server.test er_timeout with reaching timeout',
 	test	: ( done )=>{
 		const timeout	= 100;
+		let timeoutCalled	= 0;
 
 		if ( ! app.hasPlugin( app.er_timeout ) )
 			app.apply( app.er_timeout, { timeout } );
+
+		app.add({
+			handler	: ( event )=>{
+				event.on( 'clearTimeout', ()=>{
+					timeoutCalled++;
+				});
+
+				event.next();
+			}
+		});
 
 		app.get( '/testTimeoutWithReachingTimeout', ( event )=>{} );
 
 		helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 500 ).then(( response )=>{
 			assert.equal( response.body.toString(), JSON.stringify( { error: `Request timed out in: ${timeout}`} ) );
+			assert.equal( timeoutCalled, 1 );
 
 			app.add({
 				handler	: ( event )=>{
@@ -835,6 +905,7 @@ test({
 					event.next();
 				}
 			});
+
 			done();
 		}).catch( done );
 	}
@@ -967,6 +1038,71 @@ test({
 	}
 });
 
+test({
+	message	: 'Server.test er_rate_limits with specified methods matches',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethods';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits with multiple specified methods matches',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithStrictPolicyWithMultipleSpecifiedMethods';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits with specified methods does not match if method is not the same',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethodsThatDoNotMatch';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}` );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
 
 test({
 	message	: 'Server.test er_rate_limits with stopPropagation',
@@ -997,6 +1133,169 @@ test({
 			return helpers.sendServerRequest( `/${name}`, 'GET', 200 );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits with multiple rules',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithMultipleRules';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits strict overrides connection delay',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsStrictOverridesConnectionDelayPolicy';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits connection delay overrides permissive',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsConnectionDelayOverridesPermissivePolicy';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const now			= Math.floor( new Date().getTime() / 1000 );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}` );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			assert.equal( ( Math.floor( new Date().getTime() / 1000 ) - now ) >= 2, true );
+
+			done();
+		}).catch( done );
+	}
+});
+
+
+test({
+	message	: 'Server.test er_rate_limits connection delay returns 429 if no more retries',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsConnectionDelayReturns429IfNoMoreRetries';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limits with strict policy with ipLimit',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithStrictPolicyWithIpLimit';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+
+			try
+			{
+				assert.notEqual( Object.keys( event.rules[4].buckets )[0], `/${name}` );
+			}
+			catch ( e )
+			{
+				return done( 'er_rate_limits with ip limit did not return as expected' );
+			}
+
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_templating_engine attaches a render function that fetches files',
+	test	: ( done )=>{
+		const name			= 'testTemplatingEngine';
+		const deepName		= 'testTemplatingEngineDeep';
+		const templateDir 	= path.join( __dirname, './fixture/templates' );
+		let renderCalled	= 0;
+
+		app.apply( app.er_templating_engine, { templateDir } );
+
+		app.add({
+			handler	: ( event )=>{
+				event.on( 'render', ()=>{
+					renderCalled++;
+				} );
+
+				event.next();
+			}
+		});
+
+		app.get( `/${name}`, ( event )=>{
+			event.render( 'index' );
+		} );
+
+		app.get( `/${deepName}`, ( event )=>{
+			event.render( 'deep/directory/structure/file' );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString().includes( 'THIS_IS_THE_INDEX_HTML_FILE' ), true );
+			return helpers.sendServerRequest( `/${deepName}` );
+		}).then(( response )=>{
+			assert.equal( response.body.toString().includes( 'THIS_IS_THE_DEEP_HTML_FILE' ), true );
+			assert.equal( renderCalled, 2 );
 			done();
 		}).catch( done );
 	}

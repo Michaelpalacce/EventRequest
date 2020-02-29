@@ -8,6 +8,7 @@ const path				= require( 'path' );
  * @brief	Constants
  */
 const PROJECT_ROOT	= path.parse( require.main.filename ).dir;
+const CSS_HEADER	= 'text/css';
 
 /**
  * @brief	Static resource plugin used to server static resources
@@ -33,14 +34,13 @@ class StaticResourcesPlugin extends PluginInterface
 			pluginMiddlewares.push( {
 				route	: regExp,
 				handler	: ( event ) => {
-					let item		= path.join( PROJECT_ROOT, event.path );
-					let cssHeader	= 'text/css';
+					const item	= path.join( PROJECT_ROOT, event.path );
 
 					if ( fs.existsSync( item ) )
 					{
 						typeof event.headers.accept === 'string'
-							&& event.headers.accept.includes( cssHeader )
-							? event.setHeader( 'Content-Type', cssHeader )
+							&& event.headers.accept.includes( CSS_HEADER )
+							? event.setHeader( 'Content-Type', CSS_HEADER )
 							: event.setHeader( 'Content-Type', '*/*' );
 
 						event.send( fs.createReadStream( item ), 200 );

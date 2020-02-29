@@ -306,7 +306,7 @@ When adding routes you have to use the Router class.
 let { Server } = require( 'event_request' );
 
 // You can create your own router
-let router  = Server().Router();
+const router  = Server().Router();
 router.add({
     method: 'GET',
     route: '/',
@@ -320,7 +320,7 @@ router.add({
 Server().add( router );
 
 // You can also get the router attached to the Server and use that directly
-let serverRouter    = Server().router;
+const serverRouter    = Server().router;
 serverRouter.add(...);
 ~~~
 
@@ -386,7 +386,12 @@ Server.start( 80, ()=>{
 The server has 2 ways of adding routes/middleware
 
 ***
-You can use .post, .put, .get, .delete, .head, .patch, .copy methods from the server that accept Required parameters: ( String|RegExp route, Function handler )
+You can use .post, .put, .get, .delete, .head, .patch, .copy methods from the server that accept Required parameters: ( String|RegExp route, Function handler, Array||String middlewares = [] )
+
+
+**ALTERNATIVELY** You can use those methods with the following commands: ( Function handler, Array||String middlewares = [] ) which will add a middleware to every route
+
+### ARGUMENTS:
 
 **route** -> String|RegExp-> the route to witch the middleware should be attached
 
@@ -396,8 +401,12 @@ You can use .post, .put, .get, .delete, .head, .patch, .copy methods from the se
 
 ***
 
+**middlewares** -> Array||String -> The global middleware/s to be called before the handler
+
+***
+
 ~~~javascript
-let server	= Server();
+const server	= Server();
 
 server.get( '/', ( event )=>{
 	event.send( '<h1>Hello World!</h1>');
@@ -429,16 +438,22 @@ Server.start( 80 );
 
 ***
 When adding a Route the **server.add(route)** can be used. This can be used to attach another router
-to the current one: server.add( router );
+to the current one: server.add( router ) or router.add( router ) to combine 2 routers 
 
+- server.add accepts a object that must contain **handler** but **route** and **method** are optional.
+- server.add can also accept a function that will be transformed into a route without method or route
 
 ~~~javascript
 server.add({
 	route	: '/',
 	method	: 'GET',
 	handler	: ( event ) => {
-		event.next( '<h1>Hello World!</h1>' )
+		event.send( '<h1>Hello World!</h1>' )
 	}
+});
+
+server.add( ( event )=>{
+    event.send( '<h1>Hello World x2!</h1>' );
 });
 ~~~
 **handler** - Function - The callback function ! Required
@@ -1494,6 +1509,10 @@ The rate limits plugin can monitor incoming requests and stop/delay/allow them i
     Accepted Options:
         **fileLocation** -> The absolute path to the rate limits json file. Defaults to ROOT DIR / rate_limits.json
 
+**The following objects are attached to the EventRequest object:**
+- **eventRequest.rateLimited** will be set to true if the request does not pass 
+- **eventRequest.rules** will be hold all the rules that the plugin has along with the buckets
+
 The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
 If one exists, then the existing one's configuration will be taken. 
 
@@ -1506,9 +1525,9 @@ options['refillAmount']
 Rate limit can be applied to different routes and different HTTP methods
 Rate limit rule options:
 
-** path -> String - the url path to rate limit ( blank for ALL )
+**path -> String - the url path to rate limit ( blank for ALL )
 
-** methods -> Array - the methods to rate limit ( blank for ALL )
+**methods -> Array - the methods to rate limit ( blank for ALL )
 
 **maxAmount -> Number - The maximum amount of tokens to hold
 
@@ -1531,9 +1550,6 @@ Rate limit rule options:
 *PERMISSIVE_POLICY	= 'permissive';
 
 This policy will let the client connect freely but a flag will be set that it was rate limited
-
-**eventRequest.rateLimited** will be set to true if the request does not pass by this policy
-
 
 *CONNECTION_DELAY_POLICY	= 'connection_delay';
 

@@ -224,9 +224,11 @@ class RateLimitsPlugin extends PluginInterface
 		}
 
 		eventRequest.rateLimited	= false;
+		eventRequest.rules			= this.rules;
 
 		eventRequest.on( 'cleanUp', ()=>{
 			eventRequest.rateLimited	= undefined;
+			eventRequest.rules			= undefined;
 		} );
 
 		const path							= eventRequest.path;

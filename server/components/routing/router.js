@@ -59,7 +59,7 @@ class Router extends PluginInterface
 		/**
 		 * @brief	Function that adds a middleware to the block chain of the router
 		 *
-		 * @param	Object|Router route
+		 * @param	Object|Router|Function route
 		 *
 		 * @returns	Server
 		 */
@@ -75,8 +75,7 @@ class Router extends PluginInterface
 	/**
 	 * @brief	Adds .post, .put, .get, .delete methods to the object
 	 *
-	 * @details	Accepts "route" as first param that can be the the usual string or regex but MUST be given
-	 * 			and function "handler" to be called
+	 * @details	If route is a function then the handler will be treated as middlewares
 	 *
 	 * @return	void
 	 */
@@ -86,12 +85,23 @@ class Router extends PluginInterface
 
 		methods.forEach(( method )=>{
 			object[method.toLocaleLowerCase()]	= ( route, handler, middlewares = [] )=>{
-				this.add({
-					method,
-					route,
-					handler,
-					middlewares
-				});
+				if ( typeof route === 'function' )
+				{
+					this.add({
+						method,
+						handler: route,
+						middlewares: handler
+					});
+				}
+				else
+				{
+					this.add({
+						method,
+						route,
+						handler,
+						middlewares
+					});
+				}
 
 				return object;
 			}
@@ -123,6 +133,11 @@ class Router extends PluginInterface
 			}
 
 			return this;
+		}
+
+		if ( typeof route === 'function' )
+		{
+			route	= new Route( { handler: route } );
 		}
 
 		if ( ! ( route instanceof Route ) )
