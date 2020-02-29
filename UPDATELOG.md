@@ -1,3 +1,11 @@
+12.1.0
+- Made sure all the possible methods in the server and the router that don't return something else will return either the server or the router instance
+- Added Tests for the http methods for both the server and the router
+- Added Tests for the Router plugin that it attaches the methods
+- Made the DataServer write the cache file synchronously instead of a write stream.
+- Removed the resolve method in the Server
+- Added Server Functionality tests
+
 12.0.0
 - Removed the generator completely
 - Renamed getHeaderValue to getHeader

@@ -7,6 +7,7 @@ const Router							= require( './../../server/components/routing/router' );
 const PreloadedPluginManager			= require( './../../server/plugins/preloaded_plugins' );
 const Server							= App.class;
 
+const app								= App();
 
 test({
 	message	: 'Server.constructor starts without crashing with defaults',
@@ -52,24 +53,17 @@ test({
 test({
 	message	: 'Server is started',
 	test	: ( done ) =>{
-		helpers.sendServerRequest( '', '/ping', 'GET', ( err, response )=>{
-			if ( err )
-			{
-				done( err );
-			}
-			else
-			{
-				response.statusCode === 200 ? done() : done( 'Wrong status code returned' );
-			}
-		});
+		helpers.sendServerRequest( '/ping' ).then(()=>{
+			done();
+		}).catch( done );
 	}
 });
 
 test({
 	message	: 'Server.getPluginManager returns a pluginManager',
 	test	: ( done ) =>{
-		let server			= new Server();
-		let pluginManager	= server.getPluginManager();
+		const server		= new Server();
+		const pluginManager	= server.getPluginManager();
 
 		assert.equal( true, pluginManager instanceof PreloadedPluginManager.constructor );
 		done();
@@ -79,7 +73,7 @@ test({
 test({
 	message	: 'Server.add adds a handler with different permutations',
 	test	: ( done ) =>{
-		let server	= new Server();
+		const server	= new Server();
 
 		server.add({
 			handler	:()=>{}
@@ -116,10 +110,10 @@ test({
 test({
 	message	: 'Server.apply applies only a PluginInterface and a valid string',
 	test	: ( done ) =>{
-		let server			= new Server();
+		const server			= new Server();
 
-		let PluginManager	= server.getPluginManager();
-		let staticResources	= PluginManager.getPlugin( 'er_static_resources' );
+		const PluginManager		= server.getPluginManager();
+		const staticResources	= PluginManager.getPlugin( 'er_static_resources' );
 
 		server.apply( staticResources );
 		server.apply( 'er_static_resources' );
@@ -142,8 +136,8 @@ test({
 test({
 	message	: 'Server.get works as intended',
 	test	: ( done ) =>{
-		let server			= new Server();
-		let eventRequest	= helpers.getEventRequest( 'GET', '/' );
+		const server		= new Server();
+		const eventRequest	= helpers.getEventRequest( 'GET', '/' );
 
 		server.get( '/', ( event )=>{
 			event.next();
@@ -153,8 +147,8 @@ test({
 			event.next();
 		});
 
-		let router	= server.router;
-		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
+		const router	= server.router;
+		const block		= router.getExecutionBlockForCurrentEvent( eventRequest );
 
 		assert.equal( 1, block.length );
 
@@ -165,8 +159,8 @@ test({
 test({
 	message	: 'Server.post works as intended',
 	test	: ( done ) =>{
-		let server			= new Server();
-		let eventRequest	= helpers.getEventRequest( 'POST', '/' );
+		const server		= new Server();
+		const eventRequest	= helpers.getEventRequest( 'POST', '/' );
 
 		server.post( '/', ( event )=>{
 			event.next();
@@ -176,8 +170,8 @@ test({
 			event.next();
 		});
 
-		let router	= server.router;
-		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
+		const router	= server.router;
+		const block		= router.getExecutionBlockForCurrentEvent( eventRequest );
 
 		assert.equal( 1, block.length );
 
@@ -188,8 +182,8 @@ test({
 test({
 	message	: 'Server.delete works as intended',
 	test	: ( done ) =>{
-		let server			= new Server();
-		let eventRequest	= helpers.getEventRequest( 'DELETE', '/' );
+		const server		= new Server();
+		const eventRequest	= helpers.getEventRequest( 'DELETE', '/' );
 
 		server.delete( '/', ( event )=>{
 			event.next();
@@ -199,8 +193,8 @@ test({
 			event.next();
 		});
 
-		let router	= server.router;
-		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
+		const router	= server.router;
+		const block	= router.getExecutionBlockForCurrentEvent( eventRequest );
 
 		assert.equal( 1, block.length );
 
@@ -211,8 +205,8 @@ test({
 test({
 	message	: 'Server.put works as intended',
 	test	: ( done ) =>{
-		let server			= new Server();
-		let eventRequest	= helpers.getEventRequest( 'PUT', '/' );
+		const server		= new Server();
+		const eventRequest	= helpers.getEventRequest( 'PUT', '/' );
 
 		server.put( '/', ( event )=>{
 			event.next();
@@ -222,8 +216,8 @@ test({
 			event.next();
 		});
 
-		let router	= server.router;
-		let block	= router.getExecutionBlockForCurrentEvent( eventRequest );
+		const router	= server.router;
+		const block		= router.getExecutionBlockForCurrentEvent( eventRequest );
 
 		assert.equal( 1, block.length );
 
@@ -251,20 +245,15 @@ test({
 
 		server.define( middlewareName, ()=>{} );
 
-		if ( called === false )
-		{
-			return done( 'Router.define was not called but should have been' );
-		}
-
-		done();
+		called === true ? done() : done( 'Router.define was not called but should have been' );
 	}
 });
 
 test({
 	message	: 'Server() returns the same instance',
 	test	: ( done )=>{
-		let server		= App();
-		let serverTwo	= App();
+		const server		= App();
+		const serverTwo	= App();
 
 		server.define( 'testMiddleware', ()=>{} );
 
@@ -281,7 +270,7 @@ test({
 test({
 	message	: 'Server.cleanUp() cleans up',
 	test	: ( done )=>{
-		let server		= App();
+		const server	= App();
 
 		server.define( 'testMiddleware', ()=>{} );
 
@@ -314,7 +303,7 @@ test({
 		const port			= 1234;
 		const app			= App();
 
-		app.get( '/testRoute', ( event ) => {
+		app.get( '/attachUsingHttpServer', ( event ) => {
 			event.send( body, 201 );
 		});
 
@@ -323,19 +312,459 @@ test({
 		server.listen( port );
 
 		server.on( 'listening', ()=>{
-			helpers.sendServerRequest( '', '/testRoute', 'GET', ( err, response )=>{
-				if ( err )
-				{
-					done( err );
-				}
-				else
-				{
-					server.close();
+			helpers.sendServerRequest( '/attachUsingHttpServer', 'GET',  201, '', port ).then(()=>{
+				server.close();
+				done();
+			}).catch( done );
+		} );
+	}
+});
 
-					response.statusCode === 201 ? done() : done( 'Wrong status code returned' );
-				}
-			}, port );
+test({
+	message	: 'Server testGET',
+	test	: ( done )=>{
+		const body	= 'testGET';
+		app.get( '/testGET', ( event )=>{
+			event.send( body );
+		});
+
+		helpers.sendServerRequest( '/testGET', 'POST', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGET' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testPOST',
+	test	: ( done )=>{
+		const body	= 'testPOST';
+		app.post( '/testPOST', ( event )=>{
+			event.send( body );
+		});
+
+		helpers.sendServerRequest( '/testPOST', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testPOST', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOST', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOST', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOST', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOST', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOST', 'POST' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testDELETE',
+	test	: ( done )=>{
+		const body	= 'testDELETE';
+		app.delete( '/testDELETE', ( event )=>{
+			event.send( body );
+		});
+
+		helpers.sendServerRequest( '/testDELETE', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testDELETE', 'POST', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETE', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETE', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETE', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETE', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETE', 'DELETE' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testPUT',
+	test	: ( done )=>{
+		const body	= 'testPUT';
+		app.put( '/testPUT', ( event )=>{
+			event.send( body );
+		});
+
+		helpers.sendServerRequest( '/testPUT', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testPUT', 'POST', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUT', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUT', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUT', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUT', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUT', 'PUT' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testHEAD also head does not return body even if sent',
+	test	: ( done )=>{
+		const body	= 'testHEAD';
+		app.head( '/testHEAD', ( event )=>{
+			event.send( body );
+		});
+
+		helpers.sendServerRequest( '/testHEAD', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testHEAD', 'POST', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEAD', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEAD', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEAD', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEAD', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEAD', 'HEAD' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), '' );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testPATCH',
+	test	: ( done )=>{
+		const body	= 'testPATCH';
+		app.patch( '/testPATCH', ( event )=>{
+			event.send( body );
+		});
+
+		helpers.sendServerRequest( '/testPATCH', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testPATCH', 'POST', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCH', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCH', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCH', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCH', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCH', 'PATCH' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testGET with add',
+	test	: ( done )=>{
+		const body	= 'testGETWithAdd';
+		app.add({
+			method	: 'GET',
+			route	: '/testGETWithAdd',
+			handler	: ( event )=>{
+				event.send( body );
+			}
+		});
+
+		helpers.sendServerRequest( '/testGETWithAdd', 'POST', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testGETWithAdd', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGETWithAdd', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGETWithAdd', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGETWithAdd', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGETWithAdd', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testGETWithAdd' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testPOST with add',
+	test	: ( done )=>{
+		const body	= 'testPOSTWithAddWithAdd';
+		app.add({
+			method	: 'POST',
+			route	: '/testPOSTWithAdd',
+			handler	: ( event )=>{
+				event.send( body );
+			}
+		});
+
+		helpers.sendServerRequest( '/testPOSTWithAdd', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testPOSTWithAdd', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOSTWithAdd', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOSTWithAdd', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOSTWithAdd', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOSTWithAdd', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPOSTWithAdd', 'POST' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testDELETE with add',
+	test	: ( done )=>{
+		const body	= 'testDELETEWithAdd';
+		app.add({
+			method	: 'DELETE',
+			route	: '/testDELETEWithAdd',
+			handler	: ( event )=>{
+				event.send( body );
+			}
+		});
+
+		helpers.sendServerRequest( '/testDELETEWithAdd', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testDELETEWithAdd', 'POST', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETEWithAdd', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETEWithAdd', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETEWithAdd', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETEWithAdd', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testDELETEWithAdd', 'DELETE' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testPUT with add',
+	test	: ( done )=>{
+		const body	= 'testPUTWithAdd';
+		app.add({
+			method	: 'PUT',
+			route	: '/testPUTWithAdd',
+			handler	: ( event )=>{
+				event.send( body );
+			}
+		});
+
+		helpers.sendServerRequest( '/testPUTWithAdd', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testPUTWithAdd', 'POST', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUTWithAdd', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUTWithAdd', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUTWithAdd', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUTWithAdd', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPUTWithAdd', 'PUT' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testHEAD with add also head does not return body even if sent',
+	test	: ( done )=>{
+		const body	= 'testHEADWithAdd';
+		app.add({
+			method	: 'HEAD',
+			route	: '/testHEADWithAdd',
+			handler	: ( event )=>{
+				event.send( body );
+			}
+		});
+
+		helpers.sendServerRequest( '/testHEADWithAdd', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testHEADWithAdd', 'POST', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEADWithAdd', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEADWithAdd', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEADWithAdd', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEADWithAdd', 'PATCH', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testHEADWithAdd', 'HEAD' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), '' );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server testPATCH with add',
+	test	: ( done )=>{
+		const body	= 'testPATCHWithAdd';
+		app.add({
+			method	: 'PATCH',
+			route	: '/testPATCHWithAdd',
+			handler	: ( event )=>{
+				event.send( body );
+			}
+		});
+
+		helpers.sendServerRequest( '/testPATCHWithAdd', 'GET', 404 ).then(()=>{
+			return helpers.sendServerRequest( '/testPATCHWithAdd', 'POST', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCHWithAdd', 'DELETE', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCHWithAdd', 'PUT', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCHWithAdd', 'COPY', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCHWithAdd', 'HEAD', 404 );
+		}).then(()=>{
+			return helpers.sendServerRequest( '/testPATCHWithAdd', 'PATCH' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), body );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test add is case insensitive',
+	test	: ( done )=>{
+		const body			= 'testGETCaseInsensitive';
+		const headerName	= 'testGETCaseInsensitive';
+		const headerValue	= 'value';
+		app.add({
+			method	: 'GET',
+			route	: '/testGETCaseInsensitive',
+			handler	: ( event )=>{
+				event.setHeader( headerName, headerValue );
+				event.next();
+			}
+		});
+		
+		app.add({
+			method	: 'get',
+			route	: '/testGETCaseInsensitive',
+			handler	: ( event )=>{
+				event.send( body );
+			}
+		});
+
+		helpers.sendServerRequest( '/testGETCaseInsensitive' ).then(( response )=>{
+			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
+			assert.equal( response.body.toString(), body );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test middlewares',
+	test	: ( done )=>{
+		const body			= 'testGETWithMiddlewares';
+		const headerName	= 'testGETWithMiddlewares';
+		const headerValue	= 'value';
+
+		app.define( 'testGETWithMiddlewaresMiddleware', ( event )=>{
+			event.setHeader( headerName, headerValue );
+			event.next();
 		} );
 
+		app.get( '/testGETWithMiddlewares', ( event )=>{
+			event.send( body );
+		}, 'testGETWithMiddlewaresMiddleware' );
+
+		helpers.sendServerRequest( '/testGETWithMiddlewares' ).then(( response )=>{
+			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
+			assert.equal( response.body.toString(), body );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test multiple middlewares',
+	test	: ( done )=>{
+		const body				= 'testGETWithMultipleMiddlewares';
+
+		const headerName		= 'testGETWithMultipleMiddlewaresOne';
+		const headerValue		= 'valueOne';
+
+		const headerNameTwo		= 'testGETWithMultipleMiddlewaresTwo';
+		const headerValueTwo	= 'valueTwo';
+
+		app.define( 'testGETWithMultipleMiddlewaresMiddlewareOne', ( event )=>{
+			event.setHeader( headerName, headerValue );
+			event.next();
+		} );
+
+		app.define( 'testGETWithMultipleMiddlewaresMiddlewareTwo', ( event )=>{
+			event.setHeader( headerNameTwo, headerValueTwo );
+			event.next();
+		} );
+
+		app.get( '/testGETWithMultipleMiddlewares', ( event )=>{
+			event.send( body );
+		}, ['testGETWithMultipleMiddlewaresMiddlewareOne', 'testGETWithMultipleMiddlewaresMiddlewareTwo'] );
+
+		helpers.sendServerRequest( '/testGETWithMultipleMiddlewares' ).then(( response )=>{
+			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
+			assert.equal( response.headers[headerNameTwo.toLowerCase()], headerValueTwo );
+			assert.equal( response.body.toString(), body );
+			done();
+		}).catch( done );
 	}
 });

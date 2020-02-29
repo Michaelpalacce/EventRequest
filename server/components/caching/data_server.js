@@ -76,7 +76,7 @@ class DataServer
 			}
 			else
 			{
-				this._saveData();
+				fs.writeFileSync( this.persistPath, '{}' );
 			}
 
 			const persistInterval	= setInterval(()=>{

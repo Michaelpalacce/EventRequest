@@ -36,53 +36,6 @@ helpers.getCachingServer	= ()=>{
 };
 
 /**
- * @brief	Sets up the test namespace for the given caching server
- *
- * @param	DataServer server
- * @param	Function callback
- *
- * @return	void
- */
-helpers.setUpTestNamespace	= ( server, callback )=>{
-	helpers.removeTestNamespace( server, ( err )=>{
-		if ( ! err )
-		{
-			server.createNamespace( 'test', {} ).then( ()=>{
-				callback( false )
-			}).catch( callback );
-		}
-		else
-		{
-			callback( err );
-		}
-	});
-};
-/**
- * @brief	Removes the test namespace for the given caching server
- *
- * @param	DataServer server
- * @param	Function callback
- *
- * @return	void
- */
-helpers.removeTestNamespace	= ( server, callback )=>{
-	server.setUp().then(()=>{
-		server.existsNamespace( 'test' ).then(( exists )=>{
-			if ( exists === true )
-			{
-				server.removeNamespace( 'test' ).then( ()=>{
-					callback( false )
-				}).catch( callback );
-			}
-			else
-			{
-				callback( false );
-			}
-		}).catch( callback );
-	}).catch( callback )
-};
-
-/**
  * @brief	Deletes test file
  *
  * @return	Boolean
@@ -158,39 +111,56 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
 };
 
 /**
- * @brief	Sends a request to the server and returns a callback with the response
+ * @brief	Sends a request to the server and returns a Promise
  *
- * @param	mixed data
  * @param	String path
  * @param	String method
- * @param	Function callback
+ * @param	Number statusCode
+ * @param	mixed data
+ * @param	Number port
  *
- * @return	void
+ * @return	Promise
  */
-helpers.sendServerRequest	= ( data, path, method, callback, port = 3333 )=>{
-	const postData = querystring.stringify( data );
+helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '', port = 3333 )=>{
+	return new Promise(( resolve,reject )=>{
+		const postData	= querystring.stringify( data );
 
-	const options = {
-		hostname	: 'localhost',
-		port		: port,
-		path		: path,
-		method		: method,
-		headers		: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-			'Content-Length': Buffer.byteLength( postData )
-		}
-	};
+		const options	= {
+			hostname	: 'localhost',
+			port		: port,
+			path		: path,
+			method		: method,
+			headers		: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				'Content-Length': Buffer.byteLength( postData )
+			}
+		};
 
-	let req	= request( options, ( res ) =>{
-		callback( false, res );
+		const req	= request( options, ( res ) =>{
+			const bodyParts	= [];
+			res.on( 'data',( chunk )=>{
+				bodyParts.push( chunk );
+			} );
+
+			res.on( 'end',()=>{
+				res.body	= Buffer.concat( bodyParts );
+
+				if ( res.statusCode !== statusCode )
+				{
+					return reject( `Expected StatusCode: ${statusCode} but got ${res.statusCode}`)
+				}
+
+				return resolve( res );
+			});
+		});
+
+		req.on('error', ( e ) => {
+			reject( e );
+		});
+
+		req.write( postData );
+		req.end();
 	});
-
-	req.on('error', (e) => {
-		callback( e );
-	});
-
-	req.write( postData );
-	req.end();
 };
 
 /**

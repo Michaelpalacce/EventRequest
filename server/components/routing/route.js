@@ -57,8 +57,10 @@ class Route
 							? routeConfig.route
 							: '';
 
-		this.method			= typeof routeConfig.method === 'string' || routeConfig.method instanceof Array
-							? routeConfig.method
+		this.method			= typeof routeConfig.method === 'string'
+							? routeConfig.method.toUpperCase()
+							: routeConfig.method instanceof Array
+							? routeConfig.method.map( ( x )=>{ return x.toUpperCase() } )
 							: '';
 
 		this.handler		= routeConfig.handler instanceof Function
@@ -126,9 +128,11 @@ class Route
 	 */
 	matchMethod( requestedMethod )
 	{
+		requestedMethod	= requestedMethod.toUpperCase();
+
 		return this.method === requestedMethod
 				|| this.method === ''
-				|| ( this.method.constructor === Array && ( this.method.indexOf( requestedMethod ) !== -1 || this.method.length === 0 ) );
+				|| ( Array.isArray( this.method ) && ( this.method.indexOf( requestedMethod ) !== -1 || this.method.length === 0 ) );
 	}
 
 	/**

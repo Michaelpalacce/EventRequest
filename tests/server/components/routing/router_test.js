@@ -4,6 +4,8 @@
 const { assert, test, helpers }	= require( '../../../test_helper' );
 const Router					= require( '../../../../server/components/routing/router' );
 const Route						= require( '../../../../server/components/routing/route' );
+const App						= require( '../../../../server/server' );
+const Server					= App.class;
 
 test({
 	message	: 'Router.constructor does not die',
@@ -35,6 +37,21 @@ test({
 
 		assert.doesNotThrow( ()=>{
 			router.add({});
+		});
+
+		assert.deepStrictEqual( [defaultRoute], router.middleware );
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add returns self',
+	test	: ( done )=>{
+		const router		= new Router();
+		const defaultRoute	= new Route({});
+
+		assert.doesNotThrow( ()=>{
+			assert.deepStrictEqual( router.add({}), router );
 		});
 
 		assert.deepStrictEqual( [defaultRoute], router.middleware );
@@ -128,7 +145,7 @@ test({
 test({
 	message	: 'Router.getExecutionBlockForCurrentEvent throws on invalid EventRequest',
 	test	: ( done )=>{
-		let router	= new Router();
+		const router	= new Router();
 
 		assert.throws( ()=>{
 			router.getExecutionBlockForCurrentEvent( {} );
@@ -141,17 +158,17 @@ test({
 test({
 	message	: 'Router.getExecutionBlockForCurrentEvent returns correct execution block',
 	test	: ( done )=>{
-		let router							= new Router();
-		let eventRequest					= helpers.getEventRequest( 'GET', '/test', {} );
-		let emptyRoute						= new Route({}); // SHOULD BE ADDED
-		let routeWithMethodGet				= new Route({ method: 'GET' }); // SHOULD BE ADDED
-		let routeWithMethodPost				= new Route({ method: 'POST' });
-		let routeWIthRouteTest				= new Route({ route: '/test' }); // SHOULD BE ADDED
-		let routeWIthRouteNotTest			= new Route({ route: '/notTest' });
-		let routeWIthRouteNotTestAndGet		= new Route({ route: '/notTest', method: 'GET' });
-		let routeWIthRouteNotTestAndPost	= new Route({ route: '/notTest', method: 'POST' });
-		let routeWIthRouteTestAndGet		= new Route({ route: '/test', method: 'GET' }); // SHOULD BE ADDED
-		let routeWIthRouteTestAndPost		= new Route({ route: '/test', method: 'POST' });
+		const router						= new Router();
+		const eventRequest					= helpers.getEventRequest( 'GET', '/test', {} );
+		const emptyRoute					= new Route({}); // SHOULD BE ADDED
+		const routeWithMethodGet			= new Route({ method: 'GET' }); // SHOULD BE ADDED
+		const routeWithMethodPost			= new Route({ method: 'POST' });
+		const routeWIthRouteTest			= new Route({ route: '/test' }); // SHOULD BE ADDED
+		const routeWIthRouteNotTest			= new Route({ route: '/notTest' });
+		const routeWIthRouteNotTestAndGet	= new Route({ route: '/notTest', method: 'GET' });
+		const routeWIthRouteNotTestAndPost	= new Route({ route: '/notTest', method: 'POST' });
+		const routeWIthRouteTestAndGet		= new Route({ route: '/test', method: 'GET' }); // SHOULD BE ADDED
+		const routeWIthRouteTestAndPost		= new Route({ route: '/test', method: 'POST' });
 
 		router.add( emptyRoute );
 		router.add( routeWithMethodGet );
@@ -163,7 +180,7 @@ test({
 		router.add( routeWIthRouteTestAndGet );
 		router.add( routeWIthRouteTestAndPost );
 
-		let expectedExecutionBlockCount	= 4;
+		const expectedExecutionBlockCount	= 4;
 
 		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
 
@@ -184,6 +201,17 @@ test({
 
 		assert.equal( globalMiddlewareKeys.length, 1 );
 		assert.equal( globalMiddlewareKeys[0], middlewareName );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.define returns router',
+	test	: ( done )=>{
+		const router	= new Router();
+
+		assert.deepStrictEqual( router.define( 'test', ( event )=>{} ), router );
 
 		done();
 	}
@@ -261,10 +289,10 @@ test({
 test({
 	message	: 'Router.getExecutionBlockForCurrentEvent fails if route has a non existing global middleware',
 	test	: ( done )=>{
-		let router						= new Router();
-		let eventRequest				= helpers.getEventRequest( 'GET', '/test', {} );
+		const router					= new Router();
+		const eventRequest				= helpers.getEventRequest( 'GET', '/test', {} );
 
-		let routeWIthRouteTestAndGet	= new Route(
+		const routeWIthRouteTestAndGet	= new Route(
 			{
 				route: '/test',
 				method: 'GET',
@@ -286,8 +314,8 @@ test({
 test({
 	message	: 'Router.add adds another router\'s GLOBAL middleware if passed',
 	test	: ( done )=>{
-		let routerOne	= new Router();
-		let routerTwo	= new Router();
+		const routerOne	= new Router();
+		const routerTwo	= new Router();
 
 		routerOne.define( 'test1', ()=>{} );
 		routerTwo.define( 'test2', ()=>{} );
@@ -303,8 +331,8 @@ test({
 test({
 	message	: 'Router.add doesn\'t add another router\'s GLOBAL middleware if it has duplicates',
 	test	: ( done )=>{
-		let routerOne	= new Router();
-		let routerTwo	= new Router();
+		const routerOne	= new Router();
+		const routerTwo	= new Router();
 
 		routerOne.define( 'test', ()=>{} );
 		routerTwo.define( 'test', ()=>{} );
@@ -312,6 +340,74 @@ test({
 		assert.throws(()=>{
 			routerOne.add( routerTwo );
 		});
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.setServerOnRuntime adds methods to the Server and to itself that return instances of themselves',
+	test	: ( done )=>{
+		const server	= new Server();
+		const router	= server.router;
+
+		// In general it does not have these methods
+		assert.equal( typeof Server.prototype.add === 'undefined', true );
+		assert.equal( typeof Server.prototype.get === 'undefined', true );
+		assert.equal( typeof Server.prototype.post === 'undefined', true );
+		assert.equal( typeof Server.prototype.put === 'undefined', true );
+		assert.equal( typeof Server.prototype.delete === 'undefined', true );
+		assert.equal( typeof Server.prototype.head === 'undefined', true );
+		assert.equal( typeof Server.prototype.patch === 'undefined', true );
+		assert.equal( typeof Server.prototype.copy === 'undefined', true );
+
+		assert.equal( typeof Router.prototype.add !== 'undefined', true );
+
+		// In general it does not have these methods
+		assert.equal( typeof Router.prototype.get === 'undefined', true );
+		assert.equal( typeof Router.prototype.post === 'undefined', true );
+		assert.equal( typeof Router.prototype.put === 'undefined', true );
+		assert.equal( typeof Router.prototype.delete === 'undefined', true );
+		assert.equal( typeof Router.prototype.head === 'undefined', true );
+		assert.equal( typeof Router.prototype.patch === 'undefined', true );
+		assert.equal( typeof Router.prototype.copy === 'undefined', true );
+
+		// They are attached by it's router
+		assert.equal( typeof server.add !== 'undefined', true );
+		assert.equal( typeof server.get !== 'undefined', true );
+		assert.equal( typeof server.post !== 'undefined', true );
+		assert.equal( typeof server.put !== 'undefined', true );
+		assert.equal( typeof server.delete !== 'undefined', true );
+		assert.equal( typeof server.head !== 'undefined', true );
+		assert.equal( typeof server.patch !== 'undefined', true );
+		assert.equal( typeof server.copy !== 'undefined', true );
+
+		// They are attached by itself
+		assert.equal( typeof router.get !== 'undefined', true );
+		assert.equal( typeof router.post !== 'undefined', true );
+		assert.equal( typeof router.put !== 'undefined', true );
+		assert.equal( typeof router.delete !== 'undefined', true );
+		assert.equal( typeof router.head !== 'undefined', true );
+		assert.equal( typeof router.patch !== 'undefined', true );
+		assert.equal( typeof router.copy !== 'undefined', true );
+
+		assert.deepStrictEqual( server.add( { handler: ()=>{} } ) instanceof Server, true );
+		assert.deepStrictEqual( server.get( ()=>{} ) instanceof Server, true );
+		assert.deepStrictEqual( server.post( ()=>{} ) instanceof Server, true );
+		assert.deepStrictEqual( server.put( ()=>{} ) instanceof Server, true );
+		assert.deepStrictEqual( server.delete( ()=>{} ) instanceof Server, true );
+		assert.deepStrictEqual( server.head( ()=>{} ) instanceof Server, true );
+		assert.deepStrictEqual( server.patch( ()=>{} ) instanceof Server, true );
+		assert.deepStrictEqual( server.copy( ()=>{} ) instanceof Server, true );
+
+		assert.deepStrictEqual( router.add( { handler: ()=>{} } ) instanceof Router, true );
+		assert.deepStrictEqual( router.get( ()=>{} ) instanceof Router, true );
+		assert.deepStrictEqual( router.post( ()=>{} ) instanceof Router, true );
+		assert.deepStrictEqual( router.put( ()=>{} ) instanceof Router, true );
+		assert.deepStrictEqual( router.delete( ()=>{} ) instanceof Router, true );
+		assert.deepStrictEqual( router.head( ()=>{} ) instanceof Router, true );
+		assert.deepStrictEqual( router.patch( ()=>{} ) instanceof Router, true );
+		assert.deepStrictEqual( router.copy( ()=>{} ) instanceof Router, true );
 
 		done();
 	}

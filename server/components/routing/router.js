@@ -28,7 +28,7 @@ class Router extends PluginInterface
 	 * @param	String middlewareName
 	 * @param	Function middleware
 	 *
-	 * @return	void
+	 * @return	Router
 	 */
 	define( middlewareName, middleware )
 	{
@@ -41,6 +41,8 @@ class Router extends PluginInterface
 		}
 
 		this.globalMiddlewares[middlewareName]	= middleware;
+
+		return this;
 	}
 
 	/**
@@ -80,7 +82,7 @@ class Router extends PluginInterface
 	 */
 	setUpHttpMethodsToObject( object )
 	{
-		let methods	= ['POST', 'PUT', 'GET', 'DELETE', 'HEAD', 'PATCH', 'COPY'];
+		const methods	= ['POST', 'PUT', 'GET', 'DELETE', 'HEAD', 'PATCH', 'COPY'];
 
 		methods.forEach(( method )=>{
 			object[method.toLocaleLowerCase()]	= ( route, handler, middlewares = [] )=>{
@@ -106,7 +108,7 @@ class Router extends PluginInterface
 	 *
 	 * @param	Object route
 	 *
-	 * @returns	void
+	 * @returns	Router
 	 */
 	add( route )
 	{
@@ -120,7 +122,7 @@ class Router extends PluginInterface
 				this.define( key, value );
 			}
 
-			return;
+			return this;
 		}
 
 		if ( ! ( route instanceof Route ) )
@@ -129,6 +131,8 @@ class Router extends PluginInterface
 		}
 
 		this.middleware.push( route );
+
+		return this;
 	}
 
 	/**
@@ -145,7 +149,7 @@ class Router extends PluginInterface
 			throw new Error( 'Invalid EventRequest provided' );
 		}
 
-		let block	= [];
+		const block	= [];
 
 		for ( let index in this.middleware )
 		{
@@ -197,16 +201,15 @@ class Router extends PluginInterface
 	{
 		let route;
 
-		if ( typeof method === 'string' || Array.isArray( method ) )
+		switch ( true )
 		{
-			route	= new Route({
-				method	: method
-			});
-		}
-		else
-		{
-			// It should be a route object
-			route	= method;
+			case typeof method === 'string':
+			case Array.isArray( method ):
+				route	= new Route( { method } );
+				break;
+			default:
+				route	= method;
+				break;
 		}
 
 		if ( ! ( route instanceof Route ) )

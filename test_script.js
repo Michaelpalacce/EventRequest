@@ -5,18 +5,18 @@ const testSuites		= require( './tests/test_suites' );
 require( './tests/test_bootstrap' );
 
 let startTests	= ()=>{
-	testSuites.pluginsSuite();
 	testSuites.securitySuite();
 	testSuites.templatingEngine();
-	testSuites.rateLimiterSuite();
 	testSuites.helpersSuite();
 	testSuites.errorSuite();
 	testSuites.eventSuite();
 	testSuites.routingSuite();
-	testSuites.cachingSuite();
 	testSuites.loggingSuite();
 	testSuites.bodyParserSuite();
 	testSuites.validationSuite();
+	testSuites.pluginsSuite();
+	testSuites.cachingSuite();
+	testSuites.rateLimiterSuite();
 
 	runAllTests({
 		dieOnFirstError	: true,

@@ -82,13 +82,15 @@ test({
 				assert.equal( typeof event.cachingServer !== 'undefined', true );
 				assert.equal( event.cachingServer instanceof DataServer, true );
 				assert.equal( called, 1 );
+
+				removeCache( event.cachingServer );
 				done();
 			}
 		} );
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		setImmediate(()=>{
+		setTimeout(()=>{
 			eventRequest.next();
-		});
+		}, 250 );
 	}
 });

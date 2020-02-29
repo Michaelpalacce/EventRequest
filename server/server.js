@@ -37,11 +37,13 @@ class Server extends EventEmitter
 	 * @param	String middlewareName
 	 * @param	Function middleware
 	 *
-	 * @return	void
+	 * @return	Server
 	 */
 	define()
 	{
 		this.router.define.apply( this.router, arguments );
+
+		return this;
 	}
 
 	/**
@@ -196,18 +198,6 @@ class Server extends EventEmitter
 	}
 
 	/**
-	 * @brief	Resolves the given request and response
-	 *
-	 * @details	Creates a EventRequest used by the Server with helpful methods
-	 *
-	 * @return	EventRequest
-	 */
-	resolve ( request, response )
-	{
-		return new EventRequest( request, response );
-	};
-
-	/**
 	 * @brief	Called when a request is received to the server
 	 *
 	 * @param	IncomingMessage request
@@ -217,7 +207,7 @@ class Server extends EventEmitter
 	 */
 	_attach( request, response )
 	{
-		let eventRequest	= this.resolve( request, response );
+		let eventRequest	= new EventRequest( request, response );
 		this.emit( 'eventRequestResolved', { eventRequest, request, response  } );
 
 		request.on( 'close', ()=> {
@@ -310,7 +300,7 @@ App.cleanUp			= ()=>{
  * @returns	Function
  */
 App.attach			= ()=>{
-	let self	= App();
+	const self	= App();
 	return self._attach.bind( self );
 };
 
@@ -321,6 +311,7 @@ App.attach			= ()=>{
  */
 App.start			= function(){
 	const httpServer	= http.createServer( App.attach() );
+
 	return httpServer.listen.apply( httpServer, arguments );
 };
 

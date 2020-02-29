@@ -106,7 +106,7 @@ test({
 test({
 	message	: 'Route.matchMethod matches Array when provided',
 	test	: ( done ) =>{
-		let route	= getRoute( undefined, undefined, ['GET', 'POST'] );
+		const route	= getRoute( undefined, undefined, ['GET', 'POST'] );
 
 		assert.equal( route.matchMethod( 'GET' ), true );
 		assert.equal( route.matchMethod( 'POST' ), true );

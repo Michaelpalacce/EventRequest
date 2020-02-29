@@ -1,9 +1,12 @@
 'use strict';
 
+const path			= require( 'path' );
 const { Server }	= require( '../index' );
 const DataServer	= require( '../server/components/caching/data_server' );
 
-let server			= Server();
+const TEST_ROOT		= path.parse( __dirname ).dir;
+
+const server		= Server();
 
 server.add({
 	route	: '/ping',
@@ -16,7 +19,7 @@ server.add({
 Server.start( 3333, ()=>{});
 
 // Set up a memory server to be used by the tests
-let cachingServer	= new DataServer({ persist: false });
+const cachingServer	= new DataServer({ persist: false, persistPath: path.join( TEST_ROOT, './fixture/cache' )});
 
 module.exports	= {
 	server, cachingServer
