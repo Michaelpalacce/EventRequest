@@ -1,3 +1,6 @@
+12.4.1
+- Bugfix for rate_limiter_pluginnpm run deploy
+
 12.4.0
 - Added more server tests
 - Renamed the session makeNewSessionId to _makeNewSessionId

@@ -67,6 +67,13 @@ const DEFAULT_RULE						= {
  */
 class RateLimitsPlugin extends PluginInterface
 {
+	constructor( pluginId, options = {} )
+	{
+		super( pluginId, options );
+
+		this.setOptions( options );
+	}
+
 	setOptions( options )
 	{
 		super.setOptions( options );
