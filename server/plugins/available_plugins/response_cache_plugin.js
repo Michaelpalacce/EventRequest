@@ -52,12 +52,12 @@ class ResponseCachePlugin extends PluginInterface
 	attachCachingEvent( event )
 	{
 		event.on( 'send', async ( responseData )=>{
-			let { response, code, headers }	= responseData;
+			const { response, code, headers }	= responseData;
 
 			if ( typeof response === 'string' )
 			{
-				let ttl				= this.getTimeToLive( event );
-				let recordName		= this.getCacheId( event );
+				const ttl			= this.getTimeToLive( event );
+				const recordName	= this.getCacheId( event );
 
 				await this.cachingServer.set( recordName, { response, code, headers }, ttl, false );
 			}
@@ -75,14 +75,14 @@ class ResponseCachePlugin extends PluginInterface
 	 */
 	getCacheId( event )
 	{
-		let cacheId	= event.path;
-		let config	= event.currentResponseCacheConfig;
+		let cacheId		= event.path;
+		const config	= event.currentResponseCacheConfig;
 
-		let useIp	= typeof config !== 'undefined' && typeof config['useIp'] === 'boolean'
-					? config['useIp']
-					: typeof this.options !== 'undefined' && typeof this.options['useIp'] === 'boolean'
-					? this.options['useIp']
-					: DEFAULT_USE_IP;
+		const useIp		= typeof config !== 'undefined' && typeof config['useIp'] === 'boolean'
+						? config['useIp']
+						: typeof this.options !== 'undefined' && typeof this.options['useIp'] === 'boolean'
+						? this.options['useIp']
+						: DEFAULT_USE_IP;
 
 		if ( useIp === true )
 		{
@@ -101,7 +101,7 @@ class ResponseCachePlugin extends PluginInterface
 	 */
 	getTimeToLive( event )
 	{
-		let config	= event.currentResponseCacheConfig;
+		const config	= event.currentResponseCacheConfig;
 
 		return typeof config !== 'undefined' && typeof config['ttl'] === 'number'
 				? config['ttl']

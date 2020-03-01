@@ -405,7 +405,6 @@ test({
 		[null, 'value', 100, true],
 		['key', null, 100, true],
 		['key', 'value', null, true],
-		['key', 'value', 100, null],
 		[123, 'value', 100, true],
 		['key', 'value', '100', true],
 		['key', 'value', 100, 'true'],

@@ -516,25 +516,6 @@ server.apply( server.er_timeout ); // This is also valid.
 server.apply( server.er_timeout, {  timeout : 10 * 1000 } ); // This is also valid.
 ~~~
 
-###PRE-INSTALLED PLUGINS
-These plugins are automatically added to the eventRequest. They can be preconfigured before calling server.start() the same
-as other plugins by fetching them and configuring them as you wish. They can not be removed:
-
-**er_static_resources**
-
-***
-
-**er_body_parser_json**
-
-***
-
-**er_body_parser_form**
-
-***
-
-
-###Read down to the Plugin section for more information
-
 ***
 ***
 ***
@@ -1195,7 +1176,7 @@ server.apply( timeoutPlugin );
 Adds a static resources path to the request
 
     * Accepted options: 
-    **path** - String - The path to the static resources to be served. Defaults to 'public'
+    **paths** - String - The path to the static resources to be served. Defaults to 'public'
 ***
 ~~~javascript
 const PluginManager			= server.getPluginManager();
@@ -1254,7 +1235,77 @@ Server.start( 80, ()=>{
 ***
 
 ###er_session 
-@TODO DOCUMENT THIS
+Adds a Session class. The session works with a cookie. The cookie will be sent back to the client who must then return the cookie back.
+
+***
+Dependencies:
+**er_cache_server**
+
+***
+Accepted Options:
+
+**ttl: Number**
+- Time in seconds the session should be kept. 
+- Defaults to 90 days or 7776000 seconds
+
+**sessionKey: String**
+- The cookie name. 
+- Defaults to `sid`
+
+**sessionIdLength: Number**
+- The size of the session name. 
+- Defaults to 32
+
+
+***
+Events:
+**NONE**
+
+***
+Exported Functions:
+
+**initSession( Function callback ): Promise** 
+- Initializes the session. This should be called in the beginning when you want to start the user sesion
+- This will initialize a new session if one does not exist and fetch the old one if one exists
+- The callback will return false if there was no error
+
+
+***
+Attached Functionality:
+**event.session: Session**
+
+- This is the main class that should be used to manipulate the user session.
+- There is no need to save the changes done to the session, that will be done automatically at the end of the request
+
+
+The Session exports the following functions:
+
+**hasSession(): Promise: Boolean**
+- Returns true if the user has a session started. 
+- Generally will be false before you call initSession
+
+**removeSession(): Promise: void**
+- Deletes the current session from the caching server directly
+
+**newSession(): Promise: String||Boolean**
+- Resolves to the new sessionId or to false if failed
+
+**add( String name, mixed value ): void**
+- Adds a new value to the session given a key
+
+**get( String key ): mixed**
+- Gets a value from the session
+
+**delete( String key ): void**
+- Deletes a key from the session
+
+**has( String key ): Boolean**
+- Checks if the session has the given key
+
+**saveSession( String sessionId = currentSessionId ): Promise: Boolean**
+- Save the current session
+- The session id parameter is there for when switching sessions or creating new ones to not save the sessionId if it was not successfully created ( done internally )
+- You probably should never pass a sessionId 
 
 
 ***

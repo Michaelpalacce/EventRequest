@@ -1,3 +1,10 @@
+12.4.0
+- Added more server tests
+- Renamed the session makeNewSessionId to _makeNewSessionId
+- Removed the sessionId from Session.removeSession()
+- Updated the documentation about er_session and the Session class
+- Fixed a bug with the dataServer persist ( the default persist was always set to true, now looks at the given persist setting )
+
 12.3.0
 - Added more server tests
 - Made it possible to add handlers directly using app.add or router.add

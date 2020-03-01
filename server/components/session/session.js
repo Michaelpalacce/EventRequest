@@ -5,7 +5,7 @@ const uniqueId	= require( './../helpers/unique_id' );
 /**
  * @details	Time the session should be kept. Defaults to 90 days
  *
- * @var		Number TTK
+ * @var		Number TTL
  */
 const TTL		= 7776000;
 
@@ -50,7 +50,7 @@ class Session
 	 *
 	 * @return	String
 	 */
-	makeNewSessionId()
+	_makeNewSessionId()
 	{
 		return uniqueId.makeId( this.sessionIdLength );
 	}
@@ -73,13 +73,11 @@ class Session
 	/**
 	 * @brief	Removes the session from the caching server
 	 *
-	 * @param	String sessionId
-	 *
 	 * @return	void
 	 */
-	async removeSession( sessionId = this.getSessionId() )
+	async removeSession()
 	{
-		await this.server.delete( sessionId );
+		await this.server.delete( this.getSessionId() );
 	}
 
 	/**
@@ -89,7 +87,7 @@ class Session
 	 */
 	async newSession()
 	{
-		let sessionId	= this.makeNewSessionId();
+		const sessionId	= this._makeNewSessionId();
 		this.session	= {
 			id	: sessionId
 		};

@@ -89,7 +89,7 @@ test({
 });
 
 test({
-	message	: 'Session makeNewSessionId returns an id depending on the sessionKeyLength',
+	message	: 'Session _makeNewSessionId returns an id depending on the sessionKeyLength',
 	test	: ( done )=>{
 		let eventRequest			= helpers.getEventRequest();
 		eventRequest.cachingServer	= helpers.getCachingServer();
@@ -100,7 +100,7 @@ test({
 			session	= new Session( eventRequest, { sessionIdLength } );
 		});
 
-		assert.equal( sessionIdLength, session.makeNewSessionId().length );
+		assert.equal( sessionIdLength, session._makeNewSessionId().length );
 
 		done();
 	}
@@ -156,6 +156,8 @@ test({
 					if ( hasSession === true )
 					{
 						await session.removeSession();
+
+						assert.equal( await session.hasSession(), false );
 
 						done();
 					}

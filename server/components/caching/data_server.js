@@ -61,13 +61,13 @@ class DataServer
 
 		gcInterval				= gcInterval * 1000;
 
-		const persist			= typeof options['persist'] === 'boolean'
+		this.persist			= typeof options['persist'] === 'boolean'
 								? options['persist']
 								: DEFAULT_PERSIST_RULE;
 
 		this.intervals			= [];
 
-		if ( persist )
+		if ( this.persist )
 		{
 			if ( fs.existsSync( this.persistPath ) )
 			{
@@ -189,16 +189,18 @@ class DataServer
 	 *
 	 * @return	Object
 	 */
-	async set( key, value, ttl = 0, persist = true )
+	async set( key, value, ttl = 0, persist = null )
 	{
 		if (
 			typeof key !== 'string'
 			|| value == null
 			|| typeof ttl !== 'number'
-			|| typeof persist !== 'boolean'
+			|| ( typeof persist !== 'boolean' && persist !== null )
 		) {
 			return null;
 		}
+
+		persist	= persist === null ? this.persist : persist;
 
 		return this._set( key, value, ttl, persist ).catch( this._handleServerDown );
 	}
@@ -289,7 +291,7 @@ class DataServer
 	 *
 	 * @param	String key
 	 *
-	 * @return	Boolean
+	 * @return	Promise
 	 */
 	async delete( key )
 	{
@@ -298,7 +300,9 @@ class DataServer
 			return this._delete( key ).catch( this._handleServerDown );
 		}
 
-		return false;
+		return new Promise(( resolve )=>{
+			resolve( false );
+		});
 	}
 
 	/**

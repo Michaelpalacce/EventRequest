@@ -121,19 +121,22 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
  *
  * @return	Promise
  */
-helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '', port = 3333 )=>{
+helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '', headers = {}, port = 3333 )=>{
 	return new Promise(( resolve,reject )=>{
-		const postData	= querystring.stringify( data );
+		const postData			= querystring.stringify( data );
+		const predefinedHeaders	= {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Content-Length': Buffer.byteLength( postData )
+		};
+
+		headers	= { ...predefinedHeaders, ...headers };
 
 		const options	= {
 			hostname	: 'localhost',
-			port		: port,
-			path		: path,
-			method		: method,
-			headers		: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-				'Content-Length': Buffer.byteLength( postData )
-			}
+			port,
+			path,
+			method,
+			headers
 		};
 
 		const req	= request( options, ( res ) =>{

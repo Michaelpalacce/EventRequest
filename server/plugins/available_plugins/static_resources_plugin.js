@@ -25,11 +25,11 @@ class StaticResourcesPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let staticPaths			= Array.isArray( this.options.paths ) ? this.options.paths : ['public'];
-		let pluginMiddlewares	= [];
+		const staticPaths		= Array.isArray( this.options.paths ) ? this.options.paths : ['public'];
+		const pluginMiddlewares	= [];
 
 		staticPaths.forEach( ( staticPath )=>{
-			let regExp	= new RegExp( '^(\/' + staticPath + ')' );
+			const regExp	= new RegExp( '^(\/' + staticPath + ')' );
 
 			pluginMiddlewares.push( {
 				route	: regExp,

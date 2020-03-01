@@ -48,7 +48,7 @@ class SessionPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let setUpPluginMiddleware	= {
+		const setUpPluginMiddleware	= {
 			handler	: ( event ) =>
 			{
 				if ( event.session == null )
@@ -71,7 +71,7 @@ class SessionPlugin extends PluginInterface
 			}
 		};
 
-		let initSessionForPathMiddleware	= {
+		const initSessionForPathMiddleware	= {
 			handler	: ( event )=>{
 				event.initSession	= async ( callback )=>{
 					const hasSession	= await event.session.hasSession();

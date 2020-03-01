@@ -5,6 +5,8 @@ const { assert, test, helpers, Mock }	= require( '../test_helper' );
 const App								= require( './../../server/server' );
 const path								= require( 'path' );
 const Router							= require( './../../server/components/routing/router' );
+const DataServer						= require( './../../server/components/caching/data_server' );
+const Session							= require( './../../server/components/session/session' );
 const PreloadedPluginManager			= require( './../../server/plugins/preloaded_plugins' );
 const Server							= App.class;
 
@@ -271,7 +273,7 @@ test({
 test({
 	message	: 'Server() returns the same instance',
 	test	: ( done )=>{
-		const server		= App();
+		const server	= App();
 		const serverTwo	= App();
 
 		server.define( 'testMiddleware', ()=>{} );
@@ -331,7 +333,7 @@ test({
 		server.listen( port );
 
 		server.on( 'listening', ()=>{
-			helpers.sendServerRequest( '/attachUsingHttpServer', 'GET',  201, '', port ).then(()=>{
+			helpers.sendServerRequest( '/attachUsingHttpServer', 'GET',  201, '', {}, port ).then(()=>{
 				server.close();
 				done();
 			}).catch( done );
@@ -1207,7 +1209,6 @@ test({
 	}
 });
 
-
 test({
 	message	: 'Server.test er_rate_limits connection delay returns 429 if no more retries',
 	test	: ( done )=>{
@@ -1298,5 +1299,130 @@ test({
 			assert.equal( renderCalled, 2 );
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_session works as expected',
+	test	: ( done )=>{
+		const name	= 'testErSession';
+
+		assert.throws(()=>{
+			app.apply( app.er_session );
+		});
+
+		app.apply( app.er_cache_server );
+		app.apply( app.er_session );
+
+		app.get( `/${name}`, ( event )=>{
+			event.initSession( event.next ).catch( event.next );
+		} );
+
+		app.get( `/${name}`, async ( event )=>{
+			assert.equal( event.session instanceof Session, true );
+			const session	= event.session;
+
+			if ( session.has( 'authenticated' ) === false )
+			{
+				assert.throws(()=>{
+					session.get( 'authenticated' );
+				});
+
+				session.add( 'authenticated', true );
+			}
+			else
+			{
+				assert.equal( session.get( 'authenticated' ), true );
+				event.setHeader( 'authenticated', 1 );
+			}
+
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			assert.equal( typeof response.headers['set-cookie'] !== 'undefined', true );
+
+			const cookies	= {},
+				rc		= response.headers['set-cookie'][0];
+
+			rc && rc.split( ';' ).forEach( function( cookie ) {
+				const parts						= cookie.split( '=' );
+				cookies[parts.shift().trim()]	= decodeURI( parts.join( '=' ) );
+			});
+
+			assert.equal( typeof cookies.sid === 'string', true );
+
+			const headers	= { cookie: `sid=${cookies.sid}`};
+
+			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			assert.equal( typeof response.headers.authenticated !== 'undefined', true );
+			assert.equal( response.headers.authenticated, 1 );
+
+			const headers	= { cookie: `sid=wrong`};
+
+			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			assert.equal( typeof response.headers.authenticated === 'undefined', true );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_cache_server works as expected',
+	test	: ( done )=>{
+		const name			= 'testCacheServer';
+		const secondName	= `/${name}Second`;
+		const key			= `${name}_KEY`;
+		const value			= `${name}_VALUE`;
+
+		app.apply( app.er_cache_server, { dataServerOptions: { persist: false } } );
+
+		app.get( `/${name}`, async ( event )=>{
+			assert.equal( event.cachingServer instanceof DataServer, true );
+
+			await event.cachingServer.set( key, value ).catch( done );
+			await event.cachingServer.set( `${key}_delete`, value ).catch( done );
+
+			await event.cachingServer.delete( `${key}_delete`, value ).catch( done );
+
+			event.send( name );
+		});
+
+		app.get( secondName, async ( event )=>{
+			assert.equal( event.cachingServer instanceof DataServer, true );
+
+			const cacheValue	= await event.cachingServer.get( key ).catch( done );
+
+			assert.equal( cacheValue.value, value );
+			assert.equal( await event.cachingServer.get( `${key}_delete` ).catch( done ), null );
+
+			event.send( secondName );
+		});
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			return helpers.sendServerRequest( secondName );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), secondName );
+			done();
+		}).catch( done )
+	}
+});
+
+test({
+	message	: 'Server.test er_static_resources works as expected',
+	test	: ( done )=>{
+		app.apply( app.er_static_resources, { paths: ['tests/server/fixture/static'] } );
+
+		helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js` ).then(( response )=>{
+			assert.equal( response.body.toString(), 'const test=\'123\';' );
+			done();
+		}).catch( done )
 	}
 });
