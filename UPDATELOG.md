@@ -1,5 +1,13 @@
+13.0.0
+- Updated the way the server will be attached 
+- Added some er_rate_limiter tests that will prevent the bug that happened in 12.4.0 to occur 
+- Added more server tests
+- Started drastically improving the documentation
+- Render now returns a promise
+- Static resources plugin now accepts a string
+
 12.4.1
-- Bugfix for rate_limiter_pluginnpm run deploy
+- Bugfix for rate_limiter_plugin
 
 12.4.0
 - Added more server tests

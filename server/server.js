@@ -198,74 +198,73 @@ class Server extends EventEmitter
 	}
 
 	/**
-	 * @brief	Called when a request is received to the server
+	 * @brief	Callback for the http.createServer
 	 *
-	 * @param	IncomingMessage request
-	 * @param	ServerResponse response
-	 *
-	 * @return	void
+	 * @return	Function
 	 */
-	_attach( request, response )
+	attach()
 	{
-		let eventRequest	= new EventRequest( request, response );
-		this.emit( 'eventRequestResolved', { eventRequest, request, response  } );
+		return ( request, response )=>{
+			let eventRequest	= new EventRequest( request, response );
+			this.emit( 'eventRequestResolved', { eventRequest, request, response  } );
 
-		request.on( 'close', ()=> {
-			this.emit( 'eventRequestRequestClosed', { eventRequest, request } );
+			request.on( 'close', ()=> {
+				this.emit( 'eventRequestRequestClosed', { eventRequest, request } );
 
-			if ( eventRequest != null )
-			{
-				eventRequest.cleanUp();
-				eventRequest	= null;
-			}
-		});
-
-		response.on( 'finish', () => {
-			this.emit( 'eventRequestResponseFinish', { eventRequest, response } );
-
-			if ( eventRequest != null )
-			{
-				eventRequest.cleanUp();
-				eventRequest	= null;
-			}
-		});
-
-		response.on( 'error', ( error ) => {
-			this.emit( 'eventRequestResponseError', { eventRequest, response, error } );
-
-			if ( eventRequest != null )
-			{
-				eventRequest.next( error );
-				eventRequest	= null;
-			}
-		});
-
-		try
-		{
-			let block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
-			this.emit( 'eventRequestBlockSetting', { eventRequest, block } );
-			eventRequest.setBlock( block );
-			this.emit( 'eventRequestBlockSet', { eventRequest, block } );
-
-			const onErrorCallback	= ( error ) =>{
-				this.emit( 'eventRequestError', { eventRequest, error } );
-
-				if ( eventRequest.logger === null )
+				if ( eventRequest != null )
 				{
-					Loggur.log( error, LOG_LEVELS.error );
+					eventRequest.cleanUp();
+					eventRequest	= null;
 				}
-			};
+			});
 
-			eventRequest.on( 'error', onErrorCallback );
-			eventRequest.on( 'on_error', onErrorCallback );
+			response.on( 'finish', () => {
+				this.emit( 'eventRequestResponseFinish', { eventRequest, response } );
 
-			eventRequest.next();
-		}
-		catch ( error )
-		{
-			this.emit( 'eventRequestThrow', { eventRequest, error } );
+				if ( eventRequest != null )
+				{
+					eventRequest.cleanUp();
+					eventRequest	= null;
+				}
+			});
 
-			eventRequest.next( error );
+			response.on( 'error', ( error ) => {
+				this.emit( 'eventRequestResponseError', { eventRequest, response, error } );
+
+				if ( eventRequest != null )
+				{
+					eventRequest.next( error );
+					eventRequest	= null;
+				}
+			});
+
+			try
+			{
+				let block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
+				this.emit( 'eventRequestBlockSetting', { eventRequest, block } );
+				eventRequest.setBlock( block );
+				this.emit( 'eventRequestBlockSet', { eventRequest, block } );
+
+				const onErrorCallback	= ( error ) =>{
+					this.emit( 'eventRequestError', { eventRequest, error } );
+
+					if ( eventRequest.logger === null )
+					{
+						Loggur.log( error, LOG_LEVELS.error );
+					}
+				};
+
+				eventRequest.on( 'error', onErrorCallback );
+				eventRequest.on( 'on_error', onErrorCallback );
+
+				eventRequest.next();
+			}
+			catch ( error )
+			{
+				this.emit( 'eventRequestThrow', { eventRequest, error } );
+
+				eventRequest.next( error );
+			}
 		}
 	}
 
@@ -293,24 +292,12 @@ App.cleanUp			= ()=>{
 };
 
 /**
- * @brief	Returns the attach function of the serve
- *
- * @details	This can be used to implement the http/https server
- *
- * @returns	Function
- */
-App.attach			= ()=>{
-	const self	= App();
-	return self._attach.bind( self );
-};
-
-/**
  * @brief	Starts the server with the given arguments
  *
  * @returns	Server
  */
 App.start			= function(){
-	const httpServer	= http.createServer( App.attach() );
+	const httpServer	= http.createServer( App().attach() );
 
 	return httpServer.listen.apply( httpServer, arguments );
 };

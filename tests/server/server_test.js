@@ -4,6 +4,8 @@
 const { assert, test, helpers, Mock }	= require( '../test_helper' );
 const App								= require( './../../server/server' );
 const path								= require( 'path' );
+const http								= require( 'http' );
+const fs								= require( 'fs' );
 const Router							= require( './../../server/components/routing/router' );
 const DataServer						= require( './../../server/components/caching/data_server' );
 const Session							= require( './../../server/components/session/session' );
@@ -308,16 +310,16 @@ test({
 });
 
 test({
-	message	: 'Server.attach() returns a function',
+	message	: 'App().attach() returns a function',
 	test	: ( done )=>{
-		assert.equal( typeof App.attach() === 'function', true );
+		assert.equal( typeof App().attach() === 'function', true );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Server.attach() using a httpServer works as expected',
+	message	: 'App().attach() using a httpServer works as expected',
 	test	: ( done )=>{
 		const httpServer	= require( 'http' );
 		const body			= '<h1>Hello World!</h1>';
@@ -328,7 +330,7 @@ test({
 			event.send( body, 201 );
 		});
 
-		const server	= httpServer.createServer( App.attach() );
+		const server	= httpServer.createServer( App().attach() );
 
 		server.listen( port );
 
@@ -935,6 +937,32 @@ test({
 });
 
 test({
+	message	: 'Server.test er_rate_limits does not die without any parameters',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsDoesNotDie';
+		const fileLocation	= path.join( __dirname, './../../rate_limits.json' );
+
+		const Server		= App.class;
+		const app			= new Server();
+		const server		= http.createServer( app.attach() );
+
+		app.apply( app.er_rate_limits );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		server.listen( 3334 );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3334 ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			fs.unlinkSync( fileLocation );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test er_rate_limits with permissive limiting',
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithPermissiveLimiting';
@@ -1422,6 +1450,15 @@ test({
 
 		helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js` ).then(( response )=>{
 			assert.equal( response.body.toString(), 'const test=\'123\';' );
+
+			return helpers.sendServerRequest( '/tests/server/fixture/static/test.css' );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), 'body{background:black;}' );
+
+			return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString().includes( 'File not found' ), true );
+
 			done();
 		}).catch( done )
 	}

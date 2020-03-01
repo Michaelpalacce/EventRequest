@@ -18,14 +18,16 @@ class StaticResourcesPlugin extends PluginInterface
 	/**
 	 * @brief	Sets the given path as the static path where resources can be delivered easily
 	 *
-	 * @details	Accepts options:
-	 * 			- path - String - the path to make static - defaults to public
-	 *
 	 * @return	Array
 	 */
 	getPluginMiddleware()
 	{
-		const staticPaths		= Array.isArray( this.options.paths ) ? this.options.paths : ['public'];
+		const staticPaths		= Array.isArray( this.options.paths )
+								? this.options.paths
+								: typeof this.options.paths === 'string'
+								? [this.options.paths]
+								: ['public'];
+
 		const pluginMiddlewares	= [];
 
 		staticPaths.forEach( ( staticPath )=>{
@@ -47,7 +49,7 @@ class StaticResourcesPlugin extends PluginInterface
 					}
 					else
 					{
-						event.next( `File not found: ${item}` );
+						event.next( `File not found: ${item}`, 404 );
 					}
 				}
 			} );

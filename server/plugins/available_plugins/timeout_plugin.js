@@ -58,11 +58,10 @@ class TimeoutPlugin extends PluginInterface
 	{
 		event.clearTimeout	= () =>
 		{
-			event.emit( 'clearTimeout' );
-
 			if ( event.internalTimeout !== null && event.internalTimeout !== undefined )
 			{
 				clearTimeout( event.internalTimeout );
+				event.emit( 'clearTimeout' );
 			}
 
 			event.internalTimeout	= undefined;

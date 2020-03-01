@@ -23,16 +23,46 @@ const { Server, Loggur }	= require( 'event_request' );
 /**
  * @brief	Instantiate the server
  */
-const server	= Server();
+const app	= Server();
 
 // Add a new Route
-server.get( '/', ( event ) => {
+app.get( '/', ( event ) => {
 	event.send( '<h1>Hello World!</h1>' );
 });
 
 Server.start( 80, ()=>{
 	Loggur.log( 'Server started' );
 });
+~~~
+
+# Multiple Servers Setup:
+~~~javascript
+const { Server, Loggur }	= require( 'event_request' );
+const http					= require( 'http' );
+
+/**
+ * @brief	Instantiate the server
+ */
+// With this setup you'll have to work only with the variables appOne and appTwo. You cannot call Server() to get any of them in different parts of the project
+// This can be remedied a bit by creating routers in different controllers and then exporting them to be later on added 
+const appOne		= new Server.class();
+const appTwo		= new Server.class();
+
+const httpServerOne	= http.createServer( appOne.attach() );
+const httpServerTwo	= http.createServer( appTwo.attach() );
+
+// Add a new Route
+appOne.get( '/', ( event ) => {
+	event.send( '<h1>Hello World!</h1>' );
+});
+
+// Add a new Route
+appTwo.get( '/', ( event ) => {
+	event.send( '<h1>Hello World x2!</h1>' );
+});
+
+httpServerOne.listen( 3334 );
+httpServerTwo.listen( 3335 );
 ~~~
 
 #Properties exported by the Module:
@@ -1158,67 +1188,203 @@ The plugin Manager exports the following functions:
 
 
 ###er_timeout
-Adds a timeout to the request
+- Adds a timeout to the request
 
-    * Accepted options:
-    **timeout** - Number - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds
+
 ***
+Dependencies:
+
+**NONE**
+
+***
+Accepted Options:
+
+**timeout**
+- the amount of milliseconds after which the request should timeout - Defaults to 60 seconds or 60000 milliseconds
+
+***
+Events:
+
+**clearTimeout()**
+- Emitted when the event.clearTimeout() function is called if there was a timeout to be cleared
+
+***
+Exported Functions:
+
+**clearTimeout(): void**
+- Clears the Request Timeout
+- Will do nothing if there is no timeout
+
+***
+Attached Functionality:
+
+**event.internalTimeout: Timeout**
+- The request timeout set in the EventRequest
+
+***
+Exported Plugin Functions:
+
+**NONE**
+
+***
+Example:
+
 ~~~javascript
-const PluginManager	= server.getPluginManager();
-let timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
-timeoutPlugin.setOptions( { timeout : envConfig.requestTimeout } );
-server.apply( timeoutPlugin );
+app.apply( 'er_timeout', { timeout: 10000 } );
+
+// OR
+app.apply( 'er_timeout' );
+
+// OR
+app.apply( app.er_timeout );
+
+// OR
+const PluginManager	= app.getPluginManager();
+const timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
+
+timeoutPlugin.setOptions( { timeout : 10000 } ); // 10 seconds
+app.apply( timeoutPlugin );
 ~~~
 
+***
+***
 ***
 
 ###er_static_resources
-Adds a static resources path to the request
+- Adds a static resources path to the request.
+- By default the server has this plugin attached to allow favicon.ico to be sent
 
-    * Accepted options: 
-    **paths** - String - The path to the static resources to be served. Defaults to 'public'
 ***
+Dependencies:
+
+**NONE**
+
+***
+Accepted Options:
+
+**paths: Array[String] | String**
+- The path/s to the static resources to be served. Defaults to 'public'
+- Can either be an array of strings or just one string
+- The path starts from the root of the project ( where the node command is being executed )
+
+***
+Events:
+
+**NONE**
+
+***
+Exported Functions:
+
+**NONE**
+
+***
+Attached Functionality:
+
+**NONE**
+
+***
+Exported Plugin Functions:
+
+**NONE**
+
+***
+Example:
+
 ~~~javascript
-const PluginManager			= server.getPluginManager();
-let staticResourcesPlugin	= PluginManager.getPlugin( 'er_static_resources' );
+app.apply( app.er_static_resources, { paths : ['public'] } );
+
+//OR
+app.apply( 'er_static_resources', { paths : ['public'] } );
+
+//OR
+app.apply( 'er_static_resources' );
+
+//OR
+app.apply( app.er_static_resources );
+
+//OR
+const PluginManager			= app.getPluginManager();
+const staticResourcesPlugin	= PluginManager.getPlugin( 'er_static_resources' );
+
 staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
-server.apply( staticResourcesPlugin );
+app.apply( staticResourcesPlugin );
 ~~~
 
+***
+***
 ***
 
 ###er_cache_server
-Adds a Caching Server using the DataServer provided in the constructor if any.
-This plugin will add a DataServer to: `event.cachingServer` 
+- Adds a Caching Server using the DataServer provided in the constructor if any.
+- This plugin will add a DataServer to: `event.cachingServer` 
 
-    Accepted options: 
-    **dataServerOptions** - Object - The options to be passed to the DataServer if the default one should be used
-    **dataServer** - Object - An already instanciated child of DataServer to be used insted of the default one
+***
+Dependencies:
 
-You can add the plugin like:
+**NONE**
+
+***
+Accepted Options:
+
+**dataServerOptions: Object** 
+- The options to be passed to the DataServer if the default one should be used
+
+**dataServer: Object**
+ - An already instantiated child of DataServer to be used insted of the default one
+
+***
+Events:
+
+**NONE**
+
+***
+Exported Functions:
+
+**NONE**
+
+***
+Attached Functionality:
+
+**event.cachingServer: DataServer**
+- The caching server will be available to be used within the EventRequest after it has been applied in the middleware block
+- You can retrieve the DataServer from any other plugin after this one has been applied by doing: server.getPlugin( 'er_cache_server' ).getServer()
+
+***
+Exported Plugin Functions:
+
+**getServer(): DataServer**
+- Returns the instance of the DataServer, following a singleton pattern
+
+***
+Example:
+
+- You can add the plugin like:
 ~~~javascript
-server.apply( 'er_cache_server' );
+app.apply( 'er_cache_server' );
+
+// OR
+app.apply( app.er_cache_server );
 
 // OR if you have made a child of the DataServer:
-server.apply( 'er_cache_server', { dataServer: new CustomDataServer() } );
+app.apply( app.er_cache_server, { dataServer: new CustomDataServer() } );
 
 // OR if you want to pass specific parameters to the default DataServer:
-server.apply( 'er_cache_server', { dataServerOptions: { persist: false, ttl: 200, persistPath: '/root' } } );
+app.apply( app.er_cache_server, { dataServerOptions: { persist: false, ttl: 200, persistPath: '/root' } } );
 ~~~
 
-The plugin can be used like:
+- The plugin can be used like:
 ~~~javascript
 const { Server, Loggur }	= require( 'event_request' );
  
 /**
  * @brief	Instantiate the server
  */
-const server	= Server();
+const app	= Server();
 
-server.apply( 'er_cache_server', { persist: false } );
+app.apply( app.er_cache_server, { persist: false } );
  
 // Add a new Route
-server.get( '/', ( event ) => {
+app.get( '/', ( event ) => {
     event.cachingServer.set( 'key', 'value' );
 
     console.log( event.cachingServer.get( 'key' ) );
@@ -1231,15 +1397,19 @@ Server.start( 80, ()=>{
 });
 ~~~
 
-
+***
+***
 ***
 
-###er_session 
-Adds a Session class. The session works with a cookie. The cookie will be sent back to the client who must then return the cookie back.
+#er_session 
+- Adds a Session class.
+- The session works with a cookie.
+- The cookie will be sent back to the client who must then return the cookie back.
 
 ***
 Dependencies:
-**er_cache_server**
+
+ **er_cache_server**
 
 ***
 Accepted Options:
@@ -1256,9 +1426,9 @@ Accepted Options:
 - The size of the session name. 
 - Defaults to 32
 
-
 ***
 Events:
+
 **NONE**
 
 ***
@@ -1269,14 +1439,13 @@ Exported Functions:
 - This will initialize a new session if one does not exist and fetch the old one if one exists
 - The callback will return false if there was no error
 
-
 ***
 Attached Functionality:
+
 **event.session: Session**
 
 - This is the main class that should be used to manipulate the user session.
 - There is no need to save the changes done to the session, that will be done automatically at the end of the request
-
 
 The Session exports the following functions:
 
@@ -1307,41 +1476,146 @@ The Session exports the following functions:
 - The session id parameter is there for when switching sessions or creating new ones to not save the sessionId if it was not successfully created ( done internally )
 - You probably should never pass a sessionId 
 
+***
+Exported Plugin Functions:
 
+**NONE**
+
+***
+Example:
+
+- You can use the session like this:
+~~~javascript
+const { Loggur, Server } = require( 'event_request' );
+
+const app	= Server();
+
+// Initialize the session
+app.add( async ( event )=>{
+	event.initSession( event.next ).catch( event.next );
+});
+
+// Redirect to login if authenticated is not true
+app.add(( event )=>{
+	if (
+		event.path !== '/login'
+		&& ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
+	) {
+		event.redirect( '/login' );
+		return;
+	}
+
+	event.next();
+});
+
+app.post( '/login', async ( event )=>{
+	const result	= event.validationHandler.validate( event.body, { username : 'filled||string', password : 'filled||string' } );
+
+	if ( result.hasValidationFailed() )
+	{
+		event.render( '/login' );
+		return;
+	}
+
+	const { username, password }	= result.getValidationResult();
+
+	if ( username === 'username' && password === 'password' )
+	{
+		event.session.add( 'username', username );
+		event.session.add( 'authenticated', true );
+
+		event.redirect( '/' );
+	}
+	else
+	{
+		event.render( '/login' );
+	}
+});
+
+Server.start( 80, ()=>{
+    Loggur.log( 'Server started' );
+});
+~~~
+
+***
+***
 ***
 
 ###er_templating_engine
-Adds a templating engine to the event request ( the default templating engine is used just to render static HTML )
-If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
-
-    * Accepted options: 
-    * - engine - Object - Instance of a templating engine that has a method render defined that accepts
-    *       html as first argument and object of variables as second -> Defaults to DefaultTemplatingEngine which can be used to serve static HTML
-    * - templateDir - String - Where to draw the templates from -> Defaults to PROJECT_ROOT/public
+- Adds a templating engine to the event request ( the default templating engine is used just to render static HTML )
+- If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
 
 ***
+Dependencies:
 
-###Events:
-
-render ( String templateName, Object variables ) - Emitted in the beginning of the rendering process if everything has been started successfully 
+**NONE**
 
 ***
+Accepted Options:
 
-The plugin attaches the following functions:
+**engine: Object**
+- Instance of a templating engine that has a function render
+- The render function should accept html as first argument and object of variables as second 
+- Defaults to DefaultTemplatingEngine which can be used to serve static HTML
 
-**render( String templateName, Object variables = {}, Function callback = ()=>{} ): void**
+**templateDir: String**
+- Where to draw the templates from 
+- Defaults to PROJECT_ROOT/public
+
+***
+Events:
+
+**render ( String templateName, Object variables )**
+- Emitted in the beginning of the rendering process if everything has been started successfully 
+
+
+***
+Exported Functions:
+
+**render( String templateName, Object variables = {}, Function errorCallback = null ): Promise**
 - templateName will be the name of the file without the '.html' extension starting from the tempateDir given as a base ( folders are ok )
 - The variables should be an object that will be given to the templating engine
-- Callback will be called in case of a successful render. Note: you don't have to take any further actions, at this point the html has already been streamed
-- Callback will be called in case of an error too with the error that happened. Note: In case of an error, you will have to handle the error message sent to the user
+- The promise will be resolved in case of a successful render. Note: you don't have to take any further actions, at this point the html has already been streamed
+- The promise will be rejected in case of an error with the error that happened. Note: In case of an error no further actions are needed as event.next is going to be automatically called and the errorHandler will take care of the error
+- If you want to handle the error yourself, an errorCallback must be provided
 - 'render' event will be emitted by the EventRequest in the beginning with details on what is being rendered
 
 ***
+Attached Functionality:
+
+**event.templatingEngine: TemplatingEngine**
+- The templating engine to be used with the render function
+- Defaults to DefaultTemplatingEngine
+
+**event.templateDir: String**
+- The absolute path to where the templates are held
+- Defaults to path.join( PROJECT_ROOT, './public' )
+
+***
+Exported Plugin Functions:
+
+**NONE**
+
+***
+Example:
+
 ~~~javascript
-const PluginManager			= server.getPluginManager();
-let templatingEnginePlugin	= PluginManager.getPlugin( 'er_templating_engine' );
+app.apply( app.er_templating_engine, { templateDir: path.join( __dirname, './public' ) } );
+
+// OR
+app.apply( 'er_templating_engine' );
+
+// OR
+app.apply( app.er_templating_engine );
+
+// OR
+const PluginManager				= server.getPluginManager();
+const templatingEnginePlugin	= PluginManager.getPlugin( app.er_templating_engine );
+
 templatingEnginePlugin.setOptions( { templateDir : path.join( __dirname, './public' ), engine : someEngineConstructor } ); 
-server.apply( templatingEnginePlugin );
+app.apply( templatingEnginePlugin );
+
+// THEN
 
 router.get( '/preview', ( event ) => {
 		// If you have a templating engine that supports parameters:
@@ -1354,40 +1628,72 @@ router.get( '/preview', ( event ) => {
 ~~~
 
 ***
+***
+***
 
 ###er_file_stream 
-Adds a file streaming plugin to the site allowing different MIME types to be streamed
-Currently supported are :
-- Images: '.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
-- Videos: '.mp4'
-- Text: '.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini', 'ts'
+- Adds a file streaming plugin to the site allowing different MIME types to be streamed
+- Currently supported are :
+  - Images: '.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
+  - Videos: '.mp4'
+  - Text: '.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini', 'ts'
+- The VideoFileStream can be paired up with an HTML5 video player to stream videos to it
+- An 'stream_start' event will be emitted by the EventRequest the moment the stream is going to be started 
 
 ***
+Dependencies:
 
-The VideoFileStream can be paired up with an HTML5 video player to stream videos to it
-An 'stream_start' event will be emitted by the EventRequest the moment the stream is going to be started 
-
-~~~javascript
-const PluginManager		= server.getPluginManager();
-let fileStreamPlugin	= PluginManager.getPlugin( 'er_file_stream' );
-server.apply( fileStreamPlugin );
-~~~
-
-###Events:
-
-stream_start ( FileStream stream ) - Emitted when the stream is successfully started
+**NONE**
 
 ***
+Accepted Options:
 
-This plugin attaches the following functions to the EventRequest:
+**NONE**
+
+***
+Events:
+
+**stream_start ( FileStream stream )**
+- Emitted when the stream is successfully started
+
+***
+Exported Functions:
 
 **streamFile( String file, Object options = {}, errCallback ): void** 
 - This function accepts the absolute file name ( file ) and any options that should be given to the file stream ( options )
 - This function may accept an errCallback that will be called if there are no fileStreams that can handle the given file, otherwise call it will call event.next() with an error and a status code of 400
+
 **getFileStream( file, options = {} ): FileStream | null**
 - This function accepts the absolute file name ( file ) and any options that should be given to the file stream ( options )
 - This function will return null if no file streams were found or in case of another error
 
+***
+Attached Functionality:
+
+**event.fileStreamHandler: FileStreamHandler**
+- The file stream handler used to create file streams
+
+***
+Exported Plugin Functions:
+
+**NONE**
+
+***
+Example:
+
+~~~javascript
+const PluginManager		= app.getPluginManager();
+const fileStreamPlugin	= PluginManager.getPlugin( 'er_file_stream' );
+app.apply( fileStreamPlugin );
+
+// OR
+app.apply( app.er_file_stream );
+
+// OR
+app.apply( 'er_file_stream' );
+~~~
+
+- Example of streaming data:
 ~~~javascript
 const fs = require( 'fs' );
 
@@ -1424,24 +1730,71 @@ app.get( '/dataTwo', ( event ) =>{
 );
 ~~~
 
-
+***
+***
 ***
 
 ###er_logger 
-Adds a logger to the eventRequest
-Attaches a dumpStack() function as well as log( data, level ) function to the process for easier access
-This can be controlled and turned off. The process.log( data, level ) calls the given logger
- 
-    Accepted options: 
-    **logger** - Object - Instance of Logger, if incorrect object provided, defaults to the default logger from the Loggur
-    **attachToProcess** - Object - Boolean whether the plugin should attach dumpStack and log to the process
+- Adds a logger to the eventRequest
+- Attaches a dumpStack() function as well as log( data, level ) function to the process for easier access
+- This can be controlled and turned off. The process.log( data, level ) calls the given logger
+
+
 ***
+Dependencies:
+
+**NONE**
+
+***
+Accepted Options:
+
+**logger: Logger**
+- Instance of Logger, if incorrect object provided, defaults to the default logger from the Loggur
+
+**attachToProcess: Boolean**
+- Boolean whether the plugin should attach dumpStack and log to the process
+
+***
+Events:
+
+**NONE**
+
+***
+Exported Functions:
+
+**NONE**
+
+***
+Attached Functionality:
+
+**process.dumpStack(): Promise**
+- Logs the current stack
+
+**process.log( data, level ): Promise**
+- You can use the attached logger anywhere
+
+***
+Exported Plugin Functions:
+
+**NONE**
+
+***
+Example:
+
 ~~~javascript
-const PluginManager		= server.getPluginManager();
-let loggerPlugin    	= PluginManager.getPlugin( 'er_logger' );
-server.apply( loggerPlugin );
+const PluginManager	= app.getPluginManager();
+const loggerPlugin	= PluginManager.getPlugin( 'er_logger' );
+app.apply( loggerPlugin );
+
+//OR
+app.apply( 'er_logger' );
+
+//OR
+app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } );
 ~~~
 
+***
+***
 ***
 
 ###er_body_parser_json, er_body_parser_form, er_body_parser_multipart 

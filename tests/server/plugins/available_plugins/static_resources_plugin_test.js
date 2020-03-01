@@ -8,12 +8,12 @@ const Router					= require( '../../../../server/components/routing/router' );
 test({
 	message		: 'StaticResourcesPlugin sets content type to empty if accepts not passed',
 	test		: ( done )=>{
-		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.css' );
-		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
-		let router					= new Router();
+		const eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.css' );
+		const staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
+		const router				= new Router();
 		let called					= 0;
 
-		let pluginMiddlewares		= staticResourcesPlugin.getPluginMiddleware();
+		const pluginMiddlewares		= staticResourcesPlugin.getPluginMiddleware();
 
 		assert.equal( 1, pluginMiddlewares.length );
 

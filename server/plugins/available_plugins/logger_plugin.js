@@ -28,12 +28,10 @@ class LoggerPlugin extends PluginInterface
 		if ( this.options.attachToProcess === true )
 		{
 			process.dumpStack	= ()=>{
-				Loggur.log( Log.getStackTrace() );
+				return Loggur.log( Log.getStackTrace() );
 			};
 
-			process.log			= ( log, level )=>{
-				Loggur.log( log, level );
-			};
+			process.log			= Loggur.log;
 		}
 	}
 
@@ -124,11 +122,11 @@ class LoggerPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let logger	= this.getLogger();
+		const logger			= this.getLogger();
 
-		let pluginMiddleware	= {
+		const pluginMiddleware	= {
 			handler	: ( event ) =>{
-				let requestURL	= event.request.url;
+				const requestURL	= event.request.url;
 
 				event.on( 'cleanUp', () =>{
 					const userAgent	= typeof event.headers['user-agent'] === 'undefined' ? 'UNKNOWN' : event.headers['user-agent'];

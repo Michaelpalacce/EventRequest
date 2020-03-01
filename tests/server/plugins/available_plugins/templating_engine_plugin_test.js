@@ -41,15 +41,14 @@ test({
 
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
-		eventRequest.render( 'test', {}, ( err )=>{
+		eventRequest.render( 'test', {}, done ).then(()=>{
 			assert.equal( 1, called );
-			assert.equal( false, err );
 			assert.equal( false, typeof eventRequest.render === 'undefined' );
 			assert.equal( false, typeof eventRequest.templateDir === 'undefined' );
 			assert.equal( false, typeof eventRequest.templatingEngine === 'undefined' );
 
 			done();
-		} );
+		});
 
 	}
 });

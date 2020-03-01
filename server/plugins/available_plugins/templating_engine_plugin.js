@@ -26,47 +26,53 @@ class TemplatingEnginePlugin extends PluginInterface
 		 *
 		 * @param	String templateName
 		 * @param	Object variables
-		 * @param	Callable callback
+		 * @param	Callable errorCallback
 		 *
-		 * @return	String
+		 * @return	Promise
 		 */
-		eventRequest.render	= function( templateName, variables = {}, callback = ()=>{} )
+		eventRequest.render	= function( templateName, variables = {}, errorCallback = null )
 		{
-			templateName	= typeof templateName === 'string' && templateName.length > 0
-							? templateName + '.html'
-							: false;
+			const renderPromise	= new Promise(( resolve,reject )=>{
+				templateName	= typeof templateName === 'string' && templateName.length > 0
+								? templateName + '.html'
+								: false;
 
-			if ( templateName !== false )
-			{
-				const templatePath	= path.join( this.templateDir, templateName );
+				if ( templateName !== false )
+				{
+					const templatePath	= path.join( this.templateDir, templateName );
 
-				fs.readFile( templatePath, 'utf8', ( err, html ) => {
-					if ( ! err && html && html.length > 0  && ! this.isFinished() )
-					{
-						try
+					fs.readFile( templatePath, 'utf8', ( err, html ) => {
+						if ( ! err && html && html.length > 0  && ! this.isFinished() )
 						{
-							const result	= this.templatingEngine.render( html, variables );
+							try
+							{
+								const result	= this.templatingEngine.render( html, variables );
 
-							this.emit( 'render', { templateName, variables } );
+								this.emit( 'render', { templateName, variables } );
 
-							this.send( result, 200, true );
-							callback( false );
+								this.send( result, 200, true );
+								resolve();
+							}
+							catch ( e )
+							{
+								reject( e );
+							}
 						}
-						catch ( e )
+						else
 						{
-							callback( e );
+							reject( err );
 						}
-					}
-					else
-					{
-						callback( err );
-					}
-				});
-			}
-			else
-			{
-				callback( 'Error while rendering' )
-			}
+					});
+				}
+				else
+				{
+					reject( 'Error while rendering' )
+				}
+			});
+
+			renderPromise.catch( errorCallback === null ? eventRequest.next : errorCallback );
+
+			return renderPromise;
 		}
 	}
 
@@ -74,10 +80,6 @@ class TemplatingEnginePlugin extends PluginInterface
 	 * @brief	Attaches the templating engine and template dir to the event request
 	 *
 	 * @details	Also adds a render function to the eventRequest
-	 * 			Accepted options:
-	 * 			- engine - Object - Instance of a templating engine that has a method render defined that accepts
-	 * 				html as first argument, object of variables as second and a callback as third
-	 * 			- templateDir - string - the directory where all the templates are stored
 	 *
 	 * @return	Array
 	 */
@@ -92,7 +94,7 @@ class TemplatingEnginePlugin extends PluginInterface
 								? this.options.templateDir
 								: DEFAULT_TEMPLATING_DIR;
 
-		let pluginMiddleware	= {
+		const pluginMiddleware	= {
 			handler	: ( event ) =>{
 				event.templateDir		= templateDir;
 				event.templatingEngine	= templatingEngine;
