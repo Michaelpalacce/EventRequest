@@ -3,6 +3,7 @@
 // Dependencies
 const { Mock, assert, test, helpers }	= require( '../test_helper' );
 const EventRequest						= require( './../../server/event' );
+const fs								= require( 'fs' );
 const ErrorHandler						= require( '../../server/components/error/error_handler' );
 
 const MockedErrorHandler				= Mock( ErrorHandler );
@@ -184,6 +185,33 @@ test({
 		eventRequest.send( '' );
 
 		send	? done() : done( 'EventRequest send event not emitted' );
+	}
+});
+
+test({
+	message	: 'EventRequest send emits send event without response if response is raw or stream',
+	test	: ( done ) =>{
+		let eventRequest	= helpers.getEventRequest();
+		let send			= false;
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: ()=>{}
+		});
+
+		eventRequest.on( 'send', ( payload ) =>{
+			if ( typeof payload.response !== 'undefined' )
+				send	= true;
+		});
+
+		eventRequest.send( '', 200, true );
+
+		const stream	= fs.createReadStream( './tests/server/test_template.html' );
+
+		eventRequest.send( stream );
+
+		stream.close();
+
+		! send	? done() : done( 'EventRequest send event emitted but should not have been' );
 	}
 });
 

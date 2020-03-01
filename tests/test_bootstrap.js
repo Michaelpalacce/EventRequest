@@ -6,9 +6,9 @@ const DataServer	= require( '../server/components/caching/data_server' );
 
 const TEST_ROOT		= path.parse( __dirname ).dir;
 
-const server		= Server();
+const app			= Server();
 
-server.add({
+app.add({
 	route	: '/ping',
 	method	: 'GET',
 	handler	: ( event )=>{
@@ -16,11 +16,11 @@ server.add({
 	}
 });
 
-Server.start( 3333, ()=>{});
+app.listen( 3333, ()=>{});
 
 // Set up a memory server to be used by the tests
 const cachingServer	= new DataServer({ persist: false, persistPath: path.join( TEST_ROOT, './fixture/cache' )});
 
 module.exports	= {
-	server, cachingServer
+	server: app, cachingServer
 };

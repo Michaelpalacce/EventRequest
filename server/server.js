@@ -268,6 +268,17 @@ class Server extends EventEmitter
 		}
 	}
 
+	/**
+	 * @brief	Starts the server on the given port
+	 *
+	 * @return	Server
+	 */
+	listen()
+	{
+		const httpServer	= http.createServer( this.attach() );
+
+		return httpServer.listen.apply( httpServer, arguments );
+	}
 }
 
 // Holds the instance of the server class
@@ -278,7 +289,7 @@ let server	= null;
  *
  * @returns	Server
  */
-let App				= ()=>{
+const App			= ()=>{
 	return server || ( server = new Server() );
 };
 
@@ -289,17 +300,6 @@ let App				= ()=>{
  */
 App.cleanUp			= ()=>{
 	server	= null;
-};
-
-/**
- * @brief	Starts the server with the given arguments
- *
- * @returns	Server
- */
-App.start			= function(){
-	const httpServer	= http.createServer( App().attach() );
-
-	return httpServer.listen.apply( httpServer, arguments );
 };
 
 App.class			= Server;

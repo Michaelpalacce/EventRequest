@@ -30,7 +30,7 @@ app.get( '/', ( event ) => {
 	event.send( '<h1>Hello World!</h1>' );
 });
 
-Server.start( 80, ()=>{
+app.listen( 80, ()=>{
 	Loggur.log( 'Server started' );
 });
 ~~~
@@ -237,7 +237,7 @@ To start the Server you can do:
 const { Server } = require( 'event_request' );
 const app = Server();
 
-Server.start( '80', ()=>{
+app.listen( '80', ()=>{
 	Loggur.log( 'Server is running' );
 });
 ~~~
@@ -247,7 +247,7 @@ To clean up the server instance you can do:
 const { Server } = require( 'event_request' );
 const app = Server();
 
-Server.start( '80', ()=>{
+app.listen( '80', ()=>{
 	Loggur.log( 'Server is running' );
 });
 
@@ -407,7 +407,7 @@ app.add({
 
 app.add( router );
 
-Server.start( 80, ()=>{
+app.listen( 80, ()=>{
 	Loggur.log( 'Server started' );
 });
 ~~~
@@ -436,34 +436,34 @@ You can use .post, .put, .get, .delete, .head, .patch, .copy methods from the se
 ***
 
 ~~~javascript
-const server	= Server();
+const app	= Server();
 
-server.get( '/', ( event )=>{
+app.get( '/', ( event )=>{
 	event.send( '<h1>Hello World!</h1>');
 } );
 
-server.post( '/', ( event )=>{
+app.post( '/', ( event )=>{
 	event.send( ['ok']);
 } );
 
-server.delete( '/', ( event )=>{
+app.delete( '/', ( event )=>{
 	event.send( ['ok']);
 } );
 
-server.head( '/', ( event )=>{
+app.head( '/', ( event )=>{
 	event.send( ['ok']);
 } );
 
-server.put( '/', ( event )=>{
+app.put( '/', ( event )=>{
 	event.send( ['ok']);
 } );
 
-server.get( '/users/:user:', ( event )=>{
+app.get( '/users/:user:', ( event )=>{
 	console.log( event.params.user ); // Will print out whatever is passed in the url ( /users/John => 'John' )
 	event.send( ['ok']);
 } );
 
-Server.start( 80 );
+app.listen( 80 );
 ~~~
 
 ***
@@ -1392,7 +1392,7 @@ app.get( '/', ( event ) => {
     event.send( '<h1>Hello World!</h1>' );
 });
  
-Server.start( 80, ()=>{
+app.listen( 80, ()=>{
     Loggur.log( 'Server started' );
 });
 ~~~
@@ -1532,7 +1532,7 @@ app.post( '/login', async ( event )=>{
 	}
 });
 
-Server.start( 80, ()=>{
+app.listen( 80, ()=>{
     Loggur.log( 'Server started' );
 });
 ~~~
@@ -1738,7 +1738,6 @@ app.get( '/dataTwo', ( event ) =>{
 - Adds a logger to the eventRequest
 - Attaches a dumpStack() function as well as log( data, level ) function to the process for easier access
 - This can be controlled and turned off. The process.log( data, level ) calls the given logger
-
 
 ***
 Dependencies:
@@ -1961,7 +1960,7 @@ app.add(( event )=>{
 
 	event.send( 'Done' );
 });
-Server.start( 80 );
+app.listen( 80 );
 ~~~
 
 ***

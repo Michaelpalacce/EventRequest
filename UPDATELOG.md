@@ -1,3 +1,7 @@
+13.1.0
+- Added some more tests
+- Renamed start to listen and moved it to the Instance rather than the singleton object to keep it the same as the http.createServer().listen method
+
 13.0.0
 - Updated the way the server will be attached 
 - Added some er_rate_limiter tests that will prevent the bug that happened in 12.4.0 to occur 

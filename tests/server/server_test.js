@@ -345,25 +345,30 @@ test({
 
 test({
 	message	: 'Server testGETWithoutRoute ( skipped cause it will fail all the others )',
-	skipped	: true,
 	test	: ( done )=>{
 		const body	= 'testGET';
+		const app	= new Server();
+
 		app.get( ( event )=>{
 			event.send( body );
 		});
 
-		helpers.sendServerRequest( '/testGET', 'POST', 404 ).then(()=>{
-			return helpers.sendServerRequest( '/testGET', 'DELETE', 404 );
+		const server	= http.createServer( app.attach() );
+
+		server.listen( 3335 );
+
+		helpers.sendServerRequest( '/testGET', 'POST', 404, '', {}, 3335 ).then(()=>{
+			return helpers.sendServerRequest( '/testGET', 'DELETE', 404, '', {}, 3335 );
 		}).then(()=>{
-			return helpers.sendServerRequest( '/testGET', 'PUT', 404 );
+			return helpers.sendServerRequest( '/testGET', 'PUT', 404, '', {}, 3335 );
 		}).then(()=>{
-			return helpers.sendServerRequest( '/testGET', 'HEAD', 404 );
+			return helpers.sendServerRequest( '/testGET', 'HEAD', 404, '', {}, 3335 );
 		}).then(()=>{
-			return helpers.sendServerRequest( '/testGET', 'COPY', 404 );
+			return helpers.sendServerRequest( '/testGET', 'COPY', 404, '', {}, 3335 );
 		}).then(()=>{
-			return helpers.sendServerRequest( '/testGET', 'PATCH', 404 );
+			return helpers.sendServerRequest( '/testGET', 'PATCH', 404, '', {}, 3335 );
 		}).then(()=>{
-			return helpers.sendServerRequest( '/testGET' );
+			return helpers.sendServerRequest( '/testGET', 'GET', 200, '', {}, 3335 );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
 
