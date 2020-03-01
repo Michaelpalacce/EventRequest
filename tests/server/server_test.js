@@ -848,6 +848,108 @@ test({
 });
 
 test({
+	message	: 'Server.test er_response_cache caches',
+	test	: ( done )=>{
+		const name	= 'testErResponseCacheCaches';
+		let i		= 0;
+
+		if ( ! app.hasPlugin( app.er_response_cache ) )
+		{
+			app.apply( app.er_cache_server, { dataServer: helpers.getCachingServer() } );
+			app.apply( app.er_response_cache );
+		}
+
+		app.get( `/${name}`, ( event )=>{
+			if ( i === 0 )
+			{
+				i ++;
+				return event.send( name );
+			}
+
+			event.sendError( 'ERROR', 501 );
+		}, 'cache.request' );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+
+			return helpers.sendServerRequest( `/${name}` );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_response_cache does not cache if not needed',
+	test	: ( done )=>{
+		const name	= 'testErResponseCacheDoesNotCacheEverything';
+		let i		= 0;
+
+		if ( ! app.hasPlugin( app.er_response_cache ) )
+		{
+			app.apply( app.er_cache_server, { dataServer: helpers.getCachingServer() } );
+			app.apply( app.er_response_cache );
+		}
+
+		app.get( `/${name}`, ( event )=>{
+			if ( i === 0 )
+			{
+				i ++;
+				return event.send( name );
+			}
+
+			event.sendError( 'ERROR', 501 );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+
+			return helpers.sendServerRequest( `/${name}`, 'GET', 501 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'ERROR' } ) );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_response_cache does not cache raw',
+	test	: ( done )=>{
+		const name	= 'testErResponseCacheDoesNotCacheRaw';
+		let i		= 0;
+
+		if ( ! app.hasPlugin( app.er_response_cache ) )
+		{
+			app.apply( app.er_cache_server, { dataServer: helpers.getCachingServer() } );
+			app.apply( app.er_response_cache );
+		}
+
+		app.get( `/${name}`, ( event )=>{
+			if ( i === 0 )
+			{
+				i ++;
+				return event.send( name, 200, true );
+			}
+
+			event.sendError( 'ERROR', 501 );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+
+			return helpers.sendServerRequest( `/${name}`, 'GET', 501 );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'ERROR' } ) );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test er_timeout without reaching timeout',
 	test	: ( done )=>{
 		const body			= 'testTimeoutWithoutReachingTimeout';
@@ -1336,7 +1438,8 @@ test({
 		const name	= 'testErSession';
 
 		assert.throws(()=>{
-			app.apply( app.er_session );
+			const appOne	= new Server.class();
+			appOne.apply( appOne.er_session );
 		});
 
 		app.apply( app.er_cache_server );

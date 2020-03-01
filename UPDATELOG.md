@@ -5,6 +5,9 @@
 - Started drastically improving the documentation
 - Render now returns a promise
 - Static resources plugin now accepts a string
+- The EventRequest no longer emits the response on send if the response was raw
+- Added ResponseCache plugin server tests
+- Small ResponseCachePlugin improvements
 
 12.4.1
 - Bugfix for rate_limiter_plugin

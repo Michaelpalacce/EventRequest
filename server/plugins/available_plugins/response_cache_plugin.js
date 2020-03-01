@@ -52,6 +52,9 @@ class ResponseCachePlugin extends PluginInterface
 	attachCachingEvent( event )
 	{
 		event.on( 'send', async ( responseData )=>{
+			if ( typeof responseData.response === 'undefined' )
+				return;
+
 			const { response, code, headers }	= responseData;
 
 			if ( typeof response === 'string' )
@@ -115,7 +118,7 @@ class ResponseCachePlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let pluginMiddleware	= {
+		const pluginMiddleware	= {
 			handler	: ( event )	=>{
 				event.on( 'cleanUp', ()=>{
 					event.cacheCurrentRequest	= undefined;
@@ -123,8 +126,7 @@ class ResponseCachePlugin extends PluginInterface
 
 				event.cacheCurrentRequest	= async ( options = {} )=>{
 					event.currentResponseCacheConfig	= options;
-					let cacheId							= this.getCacheId( event );
-
+					const cacheId						= this.getCacheId( event );
 					const cachedDataSet					= await this.cachingServer.get( cacheId );
 
 					if ( cachedDataSet === null )
@@ -134,7 +136,7 @@ class ResponseCachePlugin extends PluginInterface
 					}
 					else
 					{
-						let ttl			= this.getTimeToLive( event );
+						const ttl		= this.getTimeToLive( event );
 						const status	= await this.cachingServer.touch( cachedDataSet.key, ttl );
 
 						if ( ! status )
@@ -142,11 +144,11 @@ class ResponseCachePlugin extends PluginInterface
 							await this.cachingServer.set( cachedDataSet.key, cachedDataSet.value, cachedDataSet.ttl );
 						}
 
-						let { response, code, headers }	= cachedDataSet.value;
-						let headersKeys					= Object.keys( headers );
+						const { response, code, headers }	= cachedDataSet.value;
+						const headersKeys					= Object.keys( headers );
 
 						headersKeys.forEach(( headerKey )=>{
-							let headerValue	= headers[headerKey];
+							const headerValue	= headers[headerKey];
 
 							event.setHeader( headerKey, headerValue );
 						});

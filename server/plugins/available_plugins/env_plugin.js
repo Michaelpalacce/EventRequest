@@ -49,8 +49,8 @@ class EnvPlugin extends PluginInterface
 			const lines				= fs.readFileSync( absFilePath, 'utf-8' ).split( '\n' );
 
 			lines.forEach(( line )=>{
-				let parts	= line.split( ENV_SEPARATOR );
-				let key		= parts.shift();
+				const parts	= line.split( ENV_SEPARATOR );
+				const key	= parts.shift();
 
 				this.envVariableKeys.push( key );
 

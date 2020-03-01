@@ -53,7 +53,6 @@ test({
 		router.add({
 			route	: '/test/responseCachePlugin/attachesEvent',
 			handler	: ( event )=>{
-
 				event.cacheCurrentRequest();
 			}
 		});
@@ -67,12 +66,10 @@ test({
 		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
-
-
 		setTimeout(()=>{
 			eventRequest2.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest2 ) );
 			eventRequest2.next();
-		}, 10 );
+		}, 5000 );
 	}
 });
 

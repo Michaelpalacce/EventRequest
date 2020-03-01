@@ -190,6 +190,8 @@ class EventRequest extends EventEmitter
 	 */
 	_send( response = '', code = 200, raw = false )
 	{
+		let isRaw	= raw;
+
 		if ( code !== 200 )
 		{
 			this.setStatusCode( code );
@@ -201,6 +203,7 @@ class EventRequest extends EventEmitter
 			&& typeof response.pipe === 'function'
 			&& response instanceof Streams.Readable
 		) {
+			isRaw	= true;
 			response.pipe( this.response );
 		}
 		else
@@ -220,7 +223,12 @@ class EventRequest extends EventEmitter
 			this.response.end( response );
 		}
 
-		this.emit( 'send', { code, raw, response, headers: this.response.getHeaders() } );
+		const payload	= { code, raw, headers: this.response.getHeaders() };
+
+		if ( ! isRaw )
+			payload.response	= response;
+
+		this.emit( 'send', payload );
 
 		this.cleanUp();
 	}

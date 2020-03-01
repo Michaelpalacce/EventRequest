@@ -1827,20 +1827,53 @@ server.apply( 'er_body_parser_multipart', { maxPayload: 0, tempDir: path.join( P
 ###er_response_cache 
 Adds a response caching mechanism.
 
-Attaches a `cacheCurrentRequest` method to the EventRequest.
+***
+Dependencies:
 
-Defines a `cache.request` middleware that can be attached to any route for caching .
+**er_cache_server**
 
 ***
-~~~javascript
-const PluginManager		= server.getPluginManager();
-let cacheServer			= PluginManager.getPlugin( 'er_cache_server' );
+Accepted Options:
 
-server.apply( cacheServer );
-server.apply( PluginManager.getPlugin( 'er_response_cache' ) );
+**NONE**
+
+***
+Events:
+
+**NONE**
+
+***
+Exported Functions:
+
+**NONE**
+
+***
+Attached Functionality:
+
+**cache.request: Middleware**
+- Can be added to any request as a global middleware and that request will be cached if possible
+
+**event.cacheCurrentRequest(): Promise**
+- Caches the current request.
+- Will not cache the response if the response was not a String
+
+***
+Exported Plugin Functions:
+
+**NONE**
+
+***
+Example:
+
+~~~javascript
+const PluginManager		= app.getPluginManager();
+const cacheServer		= PluginManager.getPlugin( app.er_cache_server );
+
+app.apply( cacheServer );
+app.apply( PluginManager.getPlugin( app.er_response_cache ) );
 
 // call event.cacheCurrentRequest() where you want to cache.
-server.add({
+app.add({
 	route	: '/',
 	method	: 'GET',
 	handler	: ( event )=>{
@@ -1850,30 +1883,26 @@ server.add({
 
 // OR  You can create your own middleware that will be added to all requests
 // you want to cache, no need to do it separately
-server.add({
-	handler	: async ( event )=>{
-		let pathsToCache    = ['/', '/sth', 'test'];
-		if ( pathsToCache.indexOf( event.path ) !== -1 )
-        {
-            await event.cacheCurrentRequest();
-        }
-		
-		// Or use the router to match RegExp
-	}
+app.add( async ( event )=>{
+	const pathsToCache = ['/', '/sth', 'test'];
+	if ( pathsToCache.indexOf( event.path ) !== -1 )
+    {
+        await event.cacheCurrentRequest().catch( event.next );
+    }
+	
+	// Or use the router to match RegExp
 });
 
 // When setting a request to be cached, ttl and useIp may be passed that will overwrite the default options
-server.add({
-	handler	: ( event )=>{
-        //**useIp** -> whether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
-        //**ttl** -> time to live for the record. Defaults to 60 * 5000 ms
+app.add( async ( event )=>{
+    //**useIp** -> whether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
+    //**ttl** -> time to live for the record. Defaults to 60 * 5000 ms
 
-        event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } );
-	}
+    await event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } ).catch( event.next );
 });
 
 // You can add it via a middleware to a specific route
-server.get( '/', ( event )=> 
+app.get( '/', ( event )=> 
 	{
 		event.send( 'Hello World!' );
 	}, 
@@ -1882,27 +1911,61 @@ server.get( '/', ( event )=>
 ~~~
 
 ***
+***
+***
 
 ###er_env 
-Adds environment variables from a .env file to the process.env Object. In case the .env file changes
-this plugin will automatically update the process.env and will delete the old environment variables.
+- Adds environment variables from a .env file to the process.env Object. In case the .env file changes
+- This plugin will automatically update the process.env and will delete the old environment variables.
 
-    Accepted Options:
-        **fileLocation** -> The absolute path to the .env file you want to use
 ***
+Dependencies:
+
+**NONE**
+
+***
+Accepted Options:
+
+**fileLocation: String**
+- The absolute path to the .env file you want to use
+- Defaults to PROJECT_ROOT
+
+***
+Events:
+
+**NONE**
+
+***
+Exported Functions:
+
+**NONE**
+
+***
+Attached Functionality:
+
+**NONE**
+
+***
+Exported Plugin Functions:
+
+**NONE**
+
+***
+Example:
+
 ~~~javascript
-let server  = Server();
-server.apply( 'er_env' );
-server.add({
-    handler : ( event )=>{
-    	console.log( process.env );
-    	
-    	event.send( 'Done' );
-    }
+const app  = Server();
+app.apply( 'er_env' );
+app.add(( event )=>{
+	console.log( process.env );
+
+	event.send( 'Done' );
 });
-server.start();
+Server.start( 80 );
 ~~~
 
+***
+***
 ***
 
 ### er_rate_limits
