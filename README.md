@@ -505,7 +505,7 @@ Router has matchRoute and matchMethod methods that can be used anywhere statical
 **matchMethod** - ( String requestedMethod, String|RegExp method ) - Matches the requested method with the ones set in the event and returns if there was a match or no.
 
 ***
-### Plugins
+# Plugins
 Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**
 Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
 plugin all you have to do is do: server.apply( 'pluginId' )
@@ -1184,10 +1184,10 @@ The plugin Manager exports the following functions:
 
 **getPlugin( id )** - returns a PluginInterface otherwise throw
 
-## Available plugins:
+# Available plugins:
 
 
-###er_timeout
+#er_timeout
 - Adds a timeout to the request
 
 
@@ -1250,7 +1250,7 @@ app.apply( timeoutPlugin );
 ***
 ***
 
-###er_static_resources
+#er_static_resources
 - Adds a static resources path to the request.
 - By default the server has this plugin attached to allow favicon.ico to be sent
 
@@ -1314,7 +1314,7 @@ app.apply( staticResourcesPlugin );
 ***
 ***
 
-###er_cache_server
+#er_cache_server
 - Adds a Caching Server using the DataServer provided in the constructor if any.
 - This plugin will add a DataServer to: `event.cachingServer` 
 
@@ -1541,7 +1541,7 @@ Server.start( 80, ()=>{
 ***
 ***
 
-###er_templating_engine
+#er_templating_engine
 - Adds a templating engine to the event request ( the default templating engine is used just to render static HTML )
 - If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
 
@@ -1631,7 +1631,7 @@ router.get( '/preview', ( event ) => {
 ***
 ***
 
-###er_file_stream 
+#er_file_stream 
 - Adds a file streaming plugin to the site allowing different MIME types to be streamed
 - Currently supported are :
   - Images: '.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
@@ -1734,7 +1734,7 @@ app.get( '/dataTwo', ( event ) =>{
 ***
 ***
 
-###er_logger 
+#er_logger 
 - Adds a logger to the eventRequest
 - Attaches a dumpStack() function as well as log( data, level ) function to the process for easier access
 - This can be controlled and turned off. The process.log( data, level ) calls the given logger
@@ -1797,7 +1797,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 ***
 ***
 
-###er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
+#er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
 Adds a JsonBodyParser, FormBodyParser or MultipartBodyParser bodyParsers respectively that can be set up
 
 ~~~javascript
@@ -1824,7 +1824,7 @@ server.apply( 'er_body_parser_multipart', { maxPayload: 0, tempDir: path.join( P
     **strict** - Boolean - Whether the received payload must match the content-length - Defaults to false
 ***
 
-###er_response_cache 
+#er_response_cache 
 Adds a response caching mechanism.
 
 ***
@@ -1914,7 +1914,7 @@ app.get( '/', ( event )=>
 ***
 ***
 
-###er_env 
+#er_env 
 - Adds environment variables from a .env file to the process.env Object. In case the .env file changes
 - This plugin will automatically update the process.env and will delete the old environment variables.
 
@@ -1968,7 +1968,7 @@ Server.start( 80 );
 ***
 ***
 
-### er_rate_limits
+# er_rate_limits
 Adds a Rate limits plugin to the server. 
 The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
 
