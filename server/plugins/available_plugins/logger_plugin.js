@@ -65,8 +65,8 @@ class LoggerPlugin extends PluginInterface
 	 */
 	attachEventsToEventRequest( event )
 	{
-		let logger		= this.getLogger();
-		let requestURL	= event.request.url;
+		const logger		= this.getLogger();
+		const requestURL	= event.request.url;
 
 		event.on( 'error', ( error ) =>{
 			if ( error instanceof Error )

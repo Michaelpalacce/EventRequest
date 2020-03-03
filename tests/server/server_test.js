@@ -6,6 +6,7 @@ const App								= require( './../../server/server' );
 const path								= require( 'path' );
 const http								= require( 'http' );
 const fs								= require( 'fs' );
+const { Loggur, File }					= require( './../../server/components/logger/loggur' );
 const Router							= require( './../../server/components/routing/router' );
 const DataServer						= require( './../../server/components/caching/data_server' );
 const Session							= require( './../../server/components/session/session' );
@@ -829,15 +830,13 @@ test({
 test({
 	message	: 'Server.test empty middleware',
 	test	: ( done )=>{
-		const body				= 'testEmptyMiddleware';
-		const headerName		= 'testEmptyMiddleware';
-		const headerValue		= 'valueOne';
+		const body			= 'testEmptyMiddleware';
+		const headerName	= 'testEmptyMiddleware';
+		const headerValue	= 'valueOne';
 
-		app.add({
-			handler	: ( event )=>{
-				event.setHeader( headerName, headerValue );
-				event.next();
-			}
+		app.add(( event )=>{
+			event.setHeader( headerName, headerValue );
+			event.next();
 		});
 
 		app.get( '/testEmptyMiddleware', ( event )=>{
@@ -849,6 +848,68 @@ test({
 			assert.equal( response.body.toString(), body );
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_logger',
+	test	: ( done )=>{
+		const name					= 'testErLogger';
+		const relativeLogLocation	= './tests/server/fixture/logger/testLog.log';
+		const fileTransport			= new File({
+			logLevel	: Loggur.LOG_LEVELS.debug,
+			filePath	: relativeLogLocation
+		});
+
+		const logger				= Loggur.createLogger({
+			serverName	: 'Server.test_er_logger',
+			logLevel	: Loggur.LOG_LEVELS.debug,
+			capture		: false,
+			transports	: [fileTransport]
+		});
+
+		const app		= new Server();
+
+		app.apply( app.er_logger, { logger, attachToProcess: true } );
+
+		app.get( `/${name}`, ( event )=>{
+			if (
+				typeof process.dumpStack !== 'function'
+				|| typeof process.log !== 'function'
+			) {
+				event.sendError( 'Logger is not attached correctly', 500 );
+			}
+
+			event.send( name );
+		} );
+
+		app.listen( 3336, ()=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3336 ).then(( response )=>{
+				fileTransport.getWriteStream().end();
+				setTimeout(()=>{
+					process.dumpStack	= undefined;
+					process.log			= undefined;
+
+					assert.equal( fs.existsSync( fileTransport.getFileName() ), true );
+					assert.equal( fs.statSync( fileTransport.getFileName() ).size > 0, true );
+					assert.equal( response.body.toString(), name );
+
+					const logData	= fs.readFileSync( fileTransport.getFileName() );
+
+					assert.equal( logData.includes( 'Headers' ), true );
+					assert.equal( logData.includes( 'Cookies' ), true );
+					assert.equal( logData.includes( `GET /${name} 200` ), true );
+					assert.equal( logData.includes( 'Event is cleaning up' ), true );
+					assert.equal( logData.includes( 'Event finished' ), true );
+					assert.equal( logData.includes( 'Server.test_er_logger/Master' ), true );
+
+					if ( fs.existsSync( fileTransport.getFileName() ) )
+						fs.unlinkSync( fileTransport.getFileName() );
+
+					done();
+				})
+			}).catch( done );
+		} );
 	}
 });
 

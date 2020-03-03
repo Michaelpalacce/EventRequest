@@ -1,3 +1,8 @@
+13.2.1
+- Fixed documentation
+- Added logger plugin tests
+- Fixed File Log Transport on error for the file stream
+
 13.2.0
 - Added File stream tests
 - Fixed an error where calling event.next twice will break the app... this should have been fixed a while ago
