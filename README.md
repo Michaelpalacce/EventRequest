@@ -1190,7 +1190,6 @@ The plugin Manager exports the following functions:
 #er_timeout
 - Adds a timeout to the request
 
-
 ***
 Dependencies:
 
@@ -1797,30 +1796,91 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 ***
 
 #er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
-Adds a JsonBodyParser, FormBodyParser or MultipartBodyParser bodyParsers respectively that can be set up
+- Adds a JsonBodyParser, FormBodyParser or MultipartBodyParser bodyParsers respectively that can be set up
+- These plugins are basically one and the same and even tho many may be added they will use a single body parser handler.
+- There will not be multiple middleware that will be attached
+- Parsers are fired according to the content-type header
+- json parser supports: application/json
+- form body parser supports: application/x-www-form-urlencoded
+- multipart body parser supports: multipart/form-data
+
+***
+Dependencies:
+
+**NONE**
+
+***
+Accepted Options:
+
+MultipartFormParser:
+
+**maxPayload: Number**
+- Maximum payload in bytes to parse if set to 0 means infinite 
+- Defaults to 0
+
+**tempDir: String** 
+- The directory where to keep the uploaded files before moving 
+- Defaults to the tmp dir of the os
+        
+
+JsonBodyParser:
+**maxPayloadLength: Number** 
+- The max size of the body to be parsed 
+- Defaults to 10485760/ 10MB
+
+**strict: Boolean**
+- Whether the received payload must match the content-length 
+- Defaults to false
+        
+FormBodyParser:
+**maxPayloadLength: Number**
+- The max size of the body to be parsed 
+- Defaults to 10485760
+
+**strict: Boolean**
+- Whether the received payload must match the content-length 
+- Defaults to false
+
+***
+Events:
+
+**NONE**
+
+***
+Exported Functions:
+
+**NONE**
+
+***
+Attached Functionality:
+
+**event.body: Object**
+- Will hold different data according to which parser was fired
+- Json and Form Body parsers will have a JS object set as the body
+- The multipart body parsers may have **$files** key set as well as whatever data was sent in a JS object format
+
+***
+Exported Plugin Functions:
+
+**NONE**
+
+***
+Example:
 
 ~~~javascript
 // Add Body Parsers
-server.apply( 'er_body_parser_json' );
-server.apply( 'er_body_parser_form' );
-server.apply( 'er_body_parser_multipart' );
+server.apply( app.er_body_parser_json );
+server.apply( app.er_body_parser_form );
+server.apply( app.er_body_parser_multipart );
 
 // Add body parsers with custom options
-server.apply( 'er_body_parser_json', { maxPayloadLength: 104857600, strict: false } );
-server.apply( 'er_body_parser_form', { maxPayloadLength: 10485760, strict: false } );
-server.apply( 'er_body_parser_multipart', { maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
+server.apply( app.er_body_parser_json, { maxPayloadLength: 104857600, strict: false } );
+server.apply( app.er_body_parser_form, { maxPayloadLength: 10485760, strict: false } );
+server.apply( app.er_body_parser_multipart, { maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
 ~~~
-    *** MiltipartFormParser Accepted options:
-    **maxPayload** - Number - Maximum payload in bytes to parse if set to 0 means infinite - Defaults to 0
-    **tempDir** - String - The directory where to keep the uploaded files before moving - Defaults to the tmp dir of the os
-            
-    *** JsonBodyParser Accepted options:
-    **maxPayloadLength** - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
-    **strict** - Boolean - Whether the received payload must match the content-length - Defaults to false
-            
-    *** FormBodyParser Accepted options:
-    *maxPayloadLength** - Number - The max size of the body to be parsed - Defaults to 10 * 1048576
-    **strict** - Boolean - Whether the received payload must match the content-length - Defaults to false
+
+***
+***
 ***
 
 #er_response_cache 
@@ -1968,56 +2028,99 @@ app.listen( 80 );
 ***
 
 # er_rate_limits
-Adds a Rate limits plugin to the server. 
-The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
+- Adds a Rate limits plugin to the server. 
+- The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
+- The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
+- If one exists, then the existing one's configuration will be taken. 
 
+***
+Dependencies:
 
-    Accepted Options:
-        **fileLocation** -> The absolute path to the rate limits json file. Defaults to ROOT DIR / rate_limits.json
+**er_cache_server**
 
-**The following objects are attached to the EventRequest object:**
-- **eventRequest.rateLimited** will be set to true if the request does not pass 
-- **eventRequest.rules** will be hold all the rules that the plugin has along with the buckets
+***
+Accepted Options:
 
-The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
-If one exists, then the existing one's configuration will be taken. 
+**fileLocation**
+- The absolute path to the rate limits json file.
+- Defaults to ROOT DIR / rate_limits.json
 
+***
+Events:
+
+**rateLimited( String policy, Object rule )**
+- The policy will be which policy applied the rate limiting 
+- There may be more than one rateLimited event emitted
+- Returns all the rule settings that rate limited the request
+- This is emitted before any actions are taken
+
+***
+Exported Functions:
+
+**NONE**
+
+***
+Attached Functionality:
+
+**event.rateLimited: Boolean**
+- Flag depicting whether the request was rate limited or not
+
+**eventRequest.rules: Array**
+- Will hold all the rules that the plugin has along with the buckets
+
+***
+Exported Plugin Functions:
+
+**NONE**
+
+***
+Notes:
 If you want to create custom rate limiting you can get er_rate_limits plugin and use getNewBucketFromOptions to get a new bucket, given options for it
 options['maxAmount']
 options['refillTime']
 options['refillAmount']
 
-
 Rate limit can be applied to different routes and different HTTP methods
 Rate limit rule options:
 
-**path -> String - the url path to rate limit ( blank for ALL )
+**path: String**
+- the url path to rate limit ( blank for ALL )
 
-**methods -> Array - the methods to rate limit ( blank for ALL )
+**methods: Array**
+- the methods to rate limit ( blank for ALL )
 
-**maxAmount -> Number - The maximum amount of tokens to hold
+**maxAmount: Number**
+- The maximum amount of tokens to hold
 
-**refillTime -> Number - the time taken to refill the refillAmount of tokens
+**refillTime: Number** 
+- the time taken to refill the refillAmount of tokens
 
-**refillAmount -> Number - the amount of tokens to refill when refilling happens
+**refillAmount: Number** 
+- the amount of tokens to refill when refilling happens
 
-**policy -> String - The type of rate limiting to be applied
+**policy: String** 
+- The type of rate limiting to be applied
 
-**delayTime -> Number - must be given if policy is connection_delay. After what time in seconds should we retry
+**delayTime: Number** 
+- must be given if policy is connection_delay. After what time in seconds should we retry
 
-**delayRetries -> Number - must be given if policy is connection_delay. How many retries to attempt
+**delayRetries: Number**
+- must be given if policy is connection_delay. How many retries to attempt
 
-**stopPropagation -> Boolean - Whether to stop if the rate limiting rule matches and ignore other rules
+**stopPropagation: Boolean** 
+- Whether to stop if the rate limiting rule matches and ignore other rules
 
-**ipLimit -> Boolean - whether the rate limiting should be done per ip
+**ipLimit: Boolean**
+- whether the rate limiting should be done per ip
 
-*** POLICIES:
+*** 
+POLICIES:
 
-*PERMISSIVE_POLICY	= 'permissive';
+**PERMISSIVE_POLICY**	= 'permissive';
 
 This policy will let the client connect freely but a flag will be set that it was rate limited
 
-*CONNECTION_DELAY_POLICY	= 'connection_delay';
+**CONNECTION_DELAY_POLICY**	= 'connection_delay';
 
 This policy will rate limit normally the request and will hold the connection until a token is freed
 If this is the policy specified then **delayTime** and **delayRetries** must be given. This will be the time after
@@ -2026,12 +2129,14 @@ The first connection delay policy hit in the case of many will be used to determ
 all buckets affected by such a connection delay will be affected
 
 
-* STRICT_POLICY	= 'strict';
+**STRICT_POLICY**	= 'strict';
 
 This policy will instantly reject if there are not enough tokens and return an empty response with a 429 header.
 This will also include a Retry-After header. If this policy is triggered, stopPropagation will be ignored and
 the request will be immediately canceled
 
+***
+Example:
 ~~~json
 [
   {
@@ -2050,8 +2155,10 @@ the request will be immediately canceled
 ~~~
 
 ~~~javascript
-let server  = Server();
-server.apply( 'er_rate_limits' )
+const app = Server();
+app.apply( app.er_rate_limits )
 ~~~
 
+***
+***
 ***

@@ -1,3 +1,8 @@
+13.3.0
+- Updated documentation for plugins
+- RateLimiter now emmits rateLimited with rule and policy
+- MultipartBodyParsers sets $files instead of files in the body now
+
 13.2.1
 - Fixed documentation
 - Added logger plugin tests

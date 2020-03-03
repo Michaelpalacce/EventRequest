@@ -68,7 +68,7 @@ class BodyParserPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		let pluginMiddleware	= {
+		const pluginMiddleware	= {
 			handler	: ( event ) =>
 			{
 				if ( event.body == null )

@@ -125,12 +125,12 @@ test({
 
 			// Sync delay
 			setTimeout(()=>{
-				assert.equal( fs.readFileSync( body.files[0].path ).toString(), 'Content of a.txt.' + os.EOL );
-				assert.equal( body.files[0].name, 'a.txt' );
-				assert.equal( body.files[0].contentType, 'text/plain' );
-				assert.equal( fs.readFileSync( body.files[1].path ).toString(), '<!DOCTYPE html><title>Content of a.html.</title>' + os.EOL );
-				assert.equal( body.files[1].name, 'a.html' );
-				assert.equal( body.files[1].contentType, 'text/html' );
+				assert.equal( fs.readFileSync( body.$files[0].path ).toString(), 'Content of a.txt.' + os.EOL );
+				assert.equal( body.$files[0].name, 'a.txt' );
+				assert.equal( body.$files[0].contentType, 'text/plain' );
+				assert.equal( fs.readFileSync( body.$files[1].path ).toString(), '<!DOCTYPE html><title>Content of a.html.</title>' + os.EOL );
+				assert.equal( body.$files[1].name, 'a.html' );
+				assert.equal( body.$files[1].contentType, 'text/html' );
 
 				multipartParser.terminate();
 				done();

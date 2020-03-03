@@ -164,9 +164,9 @@ class MultipartDataParser extends BodyParser
 	{
 		this.clearUpLastPart();
 
-		for ( let index in this.parts )
+		for ( const index in this.parts )
 		{
-			let part	= this.parts[index];
+			const part	= this.parts[index];
 			part.buffer	= null;
 			part.state	= null;
 
@@ -188,7 +188,7 @@ class MultipartDataParser extends BodyParser
 	 */
 	getPartData()
 	{
-		let length	= this.parts.length;
+		const length	= this.parts.length;
 		if ( length > 0 )
 		{
 			return this.parts[length - 1];
@@ -536,11 +536,11 @@ class MultipartDataParser extends BodyParser
 	 */
 	static getHeaderData( headers )
 	{
-		let contentType		= typeof headers[CONTENT_TYPE_HEADER] === 'string'
+		const contentType	= typeof headers[CONTENT_TYPE_HEADER] === 'string'
 							? headers[CONTENT_TYPE_HEADER]
 							: false;
 
-		let contentLength	= typeof headers[CONTENT_LENGTH_HEADER] !== 'undefined'
+		const contentLength	= typeof headers[CONTENT_LENGTH_HEADER] !== 'undefined'
 							? parseInt( headers[CONTENT_LENGTH_HEADER] )
 							: false;
 
@@ -549,7 +549,7 @@ class MultipartDataParser extends BodyParser
 			return false;
 		}
 
-		let boundary	= contentType.match( BOUNDARY_REGEX );
+		const boundary	= contentType.match( BOUNDARY_REGEX );
 
 		if ( boundary === null )
 		{
@@ -648,9 +648,9 @@ class MultipartDataParser extends BodyParser
 	cleanUpItems()
 	{
 		setTimeout(()=>{
-			if ( typeof this.parts.files !== 'undefined' )
+			if ( typeof this.parts.$files !== 'undefined' )
 			{
-				this.parts.files.forEach( ( part ) =>{
+				this.parts.$files.forEach( ( part ) =>{
 					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
 					{
 						try
@@ -687,14 +687,14 @@ class MultipartDataParser extends BodyParser
 	 */
 	separateParts()
 	{
-		let parts	= {
-			'files'			: []
+		const parts	= {
+			$files	: []
 		};
 
 		this.parts.forEach( ( part ) =>{
 			if ( part.type === DATA_TYPE_FILE )
 			{
-				parts.files.push( part );
+				parts.$files.push( part );
 			}
 
 			if ( part.type === DATA_TYPE_PARAMETER )
@@ -740,7 +740,7 @@ class MultipartDataParser extends BodyParser
 	 */
 	clearUpLastPart()
 	{
-		let lastPart	= this.getPartData();
+		const lastPart	= this.getPartData();
 
 		if ( lastPart.state !== STATE_END )
 		{

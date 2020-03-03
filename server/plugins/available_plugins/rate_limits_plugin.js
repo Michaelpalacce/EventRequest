@@ -281,6 +281,7 @@ class RateLimitsPlugin extends PluginInterface
 					const policy				= options['policy'];
 					const refillTime			= options['refillTime'];
 					eventRequest.rateLimited	= true;
+					eventRequest.emit( 'rateLimited', { policy, rule: this.rules[i] } );
 					bucketsHit.push( bucket );
 
 					switch( policy )

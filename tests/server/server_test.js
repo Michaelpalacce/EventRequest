@@ -897,7 +897,6 @@ test({
 					const logData	= fs.readFileSync( fileTransport.getFileName() );
 
 					assert.equal( logData.includes( 'Headers' ), true );
-					assert.equal( logData.includes( 'Cookies' ), true );
 					assert.equal( logData.includes( `GET /${name} 200` ), true );
 					assert.equal( logData.includes( 'Event is cleaning up' ), true );
 					assert.equal( logData.includes( 'Event finished' ), true );
