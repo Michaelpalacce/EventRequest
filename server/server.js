@@ -263,7 +263,10 @@ class Server extends EventEmitter
 			{
 				this.emit( 'eventRequestThrow', { eventRequest, error } );
 
-				eventRequest.next( error );
+				if ( ! eventRequest.isFinished() )
+				{
+					eventRequest.next( error );
+				}
 			}
 		}
 	}

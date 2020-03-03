@@ -1571,3 +1571,99 @@ test({
 		}).catch( done )
 	}
 });
+
+test({
+	message	: 'Server.test er_file_stream works as expected',
+	test	: ( done )=>{
+		app.apply( app.er_file_stream );
+
+		app.get( '/testErFileStreamMp4WithRange', ( event )=>{
+
+			if (
+				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
+				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
+				|| event.response.getHeader( 'Content-Range' ) == null
+				|| event.response.getHeader( 'Content-Length' ) == null
+				|| ! event.response.getHeader( 'Content-Range' ).includes( 'bytes' )
+				|| event.response.getHeader( 'Accept-Ranges' ) !== 'bytes'
+				|| event.response.statusCode !== 206
+			) {
+				return event.sendError( 'failed', 400 );
+			}
+
+			event.send( 'ok' ) ;
+
+		});
+
+		app.get( '/testErFileStreamMp4WithOutRange', ( event )=>{
+			if (
+				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
+				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
+				|| event.response.getHeader( 'Content-Length' ) == null
+				|| event.response.getHeader( 'Content-Range' ) != null
+				|| event.response.getHeader( 'Accept-Ranges' ) != null
+				|| event.response.statusCode !== 200
+			) {
+				return event.sendError( 'failed', 400 );
+			}
+
+			event.send( 'ok' ) ;
+		});
+
+		app.get( '/testErFileStreamImage', ( event )=>{
+			if (
+				event.getFileStream( path.join( __dirname, './fixture/file_streams/image.webp' ) ) === null
+				|| event.response.getHeader( 'Content-Length' ) != null
+				|| event.response.getHeader( 'Content-Range' ) != null
+				|| event.response.getHeader( 'Accept-Ranges' ) != null
+				|| event.response.statusCode !== 200
+			) {
+				return event.sendError( 'failed', 400 );
+			}
+
+			event.send( 'ok' ) ;
+		});
+
+		app.get( '/testErFileStreamText', ( event )=>{
+			if (
+				event.getFileStream( path.join( __dirname, './fixture/file_streams/text.txt' ) ) === null
+				|| event.response.getHeader( 'Content-Length' ) != null
+				|| event.response.getHeader( 'Content-Range' ) != null
+				|| event.response.getHeader( 'Accept-Ranges' ) != null
+				|| event.response.statusCode !== 200
+			) {
+				return event.sendError( 'failed', 400 );
+			}
+
+			event.send( 'ok' ) ;
+		});
+
+		const responses	= [];
+
+		responses.push( helpers.sendServerRequest( `/testErFileStreamMp4WithRange`, 'GET', 206, '', { range: 'bytes=1-50'} ) );
+		responses.push( helpers.sendServerRequest( `/testErFileStreamMp4WithOutRange` ) );
+		responses.push( helpers.sendServerRequest( `/testErFileStreamImage` ) );
+		responses.push( helpers.sendServerRequest( `/testErFileStreamText` ) );
+
+		Promise.all( responses ).then( ()=>{
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test calling next twice does not die critically',
+	test	: ( done )=>{
+		const error	= 'An Error Has Occurred!';
+
+		app.get( '/testCallingNextTwiceDoesNotDieCritically', ( event )=>{
+			event.next( error );
+			event.next();
+		});
+
+		helpers.sendServerRequest( `/testCallingNextTwiceDoesNotDieCritically`, 'GET', 500 ).then( ( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error } ) );
+			done();
+		} ).catch( done );
+	}
+});

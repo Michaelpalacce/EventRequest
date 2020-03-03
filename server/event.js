@@ -269,6 +269,8 @@ class EventRequest extends EventEmitter
 	 */
 	getHeader( key, defaultValue = null )
 	{
+		key	= key.toLowerCase();
+
 		return ! this.hasHeader( key ) ? defaultValue : this.headers[key];
 	}
 
@@ -291,7 +293,7 @@ class EventRequest extends EventEmitter
 	 */
 	hasHeader( key )
 	{
-		return typeof this.headers[key] !== 'undefined';
+		return typeof this.headers[key.toLowerCase()] !== 'undefined';
 	}
 
 	/**

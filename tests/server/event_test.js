@@ -626,6 +626,21 @@ test({
 });
 
 test({
+	message	: 'EventRequest.getHeader should return header regardless of case',
+	test	: ( done )=>{
+		const headerName	= 'test';
+		const headerValue	= 'TestHeader';
+
+		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
+
+		assert.equal( eventRequest.getHeader( headerName.toUpperCase() ), headerValue );
+		assert.equal( eventRequest.getHeader( headerName.toLowerCase() ), headerValue );
+
+		done();
+	}
+});
+
+test({
 	message	: 'EventRequest.getHeader should return default if header is not set',
 	test	: ( done )=>{
 		const headerName	= 'test';

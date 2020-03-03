@@ -1,3 +1,8 @@
+13.2.0
+- Added File stream tests
+- Fixed an error where calling event.next twice will break the app... this should have been fixed a while ago
+- Headers are now always lowercased when getting, setting, searching
+
 13.1.0
 - Added some more tests
 - Renamed start to listen and moved it to the Instance rather than the singleton object to keep it the same as the http.createServer().listen method
