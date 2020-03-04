@@ -1200,8 +1200,9 @@ test({
 	message	: 'Server.test er_body_parser_multipart parses only multipart/form-data',
 	test	: ( done )=>{
 		const name			= 'testErBodyParserMultipartParsesMultipartFormData';
-		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/multipart_data` ) );
-		const tempDir		= path.join( __dirname, './fixture/body_parser/multipart' );
+		const uploadFile	= process.platform === 'win32' ? 'multipart_data_windows' : 'multipart_data';
+		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/${uploadFile}` ) );
+		const tempDir		= path.join( __dirname, `./fixture/body_parser/multipart` );
 		const app			= new Server();
 
 		app.apply( app.er_body_parser_multipart, { tempDir } );

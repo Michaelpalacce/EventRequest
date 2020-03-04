@@ -1,3 +1,6 @@
+13.4.1
+- Tests fix for linux
+
 13.4.0
 - Added Body Parser Plugins tests
 - Added Header tests
