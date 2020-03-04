@@ -1198,6 +1198,7 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_multipart parses only multipart/form-data',
+	skipped	: true,
 	test	: ( done )=>{
 		const name			= 'testErBodyParserMultipartParsesMultipartFormData';
 		const uploadFile	= process.platform === 'win32' ? 'multipart_data_windows' : 'multipart_data';
@@ -1300,6 +1301,7 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_multipart will not parse if limit is reached',
+	skipped	: true,
 	test	: ( done )=>{
 		const name			= 'testErBodyParserMultipartParsesMultipartFormData';
 		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/multipart_data` ) );
