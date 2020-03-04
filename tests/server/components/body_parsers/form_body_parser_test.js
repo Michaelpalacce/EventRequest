@@ -123,7 +123,7 @@ test({
 				}
 			}
 		});
-		let formBodyParser	= new FormBodyParser( { strict: false, maxPayloadLength : 1 } );
+		const formBodyParser	= new FormBodyParser( { strict: true, maxPayloadLength : 1 } );
 
 		formBodyParser.parse( eventRequest ).then(()=>{
 			done( 'Should have rejected' )
@@ -131,6 +131,39 @@ test({
 			assert.equal( err !== false, true );
 			done();
 		});
+	}
+});
+
+test({
+	message	: 'FormBodyParser.parse parses if maxPayloadLength is reached and not strict',
+	test	: ( done )=>{
+		let bodyToStream	= 'key=value';
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'application/x-www-form-urlencoded',
+				'content-length'	: 10,
+			}
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback )=>{
+				if ( event === 'data' )
+				{
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		const formBodyParser	= new FormBodyParser( { strict: false, maxPayloadLength : 1 } );
+
+		formBodyParser.parse( eventRequest ).then(()=>{
+			done();
+		}).catch( done );
 	}
 });
 

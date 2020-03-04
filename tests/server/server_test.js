@@ -10,6 +10,7 @@ const { Loggur, File }					= require( './../../server/components/logger/loggur' 
 const Router							= require( './../../server/components/routing/router' );
 const DataServer						= require( './../../server/components/caching/data_server' );
 const Session							= require( './../../server/components/session/session' );
+const querystring						= require( 'querystring' );
 const PreloadedPluginManager			= require( './../../server/plugins/preloaded_plugins' );
 const Server							= App.class;
 
@@ -852,6 +853,508 @@ test({
 });
 
 test({
+	message	: 'Server.test eventRequest header functions',
+	test	: ( done )=>{
+		const name			= 'testEventRequestHeaderFunctions';
+		const headerName	= 'testEventRequestHeaderFunctions';
+		const headerValue	= 'valueOne';
+
+		app.get( `/${name}`, ( event )=>{
+			event.setHeader( 'testHeader', headerValue );
+
+			if (
+				event.hasHeader( headerName )
+				&& event.getHeader( headerName ) === headerValue
+				&& event.hasHeader( 'missing' ) === false
+				&& event.getHeader( 'missing' ) === null
+				&& event.getHeader( 'missing', 'default' ) === 'default'
+				&& event.response.getHeader( 'testHeader' ) === headerValue
+			) {
+				event.send( name );
+			}
+
+			event.sendError( 'Error', 400 );
+		} );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { [headerName]: headerValue } ).then(( response )=>{
+
+			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_body_parser_json does not parse anything but application/json',
+	test	: ( done )=>{
+		const name			= 'testErJsonBodyParserParsesApplicationJson';
+		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
+		const formDataValue	= 'value';
+
+		const app			= new Server();
+
+		app.apply( app.er_body_parser_json, { maxPayloadLength: 60 } );
+
+		app.get( `/${name}`, ( event )=>{
+			if (
+				typeof event.body === 'undefined'
+				|| typeof event.body[formDataKey] === 'undefined'
+				|| ! event.body[formDataKey].includes( formDataValue )
+			) {
+				event.sendError( 'Body was not parsed', 400 );
+			}
+
+			event.send( 'ok' );
+		} );
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': 'application/json' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ ['content-type'.toUpperCase()]: 'application/json' },
+				3337
+			)
+		);
+
+		// Above the limit of 60 bytes
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				JSON.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
+				{ 'content-type': 'application/json' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': 'application/*' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': '*/*' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': 'json' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': '*' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{},
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				'{wrongJson',
+				{},
+				3337
+			)
+		);
+
+		const server	= app.listen( 3337, ()=>{
+			Promise.all( responses ).then(()=>{
+				server.close();
+				done();
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test er_body_parser_json does not above the maxPayload if strict',
+	test	: ( done )=>{
+		const name			= 'testErJsonBodyParserParsesApplicationJson';
+		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
+		const formDataValue	= 'value';
+
+		const app			= new Server();
+
+		app.apply( app.er_body_parser_json, { maxPayloadLength: 60, strict: true } );
+
+		app.get( `/${name}`, ( event )=>{
+			if (
+				typeof event.body === 'undefined'
+				|| typeof event.body[formDataKey] === 'undefined'
+			) {
+				event.sendError( 'Body was not parsed', 400 );
+			}
+
+			event.send( 'ok' );
+		} );
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				500,
+				JSON.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
+				{ 'content-type': 'application/json' },
+				3338
+			)
+		);
+
+		const server	= app.listen( 3338, ()=>{
+			Promise.all( responses ).then(()=>{
+				server.close();
+				done();
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test er_body_parser_form does not above the maxPayload if strict',
+	test	: ( done )=>{
+		const name			= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
+		const formDataKey	= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
+		const formDataValue	= 'value';
+
+		const app			= new Server();
+
+		app.apply( app.er_body_parser_form, { maxPayloadLength: 60, strict: false } );
+
+		app.get( `/${name}`, ( event )=>{
+			if (
+				typeof event.body === 'undefined'
+				|| typeof event.body[formDataKey] === 'undefined'
+				|| ! event.body[formDataKey].includes( formDataValue )
+			) {
+				event.sendError( 'Body was not parsed', 400 );
+			}
+
+			event.send( 'ok' );
+		} );
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				querystring.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': 'application/x-www-form-urlencoded' },
+				3339
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				querystring.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
+				{ 'content-type': 'application/x-www-form-urlencoded' },
+				3339
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				querystring.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type' : '' },
+				3339
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				querystring.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': 'application/*' },
+				3339
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				querystring.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': '*' },
+				3339
+			)
+		);
+
+		const server	= app.listen( 3339, ()=>{
+			Promise.all( responses ).then(()=>{
+				server.close();
+				done();
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test er_body_parser_form does not above the maxPayload if strict',
+	test	: ( done )=>{
+		const name			= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
+		const formDataKey	= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
+		const formDataValue	= 'value';
+
+		const app			= new Server();
+
+		app.apply( app.er_body_parser_form, { maxPayloadLength: 60, strict: true } );
+
+		app.get( `/${name}`, ( event )=>{
+			if (
+				typeof event.body === 'undefined'
+				|| typeof event.body[formDataKey] === 'undefined'
+				|| ! event.body[formDataKey].includes( formDataValue )
+			) {
+				event.sendError( 'Body was not parsed', 400 );
+			}
+
+			event.send( 'ok' );
+		} );
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				500,
+				querystring.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
+				{ 'content-type': 'application/x-www-form-urlencoded' },
+				3340
+			)
+		);
+
+		const server	= app.listen( 3340, ()=>{
+			Promise.all( responses ).then(()=>{
+				server.close();
+				done();
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test er_body_parser_multipart parses only multipart/form-data',
+	test	: ( done )=>{
+		const name			= 'testErBodyParserMultipartParsesMultipartFormData';
+		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/multipart_data` ) );
+		const tempDir		= path.join( __dirname, './fixture/body_parser/multipart' );
+		const app			= new Server();
+
+		app.apply( app.er_body_parser_multipart, { tempDir } );
+
+		app.get( `/${name}`, ( event )=>{
+			if (
+				typeof event.body === 'undefined'
+				|| typeof event.body.$files === 'undefined'
+				|| event.body.text !== 'text default'
+				|| event.body.$files.length !== 2
+				|| event.body.$files[0].type !== 'file'
+				|| event.body.$files[0].size !== 19
+				|| event.body.$files[0].contentType !== 'text/plain'
+				|| event.body.$files[0].name !== 'a.txt'
+				|| ! event.body.$files[0].path.includes( tempDir )
+				|| event.body.$files[1].type !== 'file'
+				|| event.body.$files[1].size !== 50
+				|| event.body.$files[1].contentType !== 'text/html'
+				|| event.body.$files[1].name !== 'a.html'
+				|| ! event.body.$files[1].path.includes( tempDir )
+			) {
+				event.sendError( 'Body was not parsed', 400 );
+			}
+
+			event.send( 'ok' );
+		} );
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				multipartData,
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				multipartData,
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9041544843365972754266' },
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				500,
+				multipartData,
+				{ 'content-type': 'multipart/form-data' },
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				multipartData,
+				{},
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				'',
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+				3341
+			)
+		);
+
+		const server	= app.listen( 3341, ()=>{
+			Promise.all( responses ).then(()=>{
+				setTimeout(()=>{
+					server.close();
+					done();
+				}, 500 );
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test er_body_parser_multipart will not parse if limit is reached',
+	test	: ( done )=>{
+		const name			= 'testErBodyParserMultipartParsesMultipartFormData';
+		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/multipart_data` ) );
+		const tempDir		= path.join( __dirname, './fixture/body_parser/multipart' );
+		const app			= new Server();
+
+		app.apply( app.er_body_parser_multipart, { tempDir, maxPayload: 10 } );
+
+		app.get( `/${name}`, ( event )=>{
+			if (
+				typeof event.body === 'undefined'
+				|| typeof event.body.$files === 'undefined'
+				|| event.body.text !== 'text default'
+				|| event.body.$files.length !== 2
+				|| event.body.$files[0].type !== 'file'
+				|| event.body.$files[0].size !== 19
+				|| event.body.$files[0].contentType !== 'text/plain'
+				|| event.body.$files[0].name !== 'a.txt'
+				|| ! event.body.$files[0].path.includes( tempDir )
+				|| event.body.$files[1].type !== 'file'
+				|| event.body.$files[1].size !== 50
+				|| event.body.$files[1].contentType !== 'text/html'
+				|| event.body.$files[1].name !== 'a.html'
+				|| ! event.body.$files[1].path.includes( tempDir )
+			) {
+				event.sendError( 'Body was not parsed', 400 );
+			}
+
+			event.send( 'ok' );
+		} );
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				500,
+				multipartData,
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+				3342
+			)
+		);
+
+		const server	= app.listen( 3342, ()=>{
+			Promise.all( responses ).then(()=>{
+				setTimeout(()=>{
+					server.close();
+					done();
+				}, 500 );
+			}).catch( done );
+		} );
+	}
+});
+
+test({
 	message	: 'Server.test er_logger',
 	test	: ( done )=>{
 		const name					= 'testErLogger';
@@ -883,7 +1386,7 @@ test({
 			event.send( name );
 		} );
 
-		app.listen( 3336, ()=>{
+		const server	= app.listen( 3336, ()=>{
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3336 ).then(( response )=>{
 				fileTransport.getWriteStream().end();
 				setTimeout(()=>{
@@ -905,6 +1408,7 @@ test({
 					if ( fs.existsSync( fileTransport.getFileName() ) )
 						fs.unlinkSync( fileTransport.getFileName() );
 
+					server.close();
 					done();
 				})
 			}).catch( done );

@@ -1,3 +1,11 @@
+13.4.0
+- Added Body Parser Plugins tests
+- Added Header tests
+- Fixed Body Parser tests
+- Fixed JSON Body Parser to now stop if strict
+- Fixed Form Body Parser to now stop if strict
+- Fixed a bug with the multipart body parser error handling
+
 13.3.0
 - Updated documentation for plugins
 - RateLimiter now emmits rateLimited with rule and policy

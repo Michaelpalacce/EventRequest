@@ -3,7 +3,6 @@
 // Dependencies
 const { Tester, Mock, logger, Mocker }				= require( './../server/tester/tester' );
 const EventRequest									= require( './../server/event' );
-const querystring									= require( 'querystring' );
 const assert										= require( 'assert' );
 const fs											= require( 'fs' );
 const path											= require( 'path' );
@@ -123,10 +122,9 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
  */
 helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '', headers = {}, port = 3333 )=>{
 	return new Promise(( resolve,reject )=>{
-		const postData			= querystring.stringify( data );
 		const predefinedHeaders	= {
 			'Content-Type': 'application/x-www-form-urlencoded',
-			'Content-Length': Buffer.byteLength( postData )
+			'Content-Length': Buffer.byteLength( data )
 		};
 
 		headers	= { ...predefinedHeaders, ...headers };
@@ -161,7 +159,7 @@ helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '',
 			reject( e );
 		});
 
-		req.write( postData );
+		req.write( data );
 		req.end();
 	});
 };

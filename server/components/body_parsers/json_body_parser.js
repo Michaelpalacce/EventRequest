@@ -58,7 +58,7 @@ class JsonBodyParser extends BodyParser
 	 */
 	onEndCallback( rawPayload, headers, callback )
 	{
-		if ( rawPayload.length > this.maxPayloadLength )
+		if ( this.strict && rawPayload.length > this.maxPayloadLength )
 		{
 			callback( 'Max payload length reached' );
 			return;
@@ -83,8 +83,8 @@ class JsonBodyParser extends BodyParser
 
 		try
 		{
-			let payload	= JSON.parse( rawPayload.toString() );
-			for ( let index in payload )
+			const payload	= JSON.parse( rawPayload.toString() );
+			for ( const index in payload )
 			{
 				payload[index]	= decodeURIComponent( payload[index] );
 			}

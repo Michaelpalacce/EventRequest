@@ -596,7 +596,7 @@ class MultipartDataParser extends BodyParser
 				}
 				else
 				{
-					this.callback( err );
+					reject( err );
 					this.terminate();
 				}
 			});
@@ -677,7 +677,7 @@ class MultipartDataParser extends BodyParser
 			}
 
 			this.parts	= null;
-		}, 2000 );
+		}, 100 );
 	}
 
 	/**

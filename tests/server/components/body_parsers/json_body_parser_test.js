@@ -124,7 +124,41 @@ test({
 				}
 			}
 		});
-		let jsonBodyParser	= new JsonBodyParser( { strict: false, maxPayloadLength : 1 } );
+		let jsonBodyParser	= new JsonBodyParser( { strict: true, maxPayloadLength : 1 } );
+
+		jsonBodyParser.parse( eventRequest ).then(()=>{ done( 'Should have rejected' ); } ).catch(( err )=>{
+			assert.equal( err !== false, true );
+			done();
+		});
+	}
+});
+
+test({
+	message	: 'JsonBodyParser.parse parses if maxPayloadLength is reached and not strict',
+	test	: ( done )=>{
+		let bodyToStream	= { key : 'value' };
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'application/json',
+				'content-length'	: 10000,
+			}
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback )=>{
+				if ( event === 'data' )
+				{
+					callback( Buffer.from( JSON.stringify( bodyToStream ) ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let jsonBodyParser	= new JsonBodyParser( { strict: true, maxPayloadLength : 1 } );
 
 		jsonBodyParser.parse( eventRequest ).then(()=>{ done( 'Should have rejected' ); } ).catch(( err )=>{
 			assert.equal( err !== false, true );
