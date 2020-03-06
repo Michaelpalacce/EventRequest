@@ -89,7 +89,7 @@ httpServerTwo.listen( 3335, ()=>{
 The event request is an object that is created by the server and passed through every single middleware.
 
 ***
-Properties of eventRequest:
+####Properties of eventRequest:
 
 **queryString: Object** 
 - The query string
@@ -141,7 +141,7 @@ Properties of eventRequest:
 - Default or Custom error handler that will be called in case of an error
 
 ***
-Functions exported by the event request:
+####Functions exported by the event request:
 
 **setCookie( String name, String value, Object options = {} ): Boolean**
 - Sets a new cookie with the given name and value
@@ -200,7 +200,7 @@ Functions exported by the event request:
 - This will emit an 'on_error' event as well as the usual send events 
 
 ***
-Events emitted by the EventRequest
+####Events emitted by the EventRequest
 
 **cleanUp()** 
 - Emitted when the event request is about to begin the cleanUp phase.
@@ -252,13 +252,13 @@ Events emitted by the EventRequest
 # Server
 The main object of the framework.
 
-To retrieve the Server class do:
+- To retrieve the Server class do:
 ~~~javascript
 const { Server } = require( 'event_request' );
 const app = Server();
 ~~~
 
-To start the Server you can do:
+- To start the Server you can do:
 ~~~javascript
 const { Server } = require( 'event_request' );
 const app = Server();
@@ -268,7 +268,7 @@ app.listen( '80', ()=>{
 });
 ~~~
 
-To clean up the server instance you can do:
+- To clean up the server instance you can do:
 ~~~javascript
 const { Server } = require( 'event_request' );
 const app = Server();
@@ -284,9 +284,7 @@ NOTES:
 - This will stop the httpServer and set the internal variable of server to null
 - You may need to do  `app = Server()` again since they app variable is still a pointer to the old server
 
-#
-
-If you want to start the server using your own http/https server:
+- If you want to start the server using your own http/https server:
 ~~~javascript
 const { Server } = require( 'event_request' );
 
@@ -297,11 +295,11 @@ server.listen('80',()=>{
 });
 ~~~
 
-Calling `Server()` anywhere will return the same instance of the Server.
+- Calling `Server()` anywhere will return the same instance of the Server.
 
 
 ***
-Functions exported by the server:
+####Functions exported by the server:
 
 **getPluginManager(): PluginManager** 
 - Returns an instance of the plugin manager attached to the server
@@ -324,10 +322,18 @@ Functions exported by the server:
 **define( String middlewareName, Function Middleware ): Server**  
 - Calls Router.define
 
+**Router(): Router**
+- Returns a new Router instance that can be used anywhere and later on add() -ed back to the server
 
+**attach(): Function**
+- Returns the middleware needed by http.createServer or https.createServer
+
+**listen( ... args )**
+- Starts a http server.
+- Any arguments given will be applied to httpServer.listen
 
 ***
-Events emitted by the server
+####Events emitted by the server
 
 **addRoute ( mixed route )**  
 - When a new route is being added
@@ -357,7 +363,7 @@ Events emitted by the server
 - called when an error is thrown from the eventRequest
 
 ***
-###Router
+#Router
 
 ***
 ####Functions exported by the Router:
@@ -539,6 +545,600 @@ app.listen( 80, ()=>{
 });
 ~~~
 
+# Logging
+
+The `Logging` Suite exported by the module contains the following:
+- Loggur -> instance of Loggur used to log data and create Loggers
+- Logger -> The Logger class
+- Transport -> The interface used by the loggers
+- Console -> Transport that logs to the console
+- File -> Transport that logs to a file
+- Log -> The Log object used by all the internal classes
+- LOG_LEVELS -> The Default log levels
+- The Loggur can be accessed directly from the server { Loggur }
+
+### Default Logger:
+- The default logger is attached directly to the Loggur instance. it can be enabled or disabled by calling Loggur.enableDefault() or Loggur.disableDefault(). 
+- The default Logger has a log level of `300` and logs up until level `600` which is the debug level.
+
+- The Loggur can create Loggers with Loggur.createLogger({});
+
+***
+####Loggur.createLogger options:
+
+**serverName: String** 
+- The name of the server to be concatenated with the uniqueId 
+- Defaults to empty
+
+**transports: Array** 
+- Array of the transports to be added to the logger 
+- Defaults to empty
+
+**logLevel: Number** 
+- The log severity level 
+- Defaults to error
+
+**logLevels: Object** 
+- JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class 
+- Defaults to LOG_LEVELS
+
+**capture: Boolean** 
+- Whether to attach event listeners for process.on uncaughtException and unhandledRejection 
+- Defaults to false
+
+**dieOnCapture: Boolean** 
+- If the process should exit in case of a caught exception 
+- Defaults to true
+
+**unhandledExceptionLevel: Number** 
+- What level should the unhandled exceptions be logged at 
+- Defaults to error
+
+***
+- If you want to change the log level of a logger it can easily be done with .setLogLevel( logLevel )
+~~~javascript
+logger.setLogLevel( 600 );
+~~~
+
+Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log and will call all added Loggers
+~~~javascript
+const logger	= Loggur.createLogger({
+	transports	: [
+		new Console( { logLevel : LOG_LEVELS.notice } ),
+	]
+});
+
+Loggur.addLogger( 'logger_id', logger );
+~~~
+
+Logger.log accepts 2 parameters: 
+~~~javascript
+    logger.log( 'Log' ); // This logs by default to an error level
+    logger.log( 'Log', LOG_LEVELS.debug ); // LOG_LEVELS.debug === Number, this will log 'Log' with debug level
+~~~
+
+Each Logger can have it's own transport layers.
+There are 2 predefined transport layers:
+
+**Console**
+- Logs data in the console
+
+***
+####Accepted options:
+
+**color: Boolean**
+- Whether the log should be colored 
+- Defaults to true
+
+**logColors: Object** 
+- The colors to use 
+- Defaults to
+    - [LOG_LEVELS.error]		: 'red',
+    - [LOG_LEVELS.warning]	: 'yellow',
+    - [LOG_LEVELS.notice]	: 'green',
+    - [LOG_LEVELS.info]		: 'blue',
+    - [LOG_LEVELS.verbose]	: 'cyan',
+    - [LOG_LEVELS.debug]		: 'white'
+
+**File**
+- Logs data to a file
+
+***
+####Accepted options:
+**filePath: String**
+- The location of the file to log to 
+- If it is not provided the transport will not log
+
+~~~javascript
+const { Logging }							= require( 'event_request' );
+const { Loggur, LOG_LEVELS, Console, File }	= Logging;
+
+// Create a custom Logger
+const logger	= Loggur.createLogger({
+	serverName	: 'Test', // The name of the logger
+	logLevel	: LOG_LEVELS.debug, // The logLevel for which the logger should be fired
+	capture		: false, // Do not capture thrown errors
+	transports	: [
+		new Console( { logLevel : LOG_LEVELS.notice } ), // Console logger that logs everything below notice
+		new File({ // File logger
+			logLevel	: LOG_LEVELS.notice, // Logs everything below notice
+			filePath	: '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
+			logLevels	: { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level )
+		}),
+		new File({
+			logLevel	: LOG_LEVELS.error,
+			filePath	: '/logs/error_log.log',
+		}),
+		new File({
+			logLevel	: LOG_LEVELS.debug,
+			filePath	: '/logs/debug_log.log'
+		})
+	]
+});
+~~~
+
+### Default log levels:
+- error		: 100,
+- warning	: 200,
+- notice	: 300,
+- info		: 400,
+- verbose	: 500,
+- debug		: 600
+
+***
+***
+***
+
+# Validation
+The validation is done by using:
+
+~~~javascript
+    event.validationHandler.validate( objectToValidate, skeleton )
+~~~
+
+skeleton must have the keys that are to be validated that point to a string of rules separated by ||
+
+***
+#### Possible rules are:
+
+**rules** 
+- if malformed rules string is passed
+
+**optional** 
+- if set as long as the input is empty it will always be valid. if not empty other possible rules will be called
+
+**filled** 
+- checks if the input is filled
+
+**string** 
+- checks if the input is a string
+
+**notString** 
+- checks if the input is NOT a string
+
+**range** 
+- Is followed by min and max aka: range:1-2 where 1 is the minimum and 2 maximum.
+
+**min** 
+- minimum input length aka: min:10
+
+**max** 
+- maximum input length aka: max:50
+
+**email** 
+- checks if the input is a valid email
+
+**isTrue** 
+- checks if the input evaluates to true
+
+**isFalse** 
+- checks if the input evaluates to false
+
+**boolean** 
+- checks if the input is a boolean
+
+**notBoolean** 
+- checks if the input is not a boolean
+
+**numeric** 
+- checks if the input is a number
+
+**notNumeric** 
+- checks if the input is not a number
+
+**date** 
+- checks if the input is a date
+
+**same** 
+- checks if the input is the same as another input aka: same:emailInput
+
+**different** 
+- checks if the input is different from another input aka: different:emailInput
+
+**equals** 
+- checks if the input equals another given string: equals:makeSureToEqualToThis
+
+
+When validation is done a ValidationResult is returned. It has 2 main methods:
+    getValidationResult that will return an object with the fields tested mapped to the errors found. Otherwise 
+                        it will be an object with the fields tested mapped to the values ( done only if no errors found )
+    hasValidationFailed that returns a boolean whether there is an error
+
+~~~javascript
+     const result	= event.validationHandler.validate(
+        event.body,
+        { username : 'filled||string', password : 'filled||string' } 
+     );
+
+    console.log( result.hasValidationFailed() );
+    console.log( result.getValidationResult() );
+    
+    // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
+    // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
+    // { 'username':'username', 'password': 'password'}
+~~~
+
+The example will validate that the stringToValidate is filled is a string and is within a range of 2-3 characters
+It will also validate that the emailToValidate in case it is provided is an actual email.
+
+In case there is no error False will be returned
+
+***
+####Validation defaults
+
+Validation results can also have defaults set. This is done by instead of passing a string of rules to the skeleton keys,
+an object is passed with two values: rules and default
+
+In case where the parameters have NOT been passed, the default value will be used.
+
+~~~javascript
+     const result	= event.validationHandler.validate(
+        event.body,
+        { 
+            username : { rules: 'filled||string', default: 'root' }, 
+            password : { rules: 'filled||string', default: 'toor' } 
+        } 
+     );
+
+    console.log( result.hasValidationFailed() );
+    console.log( result.getValidationResult() );
+    
+    // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
+    // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
+    // { 'username':'username', 'password': 'password'}
+~~~
+
+***
+***
+***
+
+# LeakyBucket
+This class can be used to limit data in one way or another.
+The constructor accepts three parameters: `refillAmount = 100, refillTime = 60, maxAmount = 1000` where:
+ - Refill Amount is how many tokens to refill after the refillTime
+ - Refill Time is how often tokens should be renewed
+ - Max Amount is the max amount of tokens to be kept
+ 
+***
+####The class has the following functions:
+
+**reset(): void**
+- Resets the tokens to full
+
+**get(): Number**
+- Returns the currently available tokens
+
+**reduce( tokens = 1 ): Boolean** 
+- How many tokens should be taken. 
+- This function returns Boolean whether there were enough tokens to be reduced or not
+
+
+
+# Testing
+If you need to test your project, then you can use the Testing tools included in the project.
+
+~~~javascript
+     const { Testing }  = require( 'event_request' );
+~~~
+The testing tools include a mocker. The mocker class can be retrieved with:
+
+~~~javascript
+     const { Mock }    = Testing;
+~~~
+The exported Mock is a Function that should be used directly on the constructor of the class you want to mock. For example:
+
+~~~javascript
+     class Test { mockThis(){} };  
+     const MockedTest    = Mock( Test );  
+~~~
+
+This will return the same class but with an extra _mock function added directly to it so make sure your original class does NOT
+have a _mock function otherwise it will be overwritten. From here you can use the _mock function to mock any other function/parameter
+that is attached to the 'Test' class:
+
+~~~javascript
+     const testDouble    = new MockedTest();  
+       testDouble._mock({  
+       method        : 'mockThis',  
+       shouldReturn  : ''  
+     });  
+~~~
+
+Note: As you can see when you mock a class you MUST specify what it should return from now on. You can also give instructions
+on what should be returned on consecutive calls to this method like so :
+
+~~~javascript
+     const testDouble    = new MockedTest();  
+       testDouble._mock({  
+       method              : 'mockThis',  
+       onConsecutiveCalls  : ['first', 'secondAndOnwards']  
+     });
+~~~
+
+This will result in the following:
+1. The first time you make a call to mockThis you will get 'first' as a return
+2. The second time you make a call to mockThis you will get 'secondAndOnwards' as a return
+3. Third time you make a call and any other following you will also get 'secondAndOnwards'
+
+
+When making a mock of a class you can specify the MAX amount of times an object should be called. Since javascript uses
+an async approach and relies heavily on callbacks, a minimum cannot be set.
+
+~~~javascript
+     const testDouble    = new MockedTest();  
+        testDouble._mock({  
+        method        : 'mockThis',  
+        shouldReturn  : '',  
+        called        : 1  
+     });
+~~~
+
+This way if the method mockThis is called more than once an error will be thrown.
+
+You can also Specify the arguments that should be provided to the mocked method like so:
+~~~javascript
+     const testDouble    = new MockedTest();  
+       testDouble._mock({  
+       method        : 'mockThis',  
+       shouldReturn  : '',  
+       called        : 1,  
+       with:         [
+           [ 'firstArgument', 'secondArgument' ],  
+           [ 'secondCallFirstArgument', 'secondCallSecondArgument' ], 
+           [ 'iWantToCheckThis', undefined ],
+           [ undefined, 'iWantToCheckThis' ]  
+        ]  
+     });  
+~~~
+
+The 'with' option accepts an array of arrays where each array in the with array is a call. Again if it's called more than
+the times the with arguments, the last one will be returned. In case of mismatch an Error will be thrown.
+If you do not want the mocker to check one of the arguments, then undefined should be passed
+
+If you wan an environment to run your tests then you can use the test and runAllTests provided by the testing tools:
+
+~~~javascript
+     const { test, runAllTests }    = TestingTools;
+~~~
+
+The 'runAllTests' function accepts an object that accepts the following options:
+
+**dieOnFirstError: Boolean** 
+- Whether the testing should stop on the first error 
+- Defaults to true
+
+**debug: Boolean** 
+- Whether errors thrown should show their entire stack or just the message 
+- Defaults to false
+
+**silent: Boolean** 
+- This will set the consoleLogger logLevel to error, meaning only errors will be displayed 
+- Defaults to false
+
+**filter: String** 
+- the string to search for and filter by when testing 
+- Defaults to false
+
+**callback: Function** 
+- Callback to be called when testing is complete
+
+***
+
+- The run all tests will run all tests added by the test function.
+- If there is an err or an Error is thrown then the process with exit with code 1 otherwise it will exit with code 0
+
+***
+###The 'test' function accepts an object with the following options:
+
+**message: String** 
+- the name of the test
+
+**skipped: Boolean** 
+- defaults to false 
+- If this is set to true the test will be skipped
+
+**incomplete: Boolean** 
+- defaults to false 
+- If this is set to true the test will be marked as incomplete
+
+**dataProvider: Array** 
+- Optional 
+- If this is provided then an Array of Arrays must be supplied.
+- For each Array supplied, a new test will be created and called with the Array elements set as arguments to the test callback
+    
+**test: Function** 
+- the callback to execute.
+- the tester provides a done function as the first argument to the test callback. 
+- The done should be called just ONCE and only when the test finishes. 
+- If done is called twice within the same test then that will be seen as an error and the testing will stop.
+- If any arguments that evaluate to true are provided to done then the test will be seen as failed.
+
+***
+~~~javascript
+     test({  
+       message     : 'This test should pass',  
+       dataProvier : [
+           ['first', 2 ],
+           ['firstTwo', 21 ],
+       ],
+       test        : ( done, first, second ) =>{  
+          console.log( first ); //this will log 'first', then on the second iterration 'firstTwo'
+          console.log( second ); //this will log 2, then on the second iterration 21
+          let one = 1;  
+
+         one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );  
+       }  
+     });  
+~~~
+
+- You can also create your own Tester if you want separate test cases:
+~~~javascript
+     const { Tester }    = TestingTools;  
+     let tester          = new Tester();  
+~~~
+
+- The tester has the same functions: 'test', 'runAllTests'
+
+###Mocker
+You can also use the Mocker class by:
+~~~javascript
+       Mocker( classToMock, methodToMockOptions )
+~~~
+ 
+- The methodToMockOptions are the same as the _mock function of a testDouble. 
+- Note that this can alter a class before it is actually instantiated and WILL alter the original class passed so it is suggested to be used ONLY on testDoubles
+
+
+The TestingTools export:
+
+- Tester, -> Tester constructor
+- Mock,   -> Mock function
+- Mocker,   -> the class used to mock methods of testDoubles. Please note that if you use this class you will alter the original one
+- assert, -> nodejs assert module
+- logger		: tester.consoleLogger, -> Predefined logger that has 3 log levels: error, success, info
+- test		: tester.addTest.bind( tester ),
+- runAllTests	: tester.runAllTests.bind( tester )
+
+***
+***
+***
+
+# Caching
+- DataServer is a class that is exported through the Server.Development suite that stores data **IN MEMORY**
+- Can be extended
+~~~javascript
+const { Development }   = require( 'event_request' );
+const { DataServer }    = Development;
+
+console.log( DataServer );
+console.log( new DataServer( options ) );
+~~~
+
+***
+#### Accepted options
+
+**ttl: Number** 
+- The time in seconds to be used as a default 'Time To Live' if none is specified. 
+- Defaults to 300 
+
+**persistPath: String** 
+- The absolute path of the file that will persist data. 
+- Defaults to <PROJECT_ROOT>/cache 
+
+**persistInterval: Number** 
+- The time in seconds after which data will be persisted. 
+- Defaults to 100
+
+**gcInterval: Number** 
+- The time in seconds after which data will be garbageCollected. 
+- Defaults to 60 
+
+**persist: Boolean** 
+- Flag that specifies whether the data should be persisted to disk. 
+- Defaults to true 
+
+The DataServer provides a set of methods that have to be implemented if you want to create your own Caching server to be 
+integrated with other plugins. 
+
+**stop(): void**
+- This will stop the connection of the DataServer. ( Delete all the files, flush memory and stop gc and persistence )
+
+**get( String key ): Promise: Object|null** 
+- Retrieves the value given a key. Returns null if the key does not exist.
+- This function is a 'public' method to be used by users.
+- In the case that you want to implement your own DataServer, you should override **_get( String key )**
+
+**_get( String key ): Promise: Object|null** 
+- This method is the protected method that should be implemented in case extension of the DataServer should be done
+- This method currently calls this._prune( key ) directly
+- No need to check if key is a String, that has been done in the _get method already.
+
+**_prune( String key ): Promise: Object|null** 
+- Removes the DataSet if it is expired, otherwise returns it. Returns null if the data is removed.
+- This method also sets the expiration of the DataSet to Infinity if it is null.
+
+**set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Promise: Object|null** 
+- Returns the data if it was set, otherwise returns null
+- Sets the given key with the given value. 
+- ttl is the time in **seconds** that the data will be kept.
+- If ttl is -1 then the dataSet will NEVER expire
+- If ttl is 0 then the Default TTL will be used.
+- If ttl is > 0 then the value will be used
+- persist is a flag that will override the global persist value. You can set a key to not be persisted. 
+However if the global persist is set to false, this will not work
+- Calls _set() after checking the arguments if they are valid
+
+**_set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Promise: Object|null** 
+- Implement for development. No need to do checks of the values of the parameter as that is done in the set() function
+- This function commits the key/value to memory with all it's attributes
+- Returns the data if it was set, otherwise returns null
+
+**_makeDataSet( String key, mixed value, Number ttl = 0, Boolean persist = true ): Object**  
+- Forms the dataSet object and returns it in the following format: `{ key, value, ttl, expirationDate, persist };`
+
+**touch( String key, Number ttl = 0 ): Promise: Boolean**
+- Retruns a Boolean whether the data was successfully touched
+- Retruns a false if key is not String or ttl is not Number
+- Calls _touch after checkinf if arguments are valid
+
+**_touch( String key, Number ttl = 0 ): Promise: Boolean**
+- Implement for development. No need to do checks of the values of the parameter as that is done in the touch() function
+- Retruns a Boolean whether the data was successfully touched
+- If ttl = 0 then the dataSet will be updated with it's own ttl
+- This function actually touches the data
+
+**delete( String key ): Promise: Boolean**
+- Deletes the given data
+
+**_delete( String key ): Promise: Boolean**
+- Implement for development. No need to do checks of the values of the parameter as that is done in the delete() function
+- This function deletes the actual data
+
+**_garbageCollect(): void**
+- Prunes all the data from the server if needed
+- Implement this if your Data Server needs it, otherwise leave it blank
+
+**_saveData(): void**
+- Persists all the data set to be persisted to disk 
+- This respects any data set with persist = false
+
+**_loadData(): void**
+- Loads all the data from disk
+
+**_getExpirationDateFromTtl( Number ttl = -1 ): Number**
+- Gets the the correct ttl according to the rules described in **set()**
+
+**Used for development purposes:**
+
+**length(): Number**
+- Returns how many keys there are
+
+
+***
+***
+***
+
+
 ***
 # Plugins
 Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**
@@ -570,7 +1170,7 @@ Server {
 
 ~~~javascript
 const PluginManager	= server.getPluginManager();
-let timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
+const timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
 
 timeoutPlugin.setOptions( { timeout : 10 * 1000 } );
 server.apply( timeoutPlugin );
@@ -580,595 +1180,6 @@ server.apply( 'er_timeout', {  timeout : 10 * 1000 } ); // This is also valid.
 server.apply( server.er_timeout ); // This is also valid.
 server.apply( server.er_timeout, {  timeout : 10 * 1000 } ); // This is also valid.
 ~~~
-
-***
-***
-***
-
-# Logging
-
-The `Logging` Suite exported by the module contains the following:
-- Loggur -> instance of Loggur used to log data and create Loggers
-- Logger -> The Logger class
-- Transport -> The interface used by the loggers
-- Console -> Transport that logs to the console
-- File -> Transport that logs to a file
-- Log -> The Log object used by all the internal classes
-- LOG_LEVELS -> The Default log levels
-
-
-The Loggur can be accessed directly from the server { Loggur }
-
-## Default Logger:
-The default logger is attached directly to the Loggur instance. it can be enabled or disabled by calling
-Loggur.enableDefault() or Loggur.disableDefault(). 
-The default Logger has a log level of `300` and logs up until level `600` which is the debug level.
-
-The Loggur can be used to create Loggers which accept the following options:
-
-**serverName** - String - The name of the server to be concatenated with the uniqueId - Defaults to empty
-
-***
-
-**transports** - Array - Array of the transports to be added to the logger - Defaults to empty
-
-***
-
-**logLevel** - Number - The log severity level -> Defaults to error
-
-***
-
-**logLevels** - Object - JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
-
-***
-
-**capture** - Boolean - Whether to attach event listeners for process.on uncaughtException and unhandledRejection - Defaults to false
-
-***
-
-**dieOnCapture** - Boolean - If the process should exit in case of a caught exception -> Defaults to true
-
-***
-
-**unhandledExceptionLevel** - Number - What level should the unhandled exceptions be logged at -> Defaults to error
-
-***
-
-If you want to change the log level of a logger it can easily be done with .setLogLevel( logLevel )
-
-~~~javascript
-logger.setLogLevel( 600 );
-~~~
-
-Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log and will call all added Loggers
-~~~javascript
-let logger	= Loggur.createLogger({
-	transports	: [
-		new Console( { logLevel : LOG_LEVELS.notice } ),
-	]
-});
-
-Loggur.addLogger( 'logger_id', logger );
-~~~
-
-Logger.log accepts 2 parameters: 
-~~~javascript
-    logger.log( 'Log' ); // This logs by default to an error level
-    logger.log( 'Log', LOG_LEVELS.debug ); // LOG_LEVELS.debug === Number, this will log 'Log' with debug level
-~~~
-
-Each Logger can have it's own transport layers.
-There are 2 predefined transport layers:
-
-**Console**
-    
-    Accepted options:
-    **color** - Boolean - Whether the log should be colored -> Defaults to true
-    **logColors** - Object - The colors to use -> Defaults to
-        [LOG_LEVELS.error]		: 'red',
-        [LOG_LEVELS.warning]	: 'yellow',
-        [LOG_LEVELS.notice]	: 'green',
-        [LOG_LEVELS.info]		: 'blue',
-        [LOG_LEVELS.verbose]	: 'cyan',
-        [LOG_LEVELS.debug]		: 'white'
-
-**File**
-    
-    Accepted options:
-    **filePath** - String - the location of the file to log to -> if it is not provided the transport will not log
-
-~~~javascript
-const { Logging }							= require( 'event_request' );
-const { Loggur, LOG_LEVELS, Console, File }	= Logging;
-
-// Create a custom Logger
-let logger	= Loggur.createLogger({
-	serverName	: 'Test', // The name of the logger
-	logLevel	: LOG_LEVELS.debug, // The logLevel for which the logger should be fired
-	capture		: false, // Do not capture thrown errors
-	transports	: [
-		new Console( { logLevel : LOG_LEVELS.notice } ), // Console logger that logs everything below notice
-		new File({ // File logger
-			logLevel	: LOG_LEVELS.notice, // Logs everything below notice
-			filePath	: '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
-			logLevels	: { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level )
-		}),
-		new File({
-			logLevel	: LOG_LEVELS.error,
-			filePath	: '/logs/error_log.log',
-		}),
-		new File({
-			logLevel	: LOG_LEVELS.debug,
-			filePath	: '/logs/debug_log.log'
-		})
-	]
-});
-~~~
-
-### Default log levels:
-	error	: 100,
-	warning	: 200,
-	notice	: 300,
-	info	: 400,
-	verbose	: 500,
-	debug	: 600
-
-***
-***
-***
-
-# Validation
-The validation is done by using:
-
-~~~javascript
-    event.validationHandler.validate( objectToValidate, skeleton )
-~~~
-
-skeleton must have the keys that are to be validated that point to a string of rules separated by ||
-
-### Possible rules are:
-
-**rules** - if malformed rules string is passed
-
-***
-
-**optional** - if set as long as the input is empty it will always be valid. if not empty other possible rules will be called
-
-***
-
-**filled** - checks if the input is filled
-
-***
-
-**string** - checks if the input is a string
-
-***
-
-**notString** - checks if the input is NOT a string
-
-***
-
-**range** - Is followed by min and max aka: range:1-2 where 1 is the minimum and 2 maximum.
-
-***
-
-**min** - minimum input length
-
-***
-
-**max** - maximum input length
-
-***
-
-**email** - checks if the input is a valid email
-
-***
-
-**isTrue** - checks if the input evaluates to true
-
-***
-
-**isFalse** - checks if the input evaluates to false
-
-***
-
-**boolean** - checks if the input is a boolean
-
-***
-
-**notBoolean** - checks if the input is not a boolean
-
-***
-
-**numeric** - checks if the input is a number
-
-***
-
-**notNumeric** - checks if the input is not a number
-
-***
-
-**date** - checks if the input is a date
-
-***
-
-**same** - checks if the input is the same as another input aka: same:emailInput
-
-***
-
-**different** - checks if the input is different from another input aka: different:emailInput
-
-***
-
-**equals** - checks if the input equals another given string: equals:makeSureToEqualToThis
-
-***
-
-
-When validation is done a ValidationResult is returned. It has 2 main methods:
-    getValidationResult that will return an object with the fields tested mapped to the errors found. Otherwise 
-                        it will be an object with the fields tested mapped to the values ( done only if no errors found )
-    hasValidationFailed that returns a boolean whether there is an error
-
-~~~javascript
-     let result	= event.validationHandler.validate(
-        event.body,
-        { username : 'filled||string', password : 'filled||string' } 
-     );
-
-    console.log( result.hasValidationFailed() );
-    console.log( result.getValidationResult() );
-    
-    // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
-    // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
-    // { 'username':'username', 'password': 'password'}
-~~~
-
-The example will validate that the stringToValidate is filled is a string and is within a range of 2-3 characters
-It will also validate that the emailToValidate in case it is provided is an actual email.
-
-In case there is no error False will be returned
-
-###Validation defaults
-
-Validation results can also have defaults set. This is done by instead of passing a string of rules to the skeleton keys,
-an object is passed with two values: rules and default
-
-In case where the parameters have NOT been passed, the default value will be used.
-
-~~~javascript
-     let result	= event.validationHandler.validate(
-        event.body,
-        { 
-            username : { rules: 'filled||string', default: 'root' }, 
-            password : { rules: 'filled||string', default: 'toor' } 
-        } 
-     );
-
-    console.log( result.hasValidationFailed() );
-    console.log( result.getValidationResult() );
-    
-    // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
-    // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
-    // { 'username':'username', 'password': 'password'}
-~~~
-
-***
-***
-***
-
-# LeakyBucket
-This class can be used to limit data in one way or another.
-The constructor accepts three parameters: `refillAmount = 100, refillTime = 60, maxAmount = 1000` where:
- - Refill Amount is how many tokens to refill after the refillTime
- - Refill Time is how often tokens should be renewed
- - Max Amount is the max amount of tokens to be kept
- 
-The class has the following functions:
-
-**reset()** - Resets the tokens to full
-**get()** - Returns the currently available tokens
-**reduce( tokens = 1 ): Boolean** - How many tokens should be taken. This function returns Boolean whether there were enough tokens to be reduced or not
-
-
-
-# Testing
-If you need to test your project, then you can use the Testing tools included in the project.
-
-~~~javascript
-     const { Testing }  = require( 'event_request' );
-~~~
-The testing tools include a mocker. The mocker class can be retrieved with:
-
-~~~javascript
-     const { Mock }    = Testing;
-~~~
-The exported Mock is a Function that should be used directly on the constructor of the class you want to mock. For example:
-
-~~~javascript
-     class Test { mockThis(){} };  
-     let MockedTest    = Mock( Test );  
-~~~
-
-This will return the same class but with an extra _mock function added directly to it so make sure your original class does NOT
-have a _mock function otherwise it will be overwritten. From here you can use the _mock function to mock any other function/parameter
-that is attached to the 'Test' class:
-
-~~~javascript
-     let testDouble    = new MockedTest();  
-       testDouble._mock({  
-       method        : 'mockThis',  
-       shouldReturn  : ''  
-     });  
-~~~
-
-Note: As you can see when you mock a class you MUST specify what it should return from now on. You can also give instructions
-on what should be returned on consecutive calls to this method like so :
-
-~~~javascript
-     let testDouble    = new MockedTest();  
-       testDouble._mock({  
-       method              : 'mockThis',  
-       onConsecutiveCalls  : ['first', 'secondAndOnwards']  
-     });
-~~~
-
-This will result in the following:
-1. The first time you make a call to mockThis you will get 'first' as a return
-2. The second time you make a call to mockThis you will get 'secondAndOnwards' as a return
-3. Third time you make a call and any other following you will also get 'secondAndOnwards'
-
-
-When making a mock of a class you can specify the MAX amount of times an object should be called. Since javascript uses
-an async approach and relies heavily on callbacks, a minimum cannot be set.
-
-~~~javascript
-     let testDouble    = new MockedTest();  
-        testDouble._mock({  
-        method        : 'mockThis',  
-        shouldReturn  : '',  
-        called        : 1  
-     });
-~~~
-
-This way if the method mockThis is called more than once an error will be thrown.
-
-You can also Specify the arguments that should be provided to the mocked method like so:
-~~~javascript
-     let testDouble    = new MockedTest();  
-       testDouble._mock({  
-       method        : 'mockThis',  
-       shouldReturn  : '',  
-       called        : 1,  
-       with:         [  
-           [ 'firstArgument', 'secondArgument' ]  
-           [ 'secondCallFirstArgument', 'secondCallSecondArgument' ]  
-        ]  
-     });  
-~~~
-
-The 'with' option accepts an array of arrays where each array in the with array is a call. Again if it's called more than
-the times the with arguments, the last one will be returned. In case of mismatch an Error will be thrown.
-If you do not want the mocker to check one of the arguments, then undefined should be passed
-
-If you wan an environment to run your tests then you can use the test and runAllTests provided by the testing tools:
-
-~~~javascript
-     const { test, runAllTests }    = TestingTools;
-~~~
-
-The 'runAllTests' function accepts an object that accepts the following options:
-
-**dieOnFirstError** - Boolean - Whether the testing should stop on the first error - Defaults to true
-
-***
-
-**debug** - Boolean - Whether errors thrown should show their entire stack or just the message - Defaults to false
-
-***
-
-**silent** - Boolean - This will set the consoleLogger logLevel to error, meaning only errors will be displayed - Defaults to false
-
-***
-
-**filter** - String - the string to search for and filter by when testing - Defaults to false
-
-***
-
-**callback** - Function - Callback to be called when testing is complete
-
-***
-
-The run all tests will run all tests added by the test function.
-If there is an err or an Error is thrown then the process with exit with code 1 otherwise it will exit with code 0
-
-The 'test' function accepts an object with the following options:
-
-**message** - String - the name of the test
-
-***
-
-**skipped** - Boolean - defaults to false - If this is set to true the test will be skipped
-
-***
-
-**incomplete** - Boolean - defaults to false - If this is set to true the test will be marked as incomplete
-
-***
-
-**dataProvider** - Array - Optional - If this is provided then an Array of Arrays must be supplied.
-
-***
-
-    
-    For each Array supplied, a new test will be created and called with the Array elements set as arguments to the test callback
-    
-**test** - Function - the callback to execute.
-
-    the tester provides a done function as the first argument to the test callback. The done should be called just ONCE
-    and only when the test finishes. If done is called twice within the same test then that will be seen as an error and
-    the testing will stop.
-    If any arguments that evaluate to true are provided to done then the test will be seen as failed.
-
-~~~javascript
-     test({  
-       message     : 'This test should pass',  
-       dataProvier : [
-           ['first', 2 ],
-           ['firstTwo', 21 ],
-       ],
-       test        : ( done, first, second ) =>{  
-          console.log( first ); this will log 'first', then on the second iterration 'firstTwo'
-          console.log( second ); this will log 2, then on the second iterration 21
-          let one = 1;  
-
-         one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );  
-       }  
-     });  
-~~~
-
-You can also create your own Tester if you want separate test cases:
-
-~~~javascript
-     const { Tester }    = TestingTools;  
-     let tester          = new Tester();  
-~~~
-
-The tester has the same functions: 'test', 'runAllTests'
-
-###Mocker
-You can also use the Mocker class by:
-~~~javascript
-       Mocker( classToMock, methodToMockOptions )
-~~~
- 
-Where the methodToMockOptions are the same as the _mock function of a testDouble. Note that this can alter a class before it is actually instantiated and WILL alter
-the original class passed so it is suggested to be used ONLY on testDoubles
-
-
-The TestingTools export:
-
-	Tester, -> Tester constructor
-	Mock,   -> Mock function
-	Mocker,   -> the class used to mock methods of testDoubles. Please note that if you use this class you will alter the original one
-	assert, -> nodejs assert module
-	logger		: tester.consoleLogger, -> Predefined logger that has 3 log levels: error, success, info
-	test		: tester.addTest.bind( tester ),
-	runAllTests	: tester.runAllTests.bind( tester )
-
-***
-***
-***
-
-# Caching
-DataServer is a class that is exported through the Server.Development suite that stores data **IN MEMORY**
-~~~javascript
-const { Development }   = require( 'event_request' );
-const { DataServer }    = Development;
-
-console.log( DataServer );
-~~~
-
-The constructor accepts a configuration object.
- - **ttl** - Number - The time in seconds to be used as a default 'Time To Live' if none is specified. Defaults to 300 
- - **persistPath** - String - The absolute path of the file that will persist data. Defaults to <PROJECT_ROOT>/cache 
- - **persistInterval** - Number - The time in seconds after which data will be persisted. Defaults to 100
- - **gcInterval** - Number - The time in seconds after which data will be garbageCollected. Defaults to 60 
- - **persist** - Boolean - Flag that specifies whether the data should be persisted to disk. Defaults to true 
-
-The DataServer provides a set of methods that have to be implemented if you want to create your own Caching server to be 
-integrated with other plugins. 
-
-- **stop(): void**
-
-      - This will stop the connection of the DataServer. ( Delete all the files, flush memory and stop gc and persistence )
-     
-- **get( String key ): Promise: Object|null** 
-
-      - Retrieves the value given a key. Returns null if the key does not exist.
-      - This function is a 'public' method to be used by users.
-      - In the case that you want to implement your own DataServer, you should override **_get( String key )**
-      
-- **_get( String key ): Promise: Object|null** 
-
-      - This method is the protected method that should be implemented in case extension of the DataServer should be done
-      - This method currently calls this._prune( key ) directly
-      - No need to check if key is a String, that has been done in the _get method already.
-      
-- **_prune( String key ): Promise: Object|null** 
-
-      - Removes the DataSet if it is expired, otherwise returns it. Returns null if the data is removed.
-      - This method also sets the expiration of the DataSet to Infinity if it is null.
-                            
-                            
-- **set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Promise: Object|null** 
-
-      - Returns the data if it was set, otherwise returns null
-      - Sets the given key with the given value. 
-      - ttl is the time in **seconds** that the data will be kept.
-      - If ttl is -1 then the dataSet will NEVER expire
-      - If ttl is 0 then the Default TTL will be used.
-      - If ttl is > 0 then the value will be used
-      - persist is a flag that will override the global persist value. You can set a key to not be persisted. 
-                However if the global persist is set to false, this will not work
-      - Calls _set() after checking the arguments if they are valid
-               
-                
-- **_set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Promise: Object|null** 
-
-      - Implement for development. No need to do checks of the values of the parameter as that is done in the set() function
-      - This function commits the key/value to memory with all it's attributes
-      - Returns the data if it was set, otherwise returns null
-      
-- **_makeDataSet( String key, mixed value, Number ttl = 0, Boolean persist = true ): Object**  
-
-      - Forms the dataSet object and returns it in the following format: `{ key, value, ttl, expirationDate, persist };`
-      
-- **touch( String key, Number ttl = 0 ): Promise: Boolean**
-
-      - Retruns a Boolean whether the data was successfully touched
-      - Retruns a false if key is not String or ttl is not Number
-      - Calls _touch after checkinf if arguments are valid
-      
-- **_touch( String key, Number ttl = 0 ): Promise: Boolean**
-
-      - Implement for development. No need to do checks of the values of the parameter as that is done in the touch() function
-      - Retruns a Boolean whether the data was successfully touched
-      - If ttl = 0 then the dataSet will be updated with it's own ttl
-      - This function actually touches the data
-
-- **delete( String key ): Promise: Boolean**
-
-      - Deletes the given data
-
-- **_delete( String key ): Promise: Boolean**
-
-      - Implement for development. No need to do checks of the values of the parameter as that is done in the delete() function
-      - This function deletes the actual data
-      
-- **_garbageCollect(): void**
-
-      - Prunes all the data from the server if needed
-      - Implement this if your Data Server needs it, otherwise leave it blank
-
-- **_saveData(): void**
-
-      - Persists all the data set to be persisted to disk 
-      - This respects any data set with persist = false
-
-- **_loadData(): void**
-    
-      - Loads all the data from disk
-
-- **_getExpirationDateFromTtl( Number ttl = -1 ): Number**
-
-      - Gets the the correct ttl according to the rules described in **set()**
-
-**Used for development purposes:**
-- **length(): Number**
-
-      - Returns how many keys there are
-
 
 ***
 ***
@@ -1226,42 +1237,42 @@ The plugin Manager exports the following functions:
 - Adds a timeout to the request
 
 ***
-Dependencies:
+####Dependencies:
 
 **NONE**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **timeout**
 - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds or 60000 milliseconds
 
 ***
-Events:
+####Events:
 
 **clearTimeout()**
 - Emitted when the event.clearTimeout() function is called if there was a timeout to be cleared
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **clearTimeout(): void**
 - Clears the Request Timeout
 - Will do nothing if there is no timeout
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **event.internalTimeout: Timeout**
 - The request timeout set in the EventRequest
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Example:
+####Example:
 
 ~~~javascript
 app.apply( 'er_timeout', { timeout: 10000 } );
@@ -1289,12 +1300,12 @@ app.apply( timeoutPlugin );
 - By default the server has this plugin attached to allow favicon.ico to be sent
 
 ***
-Dependencies:
+####Dependencies:
 
 **NONE**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **paths: Array[String] | String**
 - The path/s to the static resources to be served. Defaults to 'public'
@@ -1302,27 +1313,27 @@ Accepted Options:
 - The path starts from the root of the project ( where the node command is being executed )
 
 ***
-Events:
+####Events:
 
 **NONE**
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **NONE**
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **NONE**
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Example:
+####Example:
 
 ~~~javascript
 app.apply( app.er_static_resources, { paths : ['public'] } );
@@ -1353,12 +1364,12 @@ app.apply( staticResourcesPlugin );
 - This plugin will add a DataServer to: `event.cachingServer` 
 
 ***
-Dependencies:
+####Dependencies:
 
 **NONE**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **dataServerOptions: Object** 
 - The options to be passed to the DataServer if the default one should be used
@@ -1367,30 +1378,30 @@ Accepted Options:
  - An already instantiated child of DataServer to be used insted of the default one
 
 ***
-Events:
+####Events:
 
 **NONE**
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **NONE**
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **event.cachingServer: DataServer**
 - The caching server will be available to be used within the EventRequest after it has been applied in the middleware block
 - You can retrieve the DataServer from any other plugin after this one has been applied by doing: server.getPlugin( 'er_cache_server' ).getServer()
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **getServer(): DataServer**
 - Returns the instance of the DataServer, following a singleton pattern
 
 ***
-Example:
+####Example:
 
 - You can add the plugin like:
 ~~~javascript
@@ -1441,12 +1452,12 @@ app.listen( 80, ()=>{
 - The cookie will be sent back to the client who must then return the cookie back.
 
 ***
-Dependencies:
+####Dependencies:
 
  **er_cache_server**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **ttl: Number**
 - Time in seconds the session should be kept. 
@@ -1461,12 +1472,12 @@ Accepted Options:
 - Defaults to 32
 
 ***
-Events:
+####Events:
 
 **NONE**
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **initSession( Function callback ): Promise** 
 - Initializes the session. This should be called in the beginning when you want to start the user sesion
@@ -1474,14 +1485,15 @@ Exported Functions:
 - The callback will return false if there was no error
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **event.session: Session**
 
 - This is the main class that should be used to manipulate the user session.
 - There is no need to save the changes done to the session, that will be done automatically at the end of the request
 
-The Session exports the following functions:
+***
+####The Session exports the following functions:
 
 **hasSession(): Promise: Boolean**
 - Returns true if the user has a session started. 
@@ -1511,12 +1523,12 @@ The Session exports the following functions:
 - You probably should never pass a sessionId 
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Example:
+####Example:
 
 - You can use the session like this:
 ~~~javascript
@@ -1580,12 +1592,12 @@ app.listen( 80, ()=>{
 - If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
 
 ***
-Dependencies:
+####Dependencies:
 
 **NONE**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **engine: Object**
 - Instance of a templating engine that has a function render
@@ -1597,14 +1609,14 @@ Accepted Options:
 - Defaults to PROJECT_ROOT/public
 
 ***
-Events:
+####Events:
 
 **render ( String templateName, Object variables )**
 - Emitted in the beginning of the rendering process if everything has been started successfully 
 
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **render( String templateName, Object variables = {}, Function errorCallback = null ): Promise**
 - templateName will be the name of the file without the '.html' extension starting from the tempateDir given as a base ( folders are ok )
@@ -1615,7 +1627,7 @@ Exported Functions:
 - 'render' event will be emitted by the EventRequest in the beginning with details on what is being rendered
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **event.templatingEngine: TemplatingEngine**
 - The templating engine to be used with the render function
@@ -1626,12 +1638,12 @@ Attached Functionality:
 - Defaults to path.join( PROJECT_ROOT, './public' )
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Example:
+####Example:
 
 ~~~javascript
 app.apply( app.er_templating_engine, { templateDir: path.join( __dirname, './public' ) } );
@@ -1675,23 +1687,23 @@ router.get( '/preview', ( event ) => {
 - An 'stream_start' event will be emitted by the EventRequest the moment the stream is going to be started 
 
 ***
-Dependencies:
+####Dependencies:
 
 **NONE**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **NONE**
 
 ***
-Events:
+####Events:
 
 **stream_start ( FileStream stream )**
 - Emitted when the stream is successfully started
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **streamFile( String file, Object options = {}, errCallback ): void** 
 - This function accepts the absolute file name ( file ) and any options that should be given to the file stream ( options )
@@ -1702,18 +1714,18 @@ Exported Functions:
 - This function will return null if no file streams were found or in case of another error
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **event.fileStreamHandler: FileStreamHandler**
 - The file stream handler used to create file streams
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Example:
+####Example:
 
 ~~~javascript
 const PluginManager		= app.getPluginManager();
@@ -1774,12 +1786,12 @@ app.get( '/dataTwo', ( event ) =>{
 - This can be controlled and turned off. The process.log( data, level ) calls the given logger
 
 ***
-Dependencies:
+####Dependencies:
 
 **NONE**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **logger: Logger**
 - Instance of Logger, if incorrect object provided, defaults to the default logger from the Loggur
@@ -1788,17 +1800,17 @@ Accepted Options:
 - Boolean whether the plugin should attach dumpStack and log to the process
 
 ***
-Events:
+####Events:
 
 **NONE**
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **NONE**
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **process.dumpStack(): Promise**
 - Logs the current stack
@@ -1807,12 +1819,12 @@ Attached Functionality:
 - You can use the attached logger anywhere
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Example:
+####Example:
 
 ~~~javascript
 const PluginManager	= app.getPluginManager();
@@ -1840,14 +1852,15 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 - multipart body parser supports: multipart/form-data
 
 ***
-Dependencies:
+####Dependencies:
 
 **NONE**
 
 ***
-Accepted Options:
+####Accepted Options:
 
-MultipartFormParser:
+***
+#####MultipartFormParser:
 
 **maxPayload: Number**
 - Maximum payload in bytes to parse if set to 0 means infinite 
@@ -1858,7 +1871,8 @@ MultipartFormParser:
 - Defaults to the tmp dir of the os
         
 
-JsonBodyParser:
+***
+#####JsonBodyParser:
 **maxPayloadLength: Number** 
 - The max size of the body to be parsed 
 - Defaults to 10485760/ 10MB
@@ -1866,8 +1880,9 @@ JsonBodyParser:
 **strict: Boolean**
 - Whether the received payload must match the content-length 
 - Defaults to false
-        
-FormBodyParser:
+
+***
+#####FormBodyParser:
 **maxPayloadLength: Number**
 - The max size of the body to be parsed 
 - Defaults to 10485760
@@ -1877,17 +1892,17 @@ FormBodyParser:
 - Defaults to false
 
 ***
-Events:
+####Events:
 
 **NONE**
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **NONE**
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **event.body: Object**
 - Will hold different data according to which parser was fired
@@ -1895,12 +1910,12 @@ Attached Functionality:
 - The multipart body parsers may have **$files** key set as well as whatever data was sent in a JS object format
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Example:
+####Example:
 
 ~~~javascript
 // Add Body Parsers
@@ -1922,27 +1937,27 @@ server.apply( app.er_body_parser_multipart, { maxPayload: 0, tempDir: path.join(
 Adds a response caching mechanism.
 
 ***
-Dependencies:
+####Dependencies:
 
 **er_cache_server**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **NONE**
 
 ***
-Events:
+####Events:
 
 **NONE**
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **NONE**
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **cache.request: Middleware**
 - Can be added to any request as a global middleware and that request will be cached if possible
@@ -1952,12 +1967,12 @@ Attached Functionality:
 - Will not cache the response if the response was not a String
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Example:
+####Example:
 
 ~~~javascript
 const PluginManager		= app.getPluginManager();
@@ -2013,39 +2028,39 @@ app.get( '/', ( event )=>
 - This plugin will automatically update the process.env and will delete the old environment variables.
 
 ***
-Dependencies:
+####Dependencies:
 
 **NONE**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **fileLocation: String**
 - The absolute path to the .env file you want to use
 - Defaults to PROJECT_ROOT
 
 ***
-Events:
+####Events:
 
 **NONE**
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **NONE**
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **NONE**
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Example:
+####Example:
 
 ~~~javascript
 const app  = Server();
@@ -2069,19 +2084,19 @@ app.listen( 80 );
 - If one exists, then the existing one's configuration will be taken. 
 
 ***
-Dependencies:
+####Dependencies:
 
 **er_cache_server**
 
 ***
-Accepted Options:
+####Accepted Options:
 
 **fileLocation**
 - The absolute path to the rate limits json file.
 - Defaults to ROOT DIR / rate_limits.json
 
 ***
-Events:
+####Events:
 
 **rateLimited( String policy, Object rule )**
 - The policy will be which policy applied the rate limiting 
@@ -2090,12 +2105,12 @@ Events:
 - This is emitted before any actions are taken
 
 ***
-Exported Functions:
+####Exported Functions:
 
 **NONE**
 
 ***
-Attached Functionality:
+####Attached Functionality:
 
 **event.rateLimited: Boolean**
 - Flag depicting whether the request was rate limited or not
@@ -2104,12 +2119,12 @@ Attached Functionality:
 - Will hold all the rules that the plugin has along with the buckets
 
 ***
-Exported Plugin Functions:
+####Exported Plugin Functions:
 
 **NONE**
 
 ***
-Notes:
+####Notes:
 If you want to create custom rate limiting you can get er_rate_limits plugin and use getNewBucketFromOptions to get a new bucket, given options for it
 options['maxAmount']
 options['refillTime']
@@ -2149,7 +2164,7 @@ Rate limit rule options:
 - whether the rate limiting should be done per ip
 
 *** 
-POLICIES:
+####POLICIES:
 
 **PERMISSIVE_POLICY**	= 'permissive';
 
@@ -2171,7 +2186,7 @@ This will also include a Retry-After header. If this policy is triggered, stopPr
 the request will be immediately canceled
 
 ***
-Example:
+####Example:
 ~~~json
 [
   {
