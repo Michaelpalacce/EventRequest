@@ -37,7 +37,6 @@ class EventRequest extends EventEmitter
 			list[parts.shift().trim()]	= decodeURI( parts.join( '=' ) );
 		});
 
-
 		this.queryString		= parsedUrl.query;
 		this.clientIp			= request.connection === undefined ? false : request.connection.remoteAddress;
 		this.path				= parsedUrl.pathname.trim();
@@ -174,8 +173,6 @@ class EventRequest extends EventEmitter
 		}
 		catch ( e )
 		{
-			console.log(e.toString());
-			process.exit( 0 );
 			this.sendError( e.toString() );
 		}
 	}

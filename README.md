@@ -61,8 +61,12 @@ appTwo.get( '/', ( event ) => {
 	event.send( '<h1>Hello World x2!</h1>' );
 });
 
-httpServerOne.listen( 3334 );
-httpServerTwo.listen( 3335 );
+httpServerOne.listen( 3334, ()=>{
+	Loggur.log( 'Server one started at port: 3334' );
+} );
+httpServerTwo.listen( 3335, ()=>{
+	Loggur.log( 'Server two started at port: 3335' );
+} );
 ~~~
 
 #Properties exported by the Module:
@@ -84,60 +88,62 @@ httpServerTwo.listen( 3335 );
 # Event Request
 The event request is an object that is created by the server and passed through every single middleware.
 
-### Properties of eventRequest
-**queryString** - Object - the query string
+***
+Properties of eventRequest:
+
+**queryString: Object** 
+- The query string
+- Will contain all query parameters in a JS object format
+
+**path: String** 
+- The current request path
+
+**response: OutgoingMessage**
+- The response that will be sent to the user 
+
+**request: IncomingMessage** 
+- The request sent by the user
+
+**method: String** 
+- The current request method 
+- Can be: GET, POST, DELETE, PUT, PATCH, COPY, HEAD, etc
+
+**headers: Object** 
+- The current headers 
+- They will be set in a JS object format
+
+**validationHandler: ValidationHandler**
+- A handler used to do input validation
+- Look down for more information on how to use it
+
+**extra: Object**
+- An object that holds extra data that is passed between middlewares
+- Usually used outside of plugins and native functions and is up to the client to implement if needed
+
+**cookies: Object** 
+- The current request cookies
+
+**params: Object**
+- Request url params that are set by the router
+- In the case of route: '/user/:username:/get' the parameters will look like this: { username: 'some.username' }
+
+**block: Array** 
+- The execution block of middlewares
+- Should not be touched usually
+
+**clientIp: String**
+- The ip of the client that sent the request
+
+**finished: Boolean**
+- Flag depicting if the request has finished or not
+
+**errorHandler: ErrorHandler**
+- Default or Custom error handler that will be called in case of an error
 
 ***
-
-**path** - String - the current path
-
-***
-
-**response** - Response - the response to be sent to the user 
-
-***
-
-**request** - Request - the request send by the user
-
-***
-
-**method** - String - the current method ( GET, POST, DELETE, PUT, etc)
-
-***
-
-**headers** - Object - the current headers 
-
-***
-
-**validationHandler** - ValidationHandler - A handler used to do input validation
-
-***
-
-**extra** - Object - an object that holds extra data that is passed between middlewares
-
-***
-
-**cookies** - Object - the current cookies
-
-***
-
-**params** - Object - request url params that are set by the router
-
-***
-
-**block** - Array - The execution block of middlewares
-
-***
-
-**logger** - Logger - Logs data
-
-***
-
-
-###Functions exported by the event request:
+Functions exported by the event request:
 
 **setCookie( String name, String value, Object options = {} ): Boolean**
-
 - Sets a new cookie with the given name and value
 - Options will all be applied directly as are given.
 - The options are case sensitive
@@ -188,50 +194,56 @@ The event request is an object that is created by the server and passed through 
 - If the event is stopped and the response has not been set then send a server error with a status of 500
 - If err !== undefined send an error
 
-
 **sendError( mixed error = '', Number code = 500 ): void** 
 - Like send but used to send errors. 
 - It will call the errorHandler directly with all the arguments specified ( in case of a custom error handler, you can send extra parameters with the first one being the EventRequest )
 - This will emit an 'on_error' event as well as the usual send events 
 
 ***
+Events emitted by the EventRequest
 
-### Events emitted by the EventRequest
+**cleanUp()** 
+- Emitted when the event request is about to begin the cleanUp phase.
+- At this point the data set in the EventRequest has not been cleaned up
 
-**cleanUp** - no arguments - Emitted when the event request is cleaning up after finishing
+**finished()**
+- Emitted when even cleaning up has finished and the eventRequest is completed
+- At this point the data set in the EventRequest has been cleaned up
 
-***
+**send( Object sendData )**
+- Emitted when a response has been sent.
+- sendData contains: 
+  
+  -  **code: Number** 
+     - The status code returned
+     
+  -  **raw: Boolean** 
+     - Whether the response was tried to be sent raw without parsing it to string first
+     
+  -  **response: mixed** 
+     - The response that was returned
+     
+  -  **headers: Object**
+     - The headers that were sent
 
-**finished** - no arguments - Emitted when even cleaning up has finished and the eventRequest is completed
+**setHeader( Object headerData )** 
+- Emitted when a new header was added to the response
+- headerData contains:
+  -  **key: String** 
+     - The header name
+     
+  -  **value: mixed** 
+     - The header value
 
-***
-
-**send** - ( Object sendData ) - Emitted when a response has been sent.
-sendData contains: 
+**redirect( Object redirectData )** 
+- Emitted when a redirect response was sent
+- redirectData contains:
     
-    **code** - Number - the status code returned
-    **raw** - Boolean - Whether the response was tried to be sent raw without parsing it to string first
-    **response** - Mixed - The response that was returned
-    **headers** - Object - The headers that were sent
-
-***
-
-**setHeader** - ( Object headerData ) - Emitted when a new header was added to the response
-headerData contains:
-    
-    **key** - String - The header name
-    **value** - String - The header value
-
-***
-
-**redirect** - ( Object redirectData ) - Emitted when a redirect response was sent
-redirectData contains:
-    
-    **redirectUrl** - String - the url to which the redirect response was sent
-    **statusCode** - String - the status code returned
-
-***
-
+  -  **redirectUrl: String** 
+     - the url to which the redirect response was sent
+     
+  -  **statusCode: String** 
+     - the status code returned
 
 ***
 ***
@@ -288,13 +300,14 @@ server.listen('80',()=>{
 Calling `Server()` anywhere will return the same instance of the Server.
 
 
-### Functions exported by the server:
+***
+Functions exported by the server:
+
 **getPluginManager(): PluginManager** 
 - Returns an instance of the plugin manager attached to the server
 
 **add( Object|Route|Function route ): Server** 
-- Adds a new route to the server
-- Returns the Server instance
+- Calls Router.add
 
 **apply( PluginInterface|String plugin, Object options ): Server** 
 - Applies a new plugin with the specified options
@@ -308,8 +321,14 @@ Calling `Server()` anywhere will return the same instance of the Server.
 - Checks whether a plugin has been added to the server. 
 - This does not work with the plugin manager but the server's plugins
 
+**define( String middlewareName, Function Middleware ): Server**  
+- Calls Router.define
 
-### Events emitted by the server
+
+
+***
+Events emitted by the server
+
 **addRoute ( mixed route )**  
 - When a new route is being added
 
@@ -338,10 +357,88 @@ Calling `Server()` anywhere will return the same instance of the Server.
 - called when an error is thrown from the eventRequest
 
 ***
-### Ways to add routes using the Router or the Server:
-When adding routes you have to use the Router class. 
+###Router
+
+***
+####Functions exported by the Router:
+
+**static matchRoute( String requestedRoute, String|RegExp route, matchedParams ): Boolean** 
+- Match the given route and returns any route parameters passed in the matchedParams argument. 
+- Returns bool if there was a successful match
+
+**matchMethod( String requestedMethod, String|RegExp method )** 
+- Matches the requested method with the ones set in the event and returns if there was a match or no.
+
+**define( String middlewareName, Function middleware ): Router**
+- Defines a global middleware
+- Throws if a middleware with that name already exists
+
+***
+####Adding routes
+
+- The server has 2 ways of adding routes/middleware
+
+    - You can use .post, .put, .get, .delete, .head, .patch, .copy methods from the server that accept Required parameters: ( String|RegExp route, Function handler, Array||String middlewares = [] )
+
+    - **ALTERNATIVELY** You can use those methods with the following commands: ( Function handler, Array||String middlewares = [] ) which will add a middleware to every route
+
+- Routes can be added like this:
 ~~~javascript
-let { Server } = require( 'event_request' );
+const app	= Server();
+
+app.get( '/', ( event )=>{
+	event.send( '<h1>Hello World!</h1>');
+} );
+
+app.post( '/', ( event )=>{
+	event.send( ['ok']);
+} );
+
+app.delete( '/', ( event )=>{
+	event.send( ['ok']);
+} );
+
+app.head( '/', ( event )=>{
+	event.send( ['ok']);
+} );
+
+app.put( '/', ( event )=>{
+	event.send( ['ok']);
+} );
+
+app.get( '/users/:user:', ( event )=>{
+	console.log( event.params.user ); // Will print out whatever is passed in the url ( /users/John => 'John' )
+	event.send( ['ok']);
+} );
+
+app.listen( 80 );
+~~~
+
+- When adding a Route the **server.add(route)** can be used. 
+- This can be used to attach another router to the current one: server.add( router ) or router.add( router ) to combine 2 routers 
+
+- The following parameters can be used when using .add():
+
+**handler: Function** 
+- The callback function 
+- Required
+
+**route: String|RegExp**
+- The route to match 
+- Optional if omitted the handler will be called on every request
+
+**method: String|Array[String]**
+- The method(s) to be matched for the route 
+- Optional if omitted the handler will be called on every request as long as the route matches
+
+**middlewares: String|Array[String]**
+- The global middlewares if any to be called before this middleware
+- Optional if omitted none will be called
+
+- server.add accepts a object that must contain **handler** but **route** and **method** are optional.
+- server.add can also accept a function that will be transformed into a route without method or route
+~~~javascript
+const { Server } = require( 'event_request' );
 
 // You can create your own router
 const router  = Server().Router();
@@ -353,6 +450,11 @@ router.add({
     }
 });
 
+// Adding a middleware without a method or route
+router.add( ( event )=>{
+	event.next();
+} );
+
 // To attach a router to the server simply call the add function of th server.
 // Just like you would do to add a normal route.
 Server().add( router );
@@ -362,12 +464,27 @@ const serverRouter    = Server().router;
 serverRouter.add(...);
 ~~~
 
-###Router Wildcards
+~~~javascript
+server.add({
+	route	: '/',
+	method	: 'GET',
+	handler	: ( event ) => {
+		event.send( '<h1>Hello World!</h1>' )
+	}
+});
+
+server.add( ( event )=>{
+    event.send( '<h1>Hello World x2!</h1>' );
+});
+~~~
+
+***
+####Router Wildcards
 The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
 ~~~javascript
-let { Server } = require( 'event_request' );
+const { Server } = require( 'event_request' );
 // You can create your own router
-let router  = Server().Router();
+const router  = Server().Router();
 router.add({
     method: 'GET',
     route: '/todos/:id:',
@@ -379,12 +496,14 @@ router.add({
 });
 ~~~
 
-###Router global middlewares
-You can `define` middlewares in any router or the server. Middlewares will be merged if you add a router to another router.
-These global middlewares can be used to call a function before another step in the chain.You can add multiple middlewares per route.
+***
+####Router global middlewares:
+
+- You can `define` middlewares in any router or the server. Middlewares will be merged if you add a router to another router.
+- These global middlewares can be used to call a function before another step in the chain.You can add multiple middlewares per route.
  
-When adding middlewares to routes it can either be a single string or multiple strings in an array.
-They are added as a final value in .app, .get, .post, etc, or using the key `middlewares` if using the .add method
+- When adding middlewares to routes it can either be a single string or multiple strings in an array.
+- They are added as a final value in .app, .get, .post, etc, or using the key `middlewares` if using the .add method
 ~~~javascript
 const app		= Server();
 const router	= app.Router();
@@ -419,98 +538,6 @@ app.listen( 80, ()=>{
 	Loggur.log( 'Server started' );
 });
 ~~~
-
-
-The server has 2 ways of adding routes/middleware
-
-***
-You can use .post, .put, .get, .delete, .head, .patch, .copy methods from the server that accept Required parameters: ( String|RegExp route, Function handler, Array||String middlewares = [] )
-
-
-**ALTERNATIVELY** You can use those methods with the following commands: ( Function handler, Array||String middlewares = [] ) which will add a middleware to every route
-
-### ARGUMENTS:
-
-**route** -> String|RegExp-> the route to witch the middleware should be attached
-
-***
-
-**handler** -> Function -> the middleware to be added
-
-***
-
-**middlewares** -> Array||String -> The global middleware/s to be called before the handler
-
-***
-
-~~~javascript
-const app	= Server();
-
-app.get( '/', ( event )=>{
-	event.send( '<h1>Hello World!</h1>');
-} );
-
-app.post( '/', ( event )=>{
-	event.send( ['ok']);
-} );
-
-app.delete( '/', ( event )=>{
-	event.send( ['ok']);
-} );
-
-app.head( '/', ( event )=>{
-	event.send( ['ok']);
-} );
-
-app.put( '/', ( event )=>{
-	event.send( ['ok']);
-} );
-
-app.get( '/users/:user:', ( event )=>{
-	console.log( event.params.user ); // Will print out whatever is passed in the url ( /users/John => 'John' )
-	event.send( ['ok']);
-} );
-
-app.listen( 80 );
-~~~
-
-***
-When adding a Route the **server.add(route)** can be used. This can be used to attach another router
-to the current one: server.add( router ) or router.add( router ) to combine 2 routers 
-
-- server.add accepts a object that must contain **handler** but **route** and **method** are optional.
-- server.add can also accept a function that will be transformed into a route without method or route
-
-~~~javascript
-server.add({
-	route	: '/',
-	method	: 'GET',
-	handler	: ( event ) => {
-		event.send( '<h1>Hello World!</h1>' )
-	}
-});
-
-server.add( ( event )=>{
-    event.send( '<h1>Hello World x2!</h1>' );
-});
-~~~
-**handler** - Function - The callback function ! Required
-
-***
-
-**route** - String|RegExp - The route to match - optional if omitted the handler will be called on every request
-
-***
-
-**method** - String|Array - The method(s) to be matched for the route - optional if omitted the handler will be called on every request as long as the route matches
-
-***
-
-Router has matchRoute and matchMethod methods that can be used anywhere statically to match routes the same way the Router does.
-
-**matchRoute** - ( String requestedRoute, String|RegExp route, matchedParams ) - Match the given route and returns any route parameters passed in the matchedParams argument. Returns bool if there was a successful match
-
-**matchMethod** - ( String requestedMethod, String|RegExp method ) - Matches the requested method with the ones set in the event and returns if there was a match or no.
 
 ***
 # Plugins
