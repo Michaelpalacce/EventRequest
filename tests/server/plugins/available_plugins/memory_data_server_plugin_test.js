@@ -40,7 +40,7 @@ test({
 test({
 	message	: 'MemoryDataServerPlugin.getServer returns a DataServer',
 	test	: ( done )=>{
-		const options					= { dataServerOptions: { ttl: 100 } };
+		const options					= { dataServerOptions: { ttl: 100, persist: false } };
 		const memoryDataServerPlugin	= new MemoryDataServerPlugin( 'plugin_id', options );
 
 		const dataServer				= memoryDataServerPlugin.getServer();
@@ -57,7 +57,8 @@ test({
 test({
 	message	: 'MemoryDataServerPlugin.getPluginMiddleware returns a middleware that adds a cachingServer',
 	test	: ( done )=>{
-		const memoryDataServerPlugin	= new MemoryDataServerPlugin( 'id' );
+		const options					= { dataServerOptions: { persist: false } };
+		const memoryDataServerPlugin	= new MemoryDataServerPlugin( 'id', options );
 		const eventRequest				= helpers.getEventRequest();
 		const router					= new Router();
 		const middleware				= memoryDataServerPlugin.getPluginMiddleware();

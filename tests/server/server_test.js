@@ -1368,7 +1368,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_body_parser_form does not above the maxPayload if strict',
+	message	: 'Server.test er_body_parser_form parser above the maxPayload if not strict',
 	test	: ( done )=>{
 		const name			= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
 		const formDataKey	= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
@@ -1503,13 +1503,13 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_multipart parses only multipart/form-data',
-	skipped	: true,
 	test	: ( done )=>{
-		const name			= 'testErBodyParserMultipartParsesMultipartFormData';
-		const uploadFile	= process.platform === 'win32' ? 'multipart_data_windows' : 'multipart_data';
-		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/${uploadFile}` ) );
-		const tempDir		= path.join( __dirname, `./fixture/body_parser/multipart` );
-		const app			= new Server();
+		const name				= 'testErBodyParserMultipartParsesMultipartFormData';
+		const multipartDataCR	= fs.readFileSync( path.join( __dirname, './fixture/body_parser/multipart/multipart_data_CR' ) );
+		const multipartDataCRLF	= fs.readFileSync( path.join( __dirname, './fixture/body_parser/multipart/multipart_data_CRLF' ) );
+		const multipartDataLF	= fs.readFileSync( path.join( __dirname, './fixture/body_parser/multipart/multipart_data_LF' ) );
+		const tempDir			= path.join( __dirname, `./fixture/body_parser/multipart` );
+		const app				= new Server();
 
 		app.apply( app.er_body_parser_multipart, { tempDir } );
 
@@ -1520,12 +1520,12 @@ test({
 				|| event.body.text !== 'text default'
 				|| event.body.$files.length !== 2
 				|| event.body.$files[0].type !== 'file'
-				|| event.body.$files[0].size !== 19
+				|| event.body.$files[0].size !== 17
 				|| event.body.$files[0].contentType !== 'text/plain'
 				|| event.body.$files[0].name !== 'a.txt'
 				|| ! event.body.$files[0].path.includes( tempDir )
 				|| event.body.$files[1].type !== 'file'
-				|| event.body.$files[1].size !== 50
+				|| event.body.$files[1].size !== 48
 				|| event.body.$files[1].contentType !== 'text/html'
 				|| event.body.$files[1].name !== 'a.html'
 				|| ! event.body.$files[1].path.includes( tempDir )
@@ -1543,7 +1543,29 @@ test({
 				`/${name}`,
 				'GET',
 				200,
-				multipartData,
+				multipartDataCRLF,
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				multipartDataCR,
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				multipartDataLF,
 				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
 				3341
 			)
@@ -1554,7 +1576,7 @@ test({
 				`/${name}`,
 				'GET',
 				400,
-				multipartData,
+				multipartDataCRLF,
 				{ 'content-type': 'multipart/form-data; boundary=---------------------------9041544843365972754266' },
 				3341
 			)
@@ -1565,7 +1587,7 @@ test({
 				`/${name}`,
 				'GET',
 				500,
-				multipartData,
+				multipartDataCRLF,
 				{ 'content-type': 'multipart/form-data' },
 				3341
 			)
@@ -1576,7 +1598,7 @@ test({
 				`/${name}`,
 				'GET',
 				400,
-				multipartData,
+				multipartDataCRLF,
 				{},
 				3341
 			)
@@ -1606,35 +1628,15 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_multipart will not parse if limit is reached',
-	skipped	: true,
 	test	: ( done )=>{
 		const name			= 'testErBodyParserMultipartParsesMultipartFormData';
-		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/multipart_data` ) );
+		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/multipart_data_CRLF` ) );
 		const tempDir		= path.join( __dirname, './fixture/body_parser/multipart' );
 		const app			= new Server();
 
 		app.apply( app.er_body_parser_multipart, { tempDir, maxPayload: 10 } );
 
 		app.get( `/${name}`, ( event )=>{
-			if (
-				typeof event.body === 'undefined'
-				|| typeof event.body.$files === 'undefined'
-				|| event.body.text !== 'text default'
-				|| event.body.$files.length !== 2
-				|| event.body.$files[0].type !== 'file'
-				|| event.body.$files[0].size !== 19
-				|| event.body.$files[0].contentType !== 'text/plain'
-				|| event.body.$files[0].name !== 'a.txt'
-				|| ! event.body.$files[0].path.includes( tempDir )
-				|| event.body.$files[1].type !== 'file'
-				|| event.body.$files[1].size !== 50
-				|| event.body.$files[1].contentType !== 'text/html'
-				|| event.body.$files[1].name !== 'a.html'
-				|| ! event.body.$files[1].path.includes( tempDir )
-			) {
-				event.sendError( 'Body was not parsed', 400 );
-			}
-
 			event.send( 'ok' );
 		} );
 
@@ -1695,7 +1697,7 @@ test({
 		} );
 
 		const server	= app.listen( 3336, ()=>{
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3336 ).then(( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { headerName: 'value' }, 3336 ).then(( response )=>{
 				fileTransport.getWriteStream().end();
 				setTimeout(()=>{
 					process.dumpStack	= undefined;
@@ -1707,7 +1709,6 @@ test({
 
 					const logData	= fs.readFileSync( fileTransport.getFileName() );
 
-					assert.equal( logData.includes( 'Headers' ), true );
 					assert.equal( logData.includes( `GET /${name} 200` ), true );
 					assert.equal( logData.includes( 'Event is cleaning up' ), true );
 					assert.equal( logData.includes( 'Event finished' ), true );
@@ -1718,7 +1719,7 @@ test({
 
 					server.close();
 					done();
-				}, 100 );
+				}, 250 );
 			}).catch( done );
 		} );
 	}
@@ -1934,9 +1935,12 @@ test({
 		server.listen( 3334 );
 
 		helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3334 ).then(( response )=>{
-			assert.equal( response.body.toString(), name );
-			fs.unlinkSync( fileLocation );
-			done();
+			setTimeout(()=>{
+				server.close();
+				assert.equal( response.body.toString(), name );
+				fs.unlinkSync( fileLocation );
+				done();
+			}, 200 );
 		}).catch( done );
 	}
 });

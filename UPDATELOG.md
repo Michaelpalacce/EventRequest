@@ -1,6 +1,9 @@
 13.5.1
 - Reduced Package size
-- Linux tests
+- Linux tests fixed
+- RateLimit fix if config is invalid
+- Added more multipart data parser tests
+- Multipart Data Parser now uses the line end provided by the request.
 
 13.5.0
 - Updated so the setCookie will work correctly now.

@@ -102,8 +102,13 @@ class RateLimitsPlugin extends PluginInterface
 		else
 		{
 			const buffer	= fs.readFileSync( this.fileLocation );
+			let config		= '[]';
+			try
+			{
+				config	= JSON.parse( buffer.toString( 'utf-8' ) || '[]' );
+			} catch ( e ) {}
 
-			this.sanitizeConfig( JSON.parse( buffer.toString( 'utf-8' ) ) );
+			this.sanitizeConfig( config );
 		}
 	}
 

@@ -9,10 +9,27 @@ const PROJECT_ROOT			= path.parse( require.main.filename ).dir;
 const DEFAULT_PERSIST_FILE	= path.join( PROJECT_ROOT, 'cache' );
 
 /**
+ * @brief	For linux... wait a certain amount synchronously cause of fast file deletion, creation
+ *
+ * @param	Number ms
+ */
+function wait( ms )
+{
+	const start	= Date.now();
+	let now		= start;
+
+	while ( now - start < ms )
+	{
+		now	= Date.now();
+	}
+}
+
+/**
  * @brief	Removes the cache file
  */
 function removeCache( dataServer )
 {
+	wait( 100 );
 	if ( dataServer )
 	{
 		dataServer.stop();

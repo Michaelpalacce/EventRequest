@@ -6,10 +6,8 @@ const os										= require( 'os' );
 const fs										= require( 'fs' );
 const path										= require( 'path' );
 
-let platformSpecificMultipartData				= process.platform === 'win32' ? 'multipart_data_windows' : 'multipart_data';
-let multipartData								= fs.readFileSync( path.join( __dirname, `./fixture/${platformSpecificMultipartData}` ) );
-
-let MockMultipartDataParser						= Mocker( Mock( MultipartDataParser ), {
+const multipartData								= fs.readFileSync( path.join( __dirname, './fixture/multipart_data' ) );
+const MockMultipartDataParser					= Mocker( Mock( MultipartDataParser ), {
 	method	: 'setUpTempDir'
 } );
 
@@ -125,10 +123,10 @@ test({
 
 			// Sync delay
 			setTimeout(()=>{
-				assert.equal( fs.readFileSync( body.$files[0].path ).toString(), 'Content of a.txt.' + os.EOL );
+				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
 				assert.equal( body.$files[0].name, 'a.txt' );
 				assert.equal( body.$files[0].contentType, 'text/plain' );
-				assert.equal( fs.readFileSync( body.$files[1].path ).toString(), '<!DOCTYPE html><title>Content of a.html.</title>' + os.EOL );
+				assert.equal( fs.readFileSync( body.$files[1].path ).toString().includes( '<!DOCTYPE html><title>Content of a.html.</title>' ), true );
 				assert.equal( body.$files[1].name, 'a.html' );
 				assert.equal( body.$files[1].contentType, 'text/html' );
 

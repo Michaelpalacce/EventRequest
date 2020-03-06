@@ -19,8 +19,6 @@ const CONTENT_DISPOSITION_FILENAME_CHECK_REGEX	= /\b(filename=)/;
 const CONTENT_DISPOSITION_NAME_REGEX			= /\bname="([^"]+)"/;
 const CONTENT_DISPOSITION_FILENAME_REGEX		= /\bfilename="([^"]+)"/;
 const CONTENT_TYPE_GET_TYPE_REGEX				= /Content-Type:\s+(.+)$/;
-const SYSTEM_EOL								= os.EOL;
-const SYSTEM_EOL_LENGTH							= SYSTEM_EOL.length;
 const DEFAULT_BUFFER_ENCODING					= 'utf8';
 const DEFAULT_BOUNDARY_PREFIX					= '--';
 const MULTIPART_PARSER_SUPPORTED_TYPE			= 'multipart/form-data';
@@ -68,6 +66,9 @@ class MultipartDataParser extends BodyParser
 		this.tempDir		= typeof this.options.tempDir === 'string'
 							? this.options.tempDir
 							: os.tmpdir();
+
+		this.EOL			= null;
+		this.EOL_LENGTH		= null;
 
 		this.parts			= [];
 		this.parsingError	= false;
@@ -201,6 +202,32 @@ class MultipartDataParser extends BodyParser
 	}
 
 	/**
+	 * @brief	Determines the OS line end and sets it for future use
+	 *
+	 * @param	Buffer chunk
+	 *
+	 * @return	void
+	 */
+	determineEOL( chunk )
+	{
+		const data		= chunk.toString( DEFAULT_BUFFER_ENCODING );
+		const lineEnds	= ['\r\n', '\n', '\r'];
+
+		for ( const lineEnd of lineEnds )
+		{
+			if ( data.indexOf( `${this.boundary}${lineEnd}` ) !== -1 )
+			{
+				this.EOL		= lineEnd;
+				this.EOL_LENGTH	= lineEnd.length;
+				return;
+			}
+		}
+
+		this.EOL	= '\r\n';
+		this.EOL	= this.EOL.length;
+	}
+
+	/**
 	 * @brief	Callback called when data is received by the server
 	 *
 	 * @param	Buffer chunk
@@ -263,8 +290,14 @@ class MultipartDataParser extends BodyParser
 			switch ( part.state )
 			{
 				case STATE_START:
-					// Starting 
+					// Starting
 					part.state	= STATE_START_BOUNDARY;
+
+					if ( this.EOL === null )
+					{
+						this.determineEOL( chunk );
+					}
+
 					break;
 				case STATE_START_BOUNDARY:
 					// Receive chunks until we find the first boundary if the end has been finished, throw an error
@@ -279,8 +312,8 @@ class MultipartDataParser extends BodyParser
 						return;
 					}
 
-					// Get the data after the boundary on the next line -> + SYSTEM_EOL_LENGTH
-					part.buffer	= part.buffer.slice( boundaryOffset + this.boundary.length + SYSTEM_EOL_LENGTH );
+					// Get the data after the boundary on the next line -> + this.EOL_LENGTH
+					part.buffer	= part.buffer.slice( boundaryOffset + this.boundary.length + this.EOL_LENGTH );
 					part.state	= STATE_HEADER_FIELD_START;
 					break;
 				case STATE_HEADER_FIELD_START:
@@ -292,7 +325,7 @@ class MultipartDataParser extends BodyParser
 
 					let line, idx;
 
-					while ( ( idx = read.indexOf( SYSTEM_EOL, idxStart ) ) !== -1 )
+					while ( ( idx = read.indexOf( this.EOL, idxStart ) ) !== -1 )
 					{
 						line	= read.substring( idxStart, idx );
 
@@ -309,7 +342,7 @@ class MultipartDataParser extends BodyParser
 							break;
 						}
 
-						idxStart	= idx + SYSTEM_EOL_LENGTH;
+						idxStart	= idx + this.EOL_LENGTH;
 						++ lineCount;
 					}
 
@@ -368,7 +401,7 @@ class MultipartDataParser extends BodyParser
 					if ( contentType !== null )
 					{
 						// Cut the extra empty line in this case
-						part.buffer			= part.buffer.slice( SYSTEM_EOL_LENGTH );
+						part.buffer			= part.buffer.slice( this.EOL_LENGTH );
 						// Set the file content type
 						part.contentType	= contentType[1];
 					}
@@ -434,7 +467,7 @@ class MultipartDataParser extends BodyParser
 					}
 					else
 					{
-						this.flushBuffer( part, part.buffer.slice( 0, boundaryOffset - SYSTEM_EOL_LENGTH ) );
+						this.flushBuffer( part, part.buffer.slice( 0, boundaryOffset - this.EOL_LENGTH ) );
 						if ( part.type === DATA_TYPE_FILE )
 						{
 							part.file.end();
