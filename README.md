@@ -289,60 +289,53 @@ Calling `Server()` anywhere will return the same instance of the Server.
 
 
 ### Functions exported by the server:
-**getPluginManager()** - returns PluginManager - Returns an instance of the plugin manager attached to the server
+**getPluginManager(): PluginManager** 
+- Returns an instance of the plugin manager attached to the server
 
-***
+**add( Object|Route|Function route ): Server** 
+- Adds a new route to the server
+- Returns the Server instance
 
-**add( Object|Route route )** - Adds a new route to the server
+**apply( PluginInterface|String plugin, Object options ): Server** 
+- Applies a new plugin with the specified options
+- It first calls setOptions, then checks for dependencies, then calls plugin.setServerOnRuntime then calls plugin.getPluginMiddleware
 
-***
+**getPlugin( String pluginId ): PluginInterface** 
+- PluginInterface returns the desired plugin
+- Throws if plugin is not attached
 
-**apply( String|Object plugin, Object options )** - Applies a new plugin with the specified options
-
-***
-
-**getPlugin( String pluginId )** - PluginInterface returns the desired plugin
-
-***
-
-**hasPlugin( String pluginId )** - Boolean - Checks whether a plugin has been added to the server. Note this does not work with the plugin manager
+**hasPlugin( String pluginId ): Boolean**  
+- Checks whether a plugin has been added to the server. 
+- This does not work with the plugin manager but the server's plugins
 
 
 ### Events emitted by the server
-**addRoute** - ( mixed route ) - When a new route is being added
+**addRoute ( mixed route )**  
+- When a new route is being added
 
-***
+**eventRequestResolved ( EventRequest eventRequest, IncomingMessage request, ServerResponse response )**  
+- When the event request is first created
 
-**eventRequestResolved** - ( EventRequest eventRequest, IncomingMessage request, ServerResponse response ) - When the event request is first created
+**eventRequestRequestClosed( EventRequest eventRequest, IncomingMessage request )** 
+- When the request gets closed
 
-***
+**eventRequestResponseFinish( EventRequest eventRequest, ServerResponse response )** 
+- When the response is finished
 
-**eventRequestRequestClosed** - ( EventRequest eventRequest, IncomingMessage request ) - When the request gets closed
+**eventRequestResponseError ( EventRequest eventRequest, ServerResponse response, Error error )** 
+- When there is an error with the response
 
-***
+**eventRequestBlockSetting( EventRequest eventRequest, Array block )** 
+- called when the block is retrieved from the router
 
-**eventRequestResponseFinish** - ( EventRequest eventRequest, ServerResponse response ) - When the response is finished
+**eventRequestBlockSet( EventRequest eventRequest, Array block )** 
+- called when the block is set in the eventRequest
 
-***
+**eventRequestError( EventRequest eventRequest, Error error )** 
+- called when there is an error event emitted by the eventRequest
 
-**eventRequestResponseError** - ( EventRequest eventRequest, ServerResponse response, Error error ) - When there is an error with the response
-
-***
-
-**eventRequestBlockSetting** - ( EventRequest eventRequest, Array block ) - called when the block is retrieved from the router
-
-***
-
-**eventRequestBlockSet** - ( EventRequest eventRequest, Array block ) - called when the block is set in the eventRequest
-
-***
-
-**eventRequestError** - ( EventRequest eventRequest, Error error ) - called when there is an error event emitted by the eventRequest
-
-***
-
-**eventRequestThrow** - ( EventRequest eventRequest, Error error ) - called when an error is thrown from the eventRequest
-***
+**eventRequestThrow( EventRequest eventRequest, Error error )** 
+- called when an error is thrown from the eventRequest
 
 ***
 ### Ways to add routes using the Router or the Server:
