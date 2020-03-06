@@ -4,7 +4,10 @@
 const os			= require( 'os' );
 const path			= require( 'path' );
 const fs			= require( 'fs' );
+const { promisify }	= require( 'util' );
 const BodyParser	= require( './body_parser' );
+const { Loggur }	= require( '../logger/loggur' );
+const unlink		= promisify( fs.unlink );
 
 /**
  * @brief	Constants
@@ -54,29 +57,26 @@ class MultipartDataParser extends BodyParser
 	 * 			Accepts options:
 	 * 			- maxPayload - Number - Maximum payload in bytes to parse if set to 0 means infinite
 	 * 			- tempDir - String - The directory where to keep the uploaded files before moving
+	 * 			- cleanUpItemsTimeoutMS - String - After what time should the files be deleted if any. Defaults to 100
 	 */
 	constructor( options = {} )
 	{
 		super( options );
 
-		this.maxPayload		= typeof this.options.maxPayload === 'number'
-							? this.options.maxPayload
-							: 0;
+		this.maxPayload				= this.options.maxPayload || 0;
+		this.tempDir				= this.options.tempDir || os.tmpdir();
+		this.cleanUpItemsTimeoutMS	= this.options.cleanUpItemsTimeoutMS || 100;
 
-		this.tempDir		= typeof this.options.tempDir === 'string'
-							? this.options.tempDir
-							: os.tmpdir();
+		this.EOL					= null;
+		this.EOL_LENGTH				= null;
 
-		this.EOL			= null;
-		this.EOL_LENGTH		= null;
+		this.parts					= [];
+		this.parsingError			= false;
+		this.ended					= false;
 
-		this.parts			= [];
-		this.parsingError	= false;
-		this.ended			= false;
-
-		this.event			= null;
-		this.headerData		= null;
-		this.boundary		= null;
+		this.event					= null;
+		this.headerData				= null;
+		this.boundary				= null;
 
 		this.setUpTempDir();
 	}
@@ -670,7 +670,6 @@ class MultipartDataParser extends BodyParser
 	 */
 	attachEvents()
 	{
-
 	}
 
 	/**
@@ -686,11 +685,9 @@ class MultipartDataParser extends BodyParser
 				this.parts.$files.forEach( ( part ) =>{
 					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
 					{
-						try
-						{
-							fs.unlinkSync( part.path )
-						}
-						catch (e) {}
+						unlink( part.path ).catch(( e )=>{
+							Loggur.log( e, Loggur.LOG_LEVELS.error );
+						});
 					}
 				});
 			}
@@ -704,13 +701,17 @@ class MultipartDataParser extends BodyParser
 							part.file.end();
 						}
 
-						fs.unlinkSync( part.path )
+						part.file.on( 'end',()=>{
+							unlink( part.path ).catch(( e )=>{
+								Loggur.log( e, Loggur.LOG_LEVELS.error );
+							});
+						});
 					}
 				});
 			}
 
 			this.parts	= null;
-		}, 100 );
+		}, this.cleanUpItemsTimeoutMS );
 	}
 
 	/**

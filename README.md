@@ -1891,6 +1891,10 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 - Whether the received payload must match the content-length 
 - Defaults to false
 
+**cleanUpItemsTimeoutMS: Number**
+- The time in milliseconds after which files will be attempted to be deleted on eventRequest finish
+- Defaults to 100
+
 ***
 ####Events:
 
@@ -1926,7 +1930,7 @@ server.apply( app.er_body_parser_multipart );
 // Add body parsers with custom options
 server.apply( app.er_body_parser_json, { maxPayloadLength: 104857600, strict: false } );
 server.apply( app.er_body_parser_form, { maxPayloadLength: 10485760, strict: false } );
-server.apply( app.er_body_parser_multipart, { maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
+server.apply( app.er_body_parser_multipart, { cleanUpItemsTimeoutMS: 100, maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
 ~~~
 
 ***

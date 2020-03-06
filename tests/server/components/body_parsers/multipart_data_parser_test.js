@@ -23,32 +23,18 @@ test({
 test({
 	message	: 'MultipartDataParser.constructor on correct arguments',
 	test	: ( done )=>{
-		let tempDir			= '/test';
-		let maxPayload		= 100;
+		let tempDir					= '/test';
+		let maxPayload				= 100;
+		let cleanUpItemsTimeoutMS	= 100;
 		let multipartParser	= new MockMultipartDataParser({
 			tempDir,
-			maxPayload
+			maxPayload,
+			cleanUpItemsTimeoutMS
 		});
 
 		assert.equal( multipartParser.tempDir, tempDir );
 		assert.equal( multipartParser.maxPayload, maxPayload );
-
-		done();
-	}
-});
-
-test({
-	message	: 'MultipartDataParser.constructor on incorrect arguments',
-	test	: ( done )=>{
-		let tempDir			= [];
-		let maxPayload		= [];
-		let multipartParser	= new MockMultipartDataParser({
-			tempDir,
-			maxPayload
-		});
-
-		assert.equal( multipartParser.tempDir, os.tmpdir() );
-		assert.equal( multipartParser.maxPayload, 0 );
+		assert.equal( multipartParser.cleanUpItemsTimeoutMS, 100 );
 
 		done();
 	}
