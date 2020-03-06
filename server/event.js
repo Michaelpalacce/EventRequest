@@ -92,7 +92,7 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	cleanUp()
+	_cleanUp()
 	{
 		this.emit( 'cleanUp' );
 
@@ -105,7 +105,6 @@ class EventRequest extends EventEmitter
 		this.path				= undefined;
 		this.validationHandler	= undefined;
 		this.request			= undefined;
-		this.respose			= undefined;
 		this.extra				= undefined;
 		this.errorHandler		= undefined;
 		this.cookies			= undefined;
@@ -121,17 +120,19 @@ class EventRequest extends EventEmitter
 	 * @brief	Sets a new cookie
 	 *
 	 * @details	Return false if name or value are not set
+	 * 			The options should be an object where all the keys will be taken as is as well as the values
+	 * 			And they will be used to make an cookie header
 	 *
 	 * @param	String name
 	 * @param	String value
-	 * @param	Number maxAge
-	 * @param	String domain
+	 * @param	Object options
 	 *
 	 * @return	Boolean
 	 */
-	setCookie( name, value, maxAge = null, domain = null )
+	setCookie( name, value, options = {} )
 	{
-		const result	= this.validationHandler.validate(
+		const cookieHeaderName	= 'set-cookie';
+		const result			= this.validationHandler.validate(
 			{ name, value },
 			{
 				name: 'filled',
@@ -144,19 +145,21 @@ class EventRequest extends EventEmitter
 			return false;
 		}
 
-		let cookie	= name + '=' + value;
+		let cookie	= `${name}=${value};`;
 
-		if ( maxAge !== null )
+		for( const optionName in options )
 		{
-			cookie	+= `; Max-Age=${maxAge}`
+			cookie	+= ` ${optionName}=${options[optionName]};`;
 		}
 
-		if ( domain !== null )
-		{
-			cookie	+= `; Domain=${domain}`
-		}
+		const cookieHeader	= this.response.getHeader( cookieHeaderName );
+		const cookies		= typeof cookieHeader === 'undefined'
+							? []
+							: cookieHeader;
 
-		this.setHeader( 'Set-Cookie', [cookie] );
+		cookies.push( cookie );
+
+		this.setHeader( cookieHeaderName, cookies );
 		return true;
 	}
 
@@ -171,6 +174,8 @@ class EventRequest extends EventEmitter
 		}
 		catch ( e )
 		{
+			console.log(e.toString());
+			process.exit( 0 );
 			this.sendError( e.toString() );
 		}
 	}
@@ -230,7 +235,7 @@ class EventRequest extends EventEmitter
 
 		this.emit( 'send', payload );
 
-		this.cleanUp();
+		this._cleanUp();
 	}
 
 	/**
@@ -265,7 +270,7 @@ class EventRequest extends EventEmitter
 	 * @param	String key
 	 * @param	String defaultValue
 	 *
-	 * @return	Mixed
+	 * @return	mixed
 	 */
 	getHeader( key, defaultValue = null )
 	{
@@ -305,7 +310,7 @@ class EventRequest extends EventEmitter
 	 */
 	setStatusCode( code )
 	{
-		this.response.statusCode	= typeof code === 'number' ? code : 200
+		this.response.statusCode	= typeof code === 'number' ? code : 500
 	}
 
 	/**
@@ -347,7 +352,7 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	setBlock( block )
+	_setBlock( block )
 	{
 		this.block	= block;
 	}
@@ -397,19 +402,20 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Will send a server error in case a response has not been already sent
 	 *
-	 * @param	mixed message
-	 * @param	Number code
+	 *@param	Array args
 	 *
 	 * @return	void
 	 */
-	sendError( error = '', code = 500 )
+	sendError( ...args )
 	{
 		if ( ! ( this.errorHandler instanceof ErrorHandler ) )
 		{
 			this.errorHandler	= new ErrorHandler();
 		}
 
-		this.errorHandler.handleError( this, error, code );
+		args.unshift( this );
+
+		this.errorHandler.handleError.apply( this.errorHandler, args );
 	}
 }
 

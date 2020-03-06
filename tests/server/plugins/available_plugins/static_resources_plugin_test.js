@@ -31,7 +31,7 @@ test({
 			called			: 1
 		});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		assert.equal( 1, called );
@@ -65,7 +65,7 @@ test({
 			]
 		});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		assert.equal( 1, called );
@@ -99,7 +99,7 @@ test({
 			]
 		});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		assert.equal( 1, called );

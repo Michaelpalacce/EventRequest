@@ -136,49 +136,63 @@ The event request is an object that is created by the server and passed through 
 
 ###Functions exported by the event request:
 
-**setCookie( name, value, maxAge = -1, domain = '' )** - > sets a new cookie, maxAge defaults to 90 days and the domain defaults to the actual site domain
+**setCookie( String name, String value, Object options = {} ): Boolean**
 
-***
+- Sets a new cookie with the given name and value
+- Options will all be applied directly as are given.
+- The options are case sensitive
+- Available options: Path, Domain, Max-Age, Expires, HttpOnly
+- { Path: 'test', expires: 100 } -> this will be set as 'cookieName=cookieValue; Path:test; expires:100'
 
-**setStatusCode( Number code )** - > sets the status code of the response
+**setStatusCode( Number code ): void**
+- Sets the status code of the response
+- If something other than a string is given, the status code will be assumed 500
 
-***
+**_cleanUp(): void** 
+- Cleans up the event request.
+- Usually called at the end of the request. 
+- Emits a cleanUp event and a finished event. 
+- This also removes all other event listeners and sets all the properties to undefined
 
-**cleanUp** - cleans up the event request. Usually called at the end of the request. Emits a cleanUp event and a finished event. This also removes all other event listeners and sets all the properties to undefined
+**send( mixed response = '', Number statusCode = 200, Boolean raw ): void** 
+- Sends the response to the user with the specified statusCode
+- If response is a stream then the stream will be piped to the response
+- if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. 
+- Emits a 'send' event and calls cleanUp
 
-***
+**setHeader( String key, mixed value ): boolean** 
+- Sets a new header to the response.
+- Emits a 'setHeader' event. 
+- If the response is finished then an error will be set to the next middleware
 
-**send( response, statusCode, raw )** - sends the response to the user with the specified statusCode
-* if response is a stream then the stream will be piped to the response
-* if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. Emits a 'send' event and calls cleanUp
+**redirect( String redirectUrl, Number statusCode = 302 ): void** 
+- Redirect to the given url with the specified status code.
+- Status code defaults to 302.
+- Emits a 'redirect' event. 
+- If the response is finished then an error will be set to the next middleware
 
-***
+**getHeader( String key, mixed defaultValue = null ): mixed** 
+- Retrieves a header ( if exists ) from the request. 
+- If it doesn't exist the defaultValue will be taken
 
-**setHeader( key, value )** - sets a new header to the response and emits a 'setHeader' event. If the response is finished then an error will be set to the next middleware
+**hasHeader( String key ): Boolean** 
+- Checks if a header exists in the request
 
-***
+**isFinished(): Boolean** 
+- Checks if the response is finished
+- A response is finished if the response is finished or the cleanUp method has been called
 
-**redirect( redirectUrl, statusCode )** - redirect to the given url with the specified status code (defaults to 302 ). Emits a 'redirect' event. If the response is finished then an error will be set to the next middleware
+**next( mixed err = undefined, Number code = undefined ): void** 
+- Calls the next middleware in the execution block. 
+- If there is nothing else to send and the response has not been sent YET, then send a server error with a status of 404
+- If the event is stopped and the response has not been set then send a server error with a status of 500
+- If err !== undefined send an error
 
-***
 
-**getHeader( key, defaultValue )** - Retrieves a header ( if exists ). If it doesn't exist the defaultValue will be taken
-
-***
-
-**hasHeader( key )** - Checks if a header exists. Returns Boolean
-
-***
-
-**isFinished()** - returns a Boolean. Checks if the response is finished
-
-***
-
-**next** - Calls the next middleware in the execution block. If there is nothing else to send and the response has not been sent YET, then send a server error. If the event is stopped and the response has not been set then send a server error
-
-***
-
-**sendError( error = '', code = 500 )** - Like send but used to send errors. This will emit an 'on_error' event as well as the usual send events 
+**sendError( mixed error = '', Number code = 500 ): void** 
+- Like send but used to send errors. 
+- It will call the errorHandler directly with all the arguments specified ( in case of a custom error handler, you can send extra parameters with the first one being the EventRequest )
+- This will emit an 'on_error' event as well as the usual send events 
 
 ***
 
@@ -229,7 +243,7 @@ The main object of the framework.
 To retrieve the Server class do:
 ~~~javascript
 const { Server } = require( 'event_request' );
-let server = Server();
+const app = Server();
 ~~~
 
 To start the Server you can do:
@@ -247,14 +261,15 @@ To clean up the server instance you can do:
 const { Server } = require( 'event_request' );
 const app = Server();
 
-app.listen( '80', ()=>{
+const httpServer = app.listen( '80', ()=>{
 	Loggur.log( 'Server is running' );
 });
 
+httpServer.close();
 Server().cleanUp();
 ~~~
 NOTES: 
-- This will NOT stop the httpServer, just set the internal variable of server to null
+- This will stop the httpServer and set the internal variable of server to null
 - You may need to do  `app = Server()` again since they app variable is still a pointer to the old server
 
 #

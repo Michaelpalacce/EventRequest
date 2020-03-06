@@ -47,7 +47,7 @@ test({
 			called			: 2
 		});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		assert.equal( true, eventRequest.session instanceof Session );
@@ -87,7 +87,7 @@ test({
 			}
 		});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		assert.equal( false, called );
@@ -130,7 +130,7 @@ test({
 			}
 		});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 	}
 });
@@ -175,7 +175,7 @@ test({
 					}
 				});
 
-				eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+				eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 				eventRequest.next();
 			}
 		});
@@ -220,7 +220,7 @@ test({
 			}
 		});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 	}
 });

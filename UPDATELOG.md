@@ -1,3 +1,9 @@
+13.5.0
+- Updated so the setCookie will work correctly now.
+- Added more tests
+- The sendError now sends all the arguments to the error handler
+- Updated documentation on eventRequest functions 
+
 13.4.1
 - Tests fix for linux
 

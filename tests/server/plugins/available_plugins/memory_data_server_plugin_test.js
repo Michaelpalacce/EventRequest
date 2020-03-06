@@ -88,7 +88,7 @@ test({
 			}
 		} );
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		setTimeout(()=>{
 			eventRequest.next();
 		}, 250 );

@@ -885,6 +885,311 @@ test({
 });
 
 test({
+	message	: 'Server.test eventRequest setStatusCode',
+	test	: ( done )=>{
+		const name					= 'testSetStatusCode';
+		const expectedStatusCode	= 201;
+
+		app.get( `/${name}`, ( event )=>{
+			event.setStatusCode( expectedStatusCode );
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', expectedStatusCode ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
+
+
+test({
+	message	: 'Server.test eventRequest redirect',
+	test	: ( done )=>{
+		const name					= 'testRedirect';
+		const expectedStatusCode	= 303;
+		const expectedRedirectRoute	= '/testRedirectedRoute';
+
+		app.get( `/${name}`, ( event )=>{
+			event.redirect( expectedRedirectRoute, expectedStatusCode );
+		} );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', expectedStatusCode ).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { redirectUrl: expectedRedirectRoute } ) );
+			assert.equal( typeof response.headers.location === 'string', true );
+			assert.equal( response.headers.location === expectedRedirectRoute, true );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest redirect',
+	test	: ( done )=>{
+		const name					= 'testRedirectTwo';
+		const expectedRedirectRoute	= '/testRedirectedRouteTwo';
+
+		app.get( `/${name}`, ( event )=>{
+			event.redirect( expectedRedirectRoute );
+		} );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 302 ).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { redirectUrl: expectedRedirectRoute } ) );
+			assert.equal( typeof response.headers.location === 'string', true );
+			assert.equal( response.headers.location === expectedRedirectRoute, true );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest isFinished',
+	test	: ( done )=>{
+		const name					= 'testIsFinished';
+
+		app.get( `/${name}`, ( event )=>{
+			event.response.finished	= true;
+
+			if ( ! event.isFinished() )
+			{
+				event.response.finished	= false;
+				return event.sendError( '', 400 );
+			}
+			event.response.finished	= false;
+
+			event.finished	= true;
+
+			if ( ! event.isFinished() )
+			{
+				event.finished	= false;
+				return event.sendError( '', 400 );
+			}
+
+			event.finished	= false;
+
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest send string',
+	test	: ( done )=>{
+		const name	= 'testSendString';
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest send object',
+	test	: ( done )=>{
+		const name	= 'testSendObject';
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( { name } );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { name } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest sendError',
+	test	: ( done )=>{
+		const name	= 'testEventSendError';
+
+		app.get( `/${name}`, ( event )=>{
+			event.sendError( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: name } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest sendError send Error',
+	test	: ( done )=>{
+		const name	= 'testEventSendErrorWithError';
+		const error	= new Error( 'test' );
+
+		app.get( `/${name}`, ( event )=>{
+			event.sendError( error );
+		} );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: 'test' } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest sendError with different status',
+	test	: ( done )=>{
+		const name	= 'testEventSendErrorWithDifferentStatus';
+
+		app.get( `/${name}`, ( event )=>{
+			event.sendError( name, 501 );
+		} );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 501 ).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: name } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest send Error',
+	test	: ( done )=>{
+		const error	= new Error( 'Error' );
+		const name	= 'testSendError';
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( error );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( {} ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest send raw',
+	test	: ( done )=>{
+		const name	= 'testSendErrorRaw';
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( '<h1>Test</h1>', 200, true );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), '<h1>Test</h1>' );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest send stream',
+	test	: ( done )=>{
+		const name	= 'testSendErrorStream';
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( fs.createReadStream( path.join( __dirname, './fixture/send/fileToStream.txt' ) ) );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), 'test' );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest isFinished',
+	test	: ( done )=>{
+		const name					= 'testIsFinished';
+
+		app.get( `/${name}`, ( event )=>{
+			event.response.finished	= true;
+
+			if ( ! event.isFinished() )
+			{
+				event.response.finished	= false;
+				return event.sendError( '', 400 );
+			}
+			event.response.finished	= false;
+
+			event.finished	= true;
+
+			if ( ! event.isFinished() )
+			{
+				event.finished	= false;
+				return event.sendError( '', 400 );
+			}
+
+			event.finished	= false;
+
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test eventRequest setCookie',
+	test	: ( done )=>{
+		const name			= 'testSetCookie';
+		const cookiesValue	= 'ok';
+
+		app.get( `/${name}`, ( event )=>{
+			if (
+				! event.setCookie( 'test1', cookiesValue )
+				|| event.setCookie( 'test2' )
+				|| event.setCookie( 'test3', null )
+				|| event.setCookie( 'test4', undefined )
+				|| event.setCookie( null, cookiesValue )
+				|| event.setCookie( undefined, cookiesValue )
+				|| ! event.setCookie( 'test5', cookiesValue )
+				|| ! event.setCookie( 'test6', cookiesValue )
+				|| ! event.setCookie( 'test7', cookiesValue, { Path: '/', Domain: 'localhost', HttpOnly: true, 'Max-Age': 100, Expires: 500, caseSensitive: 5, CaseSensitive: 10 } )
+			) {
+				event.sendError( 'error', 400 );
+			}
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			assert.equal( Array.isArray( response.headers['set-cookie'] ), true );
+			const presentCookies	= ['test1', 'test5', 'test6','test7'];
+			const cookies			= response.headers['set-cookie'].join( ' ' );
+
+			for ( const cookieName of presentCookies )
+			{
+				assert.equal( cookies.includes( cookieName ), true );
+			}
+
+			assert.equal( response.headers['set-cookie'][3].includes( 'Path=/;' ), true );
+			assert.equal( response.headers['set-cookie'][3].includes( 'Domain=localhost;' ), true );
+			assert.equal( response.headers['set-cookie'][3].includes( 'HttpOnly=true;' ), true );
+			assert.equal( response.headers['set-cookie'][3].includes( 'Max-Age=100;' ), true );
+			assert.equal( response.headers['set-cookie'][3].includes( 'Expires=500;' ), true );
+			assert.equal( response.headers['set-cookie'][3].includes( 'caseSensitive=5;' ), true );
+			assert.equal( response.headers['set-cookie'][3].includes( 'CaseSensitive=10;' ), true );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test er_body_parser_json does not parse anything but application/json',
 	test	: ( done )=>{
 		const name			= 'testErJsonBodyParserParsesApplicationJson';
@@ -1413,7 +1718,7 @@ test({
 
 					server.close();
 					done();
-				})
+				}, 100 );
 			}).catch( done );
 		} );
 	}

@@ -39,7 +39,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 		eventRequest.render( 'test', {}, done ).then(()=>{
 			assert.equal( 1, called );

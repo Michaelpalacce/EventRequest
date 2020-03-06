@@ -84,43 +84,51 @@ test({
 });
 
 test({
-	message	: 'EventRequest cleanUp emits event: cleanUp',
+	message	: 'EventRequest _cleanUp emits event: cleanUp',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
 
 		eventRequest.on( 'cleanUp', ()=>{ cleanUp = true; });
 
-		eventRequest.cleanUp();
+		eventRequest._cleanUp();
 
 		cleanUp	? done() : done( 'EventRequest cleanUp event not emitted' );
 	}
 });
 
 test({
-	message	: 'EventRequest cleanUp emits event: finished',
+	message	: 'EventRequest _cleanUp emits event: finished',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let finished		= false;
 		eventRequest.on( 'finished', ()=>{ finished = true; });
 
-		eventRequest.cleanUp();
+		eventRequest._cleanUp();
 
 		finished	? done() : done( 'EventRequest finished event not emitted' );
 	}
 });
 
 test({
-	message	: 'EventRequest cleanUp cleans up data',
+	message	: 'EventRequest _cleanUp cleans up data',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		eventRequest.on( 'test', ()=>{} );
 
 		assert.equal( eventRequest.listeners( 'test' ).length, 1 );
 
-		eventRequest.cleanUp();
+		eventRequest._cleanUp();
 
 		assert.equal( eventRequest.internalTimeout, undefined );
+		assert.equal( eventRequest.queryString, undefined );
+		assert.equal( eventRequest.headers, undefined );
+		assert.equal( eventRequest.method, undefined );
+		assert.equal( eventRequest.path, undefined );
+		assert.equal( eventRequest.block, undefined );
+		assert.equal( eventRequest.validationHandler, undefined );
+		assert.equal( eventRequest.request, undefined );
+		assert.equal( eventRequest.clientIp, undefined );
 		assert.equal( eventRequest.extra, undefined );
 		assert.equal( eventRequest.body, undefined );
 		assert.equal( eventRequest.fileStreamHandler, undefined );
@@ -128,6 +136,7 @@ test({
 		assert.equal( eventRequest.extra, undefined );
 		assert.equal( eventRequest.cookies, undefined );
 		assert.equal( eventRequest.params, undefined );
+		assert.equal( eventRequest.finished, true );
 		assert.equal( eventRequest.listeners( 'test' ).length, 0 );
 
 		done();
@@ -278,11 +287,11 @@ test({
 	message	: 'EventRequest setStatusCode changes the status code',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		eventRequest.setStatusCode( 500 );
+		eventRequest.setStatusCode( 200 );
 
-		assert.equal( 500, eventRequest.response.statusCode );
-		eventRequest.setStatusCode( 'wrong' );
 		assert.equal( 200, eventRequest.response.statusCode );
+		eventRequest.setStatusCode( 'wrong' );
+		assert.equal( 500, eventRequest.response.statusCode );
 
 		done();
 	}
@@ -441,11 +450,11 @@ test({
 });
 
 test({
-	message	: 'EventRequest.setBlock should set block',
+	message	: 'EventRequest._setBlock should set block',
 	test	: ( done ) =>{
 		let eventRequest	= helpers.getEventRequest();
 		let block			= ['test'];
-		eventRequest.setBlock( block );
+		eventRequest._setBlock( block );
 
 		assert.deepEqual( eventRequest.block, block );
 
@@ -469,7 +478,7 @@ test({
 		};
 
 		let block			= [callbackOne, callbackTwo];
-		eventRequest.setBlock( block );
+		eventRequest._setBlock( block );
 
 		eventRequest.next();
 
@@ -496,7 +505,7 @@ test({
 		let callback	= ()=>{};
 
 		let block		= [callback];
-		eventRequest.setBlock( block );
+		eventRequest._setBlock( block );
 
 		eventRequest.next( errorToSend, errorCode );
 
@@ -519,7 +528,7 @@ test({
 		});
 
 		let block	= [];
-		eventRequest.setBlock( block );
+		eventRequest._setBlock( block );
 
 		eventRequest.next();
 
@@ -565,30 +574,24 @@ test({
 test({
 	message: 'EventRequest setCookie should add a header with the cookie',
 	dataProvider: [
-		['key', 'value', null, null, true],
-		['key', 123, null, null, true],
-		[123, 'value', null, null, true],
-		['key', 'value', 10, null, true],
-		['key', 'value', 10, 'test.com', true],
-		[123, 123, 10, 'test.com', true],
-		['key', null, null, null, false],
-		[null, 'value', null, null, false],
-		[null, null, null, null, false],
-		['key', undefined, null, null, false],
-		[undefined, 'value', null, null, false],
-		[undefined, undefined, null, null, false],
+		['key', 'value', { Path: '/', Domain: 'localhost', HttpOnly: true, 'Max-Age': 100, Expires: 500 }, true],
+		['key', 123, { Path: '/', Domain: 'localhost', HttpOnly: true, 'Max-Age': 100, Expires: 500 }, true],
+		[123, 'value', { Path: '/', Domain: 'localhost', HttpOnly: true, 'Max-Age': 100, Expires: 500 }, true],
+		['key', 'value', { Path: '/', Domain: 'localhost', HttpOnly: true, 'Max-Age': 100, Expires: 500 }, true],
+		['key', 'value', { Path: '/', Domain: 'localhost', HttpOnly: true, 'Max-Age': 100, Expires: 500 }, true],
+		[123, 123, { Path: '/', Domain: 'localhost', HttpOnly: true, 'Max-Age': 100, Expires: 500 }, true],
+		['key', null, {}, false],
+		[null, 'value', {}, false],
+		[null, null, {}, false],
+		['key', undefined, {}, false],
+		[undefined, 'value', {}, false],
+		[undefined, undefined, {}, false],
 	],
-	test: ( done, name, value, maxAge, domain, shouldReturnTrue )=>{
+	test: ( done, name, value, options, shouldReturnTrue )=>{
 		const eventRequest		= helpers.getEventRequest();
-		let setCookieArguments	= [name, value];
+		let setCookieArguments	= [name, value, options];
 		let wasCalled			= false;
 		let cookieSet			= '';
-
-		if ( maxAge !== null )
-			setCookieArguments.push( maxAge );
-
-		if ( domain !== null )
-			setCookieArguments.push( domain );
 
 		eventRequest._mock({
 			method			: 'setHeader',
@@ -601,11 +604,10 @@ test({
 		assert.equal( eventRequest.setCookie.apply( eventRequest, setCookieArguments ), shouldReturnTrue );
 		assert.equal( wasCalled, shouldReturnTrue );
 
-		if ( maxAge !== null )
-			assert.equal( cookieSet.includes( `Max-Age=${maxAge}`), true );
-
-		if ( domain !== null )
-			assert.equal( cookieSet.includes( `Domain=${domain}`), true );
+		for( const option in options )
+		{
+			assert.equal( cookieSet.includes( option ), true );
+		}
 
 		done();
 	}

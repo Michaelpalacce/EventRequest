@@ -10,9 +10,14 @@ const fs						= require( 'fs' );
 test({
 	message	: 'EnvPlugin setServerOnRuntime and test file watcher',
 	test	: ( done )=>{
-		let MockServer		= Mock( Server.class );
-		let server			= new MockServer();
-		let fileLocation	= path.join( __dirname, '/fixture/.env');
+		const MockServer	= Mock( Server.class );
+		const server		= new MockServer();
+		const fileLocation	= path.join( __dirname, '/fixture/.env');
+
+		fs.writeFileSync( fileLocation,
+			'TESTKEY=TESTVALUE\n' +
+			'TESTKEYTWO=TESTVALUE=WITH=ENTER'
+		);
 
 		let originalContent	= fs.readFileSync( fileLocation );
 		originalContent		= originalContent.toString( 'utf-8' );

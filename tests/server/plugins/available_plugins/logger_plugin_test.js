@@ -60,7 +60,7 @@ test({
 		router.add( middleware[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		// DO this to wait for the log to complete

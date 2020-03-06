@@ -213,7 +213,7 @@ class Server extends EventEmitter
 
 				if ( eventRequest != null )
 				{
-					eventRequest.cleanUp();
+					eventRequest._cleanUp();
 					eventRequest	= null;
 				}
 			});
@@ -223,7 +223,7 @@ class Server extends EventEmitter
 
 				if ( eventRequest != null )
 				{
-					eventRequest.cleanUp();
+					eventRequest._cleanUp();
 					eventRequest	= null;
 				}
 			});
@@ -242,7 +242,7 @@ class Server extends EventEmitter
 			{
 				let block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
 				this.emit( 'eventRequestBlockSetting', { eventRequest, block } );
-				eventRequest.setBlock( block );
+				eventRequest._setBlock( block );
 				this.emit( 'eventRequestBlockSet', { eventRequest, block } );
 
 				const onErrorCallback	= ( error ) =>{

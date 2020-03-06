@@ -19,7 +19,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		assert.equal( true, typeof eventRequest.cacheCurrentRequest !== 'undefined' );
@@ -63,11 +63,11 @@ test({
 		});
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		setTimeout(()=>{
-			eventRequest2.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest2 ) );
+			eventRequest2._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest2 ) );
 			eventRequest2.next();
 		}, 5000 );
 	}

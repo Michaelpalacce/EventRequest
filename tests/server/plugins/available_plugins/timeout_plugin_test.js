@@ -25,7 +25,7 @@ test({
 			error	= true;
 		});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		assert.equal( true, typeof eventRequest.clearTimeout !== 'undefined' );
@@ -55,7 +55,7 @@ test({
 
 		eventRequest.on( 'error', ( err )=>{});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		eventRequest.on( 'clearTimeout', ()=>{
@@ -87,7 +87,7 @@ test({
 
 		eventRequest.on( 'error', ( err )=>{});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		eventRequest.emit( 'stream_start' );
@@ -116,7 +116,7 @@ test({
 
 		eventRequest.on( 'error', ( err )=>{});
 
-		eventRequest.setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		eventRequest.clearTimeout();
