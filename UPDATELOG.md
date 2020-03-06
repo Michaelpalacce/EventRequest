@@ -1,3 +1,7 @@
+13.5.1
+- Reduced Package size
+- Linux tests
+
 13.5.0
 - Updated so the setCookie will work correctly now.
 - Added more tests
