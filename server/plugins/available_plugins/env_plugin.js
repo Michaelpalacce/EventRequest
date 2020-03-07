@@ -48,14 +48,15 @@ class EnvPlugin extends PluginInterface
 			this.envVariableKeys	= [];
 			const lines				= fs.readFileSync( absFilePath, 'utf-8' ).split( '\n' );
 
-			lines.forEach(( line )=>{
+			for ( const line of lines )
+			{
 				const parts	= line.split( ENV_SEPARATOR );
 				const key	= parts.shift();
 
 				this.envVariableKeys.push( key );
 
 				process.env[key]	= parts.join( ENV_SEPARATOR ).replace( '\r', '' ).replace( '\n', '' );
-			})
+			}
 		}
 	}
 

@@ -35,8 +35,8 @@
   "main": "server.js",
   "name": "event_request",
   "scripts": {
-    "test": "node ./test_script.js",
+    "test": "node test.js",
     "deploy": "npm run test && npm publish"
   },
-  "version": "13.5.2"
+  "version": "13.5.3"
 }
