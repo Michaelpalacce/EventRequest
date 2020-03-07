@@ -786,17 +786,16 @@ In case there is no error False will be returned
 ***
 ####Validation defaults
 
-Validation results can also have defaults set. This is done by instead of passing a string of rules to the skeleton keys,
-an object is passed with two values: rules and default
-
-In case where the parameters have NOT been passed, the default value will be used.
-
+- Validation results can also have defaults set. 
+- This is done by instead of passing a string of rules to the skeleton keys, an object is passed with two values: rules and default
+- The rules must be optional otherwise validation will fail
+- In case where the parameters have NOT been passed, the default value will be used.
 ~~~javascript
      const result	= event.validationHandler.validate(
         event.body,
         { 
-            username : { rules: 'filled||string', default: 'root' }, 
-            password : { rules: 'filled||string', default: 'toor' } 
+            username : { rules: 'optional||string', default: 'root' }, 
+            password : { rules: 'optional||string', default: 'toor' } 
         } 
      );
 

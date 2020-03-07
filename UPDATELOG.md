@@ -1,3 +1,6 @@
+13.5.4
+- Updated the documentation for validation
+
 13.5.3
 - Changed the way the env plugin sets the variables so it's more synchronous
 - Changed the name of the test_script.js to just test.js
