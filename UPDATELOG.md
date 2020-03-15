@@ -1,3 +1,7 @@
+13.6.0
+- Updated README
+- Added AudioFileStream
+
 13.5.6
 - Added more file streams files ( video and text )
 - Changed the video type to video and not mp4

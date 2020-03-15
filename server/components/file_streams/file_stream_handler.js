@@ -3,6 +3,7 @@
 // Dependencies
 const FileStream		= require( './file_stream' );
 const VideoFileStream	= require( './video_file_stream' );
+const AudioFileStream	= require( './audio_file_stream' );
 const TextFileStream	= require( './text_file_stream' );
 const ImageFileStream	= require( './image_file_stream' );
 
@@ -17,6 +18,7 @@ class FileStreamHandler
 		this.options		= {
 			streams	: [
 				{ instance : VideoFileStream },
+				{ instance : AudioFileStream },
 				{ instance : ImageFileStream },
 				{ instance : TextFileStream }
 			]
@@ -98,6 +100,7 @@ class FileStreamHandler
 module.exports	= {
 	FileStreamHandler,
 	FileStream,
+	AudioFileStream,
 	VideoFileStream,
 	TextFileStream
 };

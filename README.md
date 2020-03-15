@@ -1683,10 +1683,13 @@ router.get( '/preview', ( event ) => {
 - Currently supported are :
   - Images: '.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
   - Videos: '.mp4', '.webm'
-  - Text: '.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini', '.ts', '.ejs', '.twig'
+  - Text: '.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini', '.ts', '.ejs', '.twig', '', '.rtf', '.apt', '.fodt', '.rft', '.apkg', '.fpt', '.lst', '.doc', '.docx', '.man', '.plain', '.text', '.odm', '.readme', '.cmd', '.ps1'
+  - Audio: '.mp3', '.flac', '.wav', '.aiff', '.aac'
 - The VideoFileStream can be paired up with an HTML5 video player to stream videos to it
+- The AudioFileStream can also be paired up with an HTML5 video player to stream audio to it
 - An 'stream_start' event will be emitted by the EventRequest the moment the stream is going to be started 
-- Each file stream has a getType method that returns whether it is a video, text or image
+- Each file stream has a getType method that returns whether it is a video, text, image or audio
+- Files with no extension will be treated as text files
 
 ***
 ####Dependencies:

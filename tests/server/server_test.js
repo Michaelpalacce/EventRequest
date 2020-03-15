@@ -2452,8 +2452,7 @@ test({
 	test	: ( done )=>{
 		app.apply( app.er_file_stream );
 
-		app.get( '/testErFileStreamMp4WithRange', ( event )=>{
-
+		app.get( '/testErFileStreamVideoWithRange', ( event )=>{
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
 				|| event.response.getHeader( 'Content-Type' ) !== 'video/.mp4'
@@ -2467,13 +2466,43 @@ test({
 			}
 
 			event.send( 'ok' ) ;
-
 		});
 
-		app.get( '/testErFileStreamMp4WithOutRange', ( event )=>{
+		app.get( '/testErFileStreamVideoWithOutRange', ( event )=>{
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
 				|| event.response.getHeader( 'Content-Type' ) !== 'video/.mp4'
+				|| event.response.getHeader( 'Content-Length' ) == null
+				|| event.response.getHeader( 'Content-Range' ) != null
+				|| event.response.getHeader( 'Accept-Ranges' ) != null
+				|| event.response.statusCode !== 200
+			) {
+				return event.sendError( 'failed', 400 );
+			}
+
+			event.send( 'ok' ) ;
+		});
+
+		app.get( '/testErFileStreamAudioWithRange', ( event )=>{
+			if (
+				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp3' ) ) == null
+				|| event.response.getHeader( 'Content-Type' ) !== 'audio/.mp3'
+				|| event.response.getHeader( 'Content-Range' ) == null
+				|| event.response.getHeader( 'Content-Length' ) == null
+				|| ! event.response.getHeader( 'Content-Range' ).includes( 'bytes' )
+				|| event.response.getHeader( 'Accept-Ranges' ) !== 'bytes'
+				|| event.response.statusCode !== 206
+			) {
+				return event.sendError( 'failed', 400 );
+			}
+
+			event.send( 'ok' ) ;
+		});
+
+		app.get( '/testErFileStreamAudioWithOutRange', ( event )=>{
+			if (
+				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp3' ) ) == null
+				|| event.response.getHeader( 'Content-Type' ) !== 'audio/.mp3'
 				|| event.response.getHeader( 'Content-Length' ) == null
 				|| event.response.getHeader( 'Content-Range' ) != null
 				|| event.response.getHeader( 'Accept-Ranges' ) != null
@@ -2515,8 +2544,10 @@ test({
 
 		const responses	= [];
 
-		responses.push( helpers.sendServerRequest( `/testErFileStreamMp4WithRange`, 'GET', 206, '', { range: 'bytes=1-50'} ) );
-		responses.push( helpers.sendServerRequest( `/testErFileStreamMp4WithOutRange` ) );
+		responses.push( helpers.sendServerRequest( `/testErFileStreamVideoWithRange`, 'GET', 206, '', { range: 'bytes=1-50'} ) );
+		responses.push( helpers.sendServerRequest( `/testErFileStreamAudioWithRange`, 'GET', 206, '', { range: 'bytes=1-50'} ) );
+		responses.push( helpers.sendServerRequest( `/testErFileStreamVideoWithOutRange` ) );
+		responses.push( helpers.sendServerRequest( `/testErFileStreamAudioWithOutRange` ) );
 		responses.push( helpers.sendServerRequest( `/testErFileStreamImage` ) );
 		responses.push( helpers.sendServerRequest( `/testErFileStreamText` ) );
 

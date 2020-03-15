@@ -73,4 +73,4 @@ class FileStream
 	}
 }
 
-module.exports  = FileStream;
+module.exports	= FileStream;
