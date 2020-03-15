@@ -1,3 +1,8 @@
+13.5.6
+- Added more file streams files ( video and text )
+- Changed the video type to video and not mp4
+- Updated README
+
 13.5.5
 - Fixed the Session to remove the cookie on removeSession
 - Fixed the setCookie method to modify expires and max-age options to date

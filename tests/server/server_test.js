@@ -2456,7 +2456,7 @@ test({
 
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
-				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
+				|| event.response.getHeader( 'Content-Type' ) !== 'video/.mp4'
 				|| event.response.getHeader( 'Content-Range' ) == null
 				|| event.response.getHeader( 'Content-Length' ) == null
 				|| ! event.response.getHeader( 'Content-Range' ).includes( 'bytes' )
@@ -2473,7 +2473,7 @@ test({
 		app.get( '/testErFileStreamMp4WithOutRange', ( event )=>{
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
-				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
+				|| event.response.getHeader( 'Content-Type' ) !== 'video/.mp4'
 				|| event.response.getHeader( 'Content-Length' ) == null
 				|| event.response.getHeader( 'Content-Range' ) != null
 				|| event.response.getHeader( 'Accept-Ranges' ) != null

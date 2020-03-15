@@ -24,7 +24,11 @@ class TextFileStream extends FileStream
 	{
 		super( options );
 		this.SUPPORTED_FORMATS	= [
-			'.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini', 'ts'
+			'.txt', '.js', '.php', '.html', '.json', '.cpp', '.h',
+			'.md', '.bat', '.log', '.yml', '.ini', '.ts', '.ejs', '.twig',
+			'', '.rtf', '.apt', '.fodt', '.rft', '.apkg', '.fpt', '.lst',
+			'.doc', '.docx', '.man', '.plain', '.text', '.odm', '.readme',
+			'.cmd', '.ps1'
 		];
 		this._streamType		= STREAM_TYPE;
 
@@ -44,7 +48,7 @@ class TextFileStream extends FileStream
 	supports( file )
 	{
 		file	= path.parse( file );
-		return this.SUPPORTED_FORMATS.indexOf( file.ext ) !== -1;
+		return this.SUPPORTED_FORMATS.indexOf( file.ext.toLowerCase() ) !== -1;
 	}
 
 	/**

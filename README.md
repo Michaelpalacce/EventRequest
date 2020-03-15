@@ -1682,10 +1682,11 @@ router.get( '/preview', ( event ) => {
 - Adds a file streaming plugin to the site allowing different MIME types to be streamed
 - Currently supported are :
   - Images: '.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
-  - Videos: '.mp4'
-  - Text: '.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini', 'ts'
+  - Videos: '.mp4', '.webm'
+  - Text: '.txt', '.js', '.php', '.html', '.json', '.cpp', '.h', '.md', '.bat', '.log', '.yml', '.ini', '.ts', '.ejs', '.twig'
 - The VideoFileStream can be paired up with an HTML5 video player to stream videos to it
 - An 'stream_start' event will be emitted by the EventRequest the moment the stream is going to be started 
+- Each file stream has a getType method that returns whether it is a video, text or image
 
 ***
 ####Dependencies:

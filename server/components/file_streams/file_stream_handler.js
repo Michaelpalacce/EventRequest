@@ -2,7 +2,7 @@
 
 // Dependencies
 const FileStream		= require( './file_stream' );
-const Mp4FileStream		= require( './mp4_file_stream' );
+const VideoFileStream	= require( './video_file_stream' );
 const TextFileStream	= require( './text_file_stream' );
 const ImageFileStream	= require( './image_file_stream' );
 
@@ -16,7 +16,7 @@ class FileStreamHandler
 		this.fileStreams	= [];
 		this.options		= {
 			streams	: [
-				{ instance : Mp4FileStream },
+				{ instance : VideoFileStream },
 				{ instance : ImageFileStream },
 				{ instance : TextFileStream }
 			]
@@ -98,6 +98,6 @@ class FileStreamHandler
 module.exports	= {
 	FileStreamHandler,
 	FileStream,
-	Mp4FileStream,
+	VideoFileStream,
 	TextFileStream
 };

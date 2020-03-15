@@ -10,12 +10,12 @@ const fs			= require( 'fs' );
  *
  * @var		String
  */
-const STREAM_TYPE	= 'mp4';
+const STREAM_TYPE	= 'video';
 
 /**
- * @brief	Used to stream mp4 files
+ * @brief	Used to stream mp4 and webm files
  */
-class Mp4FileStream extends FileStream
+class VideoFileStream extends FileStream
 {
 	/**
 	 * @see	FileStream::constructor()
@@ -23,7 +23,7 @@ class Mp4FileStream extends FileStream
 	constructor( options )
 	{
 		super( options );
-		this.SUPPORTED_FORMATS	= ['.mp4'];
+		this.SUPPORTED_FORMATS	= ['.mp4', '.webm'];
 		this._streamType		= STREAM_TYPE;
 
 		this.sanitize();
@@ -60,7 +60,7 @@ class Mp4FileStream extends FileStream
 		const fileSize	= stat.size;
 		const range		= event.getHeader( 'range' );
 
-		event.setHeader( 'Content-Type', 'video/mp4' );
+		event.setHeader( 'Content-Type', `video/${path.parse( file ).ext}` );
 		if ( range )
 		{
 			const parts	= range.replace( /bytes=/, "" ).split( "-" );
@@ -96,4 +96,4 @@ class Mp4FileStream extends FileStream
 	}
 }
 
-module.exports	= Mp4FileStream;
+module.exports	= VideoFileStream;
