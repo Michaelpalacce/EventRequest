@@ -1,3 +1,6 @@
+13.6.1
+- Removed dot from file streams
+
 13.6.0
 - Updated README
 - Added AudioFileStream

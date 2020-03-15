@@ -60,7 +60,7 @@ class VideoFileStream extends FileStream
 		const fileSize	= stat.size;
 		const range		= event.getHeader( 'range' );
 
-		event.setHeader( 'Content-Type', `video/${path.parse( file ).ext}` );
+		event.setHeader( 'Content-Type', `video/${path.parse( file ).ext.substring( 1 )}` );
 		if ( range )
 		{
 			const parts	= range.replace( /bytes=/, "" ).split( "-" );
