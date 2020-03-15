@@ -1,3 +1,7 @@
+13.5.5
+- Fixed the Session to remove the cookie on removeSession
+- Fixed the setCookie method to modify expires and max-age options to date
+
 13.5.4
 - Updated the documentation for validation
 

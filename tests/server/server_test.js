@@ -1175,14 +1175,13 @@ test({
 			{
 				assert.equal( cookies.includes( cookieName ), true );
 			}
-
 			assert.equal( response.headers['set-cookie'][3].includes( 'Path=/;' ), true );
 			assert.equal( response.headers['set-cookie'][3].includes( 'Domain=localhost;' ), true );
 			assert.equal( response.headers['set-cookie'][3].includes( 'HttpOnly=true;' ), true );
-			assert.equal( response.headers['set-cookie'][3].includes( 'Max-Age=100;' ), true );
-			assert.equal( response.headers['set-cookie'][3].includes( 'Expires=500;' ), true );
 			assert.equal( response.headers['set-cookie'][3].includes( 'caseSensitive=5;' ), true );
 			assert.equal( response.headers['set-cookie'][3].includes( 'CaseSensitive=10;' ), true );
+			assert.equal( response.headers['set-cookie'][3].includes( 'Max-Age' ), true );
+			assert.equal( response.headers['set-cookie'][3].includes( 'Expires' ), true );
 
 			done();
 		}).catch( done );

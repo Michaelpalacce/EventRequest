@@ -148,6 +148,8 @@ The event request is an object that is created by the server and passed through 
 - Options will all be applied directly as are given.
 - The options are case sensitive
 - Available options: Path, Domain, Max-Age, Expires, HttpOnly
+- Expires and Max-Age will be converted to date, so a timestamp in seconds must be passed
+- If you wish to expire a cookie set Expires / Max-Age to a negative number
 - { Path: 'test', expires: 100 } -> this will be set as 'cookieName=cookieValue; Path:test; expires:100'
 
 **setStatusCode( Number code ): void**

@@ -148,6 +148,11 @@ class EventRequest extends EventEmitter
 
 		for( const optionName in options )
 		{
+			if ( optionName.toLowerCase() === 'expires' || optionName.toLowerCase() === 'max-age' )
+			{
+				options[optionName]	= new Date( new Date().getTime() + options[optionName] * 1000 )
+			}
+
 			cookie	+= ` ${optionName}=${options[optionName]};`;
 		}
 

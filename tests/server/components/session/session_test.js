@@ -135,7 +135,7 @@ test({
 			shouldReturn	: ()=>{
 				setCookie	= true;
 			},
-			called			: 1
+			called			: 2
 		});
 
 		let hasSession	= await session.hasSession();

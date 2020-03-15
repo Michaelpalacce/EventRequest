@@ -77,7 +77,9 @@ class Session
 	 */
 	async removeSession()
 	{
-		await this.server.delete( this.getSessionId() );
+		await this.server.delete( this.sessionId );
+
+		this.event.setCookie( this.sessionKey, this.sessionId, { expires: - this.ttl } );
 	}
 
 	/**
@@ -99,7 +101,7 @@ class Session
 		else
 		{
 			this.sessionId	= sessionId;
-			this.event.setCookie( this.sessionKey, this.sessionId, this.ttl );
+			this.event.setCookie( this.sessionKey, this.sessionId, { expires: this.ttl } );
 
 			return sessionId;
 		}
@@ -168,7 +170,7 @@ class Session
 	 *
 	 * @return	Boolean
 	 */
-	async saveSession( sessionId = this.getSessionId() )
+	async saveSession( sessionId = this.sessionId )
 	{
 		if ( sessionId === null )
 		{
@@ -187,14 +189,12 @@ class Session
 	 */
 	async fetchSession()
 	{
-		let sessionId	= this.getSessionId();
-
-		if ( ! await this.server.touch( sessionId ) )
+		if ( ! await this.server.touch( this.sessionId ) )
 		{
 			return false;
 		}
 
-		const dataSet	= await this.server.get( sessionId );
+		const dataSet	= await this.server.get( this.sessionId );
 		this.session	= dataSet.value;
 
 		return true;
