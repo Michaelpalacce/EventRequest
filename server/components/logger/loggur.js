@@ -88,7 +88,6 @@ class Loggur
 	{
 		let logger	= this.loggers[loggerId];
 		if ( logger === undefined )
-		if ( logger === undefined )
 		{
 			return false;
 		}

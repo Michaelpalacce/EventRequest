@@ -1,3 +1,6 @@
+13.6.2
+- Fixed a typo
+
 13.6.1
 - Removed dot from file streams
 
