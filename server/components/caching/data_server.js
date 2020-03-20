@@ -370,11 +370,15 @@ class DataServer
 			}
 		}
 
-		const writeStream	= fs.createWriteStream( this.persistPath );
+		const tmpFile		= `${this.persistPath}.tmp`;
+
+		const writeStream	= fs.createWriteStream( tmpFile );
 		writeStream.setDefaultEncoding( 'utf-8' );
 
 		writeStream.write( JSON.stringify( serverData ) );
 		writeStream.end();
+
+		fs.renameSync( tmpFile, this.persistPath );
 	}
 
 	/**

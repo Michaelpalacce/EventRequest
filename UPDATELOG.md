@@ -1,3 +1,6 @@
+13.6.3
+- The data_server will now first save data to a tmp file and then overwrite the cache file
+
 13.6.2
 - Fixed a typo
 
