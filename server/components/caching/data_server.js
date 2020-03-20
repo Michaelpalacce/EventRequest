@@ -1,8 +1,12 @@
 'use strict';
 
-const path			= require( 'path' );
-const fs			= require( 'fs' );
-const { Loggur }	= require( '../logger/loggur' );
+const path				= require( 'path' );
+const fs				= require( 'fs' );
+const { Loggur }		= require( '../logger/loggur' );
+const { promisify }		= require( 'util' );
+const { EventEmitter }	= require( 'events' );
+
+const unlink			= promisify( fs.unlink );
 
 /**
  * @var	Number
@@ -22,10 +26,13 @@ const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60;
  * 			Could be implemented with Memcached or another similar Data Store Server.
  * 			All operations are internally done asynchronous
  */
-class DataServer
+class DataServer extends EventEmitter
 {
 	constructor( options = {} )
 	{
+		super();
+		this.setMaxListeners( 0 );
+
 		this._configure( options );
 	}
 
@@ -69,21 +76,12 @@ class DataServer
 
 		if ( this.persist )
 		{
-			if ( fs.existsSync( this.persistPath ) )
-			{
-				this._loadData();
-				this._garbageCollect();
-			}
-			else
-			{
-				fs.writeFileSync( this.persistPath, '{}' );
-			}
+			this._setUpPersistence();
 
 			const persistInterval	= setInterval(()=>{
 				this._garbageCollect();
 				this._saveData();
 			}, this.persistInterval );
-
 
 			this.intervals.push( persistInterval );
 		}
@@ -96,13 +94,44 @@ class DataServer
 	}
 
 	/**
-	 * @brief	Flushes data from memory, deletes the Cache file and stops all the intervals
+	 * @brief	Flushes data from memory, deletes the Cache file and stops all the intervals. Also removes all events
 	 */
 	stop()
 	{
+		this._stop();
+
 		for ( const interval of this.intervals )
 			clearInterval( interval );
 
+		this.emit( 'stop' );
+		this.removeAllListeners();
+	}
+
+	/**
+	 * @brief	Sets up the persistence
+	 *
+	 * @return	void
+	 */
+	_setUpPersistence()
+	{
+		if ( fs.existsSync( this.persistPath ) )
+		{
+			this._loadData();
+			this._garbageCollect();
+		}
+		else
+		{
+			fs.writeFileSync( this.persistPath, '{}' );
+		}
+	}
+
+	/**
+	 * @brief	Stops the server
+	 *
+	 * @return	void
+	 */
+	_stop()
+	{
 		if ( fs.existsSync( this.persistPath ) )
 			fs.unlinkSync( this.persistPath );
 
@@ -133,7 +162,10 @@ class DataServer
 	 */
 	_handleServerDown()
 	{
-		Loggur.log( 'The data server is not responding', Loggur.LOG_LEVELS.error )
+		const error	= 'The data server is not responding';
+
+		Loggur.log( error, Loggur.LOG_LEVELS.error );
+		this.emit( 'serverError', { error } );
 	}
 
 	/**
@@ -346,7 +378,7 @@ class DataServer
 	 */
 	_garbageCollect()
 	{
-		for ( let key in this.server )
+		for ( const key in this.server )
 		{
 			this._prune( key ).catch( this._handleServerDown );
 		}
@@ -378,7 +410,29 @@ class DataServer
 		writeStream.write( JSON.stringify( serverData ) );
 		writeStream.end();
 
-		fs.renameSync( tmpFile, this.persistPath );
+		writeStream.on( 'close', ()=>{
+			const readableStream	= fs.createReadStream( tmpFile );
+			const writeStream		= fs.createWriteStream( this.persistPath );
+			readableStream.pipe( writeStream );
+
+			readableStream.on( 'error', ( error )=>{
+				Loggur.log( error, Loggur.LOG_LEVELS.error );
+				this.emit( '_saveDataError', { error } );
+			});
+
+			writeStream.on( 'error', ( error )=>{
+				Loggur.log( error, Loggur.LOG_LEVELS.error );
+				this.emit( '_saveDataError', { error } );
+			});
+
+			writeStream.on( 'close', ()=>{
+				this.emit( '_saveData' );
+				unlink( tmpFile ).catch( ( error )=>{
+					Loggur.log( error, Loggur.LOG_LEVELS.error );
+					this.emit( '_saveDataError', { error } );
+				});
+			})
+		});
 	}
 
 	/**
@@ -394,8 +448,9 @@ class DataServer
 			const buffer	= fs.readFileSync( this.persistPath );
 			serverData		= JSON.parse( buffer.toString() );
 		}
-		catch ( e )
+		catch ( error )
 		{
+			Loggur.log( error, Loggur.LOG_LEVELS.error );
 		}
 
 		const currentServerData	= this.server;

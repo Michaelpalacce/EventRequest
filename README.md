@@ -577,11 +577,16 @@ The `Logging` Suite exported by the module contains the following:
 - Defaults to empty
 
 **logLevel: Number** 
-- The log severity level 
-- Defaults to error
+- The log level lower than which everything will be logged
+- This will also be the default logLevel for the logger
+- Example: if the logLevel is set to LOG_LEVELS.info then info, notice, warning and error will be logged, but verbose and debug will not
+- The higher a log level is the less sever it is
+- Defaults to LOG_LEVELS.info
 
 **logLevels: Object** 
 - JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class 
+- The logger will be able to log ONLY on these log levels
+- If you have log levels: 100 and 200 and you try with a log level of 50 or a 300 it won't log
 - Defaults to LOG_LEVELS
 
 **capture: Boolean** 
@@ -622,11 +627,24 @@ Logger.log accepts 2 parameters:
 Each Logger can have it's own transport layers.
 There are 2 predefined transport layers:
 
-**Console**
+###Console
 - Logs data in the console
 
 ***
 ####Accepted options:
+
+**logLevel: Number**
+- The log level lower than which everything will be logged
+- This will also be the default logLevel for the logger
+- Example: if the logLevel is set to LOG_LEVELS.info then info, notice, warning and error will be logged, but verbose and debug will not
+- The higher a log level is the less sever it is
+- Defaults to LOG_LEVELS.info
+
+**logLevels: Array**
+- JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class 
+- The logger will be able to log ONLY on these log levels
+- If you have log levels: 100 and 200 and you try with a log level of 50 or a 300 it won't log
+- Defaults to LOG_LEVELS
 
 **color: Boolean**
 - Whether the log should be colored 
@@ -635,18 +653,32 @@ There are 2 predefined transport layers:
 **logColors: Object** 
 - The colors to use 
 - Defaults to
-    - [LOG_LEVELS.error]		: 'red',
+    - [LOG_LEVELS.error]	: 'red',
     - [LOG_LEVELS.warning]	: 'yellow',
     - [LOG_LEVELS.notice]	: 'green',
     - [LOG_LEVELS.info]		: 'blue',
     - [LOG_LEVELS.verbose]	: 'cyan',
-    - [LOG_LEVELS.debug]		: 'white'
+    - [LOG_LEVELS.debug]	: 'white'
 
-**File**
+###File
 - Logs data to a file
 
 ***
 ####Accepted options:
+
+**logLevel: Number**
+- The log level lower than which everything will be logged
+- This will also be the default logLevel for the logger
+- Example: if the logLevel is set to LOG_LEVELS.info then info, notice, warning and error will be logged, but verbose and debug will not
+- The higher a log level is the less sever it is
+- Defaults to LOG_LEVELS.info
+
+**logLevels: Array**
+- JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class 
+- The logger will be able to log ONLY on these log levels
+- If you have log levels: 100 and 200 and you try with a log level of 50 or a 300 it won't log
+- Defaults to LOG_LEVELS
+
 **filePath: String**
 - The location of the file to log to 
 - If it is not provided the transport will not log
@@ -841,6 +873,12 @@ If you need to test your project, then you can use the Testing tools included in
 ~~~javascript
      const { Testing }  = require( 'event_request' );
 ~~~
+
+#### Accepted CLI arguments
+**--filter=**
+- Accepts a string to filter by
+- Example: node test.js --filter=DataServer
+
 The testing tools include a mocker. The mocker class can be retrieved with:
 
 ~~~javascript
@@ -1061,8 +1099,32 @@ console.log( new DataServer( options ) );
 The DataServer provides a set of methods that have to be implemented if you want to create your own Caching server to be 
 integrated with other plugins. 
 
+#### Events:
+
+**_saveDataError( Error error )**
+- Emitted in case of an error while saving data
+
+**_saveData()**
+- Emitted when the data has finished saving
+
+**stop()**
+- Emitted when the server is stopping
+
+#### Functions:
 **stop(): void**
-- This will stop the connection of the DataServer. ( Delete all the files, flush memory and stop gc and persistence )
+- This will stop the connection of the DataServer
+- It calls _stop()
+- It emits a 'stop' event
+- It clears all the intervals
+- It removes all the listeners
+
+**_stop(): void**
+- This method is the protected method that should be implemented in case extension of the DataServer should be done
+- Removes the cache file
+
+**_setUpPersistence(): void**
+- This method is the protected method that should be implemented in case extension of the DataServer should be done
+- It is called in the constructor to create the cache file we will be using if persistence is enabled
 
 **get( String key ): Promise: Object|null** 
 - Retrieves the value given a key. Returns null if the key does not exist.
@@ -1120,7 +1182,8 @@ However if the global persist is set to false, this will not work
 - Implement this if your Data Server needs it, otherwise leave it blank
 
 **_saveData(): void**
-- Persists all the data set to be persisted to disk 
+- Persists all the data set to be persisted to disk
+- Extra measures have been taken so this operation will not break if it is running fast, however if the persist interval is too low it still may cause an issue while saving
 - This respects any data set with persist = false
 
 **_loadData(): void**

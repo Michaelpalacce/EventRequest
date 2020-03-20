@@ -1,3 +1,13 @@
+13.7.0
+- Fix for the save to be done when the stream has ended in the DataServer
+- Updated logging documentation
+- Data Server is now an EventEmitter
+- Improvements to Data Server to be able to be extended easier
+- The tester now accepts --filter= as a cli argument
+- The tester now says if filtering
+- Added Router tests
+- Added some DataServer assertions
+
 13.6.3
 - The data_server will now first save data to a tmp file and then overwrite the cache file
 

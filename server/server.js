@@ -4,7 +4,7 @@
 const http						= require( 'http' );
 const EventRequest				= require( './event' );
 const { EventEmitter }			= require( 'events' );
-const Router					= require( './components/routing/router' );
+const RouterClass				= require( './components/routing/router' );
 const PluginInterface			= require( './plugins/plugin_interface' );
 const PluginManager				= require( './plugins/preloaded_plugins' );
 const Logging					= require( './components/logger/loggur' );
@@ -96,7 +96,7 @@ class Server extends EventEmitter
 	 */
 	Router()
 	{
-		return new Router();
+		return new RouterClass();
 	}
 
 	/**

@@ -85,6 +85,20 @@ class Tester
 			// Will display only errors
 			this.consoleLogger.logLevel	= LOG_LEVELS.error;
 		}
+
+		const argv	= process.argv.slice( 2 );
+
+		for ( let command of argv )
+		{
+			switch ( true )
+			{
+				case command.match( /--filter=/ ) !== null:
+					this.filter	= command.substring( 9 );
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 	/**
@@ -347,7 +361,11 @@ class Tester
 	runAllTests( options = {} )
 	{
 		this.initialize( options );
-		this.consoleLogger.error( `Running ${this.tests.length} tests.` );
+		this.consoleLogger.error( `${this.tests.length} tests found.` );
+		if ( this.filter !== false )
+		{
+			this.consoleLogger.warning( `Filtering according to: ${this.filter}` );
+		}
 
 		this.done();
 	}

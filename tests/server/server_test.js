@@ -275,6 +275,66 @@ test({
 });
 
 test({
+	message	: 'Server.Router returns a new router',
+	test	: ( done ) =>{
+		const server	= App();
+
+		const router	= server.Router();
+		assert( router instanceof Router, true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.Router can be attached back',
+	test	: ( done ) =>{
+		const server	= App();
+		const name		= '/testRouterCanBeAttachedBack';
+
+		const router	= server.Router();
+
+		router.get( name, ( event )=>{
+			event.send( name );
+		});
+
+		server.add( router );
+
+		helpers.sendServerRequest( name, 'GET', 200 ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.Router does not affect the original router if not applied back',
+	test	: ( done ) =>{
+		const server	= App();
+		const name		= '/testRouterReturnsANewRouter';
+
+		const router	= server.Router();
+
+		server.get( name, ( event )=>{
+			event.send( name );
+		});
+
+		router.get( name, ( event )=>{
+			event.send( 'wrong' );
+		});
+
+		server.listen( 3352,()=>{
+			helpers.sendServerRequest( name, 'GET', 200, '', {}, 3352 ).then(( response )=>{
+				assert.equal( response.body.toString(), name );
+
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
 	message	: 'Server() returns the same instance',
 	test	: ( done )=>{
 		const server	= App();

@@ -340,6 +340,12 @@ test({
 			const keyTwo		= 'keyTwo';
 			const keyThree		= 'keyThree';
 			const dataServer	= new DataServer( { persistInterval: 2, persistPath: DEFAULT_PERSIST_FILE + '1' } );
+			let saveCalled		= false;
+
+			dataServer.on( '_saveData', ()=>{
+				saveCalled	= true;
+			});
+
 			dataServer.set( key, 'value' );
 			dataServer.set( keyTwo, 'value2', 1, true );
 			dataServer.set( keyThree, 'value3', 10000, false );
@@ -356,7 +362,7 @@ test({
 
 				removeCache( dataServer );
 
-				done();
+				done( ! saveCalled );
 			}, 2100 );
 		}, 50 );
 	}
@@ -373,6 +379,12 @@ test({
 			const key			= 'key';
 			const value			= { test: 'value' };
 
+			let stopCalled		= false;
+
+			dataServer.on( 'stop', ()=>{
+				stopCalled	= true;
+			});
+
 			assert.equal( dataServer.intervals.length, 2 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
@@ -386,7 +398,7 @@ test({
 			assert.equal( fs.existsSync( dataServer.persistPath ), false );
 
 			removeCache( dataServer );
-			done();
+			done( ! stopCalled );
 		}, 50 );
 	}
 });
