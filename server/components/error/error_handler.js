@@ -6,27 +6,6 @@
 class ErrorHandler
 {
 	/**
-	 * @brief	Formats the error in a presentable format
-	 *
-	 * @param	mixed error
-	 *
-	 * @return	String
-	 */
-	formatError( error )
-	{
-		if ( error && typeof error !== 'object' )
-		{
-			error	= { 'error' : error };
-		}
-
-		if ( typeof message === 'object' )
-		{
-			error	= JSON.stringify( error );
-		}
-
-		return error;
-	}
-	/**
 	 * @brief	Handle the error
 	 *
 	 * @param	EventRequest event
@@ -37,21 +16,59 @@ class ErrorHandler
 	 */
 	handleError( event, error, code = 500 )
 	{
-		let errorToSend	= error;
-		let errorToEmit	= error;
+		event.emit( 'on_error', this._getErrorToEmit( error ) );
 
+		this._sendError( event, this._formatError( error ), code );
+	}
+
+	/**
+	 * @brief	Gets the error to be emitted
+	 *
+	 * @param	error Error
+	 *
+	 * @return	mixed
+	 */
+	_getErrorToEmit( error )
+	{
 		if ( error instanceof Error )
 		{
-			errorToEmit	= error.stack;
-			errorToSend	= error.message;
+			error	= error.stack;
 		}
-		event.emit( 'on_error', errorToEmit );
 
-		errorToSend	= this.formatError( errorToSend );
+		return error;
+	}
 
+	/**
+	 * @brief	Formats the error in a presentable format
+	 *
+	 * @param	error Error
+	 *
+	 * @return	Object
+	 */
+	_formatError( error )
+	{
+		if ( error instanceof Error )
+		{
+			error	= error.message;
+		}
+
+		return { error };
+	}
+
+	/**
+	 * @brief	Sends the error
+	 *
+	 * @param	event EventRequest
+	 * @param	error mixed
+	 * @param	code Number
+	 *
+	 * @return	void
+	 */
+	_sendError( event, error, code )
+	{
 		if ( ! event.isFinished() )
 		{
-			event.send( errorToSend, code );
+			event.send( error, code );
 		}
 	}
 }

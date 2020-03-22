@@ -1,3 +1,6 @@
+14.0.1
+- Error handler fixes
+
 14.0.0
 - Templating engine plugin no longer sets the response as raw so it can be cached
 - send will emit with a payload if the response is a string regardless if it is raw or not

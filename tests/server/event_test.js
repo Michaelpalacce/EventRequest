@@ -795,7 +795,7 @@ test({
 		eventRequest._mock({
 			method: 'send',
 			shouldReturn: ( one, two )=> {
-				assert.deepStrictEqual( { error: 'Cannot / GET' }, one );
+				assert.deepStrictEqual( one, { error: 'Cannot / GET' } );
 				assert.equal( 404, two );
 				called	= true;
 			}
