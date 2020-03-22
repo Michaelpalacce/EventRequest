@@ -1,3 +1,9 @@
+14.0.0
+- Templating engine plugin no longer sets the response as raw so it can be cached
+- send will emit with a payload if the response is a string regardless if it is raw or not
+- If the handler is async, in case of an error it will be caught now.
+- Added more tests
+
 13.7.0
 - Fix for the save to be done when the stream has ended in the DataServer
 - Updated logging documentation

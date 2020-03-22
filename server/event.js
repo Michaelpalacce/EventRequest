@@ -232,7 +232,7 @@ class EventRequest extends EventEmitter
 
 		const payload	= { code, raw, headers: this.response.getHeaders() };
 
-		if ( ! isRaw )
+		if ( ! isRaw || typeof response === 'string' )
 			payload.response	= response;
 
 		this.emit( 'send', payload );
@@ -392,7 +392,17 @@ class EventRequest extends EventEmitter
 
 			try
 			{
-				this.block.shift().call( this, this );
+				const next		= this.block.shift();
+				const response	= next( this );
+
+				if ( response instanceof Promise )
+				{
+					response.catch(( error )=>{
+						setImmediate(()=>{
+							this.next( error );
+						});
+					});
+				}
 			}
 			catch ( error )
 			{

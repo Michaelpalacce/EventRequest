@@ -50,7 +50,7 @@ class TemplatingEnginePlugin extends PluginInterface
 
 								this.emit( 'render', { templateName, variables } );
 
-								this.send( result, 200, true );
+								this.send( result, 200 );
 								resolve();
 							}
 							catch ( e )

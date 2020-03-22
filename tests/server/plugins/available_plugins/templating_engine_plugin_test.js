@@ -27,7 +27,7 @@ test({
 			shouldReturn	: ()=>{
 				called	++;
 			},
-			with			: [['rendered', 200, true]],
+			with			: [['rendered', 200]],
 			called			: 1
 		});
 

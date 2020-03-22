@@ -198,7 +198,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest send emits send event without response if response is raw or stream',
+	message	: 'EventRequest send emits send event with response even if isRaw is true of the response is a string',
 	test	: ( done ) =>{
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
@@ -213,6 +213,27 @@ test({
 		});
 
 		eventRequest.send( '', 200, true );
+
+		send	? done() : done( 'EventRequest send event not emitted but should have been' );
+	}
+});
+
+test({
+	message	: 'EventRequest send emits send event without response if response is raw or stream',
+	test	: ( done ) =>{
+		let eventRequest	= helpers.getEventRequest();
+		let send			= false;
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: ()=>{}
+		});
+
+		eventRequest.on( 'send', ( payload ) =>{
+			if ( typeof payload.response !== 'undefined' )
+				send	= true;
+		});
+
+		eventRequest.send( {}, 200, true );
 
 		const stream	= fs.createReadStream( './tests/server/test_template.html' );
 
@@ -465,24 +486,86 @@ test({
 test({
 	message	: 'EventRequest.next calls next middleware',
 	test	: ( done ) =>{
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let firstCalled		= false;
 		let secondCalled	= false;
 
-		let callbackOne		= ( event ) =>{
+		const callbackOne	= ( event ) =>{
 			firstCalled	= true;
 			event.next();
 		};
-		let callbackTwo		= () =>{
+		const callbackTwo	= () =>{
 			secondCalled	= true;
 		};
 
-		let block			= [callbackOne, callbackTwo];
+		const block			= [callbackOne, callbackTwo];
 		eventRequest._setBlock( block );
 
 		eventRequest.next();
 
 		firstCalled && secondCalled ? done() : done( 'EventRequest.next chain did not execute correctly' );
+	}
+});
+
+test({
+	message	: 'EventRequest.next handles thrown errors',
+	test	: ( done ) =>{
+		const eventRequest			= helpers.getEventRequest();
+		let error					= false;
+		let firstCalled				= false;
+		const errorToThrow			= new Error( 'An Error' );
+
+		eventRequest.errorHandler	= new MockedErrorHandler();
+		eventRequest.errorHandler._mock({
+			method			: 'handleError',
+			shouldReturn	: ()=>{ error = true; },
+			with			: [[eventRequest, errorToThrow]],
+			called			: 1
+		});
+
+		const callbackOne	= () =>{
+			firstCalled	= true;
+			throw errorToThrow;
+		};
+
+		const block			= [callbackOne];
+		eventRequest._setBlock( block );
+
+		eventRequest.next();
+
+		firstCalled && error ? done() : done( 'EventRequest.next error did not get handled' );
+	}
+});
+
+test({
+	message	: 'EventRequest.next handles thrown errors if async',
+	test	: ( done ) =>{
+		const eventRequest			= helpers.getEventRequest();
+		let error					= false;
+		let firstCalled				= false;
+		const errorToThrow			= new Error( 'An Error' );
+
+		eventRequest.errorHandler	= new MockedErrorHandler();
+		eventRequest.errorHandler._mock({
+			method			: 'handleError',
+			shouldReturn	: ()=>{ error = true; },
+			with			: [[eventRequest, errorToThrow]],
+			called			: 1
+		});
+
+		const callbackOne	= async () =>{
+			firstCalled	= true;
+			throw errorToThrow;
+		};
+
+		const block			= [callbackOne];
+		eventRequest._setBlock( block );
+
+		eventRequest.next();
+
+		setTimeout(()=>{
+			firstCalled && error ? done() : done( 'EventRequest.next error did not get handled' );
+		}, 100 );
 	}
 });
 

@@ -167,6 +167,7 @@ The event request is an object that is created by the server and passed through 
 - If response is a stream then the stream will be piped to the response
 - if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. 
 - Emits a 'send' event and calls cleanUp
+- The event will be emitted with a response if the response was a string or the isRaw flag was set to false 
 
 **setHeader( String key, mixed value ): boolean** 
 - Sets a new header to the response.
@@ -224,6 +225,7 @@ The event request is an object that is created by the server and passed through 
      
   -  **response: mixed** 
      - The response that was returned
+     - Will not be sent if isRaw is true and the response was not a string 
      
   -  **headers: Object**
      - The headers that were sent
