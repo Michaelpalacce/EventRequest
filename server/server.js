@@ -308,4 +308,4 @@ App.cleanUp			= ()=>{
 App.class			= Server;
 
 // Export the server module
-module.exports	= App;
+module.exports		= App;

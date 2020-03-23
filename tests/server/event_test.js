@@ -788,7 +788,6 @@ test({
 test({
 	message	: 'EventRequest.next sends 404 if route does not exist',
 	test	: ( done )=>{
-
 		const eventRequest	= helpers.getEventRequest( '/', 'GET' );
 		let called			= false;
 

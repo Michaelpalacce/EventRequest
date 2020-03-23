@@ -168,20 +168,13 @@ class Router extends PluginInterface
 
 		for ( let index in this.middleware )
 		{
-			let route			= this.middleware[index];
-			let matchedParams	= [];
-			let matched			= Router.matchRoute( event.path, route, matchedParams );
+			let route	= this.middleware[index];
+			let params	= [];
 
-			if ( matched )
+			if ( Router.matchRoute( event.path, route, params ) )
 			{
 				if ( Router.matchMethod( event.method, route ) )
 				{
-					let params	= {};
-
-					matchedParams.forEach(( param )=>{
-						params[param[0]]	= param[1];
-					});
-
 					event.params	= Object.assign( event.params, params );
 
 					for ( const middlewareName of route.getMiddlewares() )

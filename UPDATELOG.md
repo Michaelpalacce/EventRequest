@@ -1,3 +1,10 @@
+15.0.0
+- Improved Tester documentation
+- Added Tester cli arguments
+- Router speed improvements
+- Removed the Development suite. Any functionality can be required from the directory structure
+- Added More documentation 
+
 14.0.1
 - Error handler fixes
 

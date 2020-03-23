@@ -18,12 +18,7 @@ const startTests	= ()=>{
 	testSuites.cachingSuite();
 	testSuites.rateLimiterSuite();
 
-	runAllTests({
-		dieOnFirstError	: true,
-		debug			: true,
-		silent			: false,
-		filter			: ''
-	});
+	runAllTests();
 };
 
 startTests();

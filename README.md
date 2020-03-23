@@ -71,19 +71,28 @@ httpServerTwo.listen( 3335, ()=>{
 
 #Properties exported by the Module:
 	Server,				// Server callback. Use this to create a new server. The server instance can be retrieved from anywhere by: Server();
-	Development,		// Holds Development tools
-	Logging,			// Contains helpful logging functions
-	Loggur,				// Easier access to the Logging.Loggur instance
-### Properties exported by Development:
-	PluginInterface,	// Used to add plugins to the system
-	LeakyBucket,		// An implementation of the Leaky Bucket algorithm: https://en.wikipedia.org/wiki/Leaky_bucket
-	FileStream,			// Class that defines a file stream
-	DataServer,			// Instance to be extended to implement your own DataServer
 	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
 						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
+	Logging,			// Contains helpful logging functions
+	Loggur,				// Easier access to the Logging.Loggur instance
 ***
 ***
 ***
+
+#Components:
+- Components are parts of the server that can be used standalone or extended and replaced ( mostly )
+- Any component can be retrieved from : event_request/server/components
+- Extendable components are :
+   - body_parsers => require( 'event_request/server/components/body_parsers/body_parser' )
+   - caching => require( 'event_request/server/components/caching/data_server' )
+   - error => require( 'event_request/server/components/error/error_handler' )
+   - file_streams => require( 'event_request/server/components/file_streams/file_stream' )
+   - rate_limiter => require( 'event_request/server/components/rate_limiter/bucket' )
+
+#Plugins:
+- Plugins are parts of the server that attach functionality to the EventRequest
+- They can be retrieved from event_request/server/plugins
+- They can also be retrieved from Server() ( look at the plugins section for more info )
 
 # Event Request
 The event request is an object that is created by the server and passed through every single middleware.
@@ -372,9 +381,10 @@ server.listen('80',()=>{
 ***
 ####Functions exported by the Router:
 
-**static matchRoute( String requestedRoute, String|RegExp route, matchedParams ): Boolean** 
+**static matchRoute( String requestedRoute, String|RegExp route, Object matchedParams ={} ): Boolean** 
 - Match the given route and returns any route parameters passed in the matchedParams argument. 
 - Returns bool if there was a successful match
+- The matched parameters will look like this: { value: 'key' }
 
 **matchMethod( String requestedMethod, String|RegExp method )** 
 - Matches the requested method with the ones set in the event and returns if there was a match or no.
@@ -868,6 +878,11 @@ The constructor accepts three parameters: `refillAmount = 100, refillTime = 60, 
 - This function returns Boolean whether there were enough tokens to be reduced or not
 
 
+####Example:
+
+~~~javascript
+     const LeakyBucket  = require( 'event_request/server/components/rate_limiter/bucket' );
+~~~
 
 # Testing
 If you need to test your project, then you can use the Testing tools included in the project.
@@ -877,10 +892,25 @@ If you need to test your project, then you can use the Testing tools included in
 ~~~
 
 #### Accepted CLI arguments
+
 **--filter=**
 - Accepts a string to filter by
 - Example: node test.js --filter=DataServer
 
+**--silent**
+- Silences the errors
+- Example: node test.js --silent
+
+**--debug**
+- Sets it to debug
+- Example: node test.js --debug
+
+**--dieOnFirstError=**
+- Accepts 1 or 0 whether the tester should die on first error
+- Example: node test.js --dieOnFirstError=1
+- Example: node test.js --dieOnFirstError=0
+
+#### Notes:
 The testing tools include a mocker. The mocker class can be retrieved with:
 
 ~~~javascript
@@ -1064,12 +1094,120 @@ The TestingTools export:
 ***
 ***
 
+#ErrorHandler 
+- Error handler that can be extended to a custom one
+- There is a default error handler in the event request
+- This class can be extended and custom functionality may be written
+
+***
+####Accepted Options:
+
+**NONE**
+
+***
+####Events:
+
+**on_error: ( mixed error )**
+- The error returned will be the one returned from ::_getErrorToEmit()
+
+***
+####Functions:
+
+**handleError( EventRequest event, Error error, Number code = 500 ): void**
+- Emits an on_error event 
+- Calls _sendError
+- In case of extension of the ErrorHandler, this may not need to be touched
+
+**_getErrorToEmit( Error error ): mixed**
+- Returns error to be emitted
+- By default if error instanceof Error only the error.stack will be returned
+- In case of extension of the ErrorHandler this function can be overwritten
+
+**_formatError( Error error ): mixed**
+- Returns error to be sent
+- By default if error instanceof Error only the error.message will be returned
+- In case of extension of the ErrorHandler this function can be overwritten
+
+**_sendError( Error error ): mixed**
+- Sends the error to the user
+- Will not send if the response is finished
+- In case of extension of the ErrorHandler this function can be overwritten
+
+***
+####Attached Functionality:
+
+**event.errorHandler**
+- This may be null, as the only time the ErrorHandler 
+
+***
+####Exported Plugin Functions:
+
+**NONE**
+
+***
+####Example:
+
+~~~javascript
+const app  = Server();
+app.add(( event )=>{
+	event.sendError( 'Error', 500 ); // This will call the error Handler
+	event.next( 'Error', 500 ); // This will call the error Handler
+	event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
+});
+app.listen( 80 );
+~~~
+
+***
+***
+***
+
+#BodyParser
+- Can be extended to create your own body parser that can later be given back to the body parser plugin
+- Is an EventEmitter
+
+#### Accepted options
+
+**NONE**
+
+#### Functions
+
+**constructor( Object options = {} ): void**
+- This sets the max listeners to 0 ( infinite )
+- saves the options as this.options
+
+**supports( EventRequest event ): Boolean**
+- This function will be called by the BodyParserHandler attached by the body parser plugin before the parser is actually called
+- It must return a Boolean
+- If a parser returns that it supports the given request, no further body parsers will be called
+
+**parse( EventRequest event ): Promise**
+- Returns a promise
+- This is called only if the body parser is supported.
+- It resolves with a body that is then attached to event.body or rejects with an error
+
+#### Examples
+
+- If you want to add a custom BodyParser you can do:
+
+~~~javascript
+const BodyParserPlugin  = require( 'event_request/server/plugins/available_plugins/body_parser_plugin' )
+
+// The CustomBodyParser is the class and the options are the end are the parameters to be passed to the class
+// This is done because A new body parser will be created on each request
+const plugin    = new BodyParserPlugin( CustomBodyParser, 'custom_body_parser', { optionOne: 123, optionTwo: 'value' } );
+~~~
+
+***
+***
+***
+
 # Caching
 - DataServer is a class that is exported through the Server.Development suite that stores data **IN MEMORY**
+- Is an EventEmitter
 - Can be extended
+
 ~~~javascript
-const { Development }   = require( 'event_request' );
-const { DataServer }    = Development;
+const DataServer   = require( 'event_request/server/components/caching/data_server' );
 
 console.log( DataServer );
 console.log( new DataServer( options ) );
@@ -1207,12 +1345,17 @@ However if the global persist is set to false, this will not work
 
 ***
 # Plugins
-Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**
-Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
-plugin all you have to do is do: server.apply( 'pluginId' )
+- Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**
+- Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
+    plugin all you have to do is do: server.apply( 'pluginId' )
+- To enable IDE's smart autocomplete to work in your favor all the plugins 
+   available in the pluginManager are exported as values in the server:
+- The plugin interface can be retrieved like so:
 
-To enable IDE's smart autocomplete to work in your favor all the plugins
-available in the pluginManager are exported as values in the server:
+
+~~~javascript
+     const PluginInterface  = require( 'event_request/server/plugins/plugin_interface' );
+~~~
 
 ~~~
 Server {

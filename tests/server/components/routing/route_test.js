@@ -179,18 +179,18 @@ test({
 });
 
 test({
-	message			: 'Route.matchRoute matches params',
+	message			: 'Route.match Route Matches Params',
 	dataProvider	: [
-		['', false, []],
-		['/', false, []],
-		['/path', false, []],
-		['/path/test', true, [['value', 'test']]],
-		['/path/test/sth', false, []],
-		['/path/valueToMatch', true, [['value', 'valueToMatch']]],
+		['', false, {}],
+		['/', false, {}],
+		['/path', false, {}],
+		['/path/test', true, { value: 'test' }],
+		['/path/test/sth', false, {}],
+		['/path/valueToMatch', true, { value: 'valueToMatch'}],
 	],
 	test			: ( done, path, matched, params ) => {
 		let route			= getRoute( undefined, '/path/:value:' );
-		let matchedParams	= [];
+		const matchedParams	= {};
 
 		assert.deepEqual( route.matchPath( path, matchedParams ), matched );
 		assert.deepEqual( matchedParams, params );

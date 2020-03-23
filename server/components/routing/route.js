@@ -141,11 +141,11 @@ class Route
 	 * @details	Sets the matchedParams with any parameters found
 	 *
 	 * @param	String requestedRoute
-	 * @param	Array matchedParams
+	 * @param	Object matchedParams
 	 *
 	 * @return	Object
 	 */
-	matchPath( requestedRoute, matchedParams )
+	matchPath( requestedRoute, matchedParams = {} )
 	{
 		if ( requestedRoute === '' )
 		{
@@ -157,52 +157,40 @@ class Route
 			return true;
 		}
 
+		if ( requestedRoute === this.route )
+		{
+			return true;
+		}
+
 		if ( this.route instanceof RegExp )
 		{
 			return this.route.test( requestedRoute );
 		}
 
-		let routeRe		= /\/:([^:]+):/g;
-		let matched		= false;
-		let matchedKeys	= [];
+		const routeRe				= /^:([^:]+):$/;
+		const requestedRouteParts	= requestedRoute.split( '/' );
+		const routeParts			= this.route.split( '/' );
+		let hasWrongPart			= false;
 
-		let route		= this.route.replace( routeRe, ( matchedString, capturingGroupOne, offset, examinedString )=>{
-			if ( arguments === null )
-			{
-				return '';
-			}
-
-			matched	= true;
-			matchedKeys.push( capturingGroupOne );
-
-			return '/([^\\/]*)';
-		});
-
-		if ( ! matched && typeof requestedRoute === 'string' )
+		if ( requestedRouteParts.length === routeParts.length )
 		{
-			return requestedRoute === route;
-		}
+			routeParts.forEach(( pathPart, index )=>{
+				if ( hasWrongPart )
+					return;
 
-		if ( matched && typeof requestedRoute === 'string' )
-		{
-			route				+= '$';
-			route				= route.replace( new RegExp( '\/', 'g' ), '\\/' );
-			let matchPathKeys	= requestedRoute.match( route );
-			let match			= {};
-
-			if ( matchPathKeys !== null )
-			{
-				matchPathKeys.shift();
-
-				for ( let index in matchedKeys )
+				const result	= pathPart.match( routeRe );
+				if ( result !== null )
 				{
-					let key		= matchedKeys[index];
-					match[key]	= matchPathKeys[index];
-					matchedParams.push( [key, matchPathKeys[index]] );
+					matchedParams[result[1]]	= requestedRouteParts[index];
 				}
+				else
+				{
+					if ( pathPart !== requestedRouteParts[index] )
+						hasWrongPart	= true;
+				}
+			});
 
-				return true;
-			}
+			return ! hasWrongPart;
 		}
 
 		return false;

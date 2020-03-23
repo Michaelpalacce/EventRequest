@@ -80,12 +80,6 @@ class Tester
 		this.index			= 0;
 		this.hasFinished	= false;
 
-		if ( this.silent )
-		{
-			// Will display only errors
-			this.consoleLogger.logLevel	= LOG_LEVELS.error;
-		}
-
 		const argv	= process.argv.slice( 2 );
 
 		for ( let command of argv )
@@ -95,9 +89,24 @@ class Tester
 				case command.match( /--filter=/ ) !== null:
 					this.filter	= command.substring( 9 );
 					break;
+				case command.match( /--silent/ ) !== null:
+					this.silent	= true;
+					break;
+				case command.match( /--debug/ ) !== null:
+					this.debug	= true;
+					break;
+				case command.match( /--dieOnFirstError=/ ) !== null:
+					this.dieOnFirstError	= command.substring( 18 ) == 1;
+					break;
 				default:
 					break;
 			}
+		}
+
+		if ( this.silent )
+		{
+			// Will display only errors
+			this.consoleLogger.logLevel	= LOG_LEVELS.error;
 		}
 	}
 
