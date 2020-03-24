@@ -214,6 +214,8 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Sets the value to the data server
 	 *
+	 * @details	The second value resolved will be a parameter if it existed or not
+	 *
 	 * @param	String key
 	 * @param	mixed value
 	 * @param	Number ttl
@@ -252,7 +254,8 @@ class DataServer extends EventEmitter
 	async _set( key, value, ttl, persist )
 	{
 		return new Promise(( resolve )=>{
-			const dataSet	= this._makeDataSet( key, value, ttl, persist );
+			const isNew	= typeof this.server[key] === 'undefined';
+			const dataSet	= this._makeDataSet( key, value, ttl, persist, isNew );
 			resolve( this.server[key] = dataSet );
 		})
 	}
@@ -307,7 +310,7 @@ class DataServer extends EventEmitter
 			{
 				if ( typeof this.server[key] === 'undefined' )
 				{
-					return resolve( false );
+					return resolve( null );
 				}
 
 				this.server[key]	= undefined;
@@ -383,7 +386,7 @@ class DataServer extends EventEmitter
 			{
 				if ( typeof this.server[key] === 'undefined' )
 				{
-					return resolve( false );
+					return resolve( null );
 				}
 
 				this.server[key]	= undefined;
@@ -415,13 +418,15 @@ class DataServer extends EventEmitter
 	 * @param	String key
 	 * @param	mixed value
 	 * @param	Number ttl
+	 * @param	Boolean persist
+	 * @param	Boolean isNew
 	 *
 	 * @return	Object
 	 */
-	_makeDataSet( key, value, ttl, persist )
+	_makeDataSet( key, value, ttl, persist, isNew )
 	{
 		const expirationDate	= this._getExpirationDateFromTtl( ttl );
-		return { key, value, ttl, expirationDate, persist };
+		return { key, value, ttl, expirationDate, persist, isNew };
 	}
 
 	/**

@@ -1,5 +1,8 @@
 'use strict';
 
+const DataServer	= require( '../caching/data_server' );
+const { makeId }	= require( '../helpers/unique_id' );
+
 /**
  * @brief	Leaky bucket implementation
  */
@@ -9,68 +12,273 @@ class Bucket
 	 * @details	Refill Amount is how many tokens to refill after the refillTime
 	 * 			Refill Time is how often tokens should be renewed
 	 * 			Max Amount is the max amount of tokens to be kept
+	 * 			The given data store will be used, if none given an in memory one will be used
+	 * 			Prefix will be used to prefix all keys in the datastore
+	 * 			key should be passed if this Bucket wants to connect to another one in the datastore or you want to specify your own key
+	 * 			dataStoreRefetchInterval will be how often to retry the dataStore in ms, should be 1 or 2 but may be increased if the dataStore can't handle the traffice
 	 *
-	 * @param	Number refillAmount
-	 * @param	Number refillTime
-	 * @param	Number maxAmount
+	 * @param	refillAmount Number
+	 * @param	refillTime Number
+	 * @param	maxAmount Number
+	 * @param	prefix String
+	 * @param	key String
+	 * @param	dataStore DataServer
+	 * @param	dataStoreRefetchInterval Number
 	 */
-	constructor( refillAmount = 100, refillTime = 60, maxAmount = 1000 )
+	constructor(
+		refillAmount = 100,
+		refillTime = 60,
+		maxAmount = 1000,
+		prefix = Bucket.DEFAULT_PREFIX,
+		key = null,
+		dataStore = null,
+		dataStoreRefetchInterval = 1
+	) {
+		this.refillAmount				= refillAmount;
+		this.refillTime					= refillTime * 1000;
+		this.maxAmount					= maxAmount;
+		this.prefix						= prefix;
+		this.dataStoreRefetchInterval	= dataStoreRefetchInterval;
+		this.maxCounter					= Math.max( Math.floor( 1000 / dataStoreRefetchInterval ), 1 );
+
+		if ( dataStore === null || ! ( dataStore instanceof DataServer ) )
+		{
+			this.dataStore	= new DataServer({
+				ttl		: this.maxAmount / this.refillAmount * refillTime * 2,
+				persist	: false
+			});
+		}
+
+		this.key	= key;
+	}
+
+	/**
+	 * @brief	Initializes the bucket
+	 *
+	 * @return	void
+	 */
+	async init()
 	{
-		this.refillAmount	= refillAmount;
-		this.refillTime		= refillTime;
-		this.maxAmount		= maxAmount;
+		await this._getUniqueKey().catch( this.handleError );
+		await this.reset();
+	}
 
-		this.value			= null;
-		this.lastUpdate		= null;
+	/**
+	 * @brief	Handles promise errors
+	 *
+	 * @param	error Error
+	 *
+	 * @return	void
+	 */
+	handleError( error )
+	{
+		setImmediate(()=>{
+			throw error;
+		});
+	}
 
-		this.reset();
+	/**
+	 * @brief	Creates a unique key that is not present in the data store
+	 *
+	 * @return	String
+	 */
+	async _getUniqueKey()
+	{
+		if ( this.key !== null )
+		{
+			return this.key;
+		}
+
+		let key		= null;
+		let result	= '';
+
+		while ( result !== null )
+		{
+			key		= `${this.prefix}//${makeId( 64 )}`;
+			result	= await this.dataStore.get( `${key}//value` ).catch( this.handleError );
+		}
+
+		return this.key	= key;
+	}
+
+	/**
+	 * @brief	Gets the current value
+	 *
+	 * @return	Number
+	 */
+	async _getValue()
+	{
+		const { value }	= await this.dataStore.get( `${this.key}//value` ).catch( this.handleError );
+
+		return value;
+	}
+
+	/**
+	 * @brief	Sets the value
+	 *
+	 * @param	value Number
+	 *u
+	 * @return	void
+	 */
+	async _setValue( value )
+	{
+		await this.dataStore.set( `${this.key}//value`, value ).catch( this.handleError );
+	}
+
+	/**
+	 * @brief	Gets the current value
+	 *
+	 * @return	Promise
+	 */
+	async _getLastUpdate()
+	{
+		const { value }	= await this.dataStore.get( `${this.key}//lastUpdate` ).catch( this.handleError );
+
+		return value;
+	}
+
+	/**
+	 * @brief	Sets the lastUpdate
+	 *
+	 * @param	lastUpdate Number
+	 *u
+	 * @return	void
+	 */
+	async _setLastUpdate( lastUpdate )
+	{
+		await this.dataStore.set( `${this.key}//lastUpdate`, lastUpdate ).catch( this.handleError );
 	}
 
 	/**
 	 * @brief	Resets the value to the maximum available tokens
 	 *
-	 * @return	void
+	 * @return	Promise
 	 */
-	reset()
+	async reset()
 	{
-		this.value		= this.maxAmount;
-		this.lastUpdate	= this._getCurrentTime();
+		await this._setValue( this.maxAmount ).catch( this.handleError );
+		await this._setLastUpdate( this._getCurrentTime() ).catch( this.handleError );
+	}
+
+	/**
+	 * @brief	Fetches new data from the DataStore
+	 *
+	 * @return	Object
+	 */
+	async _fetchData()
+	{
+		const lastUpdate	= await this._getLastUpdate().catch( this.handleError );
+		const value			= await this._getValue().catch( this.handleError );
+
+		return { value, lastUpdate };
+	}
+
+	/**
+	 * @brief	Lock the execution
+	 *
+	 * @return	Promise
+	 */
+	_lock()
+	{
+		return new Promise( async ( resolve, reject )=>{
+			await this._doLock( resolve, reject );
+		});
+	}
+
+	/**
+	 * @brief	Implement a locking mechanism
+	 *
+	 * @param	resolve Function
+	 * @param	reject Function
+	 * @param	counter Number
+	 *
+	 * @return	Promise
+	 */
+	async _doLock( resolve, reject, counter = 0 )
+	{
+		const result	= await this.dataStore.set( `${this.key}//lock`, true ).catch( this.handleError );
+
+		if ( result !== null && result.isNew === true )
+		{
+			return resolve( true );
+		}
+
+		setTimeout(()=>{
+			counter++;
+
+			if ( counter > this.maxCounter )
+			{
+				return resolve( false );
+			}
+			this._doLock( resolve, reject, counter );
+		}, this.dataStoreRefetchInterval );
+	}
+
+	/**
+	 * @brief	Unlocks the given key
+	 *
+	 * @return	Promise
+	 */
+	async _unlock()
+	{
+		await this.dataStore.delete( `${this.key}//lock` ).catch( this.handleError )
 	}
 
 	/**
 	 * @brief	Gets the current available tokens
 	 *
-	 * @return	Number
+	 * @details	The data does not need to be passed ( it is passed from the reduce function to reduce calls to the data store )
+	 *
+	 * @param	data Object
+	 *
+	 * @return	Promise
 	 */
-	get()
+	async get( data = null )
 	{
-		const refillCount	= this._refillCount();
-		this.value			+= refillCount * this.refillAmount;
+		if ( data === null )
+		{
+			data	= await this._fetchData().catch( this.handleError );
+		}
 
-		return this.value	= Math.min( this.maxAmount, this.value );
+		const refillCount	= this._refillCount( data.lastUpdate );
+
+		return data.value	= Math.min( this.maxAmount, data.value + refillCount * this.refillAmount );
 	}
 
 	/**
 	 * @brief	Get a token
 	 *
-	 * @details	Returns true if there are tokens left otherwise, return false
+	 * @details	Resolves to true if there are tokens left otherwise, rejects to false
 	 *
-	 * @param	Number tokens
+	 * @param	tokens Number
 	 *
 	 * @return	Boolean
 	 */
-	reduce( tokens = 1 )
+	async reduce( tokens = 1 )
 	{
-		this.get();
+		const lockHandle	= await this._lock().catch( this.handleError );
 
-		this.lastUpdate	+= this._refillCount() * this.refillTime;
-		
-		if ( tokens > this.value )
+		if ( lockHandle === false )
 		{
 			return false;
 		}
 
-		this.value	-= tokens;
+		const data	= await this._fetchData().catch( this.handleError );
+		await this.get( data ).catch( this.handleError );
+
+		data.lastUpdate	+= this._refillCount( data.lastUpdate ) * this.refillTime;
+
+		if ( tokens > data.value )
+		{
+			await this._unlock();
+			return false;
+		}
+
+		data.value	-= tokens;
+
+		await this._setValue( data.value );
+		await this._setLastUpdate( data.lastUpdate );
+		await this._unlock().catch( this.handleError );
 
 		return true;
 	}
@@ -78,11 +286,13 @@ class Bucket
 	/**
 	 * @brief	How much should be refilled given the last update
 	 *
+	 * @param	lastUpdate Number
+	 *
 	 * @return	Number
 	 */
-	_refillCount()
+	_refillCount( lastUpdate )
 	{
-		return Math.round( ( this._getCurrentTime() - this.lastUpdate ) / 2 / this.refillTime );
+		return Math.floor( ( this._getCurrentTime() - lastUpdate ) / this.refillTime );
 	}
 
 	/**
@@ -90,11 +300,9 @@ class Bucket
 	 *
 	 * @return	Boolean
 	 */
-	isFull()
+	async isFull()
 	{
-		this.reduce( 0 );
-
-		return this.value	=== this.maxAmount;
+		return await this.get() === this.maxAmount;
 	}
 
 	/**
@@ -104,8 +312,10 @@ class Bucket
 	 */
 	_getCurrentTime()
 	{
-		return Math.floor( Date.now() / 1000 );
+		return Date.now();
 	}
 }
+
+Bucket.DEFAULT_PREFIX	= '$LB:';
 
 module.exports	= Bucket;

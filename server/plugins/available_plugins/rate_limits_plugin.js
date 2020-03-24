@@ -74,6 +74,9 @@ class RateLimitsPlugin extends PluginInterface
 		this.setOptions( options );
 	}
 
+	/**
+	 * @copydodc	PluginInterface::setOptions
+	 */
 	setOptions( options )
 	{
 		super.setOptions( options );
@@ -121,7 +124,7 @@ class RateLimitsPlugin extends PluginInterface
 	 */
 	sanitizeConfig( config = [] )
 	{
-		config.forEach( ( options )=>{
+		config.forEach( async ( options )=>{
 			if (
 				typeof options['maxAmount'] === 'number'
 				&& typeof options['refillTime'] === 'number'
@@ -145,7 +148,7 @@ class RateLimitsPlugin extends PluginInterface
 				}
 				const buckets	= ipLimit === true
 								? {}
-								: { [options['path']]: this.getNewBucketFromOptions( options ) };
+								: { [`${Bucket.DEFAULT_PREFIX}${options['path']}`]: await this.getNewBucketFromOptions( options ) };
 
 				this.rules.push( { buckets, options } );
 			}
@@ -163,13 +166,17 @@ class RateLimitsPlugin extends PluginInterface
 	 *
 	 * @return	Bucket
 	 */
-	getNewBucketFromOptions( options )
+	async getNewBucketFromOptions( options )
 	{
 		const maxAmount		= options['maxAmount'];
 		const refillTime	= options['refillTime'];
 		const refillAmount	= options['refillAmount'];
 
-		return new Bucket( refillAmount, refillTime, maxAmount );
+		const bucket		= new Bucket( refillAmount, refillTime, maxAmount );
+
+		await bucket.init();
+
+		return bucket;
 	}
 
 	/**
@@ -186,7 +193,7 @@ class RateLimitsPlugin extends PluginInterface
 	{
 		this.loadConfig();
 
-		setInterval(()=>{
+		setInterval( async ()=>{
 			for ( let i = 0; i < this.rules.length; ++ i )
 			{
 				const options	= this.rules[i]['options'];
@@ -199,7 +206,7 @@ class RateLimitsPlugin extends PluginInterface
 					{
 						let bucket	= buckets[path];
 
-						if ( bucket instanceof Bucket && bucket.isFull() )
+						if ( bucket instanceof Bucket && await bucket.isFull() )
 						{
 							delete this.rules[i]['buckets'][path];
 						}
@@ -228,7 +235,7 @@ class RateLimitsPlugin extends PluginInterface
 	 *
 	 * @return	void
 	 */
-	rateLimit( eventRequest )
+	async rateLimit( eventRequest )
 	{
 		if ( eventRequest.isFinished() )
 		{
@@ -260,26 +267,26 @@ class RateLimitsPlugin extends PluginInterface
 			if ( Router.matchMethod( method, ruleMethod ) && Router.matchRoute( path, rulePath ) )
 			{
 				const ipLimit	= options['ipLimit'];
-				let bucketKey	= '';
+				let bucketKey	= Bucket.DEFAULT_PREFIX;
 
 				if ( ipLimit === true )
 				{
 					const ipLimitKey	= rulePath + clientIp;
+					bucketKey			+= ipLimitKey;
 
-					if ( typeof this.rules[i]['buckets'][ipLimitKey] === 'undefined' )
+					if ( typeof this.rules[i]['buckets'][bucketKey] === 'undefined' )
 					{
-						this.rules[i]['buckets'][ipLimitKey]	= this.getNewBucketFromOptions( options );
+						this.rules[i]['buckets'][bucketKey]	= await this.getNewBucketFromOptions( options );
 					}
-
-					bucketKey	= ipLimitKey;
 				}
 				else
 				{
-					bucketKey	= rulePath;
+					bucketKey	+= rulePath;
 				}
 
 				const bucket	= this.rules[i]['buckets'][bucketKey];
-				const hasToken	= bucket.reduce();
+
+				const hasToken	= await bucket.reduce();
 
 				if ( ! hasToken )
 				{
@@ -326,7 +333,7 @@ class RateLimitsPlugin extends PluginInterface
 
 			let tries			= 0;
 
-			const interval		= setInterval(()=>{
+			const interval		= setInterval( async()=>{
 				if ( ++ tries >= delayRetries )
 				{
 					clearInterval( interval );
@@ -338,7 +345,7 @@ class RateLimitsPlugin extends PluginInterface
 				{
 					const bucket	= buckets[b];
 
-					if ( ! bucket.reduce() )
+					if ( ! await bucket.reduce() )
 					{
 						return;
 					}

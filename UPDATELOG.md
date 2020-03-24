@@ -1,3 +1,9 @@
+16.0.0
+- DataServer now returns if key is newly set or overwritten 
+- DataServer increment and decrement are now done with a single operation nothing async within them
+- Leaky bucket now uses a DataStore by default it will create an in memory data store using the data server
+- EventRequest will now only send an error for async errors if the response is not finished
+
 15.1.0
 - Added DataServer increment and decrement
 - Renamed _isFull to isFull in the Leaky Bucket

@@ -1993,14 +1993,16 @@ test({
 
 		server.listen( 3334 );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3334 ).then(( response )=>{
-			setTimeout(()=>{
-				server.close();
-				assert.equal( response.body.toString(), name );
-				fs.unlinkSync( fileLocation );
-				done();
-			}, 200 );
-		}).catch( done );
+		setTimeout(()=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3334 ).then(( response )=>{
+				setTimeout(()=>{
+					server.close();
+					assert.equal( response.body.toString(), name );
+					fs.unlinkSync( fileLocation );
+					done();
+				}, 200 );
+			}).catch( done );
+		}, 50 );
 	}
 });
 
@@ -2302,7 +2304,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with strict policy with ipLimit',
+	message	: 'Server.tester_rate_limitswithstrictpolicywithipLimit',
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithStrictPolicyWithIpLimit';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -2311,7 +2313,6 @@ test({
 			app.apply( app.er_rate_limits, { fileLocation } );
 
 		app.get( `/${name}`, ( event )=>{
-
 			try
 			{
 				assert.notEqual( Object.keys( event.rules[4].buckets )[0], `/${name}` );
@@ -2324,12 +2325,14 @@ test({
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
-			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response )=>{
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
-			done();
-		}).catch( done );
+		setTimeout(()=>{
+			helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+				return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
+			}).then(( response )=>{
+				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+				done();
+			}).catch( done );
+		}, 50 );
 	}
 });
 

@@ -859,27 +859,59 @@ In case there is no error False will be returned
 
 # LeakyBucket
 This class can be used to limit data in one way or another.
-The constructor accepts three parameters: `refillAmount = 100, refillTime = 60, maxAmount = 1000` where:
- - Refill Amount is how many tokens to refill after the refillTime
- - Refill Time is how often tokens should be renewed
- - Max Amount is the max amount of tokens to be kept
- 
+
+***
+####Accepted constructor arguments:
+
+**refillAmount: Number**
+- How many tokens to refill after the refillTime
+- Defaults to 100
+
+**refillTime: Number**
+- How long after we should refill in seconds
+- If 1 is passed and 2 seconds pass, we will refill refillAmount * 2 
+- Defaults to 60
+
+**maxAmount: Number**
+- The max amount of tokens to be kept
+- Defaults to 1000
+
+**prefix: String**
+- Prefix that the data will be stored under in the DataStore provided
+- Defaults to $LB:
+
+**key: String|null**
+- The current key that the bucket is stored under
+- If this is provided the bucket settings will be retrieved from the dataStore using this key without adding a prefix or generating a new one
+- Defaults to null ( generate a random 64 chars key and add a prefix )
+
+**dataStore: DataServer**
+- Instance of a DataServer to use for storage
+- By default uses the in memory one with persistency set to false and ttl set to: this.maxAmount / this.refillAmount * this.refillTime * 2
+
+**dataStoreRefetchInterval: Number**
+- Milliseconds after which a retry should be sent to the dataStore ( usually should be set to 1 or 2, set to more if the dataStore cannot handle a lot of traffic )
+- Used to set the maxCounter using the following formula: Math.max( Math.floor( 1000 / dataStoreRefetchInterval ), 1 )
+- Defaults to 1
+
 ***
 ####The class has the following functions:
 
-**reset(): void**
+**async init(): void**
+- This has to be called before using the class
+
+**async reset(): void**
 - Resets the tokens to full
 
-**get(): Number**
+**async get(): Number**
 - Returns the currently available tokens
 
-**reduce( tokens = 1 ): Boolean** 
+**async reduce( tokens = 1 ): Boolean** 
 - How many tokens should be taken. 
 - This function returns Boolean whether there were enough tokens to be reduced or not
 
-**isFull(): Boolean** 
+**async isFull(): Boolean** 
 - This function returns Boolean whether the bucket is full
-
 
 ####Example:
 
@@ -1298,10 +1330,12 @@ However if the global persist is set to false, this will not work
 **_set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Promise: Object|null** 
 - Implement for development. No need to do checks of the values of the parameter as that is done in the set() function
 - This function commits the key/value to memory with all it's attributes
+- If the dataSet existed, then a key 'isNew' must be set to true or false
 - Returns the data if it was set, otherwise returns null
 
-**_makeDataSet( String key, mixed value, Number ttl = 0, Boolean persist = true ): Object**  
-- Forms the dataSet object and returns it in the following format: `{ key, value, ttl, expirationDate, persist };`
+**_makeDataSet( String key, mixed value, Number ttl, Boolean persist, Boolean isNew ): Object**  
+- Forms the dataSet object and returns it in the following format: `{ key, value, ttl, expirationDate, persist, isNew };`
+- The isNew value should be used ONLY when calling set
 
 **touch( String key, Number ttl = 0 ): Promise: Boolean**
 - Retruns a Boolean whether the data was successfully touched

@@ -399,7 +399,10 @@ class EventRequest extends EventEmitter
 				{
 					response.catch(( error )=>{
 						setImmediate(()=>{
-							this.next( error );
+							if ( ! this.isFinished() )
+							{
+								this.next( error );
+							}
 						});
 					});
 				}
