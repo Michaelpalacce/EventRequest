@@ -429,6 +429,104 @@ test({
 });
 
 test({
+	message	: 'DataServer.increment increments data',
+	dataProvider	: [
+		[100, 100, 100, 200],
+		[0, 100, 100, 100],
+		[-1, 100, 100, 99],
+		['string', 100, 100, null],
+		[[], 100, 100, null],
+		[{}, 100, 100, null],
+		[100, null, 100, null],
+		[100, 'string', 100, null],
+		[100, {}, 100, null],
+		[100, [], 100, null],
+		[100, 100, null, null],
+		[100, 100, 'string', null],
+		[100, 100, {}, null],
+		[100, 100, [], null],
+	],
+	test	: async ( done, value, increment, ttl, expectedValue )=>{
+		removeCache();
+
+		const dataServer	= new DataServer({ persist: false });
+		const key			= 'key';
+
+		await dataServer.set( key, value ).catch( done );
+
+		const result	= await dataServer.increment( key, increment, ttl ).catch( done );
+
+		if ( expectedValue === null )
+		{
+			dataServer.stop();
+			removeCache( dataServer );
+			return done( ! ( expectedValue === result ) );
+		}
+
+		if ( result === null )
+		{
+			return done( `Result was null but expected: ${expectedValue}` );
+		}
+
+		assert.equal( result.value, expectedValue );
+
+		dataServer.stop();
+
+		removeCache( dataServer );
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer.decrement decrement data',
+	dataProvider	: [
+		[100, 100, 100, 0],
+		[0, 100, 100, -100],
+		[1, 100, 100, -99],
+		['string', 100, 100, null],
+		[[], 100, 100, null],
+		[{}, 100, 100, null],
+		[100, null, 100, null],
+		[100, 'string', 100, null],
+		[100, {}, 100, null],
+		[100, [], 100, null],
+		[100, 100, null, null],
+		[100, 100, 'string', null],
+		[100, 100, {}, null],
+		[100, 100, [], null],
+	],
+	test	: async ( done, value, decrement, ttl, expectedValue )=>{
+		removeCache();
+
+		const dataServer	= new DataServer({ persist: false });
+		const key			= 'key';
+
+		await dataServer.set( key, value ).catch( done );
+
+		const result	= await dataServer.decrement( key, decrement, ttl ).catch( done );
+
+		if ( expectedValue === null )
+		{
+			dataServer.stop();
+			removeCache( dataServer );
+			return done( ! ( expectedValue === result ) );
+		}
+
+		if ( result === null )
+		{
+			return done( `Result was null but expected: ${expectedValue}` );
+		}
+
+		assert.equal( result.value, expectedValue );
+
+		dataServer.stop();
+
+		removeCache( dataServer );
+		done();
+	}
+});
+
+test({
 	message			: 'DataServer.set does not set if invalid data',
 	dataProvider	: [
 		[null, 'value', 100, true],

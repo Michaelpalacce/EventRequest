@@ -90,7 +90,7 @@ class Bucket
 	 *
 	 * @return	Boolean
 	 */
-	_isFull()
+	isFull()
 	{
 		this.reduce( 0 );
 

@@ -877,6 +877,9 @@ The constructor accepts three parameters: `refillAmount = 100, refillTime = 60, 
 - How many tokens should be taken. 
 - This function returns Boolean whether there were enough tokens to be reduced or not
 
+**isFull(): Boolean** 
+- This function returns Boolean whether the bucket is full
+
 
 ####Example:
 
@@ -1218,6 +1221,7 @@ console.log( new DataServer( options ) );
 
 **ttl: Number** 
 - The time in seconds to be used as a default 'Time To Live' if none is specified. 
+- If ttl is set to -1 then the data will never expire
 - Defaults to 300 
 
 **persistPath: String** 
@@ -1309,6 +1313,30 @@ However if the global persist is set to false, this will not work
 - Retruns a Boolean whether the data was successfully touched
 - If ttl = 0 then the dataSet will be updated with it's own ttl
 - This function actually touches the data
+
+**decrement( String key, Number value = 1, Number ttl = 0 ): Promise: Object|null**
+- If value or ttl is not a number, returns null
+- If the data was not set correctly returns null
+- If the data to decrement was not set correctly returns null
+- If the data to decrement was not numeric returns null
+- Follows the same ttl rules as the rest
+- Calls _decrement() after checking for validity of data
+
+**_decrement( String key, Number value = 1, Number ttl = 0 ): Promise: Object|null**
+- Implement for development. No need to do checks of the values of the parameter as that is done in the decrement() function
+- Retrieves, decrements and then saves the new dataset 
+
+**increment( String key, Number value = 1, Number ttl = 0 ): Promise: Object|null**
+- If value or ttl is not a number, returns null
+- If the data was not set correctly returns null
+- If the data to increment was not set correctly returns null
+- If the data to increment was not numeric returns null
+- Follows the same ttl rules as the rest
+- Calls _increment() after checking for validity of data
+
+**_increment( String key, Number value = 1, Number ttl = 0 ): Promise: Object|null**
+- Implement for development. No need to do checks of the values of the parameter as that is done in the increment() function
+- Retrieves, increment and then saves the new dataset 
 
 **delete( String key ): Promise: Boolean**
 - Deletes the given data

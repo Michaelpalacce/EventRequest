@@ -199,7 +199,7 @@ class RateLimitsPlugin extends PluginInterface
 					{
 						let bucket	= buckets[path];
 
-						if ( bucket instanceof Bucket && bucket._isFull() )
+						if ( bucket instanceof Bucket && bucket.isFull() )
 						{
 							delete this.rules[i]['buckets'][path];
 						}

@@ -151,8 +151,16 @@ class Tester
 
 				newTest.test	= ( done )=>{
 					const newData	= [done].concat( data );
+					const response	= test.test.apply( this, newData );
 
-					test.test.apply( this, newData );
+					if ( response instanceof Promise )
+					{
+						response.catch(( error )=>{
+							setImmediate(()=>{
+								done( error );
+							});
+						});
+					}
 				};
 
 				tests.push( newTest );
@@ -343,7 +351,17 @@ class Tester
 
 		try
 		{
-			test.test( callback );
+			const testToExecute	= test.test;
+			const response		= testToExecute( callback );
+
+			if ( response instanceof Promise )
+			{
+				response.catch(( error )=>{
+					setImmediate(()=>{
+						this.doneCallback( test, error );
+					});
+				});
+			}
 		}
 		catch ( error )
 		{

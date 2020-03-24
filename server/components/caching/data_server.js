@@ -143,7 +143,7 @@ class DataServer extends EventEmitter
 	 *
 	 * @param	String key
 	 *
-	 * @return	Object|null
+	 * @return	Promise|null
 	 */
 	async get( key )
 	{
@@ -219,7 +219,7 @@ class DataServer extends EventEmitter
 	 * @param	Number ttl
 	 * @param	Boolean persist
 	 *
-	 * @return	Object
+	 * @return	Promise
 	 */
 	async set( key, value, ttl = 0, persist = null )
 	{
@@ -255,6 +255,158 @@ class DataServer extends EventEmitter
 			const dataSet	= this._makeDataSet( key, value, ttl, persist );
 			resolve( this.server[key] = dataSet );
 		})
+	}
+
+	/**
+	 * @brief	Increment a numeric key value
+	 *
+	 * @param	key String
+	 * @param	value Number
+	 * @param	ttl Number
+	 *
+	 * @return	Promise|null
+	 */
+	async increment( key, value = 1, ttl = 0 )
+	{
+		if (
+			typeof key !== 'string'
+			|| typeof value !== 'number'
+			|| typeof ttl !== 'number'
+		) {
+			return null;
+		}
+
+		return this._increment( key, value, ttl ).catch( this._handleServerDown );
+	}
+
+	/**
+	 * @brief	Increment a numeric key value
+	 *
+	 * @details	Does no async operations intentionally
+	 *
+	 * @param	key String
+	 * @param	value Number
+	 * @param	ttl Number
+	 *
+	 * @return	Promise
+	 */
+	async _increment( key, value = 1, ttl = 0 )
+	{
+		return new Promise( async ( resolve, reject )=>{
+			const now		= new Date().getTime() / 1000;
+			const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate !== 'undefined'
+							? this.server[key]
+							: null;
+
+			if ( dataSet !== null && this.server[key].expirationDate === null )
+			{
+				this.server[key].expirationDate	= Infinity;
+			}
+
+			if ( dataSet === null || now > dataSet.expirationDate )
+			{
+				if ( typeof this.server[key] === 'undefined' )
+				{
+					return resolve( false );
+				}
+
+				this.server[key]	= undefined;
+				delete this.server[key];
+
+				return resolve( null );
+			}
+
+			if ( ! dataSet )
+			{
+				resolve( null );
+			}
+
+			if ( typeof dataSet.value !== 'number' )
+			{
+				resolve( null );
+			}
+
+			dataSet.value	+= value;
+			dataSet.ttl		= this._getExpirationDateFromTtl( ttl );
+
+			resolve( this.server[key] = dataSet );
+		});
+	}
+
+	/**
+	 * @brief	Decrements a numeric key value
+	 *
+	 * @param	key String
+	 * @param	value Number
+	 * @param	ttl Number
+	 *
+	 * @return	Promise|null
+	 */
+	async decrement( key, value = 1, ttl = 0 )
+	{
+		if (
+			typeof key !== 'string'
+			|| typeof value !== 'number'
+			|| typeof ttl !== 'number'
+		) {
+			return null;
+		}
+
+		return this._decrement( key, value, ttl ).catch( this._handleServerDown );
+	}
+
+	/**
+	 * @brief	Decrements a numeric key value
+	 *
+	 * @details	Does no async operations intentionally
+	 *
+	 * @param	key String
+	 * @param	value Number
+	 * @param	ttl Number
+	 *
+	 * @return	Promise
+	 */
+	async _decrement( key, value = 1, ttl = 0 )
+	{
+		return new Promise( async ( resolve, reject )=>{
+			const now		= new Date().getTime() / 1000;
+			const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate !== 'undefined'
+							? this.server[key]
+							: null;
+
+			if ( dataSet !== null && this.server[key].expirationDate === null )
+			{
+				this.server[key].expirationDate	= Infinity;
+			}
+
+			if ( dataSet === null || now > dataSet.expirationDate )
+			{
+				if ( typeof this.server[key] === 'undefined' )
+				{
+					return resolve( false );
+				}
+
+				this.server[key]	= undefined;
+				delete this.server[key];
+
+				return resolve( null );
+			}
+
+			if ( ! dataSet )
+			{
+				resolve( null );
+			}
+
+			if ( typeof dataSet.value !== 'number' )
+			{
+				resolve( null );
+			}
+
+			dataSet.value	-= value;
+			dataSet.ttl		= this._getExpirationDateFromTtl( ttl );
+
+			resolve( this.server[key] = dataSet );
+		});
 	}
 
 	/**

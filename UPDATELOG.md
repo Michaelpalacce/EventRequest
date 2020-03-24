@@ -1,3 +1,7 @@
+15.1.0
+- Added DataServer increment and decrement
+- Renamed _isFull to isFull in the Leaky Bucket
+
 15.0.0
 - Improved Tester documentation
 - Added Tester cli arguments
