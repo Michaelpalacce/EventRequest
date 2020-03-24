@@ -3,6 +3,7 @@
 - DataServer increment and decrement are now done with a single operation nothing async within them
 - Leaky bucket now uses a DataStore by default it will create an in memory data store using the data server
 - EventRequest will now only send an error for async errors if the response is not finished
+- The rate limits plugin now works with the new leaky bucket and can also work in a cluster. Just use the same data store
 
 15.1.0
 - Added DataServer increment and decrement

@@ -3,6 +3,7 @@
 const Bucket			= require( './../../components/rate_limiter/bucket' );
 const PluginInterface	= require( './../plugin_interface' );
 const Router			= require( './../../components/routing/router' );
+const DataServer		= require( './../../components/caching/data_server' );
 const fs				= require( 'fs' );
 const path				= require( 'path' );
 
@@ -49,6 +50,9 @@ const STRICT_POLICY						= 'strict';
 const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
 const DEFAULT_FILE_LOCATION				= path.join( PROJECT_ROOT, 'rate_limits.json' );
 const OPTIONS_FILE_PATH					= 'fileLocation';
+const OPTIONS_DATA_STORE				= 'dataStore';
+// Let the buckets use their default one
+const DEFAULT_DATA_STORE				= null;
 const DEFAULT_RULE						= {
 	"path":"",
 	"methods":[],
@@ -84,6 +88,10 @@ class RateLimitsPlugin extends PluginInterface
 		this.fileLocation	= typeof options[OPTIONS_FILE_PATH] === 'string'
 							? options[OPTIONS_FILE_PATH]
 							: DEFAULT_FILE_LOCATION;
+
+		this.dataStore		= options[OPTIONS_DATA_STORE] instanceof DataServer
+							? options[OPTIONS_DATA_STORE]
+							: DEFAULT_DATA_STORE;
 	}
 
 	/**
@@ -138,6 +146,7 @@ class RateLimitsPlugin extends PluginInterface
 			) {
 				const policy	= options['policy'];
 				const ipLimit	= options['ipLimit'];
+				const path		= options['path'];
 
 				if (
 					policy === CONNECTION_DELAY_POLICY
@@ -146,9 +155,11 @@ class RateLimitsPlugin extends PluginInterface
 				) {
 					throw new Error( `Rate limit with ${CONNECTION_DELAY_POLICY} must have delayTime set` );
 				}
-				const buckets	= ipLimit === true
-								? {}
-								: { [`${Bucket.DEFAULT_PREFIX}${options['path']}`]: await this.getNewBucketFromOptions( options ) };
+
+				const bucketName	= `${Bucket.DEFAULT_PREFIX}${path}`;
+				const buckets		= ipLimit === true
+									? {}
+									: { [bucketName]: await this.getNewBucketFromOptions( bucketName, options ) };
 
 				this.rules.push( { buckets, options } );
 			}
@@ -162,17 +173,18 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Gets a new Bucket from the rule options
 	 *
-	 * @param	Object options
+	 * @param	key String
+	 * @param	options Object
 	 *
 	 * @return	Bucket
 	 */
-	async getNewBucketFromOptions( options )
+	async getNewBucketFromOptions( key, options )
 	{
 		const maxAmount		= options['maxAmount'];
 		const refillTime	= options['refillTime'];
 		const refillAmount	= options['refillAmount'];
 
-		const bucket		= new Bucket( refillAmount, refillTime, maxAmount );
+		const bucket		= new Bucket( refillAmount, refillTime, maxAmount , null, key, this.dataStore );
 
 		await bucket.init();
 
@@ -254,6 +266,8 @@ class RateLimitsPlugin extends PluginInterface
 		const method						= eventRequest.method;
 		const clientIp						= eventRequest.clientIp;
 
+		// console.log('-----------------------------------')
+		// console.log(this.rules)
 		let hasConnectionDelayPolicy		= false;
 		let connectionDelayPolicyOptions	= null;
 		let bucketsHit						= [];
@@ -276,7 +290,7 @@ class RateLimitsPlugin extends PluginInterface
 
 					if ( typeof this.rules[i]['buckets'][bucketKey] === 'undefined' )
 					{
-						this.rules[i]['buckets'][bucketKey]	= await this.getNewBucketFromOptions( options );
+						this.rules[i]['buckets'][bucketKey]	= await this.getNewBucketFromOptions( bucketKey, options );
 					}
 				}
 				else

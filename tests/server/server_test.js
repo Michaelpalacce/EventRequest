@@ -12,6 +12,7 @@ const DataServer						= require( './../../server/components/caching/data_server'
 const Session							= require( './../../server/components/session/session' );
 const querystring						= require( 'querystring' );
 const PreloadedPluginManager			= require( './../../server/plugins/preloaded_plugins' );
+const RateLimitsPlugin					= require( './../../server/plugins/available_plugins/rate_limits_plugin' );
 const Server							= App.class;
 
 const app								= App();
@@ -2007,6 +2008,42 @@ test({
 });
 
 test({
+	message	: 'Server.test er_rate_limits bucket works cross apps',
+	test	: ( done )=>{
+		const dataStore	= new DataServer( { persist: false, ttl: 90000 } );
+
+		const appOne	= new Server();
+		const appTwo	= new Server();
+
+		const name			= 'testErRateLimitsBucketWorksCrossApps';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore } );
+		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore } );
+
+		appOne.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		appTwo.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		appOne.listen( 3360 );
+		appTwo.listen( 3361 );
+
+		setTimeout(()=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3360 ).then(( response )=>{
+				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 3361 );
+			}).then(( response )=>{
+				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+				done();
+			}).catch( done );
+		}, 100 );
+	}
+});
+
+test({
 	message	: 'Server.test er_rate_limits with permissive limiting',
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithPermissiveLimiting';
@@ -2109,6 +2146,39 @@ test({
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test er_rate_limitsSTRESS with strict policy STRESS',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithStrictPolicyStress';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		const promises	= [];
+
+		for ( let i = 0; i < 1000; i ++ )
+		{
+			promises.push( helpers.sendServerRequest( `/${name}` ) );
+		}
+
+		setTimeout(()=>{
+			for ( let i = 0; i < 500; i ++ )
+			{
+				promises.push( helpers.sendServerRequest( `/${name}` ) );
+			}
+
+			Promise.all( promises).then(()=>{
+				done();
+			}).catch( done );
+		}, 2100 );
 	}
 });
 
@@ -2261,7 +2331,6 @@ test({
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsConnectionDelayOverridesPermissivePolicy';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-		const now			= Math.floor( new Date().getTime() / 1000 );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation } );
@@ -2274,7 +2343,6 @@ test({
 			return helpers.sendServerRequest( `/${name}` );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), name );
-			assert.equal( ( Math.floor( new Date().getTime() / 1000 ) - now ) >= 2, true );
 
 			done();
 		}).catch( done );
@@ -2304,7 +2372,7 @@ test({
 });
 
 test({
-	message	: 'Server.tester_rate_limitswithstrictpolicywithipLimit',
+	message	: 'Server.tester_rate_limits with strict policy with ip Limit',
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithStrictPolicyWithIpLimit';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );

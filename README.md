@@ -2361,6 +2361,7 @@ app.listen( 80 );
 - The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
 - The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
 - If one exists, then the existing one's configuration will be taken. 
+- If you provide the same dataStore to two servers they should work without an issue
 
 ***
 ####Dependencies:
@@ -2373,6 +2374,10 @@ app.listen( 80 );
 **fileLocation**
 - The absolute path to the rate limits json file.
 - Defaults to ROOT DIR / rate_limits.json
+
+**dataStore**
+- The dataStore to use for the buckets
+- Defaults to the LeakyBucket default DataStore
 
 ***
 ####Events:
@@ -2486,6 +2491,16 @@ the request will be immediately canceled
 ~~~javascript
 const app = Server();
 app.apply( app.er_rate_limits )
+
+// If you implement a custom distributed DataServer you can sync between servers
+// Two servers
+const dataStore	= new DataServer( { persist: false, ttl: 90000 } );
+
+const appOne	= new Server();
+const appTwo	= new Server();
+
+appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
+appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 ~~~
 
 ***

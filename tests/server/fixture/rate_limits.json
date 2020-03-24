@@ -48,6 +48,30 @@
 	"ipLimit": false
   },
   {
+	"path": "/testErRateLimitsWithStrictPolicyStress",
+	"methods": [],
+	"maxAmount": 1000,
+	"refillTime": 2,
+	"refillAmount": 500,
+	"policy": "strict",
+	"delayTime": 1,
+	"delayRetries": 1,
+	"stopPropagation": false,
+	"ipLimit": false
+  },
+  {
+	"path": "/testErRateLimitsBucketWorksCrossApps",
+	"methods": [],
+	"maxAmount": 1,
+	"refillTime": 10,
+	"refillAmount": 1,
+	"policy": "strict",
+	"delayTime": 1,
+	"delayRetries": 1,
+	"stopPropagation": false,
+	"ipLimit": false
+  },
+  {
 	"path": "/testErRateLimitsWithStrictPolicyWithIpLimit",
 	"methods": [],
 	"maxAmount": 1,

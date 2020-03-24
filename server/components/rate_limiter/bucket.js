@@ -48,6 +48,10 @@ class Bucket
 				persist	: false
 			});
 		}
+		else
+		{
+			this.dataStore	= dataStore;
+		}
 
 		this.key	= key;
 	}
