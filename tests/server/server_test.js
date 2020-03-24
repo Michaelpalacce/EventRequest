@@ -2151,6 +2151,7 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limitsSTRESS with strict policy STRESS',
+        skipped : true, 
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithStrictPolicyStress';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
