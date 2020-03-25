@@ -112,6 +112,15 @@ class Bucket
 	 */
 	async _getValue()
 	{
+		const result	= await this.dataStore.get( `${this.key}//value` ).catch( this.handleError );
+
+		if ( result !== null )
+		{
+			return result.value;
+		}
+
+		await this.reset();
+
 		const { value }	= await this.dataStore.get( `${this.key}//value` ).catch( this.handleError );
 
 		return value;
@@ -136,6 +145,15 @@ class Bucket
 	 */
 	async _getLastUpdate()
 	{
+		const result	= await this.dataStore.get( `${this.key}//lastUpdate` ).catch( this.handleError );
+
+		if ( result !== null )
+		{
+			return result.value;
+		}
+
+		await this.reset();
+
 		const { value }	= await this.dataStore.get( `${this.key}//lastUpdate` ).catch( this.handleError );
 
 		return value;
