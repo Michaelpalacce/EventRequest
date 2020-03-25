@@ -551,3 +551,22 @@ test({
 		}, 50 );
 	}
 });
+
+test({
+	message			: 'DataServer.constructor on ttl === -1 saves data forever',
+	test			: ( done )=>{
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async ()=>{
+			const dataServer	= new DataServer( { persist: false, ttl: -1 } );
+
+			assert.deepStrictEqual( dataServer.server, {} );
+
+			await dataServer.set( 'key', 1 );
+
+			assert.deepStrictEqual( dataServer.server.key.expirationDate, Infinity );
+
+			removeCache( dataServer );
+			done();
+		}, 50 );
+	}
+});

@@ -1,3 +1,6 @@
+16.1.1
+- Data Server with a default ttl of -1 will now save data with infinity too
+
 16.1.0
 - Added router merging on routes
 - Tests added for new functionality and documentation updated

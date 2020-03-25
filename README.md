@@ -1407,7 +1407,7 @@ const plugin    = new BodyParserPlugin( CustomBodyParser, 'custom_body_parser', 
 ***
 ***
 
-# Caching
+# DataServer
 - DataServer is a class that is exported through the Server.Development suite that stores data **IN MEMORY**
 - Is an EventEmitter
 - Can be extended

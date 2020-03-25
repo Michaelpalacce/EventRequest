@@ -52,6 +52,7 @@ class DataServer extends EventEmitter
 		this.defaultTtl			= typeof options['ttl'] === 'number'
 								? options['ttl']
 								: DEFAULT_TTL;
+		this.defaultTtl			= this.defaultTtl === -1 ? Infinity : this.defaultTtl;
 
 		this.persistPath		= typeof options['persistPath'] === 'string'
 								? options['persistPath']
@@ -628,6 +629,7 @@ class DataServer extends EventEmitter
 		{
 			return Infinity;
 		}
+
 		ttl	= ttl > 0 ? ttl : this.defaultTtl;
 		return new Date().getTime() / 1000 + ttl;
 	}
