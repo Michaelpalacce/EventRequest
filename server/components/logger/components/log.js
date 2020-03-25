@@ -24,15 +24,18 @@ class Log
 	/**
 	 * @param	mixed log
 	 * @param	Number level
+	 * @param	Boolean isRaw
 	 */
-	constructor( log, level )
+	constructor( log, level, isRaw )
 	{
 		this.level		= 0;
 		this.message	= '';
+		this.rawMessage	= '';
 		this.timestamp	= 0;
 		this.uniqueId	= '';
+		this.isRaw		= false;
 
-		this.processLog( log, level );
+		this.processLog( log, level, isRaw );
 
 		if ( this.level	=== LOG_LEVELS.debug )
 		{
@@ -93,7 +96,7 @@ class Log
 	 *
 	 * @return	void
 	 */
-	processLog( message = '', level = LOG_LEVELS.error )
+	processLog( message = '', level = LOG_LEVELS.error, isRaw = false )
 	{
 		let logType	= typeof message;
 		this.level	= typeof level === 'number' ? level : DEFAULT_LOG_LEVEL;
@@ -114,6 +117,9 @@ class Log
 		{
 			this.message	= JSON.stringify( message );
 		}
+
+		this.rawMessage	= logType === 'undefined' ? '' : message;
+		this.isRaw		= isRaw;
 
 		this.timestamp	= Log.getUNIXTime();
 	}
@@ -136,6 +142,26 @@ class Log
 	getMessage()
 	{
 		return this.message;
+	}
+
+	/**
+	 * @brief	Gets the raw log message of the provided log
+	 *
+	 * @return	mixed
+	 */
+	getRawMessage()
+	{
+		return this.rawMessage;
+	}
+
+	/**
+	 * @brief	Gets whether this log is attempting to be logged raw
+	 *
+	 * @return	Boolean
+	 */
+	getIsRaw()
+	{
+		return this.isRaw;
 	}
 
 	/**
@@ -183,10 +209,11 @@ class Log
 	 *
 	 * @param	mixed log
 	 * @param	Number level
+	 * @param	Boolean isRaw
 	 *
 	 * @return	Log
 	 */
-	static getInstance( log, level )
+	static getInstance( log, level, isRaw )
 	{
 		if ( log instanceof Log )
 		{
@@ -198,7 +225,7 @@ class Log
 			return log;
 		}
 
-		return new this( log, level );
+		return new this( log, level, isRaw );
 	}
 
 	/**

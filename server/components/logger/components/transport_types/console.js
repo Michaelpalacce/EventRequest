@@ -58,12 +58,13 @@ class Console extends Transport
 	 *
 	 * @param	Log log
 	 *
-	 * @return	String
+	 * @return	Array
 	 */
 	format( log )
 	{
-		let message		= log.getMessage();
-		let level		= log.getLevel();
+		const isRaw		= log.getIsRaw();
+		const level		= log.getLevel();
+		let message		= isRaw ? log.getRawMessage() : log.getMessage();
 		let uniqueId	= log.getUniqueId();
 		let timestamp	= log.getTimestamp();
 		timestamp		= new Date( timestamp * 1000 );
@@ -87,12 +88,21 @@ class Console extends Transport
 						? color
 						: TRANSPORT_DEFAULT_COLOR;
 
-			message		= colorize[color]( message );
+			if ( ! isRaw )
+			{
+				message	= colorize[color]( message );
+			}
+
 			uniqueId	= colorize.reset( uniqueId );
 			timestamp	= colorize.blue( timestamp );
 		}
 
-		return uniqueId + ' - ' + timestamp + ': ' + message + colorize.reset( '' );
+		if ( isRaw )
+		{
+			return [`${uniqueId} - ${timestamp}: ${colorize.reset( '' )}`, message];
+		}
+
+		return [`${uniqueId} - ${timestamp}: ${message} ${colorize.reset( '' )}`];
 	}
 
 	/**
@@ -106,7 +116,7 @@ class Console extends Transport
 	 */
 	_log( log, resolve, reject )
 	{
-		console.log( this.format( log ) );
+		console.log.apply( this, this.format( log ) );
 
 		resolve();
 	}

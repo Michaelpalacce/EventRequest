@@ -118,6 +118,124 @@ test({
 });
 
 test({
+	message	: 'Server.testAddingRoutersWithRoute',
+	test	: ( done )=>{
+		const name		= '/testAddingRoutersWithRoute';
+		const router	= new Router();
+
+		router.get( name, ( event )=>{
+			event.send( name )
+		});
+
+		router.post( name, ( event )=>{
+			event.send( name )
+		});
+
+		router.delete( name, ( event )=>{
+			event.send( name )
+		});
+
+		router.patch( name, ( event )=>{
+			event.send( name )
+		});
+
+		router.get( `${name}/:user:`, ( event )=>{
+			event.send( event.params.user )
+		});
+
+		router.get( '', ( event )=>{
+			event.send( name )
+		});
+
+		router.get( /\/(value)/, ( event )=>{
+			event.send( name )
+		});
+
+		router.post( ``, ( event )=>{
+			event.send( name )
+		});
+
+		router.delete( `/`, ( event )=>{
+			event.send( name )
+		});
+
+		router.patch( `/`, ( event )=>{
+			event.send( name )
+		});
+
+		app.add( '/testAdding', router );
+
+		const promises	= [];
+
+		promises.push( helpers.sendServerRequest( '', 'GET', 404 ) );
+		promises.push( helpers.sendServerRequest( '/value', 'GET', 404 ) );
+		promises.push( helpers.sendServerRequest( '', 'POST', 404 ) );
+		promises.push( helpers.sendServerRequest( '/', 'DELETE', 404 ) );
+		promises.push( helpers.sendServerRequest( '/', 'PATCH', 404 ) );
+		promises.push( helpers.sendServerRequest( name, 'GET', 404 ) );
+		promises.push( helpers.sendServerRequest( name, 'POST', 404 ) );
+		promises.push( helpers.sendServerRequest( name, 'DELETE', 404 ) );
+		promises.push( helpers.sendServerRequest( name, 'PATCH', 404 ) );
+		promises.push( helpers.sendServerRequest( `${name}/randomUser`, 'GET', 404 ) );
+
+		promises.push( helpers.sendServerRequest( `/testAdding`, 'GET', 200, '', {}, 3333, name ) );
+		promises.push( helpers.sendServerRequest( `/testAdding/value`, 'GET', 200, '', {}, 3333, name ) );
+		promises.push( helpers.sendServerRequest( `/testAdding${name}`, 'GET', 200, '', {}, 3333, name ) );
+		promises.push( helpers.sendServerRequest( `/testAdding${name}`, 'POST', 200, '', {}, 3333, name ) );
+		promises.push( helpers.sendServerRequest( `/testAdding`, 'POST', 200, '', {}, 3333, name ) );
+		promises.push( helpers.sendServerRequest( `/testAdding${name}`, 'DELETE', 200, '', {}, 3333, name ) );
+		promises.push( helpers.sendServerRequest( `/testAdding`, 'DELETE', 200, '', {}, 3333, name ) );
+		promises.push( helpers.sendServerRequest( `/testAdding${name}`, 'PATCH', 200, '', {}, 3333, name ) );
+		promises.push( helpers.sendServerRequest( `/testAdding`, 'PATCH', 200, '', {}, 3333, name ) );
+		promises.push( helpers.sendServerRequest( `/testAdding${name}/randomUser`, 'GET', 200, '', {}, 3333, 'randomUser' ) );
+
+		Promise.all( promises ).then(()=>{
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.testRouterWildCards',
+	test	: ( done )=>{
+		const name	= '/testRouterWildCards';
+		const value	= 'testValue';
+
+		app.get( `${name}/:value:`, ( event )=>{
+			event.send( event.params.value );
+		});
+
+		app.get( `${name}/:value:/somethingElse`, ( event )=>{
+			event.send( event.params.value );
+		});
+
+		app.get( `${name}/:value:/:anotherValue:`, ( event )=>{
+			event.send( event.params );
+		});
+
+		const promises	= [];
+
+		promises.push( helpers.sendServerRequest( `${name}/${value}`, 'GET', 200, '', {}, 3333, value ) );
+		promises.push( helpers.sendServerRequest( `${name}/${value}/somethingElse`, 'GET', 200, '', {}, 3333, value ) );
+		promises.push(
+			helpers.sendServerRequest(
+				`${name}/${value}/anotherValue`,
+				'GET',
+				200,
+				'',
+				{},
+				3333,
+				JSON.stringify( { value, anotherValue: 'anotherValue' } )
+			)
+		);
+
+		Promise.all( promises ).then(()=>{
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.apply applies only a PluginInterface and a valid string',
 	test	: ( done ) =>{
 		const server			= new Server();
@@ -814,7 +932,7 @@ test({
 				event.next();
 			}
 		});
-		
+
 		app.add({
 			method	: 'get',
 			route	: '/testGETCaseInsensitive',
@@ -1992,9 +2110,7 @@ test({
 			event.send( name );
 		} );
 
-		server.listen( 3334 );
-
-		setTimeout(()=>{
+		server.listen( 3334, ()=>{
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3334 ).then(( response )=>{
 				setTimeout(()=>{
 					server.close();
@@ -2003,7 +2119,7 @@ test({
 					done();
 				}, 200 );
 			}).catch( done );
-		}, 50 );
+		} );
 	}
 });
 
@@ -2151,7 +2267,6 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limitsSTRESS with strict policy STRESS',
-        skipped : true, 
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithStrictPolicyStress';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -2165,13 +2280,13 @@ test({
 
 		const promises	= [];
 
-		for ( let i = 0; i < 1000; i ++ )
+		for ( let i = 0; i < 100; i ++ )
 		{
 			promises.push( helpers.sendServerRequest( `/${name}` ) );
 		}
 
 		setTimeout(()=>{
-			for ( let i = 0; i < 500; i ++ )
+			for ( let i = 0; i < 50; i ++ )
 			{
 				promises.push( helpers.sendServerRequest( `/${name}` ) );
 			}

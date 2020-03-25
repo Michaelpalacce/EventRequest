@@ -48,7 +48,7 @@ class Route
 	 */
 	sanitize( routeConfig )
 	{
-		if ( typeof routeConfig !== 'object' )
+		if ( typeof routeConfig !== 'object' || routeConfig === null )
 		{
 			throw new Error( 'Invalid middleware added!' );
 		}
@@ -164,7 +164,16 @@ class Route
 
 		if ( this.route instanceof RegExp )
 		{
-			return this.route.test( requestedRoute );
+			const result	= requestedRoute.match( this.route );
+
+			const matched	= result !== null;
+
+			if ( matched )
+			{
+				matchedParams.match	= result;
+			}
+
+			return result !== null;
 		}
 
 		const routeRe				= /^:([^:]+):$/;

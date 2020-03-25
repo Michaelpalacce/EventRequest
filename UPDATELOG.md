@@ -1,3 +1,9 @@
+16.1.0
+- Added router merging on routes
+- Tests added for new functionality and documentation updated
+- Loggers and Loggur now support a third parameter in the log function and a second in the magic error,debug, etc called isRaw
+- Router RegExp results will now be added to the event.params.match
+
 16.0.0
 - DataServer now returns if key is newly set or overwritten 
 - DataServer increment and decrement are now done with a single operation nothing async within them

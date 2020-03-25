@@ -130,24 +130,25 @@ class Loggur
 	 *
 	 * @param	mixed data
 	 * @param	Number level
+	 * @param	Boolean isRaw
 	 *
 	 * @return	Promise
 	 */
-	log( data, level = null )
+	log( data, level = null, isRaw = false )
 	{
 		let loggersPromises	= [];
 		if ( Object.keys( this.loggers ).length !== 0 )
 		{
 			for ( let loggerId in this.loggers )
 			{
-				loggersPromises.push( this.loggers[loggerId].log( data, level ) );
+				loggersPromises.push( this.loggers[loggerId].log( data, level, isRaw ) );
 			}
 		}
 		else
 		{
 			if ( this.enableDefaultLogger )
 			{
-				loggersPromises.push( this.getDefaultLogger().log( data, level ) );
+				loggersPromises.push( this.getDefaultLogger().log( data, level, isRaw ) );
 			}
 		}
 

@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const { Tester, Mock, logger, Mocker }				= require( './../server/tester/tester' );
+const { Tester, Mock, Mocker }						= require( './../server/tester/tester' );
 const EventRequest									= require( './../server/event' );
 const assert										= require( 'assert' );
 const fs											= require( 'fs' );
@@ -117,10 +117,11 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
  * @param	Number statusCode
  * @param	mixed data
  * @param	Number port
+ * @param	String expectedBody
  *
  * @return	Promise
  */
-helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '', headers = {}, port = 3333 )=>{
+helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '', headers = {}, port = 3333, expectedBody = null )=>{
 	return new Promise(( resolve,reject )=>{
 		const predefinedHeaders	= {
 			'Content-Type': 'application/x-www-form-urlencoded',
@@ -151,6 +152,11 @@ helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '',
 					return reject( `Expected StatusCode: ${statusCode} but got ${res.statusCode} with body: ${res.body}`)
 				}
 
+				if ( expectedBody !== null )
+				{
+					assert.equal( res.body.toString(), expectedBody );
+				}
+
 				return resolve( res );
 			});
 		});
@@ -171,11 +177,10 @@ helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '',
  */
 let tester		= new Tester();
 module.exports	= {
-	Tester,
+	tester,
 	Mock,
 	Mocker,
 	assert,
-	logger,
 	helpers,
 	test		: tester.addTest.bind( tester ),
 	runAllTests	: tester.runAllTests.bind( tester )

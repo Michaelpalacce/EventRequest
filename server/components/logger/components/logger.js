@@ -156,8 +156,8 @@ class Logger
 
 			if ( ! ( key in objectProperties ) )
 			{
-				this[key]	= ( log ) => {
-					log	= Log.getInstance( log, logLevel );
+				this[key]	= ( log, isRaw = false ) => {
+					log	= Log.getInstance( log, logLevel, isRaw );
 
 					return this.log( log );
 				};
@@ -222,12 +222,13 @@ class Logger
 	 *
 	 * @param	mixed log
 	 * @param	Number level
+	 * @param	Boolean isRaw
 	 *
 	 * @return	Promise
 	 */
-	log( log, level = null )
+	log( log, level = null, isRaw = false )
 	{
-		log						= Log.getInstance( log, level );
+		log						= Log.getInstance( log, level, isRaw );
 		let transportPromises	= [];
 
 		if ( this.supports( log ) )

@@ -385,6 +385,7 @@ server.listen('80',()=>{
 - Match the given route and returns any route parameters passed in the matchedParams argument. 
 - Returns bool if there was a successful match
 - The matched parameters will look like this: { value: 'key' }
+- If there is a passed RegExp then the matched parameters will look like: { match: regExpResult }
 
 **matchMethod( String requestedMethod, String|RegExp method )** 
 - Matches the requested method with the ones set in the event and returns if there was a match or no.
@@ -392,6 +393,57 @@ server.listen('80',()=>{
 **define( String middlewareName, Function middleware ): Router**
 - Defines a global middleware
 - Throws if a middleware with that name already exists
+
+
+***
+####Adding Routers:
+- A router can be added by calling .add on another router: ( Router router )
+- All the new router's routes will be added to the old one
+- All the global middleware will be merged as well
+
+~~~javascript
+routerOne.add( '/test', routerTwo )
+~~~
+
+~~~javascript
+// You can also attach the router to a route
+const userRouter  = Server().Router();
+userRouter.get( '/list', ( event )=>{
+    event.send( { userOne: {}, userTwo: {} } );
+});
+
+userRouter.post( '/add/:username:', ( event )=>{
+    // Add user to db or somewhere else
+    event.send( 'ok' );
+});
+
+Server().add( '/user', userRouter );
+~~~
+
+***
+####Adding Routers with path:
+- A router can be added by calling .add on another router with a string route: ( String route, Router router )
+- All the new router's routes will be pefixed with the given route
+- All the global middleware will be merged as well
+
+~~~javascript
+routerOne.add( '/test', routerTwo )
+~~~
+
+~~~javascript
+// You can also attach the router to a route
+const userRouter  = Server().Router();
+userRouter.get( '/list', ( event )=>{
+    event.send( { userOne: {}, userTwo: {} } );
+});
+
+userRouter.post( '/add/:username:', ( event )=>{
+    // Add user to db or somewhere else
+    event.send( 'ok' );
+});
+
+Server().add( '/user', userRouter );
+~~~
 
 ***
 ####Adding routes
@@ -434,10 +486,12 @@ app.get( '/users/:user:', ( event )=>{
 app.listen( 80 );
 ~~~
 
-- When adding a Route the **server.add(route)** can be used. 
-- This can be used to attach another router to the current one: server.add( router ) or router.add( router ) to combine 2 routers 
 
+***
+- When adding a Route the **server.add(route)** or **router.add(route)** can be used. 
 - The following parameters can be used when using .add():
+
+####OBJECT CONTAINING:
 
 **handler: Function** 
 - The callback function 
@@ -455,11 +509,49 @@ app.listen( 80 );
 - The global middlewares if any to be called before this middleware
 - Optional if omitted none will be called
 
-- server.add accepts a object that must contain **handler** but **route** and **method** are optional.
-- server.add can also accept a function that will be transformed into a route without method or route
+- server.add accepts a object that must contain **handler** but **route**, **method** and **middlewares** are optional.
+- ( { method: '', route: '', handler:()=>{} } )
+
+####ROUTER: 
+- You can use add to attach another router to the current one: server.add( router ) or router.add( router ) to combine 2 routers 
+
+~~~javascript
+Server().add( router );
+
+// OR
+routerOne.add( routerTwo )
+~~~
+
+####ROUTE + ROUTER
+- .add also accepts a ( String route, Router router )
+- All the new router's routes will be pefixed with the given route
+
+~~~javascript
+routerOne.add( '/test', routerTwo )
+~~~
+
+####FUNCTION:
+- server.add can also accept a function that will be transformed into a route without method or route ( Function route )
+~~~javascript
+routerOne.add( ( event )=>{    
+    event.next()
+});
+~~~
+
 ~~~javascript
 const { Server } = require( 'event_request' );
 
+// Adding a route
+server.add({
+	route	: '/',
+	method	: 'GET',
+	handler	: ( event ) => {
+		event.send( '<h1>Hello World!</h1>' )
+	}
+});
+~~~
+
+~~~javascript
 // You can create your own router
 const router  = Server().Router();
 router.add({
@@ -469,28 +561,12 @@ router.add({
         event.send( '<h1>Hello World</h1>' );
     }
 });
-
-// Adding a middleware without a method or route
-router.add( ( event )=>{
-	event.next();
-} );
-
-// To attach a router to the server simply call the add function of th server.
-// Just like you would do to add a normal route.
-Server().add( router );
-
-// You can also get the router attached to the Server and use that directly
-const serverRouter    = Server().router;
-serverRouter.add(...);
 ~~~
 
 ~~~javascript
-server.add({
-	route	: '/',
-	method	: 'GET',
-	handler	: ( event ) => {
-		event.send( '<h1>Hello World!</h1>' )
-	}
+// Adding a middleware without a method or route
+router.add( ( event )=>{
+	event.next();
 });
 
 server.add( ( event )=>{
@@ -498,9 +574,36 @@ server.add( ( event )=>{
 });
 ~~~
 
+~~~javascript
+// To attach a router to the server simply call the add function of th server.
+// Just like you would do to add a normal route.
+Server().add( router );
+~~~
+
+~~~javascript
+// You can also get the router attached to the Server and use that directly
+const serverRouter    = Server().router;
+serverRouter.add(...);
+~~~
+
+~~~javascript
+// You can also attach the router to a route
+const userRouter  = Server().Router();
+userRouter.get( '/list', ( event )=>{
+    event.send( { userOne: {}, userTwo: {} } );
+});
+
+userRouter.post( '/add/:username:', ( event )=>{
+    // Add user to db or somewhere else
+    event.send( 'ok' );
+});
+
+Server().add( '/user', userRouter );
+~~~
+
 ***
 ####Router Wildcards
-The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
+- The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
 ~~~javascript
 const { Server } = require( 'event_request' );
 // You can create your own router
@@ -510,9 +613,14 @@ router.add({
     route: '/todos/:id:',
     handler: ( event)=>{
         console.log( event.params.id );
-
         event.send( '<h1>Hello World</h1>' );
     }
+});
+
+// Or
+router.get( '/todos/:id:', ( event)=>{
+    console.log( event.params.id );
+    event.send( '<h1>Hello World</h1>' );
 });
 ~~~
 
@@ -559,6 +667,9 @@ app.listen( 80, ()=>{
 });
 ~~~
 
+***
+***
+***
 # Logging
 
 The `Logging` Suite exported by the module contains the following:
@@ -630,10 +741,68 @@ const logger	= Loggur.createLogger({
 Loggur.addLogger( 'logger_id', logger );
 ~~~
 
-Logger.log accepts 2 parameters: 
+####Logging:
+
+
+#####Logger.log: 
+- Every logger has a log function that supports the following parameters: 
+
+**Log: Log||String||mixed**
+- What should be logged
+
+**level: Number**
+- The log level that we should log at
+- optional
+- Defaults to the default logLevel of the logger
+
+**isRaw: Boolean**
+- Whether we should attempt to log the data raw
+- Only specific transport types support raw
+- Defaults to false
+
 ~~~javascript
     logger.log( 'Log' ); // This logs by default to an error level
     logger.log( 'Log', LOG_LEVELS.debug ); // LOG_LEVELS.debug === Number, this will log 'Log' with debug level
+    logger.log( { test: 'value' }, LOG_LEVELS.debug, true ); // This will log on debug and will try to log the data raw
+~~~
+
+#####Loggur.log: 
+- The main Loggur has a log function that calls all the loggers added to it
+- If there are no loggers it will call it's default logger if enabled
+
+**Log: Log||String||mixed**
+- What should be logged
+
+**level: Number**
+- The log level that we should log at
+- optional
+- Defaults to the default logLevel of the logger
+
+**isRaw: Boolean**
+- Whether we should attempt to log the data raw
+- Only specific transport types support raw
+- Defaults to false
+
+~~~javascript
+    Loggur.log( 'Log' ); // This logs by default to an error level
+    Loggur.log( 'Log', LOG_LEVELS.debug ); // LOG_LEVELS.debug === Number, this will log 'Log' with debug level
+    Loggur.log( { test: 'value' }, LOG_LEVELS.debug, true ); // This will log on debug and will try to log the data raw
+~~~
+
+#####logger.error || logger.debug etc: 
+- Every logger attaches all the give log levels as functions that accept the following arguments:
+
+**Log: Log||String||mixed**
+- What should be logged
+
+**isRaw: Boolean**
+- Whether we should attempt to log the data raw
+- Only specific transport types support raw
+- Defaults to false
+
+~~~javascript
+    logger.error( 'Log' ); // This logs by default to an error level
+    logger.debug( 'Log', true ); // This will log on debug and will try to log the data raw
 ~~~
 
 Each Logger can have it's own transport layers.
@@ -641,6 +810,7 @@ There are 2 predefined transport layers:
 
 ###Console
 - Logs data in the console
+- It can log raw logs
 
 ***
 ####Accepted options:
@@ -674,6 +844,7 @@ There are 2 predefined transport layers:
 
 ###File
 - Logs data to a file
+- It can't log raw logs
 
 ***
 ####Accepted options:
@@ -1121,7 +1292,7 @@ The TestingTools export:
 - Mock,   -> Mock function
 - Mocker,   -> the class used to mock methods of testDoubles. Please note that if you use this class you will alter the original one
 - assert, -> nodejs assert module
-- logger		: tester.consoleLogger, -> Predefined logger that has 3 log levels: error, success, info
+- tester, -> Already created tester
 - test		: tester.addTest.bind( tester ),
 - runAllTests	: tester.runAllTests.bind( tester )
 

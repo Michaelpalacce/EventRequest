@@ -141,18 +141,34 @@ test({
 test({
 	message			: 'Route.matchRoute matches Regex',
 	dataProvider	: [
-		['', false, []],
-		['/', false, []],
-		['/path', true, []],
-		['/path/test', true, []],
-		['/path/valueToMatch', true, []],
+		['', false],
+		['/', false],
+		['/path', true],
+		['/path/test', true],
+		['/path/valueToMatch', true],
 	],
-	test			: ( done, path, matched, params ) => {
+	test			: ( done, path, matched ) => {
 		let route			= getRoute( undefined, new RegExp( '/pa' ) );
 		let matchedParams	= [];
 
 		assert.deepEqual( route.matchPath( path, matchedParams ), matched );
-		assert.deepEqual( matchedParams, params );
+		assert.deepEqual( typeof matchedParams.match !== 'undefined', matched );
+
+		done();
+	}
+});
+
+test({
+	message			: 'Route.matchRoute matches Regex with matchedParams',
+	test			: ( done, path, matched ) => {
+		let route			= getRoute( undefined, new RegExp( '\/(path)\/(test)' ) );
+		let matchedParams	= [];
+
+		assert.deepEqual( route.matchPath( '/path/test', matchedParams ), true );
+		assert.equal( typeof matchedParams.match !== 'undefined', true );
+		assert.equal( matchedParams.match[0], '/path/test' );
+		assert.equal( matchedParams.match[1], 'path' );
+		assert.equal( matchedParams.match[2], 'test' );
 
 		done();
 	}

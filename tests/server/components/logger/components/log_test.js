@@ -1,8 +1,8 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test }	= require( '../../../../test_helper' );
-const { Log }					= require( './../../../../../server/components/logger/loggur' );
+const {  assert, test }	= require( '../../../../test_helper' );
+const { Log }			= require( './../../../../../server/components/logger/loggur' );
 
 /**
  * @brief	Constants
@@ -27,6 +27,7 @@ test({
 
 		assert.equal( log.message, WRONG_LOG_DEFAULT_MESSAGE );
 		assert.equal( log.level, WRONG_LOG_DEFAULT_LEVEL );
+		assert.equal( log.isRaw, false );
 		assert.equal( typeof log.timestamp === 'number' && log.timestamp > 0, true );
 		assert.equal( log.uniqueId, '' );
 
@@ -42,6 +43,7 @@ test({
 
 		assert.equal( log.message, logMessage );
 		assert.equal( log.level, DEFAULT_LOG_LEVEL );
+		assert.equal( log.isRaw, false );
 		assert.equal( typeof log.timestamp === 'number' && log.timestamp > 0, true );
 		assert.equal( log.uniqueId, '' );
 
@@ -53,11 +55,13 @@ test({
 	message	: 'Log.constructor on object',
 	test	: ( done )=>{
 		let logMessage	= 'test';
+		let isRaw		= true;
 		let logLevel	= LOG_LEVELS.error;
-		let log			= new Log( logMessage, logLevel );
+		let log			= new Log( logMessage, logLevel, isRaw );
 
 		assert.equal( log.message, logMessage );
 		assert.equal( log.level, logLevel );
+		assert.equal( log.isRaw, isRaw );
 		assert.equal( typeof log.timestamp === 'number' && log.timestamp > 0, true );
 		assert.equal( log.uniqueId, '' );
 
@@ -72,6 +76,7 @@ test({
 
 		assert.equal( log.message, WRONG_LOG_DEFAULT_MESSAGE );
 		assert.equal( log.level, WRONG_LOG_DEFAULT_LEVEL );
+		assert.equal( log.isRaw, false );
 		assert.equal( typeof log.timestamp === 'number' && log.timestamp > 0, true );
 		assert.equal( log.uniqueId, '' );
 
@@ -87,6 +92,7 @@ test({
 
 		assert.equal( log.message, JSON.stringify( logMessage ) );
 		assert.equal( log.level, WRONG_LOG_DEFAULT_LEVEL );
+		assert.equal( log.isRaw, false );
 		assert.equal( typeof log.timestamp === 'number' && log.timestamp > 0, true );
 		assert.equal( log.uniqueId, '' );
 
@@ -100,6 +106,17 @@ test({
 		let log	= new Log();
 
 		assert.equal( log.getLevel(), WRONG_LOG_DEFAULT_LEVEL );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Log.getIsRaw returns the boolean',
+	test	: ( done )=>{
+		let log	= new Log();
+
+		assert.equal( log.getIsRaw(), false );
 
 		done();
 	}
@@ -153,6 +170,18 @@ test({
 		let log	= new Log();
 
 		assert.equal( typeof log.toString(), 'string' );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Log.getInstance if an instance of Log is given returns it',
+	test	: ( done )=>{
+		let logOne	= new Log( 'test' );
+		let logTwo	= Log.getInstance( logOne );
+
+		assert.deepStrictEqual( logOne, logTwo );
 
 		done();
 	}

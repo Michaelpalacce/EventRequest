@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers }	= require( '../../../test_helper' );
+const { assert, test, helpers, tester }	= require( '../../../test_helper' );
 const Router					= require( '../../../../server/components/routing/router' );
 const Route						= require( '../../../../server/components/routing/route' );
 const App						= require( '../../../../server/server' );
@@ -23,7 +23,7 @@ test({
 	test	: ( done )=>{
 		let router	= new Router();
 		assert.throws( ()=>{
-			router.add();
+			router.add( null );
 		});
 		done();
 	}
@@ -60,6 +60,19 @@ test({
 });
 
 test({
+	message	: 'Router.add with invalid middleware throws',
+	test	: ( done )=>{
+		const router		= new Router();
+
+		assert.throws( ()=>{
+			router.add();
+		});
+
+		done();
+	}
+});
+
+test({
 	message	: 'Router.add adds another router\'s middleware if passed',
 	test	: ( done )=>{
 		let routerOne		= new Router();
@@ -75,6 +88,69 @@ test({
 		routerTwo.add( routerOne );
 
 		assert.deepStrictEqual( routerOne.middleware, routerTwo.middleware );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add adds another router to a given route',
+	test	: ( done )=>{
+		let routerOne		= new Router();
+		let routerTwo		= new Router();
+
+		routerOne.add({
+			route	: '/'
+		});
+		routerOne.add({
+			route	: '/test'
+		});
+		routerOne.add({
+			route	: '/test/two'
+		});
+		routerOne.add({
+			route	: '/test/:value:'
+		});
+		routerOne.add({
+			route	: '/test',
+			method	: 'GET'
+		});
+		routerOne.add({
+			method	: 'DELETE'
+		});
+		routerOne.add({
+			route	: '/test',
+			method	: 'GET',
+			handler	: ()=>{}
+		});
+		routerOne.get( '/routre', ()=>{} );
+		routerOne.post( '/routrePOST', ()=>{} );
+
+		routerTwo.add( '/route', routerOne );
+
+		for ( const middleware of routerTwo.middleware )
+		{
+			assert.equal( middleware.route.startsWith( '/route' ), true )
+		}
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add adds another router to a given route with regexp',
+	test	: ( done )=>{
+		let routerOne		= new Router();
+		let routerTwo		= new Router();
+
+		routerOne.get( /\/(value)/g, ()=>{} );
+
+		routerTwo.add( '/route', routerOne );
+
+		for ( const middleware of routerTwo.middleware )
+		{
+			assert.equal( Router.matchRoute( '/route/value', middleware.route ), true );
+		}
 
 		done();
 	}

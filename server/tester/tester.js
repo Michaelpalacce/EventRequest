@@ -399,12 +399,13 @@ class Tester
 }
 
 let tester		= new Tester();
+
 module.exports	= {
 	Tester,
 	Mock,
 	Mocker,
 	assert,
-	logger			: tester.consoleLogger,
-	test			: tester.addTest.bind( tester ),
-	runAllTests		: tester.runAllTests.bind( tester )
+	tester,
+	test		: tester.addTest.bind( tester ),
+	runAllTests	: tester.runAllTests.bind( tester )
 };

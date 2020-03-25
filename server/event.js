@@ -28,8 +28,8 @@ class EventRequest extends EventEmitter
 			throw new Error( 'Invalid parameters passed to EventRequest' );
 		}
 
-		const parsedUrl			= url.parse( request.url, true );
-		const list	= {},
+		const parsedUrl	= url.parse( request.url, true );
+		const list		= {},
 			rc		= request.headers.cookie;
 
 		rc && rc.split( ';' ).forEach( function( cookie ) {
@@ -51,7 +51,7 @@ class EventRequest extends EventEmitter
 		this.params				= {};
 		this.block				= {};
 
-		let errorHandler	= null;
+		let errorHandler		= null;
 		Object.defineProperty( this, 'errorHandler', {
 			enumerable	: true,
 			set			: ( arg ) =>{
@@ -265,7 +265,7 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-	 * @brief	Retrieve a header value
+	 * @brief	Retrieve a request header value
 	 *
 	 * @details	If the key does not exist, then return the default value if passed. Defaults to NULL
 	 *

@@ -50,9 +50,9 @@
   {
 	"path": "/testErRateLimitsWithStrictPolicyStress",
 	"methods": [],
-	"maxAmount": 1000,
+	"maxAmount": 100,
 	"refillTime": 2,
-	"refillAmount": 500,
+	"refillAmount": 50,
 	"policy": "strict",
 	"delayTime": 1,
 	"delayRetries": 1,

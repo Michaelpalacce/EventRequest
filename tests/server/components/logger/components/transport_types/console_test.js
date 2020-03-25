@@ -8,7 +8,6 @@ const { LOG_LEVELS, Console, Log }	= require( './../../../../../../server/compon
  * @brief	Constants
  */
 const TRANSPORT_DEFAULT_SHOULD_COLOR	= true;
-const TRANSPORT_DEFAULT_COLOR			= 'red';
 const TRANSPORT_DEFAULT_COLORS			= {
 	[LOG_LEVELS.error]		: 'red',
 	[LOG_LEVELS.warning]	: 'yellow',
@@ -74,12 +73,74 @@ test({
 });
 
 test({
-	message	: 'Console.format returns string',
+	message	: 'Console.format returns Array',
 	test	: ( done )=>{
 
 		let consoleTransport	= new Console();
 
-		assert.equal( typeof consoleTransport.format( Log.getInstance( 'test' ) ), 'string' );
+		assert.equal( Array.isArray( consoleTransport.format( Log.getInstance( 'test' ) ) ), true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Console.format checks if is raw with not raw',
+	test	: ( done )=>{
+		let LogMock				= Mock( Log );
+		let consoleTransport	= new Console();
+		let log					= new LogMock( 'test', 100, false );
+
+		log._mock({
+			method			: 'getIsRaw',
+			shouldReturn	: log.isRaw,
+			called			: 1
+		});
+
+		log._mock({
+			method			: 'getMessage',
+			shouldReturn	: 'message',
+			called			: 1
+		});
+
+		log._mock({
+			method			: 'getRawMessage',
+			shouldReturn	: 'RawMessage',
+			called			: 0
+		});
+
+		assert.equal( Array.isArray( consoleTransport.format( log ) ), true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Console.format checks if is raw with raw',
+	test	: ( done )=>{
+		let LogMock				= Mock( Log );
+		let consoleTransport	= new Console();
+		let log					= new LogMock( 'test', 100, true );
+
+		log._mock({
+			method			: 'getIsRaw',
+			shouldReturn	: log.isRaw,
+			called			: 1
+		});
+
+		log._mock({
+			method			: 'getMessage',
+			shouldReturn	: '',
+			called			: 0
+		});
+
+		log._mock({
+			method			: 'getRawMessage',
+			shouldReturn	: 'RawMessage',
+			called			: 1
+		});
+
+		assert.equal( Array.isArray( consoleTransport.format( log ) ), true );
 
 		done();
 	}

@@ -63,10 +63,9 @@ class Router extends PluginInterface
 		 *
 		 * @returns	Server
 		 */
-		server.add	= ( route )=>{
-			server.emit( 'addRoute', route );
-
-			this.add( route );
+		server.add	= ( ...args )=>{
+			server.emit( 'addRoute', args );
+			this.add.apply( this, args );
 
 			return server;
 		};
@@ -115,37 +114,89 @@ class Router extends PluginInterface
 	 * 			- method - String|Array - The methods(s) to be matched for the route - optional
 	 * 			- route - String|RegExp - The route to match - optional
 	 * 			- handler - Function - Handler to be called - ! REQUIRED
+	 * 			( { method: '', route: '', handler:()=>{} } )
 	 *
-	 * @param	Object route
+	 * 			Accepts an instance of router ( Router router )
+	 *
+	 * 			Accepts a route and an instance of a router ( String route, Router router )
 	 *
 	 * @returns	Router
 	 */
-	add( route )
+	add( ...args )
 	{
-		if ( route instanceof Router )
+		if ( args.length === 1 )
 		{
-			this.middleware			= this.middleware.concat( route.middleware );
-			const routerMiddlewares	= route.globalMiddlewares;
+			let first	= args[0];
 
-			for ( const [key, value] of Object.entries( routerMiddlewares ) )
+			if ( first instanceof Router )
 			{
-				this.define( key, value );
+				this.middleware			= this.middleware.concat( first.middleware );
+				const routerMiddlewares	= first.globalMiddlewares;
+
+				for ( const [key, value] of Object.entries( routerMiddlewares ) )
+				{
+					this.define( key, value );
+				}
+
+				return this;
 			}
 
-			return this;
-		}
+			if ( typeof first === 'function' )
+			{
+				first	= new Route( { handler: first } );
+			}
 
-		if ( typeof route === 'function' )
+			if ( ! ( first instanceof Route ) )
+			{
+				first	= new Route( first );
+			}
+
+			this.middleware.push( first );
+		}
+		else if ( args.length === 2 )
 		{
-			route	= new Route( { handler: route } );
-		}
+			let first	= args[0];
+			let second	= args[1];
 
-		if ( ! ( route instanceof Route ) )
+			if ( typeof first === 'string' && second instanceof Router )
+			{
+				const secondMiddleware	= second.middleware;
+
+				for ( const middleware of secondMiddleware )
+				{
+					if ( middleware.route === '/' )
+					{
+						middleware.route	= '';
+					}
+
+					if ( middleware.route instanceof RegExp )
+					{
+						let regex	= middleware.route.source;
+
+						if ( regex.startsWith( '^' ) )
+						{
+							regex	= regex.substring( 1 );
+						}
+
+						middleware.route	= new RegExp( `${first}${regex}`, middleware.route.flags );
+						continue;
+					}
+
+					middleware.route	= first + middleware.route;
+				}
+
+				this.middleware			= this.middleware.concat( secondMiddleware );
+				const routerMiddlewares	= second.globalMiddlewares;
+				for ( const [key, value] of Object.entries( routerMiddlewares ) )
+				{
+					this.define( key, value );
+				}
+			}
+		}
+		else
 		{
-			route	= new Route( route );
+			throw new Error( 'Invalid middleware added!' );
 		}
-
-		this.middleware.push( route );
 
 		return this;
 	}
