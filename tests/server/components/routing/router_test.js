@@ -167,12 +167,37 @@ test({
 });
 
 test({
+	message	: 'Router.match method matches String requestedMethod and String method for instance router',
+	test	: ( done )=>{
+		const router	= new Router();
+
+		assert.equal( router.matchMethod( 'GET', 'GET' ), true );
+		assert.equal( router.matchMethod( 'POST', 'GET' ), false );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Router.match method matches String requestedMethod and Route method',
 	test	: ( done )=>{
 		let getRoute	= new Route( { method : 'GET' } );
 
 		assert.equal( Router.matchMethod( 'GET', getRoute ), true );
 		assert.equal( Router.matchMethod( 'POST', getRoute ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.match method matches String requestedMethod and Route method for instance router',
+	test	: ( done )=>{
+		const router	= new Router();
+		let getRoute	= new Route( { method : 'GET' } );
+
+		assert.equal( router.matchMethod( 'GET', getRoute ), true );
+		assert.equal( router.matchMethod( 'POST', getRoute ), false );
 
 		done();
 	}
@@ -189,10 +214,34 @@ test({
 });
 
 test({
+	message	: 'Router.match method matches  String requestedMethod and Array method for instance router',
+	test	: ( done )=>{
+		const router	= new Router();
+
+		assert.equal( router.matchMethod( 'GET', ['GET','POST'] ), true );
+		assert.equal( router.matchMethod( 'PUT', ['GET','POST'] ), false );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Router.matchRoute matches String requestedRoute and String route',
 	test	: ( done )=>{
 		assert.deepStrictEqual( Router.matchRoute( '/test', '/test' ), true );
 		assert.deepStrictEqual( Router.matchRoute( '/test', '/notTest' ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.matchRoute matches String requestedRoute and String route  for instance router',
+	test	: ( done )=>{
+		const router	= new Router();
+
+		assert.deepStrictEqual( router.matchRoute( '/test', '/test' ), true );
+		assert.deepStrictEqual( router.matchRoute( '/test', '/notTest' ), false );
 
 		done();
 	}
@@ -209,10 +258,34 @@ test({
 });
 
 test({
+	message	: 'Router.matchRoute matches String requestedRoute and RegExp route for instance router',
+	test	: ( done )=>{
+		const router	= new Router();
+
+		assert.deepStrictEqual( router.matchRoute( '/test', new RegExp( '\/test' ) ), true );
+		assert.deepStrictEqual( router.matchRoute( '/notTest', new RegExp( '\/test' ) ), false );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Router.matchRoute matches String requestedRoute and Route route',
 	test	: ( done )=>{
 		assert.deepStrictEqual( Router.matchRoute( '/test', new Route( { route: '/test' } ) ), true );
 		assert.deepStrictEqual( Router.matchRoute( '/notTest', new Route( { route: '/test' } ) ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.matchRoute matches String requestedRoute and Route route for instance router',
+	test	: ( done )=>{
+		const router	= new Router();
+
+		assert.deepStrictEqual( router.matchRoute( '/test', new Route( { route: '/test' } ) ), true );
+		assert.deepStrictEqual( router.matchRoute( '/notTest', new Route( { route: '/test' } ) ), false );
 
 		done();
 	}

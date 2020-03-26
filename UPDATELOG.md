@@ -1,3 +1,7 @@
+16.1.2
+- Router matchRoute and matchMethod are now also exported in the router instance
+- next is no longer cleared up on cleanUp
+
 16.1.1
 - Data Server with a default ttl of -1 will now save data with infinity too
 

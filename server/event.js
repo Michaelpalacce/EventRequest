@@ -95,7 +95,6 @@ class EventRequest extends EventEmitter
 	{
 		this.emit( 'cleanUp' );
 
-		this.next				= undefined;
 		this.block				= undefined;
 		this.errorHandler		= undefined;
 		this.queryString		= undefined;

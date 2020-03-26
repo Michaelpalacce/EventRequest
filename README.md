@@ -387,8 +387,14 @@ server.listen('80',()=>{
 - The matched parameters will look like this: { value: 'key' }
 - If there is a passed RegExp then the matched parameters will look like: { match: regExpResult }
 
-**matchMethod( String requestedMethod, String|RegExp method )** 
+**matchRoute( String requestedRoute, String|RegExp route, Object matchedParams ={} ): Boolean** 
+- Same as static
+
+**static matchMethod( String requestedMethod, String|Array|RegExp method )** 
 - Matches the requested method with the ones set in the event and returns if there was a match or no.
+
+**matchMethod( String requestedMethod, String|Array|RegExp method )** 
+- Same as static
 
 **define( String middlewareName, Function middleware ): Router**
 - Defines a global middleware

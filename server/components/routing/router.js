@@ -247,6 +247,30 @@ class Router extends PluginInterface
 	}
 
 	/**
+	 * @brief	Exported for local instances
+	 *
+	 * @param	Array args
+	 *
+	 * @return	Boolean
+	 */
+	matchMethod( ...args )
+	{
+		return Router.matchMethod.apply( Router, args );
+	}
+
+	/**
+	 * @brief	Exported for local instances
+	 *
+	 * @param	Array args
+	 *
+	 * @return	Boolean
+	 */
+	matchRoute( ...args )
+	{
+		return Router.matchRoute.apply( Router, args );
+	}
+
+	/**
 	 * @brief	Matches the requested method with the ones set in the event and returns if there was a match or no
 	 *
 	 * @details	If a string or an array is passed, then it will be converted to a Route
