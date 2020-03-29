@@ -1,3 +1,8 @@
+16.2.0
+- Added Security Plugin
+- Tested Security Plugin
+- Documented Security Plugin
+
 16.1.2
 - Router matchRoute and matchMethod are now also exported in the router instance
 - next is no longer cleared up on cleanUp
