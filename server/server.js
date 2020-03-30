@@ -73,6 +73,7 @@ class Server extends EventEmitter
 		this.er_file_stream				= 'er_file_stream';
 		this.er_logger					= 'er_logger';
 		this.er_session					= 'er_session';
+		this.er_security				= 'er_security';
 		this.er_response_cache			= 'er_response_cache';
 		this.er_body_parser_json		= 'er_body_parser_json';
 		this.er_body_parser_form		= 'er_body_parser_form';

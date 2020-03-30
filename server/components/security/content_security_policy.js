@@ -1,7 +1,12 @@
 'use strict';
 
-// Directive type keys
-const DIRECTIVES_KEY			= 'directives';
+// Option keys
+const OPTIONS_DIRECTIVES_KEY		= 'directives';
+const OPTIONS_REPORT_URI			= 'reportUri';
+const OPTIONS_USE_REPORT_TO			= 'useReportTo';
+const OPTIONS_ENABLE_XSS			= 'xss';
+const OPTIONS_ENABLE_SANDBOX		= 'sandbox';
+const OPTIONS_ENABLE_SELF			= 'self';
 
 // Directive keys
 const CHILD_SRC_KEY					= 'child-src';
@@ -56,9 +61,61 @@ class ContentSecurityPolicy
 	 */
 	parseOptions( options )
 	{
-		this.directives	= typeof options[DIRECTIVES_KEY] === 'object'
-						? options[DIRECTIVES_KEY]
-						: {};
+		this.directives		= typeof options[OPTIONS_DIRECTIVES_KEY] === 'object'
+							? options[OPTIONS_DIRECTIVES_KEY]
+							: {};
+
+		const reportUri		= typeof options[OPTIONS_REPORT_URI] === 'string'
+							? options[OPTIONS_REPORT_URI]
+							: null;
+
+		const useReportTo	= options[OPTIONS_USE_REPORT_TO] === true;
+
+		if ( useReportTo === true && reportUri !== null )
+		{
+			this.setReportOnlyWithReportTo( reportUri );
+		}
+		else if ( reportUri !== null )
+		{
+			this.setReportOnly( reportUri );
+		}
+
+		if ( options[OPTIONS_ENABLE_XSS] === true )
+		{
+			this.xss();
+		}
+
+		if ( options[OPTIONS_ENABLE_SELF] === true )
+		{
+			this.enableSelf();
+		}
+
+		if ( options[OPTIONS_ENABLE_SANDBOX] === true )
+		{
+			this.enableSandbox();
+		}
+	}
+
+	/**
+	 * @brief	Enables xss protection
+	 *
+	 * @return	void
+	 */
+	xss()
+	{
+		this.addDefaultSrc( 'none' );
+		this.addScriptSrc( 'self' );
+		this.addImgSrc( 'self' );
+		this.addFontSrc( 'self' );
+		this.addStyleSrc( 'self' );
+		this.addConnectSrc( 'self' );
+		this.addChildSrc( 'self' );
+		this.addMediaSrc( 'self' );
+		this.addManifestSrc( 'self' );
+		this.addObjectSrc( 'self' );
+		this.addFrameAncestors( 'self' );
+		this.addBaseUri( 'self' );
+		this.upgradeInsecureRequests();
 	}
 
 	/**
