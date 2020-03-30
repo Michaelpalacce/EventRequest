@@ -47,17 +47,67 @@ class HttpStrictTransportSecurity
 	 */
 	parseOptions( options = {} )
 	{
-		this.maxAge				= typeof options[OPTIONS_MAX_AGE_KEY] === 'number'
-								? options[OPTIONS_MAX_AGE_KEY]
-								: DEFAULT_MAX_AGE;
+		this.enabled				= this.setEnabled( options['enabled'] );
 
-		this.includeSubDomains	= typeof options[OPTIONS_INCLUDE_SUB_DOMAINS_KEY] === 'number'
-								? options[OPTIONS_INCLUDE_SUB_DOMAINS_KEY]
-								: DEFAULT_INCLUDE_SUB_DOMAINS;
+		this.maxAge					= typeof options[OPTIONS_MAX_AGE_KEY] === 'number'
+									? options[OPTIONS_MAX_AGE_KEY]
+									: DEFAULT_MAX_AGE;
 
-		this.preload		 	= typeof options[OPTIONS_PRELOAD_KEY] === 'number'
-								? options[OPTIONS_PRELOAD_KEY]
-								: DEFAULT_PRELOAD;
+		this.doIncludeSubDomains	= typeof options[OPTIONS_INCLUDE_SUB_DOMAINS_KEY] === 'boolean'
+									? options[OPTIONS_INCLUDE_SUB_DOMAINS_KEY]
+									: DEFAULT_INCLUDE_SUB_DOMAINS;
+
+		this.doPreload			 	= typeof options[OPTIONS_PRELOAD_KEY] === 'boolean'
+									? options[OPTIONS_PRELOAD_KEY]
+									: DEFAULT_PRELOAD;
+	}
+
+	/**
+	 * @brief	Sets the component's to either be enabled or not
+	 *
+	 * @param	enabled Boolean
+	 *
+	 * @return	void
+	 */
+	setEnabled( enabled = true )
+	{
+		this.enabled	= typeof enabled === 'boolean' ? enabled : true;
+	}
+
+	/**
+	 * @brief	Sets the component's to either be enabled or not
+	 *
+	 * @param	enabled Boolean
+	 *
+	 * @return	void
+	 */
+	preload( enabled = true )
+	{
+		this.doPreload	= typeof enabled === 'boolean' ? enabled : this.doPreload;
+	}
+
+	/**
+	 * @brief	Sets the enforce flag
+	 *
+	 * @param	maxAge Number
+	 *
+	 * @return	void
+	 */
+	setMaxAge( maxAge )
+	{
+		this.maxAge	= typeof maxAge === 'number' ? maxAge : this.maxAge;
+	}
+
+	/**
+	 * @brief	Enable or disable includeSubDomains
+	 *
+	 * @param	maxAge Number
+	 *
+	 * @return	void
+	 */
+	includeSubDomains( include = true )
+	{
+		this.doIncludeSubDomains	= typeof include === 'boolean' ? include : this.doIncludeSubDomains;
 	}
 
 	/**
@@ -77,12 +127,15 @@ class HttpStrictTransportSecurity
 	 */
 	build()
 	{
+		if ( ! this.enabled )
+			return '';
+
 		let headerContent	= `${MAX_AGE_KEY}=${this.maxAge};`;
 
-		if ( this.includeSubDomains === true )
+		if ( this.doIncludeSubDomains === true )
 			headerContent	+= ` ${INCLUDE_SUB_DOMAINS_KEY};`;
 
-		if ( this.preload === true )
+		if ( this.doPreload === true )
 			headerContent	+= ` ${PRELOAD_KEY};`;
 
 		return headerContent;

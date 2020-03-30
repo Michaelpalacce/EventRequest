@@ -2,6 +2,9 @@
 - Added Security Plugin
 - Tested Security Plugin
 - Documented Security Plugin
+- Templating engine plugin now sets the header as text/html
+- Static resources plugin now correctly sets the content-type
+- Fixed Static resources plugin always adding public as a static path
 
 16.1.2
 - Router matchRoute and matchMethod are now also exported in the router instance

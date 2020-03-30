@@ -2550,9 +2550,13 @@ test({
 
 		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
 			assert.equal( response.body.toString().includes( 'THIS_IS_THE_INDEX_HTML_FILE' ), true );
+			assert.equal( response.headers['content-type'], 'text/html' );
+
 			return helpers.sendServerRequest( `/${deepName}` );
 		}).then(( response )=>{
 			assert.equal( response.body.toString().includes( 'THIS_IS_THE_DEEP_HTML_FILE' ), true );
+			assert.equal( response.headers['content-type'], 'text/html' );
+
 			assert.equal( renderCalled, 2 );
 			done();
 		}).catch( done );
@@ -2674,15 +2678,27 @@ test({
 });
 
 test({
+	message	: 'Server.test server does not export /public by default',
+	test	: ( done )=>{
+		helpers.sendServerRequest( `/public/test/index.html`, 'GET', 404 ).then(( response )=>{
+			assert.equal( response.body.toString(), '{"error":"Cannot GET /public/test/index.html"}' );
+			done();
+		}).catch( done )
+	}
+});
+
+test({
 	message	: 'Server.test er_static_resources works as expected',
 	test	: ( done )=>{
 		app.apply( app.er_static_resources, { paths: ['tests/server/fixture/static'] } );
 
 		helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js` ).then(( response )=>{
+			assert.equal( response.headers['content-type'], 'application/javascript' );
 			assert.equal( response.body.toString(), 'const test=\'123\';' );
 
 			return helpers.sendServerRequest( '/tests/server/fixture/static/test.css' );
 		}).then(( response )=>{
+			assert.equal( response.headers['content-type'], 'text/css' );
 			assert.equal( response.body.toString(), 'body{background:black;}' );
 
 			return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404 );

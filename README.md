@@ -1746,6 +1746,7 @@ app.apply( timeoutPlugin );
 #er_static_resources
 - Adds a static resources path to the request.
 - By default the server has this plugin attached to allow favicon.ico to be sent
+- The Content-Type header will be set with a mime type if the file is css or js
 
 ***
 ####Dependencies:
@@ -2678,6 +2679,60 @@ const appTwo	= new Server();
 
 appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
+~~~
+
+***
+***
+***
+
+#er_security 
+- Adds common security http headers
+- Options for all the headers can be passed directly in the options and later changed as all components used by the security plugin implement a builder pattern
+
+***
+####Dependencies:
+
+**NONE**
+
+***
+####Accepted Options:
+
+**fileLocation: String**
+- The absolute path to the .env file you want to use
+- Defaults to PROJECT_ROOT
+
+***
+####Events:
+
+**NONE**
+
+***
+####Exported Functions:
+
+**NONE**
+
+***
+####Attached Functionality:
+
+**NONE**
+
+***
+####Exported Plugin Functions:
+
+**NONE**
+
+***
+####Example:
+
+~~~javascript
+const app  = Server();
+app.apply( 'er_env' );
+app.add(( event )=>{
+	console.log( process.env );
+
+	event.send( 'Done' );
+});
+app.listen( 80 );
 ~~~
 
 ***

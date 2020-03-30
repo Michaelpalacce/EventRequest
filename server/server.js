@@ -56,7 +56,7 @@ class Server extends EventEmitter
 		this.apply( this.router );
 
 		const pluginsToApply	= [
-			{ plugin : 'er_static_resources', options: ['favicon.ico'] },
+			{ plugin : 'er_static_resources', options: { paths: ['favicon.ico'] } },
 		];
 
 		pluginsToApply.forEach(( pluginConfig )=>{

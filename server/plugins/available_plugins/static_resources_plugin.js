@@ -9,6 +9,7 @@ const path				= require( 'path' );
  */
 const PROJECT_ROOT	= path.parse( require.main.filename ).dir;
 const CSS_HEADER	= 'text/css';
+const JS_HEADER		= 'application/javascript';
 
 /**
  * @brief	Static resource plugin used to server static resources
@@ -40,10 +41,22 @@ class StaticResourcesPlugin extends PluginInterface
 
 					if ( fs.existsSync( item ) )
 					{
-						typeof event.headers.accept === 'string'
-							&& event.headers.accept.includes( CSS_HEADER )
-							? event.setHeader( 'Content-Type', CSS_HEADER )
-							: event.setHeader( 'Content-Type', '*/*' );
+						let mimeType	= '*/*';
+						switch ( path.extname( item ) )
+						{
+							case '.css':
+								mimeType	= CSS_HEADER;
+								break;
+
+							case '.js':
+								mimeType	= JS_HEADER;
+								break;
+
+							default:
+								break;
+						}
+
+						event.setHeader( 'Content-Type', mimeType );
 
 						event.send( fs.createReadStream( item ), 200 );
 					}

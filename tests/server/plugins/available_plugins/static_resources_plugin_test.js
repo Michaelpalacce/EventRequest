@@ -6,41 +6,6 @@ const StaticResourcesPlugin		= require( '../../../../server/plugins/available_pl
 const Router					= require( '../../../../server/components/routing/router' );
 
 test({
-	message		: 'StaticResourcesPlugin sets content type to empty if accepts not passed',
-	test		: ( done )=>{
-		const eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.css' );
-		const staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
-		const router				= new Router();
-		let called					= 0;
-
-		const pluginMiddlewares		= staticResourcesPlugin.getPluginMiddleware();
-
-		assert.equal( 1, pluginMiddlewares.length );
-
-		router.add( pluginMiddlewares[0] );
-		router.add( helpers.getEmptyMiddleware() );
-
-		eventRequest._mock({
-			method			: 'setHeader',
-			shouldReturn	: ()=>{
-				called	++;
-			},
-			with			: [
-				['Content-Type', '*/*']
-			],
-			called			: 1
-		});
-
-		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		eventRequest.next();
-
-		assert.equal( 1, called );
-
-		done();
-	}
-});
-
-test({
 	message		: 'StaticResourcesPlugin setsHeader for text/css in case of css',
 	test		: ( done )=>{
 		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.css', { accept : 'text/css' } );
@@ -75,9 +40,9 @@ test({
 });
 
 test({
-	message		: 'StaticResourcesPlugin setsHeader for text/css in case of js',
+	message		: 'StaticResourcesPlugin setsHeader to application/javascript in case of js',
 	test		: ( done )=>{
-		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.js', { accept : '*/*' } );
+		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.js' );
 		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
 		let router					= new Router();
 		let called					= 0;
@@ -95,7 +60,7 @@ test({
 				called	++;
 			},
 			with			: [
-				['Content-Type', '*/*']
+				['Content-Type', 'application/javascript']
 			]
 		});
 

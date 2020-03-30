@@ -21,6 +21,7 @@ test({
 		let templatingEnginePlugin	= new TemplatingEnginePlugin( 'id', { engine : new TestTemplatingEngine(), templateDir: path.join( __dirname, './fixture/templates' ) } );
 		let router					= new Router();
 		let called					= 0;
+		let setHeaderCalled			= 0;
 
 		eventRequest._mock({
 			method			: 'send',
@@ -28,6 +29,14 @@ test({
 				called	++;
 			},
 			with			: [['rendered', 200]],
+			called			: 1
+		});
+
+		eventRequest._mock({
+			method			: 'setHeader',
+			shouldReturn	: ()=>{
+				setHeaderCalled	++;
+			},
 			called			: 1
 		});
 
@@ -43,6 +52,7 @@ test({
 		eventRequest.next();
 		eventRequest.render( 'test', {}, done ).then(()=>{
 			assert.equal( 1, called );
+			assert.equal( 1, setHeaderCalled );
 			assert.equal( false, typeof eventRequest.render === 'undefined' );
 			assert.equal( false, typeof eventRequest.templateDir === 'undefined' );
 			assert.equal( false, typeof eventRequest.templatingEngine === 'undefined' );

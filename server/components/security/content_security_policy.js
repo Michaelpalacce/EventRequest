@@ -61,6 +61,8 @@ class ContentSecurityPolicy
 	 */
 	parseOptions( options )
 	{
+		this.enabled		= this.setEnabled( options['enabled'] );
+
 		this.directives		= typeof options[OPTIONS_DIRECTIVES_KEY] === 'object'
 							? options[OPTIONS_DIRECTIVES_KEY]
 							: {};
@@ -80,7 +82,7 @@ class ContentSecurityPolicy
 			this.setReportOnly( reportUri );
 		}
 
-		if ( options[OPTIONS_ENABLE_XSS] === true )
+		if ( typeof options[OPTIONS_ENABLE_XSS] === 'boolean' ? options[OPTIONS_ENABLE_XSS] :  true )
 		{
 			this.xss();
 		}
@@ -127,6 +129,18 @@ class ContentSecurityPolicy
 	{
 		if ( MIME_TYPE_REGEXP.test( mimeType ) )
 			this._addDirective( PLUGIN_TYPES_KEY, mimeType );
+	}
+
+	/**
+	 * @brief	Sets the component's to either be enabled or not
+	 *
+	 * @param	enabled Boolean
+	 *
+	 * @return	void
+	 */
+	setEnabled( enabled = true )
+	{
+		this.enabled	= typeof enabled === 'boolean' ? enabled : true;
 	}
 
 	/**
@@ -362,6 +376,9 @@ class ContentSecurityPolicy
 	 */
 	build()
 	{
+		if ( ! this.enabled )
+			return '';
+
 		let directives	= '';
 
 		for ( const directive in this.directives )
