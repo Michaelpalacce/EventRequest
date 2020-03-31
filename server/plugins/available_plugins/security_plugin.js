@@ -45,16 +45,12 @@ class SecurityPlugin extends PluginInterface
 			event.$security.build	= ()=>{
 				for ( const index in event.$security.modules )
 				{
-					const module	= event.$security.modules[index];
+					const module		= event.$security.modules[index];
 					const headerName	= module.getHeader();
 					const headerString	= module.build();
 
-					if ( headerString === '' )
-					{
-						continue;
-					}
-
-					event.setHeader( headerName, headerString );
+					if ( headerString !== '' )
+						event.setHeader( headerName, headerString );
 				}
 			};
 
@@ -62,6 +58,10 @@ class SecurityPlugin extends PluginInterface
 			{
 				event.$security.build();
 			}
+
+			event.on( 'cleanUp', ()=>{
+				event.$security	= undefined;
+			});
 
 			event.next();
 		});

@@ -4,11 +4,15 @@ let testSuites	= {};
 
 testSuites.eventSuite		= ()=>{
 	require( './server/event_test' );
+};
+
+testSuites.serverSuite		= ()=>{
 	require( './server/server_test' );
 };
 
 testSuites.securitySuite		= ()=>{
 	require( './server/components/session/session_test' );
+	require( './server/components/security/content_security_policy_test' );
 };
 
 testSuites.routingSuite		= ()=>{

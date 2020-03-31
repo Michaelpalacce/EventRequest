@@ -8,8 +8,8 @@
  * @var		Number
  */
 const DEFAULT_MAX_AGE					= 31536000;
-const DEFAULT_INCLUDE_SUB_DOMAINS		= true;
-const DEFAULT_PRELOAD					= true;
+const DEFAULT_INCLUDE_SUB_DOMAINS		= false;
+const DEFAULT_PRELOAD					= false;
 
 /**
  * @brief	Name of the HSTS header
@@ -47,7 +47,7 @@ class HttpStrictTransportSecurity
 	 */
 	parseOptions( options = {} )
 	{
-		this.enabled				= this.setEnabled( options['enabled'] );
+		this.setEnabled( options['enabled'] );
 
 		this.maxAge					= typeof options[OPTIONS_MAX_AGE_KEY] === 'number'
 									? options[OPTIONS_MAX_AGE_KEY]
@@ -75,15 +75,15 @@ class HttpStrictTransportSecurity
 	}
 
 	/**
-	 * @brief	Sets the component's to either be enabled or not
+	 * @brief	Sets the component's to either be preloaded or not
 	 *
-	 * @param	enabled Boolean
+	 * @param	preload Boolean
 	 *
 	 * @return	void
 	 */
-	preload( enabled = true )
+	preload( preload = true )
 	{
-		this.doPreload	= typeof enabled === 'boolean' ? enabled : this.doPreload;
+		this.doPreload	= typeof preload === 'boolean' ? preload : this.doPreload;
 	}
 
 	/**

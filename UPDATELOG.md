@@ -1,4 +1,5 @@
 16.2.0
+- Added more types to the text file stream
 - Added Security Plugin
 - Tested Security Plugin
 - Documented Security Plugin

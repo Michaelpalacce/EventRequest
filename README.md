@@ -2697,9 +2697,33 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 ***
 ####Accepted Options:
 
-**fileLocation: String**
-- The absolute path to the .env file you want to use
-- Defaults to PROJECT_ROOT
+**build: Boolean**
+- Whether the headers should be build and set immediately ( taking the default settings )
+- Defaults to true
+
+**csp: Object**
+- The Content Security Policy options
+- This object will be passed to the CSP component
+- For the object supported parameters, look further down
+- Defaults to an empty object
+
+**hsts: Object**
+- The HTTP Strict Transport Security options
+- This object will be passed to the HSTS component
+- For the object supported parameters, look further down
+- Defaults to an empty object
+
+**ect: Object**
+- The Expects CT options
+- This object will be passed to the Expects-CT component
+- For the object supported parameters, look further down
+- Defaults to an empty object
+
+**cto: Object**
+- The Content Type Options options
+- This object will be passed to the Content Type Options component
+- For the object supported parameters, look further down
+- Defaults to an empty object
 
 ***
 ####Events:
@@ -2709,12 +2733,33 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 ***
 ####Exported Functions:
 
-**NONE**
+**event.$security.build(): void**
+- This function accepts no arguments. 
+- It is used to set all the security headers
+- This function is called if the build flag is set
 
 ***
 ####Attached Functionality:
 
-**NONE**
+**event.$security: Object**
+- Holds all the security modules
+- Holds the build function that builds and sets the security headers
+
+**event.$security.modules: Object**
+- Holds all the security modules
+- These modules can be accessed and used anywhere
+
+**event.$security.modules.csp: ContentSecurityPolicy**
+- Class that implements a builder design pattern
+
+**event.$security.modules.cto: ContentTypeOptions**
+- Class that implements a builder design pattern
+
+**event.$security.modules.hsts: HttpStrictTransportSecurity**
+- Class that implements a builder design pattern
+
+**event.$security.modules.ect: ExpectCT**
+- Class that implements a builder design pattern
 
 ***
 ####Exported Plugin Functions:
@@ -2722,17 +2767,354 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 **NONE**
 
 ***
+####Objects:
+
+#####HTTP Strict Transport Security
+- Used to build a Strict-Transport-Security header
+- It can either be enabled or not
+- The HTTP Strict-Transport-Security response header (often abbreviated as HSTS) lets a web site tell browsers that it should only be accessed using HTTPS, instead of using HTTP.
+- More info: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+
+***
+- Accepted options:
+
+**enabled: Boolean**
+- Whether the plugin should be enabled or not
+- Defaults to true
+
+**maxAge: Number**
+- The time, in seconds, that the browser should remember that a site is only to be accessed using HTTPS
+- Defaults to 31536000
+
+**includeSubDomains: Boolean**
+- Optional
+- If this optional parameter is specified, this rule applies to all of the site's subdomains as well.
+- Defaults to false
+
+**preload: Boolean**
+- Optional
+- See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security#Preloading_Strict_Transport_Security
+- Defaults to false
+
+***
+- Functions:
+
+**getHeader(): String**
+- Returns the header as it should be set.
+
+**build(): String**
+- Builds the header string from all the directives called before hand
+
+**setMaxAge( Number maxAge ): void**
+- Sets the max age
+- The value is in seconds
+- If it is invalid, default will be left
+
+**setEnabled( Boolean enabled = true ): void**
+- Enables the plugin  
+- You can pass false and the plugin will be disabled
+
+**preload( Boolean preload = true ): void**
+- Sets preload state
+- If it is invalid, default will be left
+
+**includeSubDomains( Boolean include = true ): void**
+- Sets includeSubDomains state
+- If it is invalid, default will be left
+
+
+***
+***
+***
+
+#####Content Type Options
+- Used to build a X-Content-Type-Options header
+- It can either be enabled or not
+- The value of the header is nosniff always
+- The X-Content-Type-Options response HTTP header is a marker used by the server to indicate that the MIME types advertised in the Content-Type headers should not be changed and be followed. This allows to opt-out of MIME type sniffing, or, in other words, it is a way to say that the webmasters knew what they were doing.
+- More info: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
+
+***
+- Accepted options:
+
+**enabled: Boolean**
+- Whether the plugin should be enabled or not
+- Defaults to true
+
+***
+- Functions:
+
+**getHeader(): String**
+- Returns the header as it should be set.
+
+**build(): String**
+- Builds the header string from all the directives called before hand
+
+
+***
+***
+***
+
+#####Expect-CT
+- Used to build a Expect-CT header
+- It can either be enabled or not
+- The Expect-CT header allows sites to opt in to reporting and/or enforcement of Certificate Transparency requirements, which prevents the use of misissued certificates for that site from going unnoticed.
+- More info: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expect-CT
+
+***
+- Accepted options:
+
+**enabled: Boolean**
+- Whether the plugin should be enabled or not
+- Defaults to true
+
+**maxAge: Number**
+- Specifies the number of seconds after reception of the Expect-CT header field during which the user agent should regard the host from whom the message was received as a known Expect-CT host.
+- Defaults to 86400
+
+**enforce: Boolean**
+- Optional
+- Signals to the user agent that compliance with the Certificate Transparency policy should be enforced (rather than only reporting compliance) and that the user agent should refuse future connections that violate its Certificate Transparency policy.
+- Defaults to true
+
+**reportUri: String**
+- Optional
+- Specifies the URI to which the user agent should report Expect-CT failures.
+- Defaults to ''
+
+***
+- Functions:
+
+**setEnabled( Boolean enabled = true ): void**
+- Enables the plugin  
+- You can pass false and the plugin will be disabled
+
+**enforce( Boolean enforce = true ): void**
+- Sets the enforcement state
+- If it is invalid, default will be left
+
+**setReportUri( String reportUri ): void**
+- Sets the report uri
+- If it is invalid, default will be left
+
+**setMaxAge( Number maxAge ): void**
+- Sets the max age
+- The value is in seconds
+- If it is invalid, default will be left
+
+**getHeader(): String**
+- Returns the header as it should be set.
+
+**build(): String**
+- Builds the header string from all the directives called before hand
+
+
+***
+***
+***
+
+#####Content Security Policy
+- Used to build a CSP header
+- Many the directives may have many arguments, when the header is build only one directive will be set.
+
+***
+- Accepted options:
+
+**enabled: Boolean**
+- Whether the plugin should be enabled or not
+- Defaults to true
+
+**directives: Object**
+- Holds all the directives for the that should be added
+- Supports all directives from: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+- The directives should be added exactly as they are specified in the documentation (script-src, style-src, frame-ancestores, etc)
+- For directives that don't have a value like lets say 'sandbox' they should be passed with an empty array: `sandbox: []`
+- There are some special arguments to these directives that need to have single quotes added around them. If you are unsure use the builder methods
+- Defaults to an empty object
+
+**xss: Boolean**
+- This flag will enable some directives used to battle XSS attacks
+- This adds src for every directive
+- This adds upgradeInsecureRequests directive as well
+- Defaults to true
+
+**self: Boolean**
+- This flag will add origin self to the default-src
+- Defaults to false
+
+**sandbox: Boolean**
+- This flag will enabled sandbox mode 
+- Defaults to false
+
+**reportUri: String**
+- If this flag is given, then the plugin will be set to reporting only mode
+- Defaults to null
+
+**useReportTo: Boolean**
+- This flag must be used with **reportUri** otherwise it won't work.
+- If this flag is set then the new report-to will be used
+- Defaults to false
+
+***
+- Functions:
+
+**xss(): void**
+- Enables xss protection
+- Same as setting the xss flag in the options
+
+**allowPluginType( String mimeType ): void**
+- Adds a 'plugin-types' directive with the given mimeType
+- The mimeType will be checked against /^[-\w.]+\/[-\w.]+$/
+
+**setEnabled( Boolean enabled = true ): void**
+- Enables the plugin  
+- You can pass false and the plugin will be disabled
+
+**getHeader(): String**
+- Returns the header as it should be set.
+- The header can be influenced if reporting is enabled
+
+**setReportOnly( String uri ): void**
+- If uri is not provided then this will do nothing
+- Sets the state to report only, which changes the header to be CSP report only
+- Adds a directive 'report-uri' with the given uri
+
+**setReportOnlyWithReportTo( String uri ): void**
+- If uri is not provided then this will do nothing
+- Sets the state to report only, which changes the header to be CSP report only
+- Adds a directive 'report-to' with the given uri
+- report-to is not supported by some browsers, so you should probably call setReportOnly with a uri as well
+
+**enableSandbox(): void**
+- Enables sandbox mode: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox
+- Adds a directive 'sandbox' to the csp
+
+**allowSandboxValue( String value ): void**
+- Enables sandbox mode: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/sandbox
+- Adds a directive 'sandbox' to the csp with a given value 
+
+**upgradeInsecureRequests(): void**
+- Adds a directive 'upgrade-insecure-requests'
+- This will upgrade all http links in your site to https automatically
+
+**addBaseUri( String uri ): void**
+- Adds a 'base-uri' directive with the given uri
+- This will add single quotes if needed
+
+**addFrameAncestors( String uri ): void**
+- Adds a 'frame-ancestors' directive with the given uri
+- This will add single quotes if needed
+
+**addScriptSrc( String uri ): void**
+- Adds a 'script-src' directive with the given uri
+- This will add single quotes if needed
+
+**addImgSrc( String uri ): void**
+- Adds a 'img-src' directive with the given uri
+- This will add single quotes if needed
+
+**addChildSrc( String uri ): void**
+- Adds a 'child-src' directive with the given uri
+- This will add single quotes if needed
+
+**addConnectSrc( String uri ): void**
+- Adds a 'connect-src' directive with the given uri
+- This will add single quotes if needed
+
+**addConnectSrc( String uri ): void**
+- Adds a 'connect-src' directive with the given uri
+- This will add single quotes if needed
+
+**addDefaultSrc( String uri ): void**
+- Adds a 'default-src' directive with the given uri
+- This will act as a fallback to ANY src directive
+- This will add single quotes if needed
+
+**enableSelf(): void**
+- Adds a 'default-src' directive with the 'self'
+
+**addFontSrc( String uri ): void**
+- Adds a 'font-src' directive with the given uri
+- This will add single quotes if needed
+
+**addFrameSrc( String uri ): void**
+- Adds a 'frame-src' directive with the given uri
+- This will add single quotes if needed
+
+**addFrameSrc( String uri ): void**
+- Adds a 'frame-src' directive with the given uri
+- This will add single quotes if needed
+
+**addManifestSrc( String uri ): void**
+- Adds a 'manifest-src' directive with the given uri
+- This will add single quotes if needed
+
+**addMediaSrc( String uri ): void**
+- Adds a 'media-src' directive with the given uri
+- This will add single quotes if needed
+
+**addObjectSrc( String uri ): void**
+- Adds a 'object-src' directive with the given uri
+- This will add single quotes if needed
+
+**addStyleSrc( String uri ): void**
+- Adds a 'style-src' directive with the given uri
+- This will add single quotes if needed
+
+**build(): String**
+- Builds the header string from all the directives called before hand
+- You can modify directives after calling build and then call build again to get a new result
+
+
+***
 ####Example:
 
+- Apply the plugin with defaults
 ~~~javascript
-const app  = Server();
-app.apply( 'er_env' );
-app.add(( event )=>{
-	console.log( process.env );
+// It's a good idea to do this first before attaching any other plugins or adding routes
+app.apply( app.er_security );
+~~~
 
-	event.send( 'Done' );
+- Apply the plugin and use the builder methods
+~~~javascript
+app.apply( app.er_security );
+
+app.add(( event )=>{
+    event.$security.modules.csp.enableSandbox();
+    event.$security.modules.hsts.setEnabled( false );
+    event.$security.modules.cto.setEnabled( false );
+    event.$security.modules.ect.setMaxAge( 300 );
+    event.$security.modules.ect.setReportUri( '/report/uri' );
+    
+    event.$security.build();
+
+    event.next();
 });
-app.listen( 80 );
+~~~
+
+- Apply the plugin with custom directives
+~~~javascript
+app.apply( app.er_security, {
+	csp	: {
+		directives	: {
+			'font-src'	: ['https://fonts.gstatic.com'],
+			'script-src': ['https://example.com'],
+			'style-src': ['https://example.com', 'unsafe-eval'],
+		},
+		xss: true
+	},
+    ect : {
+        maxAge: '300'
+    },
+    hsts    : {
+		maxAge: '300',
+        preload: false
+    },
+    cto : {
+        enabled: false
+    },
+	build: true
+});
 ~~~
 
 ***

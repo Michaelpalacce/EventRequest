@@ -48,7 +48,7 @@ class ExpectCT
 	 */
 	parseOptions( options = {} )
 	{
-		this.enabled	= this.setEnabled( options['enabled'] );
+		this.setEnabled( options['enabled'] );
 
 		this.maxAge		= typeof options[OPTIONS_MAX_AGE_KEY] === 'number'
 						? options[OPTIONS_MAX_AGE_KEY]

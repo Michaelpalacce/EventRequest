@@ -28,7 +28,7 @@ class TextFileStream extends FileStream
 			'.md', '.bat', '.log', '.yml', '.ini', '.ts', '.ejs', '.twig',
 			'', '.rtf', '.apt', '.fodt', '.rft', '.apkg', '.fpt', '.lst',
 			'.doc', '.docx', '.man', '.plain', '.text', '.odm', '.readme',
-			'.cmd', '.ps1'
+			'.cmd', '.ps1', '.conf', '.default', '.config'
 		];
 		this._streamType		= STREAM_TYPE;
 

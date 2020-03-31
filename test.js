@@ -15,6 +15,7 @@ const startTests	= ()=>{
 	testSuites.bodyParserSuite();
 	testSuites.validationSuite();
 	testSuites.pluginsSuite();
+	testSuites.serverSuite();
 	testSuites.cachingSuite();
 	testSuites.rateLimiterSuite();
 

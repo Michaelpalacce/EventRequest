@@ -1,6 +1,5 @@
 'use strict';
 
-
 /**
  * @brief	Name of the X-Content-Type-Options header
  *
@@ -27,7 +26,7 @@ class ContentTypeOptions
 	 */
 	parseOptions( options = {} )
 	{
-		this.enabled	= this.setEnabled( options['enabled'] );
+		this.setEnabled( options['enabled'] );
 	}
 
 	/**

@@ -37,7 +37,7 @@ const REPORT_ONLY_HEADER_NAME		= 'Content-Security-Policy-Report-Only';
 const DIRECTIVES_SPECIAL_ARGUMENTS	= ['self', 'unsafe-eval', 'unsafe-hashes', 'unsafe-inline', 'none'];
 
 // Regular expression to match mime types
-const MIME_TYPE_REGEXP				= new RegExp( /^[-\w.]+\/[-\w.]+$/ );
+const MIME_TYPE_REGEXP				= new RegExp( /^[-*\w.]+\/[-*\w.]+$/ );
 
 /**
  * @brief	CSP class that uses the builder pattern to build the CSP header
@@ -61,7 +61,7 @@ class ContentSecurityPolicy
 	 */
 	parseOptions( options )
 	{
-		this.enabled		= this.setEnabled( options['enabled'] );
+		this.setEnabled( options['enabled'] );
 
 		this.directives		= typeof options[OPTIONS_DIRECTIVES_KEY] === 'object'
 							? options[OPTIONS_DIRECTIVES_KEY]
@@ -393,8 +393,13 @@ class ContentSecurityPolicy
 				attributes	= ` ${attributes}`;
 			}
 
-			directives			+= `${directive}${attributes}; `;
+
+			if ( directives !== '' )
+				directives			+= ' ';
+
+			directives			+= `${directive}${attributes};`;
 		}
+
 
 		return directives;
 	}
