@@ -162,7 +162,7 @@ class ContentSecurityPolicy
 	 */
 	setReportOnly( uri )
 	{
-		if ( ! uri )
+		if ( typeof uri !== 'string' || uri === '' )
 		{
 			return;
 		}
@@ -173,9 +173,9 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @brief	Sets the header to be in report only mode
+	 * @brief	Sets the header to be in report only mode with report-to instead of report-uri
 	 *
-	 * @details	The Report-To header won't be added for you, you have to specify that yourself
+	 * @details	The report-uri header won't be added for you, you have to specify that yourself
 	 *
 	 * @param	uri String
 	 *
@@ -183,7 +183,7 @@ class ContentSecurityPolicy
 	 */
 	setReportOnlyWithReportTo( uri )
 	{
-		if ( ! uri )
+		if ( typeof uri !== 'string' || uri === '' )
 		{
 			return;
 		}

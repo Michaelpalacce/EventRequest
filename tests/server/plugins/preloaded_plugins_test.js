@@ -14,6 +14,7 @@ test({
 			PreLoadedPluginManager.getPlugin( 'er_static_resources' );
 			PreLoadedPluginManager.getPlugin( 'er_cache_server' );
 			PreLoadedPluginManager.getPlugin( 'er_session' );
+			PreLoadedPluginManager.getPlugin( 'er_security' );
 			PreLoadedPluginManager.getPlugin( 'er_templating_engine' );
 			PreLoadedPluginManager.getPlugin( 'er_file_stream' );
 			PreLoadedPluginManager.getPlugin( 'er_logger' );
