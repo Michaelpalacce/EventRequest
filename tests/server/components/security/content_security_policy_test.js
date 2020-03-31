@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers }	= require( '../../../test_helper' );
+const { assert, test }			= require( '../../../test_helper' );
 const CSP						= require( './../../../../server/components/security/content_security_policy' );
 
 const HEADER_NAME				= 'Content-Security-Policy';

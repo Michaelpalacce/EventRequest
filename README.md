@@ -178,9 +178,14 @@ The event request is an object that is created by the server and passed through 
 - Emits a 'send' event and calls cleanUp
 - The event will be emitted with a response if the response was a string or the isRaw flag was set to false 
 
-**setHeader( String key, mixed value ): boolean** 
+**setHeader( String key, mixed value ): void** 
 - Sets a new header to the response.
 - Emits a 'setHeader' event. 
+- If the response is finished then an error will be set to the next middleware
+
+**removeHeader( String key ): void** 
+- Removes an existing header from to the response.
+- Emits a 'removeHeader' event. 
 - If the response is finished then an error will be set to the next middleware
 
 **redirect( String redirectUrl, Number statusCode = 302 ): void** 
@@ -247,6 +252,12 @@ The event request is an object that is created by the server and passed through 
      
   -  **value: mixed** 
      - The header value
+
+**removeHeader( Object headerData )** 
+- Emitted when a header was removed
+- headerData contains:
+  -  **key: String** 
+     - The header name
 
 **redirect( Object redirectData )** 
 - Emitted when a redirect response was sent
@@ -2742,24 +2753,25 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 ####Attached Functionality:
 
 **event.$security: Object**
-- Holds all the security modules
 - Holds the build function that builds and sets the security headers
-
-**event.$security.modules: Object**
 - Holds all the security modules
 - These modules can be accessed and used anywhere
 
-**event.$security.modules.csp: ContentSecurityPolicy**
+**event.$security.csp: ContentSecurityPolicy**
 - Class that implements a builder design pattern
+- Look down for more info
 
-**event.$security.modules.cto: ContentTypeOptions**
+**event.$security.cto: ContentTypeOptions**
 - Class that implements a builder design pattern
+- Look down for more info
 
-**event.$security.modules.hsts: HttpStrictTransportSecurity**
+**event.$security.hsts: HttpStrictTransportSecurity**
 - Class that implements a builder design pattern
+- Look down for more info
 
-**event.$security.modules.ect: ExpectCT**
+**event.$security.ect: ExpectCT**
 - Class that implements a builder design pattern
+- Look down for more info
 
 ***
 ####Exported Plugin Functions:
@@ -2929,7 +2941,7 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 - Supports all directives from: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 - The directives should be added exactly as they are specified in the documentation (script-src, style-src, frame-ancestores, etc)
 - For directives that don't have a value like lets say 'sandbox' they should be passed with an empty array: `sandbox: []`
-- There are some special arguments to these directives that need to have single quotes added around them. If you are unsure use the builder methods
+- Single quotes will be added to the directives if needed, so it's safe to pass `self`, `unsafe-eval`, etc without single quotes
 - Defaults to an empty object
 
 **xss: Boolean**
@@ -3080,11 +3092,11 @@ app.apply( app.er_security );
 app.apply( app.er_security );
 
 app.add(( event )=>{
-    event.$security.modules.csp.enableSandbox();
-    event.$security.modules.hsts.setEnabled( false );
-    event.$security.modules.cto.setEnabled( false );
-    event.$security.modules.ect.setMaxAge( 300 );
-    event.$security.modules.ect.setReportUri( '/report/uri' );
+    event.$security.csp.enableSandbox();
+    event.$security.hsts.setEnabled( false );
+    event.$security.cto.setEnabled( false );
+    event.$security.ect.setMaxAge( 300 );
+    event.$security.ect.setReportUri( '/report/uri' );
     
     event.$security.build();
 
@@ -3115,6 +3127,43 @@ app.apply( app.er_security, {
     },
 	build: true
 });
+~~~
+
+- Apply the plugin with a lot of different commands later, as well as rebuilding
+~~~javascript
+		app.apply( app.er_security, { csp : { xss: false } } );
+
+		app.add(( event )=>{
+
+			// self is repeated twice but will be shown only once and with single quotes
+			event.$security.csp.addFontSrc( 'self' );
+			event.$security.csp.addFontSrc( "'self'" );
+			event.$security.csp.addFontSrc( 'test' );
+			event.$security.csp.upgradeInsecureRequests();
+			event.$security.csp.enableSelf();
+			event.$security.csp.enableSandbox();
+
+			event.$security.ect.setEnabled( false );
+			event.$security.ect.setMaxAge( 30000 );
+
+			event.$security.hsts.setMaxAge( 300 );
+			// null and 'string' are invalid for max age so 300 will be left
+			event.$security.hsts.setMaxAge( null );
+			event.$security.hsts.setMaxAge( 'string' );
+			event.$security.hsts.preload();
+			event.$security.hsts.includeSubDomains( false );
+
+			event.$security.build();
+
+			// This will actually add a new script-src to the csp and will disable the cto component
+			event.$security.csp.addScriptSrc( 'test' );
+			event.$security.cto.setEnabled( false );
+
+			// This will overwrite the previous build and set the new modified headers
+			event.$security.build();
+
+			event.next();
+		});
 ~~~
 
 ***

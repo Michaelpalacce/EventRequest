@@ -305,6 +305,20 @@ test({
 });
 
 test({
+	message	: 'EventRequest removeHeader emits a removeHeader event',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		let removeHeader	= false;
+
+		eventRequest.on( 'removeHeader', ()=>{ removeHeader = true; });
+
+		eventRequest.removeHeader( 'key' );
+
+		removeHeader	? done() : done( 'EventRequest removeHeader event not emitted' );
+	}
+});
+
+test({
 	message	: 'EventRequest setStatusCode changes the status code',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
@@ -334,6 +348,25 @@ test({
 
 		eventRequest.setHeader( 'key', 'value' );
 		setHeader	? done() : done( 'EventRequest setHeader did not call response.setHeader' );
+	}
+});
+
+test({
+	message	: 'EventRequest removeHeader removes the header in the response if response is not sent',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		assert.equal( eventRequest.isFinished(), false );
+		let removeHeader	= false;
+
+		eventRequest.response._mock({
+			method			: 'removeHeader',
+			shouldReturn	: ()=>{ removeHeader = true; },
+			called			: 1,
+			with			: [['key']]
+		});
+
+		eventRequest.removeHeader( 'key' );
+		removeHeader	? done() : done( 'EventRequest removeHeader did not call response.removeHeader' );
 	}
 });
 
@@ -368,6 +401,41 @@ test({
 		});
 
 		eventRequest.setHeader( 'key', 'value' );
+		errorCalled	? done() : done( 'Error was not called' );
+	}
+});
+
+test({
+	message	: 'EventRequest removeHeader does not remove header when event is finished and throws error',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		let errorHandler	= new MockedErrorHandler();
+		let errorCalled		= false;
+
+		assert.equal( eventRequest.isFinished(), false );
+
+		eventRequest.response._mock({
+			method			: 'removeHeader',
+			shouldReturn	: ()=>{
+				throw new Error( 'EventRequest removeHeader should not have called response.removeHeader' );
+			}
+		});
+
+		eventRequest.response._mock({
+			method			: 'finished',
+			shouldReturn	: true
+		});
+
+		eventRequest.errorHandler	= errorHandler;
+
+		errorHandler._mock({
+			method			: 'handleError',
+			shouldReturn	: () => { errorCalled = true; },
+			with			: [[eventRequest, undefined]],
+			called			: 1
+		});
+
+		eventRequest.removeHeader( 'key' );
 		errorCalled	? done() : done( 'Error was not called' );
 	}
 });

@@ -34,23 +34,26 @@ class SecurityPlugin extends PluginInterface
 
 		middlewares.push(( event )=>{
 			event.$security		= {
-				modules	: {
-					csp		: new CSP( typeof this.options.csp === 'object' ? this.options.csp : {} ),
-					hsts	: new HSTS( typeof this.options.hsts === 'object' ? this.options.hsts : {} ),
-					ect		: new ExpectsCT( typeof this.options.ect === 'object' ? this.options.ect : {} ),
-					cto		: new ContentTypeOptions( typeof this.options.cto === 'object' ? this.options.cto : {} ),
-				}
+				csp		: new CSP( typeof this.options.csp === 'object' ? this.options.csp : {} ),
+				hsts	: new HSTS( typeof this.options.hsts === 'object' ? this.options.hsts : {} ),
+				ect		: new ExpectsCT( typeof this.options.ect === 'object' ? this.options.ect : {} ),
+				cto		: new ContentTypeOptions( typeof this.options.cto === 'object' ? this.options.cto : {} )
 			};
 
 			event.$security.build	= ()=>{
-				for ( const index in event.$security.modules )
+				for ( const index in event.$security )
 				{
-					const module		= event.$security.modules[index];
+					if ( index === 'build' )
+						continue;
+
+					const module		= event.$security[index];
 					const headerName	= module.getHeader();
 					const headerString	= module.build();
 
 					if ( headerString !== '' )
 						event.setHeader( headerName, headerString );
+					else
+						event.removeHeader( headerName );
 				}
 			};
 

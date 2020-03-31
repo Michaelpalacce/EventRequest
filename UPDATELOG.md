@@ -1,5 +1,6 @@
 16.2.0
 - Added more types to the text file stream
+- Added removeHeader to the eventRequest and tested it
 - Added Security Plugin
 - Tested Security Plugin
 - Documented Security Plugin

@@ -259,7 +259,28 @@ class EventRequest extends EventEmitter
 		}
 		else
 		{
-			this.next( 'Trying to set headers when response is already sent' );
+			this.next( 'Trying to set header when response is already sent' );
+		}
+	}
+
+	/**
+	 * @brief	Removes a set header
+	 *
+	 * @param	key String
+	 *
+	 * @return	void
+	 */
+	removeHeader( key )
+	{
+		this.emit( 'removeHeader', { key } );
+
+		if ( ! this.isFinished() )
+		{
+			this.response.removeHeader( key )
+		}
+		else
+		{
+			this.next( 'Trying to remove header when response is already sent' );
 		}
 	}
 

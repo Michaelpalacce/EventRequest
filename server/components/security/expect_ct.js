@@ -134,10 +134,10 @@ class ExpectCT
 		let headerContent	= `${MAX_AGE_KEY}=${this.maxAge};`;
 
 		if ( this.isEnforce === true )
-			headerContent	+= ` ${ENFORCE_KEY},`;
+			headerContent	+= ` ${ENFORCE_KEY}`;
 
 		if ( this.reportUri !== '' )
-			headerContent	+= ` ${REPORT_URI_KEY}=${this.reportUri}`;
+			headerContent	+= `, ${REPORT_URI_KEY}=${this.reportUri}`;
 
 		return headerContent;
 	}

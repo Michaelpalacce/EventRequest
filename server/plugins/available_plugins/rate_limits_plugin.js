@@ -266,8 +266,6 @@ class RateLimitsPlugin extends PluginInterface
 		const method						= eventRequest.method;
 		const clientIp						= eventRequest.clientIp;
 
-		// console.log('-----------------------------------')
-		// console.log(this.rules)
 		let hasConnectionDelayPolicy		= false;
 		let connectionDelayPolicyOptions	= null;
 		let bucketsHit						= [];

@@ -67,6 +67,11 @@ class ContentSecurityPolicy
 							? options[OPTIONS_DIRECTIVES_KEY]
 							: {};
 
+		for ( const directiveName in this.directives )
+		{
+			this.directives[directiveName]	= this.directives[directiveName].map( ( attribute )=>{ return this._decorateFetchDirectiveSource( attribute ); } );
+		}
+
 		const reportUri		= typeof options[OPTIONS_REPORT_URI] === 'string'
 							? options[OPTIONS_REPORT_URI]
 							: null;
@@ -392,7 +397,6 @@ class ContentSecurityPolicy
 			{
 				attributes	= ` ${attributes}`;
 			}
-
 
 			if ( directives !== '' )
 				directives			+= ' ';
