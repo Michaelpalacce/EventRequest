@@ -13,6 +13,9 @@ testSuites.serverSuite		= ()=>{
 testSuites.securitySuite		= ()=>{
 	require( './server/components/session/session_test' );
 	require( './server/components/security/content_security_policy_test' );
+	require( './server/components/security/content_type_options_test' );
+	require( './server/components/security/expect_ct_test' );
+	require( './server/components/security/http_strict_transport_security' );
 };
 
 testSuites.routingSuite		= ()=>{

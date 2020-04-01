@@ -1394,7 +1394,7 @@ test({
 				assert.equal( response.headers['content-security-policy'], "default-src 'none'; script-src 'self'; img-src 'self'; font-src 'self'; style-src 'self'; connect-src 'self'; child-src 'self'; media-src 'self'; manifest-src 'self'; object-src 'self'; frame-ancestors 'self'; base-uri 'self'; upgrade-insecure-requests;" );
 
 				assert.equal( response.headers['strict-transport-security'], "max-age=31536000;" );
-				assert.equal( response.headers['expect-ct'], "max-age=86400; enforce" );
+				assert.equal( response.headers['expect-ct'], "max-age=86400, enforce" );
 				assert.equal( response.headers['x-content-type-options'], "nosniff" );
 
 				done();

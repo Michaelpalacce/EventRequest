@@ -84,7 +84,7 @@ class ExpectCT
 	 */
 	enforce( enforce = true )
 	{
-		this.isEnforce	= typeof enforce === 'boolean' ? enforce : true;
+		this.isEnforce	= typeof enforce === 'boolean' ? enforce : this.isEnforce;
 	}
 
 	/**
@@ -131,13 +131,13 @@ class ExpectCT
 		if ( ! this.enabled )
 			return '';
 
-		let headerContent	= `${MAX_AGE_KEY}=${this.maxAge};`;
+		let headerContent	= `${MAX_AGE_KEY}=${this.maxAge}`;
 
 		if ( this.isEnforce === true )
-			headerContent	+= ` ${ENFORCE_KEY}`;
+			headerContent	+= `, ${ENFORCE_KEY}`;
 
 		if ( this.reportUri !== '' )
-			headerContent	+= `, ${REPORT_URI_KEY}=${this.reportUri}`;
+			headerContent	+= `, ${REPORT_URI_KEY}="${this.reportUri}"`;
 
 		return headerContent;
 	}

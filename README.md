@@ -1619,6 +1619,7 @@ Server {
   er_file_stream: 'er_file_stream',
   er_logger: 'er_logger',
   er_session: 'er_session',
+  er_security: 'er_security',
   er_response_cache: 'er_response_cache',
   er_body_parser_json: 'er_body_parser_json',
   er_body_parser_form: 'er_body_parser_form',

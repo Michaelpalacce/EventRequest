@@ -1,3 +1,7 @@
+16.2.1
+- Added more tests for the security section
+- Fixed an issues with the expect-ct with the way it was being formatted
+
 16.2.0
 - Added more types to the text file stream
 - Added removeHeader to the eventRequest and tested it
