@@ -22,7 +22,7 @@ test({
 });
 
 test({
-	message			: 'ErrorHandler.handleError handles a Error successfully by emitting the stack on_error and sending the message to event.send',
+	message			: 'ErrorHandler.handleError handles an Error successfully by emitting the stack on_error and sending the message to event.send',
 	test			: ( done )=>{
 		const eventRequest	= helpers.getEventRequest();
 		const errorHandler	= new ErrorHandler();

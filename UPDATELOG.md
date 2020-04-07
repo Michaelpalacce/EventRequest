@@ -1,3 +1,6 @@
+16.2.2
+- Added repository urls to package.json
+
 16.2.1
 - Added more tests for the security section
 - Fixed an issues with the expect-ct with the way it was being formatted

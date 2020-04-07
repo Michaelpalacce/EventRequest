@@ -32,11 +32,19 @@
     "input-validation"
   ],
   "license": "GPL-3.0",
+  "repository": {
+	"type": "git",
+	"url": "git+https://github.com/Michaelpalacce/EventRequest.git"
+  },
+  "bugs": {
+	"url": "https://github.com/Michaelpalacce/EventRequest/issues"
+  },
+  "homepage": "https://github.com/Michaelpalacce/EventRequest#readme",
   "main": "server.js",
   "name": "event_request",
   "scripts": {
     "test": "node test.js",
     "deploy": "npm run test && npm publish"
   },
-  "version": "16.2.1"
+  "version": "16.2.2"
 }
