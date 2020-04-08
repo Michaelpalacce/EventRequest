@@ -194,8 +194,7 @@ class Session
 			return false;
 		}
 
-		const dataSet	= await this.server.get( this.sessionId );
-		this.session	= dataSet.value;
+		this.session	= await this.server.get( this.sessionId );
 
 		return true;
 	}

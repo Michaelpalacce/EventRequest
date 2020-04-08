@@ -32,6 +32,8 @@ class DataServer extends EventEmitter
 	{
 		super();
 		this.setMaxListeners( 0 );
+		this.intervals	= [];
+		this.server		= null;
 
 		this._configure( options );
 	}
@@ -72,8 +74,6 @@ class DataServer extends EventEmitter
 		this.persist			= typeof options['persist'] === 'boolean'
 								? options['persist']
 								: DEFAULT_PERSIST_RULE;
-
-		this.intervals			= [];
 
 		if ( this.persist )
 		{
@@ -142,18 +142,20 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Gets the value from the server
 	 *
-	 * @param	String key
+	 * @param	key String
+	 * @param	options Object
 	 *
 	 * @return	Promise|null
 	 */
-	async get( key )
+	async get( key, options = {} )
 	{
-		if ( typeof key !== 'string' )
+		if ( typeof key !== 'string' || typeof options !== 'object' )
 		{
 			return null;
 		}
 
-		return this._get( key ).catch( this._handleServerDown ) || null;
+		this.emit( 'get', { key, options } );
+		return this._get( key, options ).catch( this._handleServerDown.bind( this ) ) || null;
 	}
 
 	/**
@@ -172,23 +174,353 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Gets the data
 	 *
-	 * @param	String key
+	 * @details	Prunes the data if it is expired
+	 *
+	 * @param	key String
+	 * @param	options Object
 	 *
 	 * @return	Promise
 	 */
-	async _get( key )
+	async _get( key, options = {} )
 	{
-		return this._prune( key );
+		return new Promise( async ( resolve )=>{
+			const dataSet	= await this._prune( key, options );
+
+			if ( dataSet === null )
+			{
+				return resolve( dataSet );
+			}
+
+			return resolve( dataSet.value );
+		});
 	}
 
 	/**
-	 * @brief	Removes the dataSet if it is expired, otherwise returns it. Returns null if removed
+	 * @brief	Sets the value to the data server
 	 *
-	 * @param	string key
+	 * @param	key String
+	 * @param	value mixed
+	 * @param	ttl Number
+	 * @param	options Object
 	 *
 	 * @return	Promise
 	 */
-	async _prune( key )
+	async set( key, value, ttl = 0, options = {} )
+	{
+		if (
+			typeof key !== 'string'
+			|| value == null
+			|| typeof ttl !== 'number'
+			|| typeof options !== 'object'
+		) {
+			return null;
+		}
+
+		this.emit( 'set', { key, value, ttl, options } );
+		return this._set( key, value, ttl, options ).catch( this._handleServerDown.bind( this ) );
+	}
+
+	/**
+	 * @brief	Sets the data
+	 *
+	 * @details	Resolves the data if it was correctly set, otherwise resolves to null
+	 *
+	 * @param	key String
+	 * @param	value mixed
+	 * @param	ttl Number
+	 * @param	options Object
+	 *
+	 * @return	Promise
+	 */
+	async _set( key, value, ttl, options = {} )
+	{
+		return new Promise(( resolve )=>{
+			const persist	= typeof options.persist !== 'boolean' || options.persist == null ? this.persist : options.persist;
+
+			const dataSet	= this._makeDataSet( key, value, ttl, persist );
+			resolve( this.server[key] = dataSet );
+		})
+	}
+
+	/**
+	 * @brief	Increment a numeric key value
+	 *
+	 * @param	key String
+	 * @param	value Number
+	 * @param	options Object
+	 *
+	 * @return	Promise|null
+	 */
+	async increment( key, value = 1, options = {} )
+	{
+		if (
+			typeof key !== 'string'
+			|| typeof value !== 'number'
+			|| typeof options !== 'object'
+		) {
+			return false;
+		}
+
+		this.emit( 'increment', { key, value, options } );
+
+		return this._increment( key, value, options ).catch( this._handleServerDown.bind( this ) );
+	}
+
+	/**
+	 * @brief	Increment a numeric key value
+	 *
+	 * @details	Does no async operations intentionally
+	 *
+	 * @param	key String
+	 * @param	value Number
+	 * @param	options Object
+	 *
+	 * @return	Promise
+	 */
+	async _increment( key, value = 1, options = {} )
+	{
+		return new Promise( async ( resolve, reject )=>{
+			const dataSet	= await this._prune( key, options );
+
+			if ( dataSet === null )
+			{
+				resolve( false );
+			}
+
+			if ( typeof dataSet.value !== 'number' )
+			{
+				resolve( false );
+			}
+
+			dataSet.value	+= value;
+			dataSet.ttl		= this._getExpirationDateFromTtl( dataSet.ttl );
+
+			this.server[key] = dataSet;
+
+			resolve( dataSet.value );
+		});
+	}
+
+	/**
+	 * @brief	Decrements a numeric key value
+	 *
+	 * @param	key String
+	 * @param	value Number
+	 * @param	options Object
+	 *
+	 * @return	Promise|null
+	 */
+	async decrement( key, value = 1, options = {} )
+	{
+		if (
+			typeof key !== 'string'
+			|| typeof value !== 'number'
+			|| typeof options !== 'object'
+		) {
+			return false;
+		}
+
+		this.emit( 'decrement', { key, value, options } );
+
+		return this._decrement( key, value, options ).catch( this._handleServerDown.bind( this ) );
+	}
+
+	/**
+	 * @brief	Decrements a numeric key value
+	 *
+	 * @details	Does no async operations intentionally
+	 *
+	 * @param	key String
+	 * @param	value Number
+	 * @param	options Object
+	 *
+	 * @return	Promise
+	 */
+	async _decrement( key, value = 1, options = {} )
+	{
+		return new Promise( async ( resolve, reject )=>{
+			const dataSet	= await this._prune( key, options );
+
+			if ( dataSet === null )
+			{
+				resolve( false );
+			}
+
+			if ( typeof dataSet.value !== 'number' )
+			{
+				resolve( false );
+			}
+
+			dataSet.value	-= value;
+			dataSet.ttl		= this._getExpirationDateFromTtl( dataSet.ttl );
+
+			this.server[key] = dataSet;
+
+			resolve( dataSet.value );
+		});
+	}
+
+	/**
+	 * @brief	Locking mechanism. Will return a boolean if the lock was ok
+	 *
+	 * @param	key String
+	 * @param	options Object
+	 *
+	 * @return	Promise
+	 */
+	async lock( key, options = {} )
+	{
+		if ( typeof key !== 'string' || typeof options !== 'object' )
+		{
+			return false;
+		}
+
+		this.emit( 'lock', { key, options } );
+
+		return this._lock( key, options ).catch( this._handleServerDown.bind( this ) );
+	}
+
+	/**
+	 * @brief	Locking mechanism. Will return a boolean if the lock was ok
+	 *
+	 * @param	key String
+	 * @param	options Object
+	 *
+	 * @return	Boolean
+	 */
+	async _lock( key, options )
+	{
+		return new Promise(( resolve )=>{
+			const ttl		= -1;
+			const persist	= false;
+
+			const isNew		= typeof this.server[key] === 'undefined';
+
+			if ( isNew )
+			{
+				this.server[key]	= this._makeDataSet( key, DataServer.LOCK_VALUE, ttl, persist );
+			}
+
+			resolve( isNew );
+		});
+	}
+
+	/**
+	 * @brief	Releases the lock
+	 *
+	 * @param	key String
+	 * @param	options Object
+	 *
+	 * @return	Promise
+	 */
+	async unlock( key, options = {} )
+	{
+		if ( typeof key !== 'string' || typeof options !== 'object' )
+		{
+			return false;
+		}
+
+		this.emit( 'unlock', { key, options } );
+
+		return this._unlock( key, options ).catch( this._handleServerDown.bind( this ) );
+	}
+
+	/**
+	 * @brief	Releases the key
+	 *
+	 * @param	key String
+	 * @param	options Object
+	 *
+	 * @return	Boolean
+	 */
+	async _unlock( key, options )
+	{
+		return new Promise(( resolve )=>{
+			const exists	= typeof this.server[key] !== 'undefined';
+
+			if ( exists )
+			{
+				delete this.server[key];
+			}
+
+			resolve( true )
+		});
+	}
+
+	/**
+	 * @brief	Makes a new dataSet from the data
+	 *
+	 * @param	String key
+	 * @param	mixed value
+	 * @param	Number ttl
+	 * @param	Boolean persist
+	 *
+	 * @return	Object
+	 */
+	_makeDataSet( key, value, ttl, persist )
+	{
+		const expirationDate	= this._getExpirationDateFromTtl( ttl );
+		return { key, value, ttl, expirationDate, persist };
+	}
+
+	/**
+	 * @brief	Touches the given key
+	 *
+	 * @details	Checks if the arguments are correct
+	 *
+	 * @param	key String
+	 * @param	ttl Number
+	 * @param	options Object
+	 *
+	 * @return	Promise
+	 */
+	async touch( key, ttl = 0, options = {} )
+	{
+		if ( typeof key !== 'string' || typeof ttl !== 'number' || typeof options !== 'object' )
+		{
+			return new Promise(( resolve )=>{
+				resolve( false );
+			});
+		}
+
+		this.emit( 'touch', { key, ttl, options } );
+		return this._touch( key, ttl, options ).catch( this._handleServerDown.bind( this ) );
+	}
+
+	/**
+	 * @brief	Touches the key
+	 *
+	 * @param	key String
+	 * @param	ttl Number
+	 * @param	options Object
+	 *
+	 * @return	Promise
+	 */
+	async _touch( key, ttl = 0, options = {} )
+	{
+		return new Promise( async ( resolve )=>{
+			const dataSet	= await this._prune( key );
+
+			if ( dataSet === null )
+			{
+				return resolve( false );
+			}
+
+			ttl						= ttl === 0 ? dataSet.ttl : ttl;
+			dataSet.expirationDate	= this._getExpirationDateFromTtl( ttl );
+			resolve( true );
+		});
+	}
+
+	/**
+	 * @brief	Removes a key if it is expired, otherwise, return it
+	 *
+	 * @param	key String
+	 * @param	options Object
+	 *
+	 * @return	Promise
+	 */
+	async _prune( key, options = {} )
 	{
 		return new Promise( async ( resolve )=>{
 			const now		= new Date().getTime() / 1000;
@@ -208,270 +540,8 @@ class DataServer extends EventEmitter
 				return resolve( null );
 			}
 
-			return resolve( dataSet );
-		});
-	}
-
-	/**
-	 * @brief	Sets the value to the data server
-	 *
-	 * @details	The second value resolved will be a parameter if it existed or not
-	 *
-	 * @param	String key
-	 * @param	mixed value
-	 * @param	Number ttl
-	 * @param	Boolean persist
-	 *
-	 * @return	Promise
-	 */
-	async set( key, value, ttl = 0, persist = null )
-	{
-		if (
-			typeof key !== 'string'
-			|| value == null
-			|| typeof ttl !== 'number'
-			|| ( typeof persist !== 'boolean' && persist !== null )
-		) {
-			return null;
-		}
-
-		persist	= persist === null ? this.persist : persist;
-
-		return this._set( key, value, ttl, persist ).catch( this._handleServerDown );
-	}
-
-	/**
-	 * @brief	Sets the data
-	 *
-	 * @details	Resolves the data if it was correctly set, otherwise resolves to null
-	 *
-	 * @param	String key
-	 * @param	mixed value
-	 * @param	Number ttl
-	 * @param	Boolean persist
-	 *
-	 * @return	Promise
-	 */
-	async _set( key, value, ttl, persist )
-	{
-		return new Promise(( resolve )=>{
-			const isNew	= typeof this.server[key] === 'undefined';
-			const dataSet	= this._makeDataSet( key, value, ttl, persist, isNew );
-			resolve( this.server[key] = dataSet );
+			resolve( dataSet );
 		})
-	}
-
-	/**
-	 * @brief	Increment a numeric key value
-	 *
-	 * @param	key String
-	 * @param	value Number
-	 * @param	ttl Number
-	 *
-	 * @return	Promise|null
-	 */
-	async increment( key, value = 1, ttl = 0 )
-	{
-		if (
-			typeof key !== 'string'
-			|| typeof value !== 'number'
-			|| typeof ttl !== 'number'
-		) {
-			return null;
-		}
-
-		return this._increment( key, value, ttl ).catch( this._handleServerDown );
-	}
-
-	/**
-	 * @brief	Increment a numeric key value
-	 *
-	 * @details	Does no async operations intentionally
-	 *
-	 * @param	key String
-	 * @param	value Number
-	 * @param	ttl Number
-	 *
-	 * @return	Promise
-	 */
-	async _increment( key, value = 1, ttl = 0 )
-	{
-		return new Promise( async ( resolve, reject )=>{
-			const now		= new Date().getTime() / 1000;
-			const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate !== 'undefined'
-							? this.server[key]
-							: null;
-
-			if ( dataSet !== null && this.server[key].expirationDate === null )
-			{
-				this.server[key].expirationDate	= Infinity;
-			}
-
-			if ( dataSet === null || now > dataSet.expirationDate )
-			{
-				if ( typeof this.server[key] === 'undefined' )
-				{
-					return resolve( null );
-				}
-
-				this.server[key]	= undefined;
-				delete this.server[key];
-
-				return resolve( null );
-			}
-
-			if ( ! dataSet )
-			{
-				resolve( null );
-			}
-
-			if ( typeof dataSet.value !== 'number' )
-			{
-				resolve( null );
-			}
-
-			dataSet.value	+= value;
-			dataSet.ttl		= this._getExpirationDateFromTtl( ttl );
-
-			resolve( this.server[key] = dataSet );
-		});
-	}
-
-	/**
-	 * @brief	Decrements a numeric key value
-	 *
-	 * @param	key String
-	 * @param	value Number
-	 * @param	ttl Number
-	 *
-	 * @return	Promise|null
-	 */
-	async decrement( key, value = 1, ttl = 0 )
-	{
-		if (
-			typeof key !== 'string'
-			|| typeof value !== 'number'
-			|| typeof ttl !== 'number'
-		) {
-			return null;
-		}
-
-		return this._decrement( key, value, ttl ).catch( this._handleServerDown );
-	}
-
-	/**
-	 * @brief	Decrements a numeric key value
-	 *
-	 * @details	Does no async operations intentionally
-	 *
-	 * @param	key String
-	 * @param	value Number
-	 * @param	ttl Number
-	 *
-	 * @return	Promise
-	 */
-	async _decrement( key, value = 1, ttl = 0 )
-	{
-		return new Promise( async ( resolve, reject )=>{
-			const now		= new Date().getTime() / 1000;
-			const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate !== 'undefined'
-							? this.server[key]
-							: null;
-
-			if ( dataSet !== null && this.server[key].expirationDate === null )
-			{
-				this.server[key].expirationDate	= Infinity;
-			}
-
-			if ( dataSet === null || now > dataSet.expirationDate )
-			{
-				if ( typeof this.server[key] === 'undefined' )
-				{
-					return resolve( null );
-				}
-
-				this.server[key]	= undefined;
-				delete this.server[key];
-
-				return resolve( null );
-			}
-
-			if ( ! dataSet )
-			{
-				resolve( null );
-			}
-
-			if ( typeof dataSet.value !== 'number' )
-			{
-				resolve( null );
-			}
-
-			dataSet.value	-= value;
-			dataSet.ttl		= this._getExpirationDateFromTtl( ttl );
-
-			resolve( this.server[key] = dataSet );
-		});
-	}
-
-	/**
-	 * @brief	Makes a new dataSet from the data
-	 *
-	 * @param	String key
-	 * @param	mixed value
-	 * @param	Number ttl
-	 * @param	Boolean persist
-	 * @param	Boolean isNew
-	 *
-	 * @return	Object
-	 */
-	_makeDataSet( key, value, ttl, persist, isNew )
-	{
-		const expirationDate	= this._getExpirationDateFromTtl( ttl );
-		return { key, value, ttl, expirationDate, persist, isNew };
-	}
-
-	/**
-	 * @brief	Touches the given key
-	 *
-	 * @details	Checks if the arguments are correct
-	 *
-	 * @param	String key
-	 * @param	Number ttl
-	 *
-	 * @return	Promise
-	 */
-	async touch( key, ttl = 0 )
-	{
-		if ( typeof key !== 'string' || typeof ttl !== 'number' )
-		{
-			return false;
-		}
-
-		return this._touch( key, ttl ).catch( this._handleServerDown );
-	}
-
-	/**
-	 * @brief	Touches the key
-	 *
-	 * @param	String key
-	 * @param	Number ttl
-	 *
-	 * @return	Promise
-	 */
-	async _touch( key, ttl = 0 )
-	{
-		return new Promise( async ( resolve )=>{
-			const dataSet	= await this.get( key );
-
-			if ( dataSet === null )
-			{
-				return resolve( false );
-			}
-
-			ttl						= ttl === 0 ? dataSet.ttl : ttl;
-			dataSet.expirationDate	= this._getExpirationDateFromTtl( ttl );
-			resolve( true );
-		});
 	}
 
 	/**
@@ -479,15 +549,18 @@ class DataServer extends EventEmitter
 	 *
 	 * @details	Returns true on success and false on failure. If the key does not exist, false will be returned
 	 *
-	 * @param	String key
+	 * @param	key String
+	 * @param	options Object
 	 *
 	 * @return	Promise
 	 */
-	async delete( key )
+	async delete( key, options = {} )
 	{
-		if ( typeof key === 'string' )
+		if ( typeof key === 'string' && typeof options === 'object' )
 		{
-			return this._delete( key ).catch( this._handleServerDown );
+			this.emit( 'delete', { key, options } );
+
+			return this._delete( key, options ).catch( this._handleServerDown.bind( this ) );
 		}
 
 		return new Promise(( resolve )=>{
@@ -498,16 +571,17 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Deletes the key from the server
 	 *
-	 * @param	String key
+	 * @param	key String
+	 * @param	options Object
 	 *
 	 * @return	Promise
 	 */
-	_delete( key )
+	_delete( key, options = {} )
 	{
 		return new Promise(( resolve )=>{
 			if ( typeof this.server[key] === 'undefined' )
 			{
-				return resolve( false );
+				return resolve( true );
 			}
 
 			this.server[key]	= undefined;
@@ -538,7 +612,7 @@ class DataServer extends EventEmitter
 	{
 		for ( const key in this.server )
 		{
-			this._prune( key ).catch( this._handleServerDown );
+			this._get( key ).catch( this._handleServerDown.bind( this ) );
 		}
 	}
 
@@ -617,22 +691,35 @@ class DataServer extends EventEmitter
 	}
 
 	/**
-	 * @brief	Gets the expiration date of the record given the ttl
+	 * @brief	Gets the ttl depending on the values given
 	 *
-	 * @param	Number ttl
+	 * @param	ttl Number
 	 *
 	 * @return	Number
 	 */
-	_getExpirationDateFromTtl( ttl = -1 )
+	_getTtl( ttl = -1 )
 	{
 		if ( ttl === -1 )
 		{
 			return Infinity;
 		}
 
-		ttl	= ttl > 0 ? ttl : this.defaultTtl;
-		return new Date().getTime() / 1000 + ttl;
+		return ttl > 0 ? ttl : this.defaultTtl;
+	}
+
+	/**
+	 * @brief	Gets the expiration date of the record given the ttl
+	 *
+	 * @param	ttl Number
+	 *
+	 * @return	Number
+	 */
+	_getExpirationDateFromTtl( ttl = -1 )
+	{
+		return new Date().getTime() / 1000 + this._getTtl( ttl );
 	}
 }
 
-module.exports	= DataServer;
+DataServer.LOCK_VALUE	= 'lock';
+
+module.exports			= DataServer;

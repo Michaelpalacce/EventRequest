@@ -1474,6 +1474,15 @@ integrated with other plugins.
 **stop()**
 - Emitted when the server is stopping
 
+**touch( { String key, Number ttl, Object options } )**
+**get( { String key, Object options } )**
+**lock( { String key, Object options } )**
+**unlock( { String key, Object options } )**
+**delete( { String key, Object options } )**
+**set( { String key, mixed value, Number ttl, Object options } )**
+**increment( { String key, mixed value, Object options } )**
+**decrement( { String key, mixed value, Object options } )**
+
 #### Functions:
 **stop(): void**
 - This will stop the connection of the DataServer
@@ -1490,82 +1499,109 @@ integrated with other plugins.
 - This method is the protected method that should be implemented in case extension of the DataServer should be done
 - It is called in the constructor to create the cache file we will be using if persistence is enabled
 
-**get( String key ): Promise: Object|null** 
+**get( String key, Object options ): Promise: Object|null** 
 - Retrieves the value given a key. Returns null if the key does not exist.
 - This function is a 'public' method to be used by users.
 - In the case that you want to implement your own DataServer, you should override **_get( String key )**
+- Emits a get event
 
-**_get( String key ): Promise: Object|null** 
+**_get( String key, Object options ): Promise: mixed|null** 
 - This method is the protected method that should be implemented in case extension of the DataServer should be done
-- This method currently calls this._prune( key ) directly
-- No need to check if key is a String, that has been done in the _get method already.
-
-**_prune( String key ): Promise: Object|null** 
 - Removes the DataSet if it is expired, otherwise returns it. Returns null if the data is removed.
+- No need to check if key is a String, that has been done in the _get method already.
 - This method also sets the expiration of the DataSet to Infinity if it is null.
+- This will return the value set by set()
 
-**set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Promise: Object|null** 
+**set( String key, mixed value, Number ttl = 0, Object options ): Promise: Object|null** 
 - Returns the data if it was set, otherwise returns null
 - Sets the given key with the given value. 
 - ttl is the time in **seconds** that the data will be kept.
 - If ttl is -1 then the dataSet will NEVER expire
 - If ttl is 0 then the Default TTL will be used.
 - If ttl is > 0 then the value will be used
-- persist is a flag that will override the global persist value. You can set a key to not be persisted. 
-However if the global persist is set to false, this will not work
 - Calls _set() after checking the arguments if they are valid
+- Emits a set event
 
-**_set( String key, mixed value, Number ttl = 0, Boolean persist = true ): Promise: Object|null** 
+**_set( String key, mixed value, Number ttl = 0, Object options ): Promise: Object|null** 
 - Implement for development. No need to do checks of the values of the parameter as that is done in the set() function
 - This function commits the key/value to memory with all it's attributes
 - If the dataSet existed, then a key 'isNew' must be set to true or false
+- The options accept a Boolean flag persist that will override the global persist value. You can set a key to not be persisted. 
+However if the global persist is set to false, this will not work
 - Returns the data if it was set, otherwise returns null
 
-**_makeDataSet( String key, mixed value, Number ttl, Boolean persist, Boolean isNew ): Object**  
-- Forms the dataSet object and returns it in the following format: `{ key, value, ttl, expirationDate, persist, isNew };`
-- The isNew value should be used ONLY when calling set
+**_makeDataSet( String key, mixed value, Number ttl, Boolean persist ): Object**  
+- Forms the dataSet object and returns it in the following format: `{ key, value, ttl, expirationDate, persist };`
 
-**touch( String key, Number ttl = 0 ): Promise: Boolean**
-- Retruns a Boolean whether the data was successfully touched
-- Retruns a false if key is not String or ttl is not Number
-- Calls _touch after checkinf if arguments are valid
+**touch( String key, Number ttl = 0, Object options ): Promise: Boolean**
+- Returns a Boolean whether the data was successfully touched
+- Returns a false if key is not String or ttl is not Number
+- Calls _touch after checking if arguments are valid
+- Emits a touch event
 
-**_touch( String key, Number ttl = 0 ): Promise: Boolean**
+**_touch( String key, Number ttl = 0, Object options ): Promise: Boolean**
 - Implement for development. No need to do checks of the values of the parameter as that is done in the touch() function
-- Retruns a Boolean whether the data was successfully touched
+- Returns a Boolean whether the data was successfully touched
 - If ttl = 0 then the dataSet will be updated with it's own ttl
 - This function actually touches the data
 
-**decrement( String key, Number value = 1, Number ttl = 0 ): Promise: Object|null**
-- If value or ttl is not a number, returns null
-- If the data was not set correctly returns null
-- If the data to decrement was not set correctly returns null
-- If the data to decrement was not numeric returns null
-- Follows the same ttl rules as the rest
+**decrement( String key, Number value = 1, Object options ): Promise: Boolean**
+- If value is not a number, returns false
+- If the data was not set correctly returns false
+- If the data to decrement was not set correctly returns false
+- If the data to decrement was not numeric returns false
 - Calls _decrement() after checking for validity of data
+- Emits a decrement event
+- The ttl of the value will be extended by it's original ttl
 
-**_decrement( String key, Number value = 1, Number ttl = 0 ): Promise: Object|null**
+**_decrement( String key, Number value = 1, Object options ): Promise: Boolean**
 - Implement for development. No need to do checks of the values of the parameter as that is done in the decrement() function
 - Retrieves, decrements and then saves the new dataset 
+- If the operation is successfully done, returns true
 
-**increment( String key, Number value = 1, Number ttl = 0 ): Promise: Object|null**
-- If value or ttl is not a number, returns null
-- If the data was not set correctly returns null
-- If the data to increment was not set correctly returns null
-- If the data to increment was not numeric returns null
-- Follows the same ttl rules as the rest
+**increment( String key, Number value = 1, Object options ): Promise: Boolean**
+- If value is not a number, returns false
+- If the data was not set correctly returns false
+- If the data to increment was not set correctly returns false
+- If the data to increment was not numeric returns false
 - Calls _increment() after checking for validity of data
+- Emits an increment event
+- The ttl of the value will be extended by it's original ttl
 
-**_increment( String key, Number value = 1, Number ttl = 0 ): Promise: Object|null**
+**_increment( String key, Number value = 1, Object options ): Promise: Boolean**
 - Implement for development. No need to do checks of the values of the parameter as that is done in the increment() function
 - Retrieves, increment and then saves the new dataset 
+- If the operation is successfully done, returns true
 
-**delete( String key ): Promise: Boolean**
+**delete( String key, Object options ): Promise: Boolean**
 - Deletes the given data
+- Emits a delete event
+- WIll return false if arguments are invalid
 
-**_delete( String key ): Promise: Boolean**
+**_delete( String key, Object options ): Promise: Boolean**
 - Implement for development. No need to do checks of the values of the parameter as that is done in the delete() function
 - This function deletes the actual data
+- Will return true always
+
+**lock( String key, Object options ): Promise: Boolean**
+- Acquires a lock given a key.
+- Emits a lock event
+- This calls _lock
+
+**_lock( String key, Object options ): Promise: Boolean**
+- Implement for development. No need to do checks of the values of the parameter as that is done in the lock() function
+- Acquires a lock given a key.
+- This will return true only if there is no key like that in the DataServer, otherwise return false
+
+**unlock( String key, Object options ): Promise: Boolean**
+- Releases a lock
+- Emits a unlock event
+- This calls _unlock
+
+**_unlock( String key, Object options ): Promise: Boolean**
+- Implement for development. No need to do checks of the values of the parameter as that is done in the unlock() function
+- Releases a lock
+- This returns true always
 
 **_garbageCollect(): void**
 - Prunes all the data from the server if needed
@@ -1614,7 +1650,7 @@ Server {
   er_env: 'er_env',
   er_rate_limits: 'er_rate_limits',
   er_static_resources: 'er_static_resources',
-  er_cache_server: 'er_cache_server',
+  er_data_server: 'er_data_server',
   er_templating_engine: 'er_templating_engine',
   er_file_stream: 'er_file_stream',
   er_logger: 'er_logger',
@@ -1820,7 +1856,7 @@ app.apply( staticResourcesPlugin );
 ***
 ***
 
-#er_cache_server
+#er_data_server
 - Adds a Caching Server using the DataServer provided in the constructor if any.
 - This plugin will add a DataServer to: `event.cachingServer` 
 
@@ -1853,7 +1889,7 @@ app.apply( staticResourcesPlugin );
 
 **event.cachingServer: DataServer**
 - The caching server will be available to be used within the EventRequest after it has been applied in the middleware block
-- You can retrieve the DataServer from any other plugin after this one has been applied by doing: server.getPlugin( 'er_cache_server' ).getServer()
+- You can retrieve the DataServer from any other plugin after this one has been applied by doing: server.getPlugin( 'er_data_server' ).getServer()
 
 ***
 ####Exported Plugin Functions:
@@ -1866,16 +1902,16 @@ app.apply( staticResourcesPlugin );
 
 - You can add the plugin like:
 ~~~javascript
-app.apply( 'er_cache_server' );
+app.apply( 'er_data_server' );
 
 // OR
-app.apply( app.er_cache_server );
+app.apply( app.er_data_server );
 
 // OR if you have made a child of the DataServer:
-app.apply( app.er_cache_server, { dataServer: new CustomDataServer() } );
+app.apply( app.er_data_server, { dataServer: new CustomDataServer() } );
 
 // OR if you want to pass specific parameters to the default DataServer:
-app.apply( app.er_cache_server, { dataServerOptions: { persist: false, ttl: 200, persistPath: '/root' } } );
+app.apply( app.er_data_server, { dataServerOptions: { persist: false, ttl: 200, persistPath: '/root' } } );
 ~~~
 
 - The plugin can be used like:
@@ -1887,7 +1923,7 @@ const { Server, Loggur }	= require( 'event_request' );
  */
 const app	= Server();
 
-app.apply( app.er_cache_server, { persist: false } );
+app.apply( app.er_data_server, { persist: false } );
  
 // Add a new Route
 app.get( '/', ( event ) => {
@@ -1915,7 +1951,7 @@ app.listen( 80, ()=>{
 ***
 ####Dependencies:
 
- **er_cache_server**
+ **er_data_server**
 
 ***
 ####Accepted Options:
@@ -2408,7 +2444,7 @@ Adds a response caching mechanism.
 ***
 ####Dependencies:
 
-**er_cache_server**
+**er_data_server**
 
 ***
 ####Accepted Options:
@@ -2445,7 +2481,7 @@ Adds a response caching mechanism.
 
 ~~~javascript
 const PluginManager		= app.getPluginManager();
-const cacheServer		= PluginManager.getPlugin( app.er_cache_server );
+const cacheServer		= PluginManager.getPlugin( app.er_data_server );
 
 app.apply( cacheServer );
 app.apply( PluginManager.getPlugin( app.er_response_cache ) );
@@ -2552,11 +2588,12 @@ app.listen( 80 );
 - The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
 - If one exists, then the existing one's configuration will be taken. 
 - If you provide the same dataStore to two servers they should work without an issue
+- If you don't provide a dataStore, then the er_data_server data store will be used. If that plugin is not set, then the default bucket one will be used
 
 ***
 ####Dependencies:
 
-**er_cache_server**
+**er_data_server**
 
 ***
 ####Accepted Options:

@@ -3,16 +3,16 @@
 // Dependencies
 const { assert, test, helpers, Mock }	= require( '../../../test_helper' );
 const SessionPlugin						= require( './../../../../server/plugins/available_plugins/session_plugin' );
-const CachingServerPlugin				= require( '../../../../server/plugins/available_plugins/memory_data_server_plugin' );
+const CachingServerPlugin				= require( '../../../../server/plugins/available_plugins/data_server_plugin' );
 const Session							= require( './../../../../server/components/session/session' );
 const Router							= require( '../../../../server/components/routing/router' );
 
 test({
-	message	: 'SessionPlugin getPluginDependencies returns er_cache_server',
+	message	: 'SessionPlugin getPluginDependencies returns er_data_server',
 	test	: ( done )=>{
 		let plugin	= new SessionPlugin( 'id' );
 
-		assert.deepStrictEqual( ['er_cache_server'], plugin.getPluginDependencies() );
+		assert.deepStrictEqual( ['er_data_server'], plugin.getPluginDependencies() );
 
 		done();
 	}
@@ -152,7 +152,7 @@ test({
 
 		server._mock({
 			method			: 'getPlugin',
-			with			: [['er_cache_server']],
+			with			: [['er_data_server']],
 			shouldReturn	: cachingServerPlugin
 		});
 

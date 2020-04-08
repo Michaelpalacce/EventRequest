@@ -44,7 +44,7 @@ test({
 		assert.equal( typeof server.er_env === 'string', true );
 		assert.equal( typeof server.er_rate_limits === 'string', true );
 		assert.equal( typeof server.er_static_resources === 'string', true );
-		assert.equal( typeof server.er_cache_server === 'string', true );
+		assert.equal( typeof server.er_data_server === 'string', true );
 		assert.equal( typeof server.er_templating_engine === 'string', true );
 		assert.equal( typeof server.er_file_stream === 'string', true );
 		assert.equal( typeof server.er_logger === 'string', true );
@@ -2160,7 +2160,7 @@ test({
 
 		if ( ! app.hasPlugin( app.er_response_cache ) )
 		{
-			app.apply( app.er_cache_server, { dataServer: helpers.getCachingServer() } );
+			app.apply( app.er_data_server, { dataServer: helpers.getCachingServer() } );
 			app.apply( app.er_response_cache );
 		}
 
@@ -2194,7 +2194,7 @@ test({
 
 		if ( ! app.hasPlugin( app.er_response_cache ) )
 		{
-			app.apply( app.er_cache_server, { dataServer: helpers.getCachingServer() } );
+			app.apply( app.er_data_server, { dataServer: helpers.getCachingServer() } );
 			app.apply( app.er_response_cache );
 		}
 
@@ -2228,7 +2228,7 @@ test({
 
 		if ( ! app.hasPlugin( app.er_response_cache ) )
 		{
-			app.apply( app.er_cache_server, { dataServer: helpers.getCachingServer() } );
+			app.apply( app.er_data_server, { dataServer: helpers.getCachingServer() } );
 			app.apply( app.er_response_cache );
 		}
 
@@ -2822,7 +2822,7 @@ test({
 			appOne.apply( appOne.er_session );
 		});
 
-		app.apply( app.er_cache_server );
+		app.apply( app.er_data_server );
 		app.apply( app.er_session );
 
 		app.get( `/${name}`, ( event )=>{
@@ -2885,14 +2885,14 @@ test({
 });
 
 test({
-	message	: 'Server.test er_cache_server works as expected',
+	message	: 'Server.test er_data_server works as expected',
 	test	: ( done )=>{
 		const name			= 'testCacheServer';
 		const secondName	= `/${name}Second`;
 		const key			= `${name}_KEY`;
 		const value			= `${name}_VALUE`;
 
-		app.apply( app.er_cache_server, { dataServerOptions: { persist: false } } );
+		app.apply( app.er_data_server, { dataServerOptions: { persist: false } } );
 
 		app.get( `/${name}`, async ( event )=>{
 			assert.equal( event.cachingServer instanceof DataServer, true );
@@ -2900,7 +2900,7 @@ test({
 			await event.cachingServer.set( key, value ).catch( done );
 			await event.cachingServer.set( `${key}_delete`, value ).catch( done );
 
-			await event.cachingServer.delete( `${key}_delete`, value ).catch( done );
+			await event.cachingServer.delete( `${key}_delete` ).catch( done );
 
 			event.send( name );
 		});
@@ -2910,7 +2910,7 @@ test({
 
 			const cacheValue	= await event.cachingServer.get( key ).catch( done );
 
-			assert.equal( cacheValue.value, value );
+			assert.equal( cacheValue, value );
 			assert.equal( await event.cachingServer.get( `${key}_delete` ).catch( done ), null );
 
 			event.send( secondName );

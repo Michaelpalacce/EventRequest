@@ -29,6 +29,7 @@ function wait( ms )
  */
 function removeCache( dataServer )
 {
+	// Wait cause of vagrant tests
 	wait( 100 );
 	if ( dataServer )
 	{
@@ -87,7 +88,7 @@ test({
 
 			removeCache( dataServer );
 			done();
-		}, 50 );
+		}, 10 );
 	}
 });
 
@@ -119,7 +120,7 @@ test({
 
 			removeCache( dataServer );
 			done();
-		}, 50 );
+		}, 10 );
 	}
 });
 
@@ -134,11 +135,50 @@ test({
 			const ttl			= 100;
 			const persist		= true;
 			const expected		= { key: { key, value, ttl, persist } };
+			let called			= 0;
 
 			assert.equal( dataServer.intervals.length, 2 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			dataServer.set( key, value, ttl, persist );
+			dataServer.on( 'set', ()=>{
+				called ++;
+			});
+
+			dataServer.set( key, value, ttl, { persist } );
+
+			assert.equal( typeof dataServer.server[key] === 'object', true );
+
+			const dataSet	= dataServer.server[key];
+
+			assert.equal( dataSet.ttl, expected[key].ttl );
+			assert.equal( dataSet.persist, expected[key].persist );
+			assert.equal( dataSet.key, key );
+			assert.equal( dataSet.value, value );
+			assert.equal( typeof dataSet.expirationDate === 'number', true );
+			assert.equal( called, 1 );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
+	}
+});
+
+test({
+	message	: 'DataServer.set sets data without options',
+	test	: ( done )=>{
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( ()=>{
+			const dataServer	= new DataServer();
+			const key			= 'key';
+			const value			= 'value';
+			const persist		= true;
+			const ttl			= 100;
+			const expected		= { key: { key, value, ttl, persist } };
+
+			assert.equal( dataServer.intervals.length, 2 );
+			assert.deepStrictEqual( dataServer.server, {} );
+
+			dataServer.set( key, value, ttl );
 
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 
@@ -152,7 +192,7 @@ test({
 
 			removeCache( dataServer );
 			done();
-		}, 50 );
+		}, 10 );
 	}
 });
 
@@ -171,7 +211,7 @@ test({
 			assert.equal( dataServer.intervals.length, 1 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			dataServer.set( key, value, ttl, persist );
+			dataServer.set( key, value, ttl, { persist } );
 
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 
@@ -186,7 +226,33 @@ test({
 
 			removeCache( dataServer );
 			done();
-		}, 50 );
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.set fails on handleError',
+	dataProvider	: [
+		['key', 'value', 10, 123],
+		['key', 'value', 10, 'str'],
+		['key', 'value', 10, false],
+		['key', 'value', null, { persist: false }],
+		['key', 'value', [], { persist: false }],
+		['key', 'value', 'str', { persist: false }],
+		['key', 'value', false, { persist: false }],
+		['key', 'value', {}, { persist: false }],
+	],
+	test			: ( done, key, value, ttl, options )=>{
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async ()=>{
+			const dataServer	= new DataServer( { persist: false } );
+
+			assert.equal( await dataServer.set( key, value, ttl, options ), null );
+			assert.equal( typeof dataServer.server[key] === 'object', false );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
 	}
 });
 
@@ -202,24 +268,56 @@ test({
 			const ttl			= 100;
 			const persist		= true;
 			const expected		= { key: { key, value, ttl, persist } };
+			let called			= 0;
+
+			dataServer.on( 'get', ()=>{
+				called ++;
+			});
 
 			assert.equal( dataServer.intervals.length, 1 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			await dataServer.set( key, value, ttl, persist );
+			await dataServer.set( key, value, ttl, { persist } );
 
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 
 			const dataSet	= await dataServer.get( key );
-			assert.equal( dataSet.ttl, expected[key].ttl );
-			assert.equal( dataSet.persist, expected[key].persist );
-			assert.equal( dataSet.key, key );
-			assert.equal( dataSet.value, value );
-			assert.equal( typeof dataSet.expirationDate === 'number', true );
+			assert.equal( dataSet, value );
+
+			assert.equal( dataServer.server[key].ttl, expected[key].ttl );
+			assert.equal( dataServer.server[key].persist, expected[key].persist );
+			assert.equal( dataServer.server[key].key, key );
+			assert.equal( typeof dataServer.server[key].expirationDate === 'number', true );
+			assert.equal( called, 1 );
 
 			removeCache( dataServer );
 			done();
-		}, 50 );
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.get with invalid data',
+	dataProvider	: [
+		['key', 123],
+		['key', false],
+		[undefined, {}],
+		[null, {}],
+		[false, {}],
+		[[], {}],
+		[{}, {}],
+	],
+	test			: ( done, key, options )=>{
+		removeCache();
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async ()=>{
+			const dataServer	= new DataServer( { persist: false } );
+
+			assert.equal( await dataServer.get( key, options ), null );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
 	}
 });
 
@@ -237,7 +335,7 @@ test({
 			assert.equal( dataServer.intervals.length, 1 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			await dataServer.set( key, value, ttl, persist );
+			await dataServer.set( key, value, ttl, { persist } );
 
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 
@@ -249,7 +347,7 @@ test({
 				removeCache( dataServer );
 				done();
 			}, 1100 );
-		}, 50 );
+		}, 10 );
 	}
 });
 
@@ -263,11 +361,16 @@ test({
 			const value			= 'value';
 			const ttl			= 1;
 			const persist		= true;
+			let called			= 0;
+
+			dataServer.on( 'touch', ()=>{
+				called ++;
+			});
 
 			assert.equal( dataServer.intervals.length, 1 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			await dataServer.set( key, value, ttl, persist );
+			await dataServer.set( key, value, ttl, { persist } );
 
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 			const { expirationDate }	= dataServer.server[key];
@@ -276,15 +379,47 @@ test({
 				await dataServer.touch( key );
 				const dataSet	= await dataServer.get( key );
 
-				assert.equal( typeof dataSet === 'object', true );
+				assert.equal( dataSet, value );
 				const currentExpirationDate	= dataSet.expirationDate;
-
 				assert.notEqual( currentExpirationDate, expirationDate );
+
+				assert.equal( called, 1 );
 
 				removeCache( dataServer );
 				done();
 			}, 100 );
-		}, 50 );
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.touch with invalid data',
+	dataProvider	: [
+		['key', '123', {}],
+		[false, '123', {}],
+		[[], '123', {}],
+		[{}, '123', {}],
+		[null, '123', {}],
+		[undefined, '123', {}],
+		['key', [], {}],
+		['key', {}, {}],
+		['key', false, {}],
+		['key', null, {}],
+		['key', null, 123],
+		['key', null, 'string'],
+		['key', null, false]
+	],
+	test			: ( done, key, ttl, options )=>{
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async ()=>{
+			const dataServer	= new DataServer( { persist: false } );
+			await dataServer.set( key, '123' );
+
+			assert.equal( await dataServer.touch( key, ttl, options ), false );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
 	}
 });
 
@@ -302,7 +437,7 @@ test({
 
 			removeCache( dataServer );
 			done();
-		}, 50 );
+		}, 10 );
 	}
 });
 
@@ -325,7 +460,7 @@ test({
 				removeCache( dataServer );
 				done();
 			}, 1100 );
-		}, 50 );
+		}, 10 );
 	}
 });
 
@@ -364,7 +499,7 @@ test({
 
 				done( ! saveCalled );
 			}, 2100 );
-		}, 50 );
+		}, 10 );
 	}
 });
 
@@ -399,7 +534,7 @@ test({
 
 			removeCache( dataServer );
 			done( ! stopCalled );
-		}, 50 );
+		}, 10 );
 	}
 });
 
@@ -413,54 +548,62 @@ test({
 			const dataServer	= new DataServer({ persist: false });
 			const key			= 'key';
 			const value			= { test: 'value' };
+			let called			= 0;
+
+			dataServer.on( 'delete', ()=>{
+				called ++;
+			});
 
 			await dataServer.set( key, value );
 
 			assert.equal( await dataServer.delete( 123 ), false );
 			assert.equal( await dataServer.delete( key ), true );
-			assert.equal( await dataServer.delete( key ), false );
+			assert.equal( await dataServer.delete( key ), true );
+			// 2 because one is with invalid arguments
+			assert.equal( called, 2 );
 
 			dataServer.stop();
 
 			removeCache( dataServer );
 			done();
-		}, 50 );
+		}, 10 );
 	}
 });
 
 test({
 	message	: 'DataServer.increment increments data',
 	dataProvider	: [
-		[100, 100, 100, 200],
-		[0, 100, 100, 100],
-		[-1, 100, 100, 99],
-		['string', 100, 100, null],
-		[[], 100, 100, null],
-		[{}, 100, 100, null],
-		[100, null, 100, null],
-		[100, 'string', 100, null],
-		[100, {}, 100, null],
-		[100, [], 100, null],
-		[100, 100, null, null],
-		[100, 100, 'string', null],
-		[100, 100, {}, null],
-		[100, 100, [], null],
+		[100, 100, 200],
+		[0, 100, 100],
+		[-1, 100, 99],
+		['string', 100, null],
+		[[], 100, null],
+		[{}, 100, null],
+		[100, null, null],
+		[100, 'string', null],
+		[100, {}, null],
+		[100, [], null],
 	],
-	test	: async ( done, value, increment, ttl, expectedValue )=>{
+	test	: async ( done, value, increment, expectedValue )=>{
 		removeCache();
 
 		const dataServer	= new DataServer({ persist: false });
 		const key			= 'key';
+		let called			= 0;
+
+		dataServer.on( 'increment', ()=>{
+			called ++;
+		});
 
 		await dataServer.set( key, value ).catch( done );
 
-		const result	= await dataServer.increment( key, increment, ttl ).catch( done );
+		const result	= await dataServer.increment( key, increment ).catch( done );
 
 		if ( expectedValue === null )
 		{
 			dataServer.stop();
 			removeCache( dataServer );
-			return done( ! ( expectedValue === result ) );
+			return done( ! ( false === result ) );
 		}
 
 		if ( result === null )
@@ -468,7 +611,8 @@ test({
 			return done( `Result was null but expected: ${expectedValue}` );
 		}
 
-		assert.equal( result.value, expectedValue );
+		assert.equal( result, expectedValue );
+		assert.equal( called, 1 );
 
 		dataServer.stop();
 
@@ -480,36 +624,37 @@ test({
 test({
 	message	: 'DataServer.decrement decrement data',
 	dataProvider	: [
-		[100, 100, 100, 0],
-		[0, 100, 100, -100],
-		[1, 100, 100, -99],
-		['string', 100, 100, null],
-		[[], 100, 100, null],
-		[{}, 100, 100, null],
-		[100, null, 100, null],
-		[100, 'string', 100, null],
-		[100, {}, 100, null],
-		[100, [], 100, null],
-		[100, 100, null, null],
-		[100, 100, 'string', null],
-		[100, 100, {}, null],
-		[100, 100, [], null],
+		[100, 100, 0],
+		[0, 100, -100],
+		[1, 100, -99],
+		['string', 100, null],
+		[[], 100, null],
+		[{}, 100, null],
+		[100, null, null],
+		[100, 'string', null],
+		[100, {}, null],
+		[100, [], null],
 	],
-	test	: async ( done, value, decrement, ttl, expectedValue )=>{
+	test	: async ( done, value, decrement, expectedValue )=>{
 		removeCache();
 
 		const dataServer	= new DataServer({ persist: false });
 		const key			= 'key';
+		let called			= 0;
+
+		dataServer.on( 'decrement', ()=>{
+			called ++;
+		});
 
 		await dataServer.set( key, value ).catch( done );
 
-		const result	= await dataServer.decrement( key, decrement, ttl ).catch( done );
+		const result	= await dataServer.decrement( key, decrement ).catch( done );
 
 		if ( expectedValue === null )
 		{
 			dataServer.stop();
 			removeCache( dataServer );
-			return done( ! ( expectedValue === result ) );
+			return done( ! ( false === result ) );
 		}
 
 		if ( result === null )
@@ -517,7 +662,8 @@ test({
 			return done( `Result was null but expected: ${expectedValue}` );
 		}
 
-		assert.equal( result.value, expectedValue );
+		assert.equal( result, expectedValue );
+		assert.equal( called, 1 );
 
 		dataServer.stop();
 
@@ -535,6 +681,11 @@ test({
 		[123, 'value', 100, true],
 		['key', 'value', '100', true],
 		['key', 'value', 100, 'true'],
+		[null, 'value', 100, 'true'],
+		[undefined, 'value', 100, 'true'],
+		[[], 'value', 100, 'true'],
+		[{}, 'value', 100, 'true'],
+		[false, 'value', 100, 'true'],
 	],
 	test			: ( done, key, value, ttl, persist )=>{
 		// Wait in case the file has not been deleted from the FS
@@ -548,7 +699,7 @@ test({
 
 			removeCache( dataServer );
 			done();
-		}, 50 );
+		}, 10 );
 	}
 });
 
@@ -567,6 +718,134 @@ test({
 
 			removeCache( dataServer );
 			done();
-		}, 50 );
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.lock locks data correctly',
+	test			: ( done )=>{
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async ()=>{
+			const dataServer	= new DataServer( { persist: false } );
+			let called			= 0;
+
+			dataServer.on( 'lock', ()=>{
+				called ++;
+			});
+
+			assert.equal( await dataServer.lock( 'key' ), true );
+			assert.equal( await dataServer.lock( 'key' ), false );
+			assert.equal( await dataServer.unlock( 'key' ), true );
+			assert.equal( await dataServer.lock( 'key' ), true );
+			assert.equal( await dataServer.lock( 'key' ), false );
+
+			assert.equal( called, 4 );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.lock locks data correctly with double unlock',
+	test			: ( done )=>{
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async ()=>{
+			const dataServer	= new DataServer( { persist: false } );
+
+			assert.equal( await dataServer.lock( 'key' ), true );
+			assert.equal( await dataServer.lock( 'key' ), false );
+			assert.equal( await dataServer.unlock( 'key' ), true );
+			assert.equal( await dataServer.unlock( 'key' ), true );
+			assert.equal( await dataServer.lock( 'key' ), true );
+			assert.equal( await dataServer.lock( 'key' ), false );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.unlock always returns true',
+	test			: ( done )=>{
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async ()=>{
+			const dataServer	= new DataServer( { persist: false } );
+			let called			= 0;
+
+			dataServer.on( 'unlock', ()=>{
+				called ++;
+			});
+
+			assert.equal( await dataServer.unlock( 'key' ), true );
+			assert.equal( await dataServer.unlock( 'key' ), true );
+			assert.equal( await dataServer.lock( 'key' ), true );
+			assert.equal( await dataServer.unlock( 'key' ), true );
+			assert.equal( called, 3 );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.lock acquires only one lock',
+	test			: ( done )=>{
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async ()=>{
+			const dataServer	= new DataServer( { persist: false } );
+			const promises		= [];
+
+			for ( let i = 0; i < 10000; i ++ )
+				promises.push( dataServer.lock( 'key' ) );
+
+			Promise.all( promises ).then(( locks )=>{
+				let acquiredLocks	= 0;
+				for ( const lock of locks )
+				{
+					if ( lock )
+						acquiredLocks ++;
+				}
+
+				assert.equal( acquiredLocks, 1 );
+
+				removeCache( dataServer );
+				done();
+			}).catch( done );
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.lock acquires another lock with burst of locks',
+	test			: ( done )=>{
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async ()=>{
+			const dataServer	= new DataServer( { persist: false } );
+			const promises		= [];
+
+			for ( let i = 0; i < 50000; i ++ )
+				promises.push( dataServer.lock( 'key' ) );
+
+			promises.push( dataServer.unlock( 'key' ) );
+
+			Promise.all( promises ).then(( locks )=>{
+				let acquiredLocks	= 0;
+				for ( const lock of locks )
+				{
+					if ( lock )
+						acquiredLocks ++;
+				}
+
+				assert.equal( acquiredLocks, 2 );
+
+				removeCache( dataServer );
+				done();
+			}).catch( done );
+		}, 10 );
 	}
 });

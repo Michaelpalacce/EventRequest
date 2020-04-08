@@ -188,6 +188,7 @@ test({
 
 		assert.deepStrictEqual( {}, session.session );
 		session.add( 'key', 'value' );
+
 		assert.deepStrictEqual( { key : 'value' }, session.session );
 		assert.equal( true, session.has( 'key') );
 		assert.equal( 'value', session.get( 'key' ) );

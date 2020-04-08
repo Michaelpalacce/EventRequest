@@ -68,7 +68,7 @@ class Server extends EventEmitter
 		this.er_env						= 'er_env';
 		this.er_rate_limits				= 'er_rate_limits';
 		this.er_static_resources		= 'er_static_resources';
-		this.er_cache_server			= 'er_cache_server';
+		this.er_data_server			= 'er_data_server';
 		this.er_templating_engine		= 'er_templating_engine';
 		this.er_file_stream				= 'er_file_stream';
 		this.er_logger					= 'er_logger';

@@ -194,8 +194,7 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Attaches the listener
 	 *
-	 * @details	Loads the config, attaches a process that will clear the IP based buckets if they are full once every 60 minutes,
-	 * 			attaches a middleware that will handle the rate limiting
+	 * @details	Loads the config, attaches a process that will clear the IP based buckets if they are full once every 60 minutes
 	 *
 	 * @param	Server server
 	 *
@@ -204,6 +203,11 @@ class RateLimitsPlugin extends PluginInterface
 	setServerOnRuntime( server )
 	{
 		this.loadConfig();
+
+		if ( this.dataStore === null && server.hasPlugin( 'er_data_server' ) )
+		{
+			this.dataStore	= server.getPlugin( 'er_data_server' ).getServer();
+		}
 
 		setInterval( async ()=>{
 			for ( let i = 0; i < this.rules.length; ++ i )

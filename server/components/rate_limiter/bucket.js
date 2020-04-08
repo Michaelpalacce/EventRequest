@@ -116,7 +116,7 @@ class Bucket
 
 		if ( result !== null )
 		{
-			return result.value;
+			return result;
 		}
 
 		await this.reset();
@@ -149,7 +149,7 @@ class Bucket
 
 		if ( result !== null )
 		{
-			return result.value;
+			return result;
 		}
 
 		await this.reset();
@@ -218,9 +218,9 @@ class Bucket
 	 */
 	async _doLock( resolve, reject, counter = 0 )
 	{
-		const result	= await this.dataStore.set( `${this.key}//lock`, true ).catch( this.handleError );
+		const result	= await this.dataStore.lock( `${this.key}//lock` ).catch( this.handleError );
 
-		if ( result !== null && result.isNew === true )
+		if ( result !== null && result === true )
 		{
 			return resolve( true );
 		}
@@ -243,7 +243,7 @@ class Bucket
 	 */
 	async _unlock()
 	{
-		await this.dataStore.delete( `${this.key}//lock` ).catch( this.handleError )
+		await this.dataStore.unlock( `${this.key}//lock` ).catch( this.handleError )
 	}
 
 	/**

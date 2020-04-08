@@ -23,7 +23,7 @@ class ResponseCachePlugin extends PluginInterface
 	 */
 	getPluginDependencies()
 	{
-		return ['er_cache_server'];
+		return ['er_data_server'];
 	}
 
 	/**
@@ -35,7 +35,7 @@ class ResponseCachePlugin extends PluginInterface
 	 */
 	setServerOnRuntime( server )
 	{
-		this.cachingServer	= server.getPlugin( 'er_cache_server' ).getServer();
+		this.cachingServer	= server.getPlugin( 'er_data_server' ).getServer();
 
 		server.define( 'cache.request', ( event )=>{
 			event.cacheCurrentRequest();
@@ -62,7 +62,7 @@ class ResponseCachePlugin extends PluginInterface
 				const ttl			= this.getTimeToLive( event );
 				const recordName	= this.getCacheId( event );
 
-				await this.cachingServer.set( recordName, { response, code, headers }, ttl, false );
+				await this.cachingServer.set( recordName, { response, code, headers }, ttl, { persist: false } );
 			}
 		} );
 	}
@@ -137,14 +137,14 @@ class ResponseCachePlugin extends PluginInterface
 					else
 					{
 						const ttl		= this.getTimeToLive( event );
-						const status	= await this.cachingServer.touch( cachedDataSet.key, ttl );
+						const status	= await this.cachingServer.touch( cacheId, ttl );
 
 						if ( ! status )
 						{
-							await this.cachingServer.set( cachedDataSet.key, cachedDataSet.value, cachedDataSet.ttl );
+							await this.cachingServer.set( cacheId, cachedDataSet, ttl, { persist: false } );
 						}
 
-						const { response, code, headers }	= cachedDataSet.value;
+						const { response, code, headers }	= cachedDataSet;
 						const headersKeys					= Object.keys( headers );
 
 						headersKeys.forEach(( headerKey )=>{

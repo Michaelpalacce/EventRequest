@@ -203,7 +203,7 @@ test({
 	test		: ( done )=>{
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 
-		assert.deepStrictEqual( ['er_cache_server'], responseCachePlugin.getPluginDependencies() );
+		assert.deepStrictEqual( ['er_data_server'], responseCachePlugin.getPluginDependencies() );
 
 		done();
 	}

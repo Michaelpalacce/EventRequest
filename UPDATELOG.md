@@ -1,3 +1,13 @@
+17.0.0
+- Renamed er_cache_server to er_data_server
+- Updated DataServer handleServer error and added tests for it
+- DataServer refactored to accept options everywhere in case of specific options needed for some DataServers
+- Added more DataServer tests
+- Rate limits plugin now takes the er_data_server data server if present
+- Fixed documentation
+- DataServer.get will now return ONLY the value
+- DataServer.increment and DataServer.decrement now return true and false instead of objects
+
 16.2.2
 - Added repository urls to package.json
 

@@ -22,7 +22,7 @@ class SessionPlugin extends PluginInterface
 	 */
 	getPluginDependencies()
 	{
-		return ['er_cache_server'];
+		return ['er_data_server'];
 	}
 
 	/**
@@ -34,7 +34,7 @@ class SessionPlugin extends PluginInterface
 	 */
 	setServerOnRuntime( server )
 	{
-		this.cachingServer	= server.getPlugin( 'er_cache_server' ).getServer();
+		this.cachingServer	= server.getPlugin( 'er_data_server' ).getServer();
 	}
 
 	/**
