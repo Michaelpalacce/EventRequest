@@ -8,6 +8,9 @@ const Streams								= require( 'stream' );
 const ValidationHandler						= require( './components/validation/validation_handler' );
 const { IncomingMessage, ServerResponse }	= require( 'http' );
 
+const X_POWERED_BY_HEADER					= 'X-Powered-By';
+const X_POWERED_BY_HEADER_VALUE				= 'ER';
+
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
  */
@@ -30,7 +33,7 @@ class EventRequest extends EventEmitter
 
 		const parsedUrl	= url.parse( request.url, true );
 		const list		= {},
-			rc		= request.headers.cookie;
+			rc			= request.headers.cookie;
 
 		rc && rc.split( ';' ).forEach( function( cookie ) {
 			const parts					= cookie.split( '=' );
@@ -50,36 +53,15 @@ class EventRequest extends EventEmitter
 		this.extra				= {};
 		this.params				= {};
 		this.block				= {};
-
-		let errorHandler		= null;
-		Object.defineProperty( this, 'errorHandler', {
-			enumerable	: true,
-			set			: ( arg ) =>{
-				if ( arg == null )
-				{
-					errorHandler	= arg;
-					return;
-				}
-
-				if ( arg instanceof ErrorHandler )
-				{
-					errorHandler	= arg;
-				}
-				else
-				{
-					throw new Error( 'Error handler must be an instance of ErrorHandler' );
-				}
-			},
-			get			: () =>{
-				return errorHandler;
-			}
-		});
+		this.errorHandler		= new ErrorHandler();
 
 		// We do this so we can pass the event.next function by reference
 		const self	= this;
-		this.next	= ( err, code )=>{
-			self._next( err, code );
+		this.next	= ( ...args )=>{
+			self._next.apply( self, args );
 		};
+
+		this.setHeader( X_POWERED_BY_HEADER, X_POWERED_BY_HEADER_VALUE );
 	}
 
 	/**
@@ -104,7 +86,6 @@ class EventRequest extends EventEmitter
 		this.validationHandler	= undefined;
 		this.request			= undefined;
 		this.extra				= undefined;
-		this.errorHandler		= undefined;
 		this.cookies			= undefined;
 		this.params				= undefined;
 		this.clientIp			= undefined;
@@ -394,21 +375,14 @@ class EventRequest extends EventEmitter
 	_next( err, code )
 	{
 		if ( err )
-		{
-			code	= typeof code === 'number' ? code : 500;
-			this.sendError( err, code );
-			return;
-		}
+			return this.sendError( err, typeof code === 'number' ? code : 500 );
 
 		const isResponseFinished	= this.isFinished();
 
 		if ( ! isResponseFinished )
 		{
 			if ( ! this.block.length > 0  )
-			{
-				this.sendError( `Cannot ${this.method} ${this.path}`, 404 );
-				return;
-			}
+				return this.sendError( `Cannot ${this.method} ${this.path}`, 404 );
 
 			try
 			{
@@ -443,10 +417,8 @@ class EventRequest extends EventEmitter
 	 */
 	sendError( ...args )
 	{
-		if ( ! ( this.errorHandler instanceof ErrorHandler ) )
-		{
+		if ( typeof this.errorHandler.handleError !== 'function' )
 			this.errorHandler	= new ErrorHandler();
-		}
 
 		args.unshift( this );
 

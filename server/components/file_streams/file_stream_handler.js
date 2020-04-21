@@ -1,7 +1,6 @@
 'use strict';
 
 // Dependencies
-const FileStream		= require( './file_stream' );
 const VideoFileStream	= require( './video_file_stream' );
 const AudioFileStream	= require( './audio_file_stream' );
 const TextFileStream	= require( './text_file_stream' );
@@ -49,7 +48,7 @@ class FileStreamHandler
 
 				stream	= stream.getInstance( streamOptions );
 
-				if ( stream instanceof FileStream )
+				if ( typeof stream.supports === 'function' && typeof stream.getFileStream === 'function' )
 				{
 					this.fileStreams.push( stream );
 				}
@@ -58,27 +57,11 @@ class FileStreamHandler
 	}
 
 	/**
-	 * @brief	Get all supported file types from the added file streams
-	 *
-	 * @return	Array
-	 */
-	getSupportedTypes()
-	{
-		let formats	= [];
-		for ( const index in this.fileStreams )
-		{
-			formats	= formats.concat( this.fileStreams[index].SUPPORTED_FORMATS );
-		}
-
-		return formats;
-	}
-
-	/**
 	 * @brief	Gets the file streamer responsible for handling the given file type
 	 *
 	 * @details	Returns null if a file streamer is not found
 	 *
-	 * @param	String file
+	 * @param	file String
 	 *
 	 * @return	FileStream
 	 */
@@ -99,7 +82,6 @@ class FileStreamHandler
 
 module.exports	= {
 	FileStreamHandler,
-	FileStream,
 	AudioFileStream,
 	VideoFileStream,
 	TextFileStream

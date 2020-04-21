@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const BodyParser	= require( './body_parser' );
+const { EventEmitter }				= require( 'events' );
 
 /**
  * @brief	Constants
@@ -13,7 +13,7 @@ const CONTENT_TYPE_HEADER			= 'content-type';
 /**
  * @brief	FormBodyParser responsible for parsing application/x-www-form-urlencoded forms
  */
-class FormBodyParser extends BodyParser
+class FormBodyParser extends EventEmitter
 {
 	/**
 	 * @param	Object options
@@ -23,7 +23,8 @@ class FormBodyParser extends BodyParser
 	 */
 	constructor( options = {} )
 	{
-		super( options );
+		super();
+		this.setMaxListeners( 0 );
 
 		// Defaults to 10 MB
 		this.maxPayloadLength	= typeof options.maxPayloadLength === 'number'
@@ -33,13 +34,12 @@ class FormBodyParser extends BodyParser
 		this.strict				= typeof options.strict === 'boolean'
 								? options.strict
 								: false;
-
-		this.rawPayload			= [];
-		this.payloadLength		= 0;
 	}
 
 	/**
-	 * @see	BodyParser::supports
+	 * @brief	Returns true if the current body parser supports teh given request
+	 *
+	 * @return	void
 	 */
 	supports( event )
 	{
@@ -48,94 +48,63 @@ class FormBodyParser extends BodyParser
 	}
 
 	/**
-	 * @brief	Called when the body has been fully received
-	 *
-	 * @param	Buffer rawPayload
-	 * @param	Object headers
-	 * @param	Function callback
-	 *
-	 * @return	void
-	 */
-	onEndCallback( rawPayload, headers, callback )
-	{
-		if ( this.strict && rawPayload.length > this.maxPayloadLength )
-		{
-			callback( 'Max payload length reached' );
-			return;
-		}
-
-		if (
-			this.strict &&
-			(
-				typeof headers !== 'object'
-				|| typeof headers[CONTENT_LENGTH_HEADER] === 'undefined'
-				|| rawPayload.length !== Number( headers[CONTENT_LENGTH_HEADER] )
-			)
-		) {
-			callback( 'Payload length does not match provided content-length' );
-			return;
-		}
-
-		if ( rawPayload.length === 0 )
-		{
-			return callback( false, {} );
-		}
-
-		let payload			= rawPayload.toString();
-		let body			= {};
-		let payloadParts	= payload.split( '&' );
-
-		for ( let i = 0; i < payloadParts.length; ++ i )
-		{
-			let param	= payloadParts[i].split( '=' );
-
-			if ( param.length !== 2 )
-			{
-				continue;
-			}
-
-			body[param[0]]	= decodeURIComponent( param[1] );
-		}
-
-		callback( false, body );
-	}
-
-	/**
 	 * @see	BodyParser::parse()
 	 */
 	parse( event )
 	{
 		return new Promise(( resolve, reject ) => {
+			let rawPayload		= [];
+			let payloadLength	= 0;
+
 			if ( ! this.supports( event ) )
-			{
-				reject( 'Body type not supported' );
-				return;
-			}
+				return reject( 'Body type not supported' );
 
 			event.request.on( 'data', ( data ) =>
 			{
 				if ( ! event.isFinished() )
 				{
-					this.rawPayload.push( data );
-					this.payloadLength	+= data.length;
+					rawPayload.push( data );
+					payloadLength	+= data.length;
 				}
 			});
 
 			event.request.on( 'end', () => {
 				if ( ! event.isFinished() )
 				{
-					const rawPayload	= Buffer.concat( this.rawPayload, this.payloadLength );
-					this.onEndCallback( rawPayload, event.headers, ( err, body )=>{
-						if ( ! err )
-						{
-							event.body	= body;
-							resolve( body );
-						}
-						else
-						{
-							reject( 'Could not parse the body' );
-						}
-					});
+					rawPayload	= Buffer.concat( rawPayload, payloadLength );
+
+					if ( this.strict && rawPayload.length > this.maxPayloadLength )
+						return resolve( {} );
+
+					if (
+						this.strict &&
+						(
+							typeof event.headers !== 'object'
+							|| typeof event.headers[CONTENT_LENGTH_HEADER] === 'undefined'
+							|| rawPayload.length !== Number( event.headers[CONTENT_LENGTH_HEADER] )
+						)
+					) {
+						return resolve( {} );
+					}
+
+					if ( rawPayload.length === 0 )
+						return resolve( {} );
+
+					let payload			= rawPayload.toString();
+					let body			= {};
+					let payloadParts	= payload.split( '&' );
+
+					for ( let i = 0; i < payloadParts.length; ++ i )
+					{
+						let param	= payloadParts[i].split( '=' );
+
+						if ( param.length !== 2 )
+							continue;
+
+						body[param[0]]	= decodeURIComponent( param[1] );
+					}
+
+					resolve( body );
 				}
 			});
 		})

@@ -100,7 +100,7 @@ test({
 });
 
 test({
-	message	: 'JsonBodyParser.parse does not parse if maxPayloadLength is reached',
+	message	: 'JsonBodyParser.parse does not parse if maxPayloadLength is reached and is not strict',
 	test	: ( done )=>{
 		let bodyToStream	= { key : 'value' };
 		let eventRequest	= helpers.getEventRequest(
@@ -126,15 +126,19 @@ test({
 		});
 		let jsonBodyParser	= new JsonBodyParser( { strict: true, maxPayloadLength : 1 } );
 
-		jsonBodyParser.parse( eventRequest ).then(()=>{ done( 'Should have rejected' ); } ).catch(( err )=>{
-			assert.equal( err !== false, true );
+		jsonBodyParser.parse( eventRequest ).then(( body )=>{
+			assert.deepStrictEqual( body, {} );
+
+			done();
+		}).catch(( err )=>{
+			done( 'Should NOT have rejected' );
 			done();
 		});
 	}
 });
 
 test({
-	message	: 'JsonBodyParser.parse parses if maxPayloadLength is reached and not strict',
+	message	: 'JsonBodyParser.parse parses if maxPayloadLength is reached and is strict',
 	test	: ( done )=>{
 		let bodyToStream	= { key : 'value' };
 		let eventRequest	= helpers.getEventRequest(
@@ -160,8 +164,12 @@ test({
 		});
 		let jsonBodyParser	= new JsonBodyParser( { strict: true, maxPayloadLength : 1 } );
 
-		jsonBodyParser.parse( eventRequest ).then(()=>{ done( 'Should have rejected' ); } ).catch(( err )=>{
-			assert.equal( err !== false, true );
+		jsonBodyParser.parse( eventRequest ).then(( body )=>{
+			assert.deepStrictEqual( body, {} );
+
+			done();
+		}).catch(( err )=>{
+			done( 'Should NOT have rejected' );
 			done();
 		});
 	}
@@ -194,8 +202,12 @@ test({
 		});
 		let jsonBodyParser	= new JsonBodyParser( { strict: true } );
 
-		jsonBodyParser.parse( eventRequest ).then(()=>{ done( 'Should have rejected' ); } ).catch(( err )=>{
-			assert.equal( err !== false, true );
+		jsonBodyParser.parse( eventRequest ).then(( body )=>{
+			assert.deepStrictEqual( body, {} );
+
+			done();
+		}).catch(( err )=>{
+			done( 'Should NOT have rejected' );
 			done();
 		});
 	}

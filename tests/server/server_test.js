@@ -1751,7 +1751,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_body_parser_json does not above the maxPayload if strict',
+	message	: 'Server.test er_body_parser_json does not parse above the maxPayload if strict',
 	test	: ( done )=>{
 		const name			= 'testErJsonBodyParserParsesApplicationJson';
 		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
@@ -1762,12 +1762,7 @@ test({
 		app.apply( app.er_body_parser_json, { maxPayloadLength: 60, strict: true } );
 
 		app.get( `/${name}`, ( event )=>{
-			if (
-				typeof event.body === 'undefined'
-				|| typeof event.body[formDataKey] === 'undefined'
-			) {
-				event.sendError( 'Body was not parsed', 400 );
-			}
+			assert.deepStrictEqual( event.body, {} );
 
 			event.send( 'ok' );
 		} );
@@ -1778,7 +1773,7 @@ test({
 			helpers.sendServerRequest(
 				`/${name}`,
 				'GET',
-				500,
+				200,
 				JSON.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
 				{ 'content-type': 'application/json' },
 				3338
@@ -1884,7 +1879,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_body_parser_form does not above the maxPayload if strict',
+	message	: 'Server.test er_body_parser_form does parse not above the maxPayload if strict',
 	test	: ( done )=>{
 		const name			= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
 		const formDataKey	= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
@@ -1895,13 +1890,7 @@ test({
 		app.apply( app.er_body_parser_form, { maxPayloadLength: 60, strict: true } );
 
 		app.get( `/${name}`, ( event )=>{
-			if (
-				typeof event.body === 'undefined'
-				|| typeof event.body[formDataKey] === 'undefined'
-				|| ! event.body[formDataKey].includes( formDataValue )
-			) {
-				event.sendError( 'Body was not parsed', 400 );
-			}
+			assert.deepStrictEqual( event.body, {} );
 
 			event.send( 'ok' );
 		} );
@@ -1912,7 +1901,7 @@ test({
 			helpers.sendServerRequest(
 				`/${name}`,
 				'GET',
-				500,
+				200,
 				querystring.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
 				{ 'content-type': 'application/x-www-form-urlencoded' },
 				3340
@@ -2813,6 +2802,24 @@ test({
 });
 
 test({
+	message	: 'Server.tester_templating_engine attaches a render function that calls next on error',
+	test	: ( done )=>{
+		const name			= 'testTemplatingEngineFail';
+		const templateDir 	= path.join( __dirname, './fixture/templates' );
+
+		app.apply( app.er_templating_engine, { templateDir } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.render( 'fail' );
+		} );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response )=>{
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test er_session works as expected',
 	test	: ( done )=>{
 		const name	= 'testErSession';
@@ -3081,6 +3088,22 @@ test({
 
 		helpers.sendServerRequest( `/testCallingNextTwiceDoesNotDieCritically`, 'GET', 500 ).then( ( response )=>{
 			assert.equal( response.body.toString(), JSON.stringify( { error } ) );
+			done();
+		} ).catch( done );
+	}
+});
+
+
+test({
+	message	: 'Server.testServerAddsXPoweredBy',
+	test	: ( done )=>{
+		app.get( '/textServerAddsXPoweredBy', event => event.send( 'ok' ) );
+
+		helpers.sendServerRequest( `/textServerAddsXPoweredBy` ).then( ( response )=>{
+			assert.equal( response.body.toString(), 'ok' );
+			assert.equal( typeof response.headers['x-powered-by'] !== 'undefined', true );
+			assert.equal( response.headers['x-powered-by'], 'ER' );
+
 			done();
 		} ).catch( done );
 	}

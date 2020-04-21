@@ -1,13 +1,13 @@
 'use strict';
 
 // Dependencies
-const os			= require( 'os' );
-const path			= require( 'path' );
-const fs			= require( 'fs' );
-const { promisify }	= require( 'util' );
-const BodyParser	= require( './body_parser' );
-const { Loggur }	= require( '../logger/loggur' );
-const unlink		= promisify( fs.unlink );
+const os				= require( 'os' );
+const path				= require( 'path' );
+const fs				= require( 'fs' );
+const { promisify }		= require( 'util' );
+const { EventEmitter }	= require( 'events' );
+const { Loggur }		= require( '../logger/loggur' );
+const unlink			= promisify( fs.unlink );
 
 /**
  * @brief	Constants
@@ -46,13 +46,10 @@ const ERROR_RESOURCE_TAKEN						= 106;
 
 /**
  * @brief	FormParser used to parse multipart data
- *
- * @TODO	Figure out how to get the offset of the buffer value without regex
  */
-class MultipartDataParser extends BodyParser
+class MultipartDataParser extends EventEmitter
 {
 	/**
-	 * @param	BodyParser bodyParser
 	 * @param	Object options
 	 * 			Accepts options:
 	 * 			- maxPayload - Number - Maximum payload in bytes to parse if set to 0 means infinite
@@ -61,11 +58,12 @@ class MultipartDataParser extends BodyParser
 	 */
 	constructor( options = {} )
 	{
-		super( options );
+		super();
+		this.setMaxListeners( 0 );
 
-		this.maxPayload				= this.options.maxPayload || 0;
-		this.tempDir				= this.options.tempDir || os.tmpdir();
-		this.cleanUpItemsTimeoutMS	= this.options.cleanUpItemsTimeoutMS || 100;
+		this.maxPayload				= options.maxPayload || 0;
+		this.tempDir				= options.tempDir || os.tmpdir();
+		this.cleanUpItemsTimeoutMS	= options.cleanUpItemsTimeoutMS || 100;
 
 		this.EOL					= null;
 		this.EOL_LENGTH				= null;
@@ -596,7 +594,9 @@ class MultipartDataParser extends BodyParser
 	}
 
 	/**
-	 * @see	BodyParser::parse()
+	 * @brief	Parses the body
+	 *
+	 * @return	Promise
 	 */
 	parse( event )
 	{
@@ -618,6 +618,7 @@ class MultipartDataParser extends BodyParser
 						this.ended	= true;
 						this.stripDataFromParts();
 						this.separateParts();
+
 						resolve( this.parts );
 					});
 
@@ -750,12 +751,11 @@ class MultipartDataParser extends BodyParser
 	 */
 	absorbStream()
 	{
-		let self	= this;
 		this.event.request.on( 'data', ( chunk ) =>
 		{
 			if ( ! this.hasFinished() )
 			{
-				self.onDataReceivedCallback( chunk );
+				this.onDataReceivedCallback( chunk );
 			}
 		});
 

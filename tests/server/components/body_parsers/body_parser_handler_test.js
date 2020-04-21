@@ -2,8 +2,7 @@
 
 const { Mock, Mocker, assert, test, helpers }	= require( '../../../test_helper' );
 const BodyParserHandler							= require( '../../../../server/components/body_parsers/body_parser_handler' );
-const BodyParser								= require( '../../../../server/components/body_parsers/body_parser' );
-const MultipartDataParser						= require( '../../../../server/components/body_parsers/multipart_data_parser' );
+const JsonBodyParser							= require( '../../../../server/components/body_parsers/json_body_parser' );
 
 test({
 	message	: 'BodyParserHandler.constructor does not throw with valid arguments',
@@ -21,7 +20,12 @@ test({
 		assert.doesNotThrow(()=>{
 			const bodyParserHandler	= new BodyParserHandler();
 
-			bodyParserHandler.addParser( new MultipartDataParser() );
+			const bodyParser		= {
+				parse		: ()=>{},
+				supports	: ()=>{}
+			};
+
+			bodyParserHandler.addParser( bodyParser );
 		});
 		done();
 	}
@@ -33,7 +37,7 @@ test({
 		assert.throws(()=>{
 			const bodyParserHandler	= new BodyParserHandler();
 
-			bodyParserHandler.addParser( new Error() );
+			bodyParserHandler.addParser( {} );
 		});
 		done();
 	}
@@ -56,7 +60,7 @@ test({
 test({
 	message	: 'BodyParserHandler.parseBody calls BodyParser parse if supported',
 	test	: ( done )=>{
-		const MockBodyParser		= Mock( BodyParser );
+		const MockBodyParser		= Mock( JsonBodyParser );
 		const testBody			= 'Test';
 		Mocker( MockBodyParser, {
 			method			: 'supports',
@@ -84,7 +88,7 @@ test({
 test({
 	message	: 'BodyParserHandler.parseBody does not parse if not supports and does not return an error',
 	test	: ( done )=>{
-		const MockBodyParser		= Mock( BodyParser );
+		const MockBodyParser		= Mock( JsonBodyParser );
 
 		Mocker( MockBodyParser, {
 			method			: 'supports',
@@ -110,8 +114,8 @@ test({
 test({
 	message	: 'BodyParserHandler.parseBody calls only the first one that supports it',
 	test	: ( done )=>{
-		const MockBodyParser		= Mock( BodyParser );
-		const MockBodyParserTwo	= Mock( BodyParser );
+		const MockBodyParser	= Mock( JsonBodyParser );
+		const MockBodyParserTwo	= Mock( JsonBodyParser );
 		const testBody			= 'Test';
 		Mocker( MockBodyParserTwo, {
 			method			: 'supports',
@@ -152,7 +156,7 @@ test({
 test({
 	message	: 'BodyParserHandler.parseBody returns an error in case of an error in the body parser',
 	test	: ( done )=>{
-		const MockBodyParser	= Mock( BodyParser );
+		const MockBodyParser	= Mock( JsonBodyParser );
 		const error			= 'Not supported';
 		Mocker( MockBodyParser, {
 			method			: 'supports',

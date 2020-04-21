@@ -90,10 +90,11 @@ class BodyParserPlugin extends PluginInterface
 					bodyParserHandler.addParser( new parserClass( parserOptions ) );
 				}
 
-				bodyParserHandler.parseBody( event ).then(( data )=>{
-					event.body	= data;
+				bodyParserHandler.parseBody( event ).then( body => {
+					event.body	= body;
+
 					event.next();
-				}).catch( event.next );
+				} ).catch( event.next );
 			}
 		};
 

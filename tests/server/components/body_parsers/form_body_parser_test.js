@@ -125,10 +125,12 @@ test({
 		});
 		const formBodyParser	= new FormBodyParser( { strict: true, maxPayloadLength : 1 } );
 
-		formBodyParser.parse( eventRequest ).then(()=>{
-			done( 'Should have rejected' )
+		formBodyParser.parse( eventRequest ).then(( body )=>{
+			assert.deepStrictEqual( body, {} );
+
+			done();
 		}).catch(( err )=>{
-			assert.equal( err !== false, true );
+			done( 'Should NOT have rejected' );
 			done();
 		});
 	}

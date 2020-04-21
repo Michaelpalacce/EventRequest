@@ -1,3 +1,11 @@
+17.1.0
+- Main focus of this release is to remove dependencies in case where custom logic wants to be added to some classes.
+- Added x-powered-by
+- Removed the BodyParser as a parent to all BodyParsers. Now the BodyParserHandler uses duck-typing to determine if it is correct
+- The ErrorHandler no longer needs to be the correct class when setting in the EventRequest. Now uses duck-typing
+- The FileStreams no longer need to extend FileStream to work. Now uses duck-typing
+- Small Rework to the templating engine plugin that should not affect anything
+
 17.0.0
 - Renamed er_cache_server to er_data_server
 - Updated DataServer handleServer error and added tests for it

@@ -1,7 +1,6 @@
 'use strict';
 
 // Dependencies
-const FileStream	= require( './file_stream' );
 const path			= require( 'path' );
 const fs			= require( 'fs' );
 
@@ -15,29 +14,24 @@ const STREAM_TYPE	= 'video';
 /**
  * @brief	Used to stream mp4 and webm files
  */
-class VideoFileStream extends FileStream
+class VideoFileStream
 {
 	/**
-	 * @see	FileStream::constructor()
+	 * @param	options Object
 	 */
 	constructor( options )
 	{
-		super( options );
+		this.options			= options;
 		this.SUPPORTED_FORMATS	= ['.mp4', '.webm'];
 		this._streamType		= STREAM_TYPE;
-
-		this.sanitize();
 	}
 
 	/**
-	 * @see	FileStream::sanitize()
-	 */
-	sanitize()
-	{
-	}
-
-	/**
-	 * @see	FileStream::supports()
+	 * @brief	Check whether the given file is supported by the file stream
+	 *
+	 * @param	file String
+	 *
+	 * @return	Boolean
 	 */
 	supports( file )
 	{
@@ -46,7 +40,23 @@ class VideoFileStream extends FileStream
 	}
 
 	/**
-	 * @see	FileStream::getFileStream()
+	 * @brief	Gets an instance of file stream
+	 *
+	 * @return	AudioFileStream
+	 */
+	static getInstance( options )
+	{
+		return new this( options );
+	}
+
+	/**
+	 * @brief	Gets the file stream for the file
+	 *
+	 * @param	event EventRequest
+	 * @param	file String
+	 * @param	options Object
+	 *
+	 * @return	ReadableStream
 	 */
 	getFileStream( event, file, options = {} )
 	{
@@ -88,7 +98,9 @@ class VideoFileStream extends FileStream
 	}
 
 	/**
-	 * @see	FileStream::stream()
+	 * @brief	Gets the type of file this stream supports
+	 *
+	 * @return	String
 	 */
 	getType()
 	{

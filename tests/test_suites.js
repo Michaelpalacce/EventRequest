@@ -54,7 +54,6 @@ testSuites.helpersSuite		= ()=>{
 
 testSuites.bodyParserSuite	= ()=>{
 	require( './server/components/body_parsers/body_parser_handler_test' );
-	require( './server/components/body_parsers/body_parser_test' );
 	require( './server/components/body_parsers/form_body_parser_test' );
 	require( './server/components/body_parsers/json_body_parser_test' );
 	require( './server/components/body_parsers/multipart_data_parser_test' );

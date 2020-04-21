@@ -67,19 +67,36 @@ test({
 });
 
 test({
-	message	: 'EventRequest errorHandler can only be an instance of ErrorHandler',
+	message	: 'EventRequest errorHandler does not need to be an instance of ErrorHandler',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 
 		assert.doesNotThrow( () =>{
-			eventRequest.errorHandler	= new ErrorHandler()
-		});
-
-		assert.throws( () => {
+			eventRequest.errorHandler	= new ErrorHandler();
 			eventRequest.errorHandler	= {};
 		});
 
 		done();
+	}
+});
+
+test({
+	message	: 'EventRequest sendError will create a default Error Handler if it is not correct',
+	test	: ( done ) => {
+		let eventRequest			= helpers.getEventRequest();
+		let errorToThrow			= 'Error to throw';
+		let called					= false;
+
+		eventRequest.errorHandler	= {};
+		eventRequest._mock({
+			method			: 'send',
+			called			: 1,
+			shouldReturn	: ()=>{ called = true; }
+		});
+
+		eventRequest.sendError( errorToThrow );
+
+		called ? done() : done( 'Send was not called' );
 	}
 });
 

@@ -214,7 +214,6 @@ The event request is an object that is created by the server and passed through 
 **sendError( mixed error = '', Number code = 500 ): void** 
 - Like send but used to send errors. 
 - It will call the errorHandler directly with all the arguments specified ( in case of a custom error handler, you can send extra parameters with the first one being the EventRequest )
-- This will emit an 'on_error' event as well as the usual send events 
 
 ***
 ####Events emitted by the EventRequest
@@ -1318,9 +1317,9 @@ The TestingTools export:
 ***
 
 #ErrorHandler 
-- Error handler that can be extended to a custom one
 - There is a default error handler in the event request
 - This class can be extended and custom functionality may be written
+- Alternatively instead of extending you can write your own class as long as it has a handleError function.
 
 ***
 ####Accepted Options:
@@ -1360,7 +1359,7 @@ The TestingTools export:
 ####Attached Functionality:
 
 **event.errorHandler**
-- This may be null, as the only time the ErrorHandler 
+- By default it is attached to the EventRequest but can be overwritten at any point
 
 ***
 ####Exported Plugin Functions:
@@ -1385,8 +1384,7 @@ app.listen( 80 );
 ***
 
 #BodyParser
-- Can be extended to create your own body parser that can later be given back to the body parser plugin
-- Is an EventEmitter
+- If you want to create a new BodyParser the new BodyParser must implement the functions described below
 
 #### Accepted options
 
@@ -1394,16 +1392,12 @@ app.listen( 80 );
 
 #### Functions
 
-**constructor( Object options = {} ): void**
-- This sets the max listeners to 0 ( infinite )
-- saves the options as this.options
-
 **supports( EventRequest event ): Boolean**
 - This function will be called by the BodyParserHandler attached by the body parser plugin before the parser is actually called
 - It must return a Boolean
 - If a parser returns that it supports the given request, no further body parsers will be called
 
-**parse( EventRequest event ): Promise**
+**parse( EventRequest event ): Promise: body**
 - Returns a promise
 - This is called only if the body parser is supported.
 - It resolves with a body that is then attached to event.body or rejects with an error
@@ -1413,7 +1407,14 @@ app.listen( 80 );
 - If you want to add a custom BodyParser you can do:
 
 ~~~javascript
-const BodyParserPlugin  = require( 'event_request/server/plugins/available_plugins/body_parser_plugin' )
+const BodyParserPlugin	= require( 'event_request/server/plugins/available_plugins/body_parser_plugin' );
+
+class CustomBodyParser
+{
+    parse(){} // define logic
+
+    supports(){} // define logic
+}
 
 // The CustomBodyParser is the class and the options are the end are the parameters to be passed to the class
 // This is done because A new body parser will be created on each request
@@ -2345,6 +2346,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 
 #er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
 - Adds a JsonBodyParser, FormBodyParser or MultipartBodyParser bodyParsers respectively that can be set up
+- They all implement the design principle behind the BodyParser 
 - These plugins are basically one and the same and even tho many may be added they will use a single body parser handler.
 - There will not be multiple middleware that will be attached
 - Parsers are fired according to the content-type header

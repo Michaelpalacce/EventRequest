@@ -1,8 +1,5 @@
 'use strict';
 
-// Dependencies
-const BodyParser	= require( './body_parser' );
-
 /**
  * @brief	BodyParserHandler responsible for parsing the body of the request
  */
@@ -16,15 +13,15 @@ class BodyParserHandler
 	/**
 	 * @brief	Adds a new parser to the Body Parser Handler
 	 *
-	 * @param	BodyParser parser
+	 * @param	mixed parser
 	 *
 	 * @return	void
 	 */
 	addParser( parser )
 	{
-		if ( parser instanceof BodyParser === false )
+		if ( typeof parser.supports !== 'function' || typeof parser.parse !== 'function' )
 		{
-			throw new Error( 'Parser must be of type BodyParser' );
+			throw new Error( 'Parser must have a supports and parse functions' );
 		}
 
 		this.parsers.push( parser );
@@ -36,7 +33,7 @@ class BodyParserHandler
 	 * @param	EventRequest event
 	 * @param	Function callback
 	 *
-	 * @return	Promise | null
+	 * @return	Promise
 	 */
 	parseBody( event )
 	{
@@ -49,6 +46,7 @@ class BodyParserHandler
 			}
 		}
 
+		// Fallback
 		return new Promise(( resolve )=>{
 			resolve( {} );
 		})

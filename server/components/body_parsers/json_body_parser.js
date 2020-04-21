@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const BodyParser	= require( './body_parser' );
+const { EventEmitter }					= require( 'events' );
 
 /**
  * @brief	Constants
@@ -13,7 +13,7 @@ const CONTENT_TYPE_HEADER				= 'content-type';
 /**
  * @brief	JsonBodyParser responsible for parsing application/json forms
  */
-class JsonBodyParser extends BodyParser
+class JsonBodyParser extends EventEmitter
 {
 	/**
 	 * @param	Object options
@@ -23,7 +23,8 @@ class JsonBodyParser extends BodyParser
 	 */
 	constructor( options = {} )
 	{
-		super( options );
+		super();
+		this.setMaxListeners( 0 );
 
 		// Defaults to 100 MB
 		this.maxPayloadLength	= typeof options.maxPayloadLength === 'number'
@@ -33,13 +34,12 @@ class JsonBodyParser extends BodyParser
 		this.strict				= typeof options.strict === 'boolean'
 								? options.strict
 								: false;
-
-		this.rawPayload			= [];
-		this.payloadLength		= 0;
 	}
 
 	/**
-	 * @see	BodyParser::supports()
+	 * @brief	Returns a boolean if the current body parser supports the request
+	 *
+	 * @return	boolean
 	 */
 	supports( event )
 	{
@@ -48,92 +48,66 @@ class JsonBodyParser extends BodyParser
 	}
 
 	/**
-	 * @brief	Called when the body has been fully received
+	 * @brief	Parses the request
 	 *
-	 * @param	Buffer rawPayload
-	 * @param	Object headers
-	 * @param	Function callback
-	 *
-	 * @return	void
-	 */
-	onEndCallback( rawPayload, headers, callback )
-	{
-		if ( this.strict && rawPayload.length > this.maxPayloadLength )
-		{
-			callback( 'Max payload length reached' );
-			return;
-		}
-
-		if (
-			this.strict &&
-			(
-				typeof headers !== 'object'
-				|| typeof headers[CONTENT_LENGTH_HEADER] === 'undefined'
-				|| rawPayload.length !== Number( headers[CONTENT_LENGTH_HEADER] )
-			)
-		) {
-			callback( 'Payload length does not match provided content-length' );
-			return;
-		}
-
-		if ( rawPayload.length === 0 )
-		{
-			return callback( false, {} );
-		}
-
-		try
-		{
-			const payload	= JSON.parse( rawPayload.toString() );
-			for ( const index in payload )
-			{
-				payload[index]	= decodeURIComponent( payload[index] );
-			}
-
-			callback( false, payload );
-		}
-		catch ( e )
-		{
-			callback( 'Could not parse the body' );
-		}
-	}
-
-	/**
-	 * @see	BodyParser::parse()
+	 * @return	Promise
 	 */
 	parse( event )
 	{
 		return new Promise(( resolve, reject )=>{
+			let rawPayload		= [];
+			let payloadLength	= 0;
+
 			if ( ! this.supports( event ) )
-			{
-				reject( 'Body type not supported' );
-				return;
-			}
+				return reject( 'Body type not supported' );
 
 			event.request.on( 'data', ( data ) =>
 			{
 				if ( ! event.isFinished() )
 				{
-					this.rawPayload.push( data );
-					this.payloadLength	+= data.length;
+					rawPayload.push( data );
+					payloadLength	+= data.length;
 				}
 			});
 
 			event.request.on( 'end', () => {
 				if ( ! event.isFinished() )
 				{
-					const rawPayload	= Buffer.concat( this.rawPayload, this.payloadLength );
-					this.onEndCallback( rawPayload, event.headers, ( err, body )=>{
-						if ( ! err )
-						{
-							event.body	= body;
+					rawPayload	= Buffer.concat( rawPayload, payloadLength );
 
-							resolve( body );
-						}
-						else
-						{
-							reject( 'Could not parse the body' );
-						}
-					});
+					if ( this.strict && rawPayload.length > this.maxPayloadLength )
+					{
+						return resolve( {} );
+					}
+
+					if (
+						this.strict &&
+						(
+							typeof event.headers !== 'object'
+							|| typeof event.headers[CONTENT_LENGTH_HEADER] === 'undefined'
+							|| rawPayload.length !== Number( event.headers[CONTENT_LENGTH_HEADER] )
+						)
+					) {
+						return resolve( {} );
+					}
+
+					if ( rawPayload.length === 0 )
+					{
+						return resolve( {} );
+					}
+
+					try
+					{
+						const payload	= JSON.parse( rawPayload.toString() );
+						for ( const index in payload )
+							payload[index]	= decodeURIComponent( payload[index] );
+
+						resolve( payload );
+					}
+					catch ( e )
+					{
+						reject( 'Could not parse the body' );
+					}
 				}
 			});
 		});

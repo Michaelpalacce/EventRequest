@@ -1,7 +1,6 @@
 'use strict';
 
 // Dependencies
-const FileStream	= require( './file_stream' );
 const path			= require( 'path' );
 const fs			= require( 'fs' );
 
@@ -15,29 +14,24 @@ const STREAM_TYPE	= 'audio';
 /**
  * @brief	Used to stream audio files
  */
-class AudioFileStream extends FileStream
+class AudioFileStream
 {
 	/**
-	 * @see	FileStream::constructor()
+	 * @param	options Object
 	 */
 	constructor( options )
 	{
-		super( options );
+		this.options			= options;
 		this.SUPPORTED_FORMATS	= ['.mp3', '.flac', '.wav', '.aiff', '.aac'];
 		this._streamType		= STREAM_TYPE;
-
-		this.sanitize();
 	}
 
 	/**
-	 * @see	FileStream::sanitize()
-	 */
-	sanitize()
-	{
-	}
-
-	/**
-	 * @see	FileStream::supports()
+	 * @brief	Check whether the given file is supported by the file stream
+	 *
+	 * @param	file String
+	 *
+	 * @return	Boolean
 	 */
 	supports( file )
 	{
@@ -46,7 +40,23 @@ class AudioFileStream extends FileStream
 	}
 
 	/**
-	 * @see	FileStream::getFileStream()
+	 * @brief	Gets an instance of file stream
+	 *
+	 * @return	AudioFileStream
+	 */
+	static getInstance( options )
+	{
+		return new this( options );
+	}
+
+	/**
+	 * @brief	Gets the file stream for the file
+	 *
+	 * @param	event EventRequest
+	 * @param	file String
+	 * @param	options Object
+	 *
+	 * @return	ReadableStream
 	 */
 	getFileStream( event, file, options = {} )
 	{
@@ -88,7 +98,9 @@ class AudioFileStream extends FileStream
 	}
 
 	/**
-	 * @see	FileStream::stream()
+	 * @brief	Gets the type of file this stream supports
+	 *
+	 * @return	String
 	 */
 	getType()
 	{

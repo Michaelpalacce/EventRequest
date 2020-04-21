@@ -1,7 +1,7 @@
 'use strict';
 
 const PluginInterface			= require( '../plugin_interface' );
-const fs						= require( 'fs' );
+const { readFile }				= require( 'fs' ).promises;
 const path						= require( 'path' );
 const DefaultTemplatingEngine	= require( '../../components/templating_engine/default_templating_engine' );
 const PROJECT_ROOT				= path.parse( require.main.filename ).dir;
@@ -35,40 +35,31 @@ class TemplatingEnginePlugin extends PluginInterface
 			const renderPromise	= new Promise(( resolve,reject )=>{
 				templateName	= typeof templateName === 'string' && templateName.length > 0
 								? templateName + '.html'
-								: false;
+								: 'index.html';
 
-				if ( templateName !== false )
-				{
-					const templatePath	= path.join( this.templateDir, templateName );
-
-					fs.readFile( templatePath, 'utf8', ( err, html ) => {
-						if ( ! err && html && html.length > 0  && ! this.isFinished() )
+				readFile( path.join( this.templateDir, templateName ), 'utf8' ).then( html => {
+					if ( html && html.length > 0  && ! this.isFinished() )
+					{
+						try
 						{
-							try
-							{
-								const result	= this.templatingEngine.render( html, variables );
+							const result	= this.templatingEngine.render( html, variables );
 
-								this.emit( 'render', { templateName, variables } );
+							this.emit( 'render', { templateName, variables } );
 
-								this.setHeader( 'Content-Type', 'text/html' );
-								this.send( result, 200 );
-								resolve();
-							}
-							catch ( e )
-							{
-								reject( e );
-							}
+							this.setHeader( 'Content-Type', 'text/html' );
+							this.send( result, 200 );
+							resolve();
 						}
-						else
+						catch ( e )
 						{
-							reject( err );
+							reject( e );
 						}
-					});
-				}
-				else
-				{
-					reject( 'Error while rendering' )
-				}
+					}
+					else
+					{
+						reject( 'Error rendering' );
+					}
+				}).catch( reject );
 			});
 
 			renderPromise.catch( errorCallback === null ? eventRequest.next : errorCallback );
