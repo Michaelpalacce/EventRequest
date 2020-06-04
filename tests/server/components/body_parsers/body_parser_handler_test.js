@@ -49,8 +49,8 @@ test({
 		assert.doesNotThrow(()=>{
 			const bodyParserHandler	= new BodyParserHandler();
 
-			bodyParserHandler.parseBody( helpers.getEventRequest() ).then(( body )=>{
-				assert.deepStrictEqual( body, {} );
+			bodyParserHandler.parseBody( helpers.getEventRequest() ).then(( parsedData )=>{
+				assert.deepStrictEqual( parsedData, { body: {}, rawBody: {} } );
 				done();
 			});
 		});
@@ -105,7 +105,7 @@ test({
 
 		bodyParserHandler.addParser( new MockBodyParser() );
 		bodyParserHandler.parseBody( event ).then(( data )=>{
-			assert.deepStrictEqual( {}, data );
+			assert.deepStrictEqual( { body: {}, rawBody: {} }, data );
 			done();
 		}).catch( done );
 	}

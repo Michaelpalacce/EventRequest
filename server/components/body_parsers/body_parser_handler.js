@@ -48,7 +48,7 @@ class BodyParserHandler
 
 		// Fallback
 		return new Promise(( resolve )=>{
-			resolve( {} );
+			resolve( { body: {}, rawBody: {} } );
 		})
 	}
 }

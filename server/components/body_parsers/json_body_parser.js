@@ -55,7 +55,7 @@ class JsonBodyParser extends EventEmitter
 	parse( event )
 	{
 		return new Promise(( resolve, reject )=>{
-			let rawPayload		= [];
+			let rawBody		= [];
 			let payloadLength	= 0;
 
 			if ( ! this.supports( event ) )
@@ -65,7 +65,7 @@ class JsonBodyParser extends EventEmitter
 			{
 				if ( ! event.isFinished() )
 				{
-					rawPayload.push( data );
+					rawBody.push( data );
 					payloadLength	+= data.length;
 				}
 			});
@@ -73,11 +73,11 @@ class JsonBodyParser extends EventEmitter
 			event.request.on( 'end', () => {
 				if ( ! event.isFinished() )
 				{
-					rawPayload	= Buffer.concat( rawPayload, payloadLength );
+					rawBody	= Buffer.concat( rawBody, payloadLength );
 
-					if ( this.strict && rawPayload.length > this.maxPayloadLength )
+					if ( this.strict && rawBody.length > this.maxPayloadLength )
 					{
-						return resolve( {} );
+						return resolve( { body: {}, rawBody: {} } );
 					}
 
 					if (
@@ -85,24 +85,25 @@ class JsonBodyParser extends EventEmitter
 						(
 							typeof event.headers !== 'object'
 							|| typeof event.headers[CONTENT_LENGTH_HEADER] === 'undefined'
-							|| rawPayload.length !== Number( event.headers[CONTENT_LENGTH_HEADER] )
+							|| rawBody.length !== Number( event.headers[CONTENT_LENGTH_HEADER] )
 						)
 					) {
-						return resolve( {} );
+						return resolve( { body: {}, rawBody: {} } );
 					}
 
-					if ( rawPayload.length === 0 )
+					if ( rawBody.length === 0 )
 					{
-						return resolve( {} );
+						return resolve( { body: {}, rawBody: {} } );
 					}
 
 					try
 					{
-						const payload	= JSON.parse( rawPayload.toString() );
-						for ( const index in payload )
-							payload[index]	= decodeURIComponent( payload[index] );
+						rawBody		= rawBody.toString();
+						const body	= JSON.parse( rawBody );
+						for ( const index in body )
+							body[index]	= decodeURIComponent( body[index] );
 
-						resolve( payload );
+						resolve( { body, rawBody } );
 					}
 					catch ( e )
 					{

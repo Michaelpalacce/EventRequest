@@ -3,26 +3,11 @@ A highly customizable backend server in NodeJs
 
 [![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest)
 
-# GitHub
-https://github.com/Michaelpalacce/EventRequest
-
-# Example Projects:
-https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc. As well as stream videos directly from your browser
-
-https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
-
-# Installation
-~~~bash
-npm i --save event_request 
-~~~
-
-# Set up
+# Setup
 ~~~javascript
 const { Server, Loggur }	= require( 'event_request' );
 
-/**
- * @brief	Instantiate the server
- */
+// Instantiate the server
 const app	= Server();
 
 // Add a new Route
@@ -30,15 +15,24 @@ app.get( '/', ( event ) => {
 	event.send( '<h1>Hello World!</h1>' );
 });
 
+// Start Listening
 app.listen( 80, ()=>{
 	Loggur.log( 'Server started' );
 });
 ~~~
 
+# Plugins:
+- https://www.npmjs.com/package/er_memcached_data_server - memcached data server
+
+# Example Projects:
+- https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
+- https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
+
+
 # Multiple Servers Setup:
 ~~~javascript
 const { Server, Loggur }	= require( 'event_request' );
-const http					= require( 'http' );
+const http			= require( 'http' );
 
 /**
  * @brief	Instantiate the server
@@ -70,11 +64,11 @@ httpServerTwo.listen( 3335, ()=>{
 ~~~
 
 #Properties exported by the Module:
-	Server,				// Server callback. Use this to create a new server. The server instance can be retrieved from anywhere by: Server();
-	Testing,			// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
-						// test( function to use to add tests ), runAllTests( way to run all tests added by test )
-	Logging,			// Contains helpful logging functions
-	Loggur,				// Easier access to the Logging.Loggur instance
+	Server,		// Server callback. Use this to create a new server. The server instance can be retrieved from anywhere by: Server();
+	Testing,	// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
+				// test( function to use to add tests ), runAllTests( way to run all tests added by test )
+	Logging,	// Contains helpful logging functions
+	Loggur,		// Easier access to the Logging.Loggur instance
 ***
 ***
 ***
@@ -2414,7 +2408,12 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 **event.body: Object**
 - Will hold different data according to which parser was fired
 - Json and Form Body parsers will have a JS object set as the body
-- The multipart body parsers may have **$files** key set as well as whatever data was sent in a JS object format
+- The multipart body parser may have **$files** key set as well as whatever data was sent in a JS object format
+
+**event.rawBody: Object**
+- Will hold the RAW request received
+- Json and Form Body parsers will have a JS object 
+- The multipart body parser will also have the rawBody set but will always be {}
 
 ***
 ####Exported Plugin Functions:
@@ -2434,6 +2433,13 @@ server.apply( app.er_body_parser_multipart );
 server.apply( app.er_body_parser_json, { maxPayloadLength: 104857600, strict: false } );
 server.apply( app.er_body_parser_form, { maxPayloadLength: 10485760, strict: false } );
 server.apply( app.er_body_parser_multipart, { cleanUpItemsTimeoutMS: 100, maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
+
+server.post( '/submit', ( event )=>{
+    console.log( event.body );
+    console.log( event.rawBody );
+
+    event.send();
+});
 ~~~
 
 ***

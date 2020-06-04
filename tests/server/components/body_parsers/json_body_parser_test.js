@@ -70,8 +70,8 @@ test({
 test({
 	message	: 'JsonBodyParser.parse parses event request body',
 	test	: ( done )=>{
-		let expectedBody	= { key: 'value' };
-		let bodyToStream	= JSON.stringify( expectedBody );
+		let expectedBody	= { body: { key: 'value' }, rawBody: '{"key":"value"}' };
+		let bodyToStream	= JSON.stringify( { key: 'value' } );
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
 			undefined,
@@ -127,12 +127,11 @@ test({
 		let jsonBodyParser	= new JsonBodyParser( { strict: true, maxPayloadLength : 1 } );
 
 		jsonBodyParser.parse( eventRequest ).then(( body )=>{
-			assert.deepStrictEqual( body, {} );
+			assert.deepStrictEqual( body, { body: {}, rawBody: {} } );
 
 			done();
 		}).catch(( err )=>{
-			done( 'Should NOT have rejected' );
-			done();
+			done( err );
 		});
 	}
 });
@@ -165,12 +164,11 @@ test({
 		let jsonBodyParser	= new JsonBodyParser( { strict: true, maxPayloadLength : 1 } );
 
 		jsonBodyParser.parse( eventRequest ).then(( body )=>{
-			assert.deepStrictEqual( body, {} );
+			assert.deepStrictEqual( body, { body: {}, rawBody: {} } );
 
 			done();
 		}).catch(( err )=>{
-			done( 'Should NOT have rejected' );
-			done();
+			done( err );
 		});
 	}
 });
@@ -203,12 +201,11 @@ test({
 		let jsonBodyParser	= new JsonBodyParser( { strict: true } );
 
 		jsonBodyParser.parse( eventRequest ).then(( body )=>{
-			assert.deepStrictEqual( body, {} );
+			assert.deepStrictEqual( body, { body: {}, rawBody: {} } );
 
 			done();
 		}).catch(( err )=>{
-			done( 'Should NOT have rejected' );
-			done();
+			done( err );
 		});
 	}
 });

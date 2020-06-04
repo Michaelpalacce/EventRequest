@@ -90,8 +90,9 @@ class BodyParserPlugin extends PluginInterface
 					bodyParserHandler.addParser( new parserClass( parserOptions ) );
 				}
 
-				bodyParserHandler.parseBody( event ).then( body => {
-					event.body	= body;
+				bodyParserHandler.parseBody( event ).then( parsedData => {
+					event.body		= typeof parsedData.body === 'undefined' ? {} : parsedData.body;
+					event.rawBody	= typeof parsedData.rawBody === 'undefined' ? {} : parsedData.rawBody;
 
 					event.next();
 				} ).catch( event.next );

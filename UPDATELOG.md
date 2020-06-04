@@ -1,3 +1,8 @@
+17.2.0
+- Added rawBody when parsing json and form data. In the case of multipart data raw body will be set but will always be equal to {}
+- Added documentation about this new change
+- Updated the documentation and added plugin URLS
+
 17.1.0
 - Main focus of this release is to remove dependencies in case where custom logic wants to be added to some classes.
 - Added x-powered-by

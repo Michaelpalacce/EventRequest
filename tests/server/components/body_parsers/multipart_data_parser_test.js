@@ -105,10 +105,12 @@ test({
 			}
 		});
 
-		multipartParser.parse( eventRequest ).then(( body )=>{
+		multipartParser.parse( eventRequest ).then(( parsedData )=>{
+			const body	= parsedData.body;
 
 			// Sync delay
 			setTimeout(()=>{
+				assert.deepStrictEqual( parsedData.rawBody, {} );
 				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
 				assert.equal( body.$files[0].name, 'a.txt' );
 				assert.equal( body.$files[0].contentType, 'text/plain' );

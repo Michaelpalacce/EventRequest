@@ -69,7 +69,7 @@ test({
 test({
 	message	: 'FormBodyParser.parse parses event request body',
 	test	: ( done )=>{
-		let expectedBody	= { key: 'value' };
+		let expectedBody	= { body: { key: 'value' }, rawBody: 'key=value' };
 		let bodyToStream	= 'key=value';
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
@@ -126,12 +126,11 @@ test({
 		const formBodyParser	= new FormBodyParser( { strict: true, maxPayloadLength : 1 } );
 
 		formBodyParser.parse( eventRequest ).then(( body )=>{
-			assert.deepStrictEqual( body, {} );
+			assert.deepStrictEqual( body, { body: {}, rawBody: {} } );
 
 			done();
 		}).catch(( err )=>{
-			done( 'Should NOT have rejected' );
-			done();
+			done( err );
 		});
 	}
 });

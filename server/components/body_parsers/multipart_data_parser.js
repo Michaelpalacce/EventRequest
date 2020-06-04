@@ -619,7 +619,7 @@ class MultipartDataParser extends EventEmitter
 						this.stripDataFromParts();
 						this.separateParts();
 
-						resolve( this.parts );
+						resolve( { body: this.parts, rawBody: {} } );
 					});
 
 					this.event.on( 'cleanUp', () => {

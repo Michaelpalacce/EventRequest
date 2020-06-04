@@ -53,7 +53,7 @@ class FormBodyParser extends EventEmitter
 	parse( event )
 	{
 		return new Promise(( resolve, reject ) => {
-			let rawPayload		= [];
+			let rawBody		= [];
 			let payloadLength	= 0;
 
 			if ( ! this.supports( event ) )
@@ -63,7 +63,7 @@ class FormBodyParser extends EventEmitter
 			{
 				if ( ! event.isFinished() )
 				{
-					rawPayload.push( data );
+					rawBody.push( data );
 					payloadLength	+= data.length;
 				}
 			});
@@ -71,28 +71,29 @@ class FormBodyParser extends EventEmitter
 			event.request.on( 'end', () => {
 				if ( ! event.isFinished() )
 				{
-					rawPayload	= Buffer.concat( rawPayload, payloadLength );
+					rawBody	= Buffer.concat( rawBody, payloadLength );
 
-					if ( this.strict && rawPayload.length > this.maxPayloadLength )
-						return resolve( {} );
+					if ( this.strict && rawBody.length > this.maxPayloadLength )
+						return resolve( { body: {}, rawBody: {} } );
 
 					if (
 						this.strict &&
 						(
 							typeof event.headers !== 'object'
 							|| typeof event.headers[CONTENT_LENGTH_HEADER] === 'undefined'
-							|| rawPayload.length !== Number( event.headers[CONTENT_LENGTH_HEADER] )
+							|| rawBody.length !== Number( event.headers[CONTENT_LENGTH_HEADER] )
 						)
 					) {
-						return resolve( {} );
+						return resolve( { body: {}, rawBody: {} } );
 					}
 
-					if ( rawPayload.length === 0 )
-						return resolve( {} );
+					if ( rawBody.length === 0 )
+						return resolve( { body: {}, rawBody: {} } );
 
-					let payload			= rawPayload.toString();
-					let body			= {};
-					let payloadParts	= payload.split( '&' );
+					rawBody				= rawBody.toString();
+					const payload		= rawBody;
+					const body			= {};
+					const payloadParts	= payload.split( '&' );
 
 					for ( let i = 0; i < payloadParts.length; ++ i )
 					{
@@ -104,7 +105,7 @@ class FormBodyParser extends EventEmitter
 						body[param[0]]	= decodeURIComponent( param[1] );
 					}
 
-					resolve( body );
+					resolve( { body, rawBody } );
 				}
 			});
 		})
