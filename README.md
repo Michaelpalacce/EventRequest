@@ -88,299 +88,12 @@ httpServerTwo.listen( 3335, ()=>{
 - They can be retrieved from event_request/server/plugins
 - They can also be retrieved from Server() ( look at the plugins section for more info )
 
-# Event Request
-The event request is an object that is created by the server and passed through every single middleware.
-
-***
-####Properties of eventRequest:
-
-**queryString: Object** 
-- The query string
-- Will contain all query parameters in a JS object format
-
-**path: String** 
-- The current request path
-
-**response: OutgoingMessage**
-- The response that will be sent to the user 
-
-**request: IncomingMessage** 
-- The request sent by the user
-
-**method: String** 
-- The current request method 
-- Can be: GET, POST, DELETE, PUT, PATCH, COPY, HEAD, etc
-
-**headers: Object** 
-- The current headers 
-- They will be set in a JS object format
-
-**validationHandler: ValidationHandler**
-- A handler used to do input validation
-- Look down for more information on how to use it
-
-**extra: Object**
-- An object that holds extra data that is passed between middlewares
-- Usually used outside of plugins and native functions and is up to the client to implement if needed
-
-**cookies: Object** 
-- The current request cookies
-
-**params: Object**
-- Request url params that are set by the router
-- In the case of route: '/user/:username:/get' the parameters will look like this: { username: 'some.username' }
-
-**block: Array** 
-- The execution block of middlewares
-- Should not be touched usually
-
-**clientIp: String**
-- The ip of the client that sent the request
-
-**finished: Boolean**
-- Flag depicting if the request has finished or not
-
-**errorHandler: ErrorHandler**
-- Default or Custom error handler that will be called in case of an error
-
-***
-####Functions exported by the event request:
-
-**setCookie( String name, String value, Object options = {} ): Boolean**
-- Sets a new cookie with the given name and value
-- Options will all be applied directly as are given.
-- The options are case sensitive
-- Available options: Path, Domain, Max-Age, Expires, HttpOnly
-- Expires and Max-Age will be converted to date, so a timestamp in seconds must be passed
-- If you wish to expire a cookie set Expires / Max-Age to a negative number
-- { Path: 'test', expires: 100 } -> this will be set as 'cookieName=cookieValue; Path:test; expires:100'
-
-**setStatusCode( Number code ): void**
-- Sets the status code of the response
-- If something other than a string is given, the status code will be assumed 500
-
-**_cleanUp(): void** 
-- Cleans up the event request.
-- Usually called at the end of the request. 
-- Emits a cleanUp event and a finished event. 
-- This also removes all other event listeners and sets all the properties to undefined
-
-**send( mixed response = '', Number statusCode = 200, Boolean raw ): void** 
-- Sends the response to the user with the specified statusCode
-- If response is a stream then the stream will be piped to the response
-- if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. 
-- Emits a 'send' event and calls cleanUp
-- The event will be emitted with a response if the response was a string or the isRaw flag was set to false 
-
-**setHeader( String key, mixed value ): void** 
-- Sets a new header to the response.
-- Emits a 'setHeader' event. 
-- If the response is finished then an error will be set to the next middleware
-
-**removeHeader( String key ): void** 
-- Removes an existing header from to the response.
-- Emits a 'removeHeader' event. 
-- If the response is finished then an error will be set to the next middleware
-
-**redirect( String redirectUrl, Number statusCode = 302 ): void** 
-- Redirect to the given url with the specified status code.
-- Status code defaults to 302.
-- Emits a 'redirect' event. 
-- If the response is finished then an error will be set to the next middleware
-
-**getHeader( String key, mixed defaultValue = null ): mixed** 
-- Retrieves a header ( if exists ) from the request. 
-- If it doesn't exist the defaultValue will be taken
-
-**hasHeader( String key ): Boolean** 
-- Checks if a header exists in the request
-
-**isFinished(): Boolean** 
-- Checks if the response is finished
-- A response is finished if the response is finished or the cleanUp method has been called
-
-**next( mixed err = undefined, Number code = undefined ): void** 
-- Calls the next middleware in the execution block. 
-- If there is nothing else to send and the response has not been sent YET, then send a server error with a status of 404
-- If the event is stopped and the response has not been set then send a server error with a status of 500
-- If err !== undefined send an error
-
-**sendError( mixed error = '', Number code = 500 ): void** 
-- Like send but used to send errors. 
-- It will call the errorHandler directly with all the arguments specified ( in case of a custom error handler, you can send extra parameters with the first one being the EventRequest )
-
-***
-####Events emitted by the EventRequest
-
-**cleanUp()** 
-- Emitted when the event request is about to begin the cleanUp phase.
-- At this point the data set in the EventRequest has not been cleaned up
-
-**finished()**
-- Emitted when even cleaning up has finished and the eventRequest is completed
-- At this point the data set in the EventRequest has been cleaned up
-
-**send( Object sendData )**
-- Emitted when a response has been sent.
-- sendData contains: 
-  
-  -  **code: Number** 
-     - The status code returned
-     
-  -  **raw: Boolean** 
-     - Whether the response was tried to be sent raw without parsing it to string first
-     
-  -  **response: mixed** 
-     - The response that was returned
-     - Will not be sent if isRaw is true and the response was not a string 
-     
-  -  **headers: Object**
-     - The headers that were sent
-
-**setHeader( Object headerData )** 
-- Emitted when a new header was added to the response
-- headerData contains:
-  -  **key: String** 
-     - The header name
-     
-  -  **value: mixed** 
-     - The header value
-
-**removeHeader( Object headerData )** 
-- Emitted when a header was removed
-- headerData contains:
-  -  **key: String** 
-     - The header name
-
-**redirect( Object redirectData )** 
-- Emitted when a redirect response was sent
-- redirectData contains:
-    
-  -  **redirectUrl: String** 
-     - the url to which the redirect response was sent
-     
-  -  **statusCode: String** 
-     - the status code returned
-
 ***
 ***
 ***
 
-# Server
-The main object of the framework.
-
-- To retrieve the Server class do:
-~~~javascript
-const { Server } = require( 'event_request' );
-const app = Server();
-~~~
-
-- To start the Server you can do:
-~~~javascript
-const { Server } = require( 'event_request' );
-const app = Server();
-
-app.listen( '80', ()=>{
-	Loggur.log( 'Server is running' );
-});
-~~~
-
-- To clean up the server instance you can do:
-~~~javascript
-const { Server } = require( 'event_request' );
-const app = Server();
-
-const httpServer = app.listen( '80', ()=>{
-	Loggur.log( 'Server is running' );
-});
-
-httpServer.close();
-Server().cleanUp();
-~~~
-NOTES: 
-- This will stop the httpServer and set the internal variable of server to null
-- You may need to do  `app = Server()` again since they app variable is still a pointer to the old server
-
-- If you want to start the server using your own http/https server:
-~~~javascript
-const { Server } = require( 'event_request' );
-
-const server = http.createServer( Server.attach() );
-
-server.listen('80',()=>{
-	console.log( 'Server is UN' )
-});
-~~~
-
-- Calling `Server()` anywhere will return the same instance of the Server.
-
-
 ***
-####Functions exported by the server:
-
-**getPluginManager(): PluginManager** 
-- Returns an instance of the plugin manager attached to the server
-
-**add( Object|Route|Function route ): Server** 
-- Calls Router.add
-
-**apply( PluginInterface|String plugin, Object options ): Server** 
-- Applies a new plugin with the specified options
-- It first calls setOptions, then checks for dependencies, then calls plugin.setServerOnRuntime then calls plugin.getPluginMiddleware
-
-**getPlugin( String pluginId ): PluginInterface** 
-- PluginInterface returns the desired plugin
-- Throws if plugin is not attached
-
-**hasPlugin( String pluginId ): Boolean**  
-- Checks whether a plugin has been added to the server. 
-- This does not work with the plugin manager but the server's plugins
-
-**define( String middlewareName, Function Middleware ): Server**  
-- Calls Router.define
-
-**Router(): Router**
-- Returns a new Router instance that can be used anywhere and later on add() -ed back to the server
-
-**attach(): Function**
-- Returns the middleware needed by http.createServer or https.createServer
-
-**listen( ... args )**
-- Starts a http server.
-- Any arguments given will be applied to httpServer.listen
-
-***
-####Events emitted by the server
-
-**addRoute ( mixed route )**  
-- When a new route is being added
-
-**eventRequestResolved ( EventRequest eventRequest, IncomingMessage request, ServerResponse response )**  
-- When the event request is first created
-
-**eventRequestRequestClosed( EventRequest eventRequest, IncomingMessage request )** 
-- When the request gets closed
-
-**eventRequestResponseFinish( EventRequest eventRequest, ServerResponse response )** 
-- When the response is finished
-
-**eventRequestResponseError ( EventRequest eventRequest, ServerResponse response, Error error )** 
-- When there is an error with the response
-
-**eventRequestBlockSetting( EventRequest eventRequest, Array block )** 
-- called when the block is retrieved from the router
-
-**eventRequestBlockSet( EventRequest eventRequest, Array block )** 
-- called when the block is set in the eventRequest
-
-**eventRequestError( EventRequest eventRequest, Error error )** 
-- called when there is an error event emitted by the eventRequest
-
-**eventRequestThrow( EventRequest eventRequest, Error error )** 
-- called when an error is thrown from the eventRequest
-
-***
-#Router
+#Router and Routing
 
 ***
 ####Functions exported by the Router:
@@ -676,6 +389,297 @@ app.listen( 80, ()=>{
 	Loggur.log( 'Server started' );
 });
 ~~~
+
+# Event Request
+The event request is an object that is created by the server and passed through every single middleware.
+
+***
+####Properties of eventRequest:
+
+**queryString: Object** 
+- The query string
+- Will contain all query parameters in a JS object format
+
+**path: String** 
+- The current request path
+
+**response: OutgoingMessage**
+- The response that will be sent to the user 
+
+**request: IncomingMessage** 
+- The request sent by the user
+
+**method: String** 
+- The current request method 
+- Can be: GET, POST, DELETE, PUT, PATCH, COPY, HEAD, etc
+
+**headers: Object** 
+- The current headers 
+- They will be set in a JS object format
+
+**validationHandler: ValidationHandler**
+- A handler used to do input validation
+- Look down for more information on how to use it
+
+**extra: Object**
+- An object that holds extra data that is passed between middlewares
+- Usually used outside of plugins and native functions and is up to the client to implement if needed
+
+**cookies: Object** 
+- The current request cookies
+
+**params: Object**
+- Request url params that are set by the router
+- In the case of route: '/user/:username:/get' the parameters will look like this: { username: 'some.username' }
+
+**block: Array** 
+- The execution block of middlewares
+- Should not be touched usually
+
+**clientIp: String**
+- The ip of the client that sent the request
+
+**finished: Boolean**
+- Flag depicting if the request has finished or not
+
+**errorHandler: ErrorHandler**
+- Default or Custom error handler that will be called in case of an error
+
+***
+####Functions exported by the event request:
+
+**setCookie( String name, String value, Object options = {} ): Boolean**
+- Sets a new cookie with the given name and value
+- Options will all be applied directly as are given.
+- The options are case sensitive
+- Available options: Path, Domain, Max-Age, Expires, HttpOnly
+- Expires and Max-Age will be converted to date, so a timestamp in seconds must be passed
+- If you wish to expire a cookie set Expires / Max-Age to a negative number
+- { Path: 'test', expires: 100 } -> this will be set as 'cookieName=cookieValue; Path:test; expires:100'
+
+**setStatusCode( Number code ): void**
+- Sets the status code of the response
+- If something other than a string is given, the status code will be assumed 500
+
+**_cleanUp(): void** 
+- Cleans up the event request.
+- Usually called at the end of the request. 
+- Emits a cleanUp event and a finished event. 
+- This also removes all other event listeners and sets all the properties to undefined
+
+**send( mixed response = '', Number statusCode = 200, Boolean raw ): void** 
+- Sends the response to the user with the specified statusCode
+- If response is a stream then the stream will be piped to the response
+- if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. 
+- Emits a 'send' event and calls cleanUp
+- The event will be emitted with a response if the response was a string or the isRaw flag was set to false 
+
+**setHeader( String key, mixed value ): void** 
+- Sets a new header to the response.
+- Emits a 'setHeader' event. 
+- If the response is finished then an error will be set to the next middleware
+
+**removeHeader( String key ): void** 
+- Removes an existing header from to the response.
+- Emits a 'removeHeader' event. 
+- If the response is finished then an error will be set to the next middleware
+
+**redirect( String redirectUrl, Number statusCode = 302 ): void** 
+- Redirect to the given url with the specified status code.
+- Status code defaults to 302.
+- Emits a 'redirect' event. 
+- If the response is finished then an error will be set to the next middleware
+
+**getHeader( String key, mixed defaultValue = null ): mixed** 
+- Retrieves a header ( if exists ) from the request. 
+- If it doesn't exist the defaultValue will be taken
+
+**hasHeader( String key ): Boolean** 
+- Checks if a header exists in the request
+
+**isFinished(): Boolean** 
+- Checks if the response is finished
+- A response is finished if the response is finished or the cleanUp method has been called
+
+**next( mixed err = undefined, Number code = undefined ): void** 
+- Calls the next middleware in the execution block. 
+- If there is nothing else to send and the response has not been sent YET, then send a server error with a status of 404
+- If the event is stopped and the response has not been set then send a server error with a status of 500
+- If err !== undefined send an error
+
+**sendError( mixed error = '', Number code = 500 ): void** 
+- Like send but used to send errors. 
+- It will call the errorHandler directly with all the arguments specified ( in case of a custom error handler, you can send extra parameters with the first one being the EventRequest )
+
+***
+####Events emitted by the EventRequest
+
+**cleanUp()** 
+- Emitted when the event request is about to begin the cleanUp phase.
+- At this point the data set in the EventRequest has not been cleaned up
+
+**finished()**
+- Emitted when even cleaning up has finished and the eventRequest is completed
+- At this point the data set in the EventRequest has been cleaned up
+
+**send( Object sendData )**
+- Emitted when a response has been sent.
+- sendData contains: 
+  
+  -  **code: Number** 
+     - The status code returned
+     
+  -  **raw: Boolean** 
+     - Whether the response was tried to be sent raw without parsing it to string first
+     
+  -  **response: mixed** 
+     - The response that was returned
+     - Will not be sent if isRaw is true and the response was not a string 
+     
+  -  **headers: Object**
+     - The headers that were sent
+
+**setHeader( Object headerData )** 
+- Emitted when a new header was added to the response
+- headerData contains:
+  -  **key: String** 
+     - The header name
+     
+  -  **value: mixed** 
+     - The header value
+
+**removeHeader( Object headerData )** 
+- Emitted when a header was removed
+- headerData contains:
+  -  **key: String** 
+     - The header name
+
+**redirect( Object redirectData )** 
+- Emitted when a redirect response was sent
+- redirectData contains:
+    
+  -  **redirectUrl: String** 
+     - the url to which the redirect response was sent
+     
+  -  **statusCode: String** 
+     - the status code returned
+
+***
+***
+***
+
+# Server
+The main object of the framework.
+
+- To retrieve the Server class do:
+~~~javascript
+const { Server } = require( 'event_request' );
+const app = Server();
+~~~
+
+- To start the Server you can do:
+~~~javascript
+const { Server } = require( 'event_request' );
+const app = Server();
+
+app.listen( '80', ()=>{
+	Loggur.log( 'Server is running' );
+});
+~~~
+
+- To clean up the server instance you can do:
+~~~javascript
+const { Server } = require( 'event_request' );
+const app = Server();
+
+const httpServer = app.listen( '80', ()=>{
+	Loggur.log( 'Server is running' );
+});
+
+httpServer.close();
+Server().cleanUp();
+~~~
+NOTES: 
+- This will stop the httpServer and set the internal variable of server to null
+- You may need to do  `app = Server()` again since they app variable is still a pointer to the old server
+
+- If you want to start the server using your own http/https server:
+~~~javascript
+const { Server } = require( 'event_request' );
+
+const server = http.createServer( Server.attach() );
+
+server.listen('80',()=>{
+	console.log( 'Server is UN' )
+});
+~~~
+
+- Calling `Server()` anywhere will return the same instance of the Server.
+
+
+***
+####Functions exported by the server:
+
+**getPluginManager(): PluginManager** 
+- Returns an instance of the plugin manager attached to the server
+
+**add( Object|Route|Function route ): Server** 
+- Calls Router.add
+
+**apply( PluginInterface|String plugin, Object options ): Server** 
+- Applies a new plugin with the specified options
+- It first calls setOptions, then checks for dependencies, then calls plugin.setServerOnRuntime then calls plugin.getPluginMiddleware
+
+**getPlugin( String pluginId ): PluginInterface** 
+- PluginInterface returns the desired plugin
+- Throws if plugin is not attached
+
+**hasPlugin( String pluginId ): Boolean**  
+- Checks whether a plugin has been added to the server. 
+- This does not work with the plugin manager but the server's plugins
+
+**define( String middlewareName, Function Middleware ): Server**  
+- Calls Router.define
+
+**Router(): Router**
+- Returns a new Router instance that can be used anywhere and later on add() -ed back to the server
+
+**attach(): Function**
+- Returns the middleware needed by http.createServer or https.createServer
+
+**listen( ... args )**
+- Starts a http server.
+- Any arguments given will be applied to httpServer.listen
+
+***
+####Events emitted by the server
+
+**addRoute ( mixed route )**  
+- When a new route is being added
+
+**eventRequestResolved ( EventRequest eventRequest, IncomingMessage request, ServerResponse response )**  
+- When the event request is first created
+
+**eventRequestRequestClosed( EventRequest eventRequest, IncomingMessage request )** 
+- When the request gets closed
+
+**eventRequestResponseFinish( EventRequest eventRequest, ServerResponse response )** 
+- When the response is finished
+
+**eventRequestResponseError ( EventRequest eventRequest, ServerResponse response, Error error )** 
+- When there is an error with the response
+
+**eventRequestBlockSetting( EventRequest eventRequest, Array block )** 
+- called when the block is retrieved from the router
+
+**eventRequestBlockSet( EventRequest eventRequest, Array block )** 
+- called when the block is set in the eventRequest
+
+**eventRequestError( EventRequest eventRequest, Error error )** 
+- called when there is an error event emitted by the eventRequest
+
+**eventRequestThrow( EventRequest eventRequest, Error error )** 
+- called when an error is thrown from the eventRequest
 
 ***
 ***

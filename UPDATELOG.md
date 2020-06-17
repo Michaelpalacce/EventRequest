@@ -1,3 +1,6 @@
+17.2.1
+- Updated the documentation so that routing is easier to find for people and is moved up
+
 17.2.0
 - Added rawBody when parsing json and form data. In the case of multipart data raw body will be set but will always be equal to {}
 - Added documentation about this new change
