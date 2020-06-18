@@ -1,12 +1,10 @@
 'use strict';
 
 const path			= require( 'path' );
-const { Server }	= require( '../index' );
+const app			= require( '../index' )();
 const DataServer	= require( '../server/components/caching/data_server' );
 
 const TEST_ROOT		= path.parse( __dirname ).dir;
-
-const app			= Server();
 
 app.add({
 	route	: '/ping',

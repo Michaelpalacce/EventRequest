@@ -2,10 +2,9 @@
 
 // Dependencies
 const { assert, test, helpers, tester }	= require( '../../../test_helper' );
-const Router					= require( '../../../../server/components/routing/router' );
-const Route						= require( '../../../../server/components/routing/route' );
-const App						= require( '../../../../server/server' );
-const Server					= App.class;
+const Router							= require( '../../../../server/components/routing/router' );
+const Route								= require( '../../../../server/components/routing/route' );
+const Server							= require( '../../../../server/server' );
 
 test({
 	message	: 'Router.constructor does not die',

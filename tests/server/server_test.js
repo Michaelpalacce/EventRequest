@@ -2,7 +2,7 @@
 
 // Dependencies
 const { assert, test, helpers, Mock }	= require( '../test_helper' );
-const App								= require( './../../server/server' );
+const Server							= require( './../../server/server' );
 const path								= require( 'path' );
 const http								= require( 'http' );
 const fs								= require( 'fs' );
@@ -13,8 +13,8 @@ const Session							= require( './../../server/components/session/session' );
 const querystring						= require( 'querystring' );
 const PreloadedPluginManager			= require( './../../server/plugins/preloaded_plugins' );
 const RateLimitsPlugin					= require( './../../server/plugins/available_plugins/rate_limits_plugin' );
-const Server							= App.class;
 
+const App								= require( './../../index' );
 const app								= App();
 
 test({
@@ -29,6 +29,13 @@ test({
 	}
 });
 
+test({
+	message	: 'Server.App Returns the same as App()',
+	test	: ( done )=>{
+		assert.deepStrictEqual( app, App.App() );
+		done();
+	}
+});
 
 test({
 	message	: 'Server.constructor defaults',
@@ -396,9 +403,7 @@ test({
 test({
 	message	: 'Server.Router returns a new router',
 	test	: ( done ) =>{
-		const server	= App();
-
-		const router	= server.Router();
+		const router	= app.Router();
 		assert( router instanceof Router, true );
 
 		done();
@@ -2338,7 +2343,6 @@ test({
 		const name			= 'testErRateLimitsDoesNotDie';
 		const fileLocation	= path.join( __dirname, './../../rate_limits.json' );
 
-		const Server		= App.class;
 		const app			= new Server();
 		const server		= http.createServer( app.attach() );
 
@@ -2825,7 +2829,7 @@ test({
 		const name	= 'testErSession';
 
 		assert.throws(()=>{
-			const appOne	= new Server.class();
+			const appOne	= new Server();
 			appOne.apply( appOne.er_session );
 		});
 

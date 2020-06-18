@@ -5,10 +5,9 @@ A highly customizable backend server in NodeJs
 
 # Setup
 ~~~javascript
-const { Server, Loggur }	= require( 'event_request' );
-
-// Instantiate the server
-const app	= Server();
+// Framework Singleton instance
+const app			= require( 'event_request' )();
+const { Loggur }	= require( 'event_request' );
 
 // Add a new Route
 app.get( '/', ( event ) => {
@@ -21,29 +20,28 @@ app.listen( 80, ()=>{
 });
 ~~~
 
-# Plugins:
-- https://www.npmjs.com/package/er_memcached_data_server - memcached data server
+The framework has a web server Singleton instance that you can fetch from anywhere using:
+~~~javascript
+// First way
+const app		= require( 'event_request' )();
 
-# Example Projects:
-- https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
-- https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
-
+// Second way ( you can use this when you want to fetch multiple things from the framework )
+const { App }	= require( 'event_request' );
+const app		= App();
+~~~
 
 # Multiple Servers Setup:
 ~~~javascript
 const { Server, Loggur }	= require( 'event_request' );
-const http			= require( 'http' );
 
 /**
  * @brief	Instantiate the server
  */
 // With this setup you'll have to work only with the variables appOne and appTwo. You cannot call Server() to get any of them in different parts of the project
 // This can be remedied a bit by creating routers in different controllers and then exporting them to be later on added 
-const appOne		= new Server.class();
-const appTwo		= new Server.class();
+const appOne	= new Server();
+const appTwo	= new Server();
 
-const httpServerOne	= http.createServer( appOne.attach() );
-const httpServerTwo	= http.createServer( appTwo.attach() );
 
 // Add a new Route
 appOne.get( '/', ( event ) => {
@@ -55,20 +53,67 @@ appTwo.get( '/', ( event ) => {
 	event.send( '<h1>Hello World x2!</h1>' );
 });
 
-httpServerOne.listen( 3334, ()=>{
+appOne.listen( 3334, ()=>{
 	Loggur.log( 'Server one started at port: 3334' );
 } );
-httpServerTwo.listen( 3335, ()=>{
+appTwo.listen( 3335, ()=>{
 	Loggur.log( 'Server two started at port: 3335' );
 } );
 ~~~
 
+# Custom http Server setup:
+~~~javascript
+const http		= require( 'http' );
+const Server	= require( 'event_request' );
+const app		= http.createServer( Server().attach() );
+
+// No problem adding routes like this
+Server().get( '/',( event )=>{
+	event.send( 'ok' );
+} );
+
+// OR like this
+app.get( '/test',( event )=>{
+	event.send( 'ok' );
+} );
+
+app.listen( '80',()=>{
+	console.log( 'Server is UN' )
+});
+~~~
+
+# Plugins:
+- https://www.npmjs.com/package/er_memcached_data_server - memcached data server
+
+# Example Projects:
+- https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
+- https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
+
 #Properties exported by the Module:
-	Server,		// Server callback. Use this to create a new server. The server instance can be retrieved from anywhere by: Server();
+	App,		// The Singleton Instance of the Framework that can be used to retrieve the Web Server at any point
+	Server,		// The Server of the framework. This is just the class and not the actual isntance. Use this only if you want to create multiple servers
 	Testing,	// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
 				// test( function to use to add tests ), runAllTests( way to run all tests added by test )
 	Logging,	// Contains helpful logging functions
 	Loggur,		// Easier access to the Logging.Loggur instance
+	
+
+#Getting started:
+
+#### Setup
+The Framework uses the "Singleton" design pattern to create a web server that can be retrieved from anywhere. When requiring the module a callback is returned that if called will return the instance: 
+**const app = require( 'event_request' )();**.
+
+#### Parts of the framework:
+Middlewares are callbacks attached to specific routes. They are called in order of addition.
+Global middlewares are teh same as normal middlewares but they are defined differently than the normal middlewares and are attached to those normal middlewares. They are called before the middleware they are attached to
+
+EventRequest is an object passed to each middleware. It holds all data about the request and has a lot of helpful functionality used for sending responses and other.
+
+The framework has a set of components. These components are individual and can be used outside of the framework.
+
+The framework also has a set of plugins that are pre included in it. Each Plugin modifies the Server / Event Request a bit and plugs in new functionality.
+
 ***
 ***
 ***
@@ -117,56 +162,8 @@ httpServerTwo.listen( 3335, ()=>{
 - Defines a global middleware
 - Throws if a middleware with that name already exists
 
-
-***
-####Adding Routers:
-- A router can be added by calling .add on another router: ( Router router )
-- All the new router's routes will be added to the old one
-- All the global middleware will be merged as well
-
-~~~javascript
-routerOne.add( '/test', routerTwo )
-~~~
-
-~~~javascript
-// You can also attach the router to a route
-const userRouter  = Server().Router();
-userRouter.get( '/list', ( event )=>{
-    event.send( { userOne: {}, userTwo: {} } );
-});
-
-userRouter.post( '/add/:username:', ( event )=>{
-    // Add user to db or somewhere else
-    event.send( 'ok' );
-});
-
-Server().add( '/user', userRouter );
-~~~
-
-***
-####Adding Routers with path:
-- A router can be added by calling .add on another router with a string route: ( String route, Router router )
-- All the new router's routes will be pefixed with the given route
-- All the global middleware will be merged as well
-
-~~~javascript
-routerOne.add( '/test', routerTwo )
-~~~
-
-~~~javascript
-// You can also attach the router to a route
-const userRouter  = Server().Router();
-userRouter.get( '/list', ( event )=>{
-    event.send( { userOne: {}, userTwo: {} } );
-});
-
-userRouter.post( '/add/:username:', ( event )=>{
-    // Add user to db or somewhere else
-    event.send( 'ok' );
-});
-
-Server().add( '/user', userRouter );
-~~~
+**get/post/head/put/delete...( String route, Function middleware ): void**
+- Defines a get/post/head/put/delete middlewares for the given route
 
 ***
 ####Adding routes
@@ -179,7 +176,8 @@ Server().add( '/user', userRouter );
 
 - Routes can be added like this:
 ~~~javascript
-const app	= Server();
+const Server	= require( 'event_request' );
+const app   	= Server();
 
 app.get( '/', ( event )=>{
 	event.send( '<h1>Hello World!</h1>');
@@ -209,7 +207,6 @@ app.get( '/users/:user:', ( event )=>{
 app.listen( 80 );
 ~~~
 
-
 ***
 - When adding a Route the **server.add(route)** or **router.add(route)** can be used. 
 - The following parameters can be used when using .add():
@@ -235,37 +232,72 @@ app.listen( 80 );
 - server.add accepts a object that must contain **handler** but **route**, **method** and **middlewares** are optional.
 - ( { method: '', route: '', handler:()=>{} } )
 
-####ROUTER: 
-- You can use add to attach another router to the current one: server.add( router ) or router.add( router ) to combine 2 routers 
+***
+####Adding Routers:
+- A router can be added by calling .add on another router: ( Router router )
+- All the new router's routes will be added to the old one
+- All the global middleware will be merged as well
+
 
 ~~~javascript
+const Server	= require( 'event_request' );
 Server().add( router );
 
 // OR
+const routerOne	= Server().Router();
+const routerTwo	= Server().Router();
 routerOne.add( routerTwo )
 ~~~
 
-####ROUTE + ROUTER
-- .add also accepts a ( String route, Router router )
+***
+####Adding Routers with path:
+- A router can be added by calling .add on another router with a string route: ( String route, Router router )
 - All the new router's routes will be pefixed with the given route
+- All the global middleware will be merged as well
 
 ~~~javascript
+const Server	= require( 'event_request' );
+
+const routerOne	= Server().Router();
+const routerTwo	= Server().Router();
+
 routerOne.add( '/test', routerTwo )
+~~~
+
+~~~javascript
+const Server	= require( 'event_request' );
+
+// You can also attach the router to a route
+const userRouter  = Server().Router();
+userRouter.get( '/list', ( event )=>{
+    event.send( { userOne: {}, userTwo: {} } );
+});
+
+userRouter.post( '/add/:username:', ( event )=>{
+    // Add user to db or somewhere else
+    event.send( 'ok' );
+});
+
+Server().add( '/user', userRouter );
 ~~~
 
 ####FUNCTION:
 - server.add can also accept a function that will be transformed into a route without method or route ( Function route )
 ~~~javascript
+const Server	= require( 'event_request' );
+
+const routerOne	= Server().Router();
+
 routerOne.add( ( event )=>{    
     event.next()
 });
 ~~~
 
 ~~~javascript
-const { Server } = require( 'event_request' );
+const Server	= require( 'event_request' );
 
 // Adding a route
-server.add({
+Server().add({
 	route	: '/',
 	method	: 'GET',
 	handler	: ( event ) => {
@@ -275,6 +307,8 @@ server.add({
 ~~~
 
 ~~~javascript
+const Server	= require( 'event_request' );
+
 // You can create your own router
 const router  = Server().Router();
 router.add({
@@ -287,29 +321,37 @@ router.add({
 ~~~
 
 ~~~javascript
+const Server	= require( 'event_request' );
+
 // Adding a middleware without a method or route
-router.add( ( event )=>{
+Server().add( ( event )=>{
 	event.next();
 });
 
-server.add( ( event )=>{
+Server().add( ( event )=>{
     event.send( '<h1>Hello World x2!</h1>' );
 });
 ~~~
 
 ~~~javascript
-// To attach a router to the server simply call the add function of th server.
+const Server	= require( 'event_request' );
+
+// To attach a router to the server simply call the add function of the server.
 // Just like you would do to add a normal route.
 Server().add( router );
 ~~~
 
 ~~~javascript
+const Server	= require( 'event_request' );
+
 // You can also get the router attached to the Server and use that directly
 const serverRouter    = Server().router;
 serverRouter.add(...);
 ~~~
 
 ~~~javascript
+const Server	= require( 'event_request' );
+
 // You can also attach the router to a route
 const userRouter  = Server().Router();
 userRouter.get( '/list', ( event )=>{
@@ -328,10 +370,9 @@ Server().add( '/user', userRouter );
 ####Router Wildcards
 - The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
 ~~~javascript
-const { Server } = require( 'event_request' );
-// You can create your own router
-const router  = Server().Router();
-router.add({
+const Server	= require( 'event_request' );
+
+Server().add({
     method: 'GET',
     route: '/todos/:id:',
     handler: ( event)=>{
@@ -341,7 +382,7 @@ router.add({
 });
 
 // Or
-router.get( '/todos/:id:', ( event)=>{
+Server().get( '/todos/:id:', ( event)=>{
     console.log( event.params.id );
     event.send( '<h1>Hello World</h1>' );
 });
@@ -356,24 +397,26 @@ router.get( '/todos/:id:', ( event)=>{
 - When adding middlewares to routes it can either be a single string or multiple strings in an array.
 - They are added as a final value in .app, .get, .post, etc, or using the key `middlewares` if using the .add method
 ~~~javascript
-const app		= Server();
-const router	= app.Router();
+const Server		= require( 'event_request' );
+const { Loggur }	= require( 'event_request' );
+
+const router	= Server().Router();
 
 router.define( 'test', ( event )=>{
 	Loggur.log( 'Middleware One!' );
 	event.next();
 } );
 
-app.define( 'test2', ( event )=>{
+Server().define( 'test2', ( event )=>{
 	Loggur.log( 'Middleware Two!' );
 	event.next();
 } );
 
-app.get( '/', ( event )=>{
+Server().get( '/', ( event )=>{
 	event.send( 'TEST' );
 }, ['test','test2'] );
 
-app.add({
+Server().add({
 	method: 'GET',
 	route: '/test',
 	middlewares: 'test',
@@ -383,9 +426,9 @@ app.add({
 	}
 });
 
-app.add( router );
+Server().add( router );
 
-app.listen( 80, ()=>{
+Server().listen( 80, ()=>{
 	Loggur.log( 'Server started' );
 });
 ~~~
@@ -579,8 +622,8 @@ const app = Server();
 
 - To start the Server you can do:
 ~~~javascript
-const { Server } = require( 'event_request' );
-const app = Server();
+const Server	= require( 'event_request' );
+const app		= Server();
 
 app.listen( '80', ()=>{
 	Loggur.log( 'Server is running' );
@@ -589,8 +632,8 @@ app.listen( '80', ()=>{
 
 - To clean up the server instance you can do:
 ~~~javascript
-const { Server } = require( 'event_request' );
-const app = Server();
+const Server	= require( 'event_request' );
+const app		= Server();
 
 const httpServer = app.listen( '80', ()=>{
 	Loggur.log( 'Server is running' );
@@ -605,11 +648,21 @@ NOTES:
 
 - If you want to start the server using your own http/https server:
 ~~~javascript
-const { Server } = require( 'event_request' );
+const http		= require( 'http' );
+const Server	= require( 'event_request' );
+const app		= http.createServer( Server().attach() );
 
-const server = http.createServer( Server.attach() );
+// No problem adding routes like this
+Server().get( '/',( event )=>{
+	event.send( 'ok' );
+} );
 
-server.listen('80',()=>{
+// OR like this
+app.get( '/test',( event )=>{
+	event.send( 'ok' );
+} );
+
+app.listen( '80',()=>{
 	console.log( 'Server is UN' )
 });
 ~~~
@@ -746,6 +799,8 @@ logger.setLogLevel( 600 );
 
 Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log and will call all added Loggers
 ~~~javascript
+const { Loggur }	= require( 'event_request' );
+
 const logger	= Loggur.createLogger({
 	transports	: [
 		new Console( { logLevel : LOG_LEVELS.notice } ),
@@ -1368,7 +1423,9 @@ The TestingTools export:
 ####Example:
 
 ~~~javascript
-const app  = Server();
+const Server	= require( 'event_request' );
+
+const app       = Server();
 app.add(( event )=>{
 	event.sendError( 'Error', 500 ); // This will call the error Handler
 	event.next( 'Error', 500 ); // This will call the error Handler
@@ -1664,16 +1721,19 @@ Server {
 - Generally all the integrated plug-ins begin with `er_`
 
 ~~~javascript
-const PluginManager	= server.getPluginManager();
+const Server	= require( 'event_request' );
+const app   = Server();
+
+const PluginManager	= app.getPluginManager();
 const timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
 
 timeoutPlugin.setOptions( { timeout : 10 * 1000 } );
-server.apply( timeoutPlugin );
-server.apply( timeoutPlugin, {  timeout : 10 * 1000 } );// This will accomplish the same thing as the rows above
-server.apply( 'er_timeout' ); // This is also valid.
-server.apply( 'er_timeout', {  timeout : 10 * 1000 } ); // This is also valid.
-server.apply( server.er_timeout ); // This is also valid.
-server.apply( server.er_timeout, {  timeout : 10 * 1000 } ); // This is also valid.
+app.apply( timeoutPlugin );
+app.apply( timeoutPlugin, {  timeout : 10 * 1000 } );// This will accomplish the same thing as the rows above
+app.apply( 'er_timeout' ); // This is also valid.
+app.apply( 'er_timeout', {  timeout : 10 * 1000 } ); // This is also valid.
+app.apply( app.er_timeout ); // This is also valid.
+app.apply( app.er_timeout, {  timeout : 10 * 1000 } ); // This is also valid.
 ~~~
 
 ***
@@ -1770,6 +1830,9 @@ The plugin Manager exports the following functions:
 ####Example:
 
 ~~~javascript
+const Server	= require( 'event_request' );
+const app   = Server();
+
 app.apply( 'er_timeout', { timeout: 10000 } );
 
 // OR
@@ -1832,6 +1895,9 @@ app.apply( timeoutPlugin );
 ####Example:
 
 ~~~javascript
+const Server	= require( 'event_request' );
+const app   = Server();
+
 app.apply( app.er_static_resources, { paths : ['public'] } );
 
 //OR
@@ -1901,6 +1967,9 @@ app.apply( staticResourcesPlugin );
 
 - You can add the plugin like:
 ~~~javascript
+const Server	= require( 'event_request' );
+const app   = Server();
+
 app.apply( 'er_data_server' );
 
 // OR
@@ -1915,13 +1984,13 @@ app.apply( app.er_data_server, { dataServerOptions: { persist: false, ttl: 200, 
 
 - The plugin can be used like:
 ~~~javascript
-const { Server, Loggur }	= require( 'event_request' );
- 
+const { Loggur }	= require( 'event_request' );
+
 /**
  * @brief	Instantiate the server
  */
-const app	= Server();
-
+const app			= require( 'event_request' )();
+ 
 app.apply( app.er_data_server, { persist: false } );
  
 // Add a new Route
@@ -2028,9 +2097,12 @@ app.listen( 80, ()=>{
 
 - You can use the session like this:
 ~~~javascript
-const { Loggur, Server } = require( 'event_request' );
+const { Loggur }	= require( 'event_request' );
 
-const app	= Server();
+/**
+ * @brief	Instantiate the server
+ */
+const app			= require( 'event_request' )();
 
 // Initialize the session
 app.add( async ( event )=>{
@@ -2142,6 +2214,11 @@ app.listen( 80, ()=>{
 ####Example:
 
 ~~~javascript
+/**
+ * @brief	Instantiate the server
+ */
+const app	= require( 'event_request' )();
+
 app.apply( app.er_templating_engine, { templateDir: path.join( __dirname, './public' ) } );
 
 // OR
@@ -2228,6 +2305,11 @@ router.get( '/preview', ( event ) => {
 ####Example:
 
 ~~~javascript
+/**
+ * @brief	Instantiate the server
+ */
+const app			= require( 'event_request' )();
+
 const PluginManager		= app.getPluginManager();
 const fileStreamPlugin	= PluginManager.getPlugin( 'er_file_stream' );
 app.apply( fileStreamPlugin );
@@ -2242,6 +2324,11 @@ app.apply( 'er_file_stream' );
 - Example of streaming data:
 ~~~javascript
 const fs = require( 'fs' );
+
+/**
+ * @brief	Instantiate the server
+ */
+const app	= require( 'event_request' )();
 
 app.get( '/data', ( event ) =>{
 		const result	= event.validationHandler.validate( event.queryString, { file: 'filled||string||min:1' } );
@@ -2327,6 +2414,11 @@ app.get( '/dataTwo', ( event ) =>{
 ####Example:
 
 ~~~javascript
+/**
+ * @brief	Instantiate the server
+ */
+const app			= require( 'event_request' )();
+
 const PluginManager	= app.getPluginManager();
 const loggerPlugin	= PluginManager.getPlugin( 'er_logger' );
 app.apply( loggerPlugin );
@@ -2428,17 +2520,22 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 ####Example:
 
 ~~~javascript
+/**
+ * @brief	Instantiate the server
+ */
+const app			= require( 'event_request' )();
+
 // Add Body Parsers
-server.apply( app.er_body_parser_json );
-server.apply( app.er_body_parser_form );
-server.apply( app.er_body_parser_multipart );
+app.apply( app.er_body_parser_json );
+app.apply( app.er_body_parser_form );
+app.apply( app.er_body_parser_multipart );
 
 // Add body parsers with custom options
-server.apply( app.er_body_parser_json, { maxPayloadLength: 104857600, strict: false } );
-server.apply( app.er_body_parser_form, { maxPayloadLength: 10485760, strict: false } );
-server.apply( app.er_body_parser_multipart, { cleanUpItemsTimeoutMS: 100, maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
+app.apply( app.er_body_parser_json, { maxPayloadLength: 104857600, strict: false } );
+app.apply( app.er_body_parser_form, { maxPayloadLength: 10485760, strict: false } );
+app.apply( app.er_body_parser_multipart, { cleanUpItemsTimeoutMS: 100, maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
 
-server.post( '/submit', ( event )=>{
+app.post( '/submit', ( event )=>{
     console.log( event.body );
     console.log( event.rawBody );
 
@@ -2492,6 +2589,11 @@ Adds a response caching mechanism.
 ####Example:
 
 ~~~javascript
+/**
+ * @brief	Instantiate the server
+ */
+const app			= require( 'event_request' )();
+
 const PluginManager		= app.getPluginManager();
 const cacheServer		= PluginManager.getPlugin( app.er_data_server );
 
@@ -2580,7 +2682,11 @@ app.get( '/', ( event )=>
 ####Example:
 
 ~~~javascript
-const app  = Server();
+/**
+ * @brief	Instantiate the server
+ */
+const app	= require( 'event_request' )();
+
 app.apply( 'er_env' );
 app.add(( event )=>{
 	console.log( process.env );
@@ -2728,8 +2834,15 @@ the request will be immediately canceled
 ~~~
 
 ~~~javascript
-const app = Server();
-app.apply( app.er_rate_limits )
+/**
+ * @brief	Instantiate the server
+ */
+const app				= require( 'event_request' )();
+const { Server }		= require( 'event_request' );
+const RateLimitsPlugin	= require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
+const DataServer		= require( 'event_request/server/components/caching/data_server' );
+
+app.apply( app.er_rate_limits );
 
 // If you implement a custom distributed DataServer you can sync between servers
 // Two servers
@@ -3133,6 +3246,11 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 
 - Apply the plugin with defaults
 ~~~javascript
+/**
+ * @brief	Instantiate the server
+ */
+const app			= require( 'event_request' )();
+
 // It's a good idea to do this first before attaching any other plugins or adding routes
 app.apply( app.er_security );
 ~~~
@@ -3156,6 +3274,11 @@ app.add(( event )=>{
 
 - Apply the plugin with custom directives
 ~~~javascript
+/**
+ * @brief	Instantiate the server
+ */
+const app	= require( 'event_request' )();
+
 app.apply( app.er_security, {
 	csp	: {
 		directives	: {
@@ -3181,39 +3304,44 @@ app.apply( app.er_security, {
 
 - Apply the plugin with a lot of different commands later, as well as rebuilding
 ~~~javascript
-		app.apply( app.er_security, { csp : { xss: false } } );
 
-		app.add(( event )=>{
+/**
+ * @brief	Instantiate the server
+ */
+const app			= require( 'event_request' )();
+app.apply( app.er_security, { csp : { xss: false } } );
 
-			// self is repeated twice but will be shown only once and with single quotes
-			event.$security.csp.addFontSrc( 'self' );
-			event.$security.csp.addFontSrc( "'self'" );
-			event.$security.csp.addFontSrc( 'test' );
-			event.$security.csp.upgradeInsecureRequests();
-			event.$security.csp.enableSelf();
-			event.$security.csp.enableSandbox();
+app.add(( event )=>{
 
-			event.$security.ect.setEnabled( false );
-			event.$security.ect.setMaxAge( 30000 );
+	// self is repeated twice but will be shown only once and with single quotes
+	event.$security.csp.addFontSrc( 'self' );
+	event.$security.csp.addFontSrc( "'self'" );
+	event.$security.csp.addFontSrc( 'test' );
+	event.$security.csp.upgradeInsecureRequests();
+	event.$security.csp.enableSelf();
+	event.$security.csp.enableSandbox();
 
-			event.$security.hsts.setMaxAge( 300 );
-			// null and 'string' are invalid for max age so 300 will be left
-			event.$security.hsts.setMaxAge( null );
-			event.$security.hsts.setMaxAge( 'string' );
-			event.$security.hsts.preload();
-			event.$security.hsts.includeSubDomains( false );
+	event.$security.ect.setEnabled( false );
+	event.$security.ect.setMaxAge( 30000 );
 
-			event.$security.build();
+	event.$security.hsts.setMaxAge( 300 );
+	// null and 'string' are invalid for max age so 300 will be left
+	event.$security.hsts.setMaxAge( null );
+	event.$security.hsts.setMaxAge( 'string' );
+	event.$security.hsts.preload();
+	event.$security.hsts.includeSubDomains( false );
 
-			// This will actually add a new script-src to the csp and will disable the cto component
-			event.$security.csp.addScriptSrc( 'test' );
-			event.$security.cto.setEnabled( false );
+	event.$security.build();
 
-			// This will overwrite the previous build and set the new modified headers
-			event.$security.build();
+	// This will actually add a new script-src to the csp and will disable the cto component
+	event.$security.csp.addScriptSrc( 'test' );
+	event.$security.cto.setEnabled( false );
 
-			event.next();
-		});
+	// This will overwrite the previous build and set the new modified headers
+	event.$security.build();
+
+	event.next();
+});
 ~~~
 
 ***

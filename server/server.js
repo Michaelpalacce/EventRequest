@@ -68,7 +68,7 @@ class Server extends EventEmitter
 		this.er_env						= 'er_env';
 		this.er_rate_limits				= 'er_rate_limits';
 		this.er_static_resources		= 'er_static_resources';
-		this.er_data_server			= 'er_data_server';
+		this.er_data_server				= 'er_data_server';
 		this.er_templating_engine		= 'er_templating_engine';
 		this.er_file_stream				= 'er_file_stream';
 		this.er_logger					= 'er_logger';
@@ -285,28 +285,4 @@ class Server extends EventEmitter
 	}
 }
 
-// Holds the instance of the server class
-let server	= null;
-
-/**
- * @brief	Creates a new server, or return existing instance
- *
- * @returns	Server
- */
-const App			= ()=>{
-	return server || ( server = new Server() );
-};
-
-/**
- * @brief	Removes the server instance ( this does not stop the httpServer if it was started )
- *
- * @return	void
- */
-App.cleanUp			= ()=>{
-	server	= null;
-};
-
-App.class			= Server;
-
-// Export the server module
-module.exports		= App;
+module.exports	= Server;

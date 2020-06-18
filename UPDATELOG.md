@@ -1,3 +1,8 @@
+18.0.0
+- Major breaking version. The way the server is created has changed. This was done to simplify the whole procedure. The Server retrieved from the module can now be used to create separate web servers. 
+- Added a new export App that can be used to fetch the singleton instance of the web server
+- Updated the documentation
+
 17.2.1
 - Updated the documentation so that routing is easier to find for people and is moved up
 
