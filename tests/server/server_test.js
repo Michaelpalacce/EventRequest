@@ -60,6 +60,7 @@ test({
 		assert.equal( typeof server.er_body_parser_json === 'string', true );
 		assert.equal( typeof server.er_body_parser_form === 'string', true );
 		assert.equal( typeof server.er_body_parser_multipart === 'string', true );
+		assert.equal( typeof server.er_body_parser_raw === 'string', true );
 
 		done();
 	}
@@ -1673,7 +1674,7 @@ test({
 			helpers.sendServerRequest(
 				`/${name}`,
 				'GET',
-				200,
+				400,
 				JSON.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
 				{ 'content-type': 'application/json' },
 				3337
@@ -1823,7 +1824,7 @@ test({
 			helpers.sendServerRequest(
 				`/${name}`,
 				'GET',
-				200,
+				400,
 				querystring.stringify( { [formDataKey]: formDataValue } ),
 				{ 'content-type': 'application/x-www-form-urlencoded' },
 				3339
@@ -1834,7 +1835,7 @@ test({
 			helpers.sendServerRequest(
 				`/${name}`,
 				'GET',
-				200,
+				400,
 				querystring.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
 				{ 'content-type': 'application/x-www-form-urlencoded' },
 				3339
@@ -2075,6 +2076,93 @@ test({
 		);
 
 		const server	= app.listen( 3342, ()=>{
+			Promise.all( responses ).then(()=>{
+				setTimeout(()=>{
+					server.close();
+					done();
+				}, 500 );
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test body_parser_handler fallback parser',
+	test	: ( done )=>{
+		const name	= 'testBodyParserHandlerFallbackParser';
+		const app	= new Server();
+
+		app.apply( app.er_body_parser_json );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( { body: event.body, rawBody: event.rawBody } );
+		} );
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				'SomeRandomData',
+				{ 'content-type': 'somethingDoesntMatter' },
+				3901,
+				JSON.stringify( { body: 'SomeRandomData', rawBody: 'SomeRandomData' } )
+			)
+		);
+
+		const server	= app.listen( 3901, ()=>{
+			Promise.all( responses ).then(()=>{
+				setTimeout(()=>{
+					server.close();
+					done();
+				}, 500 );
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test er_body_parser_raw handles anything',
+	test	: ( done )=>{
+		const name	= 'testErBodyParserRaw';
+		const app	= new Server();
+
+		app.apply( app.er_body_parser_raw, { maxPayloadLength: 15 } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( { body: event.body, rawBody: event.rawBody } );
+		} );
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				'SomeRandomData',
+				{ 'content-type': 'somethingDoesntMatter' },
+				3902,
+				JSON.stringify( { body: 'SomeRandomData', rawBody: 'SomeRandomData' } )
+			)
+		);
+
+		// Returns 200 and an empty body due to limit reached
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				'SomeRandomDataSomeRandomData',
+				{ 'content-type': 'somethingDoesntMatter' },
+				3902,
+				JSON.stringify( { body: {}, rawBody: {} } )
+			)
+		);
+
+		const server	= app.listen( 3902, ()=>{
 			Promise.all( responses ).then(()=>{
 				setTimeout(()=>{
 					server.close();

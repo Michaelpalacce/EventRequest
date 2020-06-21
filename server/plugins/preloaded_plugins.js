@@ -16,6 +16,7 @@ const SecurityPlugin			= require( './available_plugins/security_plugin' );
 const JsonBodyParser			= require( './../components/body_parsers/json_body_parser' );
 const MultipartDataParser		= require( './../components/body_parsers/multipart_data_parser' );
 const FormBodyParser			= require( './../components/body_parsers/form_body_parser' );
+const RawBodyParser				= require( './../components/body_parsers/raw_body_parser' );
 
 /**
  * @brief	Constants
@@ -36,5 +37,6 @@ PluginManager.addPlugin( new ResponseCachePlugin( 'er_response_cache' )) ;
 PluginManager.addPlugin( new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' ) );
 PluginManager.addPlugin( new BodyParserPlugin( FormBodyParser, 'er_body_parser_form' ) );
 PluginManager.addPlugin( new BodyParserPlugin( MultipartDataParser, 'er_body_parser_multipart' ) );
+PluginManager.addPlugin( new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' ) );
 
 module.exports	= PluginManager;

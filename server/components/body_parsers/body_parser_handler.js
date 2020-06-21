@@ -1,5 +1,7 @@
 'use strict';
 
+const RawBodyParser	= require( './raw_body_parser' )
+
 /**
  * @brief	BodyParserHandler responsible for parsing the body of the request
  */
@@ -7,7 +9,9 @@ class BodyParserHandler
 {
 	constructor()
 	{
-		this.parsers	= [];
+		this.parsers		= [];
+
+		this.fallbackParser	= new RawBodyParser();
 	}
 
 	/**
@@ -46,10 +50,7 @@ class BodyParserHandler
 			}
 		}
 
-		// Fallback
-		return new Promise(( resolve )=>{
-			resolve( { body: {}, rawBody: {} } );
-		})
+		return this.fallbackParser.parse( event );
 	}
 }
 

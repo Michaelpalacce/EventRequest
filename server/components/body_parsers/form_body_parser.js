@@ -63,8 +63,11 @@ class FormBodyParser extends EventEmitter
 			{
 				if ( ! event.isFinished() )
 				{
-					rawBody.push( data );
-					payloadLength	+= data.length;
+					if ( payloadLength <= this.maxPayloadLength )
+					{
+						rawBody.push( data );
+						payloadLength	+= data.length;
+					}
 				}
 			});
 
@@ -73,7 +76,7 @@ class FormBodyParser extends EventEmitter
 				{
 					rawBody	= Buffer.concat( rawBody, payloadLength );
 
-					if ( this.strict && rawBody.length > this.maxPayloadLength )
+					if ( payloadLength > this.maxPayloadLength || payloadLength === 0 )
 						return resolve( { body: {}, rawBody: {} } );
 
 					if (
@@ -81,14 +84,11 @@ class FormBodyParser extends EventEmitter
 						(
 							typeof event.headers !== 'object'
 							|| typeof event.headers[CONTENT_LENGTH_HEADER] === 'undefined'
-							|| rawBody.length !== Number( event.headers[CONTENT_LENGTH_HEADER] )
+							|| payloadLength !== Number( event.headers[CONTENT_LENGTH_HEADER] )
 						)
 					) {
 						return resolve( { body: {}, rawBody: {} } );
 					}
-
-					if ( rawBody.length === 0 )
-						return resolve( { body: {}, rawBody: {} } );
 
 					rawBody				= rawBody.toString();
 					const payload		= rawBody;

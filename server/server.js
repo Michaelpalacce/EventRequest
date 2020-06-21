@@ -78,6 +78,7 @@ class Server extends EventEmitter
 		this.er_body_parser_json		= 'er_body_parser_json';
 		this.er_body_parser_form		= 'er_body_parser_form';
 		this.er_body_parser_multipart	= 'er_body_parser_multipart';
+		this.er_body_parser_raw			= 'er_body_parser_raw';
 	}
 
 	/**

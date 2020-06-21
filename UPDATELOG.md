@@ -1,3 +1,8 @@
+18.1.0
+- Fixed the way strict behaves in the body parser so now it will only affect the content length and not the actual maxPayload
+- Added a fallback body parser that will parse everything and return it as a string
+- Added a new plugin er_body_parser_raw
+
 18.0.0
 - Major breaking version. The way the server is created has changed. This was done to simplify the whole procedure. The Server retrieved from the module can now be used to create separate web servers. 
 - Added a new export App that can be used to fetch the singleton instance of the web server

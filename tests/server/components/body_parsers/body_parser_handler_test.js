@@ -3,6 +3,7 @@
 const { Mock, Mocker, assert, test, helpers }	= require( '../../../test_helper' );
 const BodyParserHandler							= require( '../../../../server/components/body_parsers/body_parser_handler' );
 const JsonBodyParser							= require( '../../../../server/components/body_parsers/json_body_parser' );
+const RawBodyParser								= require( '../../../../server/components/body_parsers/raw_body_parser' );
 
 test({
 	message	: 'BodyParserHandler.constructor does not throw with valid arguments',
@@ -47,10 +48,29 @@ test({
 	message	: 'BodyParserHandler.parseBody if no parsers support it',
 	test	: ( done )=>{
 		assert.doesNotThrow(()=>{
-			const bodyParserHandler	= new BodyParserHandler();
+			const MockBodyParser	= Mock( RawBodyParser );
+			const fallbackParser	= new MockBodyParser();
+			const testBody			= 'Test';
+
+			fallbackParser._mock({
+				method			: 'supports',
+				shouldReturn	: true
+			});
+
+			fallbackParser._mock({
+				method			: 'parse',
+				shouldReturn	: ()=>{
+					return new Promise(( resolve, reject )=>{
+						resolve( testBody );
+					})
+				}
+			});
+
+			const bodyParserHandler				= new BodyParserHandler();
+			bodyParserHandler.fallbackParser	= fallbackParser;
 
 			bodyParserHandler.parseBody( helpers.getEventRequest() ).then(( parsedData )=>{
-				assert.deepStrictEqual( parsedData, { body: {}, rawBody: {} } );
+				assert.deepStrictEqual( parsedData, testBody );
 				done();
 			});
 		});
@@ -60,7 +80,7 @@ test({
 test({
 	message	: 'BodyParserHandler.parseBody calls BodyParser parse if supported',
 	test	: ( done )=>{
-		const MockBodyParser		= Mock( JsonBodyParser );
+		const MockBodyParser	= Mock( JsonBodyParser );
 		const testBody			= 'Test';
 		Mocker( MockBodyParser, {
 			method			: 'supports',
@@ -88,7 +108,9 @@ test({
 test({
 	message	: 'BodyParserHandler.parseBody does not parse if not supports and does not return an error',
 	test	: ( done )=>{
-		const MockBodyParser		= Mock( JsonBodyParser );
+		const MockBodyParser	= Mock( JsonBodyParser );
+		const MockRawBodyParser	= Mock( RawBodyParser );
+		const fallbackParser	= new MockRawBodyParser();
 
 		Mocker( MockBodyParser, {
 			method			: 'supports',
@@ -100,8 +122,23 @@ test({
 			called	: 0
 		} );
 
-		const event				= helpers.getEventRequest();
-		const bodyParserHandler	= new BodyParserHandler();
+		fallbackParser._mock({
+			method			: 'supports',
+			shouldReturn	: true
+		});
+
+		fallbackParser._mock({
+			method			: 'parse',
+			shouldReturn	: ()=>{
+				return new Promise(( resolve, reject )=>{
+					resolve( { body: {}, rawBody: {} } );
+				})
+			}
+		});
+
+		const event							= helpers.getEventRequest();
+		const bodyParserHandler				= new BodyParserHandler();
+		bodyParserHandler.fallbackParser	= fallbackParser;
 
 		bodyParserHandler.addParser( new MockBodyParser() );
 		bodyParserHandler.parseBody( event ).then(( data )=>{

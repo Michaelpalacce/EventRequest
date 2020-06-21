@@ -138,7 +138,7 @@ test({
 });
 
 test({
-	message	: 'File.getCurrentDat gives the beginning of the day',
+	message	: 'File.getCurrentData gives the beginning of the day',
 	test	: ( done )=>{
 		let logLevel	= LOG_LEVELS.error;
 		let logLevels	= LOG_LEVELS;
@@ -197,7 +197,7 @@ test({
 			()=>{
 				let data	= fs.readFileSync( path.join( __dirname, './fixtures/testfile' ) );
 				assert.equal( data.toString().indexOf( logData ) !== -1, true );
-				
+
 				helpers.clearUpTestFile();
 
 				done();

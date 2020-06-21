@@ -1716,6 +1716,7 @@ Server {
   er_body_parser_json: 'er_body_parser_json',
   er_body_parser_form: 'er_body_parser_form',
   er_body_parser_multipart: 'er_body_parser_multipart'
+  er_body_parser_raw: 'er_body_parser_raw'
 }
 ~~~
 - Generally all the integrated plug-ins begin with `er_`
@@ -2434,7 +2435,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 ***
 ***
 
-#er_body_parser_json, er_body_parser_form, er_body_parser_multipart 
+#er_body_parser_json, er_body_parser_form, er_body_parser_multipart, er_body_parser_raw
 - Adds a JsonBodyParser, FormBodyParser or MultipartBodyParser bodyParsers respectively that can be set up
 - They all implement the design principle behind the BodyParser 
 - These plugins are basically one and the same and even tho many may be added they will use a single body parser handler.
@@ -2443,6 +2444,8 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 - json parser supports: application/json
 - form body parser supports: application/x-www-form-urlencoded
 - multipart body parser supports: multipart/form-data
+- er_body_parser_raw is a fallback body parser that will return the data as a raw string if no other parser supports the request. The default body parser has a limit of 10MB. It can optionally be added as a final parser manually to have it's maxPayloadLength changed
+
 
 ***
 ####Dependencies:
@@ -2462,17 +2465,22 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 **tempDir: String** 
 - The directory where to keep the uploaded files before moving 
 - Defaults to the tmp dir of the os
-        
 
 ***
 #####JsonBodyParser:
 **maxPayloadLength: Number** 
 - The max size of the body to be parsed 
-- Defaults to 10485760/ 10MB
+- Defaults to 104857600/ 100MB
 
 **strict: Boolean**
 - Whether the received payload must match the content-length 
 - Defaults to false
+
+***
+#####RawBodyParser:
+**maxPayloadLength: Number** 
+- The max size of the body to be parsed 
+- Defaults to 10485760/ 10MB
 
 ***
 #####FormBodyParser:
@@ -2529,11 +2537,13 @@ const app			= require( 'event_request' )();
 app.apply( app.er_body_parser_json );
 app.apply( app.er_body_parser_form );
 app.apply( app.er_body_parser_multipart );
+app.apply( app.er_body_parser_raw );
 
 // Add body parsers with custom options
 app.apply( app.er_body_parser_json, { maxPayloadLength: 104857600, strict: false } );
 app.apply( app.er_body_parser_form, { maxPayloadLength: 10485760, strict: false } );
 app.apply( app.er_body_parser_multipart, { cleanUpItemsTimeoutMS: 100, maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
+app.apply( app.er_body_parser_raw, { maxPayloadLength: 10485760 } );
 
 app.post( '/submit', ( event )=>{
     console.log( event.body );
