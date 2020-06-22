@@ -135,7 +135,7 @@ assert.assertNotString		= ( actual ) => {
  * @return	Boolean
  */
 assert.assertIsNumeric		= ( actual ) => {
-	let check	= Number( actual );
+	const check	= Number( actual );
 
 	return ! isNaN( check ) && actual === check;
 };

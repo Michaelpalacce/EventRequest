@@ -104,13 +104,21 @@ class ValidationAttribute
 				return false;
 
 			case VALIDATION_ERRORS.string:
+				if ( assert.assertIsNumeric( parseInt( this.value ) ) )
+					this.value	= this.value.toString();
+
 				return assert.assertIsString( this.value ) ? false : VALIDATION_ERRORS.string;
 
 			case VALIDATION_ERRORS.notString:
 				return assert.assertNotString( this.value ) ? false : VALIDATION_ERRORS.notString;
 
 			case VALIDATION_ERRORS.numeric:
-				return assert.assertIsNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.numeric;
+				let result	= assert.assertIsNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.numeric;
+
+				if ( result === false )
+					this.value	= parseInt( this.value );
+
+				return result;
 
 			case VALIDATION_ERRORS.notNumeric:
 				return assert.assertNotNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.notNumeric;
@@ -155,13 +163,32 @@ class ValidationAttribute
 				return assert.assertIsValidEmail( this.value ) ? false : VALIDATION_ERRORS.email;
 
 			case VALIDATION_ERRORS.isTrue:
-				return assert.assertTrue( this.value ) ? false : VALIDATION_ERRORS.isTrue;
+				let isTrueForIsTrueValidation	= assert.assertTrue( this.value );
+
+				if ( isTrueForIsTrueValidation )
+					this.value	= true;
+
+				return isTrueForIsTrueValidation ? false : VALIDATION_ERRORS.isTrue;
 
 			case VALIDATION_ERRORS.isFalse:
-				return assert.assertFalse( this.value ) ? false : VALIDATION_ERRORS.isFalse;
+				let isFalseForIsFalseValidation	= assert.assertFalse( this.value );
+
+				if ( isFalseForIsFalseValidation )
+					this.value	= false;
+
+				return isFalseForIsFalseValidation ? false : VALIDATION_ERRORS.isFalse;
 
 			case VALIDATION_ERRORS.boolean:
-				return assert.assertIsBoolean( this.value ) ? false : VALIDATION_ERRORS.boolean;
+				let isTrueForBooleanValidation	= assert.assertTrue( this.value );
+				let isFalseForBooleanValidation	= assert.assertFalse( this.value );
+
+				if ( isTrueForBooleanValidation )
+					this.value	= true;
+
+				if ( isFalseForBooleanValidation )
+					this.value	= false;
+
+				return isTrueForBooleanValidation || isFalseForBooleanValidation ? false : VALIDATION_ERRORS.boolean;
 
 			case VALIDATION_ERRORS.notBoolean:
 				return assert.assertNotBoolean( this.value ) ? false : VALIDATION_ERRORS.notBoolean;

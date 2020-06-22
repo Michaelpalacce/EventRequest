@@ -3,6 +3,8 @@ A highly customizable backend server in NodeJs
 
 [![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest)
 
+[**CHANGELOG**](https://github.com/Michaelpalacce/EventRequest/blob/master/UPDATELOG.md)
+
 # Setup
 ~~~javascript
 // Framework Singleton instance
@@ -982,13 +984,12 @@ The validation is done by using:
     event.validationHandler.validate( objectToValidate, skeleton )
 ~~~
 
-skeleton must have the keys that are to be validated that point to a string of rules separated by ||
+- skeleton must have the keys that are to be validated that point to a string of rules separated by ||
+
+- Asserting that an input is a string|numeric|boolean will do type conversion on the input to the appropriate type. You should retrieve the value FROM the validation result for correct result
 
 ***
 #### Possible rules are:
-
-**rules** 
-- if malformed rules string is passed
 
 **optional** 
 - if set as long as the input is empty it will always be valid. if not empty other possible rules will be called
@@ -997,37 +998,49 @@ skeleton must have the keys that are to be validated that point to a string of r
 - checks if the input is filled
 
 **string** 
-- checks if the input is a string
+- checks if the input is a string.
+ - Will convert a number to a string
 
 **notString** 
 - checks if the input is NOT a string
 
 **range** 
 - Is followed by min and max aka: range:1-2 where 1 is the minimum and 2 maximum.
+- If the type is numeric then it will check if it's within the range.
+- If the type is a string then the length will be checked
 
 **min** 
 - minimum input length aka: min:10
+- Same rules about types apply as in **range** 
 
 **max** 
 - maximum input length aka: max:50
+- Same rules about types apply as in **range** 
 
 **email** 
 - checks if the input is a valid email
 
 **isTrue** 
 - checks if the input evaluates to true
+- 1 will be asserted as true, true will be asserted as true, 'true' and '1' will also be asserted as true
+- The value will be converted to a boolean
 
 **isFalse** 
 - checks if the input evaluates to false
+- 0 will be asserted as false, false will be asserted as false, 'false' and '0' will also be asserted as false
+- The value will be converted to a boolean
 
 **boolean** 
 - checks if the input is a boolean
+- The value will be converted to a boolean
+- Applies the same rules as **isFalse** and **isTrue** 
 
 **notBoolean** 
 - checks if the input is not a boolean
 
 **numeric** 
-- checks if the input is a number
+- checks if the input is a number. 
+- This will convert the input to a Number if possible
 
 **notNumeric** 
 - checks if the input is not a number
@@ -1044,6 +1057,7 @@ skeleton must have the keys that are to be validated that point to a string of r
 **equals** 
 - checks if the input equals another given string: equals:makeSureToEqualToThis
 
+####Note: in case of an error the exact rule/s that failed will be returned, furthermore if the rules passed were malformed a special "rules" error will be returned for the field/s
 
 When validation is done a ValidationResult is returned. It has 2 main methods:
     getValidationResult that will return an object with the fields tested mapped to the errors found. Otherwise 
@@ -1053,7 +1067,7 @@ When validation is done a ValidationResult is returned. It has 2 main methods:
 ~~~javascript
      const result	= event.validationHandler.validate(
         event.body,
-        { username : 'filled||string', password : 'filled||string' } 
+        { username : 'filled||string||range:6-32', password : 'filled||string', customerNumber: 'numeric||max:32' } 
      );
 
     console.log( result.hasValidationFailed() );
@@ -1061,13 +1075,11 @@ When validation is done a ValidationResult is returned. It has 2 main methods:
     
     // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
     // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
-    // { 'username':'username', 'password': 'password'}
+    // { 'username':'username', 'password': 'password', 'customerNumber': 16 }
 ~~~
 
-The example will validate that the stringToValidate is filled is a string and is within a range of 2-3 characters
-It will also validate that the emailToValidate in case it is provided is an actual email.
-
-In case there is no error False will be returned
+The example will validate that the username is filled is a string and is within a range of 6-32 characters
+It will also validate that the password is filled and is a string
 
 ***
 ####Validation defaults

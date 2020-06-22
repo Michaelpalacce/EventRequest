@@ -24,10 +24,17 @@ test({
 		['testKey', 'xx', 'range:5-2', ['range']],
 		['testKey', 'xx', 'min:2', false],
 		['testKey', 'xx', 'min:2:3', ['rules']],
-		['testKey', 1, 'min:2||numeric', ['min']],
-		['testKey', 3, 'min:2||numeric', false],
-		['testKey', '123', 'min:2||numeric', false],
-		['testKey', '1', 'min:2||numeric', ['min']],
+		['testKey', 1, 'numeric||min:2', ['min']],
+		['testKey', 3, 'numeric||min:2', false],
+		['testKey', '123', 'numeric||min:50', false],
+		['testKey', '123', 'string||min:2', false],
+		['testKey', '123', 'string||min:3', false],
+		['testKey', '123', 'string||min:4', ['min']],
+		['testKey', '123', 'string||range:5-6', ['range']],
+		['testKey', '123', 'string||range:2-4', false],
+		['testKey', '123', 'numeric||range:50-150', false],
+		['testKey', '151', 'numeric||range:50-150', ['range']],
+		['testKey', '1', 'numeric||min:2', ['min']],
 		['testKey', '1', 'max:2', false],
 		['testKey', '1xx', 'max:2', ['max']],
 		['testKey', 1, 'max:2', false],
@@ -74,6 +81,47 @@ test({
 		let validationAttribute	= new ValidationAttribute( key, value, rules, dataToValidate );
 
 		assert.deepStrictEqual( validationAttribute.validateSelf(), anythingInvalid );
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationAttribute validateSelf changes the value',
+	dataProvider	: [
+		['testKey', 'testValue', 'string', 'testValue'],
+		['testKey', 12, 'string', '12'],
+		['testKey', 12, 'string||min:2', '12'],
+		['testKey', 1, 'boolean', true],
+		['testKey', '1', 'boolean', true],
+		['testKey', true, 'boolean', true],
+		['testKey', 'true', 'boolean', true],
+		['testKey', 'false', 'boolean', false],
+		['testKey', '0', 'boolean', false],
+		['testKey', 0, 'boolean', false],
+		['testKey', false, 'boolean', false],
+		['testKey', 'true', 'isTrue', true],
+		['testKey', '1', 'isTrue', true],
+		['testKey', 1, 'isTrue', true],
+		['testKey', true, 'isTrue', true],
+		['testKey', false, 'isFalse', false],
+		['testKey', 0, 'isFalse', false],
+		['testKey', '0', 'isFalse', false],
+		['testKey', 'false', 'isFalse', false],
+		['testKey', '1', 'numeric', 1],
+		['testKey', '5125125', 'numeric', 5125125],
+		['testKey', 'false', 'numeric', 'false'],
+		['testKey', 1, 'numeric', 1],
+		['testKey', 50, 'numeric||min:50', 50],
+	],
+	test			: ( done, key, value, rules, expectedValue )=>{
+		let dataToValidate		= {
+			[key]	: value
+		};
+
+		let validationAttribute	= new ValidationAttribute( key, value, rules, dataToValidate );
+		validationAttribute.validateSelf();
+
+		assert.deepStrictEqual( validationAttribute.value, expectedValue );
 		done();
 	}
 });

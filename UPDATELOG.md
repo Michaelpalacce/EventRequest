@@ -1,3 +1,8 @@
+18.2.0
+- Code cleanup for the router route adding
+- Small changes to validation. The type of the input will be changed to the appropriate type now
+- Some documentation improvements
+
 18.1.0
 - Fixed the way strict behaves in the body parser so now it will only affect the content length and not the actual maxPayload
 - Added a fallback body parser that will parse everything and return it as a string

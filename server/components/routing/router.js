@@ -83,24 +83,36 @@ class Router extends PluginInterface
 		const methods	= ['POST', 'PUT', 'GET', 'DELETE', 'HEAD', 'PATCH', 'COPY'];
 
 		methods.forEach(( method )=>{
-			object[method.toLocaleLowerCase()]	= ( route, handler, middlewares = [] )=>{
-				if ( typeof route === 'function' )
+			object[method.toLocaleLowerCase()]	= ( ...args )=>{
+				const firstArgument	= args[0];
+				let route			= null;
+				let handler			= null;
+				let middlewares		= null;
+
+				switch ( true )
 				{
-					this.add({
-						method,
-						handler: route,
-						middlewares: handler
-					});
+					case typeof firstArgument === 'function':
+						route		= '';
+						handler		= firstArgument;
+						middlewares	= typeof args[1] === 'undefined' ? [] : args[1];
+						break;
+
+					case ( typeof firstArgument === 'string' || firstArgument instanceof RegExp ) && typeof args[1] === 'function':
+						route		= firstArgument;
+						handler		= typeof args[1] === 'function' ? args[1] : null;
+						middlewares	= args[2];
+						break;
+
+					default:
+						throw new Error( 'Trying to add an invalid middleware' );
 				}
-				else
-				{
-					this.add({
-						method,
-						route,
-						handler,
-						middlewares
-					});
-				}
+
+				this.add({
+					method,
+					route,
+					handler,
+					middlewares
+				});
 
 				return object;
 			}
@@ -110,11 +122,12 @@ class Router extends PluginInterface
 	/**
 	 * @brief	Function that adds a middleware to the block chain of the router
 	 *
-	 * @details	Accepts an object with 3 arguments:
+	 * @details	Accepts an object with 4 arguments:
+	 * 			- handler - Function - Handler to be called - ! REQUIRED
 	 * 			- method - String|Array - The methods(s) to be matched for the route - optional
 	 * 			- route - String|RegExp - The route to match - optional
-	 * 			- handler - Function - Handler to be called - ! REQUIRED
-	 * 			( { method: '', route: '', handler:()=>{} } )
+	 * 			- middlewares - Array|String - Handler to be called - ! optional
+	 * 			( { method: '', route: '', handler:()=>{}, middlewares: '' } )
 	 *
 	 * 			Accepts an instance of router ( Router router )
 	 *
