@@ -11,7 +11,7 @@ class FileStreamHandlerPlugin extends PluginInterface
 	/**
 	 * @brief	Attaches the function stream file to the event
 	 *
-	 * @param	EventRequest event
+	 * @param	event EventRequest
 	 *
 	 * @return	void
 	 */
@@ -22,9 +22,9 @@ class FileStreamHandlerPlugin extends PluginInterface
 		 *
 		 * @details	The file must be the absolute path to the file to be streamed
 		 *
-		 * @param	String file
-		 * @param	Object options
-		 * @param	Function errCallback
+		 * @param	file String
+		 * @param	options Object
+		 * @param	errCallback Function
 		 *
 		 * @return	void
 		 */
@@ -54,8 +54,8 @@ class FileStreamHandlerPlugin extends PluginInterface
 		 *
 		 * @details	The file must be the absolute path to the file to be streamed
 		 *
-		 * @param	String file
-		 * @param	Object options
+		 * @param	file String
+		 * @param	options Object
 		 *
 		 * @return	ReadableStream | null
 		 */

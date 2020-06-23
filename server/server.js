@@ -34,8 +34,8 @@ class Server extends EventEmitter
 	/**
 	 * @brief	Adds a new middleware to the router
 	 *
-	 * @param	String middlewareName
-	 * @param	Function middleware
+	 * @param	middlewareName String
+	 * @param	middleware Function
 	 *
 	 * @return	Server
 	 */
@@ -107,8 +107,8 @@ class Server extends EventEmitter
 	 * @details	The plugin manager can be used to extract and set up plugins and then add them to the server just by
 	 * 			giving their plugin ids
 	 *
-	 * @param	PluginInterface|String plugin
-	 * @param	Object options
+	 * @param	plugin PluginInterface|String
+	 * @param	options Object
 	 *
 	 * @return	Server
 	 */
@@ -139,7 +139,7 @@ class Server extends EventEmitter
 	/**
 	 * @brief	Attaches a PluginInterface to the server
 	 *
-	 * @param	PluginInterface plugin
+	 * @param	plugin PluginInterface
 	 *
 	 * @return	void
 	 */
@@ -171,7 +171,7 @@ class Server extends EventEmitter
 	 *
 	 * @details	Will throw if the plugin is not attached
 	 *
-	 * @param	String pluginId
+	 * @param	pluginId String
 	 *
 	 * @return	PluginInterface
 	 */
@@ -190,7 +190,7 @@ class Server extends EventEmitter
 	/**
 	 * @brief	Checks whether the server has a plugin with the given id
 	 *
-	 * @param	String pluginId
+	 * @param	pluginId String
 	 *
 	 * @return	Boolean
 	 */

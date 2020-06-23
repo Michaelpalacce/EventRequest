@@ -21,7 +21,7 @@ class Transport
 	/**
 	 * @brief	Sanitize the given options
 	 *
-	 * @param	Object options
+	 * @param	options Object
 	 *
 	 * @return	void
 	 */
@@ -41,7 +41,7 @@ class Transport
 	/**
 	 * @brief	Get an instance of the current transport
 	 *
-	 * @param	Object options
+	 * @param	options Object
 	 *
 	 * @return	Transport
 	 */
@@ -53,7 +53,7 @@ class Transport
 	/**
 	 * @brief	Returns whether the current log is supported by the transport
 	 *
-	 * @param	Log log
+	 * @param	log Log
 	 *
 	 * @return	Boolean
 	 */
@@ -75,7 +75,7 @@ class Transport
 	/**
 	 * @brief	Formats the log according to the specified format
 	 *
-	 * @param	Log log
+	 * @param	log Log
 	 *
 	 * @return	String|mixed
 	 */
@@ -87,9 +87,9 @@ class Transport
 	/**
 	 * @brief	The method that actually logs the data
 	 *
-	 * @param	Log log
-	 * @param	Function resolve
-	 * @param	Function reject
+	 * @param	log Log
+	 * @param	resolve Function
+	 * @param	reject Function
 	 *
 	 * @private
 	 *
@@ -103,7 +103,7 @@ class Transport
 	/**
 	 * @brief	Saves the log
 	 *
-	 * @param	Log log
+	 * @param	log Log
 	 *
 	 * @return	Promise
 	 */

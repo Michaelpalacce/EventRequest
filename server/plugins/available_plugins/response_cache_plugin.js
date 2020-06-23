@@ -29,7 +29,7 @@ class ResponseCachePlugin extends PluginInterface
 	/**
 	 * @brief	Creates a rcp namespace to be used
 	 *
-	 * @param	Server server
+	 * @param	server Server
 	 *
 	 * @return	void
 	 */
@@ -45,7 +45,7 @@ class ResponseCachePlugin extends PluginInterface
 	/**
 	 * @brief	Attaches an event to cache the response on send
 	 *
-	 * @param	EventRequest event
+	 * @param	event EventRequest
 	 *
 	 * @return	void
 	 */
@@ -72,7 +72,7 @@ class ResponseCachePlugin extends PluginInterface
 	 *
 	 * @details	This will check if this request should be cached using the client's ip or not
 	 *
-	 * @param	EventRequest event
+	 * @param	event EventRequest
 	 *
 	 * @return	String
 	 */
@@ -98,7 +98,7 @@ class ResponseCachePlugin extends PluginInterface
 	/**
 	 * @brief	Gets the time to live from the config passed or not from the options set
 	 *
-	 * @param	EventRequest event
+	 * @param	event EventRequest
 	 *
 	 * @return	Number
 	 */

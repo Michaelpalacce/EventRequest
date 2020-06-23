@@ -110,8 +110,8 @@ class Session
 	/**
 	 * @brief	Adds a new variable to the session
 	 *
-	 * @param	String name
-	 * @param	Mixed value
+	 * @param	name String
+	 * @param	value Mixed
 	 *
 	 * @return	void
 	 */
@@ -123,7 +123,7 @@ class Session
 	/**
 	 * @brief	Deletes a variable from the session
 	 *
-	 * @param	String name
+	 * @param	name String
 	 *
 	 * @return	void
 	 */
@@ -135,7 +135,7 @@ class Session
 	/**
 	 * @brief	Checks if a variable exists in the session
 	 *
-	 * @param	String name
+	 * @param	name String
 	 *
 	 * @return	Boolean
 	 */
@@ -147,7 +147,7 @@ class Session
 	/**
 	 * @brief	Gets a session variable, will throw if that variable does not exist
 	 *
-	 * @param	String name
+	 * @param	name String
 	 *
 	 * @return	Mixed
 	 */
@@ -166,7 +166,7 @@ class Session
 	 *
 	 * @details	Returns true if the session was saved successfully
 	 *
-	 * @param	String sessionId
+	 * @param	sessionId String
 	 *
 	 * @return	Boolean
 	 */

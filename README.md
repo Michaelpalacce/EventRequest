@@ -2733,7 +2733,7 @@ app.listen( 80 );
 ***
 ####Dependencies:
 
-**er_data_server**
+**NONE**
 
 ***
 ####Accepted Options:
@@ -2766,7 +2766,7 @@ app.listen( 80 );
 **event.rateLimited: Boolean**
 - Flag depicting whether the request was rate limited or not
 
-**eventRequest.rules: Array**
+**eventRequest.erRateLimitRules: Array**
 - Will hold all the rules that the plugin has along with the buckets
 
 ***

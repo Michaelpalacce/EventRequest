@@ -44,7 +44,7 @@ class Logger
 	 * 			- dieOnCapture - Boolean - If the process should exit in case of a caught exception -> Defaults to true
 	 * 			- unhandledExceptionLevel - Number - What level should the unhandled exceptions be logged at -> Defaults to error
 	 *
-	 * @param	Object options
+	 * @param	options Object
 	 *
 	 * @return	void
 	 */
@@ -96,7 +96,7 @@ class Logger
 	/**
 	 * @brief	Sets the Log Level of the Logger
 	 *
-	 * @param	Number logLevel
+	 * @param	logLevel Number
 	 *
 	 * @return	void
 	 */
@@ -168,7 +168,7 @@ class Logger
 	/**
 	 * @brief	Add a transport to the logger
 	 *
-	 * @param	mixed transport
+	 * @param	transport mixed
 	 *
 	 * @return	Boolean
 	 */
@@ -220,9 +220,9 @@ class Logger
 	/**
 	 * @brief	Logs the given data
 	 *
-	 * @param	mixed log
-	 * @param	Number level
-	 * @param	Boolean isRaw
+	 * @param	log mixed
+	 * @param	level Number
+	 * @param	isRaw Boolean
 	 *
 	 * @return	Promise
 	 */
@@ -238,15 +238,11 @@ class Logger
 			this.transports.forEach( ( transport ) =>{
 				let logPromise	= new Promise( ( resolve, reject )=>{
 					setImmediate(()=>{
-						let transportPromise	= transport.log( log );
+						const transportPromise	= transport.log( log );
 
 						transportPromise.then(()=>{
 							resolve();
-						});
-
-						transportPromise.catch(( err )=>{
-							reject( err );
-						});
+						}).catch( reject );
 					});
 				});
 
@@ -257,7 +253,7 @@ class Logger
 		if ( transportPromises.length === 0 )
 		{
 			// Do not reject the log if not supported
-			transportPromises.push( new Promise(( resolve, reject )=>{
+			transportPromises.push( new Promise(( resolve )=>{
 				resolve();
 			}));
 		}

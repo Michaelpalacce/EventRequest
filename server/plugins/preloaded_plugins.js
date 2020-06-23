@@ -1,6 +1,6 @@
 'use strict';
 
-const PluginManagerClass		= require( './plugin_manager' );
+const PluginManager				= require( './plugin_manager' );
 const TimeoutPlugin				= require( './available_plugins/timeout_plugin' );
 const EnvPlugin					= require( './available_plugins/env_plugin' );
 const RateLimitsPlugin			= require( './available_plugins/rate_limits_plugin' );
@@ -21,22 +21,22 @@ const RawBodyParser				= require( './../components/body_parsers/raw_body_parser'
 /**
  * @brief	Constants
  */
-const PluginManager				= new PluginManagerClass();
+const pluginManager		= new PluginManager();
 
-PluginManager.addPlugin( new TimeoutPlugin( 'er_timeout' ) );
-PluginManager.addPlugin( new EnvPlugin( 'er_env' ) );
-PluginManager.addPlugin( new RateLimitsPlugin( 'er_rate_limits' ) );
-PluginManager.addPlugin( new StaticResourcesPlugin( 'er_static_resources' ) );
-PluginManager.addPlugin( new DataServerPlugin( 'er_data_server' ) );
-PluginManager.addPlugin( new TemplatingEnginePlugin( 'er_templating_engine' ) );
-PluginManager.addPlugin( new FileStreamHandlerPlugin( 'er_file_stream' ) );
-PluginManager.addPlugin( new LoggerPlugin( 'er_logger' ) );
-PluginManager.addPlugin( new SessionPlugin( 'er_session' ) );
-PluginManager.addPlugin( new SecurityPlugin( 'er_security' ) );
-PluginManager.addPlugin( new ResponseCachePlugin( 'er_response_cache' )) ;
-PluginManager.addPlugin( new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' ) );
-PluginManager.addPlugin( new BodyParserPlugin( FormBodyParser, 'er_body_parser_form' ) );
-PluginManager.addPlugin( new BodyParserPlugin( MultipartDataParser, 'er_body_parser_multipart' ) );
-PluginManager.addPlugin( new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' ) );
+pluginManager.addPlugin( new TimeoutPlugin( 'er_timeout' ) );
+pluginManager.addPlugin( new EnvPlugin( 'er_env' ) );
+pluginManager.addPlugin( new RateLimitsPlugin( 'er_rate_limits' ) );
+pluginManager.addPlugin( new StaticResourcesPlugin( 'er_static_resources' ) );
+pluginManager.addPlugin( new DataServerPlugin( 'er_data_server' ) );
+pluginManager.addPlugin( new TemplatingEnginePlugin( 'er_templating_engine' ) );
+pluginManager.addPlugin( new FileStreamHandlerPlugin( 'er_file_stream' ) );
+pluginManager.addPlugin( new LoggerPlugin( 'er_logger' ) );
+pluginManager.addPlugin( new SessionPlugin( 'er_session' ) );
+pluginManager.addPlugin( new SecurityPlugin( 'er_security' ) );
+pluginManager.addPlugin( new ResponseCachePlugin( 'er_response_cache' )) ;
+pluginManager.addPlugin( new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' ) );
+pluginManager.addPlugin( new BodyParserPlugin( FormBodyParser, 'er_body_parser_form' ) );
+pluginManager.addPlugin( new BodyParserPlugin( MultipartDataParser, 'er_body_parser_multipart' ) );
+pluginManager.addPlugin( new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' ) );
 
-module.exports	= PluginManager;
+module.exports	= pluginManager;

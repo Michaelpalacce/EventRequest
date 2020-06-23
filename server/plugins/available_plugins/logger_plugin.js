@@ -19,7 +19,7 @@ class LoggerPlugin extends PluginInterface
 	/**
 	 * @brief	Attaches a process.dumpStack and process.log function for easier use
 	 *
-	 * @param	Server server
+	 * @param	server Server
 	 *
 	 * @return	void
 	 */
@@ -59,7 +59,7 @@ class LoggerPlugin extends PluginInterface
 	 *
 	 * @details	Events attached: error, finished, send, redirect, stop, setHeader, cleanUp, clearTimeout
 	 *
-	 * @param	EventRequest event
+	 * @param	event EventRequest
 	 *
 	 * @return	void
 	 */

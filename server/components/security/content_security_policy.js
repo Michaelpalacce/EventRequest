@@ -55,7 +55,7 @@ class ContentSecurityPolicy
 	/**
 	 * @brief	Parses the given options and sets the different directives in keys
 	 *
-	 * @param	Object options
+	 * @param	options Object
 	 *
 	 * @return	void
 	 */
@@ -126,7 +126,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	uri String
+	 * @param	mimeType String
 	 *
 	 * @return	void
 	 */

@@ -101,7 +101,7 @@ class HttpStrictTransportSecurity
 	/**
 	 * @brief	Enable or disable includeSubDomains
 	 *
-	 * @param	maxAge Number
+	 * @param	include Boolean
 	 *
 	 * @return	void
 	 */

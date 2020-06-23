@@ -126,7 +126,7 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Parses and sanitizes the config
 	 *
-	 * @param	Array config
+	 * @param	config Array
 	 *
 	 * @return	void
 	 */
@@ -196,7 +196,7 @@ class RateLimitsPlugin extends PluginInterface
 	 *
 	 * @details	Loads the config, attaches a process that will clear the IP based buckets if they are full once every 60 minutes
 	 *
-	 * @param	Server server
+	 * @param	server Server
 	 *
 	 * @return	void
 	 */
@@ -247,7 +247,7 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Checks whether the client's ip has reached the limit of requests
 	 *
-	 * @param	EventRequest eventRequest
+	 * @param	eventRequest EventRequest
 	 *
 	 * @return	void
 	 */
@@ -258,12 +258,12 @@ class RateLimitsPlugin extends PluginInterface
 			return;
 		}
 
-		eventRequest.rateLimited	= false;
-		eventRequest.rules			= this.rules;
+		eventRequest.rateLimited		= false;
+		eventRequest.erRateLimitRules	= this.rules;
 
 		eventRequest.on( 'cleanUp', ()=>{
-			eventRequest.rateLimited	= undefined;
-			eventRequest.rules			= undefined;
+			eventRequest.rateLimited		= undefined;
+			eventRequest.erRateLimitRules	= undefined;
 		} );
 
 		const path							= eventRequest.path;
@@ -380,8 +380,8 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Sends a 429 response
 	 *
-	 * @param	EventRequest eventRequest
-	 * @param	Number retryAfterTime
+	 * @param	eventRequest EventRequest
+	 * @param	retryAfterTime Number
 	 *
 	 * @return	void
 	 */

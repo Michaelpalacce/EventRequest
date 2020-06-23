@@ -2829,7 +2829,7 @@ test({
 		app.get( `/${name}`, ( event )=>{
 			try
 			{
-				assert.notEqual( Object.keys( event.rules[4].buckets )[0], `/${name}` );
+				assert.notEqual( Object.keys( event.erRateLimitRules[4].buckets )[0], `/${name}` );
 			}
 			catch ( e )
 			{

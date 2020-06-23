@@ -8,8 +8,8 @@ class TemplatingEngine
 	/**
 	 * @brief	Return the HTML directly
 	 *
-	 * @param	String html
-	 * @param	Object variables
+	 * @param	html String
+	 * @param	variables Object
 	 *
 	 * @returns	String
 	 */

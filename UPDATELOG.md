@@ -1,3 +1,8 @@
+18.3.0
+- Changed the way that loggur passes data so it's no longer his job to verify the arguments of the log function.
+- Documentation arguments changes for my sake
+- Changed the rate limits plugin rules key that was attached to erRateLimitRules
+
 18.2.0
 - Code cleanup for the router route adding
 - Small changes to validation. The type of the input will be changed to the appropriate type now

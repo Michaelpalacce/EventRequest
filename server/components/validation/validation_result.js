@@ -17,7 +17,7 @@ class ValidationResult
 	/**
 	 * @brief	Adds attributes to the validation result
 	 *
-	 * @param	ValidationAttribute attribute
+	 * @param	attribute ValidationAttribute
 	 *
 	 * @return	void
 	 */

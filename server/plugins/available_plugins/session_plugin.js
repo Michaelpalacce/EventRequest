@@ -28,7 +28,7 @@ class SessionPlugin extends PluginInterface
 	/**
 	 * @brief	creates the namespace when attaching to the server
 	 *
-	 * @param	Server server
+	 * @param	server Server
 	 *
 	 * @return	void
 	 */

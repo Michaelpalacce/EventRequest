@@ -113,7 +113,7 @@ class Tester
 	/**
 	 * @brief	Formats the given test object by adding needed internal fields
 	 *
-	 * @param	Object test
+	 * @param	test Object
 	 *
 	 * @return	Array
 	 */
@@ -179,7 +179,7 @@ class Tester
 	/**
 	 * @brief	Adds the given test to the queue
 	 *
-	 * @param	Object test
+	 * @param	test Object
 	 *
 	 * @return	void
 	 */
@@ -205,8 +205,8 @@ class Tester
 	/**
 	 * @brief	Called if there is an error in the test
 	 *
-	 * @param	Object test
-	 * @param	mixed err
+	 * @param	test Object
+	 * @param	error mixed
 	 */
 	errorCallback( test, error )
 	{
@@ -253,7 +253,7 @@ class Tester
 		logPromises.push( this.consoleLogger.warning( `There were ${this.incomplete.length} incomplete tests` ) );
 
 		// Done so logging can occur by adding this to the end of the event loop
-		setImmediate(()=>{
+		Promise.all( logPromises ).then(()=>{
 			this.callback( this.errors.length > 0 ? 'Errors while testing' : false );
 		});
 	};
@@ -261,8 +261,8 @@ class Tester
 	/**
 	 * @brief	Called by the done function of the tests
 	 *
-	 * @param	Object test
-	 * @param	mixed err
+	 * @param	test Object
+	 * @param	err mixed
 	 *
 	 * @return	void
 	 */
@@ -271,7 +271,6 @@ class Tester
 		if ( this.hasFinished || this.stop )
 		{
 			throw new Error( 'Done called after finishing up. There could be a potential error!' );
-			return;
 		}
 
 		if ( err )
@@ -289,7 +288,7 @@ class Tester
 	/**
 	 * @brief	Checks the given test's status and determines what should happen
 	 *
-	 * @param	Object test
+	 * @param	test Object
 	 *
 	 * @return	Boolean
 	 */
@@ -381,7 +380,7 @@ class Tester
 	 *
 	 * @details	This will produce an output directly to the console of the user
 	 *
-	 * @param	Object options
+	 * @param	options Object
 	 *
 	 * @return	void
 	 */

@@ -25,8 +25,8 @@ class Router extends PluginInterface
 	/**
 	 * @brief	Defines a middleware to be used globally
 	 *
-	 * @param	String middlewareName
-	 * @param	Function middleware
+	 * @param	middlewareName String
+	 * @param	middleware Function
 	 *
 	 * @return	Router
 	 */
@@ -48,7 +48,7 @@ class Router extends PluginInterface
 	/**
 	 * @brief	Attaches methods to the server on runtime
 	 *
-	 * @param	Server server
+	 * @param	server Server
 	 *
 	 * @return	void
 	 */
@@ -59,7 +59,7 @@ class Router extends PluginInterface
 		/**
 		 * @brief	Function that adds a middleware to the block chain of the router
 		 *
-		 * @param	Object|Router|Function route
+		 * @param	route Object|Router|Function
 		 *
 		 * @returns	Server
 		 */
@@ -217,7 +217,7 @@ class Router extends PluginInterface
 	/**
 	 * @brief	This will process the request and return the appropriate block chain
 	 *
-	 * @param	EventRequest event
+	 * @param	event EventRequest
 	 *
 	 * @return	Array
 	 */
@@ -262,25 +262,21 @@ class Router extends PluginInterface
 	/**
 	 * @brief	Exported for local instances
 	 *
-	 * @param	Array args
-	 *
 	 * @return	Boolean
 	 */
-	matchMethod( ...args )
+	matchMethod()
 	{
-		return Router.matchMethod.apply( Router, args );
+		return Router.matchMethod.apply( Router, arguments );
 	}
 
 	/**
 	 * @brief	Exported for local instances
 	 *
-	 * @param	Array args
-	 *
 	 * @return	Boolean
 	 */
-	matchRoute( ...args )
+	matchRoute()
 	{
-		return Router.matchRoute.apply( Router, args );
+		return Router.matchRoute.apply( Router, arguments );
 	}
 
 	/**
@@ -288,8 +284,8 @@ class Router extends PluginInterface
 	 *
 	 * @details	If a string or an array is passed, then it will be converted to a Route
 	 *
-	 * @param	String requestedMethod
-	 * @param	Route|Array|String method
+	 * @param	requestedMethod String
+	 * @param	method Route|Array|String
 	 *
 	 * @return	Boolean
 	 */
@@ -321,9 +317,9 @@ class Router extends PluginInterface
 	 *
 	 * @details	Returns bool if there was a successful match
 	 *
-	 * @param	String requestedRoute
-	 * @param	String|RegExp|Route eventPath
-	 * @param	Array matchedParams
+	 * @param	requestedRoute String
+	 * @param	route String|RegExp|Route
+	 * @param	matchedParams Array
 	 *
 	 * @return	Boolean
 	 */
