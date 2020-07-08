@@ -43,7 +43,7 @@ class JsonBodyParser extends EventEmitter
 	 */
 	supports( event )
 	{
-		const contentType	= event.getHeader( CONTENT_TYPE_HEADER );
+		const contentType	= event.getRequestHeader( CONTENT_TYPE_HEADER );
 		return typeof contentType === 'string' && contentType.match( JSON_BODY_PARSER_SUPPORTED_TYPE ) !== null
 	}
 

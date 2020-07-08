@@ -68,25 +68,25 @@ class AudioFileStream
 		let stream		= null;
 		const stat		= fs.statSync( file );
 		const fileSize	= stat.size;
-		const range		= event.getHeader( 'range' );
+		const range		= event.getRequestHeader( 'range' );
 
-		event.setHeader( 'Content-Type', `audio/${path.parse( file ).ext.substring( 1 )}` );
+		event.setResponseHeader( 'Content-Type', `audio/${path.parse( file ).ext.substring( 1 )}` );
 		if ( range )
 		{
 			const parts	= range.replace( /bytes=/, "" ).split( "-" );
 			const start	= parseInt( parts[0], 10 );
 			const end	= parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
-			event.setHeader( 'Content-Range', `bytes ${start}-${end}/${fileSize}` );
-			event.setHeader( 'Accept-Ranges', 'bytes' );
-			event.setHeader( 'Content-Length', ( end - start ) + 1 );
+			event.setResponseHeader( 'Content-Range', `bytes ${start}-${end}/${fileSize}` );
+			event.setResponseHeader( 'Accept-Ranges', 'bytes' );
+			event.setResponseHeader( 'Content-Length', ( end - start ) + 1 );
 			event.setStatusCode( 206 );
 
 			stream	= fs.createReadStream( file, { start, end } );
 		}
 		else
 		{
-			event.setHeader( 'Content-Length', fileSize );
+			event.setResponseHeader( 'Content-Length', fileSize );
 			event.setStatusCode( 200 );
 
 			stream	= fs.createReadStream( file );

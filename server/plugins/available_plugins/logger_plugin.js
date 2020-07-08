@@ -57,7 +57,7 @@ class LoggerPlugin extends PluginInterface
 	/**
 	 * @brief	Attaches events to the event request
 	 *
-	 * @details	Events attached: error, finished, send, redirect, stop, setHeader, cleanUp, clearTimeout
+	 * @details	Events attached: error, finished, send, redirect, stop, setResponseHeader, cleanUp, clearTimeout
 	 *
 	 * @param	event EventRequest
 	 *
@@ -102,7 +102,7 @@ class LoggerPlugin extends PluginInterface
 			logger.verbose( 'Event stopped' )
 		});
 
-		event.on( 'setHeader', ( header ) =>{
+		event.on( 'setResponseHeader', ( header ) =>{
 			logger.verbose( `Header set: ${header.key} with value: ${header.value}` )
 		});
 

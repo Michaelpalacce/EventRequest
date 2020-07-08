@@ -51,9 +51,9 @@ class SecurityPlugin extends PluginInterface
 					const headerString	= module.build();
 
 					if ( headerString !== '' )
-						event.setHeader( headerName, headerString );
+						event.setResponseHeader( headerName, headerString );
 					else
-						event.removeHeader( headerName );
+						event.removeResponseHeader( headerName );
 				}
 			};
 

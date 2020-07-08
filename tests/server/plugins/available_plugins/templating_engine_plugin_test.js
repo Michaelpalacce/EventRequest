@@ -33,7 +33,7 @@ test({
 		});
 
 		eventRequest._mock({
-			method			: 'setHeader',
+			method			: 'setResponseHeader',
 			shouldReturn	: ()=>{
 				setHeaderCalled	++;
 			},

@@ -60,7 +60,7 @@ class EventRequest extends EventEmitter
 			self._next.apply( self, args );
 		};
 
-		this.setHeader( X_POWERED_BY_HEADER, X_POWERED_BY_HEADER_VALUE );
+		this.setResponseHeader( X_POWERED_BY_HEADER, X_POWERED_BY_HEADER_VALUE );
 	}
 
 	/**
@@ -142,7 +142,7 @@ class EventRequest extends EventEmitter
 
 		cookies.push( cookie );
 
-		this.setHeader( cookieHeaderName, cookies );
+		this.setResponseHeader( cookieHeaderName, cookies );
 		return true;
 	}
 
@@ -229,9 +229,9 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	setHeader( key, value )
+	setResponseHeader( key, value )
 	{
-		this.emit( 'setHeader', { key, value } );
+		this.emit( 'setResponseHeader', { key, value } );
 
 		if ( ! this.isFinished() )
 		{
@@ -250,9 +250,9 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	removeHeader( key )
+	removeResponseHeader( key )
 	{
-		this.emit( 'removeHeader', { key } );
+		this.emit( 'removeResponseHeader', { key } );
 
 		if ( ! this.isFinished() )
 		{
@@ -274,11 +274,11 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	mixed
 	 */
-	getHeader( key, defaultValue = null )
+	getRequestHeader( key, defaultValue = null )
 	{
 		key	= key.toLowerCase();
 
-		return ! this.hasHeader( key ) ? defaultValue : this.headers[key];
+		return ! this.hasRequestHeader( key ) ? defaultValue : this.headers[key];
 	}
 
 	/**
@@ -298,7 +298,7 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	Boolean
 	 */
-	hasHeader( key )
+	hasRequestHeader( key )
 	{
 		return typeof this.headers[key.toLowerCase()] !== 'undefined';
 	}
@@ -328,7 +328,7 @@ class EventRequest extends EventEmitter
 
 		if ( ! this.isFinished() )
 		{
-			this.setHeader( 'Location', redirectUrl );
+			this.setResponseHeader( 'Location', redirectUrl );
 			this.send( { redirectUrl }, statusCode );
 		}
 		else

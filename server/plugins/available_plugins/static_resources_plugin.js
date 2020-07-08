@@ -56,7 +56,7 @@ class StaticResourcesPlugin extends PluginInterface
 								break;
 						}
 
-						event.setHeader( 'Content-Type', mimeType );
+						event.setResponseHeader( 'Content-Type', mimeType );
 
 						event.send( fs.createReadStream( item ), 200 );
 					}

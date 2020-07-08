@@ -8,8 +8,8 @@ A highly customizable backend server in NodeJs
 # Setup
 ~~~javascript
 // Framework Singleton instance
-const app			= require( 'event_request' )();
-const { Loggur }	= require( 'event_request' );
+const app = require( 'event_request' )();
+const { Loggur } = require( 'event_request' );
 
 // Add a new Route
 app.get( '/', ( event ) => {
@@ -25,24 +25,24 @@ app.listen( 80, ()=>{
 The framework has a web server Singleton instance that you can fetch from anywhere using:
 ~~~javascript
 // First way
-const app		= require( 'event_request' )();
+const app = require( 'event_request' )();
 
 // Second way ( you can use this when you want to fetch multiple things from the framework )
-const { App }	= require( 'event_request' );
-const app		= App();
+const { App } = require( 'event_request' );
+const app = App();
 ~~~
 
 # Multiple Servers Setup:
 ~~~javascript
-const { Server, Loggur }	= require( 'event_request' );
+const { Server, Loggur } = require( 'event_request' );
 
 /**
  * @brief	Instantiate the server
  */
 // With this setup you'll have to work only with the variables appOne and appTwo. You cannot call Server() to get any of them in different parts of the project
 // This can be remedied a bit by creating routers in different controllers and then exporting them to be later on added 
-const appOne	= new Server();
-const appTwo	= new Server();
+const appOne = new Server();
+const appTwo = new Server();
 
 
 // Add a new Route
@@ -65,9 +65,9 @@ appTwo.listen( 3335, ()=>{
 
 # Custom http Server setup:
 ~~~javascript
-const http		= require( 'http' );
-const Server	= require( 'event_request' );
-const app		= http.createServer( Server().attach() );
+const http = require( 'http' );
+const Server = require( 'event_request' );
+const app = http.createServer( Server().attach() );
 
 // No problem adding routes like this
 Server().get( '/',( event )=>{
@@ -519,14 +519,14 @@ The event request is an object that is created by the server and passed through 
 - Emits a 'send' event and calls cleanUp
 - The event will be emitted with a response if the response was a string or the isRaw flag was set to false 
 
-**setHeader( String key, mixed value ): void** 
+**setResponseHeader( String key, mixed value ): void** 
 - Sets a new header to the response.
-- Emits a 'setHeader' event. 
+- Emits a 'setResponseHeader' event. 
 - If the response is finished then an error will be set to the next middleware
 
-**removeHeader( String key ): void** 
+**removeResponseHeader( String key ): void** 
 - Removes an existing header from to the response.
-- Emits a 'removeHeader' event. 
+- Emits a 'removeResponseHeader' event. 
 - If the response is finished then an error will be set to the next middleware
 
 **redirect( String redirectUrl, Number statusCode = 302 ): void** 
@@ -535,11 +535,11 @@ The event request is an object that is created by the server and passed through 
 - Emits a 'redirect' event. 
 - If the response is finished then an error will be set to the next middleware
 
-**getHeader( String key, mixed defaultValue = null ): mixed** 
+**getRequestHeader( String key, mixed defaultValue = null ): mixed** 
 - Retrieves a header ( if exists ) from the request. 
 - If it doesn't exist the defaultValue will be taken
 
-**hasHeader( String key ): Boolean** 
+**hasRequestHeader( String key ): Boolean** 
 - Checks if a header exists in the request
 
 **isFinished(): Boolean** 
@@ -584,7 +584,7 @@ The event request is an object that is created by the server and passed through 
   -  **headers: Object**
      - The headers that were sent
 
-**setHeader( Object headerData )** 
+**setResponseHeader( Object headerData )** 
 - Emitted when a new header was added to the response
 - headerData contains:
   -  **key: String** 
@@ -593,7 +593,7 @@ The event request is an object that is created by the server and passed through 
   -  **value: mixed** 
      - The header value
 
-**removeHeader( Object headerData )** 
+**removeResponseHeader( Object headerData )** 
 - Emitted when a header was removed
 - headerData contains:
   -  **key: String** 
@@ -2595,7 +2595,7 @@ Adds a response caching mechanism.
 ***
 ####Attached Functionality:
 
-**cache.request: Middleware**
+Middleware: **cache.request**
 - Can be added to any request as a global middleware and that request will be cached if possible
 
 **event.cacheCurrentRequest(): Promise**
@@ -2727,6 +2727,7 @@ app.listen( 80 );
 - The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
 - The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
 - If one exists, then the existing one's configuration will be taken. 
+- Instead of passing fileLocation you can pass the rules directly as an array
 - If you provide the same dataStore to two servers they should work without an issue
 - If you don't provide a dataStore, then the er_data_server data store will be used. If that plugin is not set, then the default bucket one will be used
 
@@ -2740,11 +2741,19 @@ app.listen( 80 );
 
 **fileLocation**
 - The absolute path to the rate limits json file.
+- The rules will be validated.
 - Defaults to ROOT DIR / rate_limits.json
 
 **dataStore**
 - The dataStore to use for the buckets
 - Defaults to the LeakyBucket default DataStore
+
+**rules**
+- Optional parameter that if passed will have more weight than the rate_limits.json file.
+- If this is passed the file will never be created/loaded
+- The structure of this option must be the same as the one in the rate_limits.json file.
+- The rules will be validated.
+- Defaults to empty
 
 ***
 ####Events:
@@ -2865,6 +2874,56 @@ const RateLimitsPlugin	= require( 'event_request/server/plugins/available_plugin
 const DataServer		= require( 'event_request/server/components/caching/data_server' );
 
 app.apply( app.er_rate_limits );
+
+// If you implement a custom distributed DataServer you can sync between servers
+// Two servers
+const dataStore	= new DataServer( { persist: false, ttl: 90000 } );
+
+const appOne	= new Server();
+const appTwo	= new Server();
+
+appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
+appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
+~~~
+
+- Adding with rules directly:
+~~~javascript
+/**
+ * @brief	Instantiate the server
+ */
+const app				= require( 'event_request' )();
+const { Server }		= require( 'event_request' );
+const RateLimitsPlugin	= require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
+const DataServer		= require( 'event_request/server/components/caching/data_server' );
+
+const rules = [
+  {
+    "path": "",
+    "methods": [],
+    "maxAmount": 10000,
+    "refillTime": 10,
+    "refillAmount": 1000,
+    "policy": "connection_delay",
+    "delayTime": 3,
+    "delayRetries": 5,
+    "stopPropagation": false,
+    "ipLimit": false
+  },
+  {
+    "path": "/test",
+    "methods": [],
+    "maxAmount": 10000,
+    "refillTime": 10,
+    "refillAmount": 1000,
+    "policy": "connection_delay",
+    "delayTime": 3,
+    "delayRetries": 5,
+    "stopPropagation": false,
+    "ipLimit": false
+  },
+];
+
+app.apply( app.er_rate_limits, { rules } );
 
 // If you implement a custom distributed DataServer you can sync between servers
 // Two servers

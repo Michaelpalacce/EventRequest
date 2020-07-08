@@ -308,30 +308,30 @@ test({
 });
 
 test({
-	message	: 'EventRequest setHeader emits a setHeader event',
+	message	: 'EventRequest setResponseHeader emits a setResponseHeader event',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		let setHeader		= false;
+		let setResponseHeader		= false;
 
-		eventRequest.on( 'setHeader', ()=>{ setHeader = true; });
+		eventRequest.on( 'setResponseHeader', ()=>{ setResponseHeader = true; });
 
-		eventRequest.setHeader( 'key', 'value' );
+		eventRequest.setResponseHeader( 'key', 'value' );
 
-		setHeader	? done() : done( 'EventRequest setHeader event not emitted' );
+		setResponseHeader	? done() : done( 'EventRequest setResponseHeader event not emitted' );
 	}
 });
 
 test({
-	message	: 'EventRequest removeHeader emits a removeHeader event',
+	message	: 'EventRequest removeResponseHeader emits a removeResponseHeader event',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let removeHeader	= false;
 
-		eventRequest.on( 'removeHeader', ()=>{ removeHeader = true; });
+		eventRequest.on( 'removeResponseHeader', ()=>{ removeHeader = true; });
 
-		eventRequest.removeHeader( 'key' );
+		eventRequest.removeResponseHeader( 'key' );
 
-		removeHeader	? done() : done( 'EventRequest removeHeader event not emitted' );
+		removeHeader	? done() : done( 'EventRequest removeResponseHeader event not emitted' );
 	}
 });
 
@@ -350,7 +350,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest setHeader sets the header in the response if response is not sent',
+	message	: 'EventRequest setResponseHeader sets the header in the response if response is not sent',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		assert.equal( eventRequest.isFinished(), false );
@@ -363,13 +363,13 @@ test({
 			with			: [['key', 'value']]
 		});
 
-		eventRequest.setHeader( 'key', 'value' );
+		eventRequest.setResponseHeader( 'key', 'value' );
 		setHeader	? done() : done( 'EventRequest setHeader did not call response.setHeader' );
 	}
 });
 
 test({
-	message	: 'EventRequest removeHeader removes the header in the response if response is not sent',
+	message	: 'EventRequest removeResponseHeader removes the header in the response if response is not sent',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		assert.equal( eventRequest.isFinished(), false );
@@ -382,13 +382,13 @@ test({
 			with			: [['key']]
 		});
 
-		eventRequest.removeHeader( 'key' );
-		removeHeader	? done() : done( 'EventRequest removeHeader did not call response.removeHeader' );
+		eventRequest.removeResponseHeader( 'key' );
+		removeHeader	? done() : done( 'EventRequest removeResponseHeader did not call response.removeHeader' );
 	}
 });
 
 test({
-	message	: 'EventRequest setHeader does not set header when event is finished and throws error',
+	message	: 'EventRequest setResponseHeader does not set header when event is finished and throws error',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let errorHandler	= new MockedErrorHandler();
@@ -417,13 +417,13 @@ test({
 			called			: 1
 		});
 
-		eventRequest.setHeader( 'key', 'value' );
+		eventRequest.setResponseHeader( 'key', 'value' );
 		errorCalled	? done() : done( 'Error was not called' );
 	}
 });
 
 test({
-	message	: 'EventRequest removeHeader does not remove header when event is finished and throws error',
+	message	: 'EventRequest removeResponseHeader does not remove header when event is finished and throws error',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let errorHandler	= new MockedErrorHandler();
@@ -434,7 +434,7 @@ test({
 		eventRequest.response._mock({
 			method			: 'removeHeader',
 			shouldReturn	: ()=>{
-				throw new Error( 'EventRequest removeHeader should not have called response.removeHeader' );
+				throw new Error( 'EventRequest removeResponseHeader should not have called response.removeHeader' );
 			}
 		});
 
@@ -452,7 +452,7 @@ test({
 			called			: 1
 		});
 
-		eventRequest.removeHeader( 'key' );
+		eventRequest.removeResponseHeader( 'key' );
 		errorCalled	? done() : done( 'Error was not called' );
 	}
 });
@@ -481,19 +481,19 @@ test({
 	message	: 'EventRequest.redirect sets header',
 	test	: ( done ) =>{
 		let eventRequest	= helpers.getEventRequest();
-		let setHeader		= false;
+		let setResponseHeader		= false;
 		let redirectUrl		= '/test';
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
-			shouldReturn	: ()=>{ setHeader = true; },
+			shouldReturn	: ()=>{ setResponseHeader = true; },
 			with			: [['Location', redirectUrl]],
 			called			: 1
 		});
 
 		eventRequest.redirect( redirectUrl, 302 );
 
-		setHeader ? done() : done( 'Redirect does not set header' );
+		setResponseHeader ? done() : done( 'Redirect does not set header' );
 	}
 });
 
@@ -762,7 +762,7 @@ test({
 		let cookieSet			= '';
 
 		eventRequest._mock({
-			method			: 'setHeader',
+			method			: 'setResponseHeader',
 			shouldReturn	: ( headerName, cookie )=>{
 				wasCalled	= true;
 				cookieSet	= cookie[0];
@@ -782,71 +782,71 @@ test({
 });
 
 test({
-	message	: 'EventRequest.getHeader should return header',
+	message	: 'EventRequest.getRequestHeader should return header',
 	test	: ( done )=>{
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
 		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
 
-		assert.equal( eventRequest.getHeader( headerName ), headerValue );
+		assert.equal( eventRequest.getRequestHeader( headerName ), headerValue );
 
 		done();
 	}
 });
 
 test({
-	message	: 'EventRequest.getHeader should return header regardless of case',
+	message	: 'EventRequest.getRequestHeader should return header regardless of case',
 	test	: ( done )=>{
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
 		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
 
-		assert.equal( eventRequest.getHeader( headerName.toUpperCase() ), headerValue );
-		assert.equal( eventRequest.getHeader( headerName.toLowerCase() ), headerValue );
+		assert.equal( eventRequest.getRequestHeader( headerName.toUpperCase() ), headerValue );
+		assert.equal( eventRequest.getRequestHeader( headerName.toLowerCase() ), headerValue );
 
 		done();
 	}
 });
 
 test({
-	message	: 'EventRequest.getHeader should return default if header is not set',
+	message	: 'EventRequest.getRequestHeader should return default if header is not set',
 	test	: ( done )=>{
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
 		const eventRequest	= helpers.getEventRequest();
 
-		assert.equal( eventRequest.getHeader( headerName ), null );
-		assert.equal( eventRequest.getHeader( headerName, headerValue ), headerValue );
+		assert.equal( eventRequest.getRequestHeader( headerName ), null );
+		assert.equal( eventRequest.getRequestHeader( headerName, headerValue ), headerValue );
 
 		done();
 	}
 });
 
 test({
-	message	: 'EventRequest.hasHeader returns false if header does not exist',
+	message	: 'EventRequest.hasRequestHeader returns false if header does not exist',
 	test	: ( done )=>{
 		const headerName	= 'test';
 
 		const eventRequest	= helpers.getEventRequest();
 
-		assert.equal( eventRequest.hasHeader( headerName ), false );
+		assert.equal( eventRequest.hasRequestHeader( headerName ), false );
 
 		done();
 	}
 });
 
 test({
-	message	: 'EventRequest.hasHeader returns true if header exists',
+	message	: 'EventRequest.hasRequestHeader returns true if header exists',
 	test	: ( done )=>{
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
 		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
 
-		assert.equal( eventRequest.hasHeader( headerName ), true );
+		assert.equal( eventRequest.hasRequestHeader( headerName ), true );
 
 		done();
 	}

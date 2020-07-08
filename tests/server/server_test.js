@@ -934,7 +934,7 @@ test({
 			method	: 'GET',
 			route	: '/testGETCaseInsensitive',
 			handler	: ( event )=>{
-				event.setHeader( headerName, headerValue );
+				event.setResponseHeader( headerName, headerValue );
 				event.next();
 			}
 		});
@@ -963,7 +963,7 @@ test({
 		const headerValue	= 'value';
 
 		app.define( 'testGETWithMiddlewaresMiddleware', ( event )=>{
-			event.setHeader( headerName, headerValue );
+			event.setResponseHeader( headerName, headerValue );
 			event.next();
 		} );
 
@@ -991,12 +991,12 @@ test({
 		const headerValueTwo	= 'valueTwo';
 
 		app.define( 'testGETWithMultipleMiddlewaresMiddlewareOne', ( event )=>{
-			event.setHeader( headerName, headerValue );
+			event.setResponseHeader( headerName, headerValue );
 			event.next();
 		} );
 
 		app.define( 'testGETWithMultipleMiddlewaresMiddlewareTwo', ( event )=>{
-			event.setHeader( headerNameTwo, headerValueTwo );
+			event.setResponseHeader( headerNameTwo, headerValueTwo );
 			event.next();
 		} );
 
@@ -1021,7 +1021,7 @@ test({
 		const headerValue	= 'valueOne';
 
 		app.add(( event )=>{
-			event.setHeader( headerName, headerValue );
+			event.setResponseHeader( headerName, headerValue );
 			event.next();
 		});
 
@@ -1045,16 +1045,16 @@ test({
 		const headerValue	= 'valueOne';
 
 		app.get( `/${name}`, ( event )=>{
-			event.setHeader( 'testHeader', headerValue );
-			event.setHeader( 'shouldNotExist', headerValue );
-			event.removeHeader( 'shouldNotExist' );
+			event.setResponseHeader( 'testHeader', headerValue );
+			event.setResponseHeader( 'shouldNotExist', headerValue );
+			event.removeResponseHeader( 'shouldNotExist' );
 
 			if (
-				event.hasHeader( headerName )
-				&& event.getHeader( headerName ) === headerValue
-				&& event.hasHeader( 'missing' ) === false
-				&& event.getHeader( 'missing' ) === null
-				&& event.getHeader( 'missing', 'default' ) === 'default'
+				event.hasRequestHeader( headerName )
+				&& event.getRequestHeader( headerName ) === headerValue
+				&& event.hasRequestHeader( 'missing' ) === false
+				&& event.getRequestHeader( 'missing' ) === null
+				&& event.getRequestHeader( 'missing', 'default' ) === 'default'
 				&& event.response.getHeader( 'testHeader' ) === headerValue
 			) {
 				return event.send( name );
@@ -2454,7 +2454,48 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits bucket works cross apps',
+	message	: 'Server.test er_rate_limits with rules in an array instead of json',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithRulesInAnArray';
+
+		const app			= new Server();
+		const server		= http.createServer( app.attach() );
+
+		const rule			= {
+			"path":name,
+			"methods":['GET'],
+			"maxAmount":1,
+			"refillTime":100,
+			"refillAmount":1,
+			"policy": 'strict',
+			"delayTime": 3,
+			"delayRetries": 5,
+			"stopPropagation": false,
+			"ipLimit": false
+		};
+
+		app.apply( app.er_rate_limits, { rules: [rule] } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.send( name );
+		} );
+
+		server.listen( 4001, ()=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
+				return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 );
+			}).then(( response )=>{
+				setTimeout(()=>{
+					server.close();
+					assert.equal( response.body.toString(), name );
+					done();
+				}, 200 );
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits bucket works cross apps',
 	test	: ( done )=>{
 		const dataStore	= new DataServer( { persist: false, ttl: 90000 } );
 
@@ -2490,7 +2531,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with permissive limiting',
+	message	: 'Server.test.er_rate_limits.with.permissive.limiting',
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithPermissiveLimiting';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -2524,7 +2565,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with permissive limiting refills',
+	message	: 'Server.test.er_rate_limits.with.permissive.limiting.refills',
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithPermissiveLimitingRefills';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -2818,7 +2859,7 @@ test({
 });
 
 test({
-	message	: 'Server.tester_rate_limits with strict policy with ip Limit',
+	message	: 'Server.tester_rate_limits.with.strict.policy.with.ip.limit',
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithStrictPolicyWithIpLimit';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -2829,7 +2870,10 @@ test({
 		app.get( `/${name}`, ( event )=>{
 			try
 			{
-				assert.notEqual( Object.keys( event.erRateLimitRules[4].buckets )[0], `/${name}` );
+				assert.notEqual(
+					app.getPlugin( app.er_rate_limits ).dataStore.server['$LB:/testErRateLimitsWithStrictPolicyWithIpLimitstrict::ffff:127.0.0.1//value'],
+					`/${name}` )
+				;
 			}
 			catch ( e )
 			{
@@ -2943,7 +2987,7 @@ test({
 			else
 			{
 				assert.equal( session.get( 'authenticated' ), true );
-				event.setHeader( 'authenticated', 1 );
+				event.setResponseHeader( 'authenticated', 1 );
 			}
 
 			event.send( name );

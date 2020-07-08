@@ -150,7 +150,7 @@ class ResponseCachePlugin extends PluginInterface
 						headersKeys.forEach(( headerKey )=>{
 							const headerValue	= headers[headerKey];
 
-							event.setHeader( headerKey, headerValue );
+							event.setResponseHeader( headerKey, headerValue );
 						});
 
 						event.emit( 'cachedResponse' );

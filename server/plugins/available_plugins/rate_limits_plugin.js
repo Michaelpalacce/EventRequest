@@ -48,10 +48,12 @@ const CONNECTION_DELAY_POLICY			= 'connection_delay';
 const STRICT_POLICY						= 'strict';
 
 const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
-const DEFAULT_FILE_LOCATION				= path.join( PROJECT_ROOT, 'rate_limits.json' );
+
 const OPTIONS_FILE_PATH					= 'fileLocation';
 const OPTIONS_DATA_STORE				= 'dataStore';
-// Let the buckets use their default one
+const OPTIONS_RULES						= 'rules';
+
+const DEFAULT_FILE_LOCATION				= path.join( PROJECT_ROOT, 'rate_limits.json' );
 const DEFAULT_DATA_STORE				= null;
 const DEFAULT_RULE						= {
 	"path":"",
@@ -84,7 +86,11 @@ class RateLimitsPlugin extends PluginInterface
 	setOptions( options )
 	{
 		super.setOptions( options );
-		this.rules			= [];
+
+		this.rules			= Array.isArray( options[OPTIONS_RULES] )
+							? options[OPTIONS_RULES]
+							: [];
+
 		this.fileLocation	= typeof options[OPTIONS_FILE_PATH] === 'string'
 							? options[OPTIONS_FILE_PATH]
 							: DEFAULT_FILE_LOCATION;
@@ -101,26 +107,31 @@ class RateLimitsPlugin extends PluginInterface
 	 */
 	loadConfig()
 	{
-		if ( ! fs.existsSync( this.fileLocation ) )
+		let config	= [DEFAULT_RULE];
+
+		if ( this.rules.length !== 0 )
+		{
+			config	= this.rules;
+		}
+		else if ( ! fs.existsSync( this.fileLocation ) )
 		{
 			const writeStream	= fs.createWriteStream( this.fileLocation );
 			const config		= [DEFAULT_RULE];
 
 			writeStream.write( JSON.stringify( config ) );
 			writeStream.end();
-			this.sanitizeConfig( config )
 		}
 		else
 		{
 			const buffer	= fs.readFileSync( this.fileLocation );
-			let config		= '[]';
+			config		= '[]';
 			try
 			{
 				config	= JSON.parse( buffer.toString( 'utf-8' ) || '[]' );
 			} catch ( e ) {}
-
-			this.sanitizeConfig( config );
 		}
+
+		this.sanitizeConfig( config );
 	}
 
 	/**
@@ -145,8 +156,6 @@ class RateLimitsPlugin extends PluginInterface
 				&& typeof options['ipLimit'] === 'boolean'
 			) {
 				const policy	= options['policy'];
-				const ipLimit	= options['ipLimit'];
-				const path		= options['path'];
 
 				if (
 					policy === CONNECTION_DELAY_POLICY
@@ -155,19 +164,14 @@ class RateLimitsPlugin extends PluginInterface
 				) {
 					throw new Error( `Rate limit with ${CONNECTION_DELAY_POLICY} must have delayTime set` );
 				}
-
-				const bucketName	= `${Bucket.DEFAULT_PREFIX}${path}`;
-				const buckets		= ipLimit === true
-									? {}
-									: { [bucketName]: await this.getNewBucketFromOptions( bucketName, options ) };
-
-				this.rules.push( { buckets, options } );
 			}
 			else
 			{
 				throw new Error( 'Invalid rate limit options set: ' + JSON.stringify( options ) );
 			}
 		});
+
+		this.rules	= config;
 	}
 
 	/**
@@ -184,7 +188,7 @@ class RateLimitsPlugin extends PluginInterface
 		const refillTime	= options['refillTime'];
 		const refillAmount	= options['refillAmount'];
 
-		const bucket		= new Bucket( refillAmount, refillTime, maxAmount , null, key, this.dataStore );
+		const bucket		= new Bucket( refillAmount, refillTime, maxAmount, null, key, this.dataStore );
 
 		await bucket.init();
 
@@ -204,32 +208,19 @@ class RateLimitsPlugin extends PluginInterface
 	{
 		this.loadConfig();
 
-		if ( this.dataStore === null && server.hasPlugin( 'er_data_server' ) )
+		if ( this.dataStore === null )
 		{
-			this.dataStore	= server.getPlugin( 'er_data_server' ).getServer();
-		}
-
-		setInterval( async ()=>{
-			for ( let i = 0; i < this.rules.length; ++ i )
+			if ( server.hasPlugin( 'er_data_server' ) )
 			{
-				const options	= this.rules[i]['options'];
-
-				if ( options['ipLimit'] === true )
-				{
-					const buckets	= this.rules[i]['buckets'];
-
-					for ( let path in buckets )
-					{
-						let bucket	= buckets[path];
-
-						if ( bucket instanceof Bucket && await bucket.isFull() )
-						{
-							delete this.rules[i]['buckets'][path];
-						}
-					}
-				}
+				this.dataStore	= server.getPlugin( 'er_data_server' ).getServer();
+				return;
 			}
-		}, 60 * 60 * 1000 );
+
+			this.dataStore	= new DataServer({
+				ttl		: -1,
+				persist	: false
+			});
+		}
 	}
 
 	/**
@@ -276,40 +267,31 @@ class RateLimitsPlugin extends PluginInterface
 
 		for ( let i = 0; i < this.rules.length; ++ i )
 		{
-			const options		= this.rules[i]['options'];
-			const ruleMethod	= options['methods'];
-			const rulePath		= options['path'];
+			const rule			= this.rules[i];
+			const ruleMethod	= rule['methods'];
+			const rulePath		= rule['path'];
 
 			if ( Router.matchMethod( method, ruleMethod ) && Router.matchRoute( path, rulePath ) )
 			{
-				const ipLimit	= options['ipLimit'];
+				const ipLimit	= rule['ipLimit'];
+				const policy	= rule['policy'];
+
 				let bucketKey	= Bucket.DEFAULT_PREFIX;
+				bucketKey	+= `${rulePath}${policy}`;
 
 				if ( ipLimit === true )
 				{
-					const ipLimitKey	= rulePath + clientIp;
-					bucketKey			+= ipLimitKey;
-
-					if ( typeof this.rules[i]['buckets'][bucketKey] === 'undefined' )
-					{
-						this.rules[i]['buckets'][bucketKey]	= await this.getNewBucketFromOptions( bucketKey, options );
-					}
-				}
-				else
-				{
-					bucketKey	+= rulePath;
+					bucketKey	+= clientIp;
 				}
 
-				const bucket	= this.rules[i]['buckets'][bucketKey];
-
+				const bucket	= await this.getNewBucketFromOptions( bucketKey, rule );
 				const hasToken	= await bucket.reduce();
 
 				if ( ! hasToken )
 				{
-					const policy				= options['policy'];
-					const refillTime			= options['refillTime'];
+					const refillTime			= rule['refillTime'];
 					eventRequest.rateLimited	= true;
-					eventRequest.emit( 'rateLimited', { policy, rule: this.rules[i] } );
+					eventRequest.emit( 'rateLimited', { policy, rule } );
 					bucketsHit.push( bucket );
 
 					switch( policy )
@@ -321,7 +303,7 @@ class RateLimitsPlugin extends PluginInterface
 							if ( ! hasConnectionDelayPolicy )
 							{
 								hasConnectionDelayPolicy		= true;
-								connectionDelayPolicyOptions	= options;
+								connectionDelayPolicyOptions	= rule;
 							}
 
 							break;
@@ -331,7 +313,7 @@ class RateLimitsPlugin extends PluginInterface
 							return;
 					}
 
-					if ( options['stopPropagation'] === true )
+					if ( rule['stopPropagation'] === true )
 					{
 						break;
 					}
@@ -341,11 +323,11 @@ class RateLimitsPlugin extends PluginInterface
 
 		if ( hasConnectionDelayPolicy )
 		{
-			const options		= connectionDelayPolicyOptions;
+			const rule			= connectionDelayPolicyOptions;
 			const buckets		= bucketsHit;
-			const delayTime		= options['delayTime'];
-			const delayRetries	= options['delayRetries'];
-			const refillTime	= options['refillTime'];
+			const delayTime		= rule['delayTime'];
+			const delayRetries	= rule['delayRetries'];
+			const refillTime	= rule['refillTime'];
 
 			let tries			= 0;
 
@@ -387,7 +369,7 @@ class RateLimitsPlugin extends PluginInterface
 	 */
 	sendRetryAfterRequest( eventRequest, retryAfterTime )
 	{
-		eventRequest.setHeader( 'Retry-After', retryAfterTime );
+		eventRequest.setResponseHeader( 'Retry-After', retryAfterTime );
 		eventRequest.sendError( 'Too many requests', TOO_MANY_REQUESTS_STATUS_CODE );
 	}
 }

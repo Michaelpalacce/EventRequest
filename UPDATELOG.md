@@ -1,3 +1,10 @@
+19.0.0
+- Changed the name of header methods to better reflect where the headers are being sent, added tests
+- The Rate limiting rules can now be set inline as well as in a json file, added tests
+- The Rate limiting plugin will no longer store the buckets but create a new bucket every time. Should no longer take memory
+- The leaky bucket has been updated where it will not try to set the key if the key is passed
+- Fixed a small bug with the leaky bucket
+
 18.3.0
 - Changed the way that loggur passes data so it's no longer his job to verify the arguments of the log function.
 - Documentation arguments changes for my sake

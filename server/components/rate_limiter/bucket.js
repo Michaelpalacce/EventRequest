@@ -63,6 +63,13 @@ class Bucket
 	 */
 	async init()
 	{
+		if ( this.key !== null )
+		{
+			await this._getValue().catch( this.handleError );
+			await this._getLastUpdate().catch( this.handleError );
+			return;
+		}
+
 		await this._getUniqueKey().catch( this.handleError );
 		await this.reset();
 	}
@@ -88,11 +95,6 @@ class Bucket
 	 */
 	async _getUniqueKey()
 	{
-		if ( this.key !== null )
-		{
-			return this.key;
-		}
-
 		let key		= null;
 		let result	= '';
 
@@ -119,18 +121,16 @@ class Bucket
 			return result;
 		}
 
-		await this.reset();
+		await this._setValue( this.maxAmount ).catch( this.handleError );
 
-		const { value }	= await this.dataStore.get( `${this.key}//value` ).catch( this.handleError );
-
-		return value;
+		return this.maxAmount;
 	}
 
 	/**
 	 * @brief	Sets the value
 	 *
 	 * @param	value Number
-	 *u
+	 *
 	 * @return	void
 	 */
 	async _setValue( value )
@@ -152,11 +152,10 @@ class Bucket
 			return result;
 		}
 
-		await this.reset();
+		const currTime	= this._getCurrentTime();
+		await this._setLastUpdate( currTime ).catch( this.handleError );
 
-		const { value }	= await this.dataStore.get( `${this.key}//lastUpdate` ).catch( this.handleError );
-
-		return value;
+		return currTime;
 	}
 
 	/**
@@ -263,7 +262,6 @@ class Bucket
 		}
 
 		const refillCount	= this._refillCount( data.lastUpdate );
-
 		return data.value	= Math.min( this.maxAmount, data.value + refillCount * this.refillAmount );
 	}
 
@@ -287,7 +285,6 @@ class Bucket
 
 		const data	= await this._fetchData().catch( this.handleError );
 		await this.get( data ).catch( this.handleError );
-
 		data.lastUpdate	+= this._refillCount( data.lastUpdate ) * this.refillTime;
 
 		if ( tokens > data.value )

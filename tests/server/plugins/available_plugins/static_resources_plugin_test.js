@@ -21,7 +21,7 @@ test({
 		router.add( helpers.getEmptyMiddleware() );
 
 		eventRequest._mock({
-			method			: 'setHeader',
+			method			: 'setResponseHeader',
 			shouldReturn	: ()=>{
 				called	++;
 			},
@@ -55,7 +55,7 @@ test({
 		router.add( helpers.getEmptyMiddleware() );
 
 		eventRequest._mock({
-			method			: 'setHeader',
+			method			: 'setResponseHeader',
 			shouldReturn	: ()=>{
 				called	++;
 			},

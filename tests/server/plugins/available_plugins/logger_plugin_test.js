@@ -50,7 +50,7 @@ test({
 				['redirect', undefined],
 				['cachedResponse', undefined],
 				['stop', undefined],
-				['setHeader', undefined],
+				['setResponseHeader', undefined],
 				['cleanUp', undefined],
 				['clearTimeout', undefined],
 			],
