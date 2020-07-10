@@ -1,7 +1,6 @@
 'use strict';
 
 // Dependencies
-const ValidationAttribute	= require( './validation_attribute' );
 const ValidationResult		= require( './validation_result' );
 
 /**
@@ -21,24 +20,7 @@ class ValidationHandler
 			validationInput	= {};
 		}
 
-		let key,
-			value,
-			rules,
-			validationAttribute,
-			validationResult	= new ValidationResult();
-
-		for ( key in skeleton )
-		{
-			value				= validationInput[key];
-			rules				= skeleton[key];
-
-			validationAttribute	= new ValidationAttribute( key, value, rules, validationInput );
-			validationResult.addAttribute( validationAttribute );
-		}
-
-		validationResult.validateAllAttributes();
-
-		return validationResult;
+		return new ValidationResult( validationInput, skeleton );
 	}
 }
 

@@ -8,6 +8,8 @@ const assert	= require( './validation_rules' );
  */
 const VALIDATION_ERRORS	= {
 	rules		: 'rules',
+	array		: 'array',
+	notArray	: 'notArray',
 	optional	: 'optional',
 	filled		: 'filled',
 	string		: 'string',
@@ -45,14 +47,14 @@ class ValidationAttribute
 	/**
 	 * @brief	Returns true otherwise returns reason why it is not valid
 	 *
-	 * @return	String|Boolean
+	 * @return	Array|Boolean
 	 */
 	validateSelf()
 	{
-		if ( typeof this.rules === 'object' && typeof this.rules['default'] !== 'undefined' && typeof this.rules['rules'] === 'string')
+		if ( typeof this.rules === 'object' && typeof this.rules['$default'] !== 'undefined' && typeof this.rules['$rules'] === 'string')
 		{
-			this.default	= this.rules['default'];
-			this.rules		= this.rules['rules'];
+			this.default	= this.rules['$default'];
+			this.rules		= this.rules['$rules'];
 		}
 
 		if ( this.rules === undefined || typeof this.rules !== 'string' )
@@ -122,6 +124,12 @@ class ValidationAttribute
 
 			case VALIDATION_ERRORS.notNumeric:
 				return assert.assertNotNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.notNumeric;
+
+			case VALIDATION_ERRORS.array:
+				return assert.assertIsArray( this.value ) ? false : VALIDATION_ERRORS.array;
+
+			case VALIDATION_ERRORS.notArray:
+				return assert.assertNotArray( this.value ) ? false : VALIDATION_ERRORS.notArray;
 
 			case VALIDATION_ERRORS.filled:
 				return assert.assertNotEmpty( this.value ) ? false : VALIDATION_ERRORS.filled;
@@ -244,5 +252,7 @@ class ValidationAttribute
 		}
 	}
 }
+
+ValidationAttribute.VALIDATION_ERRORS	= VALIDATION_ERRORS;
 
 module.exports	= ValidationAttribute;

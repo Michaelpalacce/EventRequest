@@ -2531,6 +2531,25 @@ test({
 });
 
 test({
+	message	: 'Server.test er_rate_limits.with.params',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithParams';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { fileLocation } );
+
+		app.get( `/${name}/:test:`, ( event )=>{
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}/testTwo`, 'GET', 200, '', {} ).then(( response )=>{
+			return helpers.sendServerRequest( `/${name}/testTwo`, 'GET', 429, '', {} );
+		}).then( ()=>{ done(); } ).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test.er_rate_limits.with.permissive.limiting',
 	test	: ( done )=>{
 		const name			= 'testErRateLimitsWithPermissiveLimiting';
@@ -3228,7 +3247,6 @@ test({
 		} ).catch( done );
 	}
 });
-
 
 test({
 	message	: 'Server.testServerAddsXPoweredBy',

@@ -1,3 +1,10 @@
+20.0.0
+- Added tests for rate limiting with params to confirm it works as expected
+- Reworked the validation to now be able to validate arrays
+- Reworked validation to be able to do "deep" assertion in multi dimensional objects
+- Renamed the rules and default to $rules and $default in the validation
+- Added VALIDATION_ERRORS to ValidationAttribute class
+
 19.0.0
 - Changed the name of header methods to better reflect where the headers are being sent, added tests
 - The Rate limiting rules can now be set inline as well as in a json file, added tests

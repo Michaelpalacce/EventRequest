@@ -158,7 +158,6 @@ test({
 	}
 });
 
-
 test({
 	message			: 'ValidationRules assertIsEmpty',
 	dataProvider	: [
@@ -172,6 +171,40 @@ test({
 	],
 	test			: ( done, value, shouldBeEqual )=>{
 		assert.equal( ValidationRules.assertNotEmpty( value ), shouldBeEqual );
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules assertIsArray',
+	dataProvider	: [
+		['', false],
+		[{}, false],
+		[[], true],
+		[true, false],
+		[1, false],
+		[{key:'value'}, false],
+		[[1,2,3], true]
+	],
+	test			: ( done, value, shouldBeEqual )=>{
+		assert.equal( ValidationRules.assertIsArray( value ), shouldBeEqual );
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules assertNotArray',
+	dataProvider	: [
+		['', true],
+		[{}, true],
+		[[], false],
+		[true, true],
+		[1, true],
+		[{key:'value'}, true],
+		[[1,2,3], false]
+	],
+	test			: ( done, value, shouldBeEqual )=>{
+		assert.equal( ValidationRules.assertNotArray( value ), shouldBeEqual );
 		done();
 	}
 });

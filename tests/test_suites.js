@@ -63,6 +63,7 @@ testSuites.validationSuite	= ()=>{
 	require( './server/components/validation/validation_rules_test' );
 	require( './server/components/validation/validation_attribute_test' );
 	require( './server/components/validation/validation_result_test' );
+	require( './server/components/validation/validation_handler_test' );
 };
 
 testSuites.pluginsSuite		= ()=>{

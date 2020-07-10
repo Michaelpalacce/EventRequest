@@ -71,7 +71,18 @@ test({
 		['testKey', 2, 'notBoolean', false],
 		['testKey', 'test', 'equals:test', false],
 		['testKey', 'test2', 'equals:test', ['equals']],
-		['testKey', '', 'something', ['rules']]
+		['testKey', '', 'something', ['rules']],
+		['testKey', [], 'array', false],
+		['testKey', [], 'array||range:0-1', false],
+		['testKey', [], 'array||range:1-2', ['range']],
+		['testKey', [], 'array||min:0', false],
+		['testKey', [], 'array||min:1', ['min']],
+		['testKey', [], 'notArray', ['notArray']],
+		['testKey', [1,2,3], 'array||max:1', ['max']],
+		['testKey', [1,2,3], 'array||max:4', false],
+		['testKey', [1,2,3], 'array||range:1-4', false],
+		['testKey', [1,2,3], 'array||range:5-6', ['range']],
+		['testKey', [1,2,3], 'array||min:2', false],
 	],
 	test			: ( done, key, value, rules, anythingInvalid )=>{
 		let dataToValidate		= {

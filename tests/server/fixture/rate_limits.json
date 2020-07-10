@@ -226,5 +226,17 @@
 	"delayRetries": 1,
 	"stopPropagation": false,
 	"ipLimit": false
+  },
+  {
+	"path": "/testErRateLimitsWithParams/:test:",
+	"methods": [],
+	"maxAmount": 1,
+	"refillTime": 3,
+	"refillAmount": 1,
+	"policy": "strict",
+	"delayTime": 1,
+	"delayRetries": 1,
+	"stopPropagation": false,
+	"ipLimit": false
   }
 ]

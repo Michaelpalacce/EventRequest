@@ -986,6 +986,8 @@ The validation is done by using:
 
 - skeleton must have the keys that are to be validated that point to a string of rules separated by ||
 
+- if the object to be validated is multi dimensional then you can specify the multi dimensional keys as well ( see example below )
+
 - Asserting that an input is a string|numeric|boolean will do type conversion on the input to the appropriate type. You should retrieve the value FROM the validation result for correct result
 
 ***
@@ -1067,33 +1069,42 @@ When validation is done a ValidationResult is returned. It has 2 main methods:
 ~~~javascript
      const result	= event.validationHandler.validate(
         event.body,
-        { username : 'filled||string||range:6-32', password : 'filled||string', customerNumber: 'numeric||max:32' } 
-     );
+        { 
+            username : 'filled||string||range:6-32',
+            password : 'filled||string',
+            customerNumber: 'numeric||max:32', 
+            address: { street: 'string', number: 'numeric' },
+            extra : { $rules: 'optional||string', $default: 'def' }
+        } 
+    );
 
     console.log( result.hasValidationFailed() );
     console.log( result.getValidationResult() );
     
     // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
     // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
-    // { 'username':'username', 'password': 'password', 'customerNumber': 16 }
+    // { 'username':'username', 'password': 'password', 'customerNumber': 16, address: { street: 'street', number: 64 }, extra: 'def' }
 ~~~
 
 The example will validate that the username is filled is a string and is within a range of 6-32 characters
 It will also validate that the password is filled and is a string
+The customerNumber will be validated to be numeric that is lower than 32
+The address will be asserted to be an object and the keys in it will be validated
+The extra if not passed will default to 'def'
 
 ***
 ####Validation defaults
 
 - Validation results can also have defaults set. 
-- This is done by instead of passing a string of rules to the skeleton keys, an object is passed with two values: rules and default
-- The rules must be optional otherwise validation will fail
+- This is done by instead of passing a string of rules to the skeleton keys, an object is passed with two values: $rules and $default
+- The$ rules must be optional otherwise validation will fail
 - In case where the parameters have NOT been passed, the default value will be used.
 ~~~javascript
      const result	= event.validationHandler.validate(
         event.body,
         { 
-            username : { rules: 'optional||string', default: 'root' }, 
-            password : { rules: 'optional||string', default: 'toor' } 
+            username : { $rules: 'optional||string', $default: 'root' }, 
+            password : { $rules: 'optional||string', $default: 'toor' } 
         } 
      );
 
@@ -1103,6 +1114,62 @@ It will also validate that the password is filled and is a string
     // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
     // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
     // { 'username':'username', 'password': 'password'}
+~~~
+
+
+~~~javascript
+const dataToValidate	= {
+			testOne	: 123,
+			testTwo	: '123',
+			123			: [1,2,3,4,5],
+			testThree	: {
+				'deepOne'	: 123,
+				deepTwo	: {
+					deeperOne	: 123,
+					deeperTwo	: '123'
+				}
+			},
+			testFour	: true,
+			testFive	: 'true',
+			testSix		: '1',
+		};
+
+		const result	= validationHandler.validate(
+			dataToValidate,
+			{
+				testOne		: 'string||range:2-4',
+				testTwo		: 'numeric||range:123-124',
+				123			: 'array||range:4-6',
+				testThree	: {
+					deepOne	: 'numeric||range:122-124',
+					deepTwo	: {
+						deeperOne	: 'string||range:2-4',
+						deeperTwo	: 'numeric||range:123-124'
+					}
+				},
+				testFour	: 'boolean',
+				testFive	: 'boolean',
+				testSix		: 'boolean'
+			}
+		);
+
+		console.log( result.hasValidationFailed() ); // false
+		console.log( result.getValidationResult() );
+		//{
+		//	'123'	: [1,2,3,4,5],
+		//	testOne	: '123',
+		//	testTwo	: 123,
+		//	testThree	: {
+		//		deepOne	: 123,
+		//		deepTwo	: {
+		//			deeperOne	: '123',
+		//			deeperTwo	: 123
+		//		}
+		//	},
+		//	testFour	: true,
+		//	testFive	: true,
+		//	testSix		: true,
+		//}
 ~~~
 
 ***

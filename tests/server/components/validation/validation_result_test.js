@@ -6,47 +6,17 @@ const ValidationAttribute				= require( './../../../../server/components/validat
 const MockValidationAttribute			= Mock( ValidationAttribute );
 
 test({
-	message	: 'ValidationResult addAttribute',
-	test	: ( done )=>{
-		let attribute	= new MockValidationAttribute();
-		let result		= new ValidationResult();
-
-		result.addAttribute( attribute );
-		
-		done();
-	}
-});
-
-test({
-	message	: 'ValidationResult addAttribute throws if not an instance of ValidationAttribute',
-	test	: ( done )=>{
-		let attribute	= {};
-		let result		= new ValidationResult();
-
-		assert.throws(()=>{
-			result.addAttribute( attribute );
-		});
-
-		done();
-	}
-});
-
-test({
 	message	: 'ValidationResult validateAllAttributes doesn\'t validate if already validated',
 	test	: ( done )=>{
-		let attribute	= new MockValidationAttribute();
-		let result		= new ValidationResult();
-
-		Mocker( attribute, {
-			method			: 'validateSelf',
-			shouldReturn	: false,
-			called			: 1
-		});
-
-		result.addAttribute( attribute );
+		const result		= new ValidationResult( { key: 123 }, { key: 'numeric' } );
 
 		result.validateAllAttributes();
+		assert.equal( result.hasValidationFailed(), false );
+
+		result.skeleton	= {};
+
 		result.validateAllAttributes();
+		assert.equal( result.hasValidationFailed(), false );
 
 		done();
 	}
@@ -55,19 +25,10 @@ test({
 test({
 	message	: 'ValidationResult hasValidationFailed',
 	test	: ( done )=>{
-		let attribute	= new MockValidationAttribute( 'key', 'value', [''], {} );
-		let result		= new ValidationResult();
+		const result		= new ValidationResult( { key: 123 }, { key: 'numeric' } );
 
-		Mocker( attribute, {
-			method			: 'validateSelf',
-			shouldReturn	: false,
-			called			: 1
-		});
-
-		result.addAttribute( attribute );
 		result.validateAllAttributes();
-
-		assert.equal( false, result.hasValidationFailed() );
+		assert.equal( result.hasValidationFailed(), false );
 
 		done();
 	}
@@ -76,19 +37,10 @@ test({
 test({
 	message	: 'ValidationResult hasValidationFailed if one has failed',
 	test	: ( done )=>{
-		let attribute	= new MockValidationAttribute( 'key', 'value', [''], {} );
-		let result		= new ValidationResult();
+		const result		= new ValidationResult( { key: 123 }, { key: 'array' } );
 
-		Mocker( attribute, {
-			method			: 'validateSelf',
-			shouldReturn	: ['string'],
-			called			: 1
-		});
-
-		result.addAttribute( attribute );
 		result.validateAllAttributes();
-
-		assert.equal( true, result.hasValidationFailed() );
+		assert.equal( result.hasValidationFailed(), true );
 
 		done();
 	}
@@ -97,19 +49,10 @@ test({
 test({
 	message	: 'ValidationResult getValidationResult',
 	test	: ( done )=>{
-		let attribute	= new MockValidationAttribute( 'key', 'value', [''], {} );
-		let result		= new ValidationResult();
+		const result		= new ValidationResult( { key: 123 }, { key: 'string' } );
 
-		Mocker( attribute, {
-			method			: 'validateSelf',
-			shouldReturn	: false,
-			called			: 1
-		});
-
-		result.addAttribute( attribute );
 		result.validateAllAttributes();
-
-		assert.deepEqual( { key: 'value' }, result.getValidationResult() );
+		assert.deepStrictEqual( result.getValidationResult(), { key: '123' } );
 
 		done();
 	}
@@ -118,19 +61,10 @@ test({
 test({
 	message	: 'ValidationResult getValidationResult when something has failed',
 	test	: ( done )=>{
-		let attribute	= new MockValidationAttribute( 'key', 'value', [''], {} );
-		let result		= new ValidationResult();
+		const result		= new ValidationResult( { key: 123 }, { key: 'array' } );
 
-		Mocker( attribute, {
-			method			: 'validateSelf',
-			shouldReturn	: ['string'],
-			called			: 1
-		});
-
-		result.addAttribute( attribute );
 		result.validateAllAttributes();
-
-		assert.deepEqual( { key: ['string'] }, result.getValidationResult() );
+		assert.deepStrictEqual( result.getValidationResult(), { key: ['array'] } );
 
 		done();
 	}

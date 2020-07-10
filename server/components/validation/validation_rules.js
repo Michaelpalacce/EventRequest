@@ -152,6 +152,28 @@ assert.assertNotNumeric		= ( actual ) => {
 };
 
 /**
+ * @brief	Asserts that the given value is an array
+ *
+ * @param	actual mixed
+ *
+ * @return	Boolean
+ */
+assert.assertIsArray		= ( actual ) => {
+	return Array.isArray( actual );
+};
+
+/**
+ * @brief	Asserts that the given value is NOT an array
+ *
+ * @param	actual mixed
+ *
+ * @return	Boolean
+ */
+assert.assertNotArray		= ( actual ) => {
+	return ! Array.isArray( actual );
+};
+
+/**
  * @brief	Assert that the given value is empty
  *
  * @details	Will check for an empty String, empty Object or empty Array

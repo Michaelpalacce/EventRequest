@@ -7,64 +7,120 @@ const ValidationAttribute	= require( './validation_attribute' );
  */
 class ValidationResult
 {
-	constructor()
+	/**
+	 * @param	validationInput Object
+	 * @param	skeleton Object
+	 */
+	constructor( validationInput, skeleton )
 	{
-		this.attributes			= [];
-		this.result				= null;
-		this.validationFailed	= false;
+		this.validationInput	= validationInput;
+		this.skeleton			= skeleton;
+		this.result				= {};
+		this.validationFailed	= null;
 	}
 
 	/**
-	 * @brief	Adds attributes to the validation result
+	 * @brief	Validates all the attributes
 	 *
-	 * @param	attribute ValidationAttribute
+	 * @details	Will not validate if validation was already performed
 	 *
 	 * @return	void
 	 */
-	addAttribute( attribute )
+	validateAllAttributes()
 	{
-		if ( ! ( attribute instanceof ValidationAttribute ) )
-		{
-			throw new Error( 'Invalid attribute added. Attribute must be an instanceof ValidationAttribute' );
-		}
+		if ( this.validationFailed !== null )
+			return;
 
-		this.attributes.push( attribute );
+		this.validationFailed	= false;
+		const failures			= {};
+
+		this._formResult( this.validationInput, this.skeleton, this.result, failures );
+
+		if ( this.validationFailed )
+		{
+			this._sanitizeFailures( failures );
+
+			this.result	= failures;
+		}
 	}
 
 	/**
-	 * @brief	Triggers the validate self on each of the added attributes and returns the validation
+	 * @brief	Forms the result using recursion
 	 *
-	 * @return	Object
+	 * @param	validationInput Object
+	 * @param	skeleton Object
+	 * @param	result Object
+	 * @param	failures Object
+	 *
+	 * @private
+	 *
+	 * @return	void
 	 */
-	validateAllAttributes()
+	_formResult( validationInput, skeleton, result, failures )
 	{
-		if ( this.result === null )
-		{
-			this.result	= {};
+		let key;
 
-			if ( this.attributes.length === 0 )
+		for ( key in skeleton )
+		{
+			const value	= validationInput[key];
+			const rules	= skeleton[key];
+
+			if ( typeof rules === 'object' && typeof rules.$default === 'undefined' && typeof rules.$rules === 'undefined' )
 			{
-				this.validationFailed	= true;
+				result[key]		= {};
+				failures[key]	= {};
+
+				this._formResult( value, rules, result[key], failures[key] );
+				continue;
 			}
 
-			this.attributes.forEach( ( attribute ) => {
-				let validation				= attribute.validateSelf();
-				this.result[attribute.key]	= validation;
+			const attribute		= new ValidationAttribute( key, value, rules, validationInput );
+			const validation	= attribute.validateSelf();
 
-				if ( validation !== false )
-				{
-					this.validationFailed	= true;
-				}
-			});
-
-			if ( ! this.validationFailed )
+			if ( validation !== false )
 			{
-				this.attributes.forEach( ( attribute ) => {
-					this.result[attribute.key]	= typeof attribute.value === 'undefined'
-												|| attribute.value === null
-												? attribute.default
-												: attribute.value;
-				})
+				this.validationFailed	= true;
+
+				failures[attribute.key]	= validation;
+			}
+			else
+			{
+				result[attribute.key]	= typeof attribute.value === 'undefined'
+										|| attribute.value === null
+										? attribute.default
+										: attribute.value;
+			}
+		}
+	}
+
+	/**
+	 * @brief	Sanitizes the failures object to not report any empty properties
+	 *
+	 * @param	failures Object
+	 *
+	 * @private
+	 *
+	 * @return	void
+	 */
+	_sanitizeFailures( failures )
+	{
+		for ( const key in failures )
+		{
+			if ( typeof failures[key] === 'object' )
+			{
+				if ( Object.keys( failures[key] ).length === 0 )
+				{
+					delete failures[key];
+				}
+				else
+				{
+					this._sanitizeFailures( failures[key] );
+
+					if ( Object.keys( failures[key] ).length === 0 )
+					{
+						delete failures[key];
+					}
+				}
 			}
 		}
 	}
