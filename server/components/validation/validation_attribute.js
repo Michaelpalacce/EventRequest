@@ -25,6 +25,11 @@ const VALIDATION_ERRORS	= {
 	numeric		: 'numeric',
 	notNumeric	: 'notNumeric',
 	date		: 'date',
+	weakString	: 'weakString',
+	weakNumeric	: 'weakNumeric',
+	weakBoolean	: 'weakBoolean',
+	weakIsTrue	: 'weakIsTrue',
+	weakIsFalse	: 'weakIsFalse',
 	same		: 'same',
 	different	: 'different',
 	equals		: 'equals'
@@ -113,6 +118,21 @@ class ValidationAttribute
 
 			case VALIDATION_ERRORS.notString:
 				return assert.assertNotString( this.value ) ? false : VALIDATION_ERRORS.notString;
+
+			case VALIDATION_ERRORS.weakString:
+				return assert.assertIsInternalType( this.value, 'string' ) ? false : VALIDATION_ERRORS.weakString;
+
+			case VALIDATION_ERRORS.weakNumeric:
+				return assert.assertIsInternalType( this.value, 'number' ) ? false : VALIDATION_ERRORS.weakNumeric;
+
+			case VALIDATION_ERRORS.weakBoolean:
+				return assert.assertIsInternalType( this.value, 'boolean' ) ? false : VALIDATION_ERRORS.weakBoolean;
+
+			case VALIDATION_ERRORS.weakIsTrue:
+				return this.value === true ? false : VALIDATION_ERRORS.weakIsTrue;
+
+			case VALIDATION_ERRORS.weakIsFalse:
+				return this.value === false ? false : VALIDATION_ERRORS.weakIsFalse;
 
 			case VALIDATION_ERRORS.numeric:
 				let result	= assert.assertIsNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.numeric;

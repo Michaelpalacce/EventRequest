@@ -729,11 +729,11 @@ test({
 test({
 	message: 'EventRequest should have a validation handler',
 	test: ( done )=>{
-		const eventRequest	= helpers.getEventRequest();
-		const ValidationHandlerClass	= require( '../../server/components/validation/validation_handler' );
+		const eventRequest		= helpers.getEventRequest();
+		const ValidationHandler	= require( '../../server/components/validation/validation_handler' );
 
 		assert.equal( typeof eventRequest.validation, 'object' );
-		assert.equal( eventRequest.validation instanceof ValidationHandlerClass, true );
+		assert.deepStrictEqual( eventRequest.validation, ValidationHandler );
 
 		done();
 	}

@@ -1,6 +1,8 @@
 21.0.0
 - Updated the documentation
 - The validationHandler in the event is now called just validation
+- The Validation Handler is no longer a class. It is now an object with one function: validate
+- Fixed an issue with the validation where it would throw in case of a deep validation and the structure not being set in the value to be validated
 
 20.0.0
 - Added tests for rate limiting with params to confirm it works as expected

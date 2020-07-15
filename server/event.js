@@ -44,7 +44,7 @@ class EventRequest extends EventEmitter
 		this.path				= parsedUrl.pathname.trim();
 		this.method				= request.method.toUpperCase();
 		this.headers			= request.headers;
-		this.validation			= new ValidationHandler();
+		this.validation			= ValidationHandler;
 		this.request			= request;
 		this.response			= response;
 		this.cookies			= list;
@@ -162,7 +162,7 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-	 * @brief	Sends the response to the user
+	 * @brief	Sends the response to the usern
 	 *
 	 * @details	Raw is a flag to tell the eventRequest how to send the data
 	 * 			If set to false, then the response passed will be returned in a JSON format if is not already a valid string

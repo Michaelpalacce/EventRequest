@@ -62,11 +62,16 @@ class ValidationResult
 
 		for ( key in skeleton )
 		{
-			const value	= validationInput[key];
+			let value	= validationInput[key];
 			const rules	= skeleton[key];
 
 			if ( typeof rules === 'object' && typeof rules.$default === 'undefined' && typeof rules.$rules === 'undefined' )
 			{
+				if ( value === undefined )
+				{
+					value	= {};
+				}
+
 				result[key]		= {};
 				failures[key]	= {};
 

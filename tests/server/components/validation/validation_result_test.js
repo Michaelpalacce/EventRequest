@@ -1,9 +1,7 @@
 'use strict';
 
-const { assert, test, Mock, Mocker }	= require( '../../../test_helper' );
-const ValidationResult					= require( './../../../../server/components/validation/validation_result' );
-const ValidationAttribute				= require( './../../../../server/components/validation/validation_attribute' );
-const MockValidationAttribute			= Mock( ValidationAttribute );
+const { assert, test }	= require( '../../../test_helper' );
+const ValidationResult	= require( './../../../../server/components/validation/validation_result' );
 
 test({
 	message	: 'ValidationResult validateAllAttributes doesn\'t validate if already validated',

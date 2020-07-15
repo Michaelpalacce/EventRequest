@@ -1,12 +1,11 @@
 'use strict';
 
 const { assert, test }	= require( '../../../test_helper' );
-const ValidationHandler	= require( './../../../../server/components/validation/validation_handler' );
+const validationHandler	= require( './../../../../server/components/validation/validation_handler' );
 
 test({
 	message	: 'ValidationHandler.validation',
 	test	: ( done )=>{
-		const validationHandler	= new ValidationHandler();
 		const dataToValidate	= {
 			testOne	: 123,
 			testTwo	: '123',
@@ -76,7 +75,6 @@ test({
 test({
 	message	: 'ValidationHandler.validation.with.missing',
 	test	: ( done )=>{
-		const validationHandler	= new ValidationHandler();
 		const dataToValidate	= {
 			testOne	: 123,
 			testTwo	: '123',
@@ -92,6 +90,13 @@ test({
 			testFour	: true,
 			testFive	: 'true',
 			testSix		: '1',
+			testNine	: {
+				weakString	: 'weakString',
+				weakBoolean	: true,
+				weakNumeric	: 123,
+				weakIsTrue	: true,
+				weakIsFalse	: false,
+			}
 		};
 
 		const result	= validationHandler.validate(
@@ -113,12 +118,34 @@ test({
 				testFive	: 'boolean',
 				testSix		: 'boolean',
 				testSeven	: { $rules: 'optional||min:2||max:5', $default: 4 },
-				testEight	: 'numeric'
+				testEight	: 'numeric',
+				testNine	: {
+					weakString	: 'weakString',
+					weakBoolean	: 'weakBoolean',
+					weakNumeric	: 'weakNumeric',
+					weakIsTrue	: 'weakIsTrue',
+					weakIsFalse	: 'weakIsFalse',
+					deep	: {
+						deeper	: {
+							deepest: 'string'
+						}
+					}
+				}
 			}
 		);
 
 		assert.equal( result.hasValidationFailed(), true );
-		assert.deepStrictEqual( result.getValidationResult(), { testEight: ['numeric'] } );
+		assert.deepStrictEqual( result.getValidationResult(), {
+				testEight: ['numeric'],
+				testNine: {
+					deep: {
+						deeper: {
+							deepest: ['string']
+						}
+					}
+				}
+			}
+		);
 
 		done();
 	}

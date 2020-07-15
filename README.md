@@ -1018,7 +1018,15 @@ const logger    = Loggur.createLogger({
 The validation is done by using:
 
 ~~~javascript
-    event.validation.validate( objectToValidate, skeleton )
+    const objectToValidate  = { username: 'user@test.com', password: 'pass' };
+
+    event.validation.validate( 
+        objectToValidate, 
+        { 
+            username: 'filled||string||email||max:255', 
+            password: 'filled||string||range:6-255' 
+        } 
+    );
 ~~~
 
 - skeleton must have the keys that are to be validated that point to a string of rules separated by ||
@@ -1036,9 +1044,19 @@ The validation is done by using:
 **filled** 
 - checks if the input is filled
 
+**array** 
+- checks if the input is an array
+
+**notArray** 
+- checks if the input is not an array
+
 **string** 
 - checks if the input is a string.
  - Will convert a number to a string
+
+**weakString** 
+- checks if the input is a string
+- will not do value conversion
 
 **notString** 
 - checks if the input is NOT a string
@@ -1047,6 +1065,7 @@ The validation is done by using:
 - Is followed by min and max aka: range:1-2 where 1 is the minimum and 2 maximum.
 - If the type is numeric then it will check if it's within the range.
 - If the type is a string then the length will be checked
+- If the type is an array then the array length will be checked
 
 **min** 
 - minimum input length aka: min:10
@@ -1064,15 +1083,27 @@ The validation is done by using:
 - 1 will be asserted as true, true will be asserted as true, 'true' and '1' will also be asserted as true
 - The value will be converted to a boolean
 
+**weakIsTrue** 
+- checks if the input equals to true ( boolean )
+- will not do value conversion
+
 **isFalse** 
 - checks if the input evaluates to false
 - 0 will be asserted as false, false will be asserted as false, 'false' and '0' will also be asserted as false
 - The value will be converted to a boolean
 
+**weakIsFalse** 
+- checks if the input equals to false ( boolean )
+- will not do value conversion
+
 **boolean** 
 - checks if the input is a boolean
 - The value will be converted to a boolean
 - Applies the same rules as **isFalse** and **isTrue** 
+
+**weakBoolean** 
+- checks if the input is a boolean
+- will not do value conversion
 
 **notBoolean** 
 - checks if the input is not a boolean
@@ -1080,6 +1111,10 @@ The validation is done by using:
 **numeric** 
 - checks if the input is a number. 
 - This will convert the input to a Number if possible
+
+**weakNumeric** 
+- checks if the input is numeric
+- will not do value conversion
 
 **notNumeric** 
 - checks if the input is not a number
@@ -1098,9 +1133,9 @@ The validation is done by using:
 
 ####Note: in case of an error the exact rule/s that failed will be returned, furthermore if the rules passed were malformed a special "rules" error will be returned for the field/s
 
-When validation is done a ValidationResult is returned. It has 2 main methods:
-    getValidationResult that will return an object with the fields tested mapped to the errors found. Otherwise 
-                        it will be an object with the fields tested mapped to the values ( done only if no errors found )
+When validation is done a ValidationResult is returned. It has 2 methods:
+    getValidationResult that in case of a validation error will return an object with the fields tested mapped to the errors found. 
+        Otherwise it will be an object with the fields tested mapped to the values
     hasValidationFailed that returns a boolean whether there is an error
 
 ~~~javascript
@@ -1134,7 +1169,7 @@ The extra if not passed will default to 'def'
 
 - Validation results can also have defaults set. 
 - This is done by instead of passing a string of rules to the skeleton keys, an object is passed with two values: $rules and $default
-- The$ rules must be optional otherwise validation will fail
+- The $rules must be optional otherwise validation will fail
 - In case where the parameters have NOT been passed, the default value will be used.
 ~~~javascript
      const result    = event.validation.validate(
@@ -1171,7 +1206,7 @@ const dataToValidate    = {
             testSix        : '1',
         };
 
-        const result    = validationHandler.validate(
+        const result    = event.validation.validate(
             dataToValidate,
             {
                 testOne        : 'string||range:2-4',
@@ -3493,7 +3528,7 @@ app.apply( app.er_security, {
 /**
  * @brief    Instantiate the server
  */
-const app            = require( 'event_request' )();
+const app = require( 'event_request' )();
 app.apply( app.er_security, { csp : { xss: false } } );
 
 app.add(( event )=>{
