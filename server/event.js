@@ -44,7 +44,7 @@ class EventRequest extends EventEmitter
 		this.path				= parsedUrl.pathname.trim();
 		this.method				= request.method.toUpperCase();
 		this.headers			= request.headers;
-		this.validationHandler	= new ValidationHandler();
+		this.validation			= new ValidationHandler();
 		this.request			= request;
 		this.response			= response;
 		this.cookies			= list;
@@ -82,7 +82,7 @@ class EventRequest extends EventEmitter
 		this.headers			= undefined;
 		this.method				= undefined;
 		this.path				= undefined;
-		this.validationHandler	= undefined;
+		this.validation			= undefined;
 		this.request			= undefined;
 		this.extra				= undefined;
 		this.cookies			= undefined;
@@ -110,7 +110,7 @@ class EventRequest extends EventEmitter
 	setCookie( name, value, options = {} )
 	{
 		const cookieHeaderName	= 'set-cookie';
-		const result			= this.validationHandler.validate(
+		const result			= this.validation.validate(
 			{ name, value },
 			{
 				name: 'filled',

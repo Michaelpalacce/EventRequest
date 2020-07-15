@@ -143,7 +143,7 @@ test({
 		assert.equal( eventRequest.method, undefined );
 		assert.equal( eventRequest.path, undefined );
 		assert.equal( eventRequest.block, undefined );
-		assert.equal( eventRequest.validationHandler, undefined );
+		assert.equal( eventRequest.validation, undefined );
 		assert.equal( eventRequest.request, undefined );
 		assert.equal( eventRequest.clientIp, undefined );
 		assert.equal( eventRequest.extra, undefined );
@@ -732,8 +732,8 @@ test({
 		const eventRequest	= helpers.getEventRequest();
 		const ValidationHandlerClass	= require( '../../server/components/validation/validation_handler' );
 
-		assert.equal( typeof eventRequest.validationHandler, 'object' );
-		assert.equal( eventRequest.validationHandler instanceof ValidationHandlerClass, true );
+		assert.equal( typeof eventRequest.validation, 'object' );
+		assert.equal( eventRequest.validation instanceof ValidationHandlerClass, true );
 
 		done();
 	}

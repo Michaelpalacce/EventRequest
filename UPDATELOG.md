@@ -1,3 +1,7 @@
+21.0.0
+- Updated the documentation
+- The validationHandler in the event is now called just validation
+
 20.0.0
 - Added tests for rate limiting with params to confirm it works as expected
 - Reworked the validation to now be able to validate arrays

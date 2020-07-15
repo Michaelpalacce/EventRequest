@@ -59,8 +59,6 @@ class Router extends PluginInterface
 		/**
 		 * @brief	Function that adds a middleware to the block chain of the router
 		 *
-		 * @param	route Object|Router|Function
-		 *
 		 * @returns	Server
 		 */
 		server.add	= ( ...args )=>{
@@ -235,9 +233,9 @@ class Router extends PluginInterface
 			let route	= this.middleware[index];
 			let params	= [];
 
-			if ( Router.matchRoute( event.path, route, params ) )
+			if ( Router.matchMethod( event.method, route ) )
 			{
-				if ( Router.matchMethod( event.method, route ) )
+				if ( Router.matchRoute( event.path, route, params ) )
 				{
 					event.params	= Object.assign( event.params, params );
 
@@ -323,7 +321,7 @@ class Router extends PluginInterface
 	 *
 	 * @return	Boolean
 	 */
-	static matchRoute( requestedRoute, route, matchedParams = [] )
+	static matchRoute( requestedRoute, route, matchedParams = {} )
 	{
 		if ( typeof route === 'string' || route instanceof RegExp )
 		{

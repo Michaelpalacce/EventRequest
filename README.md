@@ -13,12 +13,12 @@ const { Loggur } = require( 'event_request' );
 
 // Add a new Route
 app.get( '/', ( event ) => {
-	event.send( '<h1>Hello World!</h1>' );
+ event.send( '<h1>Hello World!</h1>' );
 });
 
 // Start Listening
 app.listen( 80, ()=>{
-	Loggur.log( 'Server started' );
+ Loggur.log( 'Server started' );
 });
 ~~~
 
@@ -37,50 +37,49 @@ const app = App();
 const { Server, Loggur } = require( 'event_request' );
 
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
 // With this setup you'll have to work only with the variables appOne and appTwo. You cannot call Server() to get any of them in different parts of the project
 // This can be remedied a bit by creating routers in different controllers and then exporting them to be later on added 
 const appOne = new Server();
 const appTwo = new Server();
 
-
 // Add a new Route
 appOne.get( '/', ( event ) => {
-	event.send( '<h1>Hello World!</h1>' );
+    event.send( '<h1>Hello World!</h1>' );
 });
 
 // Add a new Route
 appTwo.get( '/', ( event ) => {
-	event.send( '<h1>Hello World x2!</h1>' );
+    event.send( '<h1>Hello World x2!</h1>' );
 });
 
 appOne.listen( 3334, ()=>{
-	Loggur.log( 'Server one started at port: 3334' );
+    Loggur.log( 'Server one started at port: 3334' );
 } );
 appTwo.listen( 3335, ()=>{
-	Loggur.log( 'Server two started at port: 3335' );
+    Loggur.log( 'Server two started at port: 3335' );
 } );
 ~~~
 
 # Custom http Server setup:
 ~~~javascript
 const http = require( 'http' );
-const Server = require( 'event_request' );
-const app = http.createServer( Server().attach() );
+const { App, Loggur } = require( 'event_request' );
+const app = http.createServer( App().attach() );
 
 // No problem adding routes like this
 Server().get( '/',( event )=>{
-	event.send( 'ok' );
+    event.send( 'ok' );
 } );
 
 // OR like this
 app.get( '/test',( event )=>{
-	event.send( 'ok' );
+    event.send( 'ok' );
 } );
 
 app.listen( '80',()=>{
-	console.log( 'Server is UN' )
+    Loggur.log( 'Server is up and running on port 80' )
 });
 ~~~
 
@@ -92,29 +91,36 @@ app.listen( '80',()=>{
 - https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
 
 #Properties exported by the Module:
-	App,		// The Singleton Instance of the Framework that can be used to retrieve the Web Server at any point
-	Server,		// The Server of the framework. This is just the class and not the actual isntance. Use this only if you want to create multiple servers
-	Testing,	// Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ),
-				// test( function to use to add tests ), runAllTests( way to run all tests added by test )
-	Logging,	// Contains helpful logging functions
-	Loggur,		// Easier access to the Logging.Loggur instance
-	
+    App, // The Singleton Instance of the Framework that can be used to retrieve the Web Server at any point
+
+    Server, // The Server of the framework. This is just the class and not the actual isntance. Use this only if you want to create multiple servers
+
+    Testing, // Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ), test( function to use to add tests ), runAllTests( way to run all tests added by test )
+
+    Logging, // Contains helpful logging functions
+
+    Loggur, // Easier access to the Logging.Loggur instance
+
 
 #Getting started:
 
 #### Setup
-The Framework uses the "Singleton" design pattern to create a web server that can be retrieved from anywhere. When requiring the module a callback is returned that if called will return the instance: 
-**const app = require( 'event_request' )();**.
+The Framework uses the "Singleton" design pattern to create a web server that can be retrieved from anywhere. 
+When requiring the module a callback is returned that if called will return the instance: 
+
+~~~javascript
+const app = require( 'event_request' )();
+~~~
 
 #### Parts of the framework:
 Middlewares are callbacks attached to specific routes. They are called in order of addition.
-Global middlewares are teh same as normal middlewares but they are defined differently than the normal middlewares and are attached to those normal middlewares. They are called before the middleware they are attached to
+Global middlewares are the same as normal middlewares but they are defined differently than the normal middlewares and are attached to them. They are called before the middleware they are attached to.
 
-EventRequest is an object passed to each middleware. It holds all data about the request and has a lot of helpful functionality used for sending responses and other.
+EventRequest is an object passed to each middleware. It holds all data about the request and has a lot of helpful functionality used for sending responses.
 
 The framework has a set of components. These components are individual and can be used outside of the framework.
 
-The framework also has a set of plugins that are pre included in it. Each Plugin modifies the Server / Event Request a bit and plugs in new functionality.
+The framework also has a set of plugins that are pre included. Each Plugin modifies the Server / Event Request a bit and "plugs in" new functionality.
 
 ***
 ***
@@ -149,7 +155,7 @@ The framework also has a set of plugins that are pre included in it. Each Plugin
 - Match the given route and returns any route parameters passed in the matchedParams argument. 
 - Returns bool if there was a successful match
 - The matched parameters will look like this: { value: 'key' }
-- If there is a passed RegExp then the matched parameters will look like: { match: regExpResult }
+- If the route is a RegExp then the matched parameters will contain the result of it and look like: { match: regExpResult }
 
 **matchRoute( String requestedRoute, String|RegExp route, Object matchedParams ={} ): Boolean** 
 - Same as static
@@ -175,42 +181,73 @@ The framework also has a set of plugins that are pre included in it. Each Plugin
     - You can use .post, .put, .get, .delete, .head, .patch, .copy methods from the server that accept Required parameters: ( String|RegExp route, Function handler, Array||String middlewares = [] )
 
     - **ALTERNATIVELY** You can use those methods with the following commands: ( Function handler, Array||String middlewares = [] ) which will add a middleware to every route
-
-- Routes can be added like this:
 ~~~javascript
-const Server	= require( 'event_request' );
-const app   	= Server();
+const { App, Loggur } = require( 'event_request' );
+const app = App();
+
+app.define( 'default', ( event )=>{
+    Loggur.log( 'Hit the default global middleware' );
+    event.next();
+});
+
+app.define( 'defaultTwo', ( event )=>{
+    Loggur.log( 'Hit the second default global middleware' );
+    event.next();
+});
+
+app.get( ( event )=>{
+    Loggur.log( 'Always hits if method is get' );
+    event.next();
+});
+
+app.get( ( event )=>{
+    Loggur.log( 'After hitting the default global middleware' );
+    event.next();
+}, 'default' );
+
+app.get( ( event )=>{
+    Loggur.log( 'After hitting the default global middleware with an ARRAY!' );
+    event.next();
+}, ['default', 'defaultTwo'] );
 
 app.get( '/', ( event )=>{
-	event.send( '<h1>Hello World!</h1>');
-} );
+    event.send( '<h1>Hello World!</h1>');
+});
 
 app.post( '/', ( event )=>{
-	event.send( ['ok']);
-} );
+    event.send( 'ok' );
+});
 
 app.delete( '/', ( event )=>{
-	event.send( ['ok']);
-} );
+    event.send( 'ok' );
+});
 
 app.head( '/', ( event )=>{
-	event.send( ['ok']);
-} );
+    event.send( 'ok' );
+});
 
 app.put( '/', ( event )=>{
-	event.send( ['ok']);
-} );
+    event.send( 'ok' );
+});
 
 app.get( '/users/:user:', ( event )=>{
-	console.log( event.params.user ); // Will print out whatever is passed in the url ( /users/John => 'John' )
-	event.send( ['ok']);
-} );
+    Loggur.log( event.params, null, true ); // Will print out whatever is passed in the url ( /users/John => 'John' )
+    event.send( event.params );
+});
 
-app.listen( 80 );
+app.get( /\/pa/, ( event )=>{
+    Loggur.log( event.params, null, true );
+    // Will log { match: [ '/pa', index: 0, input: '/path', groups: undefined ] } if you hit the route /path
+    event.send( 'ok' );
+});
+
+app.listen( 80, ()=>{
+    Loggur.log( 'Server Started, try going to http://localhost and then to http://localhost/path. Don\'t forget to check the console logs ' );
+});
 ~~~
 
 ***
-- When adding a Route the **server.add(route)** or **router.add(route)** can be used. 
+- When adding a Route the **server.add( Object route )** or **router.add( Object route )** can be used. 
 - The following parameters can be used when using .add():
 
 ####OBJECT CONTAINING:
@@ -240,14 +277,13 @@ app.listen( 80 );
 - All the new router's routes will be added to the old one
 - All the global middleware will be merged as well
 
-
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server = require( 'event_request' );
 Server().add( router );
 
 // OR
-const routerOne	= Server().Router();
-const routerTwo	= Server().Router();
+const routerOne = Server().Router();
+const routerTwo = Server().Router();
 routerOne.add( routerTwo )
 ~~~
 
@@ -258,19 +294,19 @@ routerOne.add( routerTwo )
 - All the global middleware will be merged as well
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server = require( 'event_request' );
 
-const routerOne	= Server().Router();
-const routerTwo	= Server().Router();
+const routerOne = Server().Router();
+const routerTwo = Server().Router();
 
 routerOne.add( '/test', routerTwo )
 ~~~
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server = require( 'event_request' );
 
 // You can also attach the router to a route
-const userRouter  = Server().Router();
+const userRouter = Server().Router();
 userRouter.get( '/list', ( event )=>{
     event.send( { userOne: {}, userTwo: {} } );
 });
@@ -286,9 +322,9 @@ Server().add( '/user', userRouter );
 ####FUNCTION:
 - server.add can also accept a function that will be transformed into a route without method or route ( Function route )
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server = require( 'event_request' );
 
-const routerOne	= Server().Router();
+const routerOne = Server().Router();
 
 routerOne.add( ( event )=>{    
     event.next()
@@ -296,38 +332,38 @@ routerOne.add( ( event )=>{
 ~~~
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server = require( 'event_request' );
 
 // Adding a route
 Server().add({
-	route	: '/',
-	method	: 'GET',
-	handler	: ( event ) => {
-		event.send( '<h1>Hello World!</h1>' )
-	}
+    route : '/',
+    method : 'GET',
+    handler : ( event ) => {
+        event.send( '<h1>Hello World!</h1>' )
+    }
 });
 ~~~
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server = require( 'event_request' );
 
 // You can create your own router
-const router  = Server().Router();
+const router = Server().Router();
 router.add({
-    method: 'GET',
-    route: '/',
-    handler: ( event)=>{
+    route : '/',
+    method : 'GET',
+    handler : ( event)=>{
         event.send( '<h1>Hello World</h1>' );
     }
 });
 ~~~
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server = require( 'event_request' );
 
 // Adding a middleware without a method or route
 Server().add( ( event )=>{
-	event.next();
+    event.next();
 });
 
 Server().add( ( event )=>{
@@ -336,7 +372,7 @@ Server().add( ( event )=>{
 ~~~
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server = require( 'event_request' );
 
 // To attach a router to the server simply call the add function of the server.
 // Just like you would do to add a normal route.
@@ -344,18 +380,20 @@ Server().add( router );
 ~~~
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server = require( 'event_request' );
 
 // You can also get the router attached to the Server and use that directly
-const serverRouter    = Server().router;
-serverRouter.add(...);
+const serverRouter = Server().router;
+serverRouter.add(
+    //
+);
 ~~~
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const App = require( 'event_request' );
 
 // You can also attach the router to a route
-const userRouter  = Server().Router();
+const userRouter = App().Router();
 userRouter.get( '/list', ( event )=>{
     event.send( { userOne: {}, userTwo: {} } );
 });
@@ -365,27 +403,27 @@ userRouter.post( '/add/:username:', ( event )=>{
     event.send( 'ok' );
 });
 
-Server().add( '/user', userRouter );
+App().add( '/user', userRouter );
 ~~~
 
 ***
 ####Router Wildcards
 - The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
 ~~~javascript
-const Server	= require( 'event_request' );
+const { App, Loggur } = require( 'event_request' );
 
-Server().add({
-    method: 'GET',
-    route: '/todos/:id:',
+App().add({
+    route : '/todos/:id:',
+    method : 'GET',
     handler: ( event)=>{
-        console.log( event.params.id );
+        Loggur.log( event.params.id );
         event.send( '<h1>Hello World</h1>' );
     }
 });
 
 // Or
-Server().get( '/todos/:id:', ( event)=>{
-    console.log( event.params.id );
+App().get( '/todos/:id:', ( event)=>{
+    Loggur.log( event.params.id );
     event.send( '<h1>Hello World</h1>' );
 });
 ~~~
@@ -399,39 +437,38 @@ Server().get( '/todos/:id:', ( event)=>{
 - When adding middlewares to routes it can either be a single string or multiple strings in an array.
 - They are added as a final value in .app, .get, .post, etc, or using the key `middlewares` if using the .add method
 ~~~javascript
-const Server		= require( 'event_request' );
-const { Loggur }	= require( 'event_request' );
+const { App, Loggur } = require( 'event_request' );
 
-const router	= Server().Router();
+const router = App().Router();
 
 router.define( 'test', ( event )=>{
-	Loggur.log( 'Middleware One!' );
-	event.next();
-} );
-
-Server().define( 'test2', ( event )=>{
-	Loggur.log( 'Middleware Two!' );
-	event.next();
-} );
-
-Server().get( '/', ( event )=>{
-	event.send( 'TEST' );
-}, ['test','test2'] );
-
-Server().add({
-	method: 'GET',
-	route: '/test',
-	middlewares: 'test',
-	handler: ( event )=>{
-		Loggur.log( 'Test!' );
-		event.send( 'Test2' );
-	}
+    Loggur.log( 'Middleware One!' );
+    event.next();
 });
 
-Server().add( router );
+App().define( 'test2', ( event )=>{
+    Loggur.log( 'Middleware Two!' );
+    event.next();
+});
 
-Server().listen( 80, ()=>{
-	Loggur.log( 'Server started' );
+App().get( '/', ( event )=>{
+    event.send( 'TEST' );
+}, ['test','test2'] );
+
+App().add({
+    route: '/test',
+    method: 'GET',
+    middlewares: 'test',
+    handler: ( event )=>{
+        Loggur.log( 'Test!' );
+        event.send( 'Test2' );
+    }
+});
+
+App().add( router );
+
+App().listen( 80, ()=>{
+    Loggur.log( 'Server started' );
 });
 ~~~
 
@@ -462,8 +499,8 @@ The event request is an object that is created by the server and passed through 
 - The current headers 
 - They will be set in a JS object format
 
-**validationHandler: ValidationHandler**
-- A handler used to do input validation
+**validation: ValidationHandler**
+- An object used to do input validation
 - Look down for more information on how to use it
 
 **extra: Object**
@@ -544,7 +581,7 @@ The event request is an object that is created by the server and passed through 
 
 **isFinished(): Boolean** 
 - Checks if the response is finished
-- A response is finished if the response is finished or the cleanUp method has been called
+- A response is finished if the response object returns true when calling isFinished or the cleanUp method has been called
 
 **next( mixed err = undefined, Number code = undefined ): void** 
 - Calls the next middleware in the execution block. 
@@ -624,52 +661,52 @@ const app = Server();
 
 - To start the Server you can do:
 ~~~javascript
-const Server	= require( 'event_request' );
-const app		= Server();
+const { App, Loggur } = require( 'event_request' );
+const app = App();
 
 app.listen( '80', ()=>{
-	Loggur.log( 'Server is running' );
+    Loggur.log( 'Server is running' );
 });
 ~~~
 
 - To clean up the server instance you can do:
 ~~~javascript
-const Server	= require( 'event_request' );
-const app		= Server();
+const { App, Loggur } = require( 'event_request' );
+const app = App();
 
 const httpServer = app.listen( '80', ()=>{
-	Loggur.log( 'Server is running' );
+    Loggur.log( 'Server is running' );
 });
 
 httpServer.close();
-Server().cleanUp();
+App().cleanUp();
 ~~~
 NOTES: 
 - This will stop the httpServer and set the internal variable of server to null
-- You may need to do  `app = Server()` again since they app variable is still a pointer to the old server
+- You may need to do `app = App()` again since they app variable is still a pointer to the old server
 
 - If you want to start the server using your own http/https server:
 ~~~javascript
-const http		= require( 'http' );
-const Server	= require( 'event_request' );
-const app		= http.createServer( Server().attach() );
+const http = require( 'http' );
+const { App, Loggur } = require( 'event_request' );
+const app = http.createServer( App().attach() );
 
 // No problem adding routes like this
-Server().get( '/',( event )=>{
-	event.send( 'ok' );
-} );
+App().get( '/',( event )=>{
+    event.send( 'ok' );
+});
 
 // OR like this
 app.get( '/test',( event )=>{
-	event.send( 'ok' );
-} );
+    event.send( 'ok' );
+});
 
 app.listen( '80',()=>{
-	console.log( 'Server is UN' )
+    Loggur.log( 'Server is UN' )
 });
 ~~~
 
-- Calling `Server()` anywhere will return the same instance of the Server.
+- Calling `App()` anywhere will return the same instance of the Framework.
 
 
 ***
@@ -801,12 +838,12 @@ logger.setLogLevel( 600 );
 
 Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log and will call all added Loggers
 ~~~javascript
-const { Loggur }	= require( 'event_request' );
+const { Loggur } = require( 'event_request' );
 
-const logger	= Loggur.createLogger({
-	transports	: [
-		new Console( { logLevel : LOG_LEVELS.notice } ),
-	]
+const logger = Loggur.createLogger({
+    transports : [
+        new Console( { logLevel : LOG_LEVELS.notice } ),
+    ]
 });
 
 Loggur.addLogger( 'logger_id', logger );
@@ -906,12 +943,12 @@ There are 2 predefined transport layers:
 **logColors: Object** 
 - The colors to use 
 - Defaults to
-    - [LOG_LEVELS.error]	: 'red',
-    - [LOG_LEVELS.warning]	: 'yellow',
-    - [LOG_LEVELS.notice]	: 'green',
-    - [LOG_LEVELS.info]		: 'blue',
-    - [LOG_LEVELS.verbose]	: 'cyan',
-    - [LOG_LEVELS.debug]	: 'white'
+    - [LOG_LEVELS.error]    : 'red',
+    - [LOG_LEVELS.warning]    : 'yellow',
+    - [LOG_LEVELS.notice]    : 'green',
+    - [LOG_LEVELS.info]        : 'blue',
+    - [LOG_LEVELS.verbose]    : 'cyan',
+    - [LOG_LEVELS.debug]    : 'white'
 
 ###File
 - Logs data to a file
@@ -938,40 +975,40 @@ There are 2 predefined transport layers:
 - If it is not provided the transport will not log
 
 ~~~javascript
-const { Logging }							= require( 'event_request' );
-const { Loggur, LOG_LEVELS, Console, File }	= Logging;
+const { Logging }                              = require( 'event_request' );
+const { Loggur, LOG_LEVELS, Console, File }    = Logging;
 
 // Create a custom Logger
-const logger	= Loggur.createLogger({
-	serverName	: 'Test', // The name of the logger
-	logLevel	: LOG_LEVELS.debug, // The logLevel for which the logger should be fired
-	capture		: false, // Do not capture thrown errors
-	transports	: [
-		new Console( { logLevel : LOG_LEVELS.notice } ), // Console logger that logs everything below notice
-		new File({ // File logger
-			logLevel	: LOG_LEVELS.notice, // Logs everything below notice
-			filePath	: '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
-			logLevels	: { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level )
-		}),
-		new File({
-			logLevel	: LOG_LEVELS.error,
-			filePath	: '/logs/error_log.log',
-		}),
-		new File({
-			logLevel	: LOG_LEVELS.debug,
-			filePath	: '/logs/debug_log.log'
-		})
-	]
+const logger    = Loggur.createLogger({
+    serverName    : 'Test', // The name of the logger
+    logLevel    : LOG_LEVELS.debug, // The logLevel for which the logger should be fired
+    capture        : false, // Do not capture thrown errors
+    transports    : [
+        new Console( { logLevel : LOG_LEVELS.notice } ), // Console logger that logs everything below notice
+        new File({ // File logger
+            logLevel    : LOG_LEVELS.notice, // Logs everything below notice
+            filePath    : '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
+            logLevels    : { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level )
+        }),
+        new File({
+            logLevel    : LOG_LEVELS.error,
+            filePath    : '/logs/error_log.log',
+        }),
+        new File({
+            logLevel    : LOG_LEVELS.debug,
+            filePath    : '/logs/debug_log.log'
+        })
+    ]
 });
 ~~~
 
 ### Default log levels:
-- error		: 100,
-- warning	: 200,
-- notice	: 300,
-- info		: 400,
-- verbose	: 500,
-- debug		: 600
+- error   : 100,
+- warning : 200,
+- notice  : 300,
+- info    : 400,
+- verbose : 500,
+- debug   : 600
 
 ***
 ***
@@ -981,7 +1018,7 @@ const logger	= Loggur.createLogger({
 The validation is done by using:
 
 ~~~javascript
-    event.validationHandler.validate( objectToValidate, skeleton )
+    event.validation.validate( objectToValidate, skeleton )
 ~~~
 
 - skeleton must have the keys that are to be validated that point to a string of rules separated by ||
@@ -1067,7 +1104,7 @@ When validation is done a ValidationResult is returned. It has 2 main methods:
     hasValidationFailed that returns a boolean whether there is an error
 
 ~~~javascript
-     const result	= event.validationHandler.validate(
+     const result    = event.validation.validate(
         event.body,
         { 
             username : 'filled||string||range:6-32',
@@ -1100,7 +1137,7 @@ The extra if not passed will default to 'def'
 - The$ rules must be optional otherwise validation will fail
 - In case where the parameters have NOT been passed, the default value will be used.
 ~~~javascript
-     const result	= event.validationHandler.validate(
+     const result    = event.validation.validate(
         event.body,
         { 
             username : { $rules: 'optional||string', $default: 'root' }, 
@@ -1118,58 +1155,58 @@ The extra if not passed will default to 'def'
 
 
 ~~~javascript
-const dataToValidate	= {
-			testOne	: 123,
-			testTwo	: '123',
-			123			: [1,2,3,4,5],
-			testThree	: {
-				'deepOne'	: 123,
-				deepTwo	: {
-					deeperOne	: 123,
-					deeperTwo	: '123'
-				}
-			},
-			testFour	: true,
-			testFive	: 'true',
-			testSix		: '1',
-		};
+const dataToValidate    = {
+            testOne    : 123,
+            testTwo    : '123',
+            123            : [1,2,3,4,5],
+            testThree    : {
+                'deepOne'    : 123,
+                deepTwo    : {
+                    deeperOne    : 123,
+                    deeperTwo    : '123'
+                }
+            },
+            testFour    : true,
+            testFive    : 'true',
+            testSix        : '1',
+        };
 
-		const result	= validationHandler.validate(
-			dataToValidate,
-			{
-				testOne		: 'string||range:2-4',
-				testTwo		: 'numeric||range:123-124',
-				123			: 'array||range:4-6',
-				testThree	: {
-					deepOne	: 'numeric||range:122-124',
-					deepTwo	: {
-						deeperOne	: 'string||range:2-4',
-						deeperTwo	: 'numeric||range:123-124'
-					}
-				},
-				testFour	: 'boolean',
-				testFive	: 'boolean',
-				testSix		: 'boolean'
-			}
-		);
+        const result    = validationHandler.validate(
+            dataToValidate,
+            {
+                testOne        : 'string||range:2-4',
+                testTwo        : 'numeric||range:123-124',
+                123            : 'array||range:4-6',
+                testThree    : {
+                    deepOne    : 'numeric||range:122-124',
+                    deepTwo    : {
+                        deeperOne    : 'string||range:2-4',
+                        deeperTwo    : 'numeric||range:123-124'
+                    }
+                },
+                testFour    : 'boolean',
+                testFive    : 'boolean',
+                testSix        : 'boolean'
+            }
+        );
 
-		console.log( result.hasValidationFailed() ); // false
-		console.log( result.getValidationResult() );
-		//{
-		//	'123'	: [1,2,3,4,5],
-		//	testOne	: '123',
-		//	testTwo	: 123,
-		//	testThree	: {
-		//		deepOne	: 123,
-		//		deepTwo	: {
-		//			deeperOne	: '123',
-		//			deeperTwo	: 123
-		//		}
-		//	},
-		//	testFour	: true,
-		//	testFive	: true,
-		//	testSix		: true,
-		//}
+        console.log( result.hasValidationFailed() ); // false
+        console.log( result.getValidationResult() );
+        //{
+        //    '123'    : [1,2,3,4,5],
+        //    testOne    : '123',
+        //    testTwo    : 123,
+        //    testThree    : {
+        //        deepOne    : 123,
+        //        deepTwo    : {
+        //            deeperOne    : '123',
+        //            deeperTwo    : 123
+        //        }
+        //    },
+        //    testFour    : true,
+        //    testFive    : true,
+        //    testSix        : true,
+        //}
 ~~~
 
 ***
@@ -1441,8 +1478,8 @@ The TestingTools export:
 - Mocker,   -> the class used to mock methods of testDoubles. Please note that if you use this class you will alter the original one
 - assert, -> nodejs assert module
 - tester, -> Already created tester
-- test		: tester.addTest.bind( tester ),
-- runAllTests	: tester.runAllTests.bind( tester )
+- test        : tester.addTest.bind( tester ),
+- runAllTests    : tester.runAllTests.bind( tester )
 
 ***
 ***
@@ -1502,13 +1539,13 @@ The TestingTools export:
 ####Example:
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server    = require( 'event_request' );
 
 const app       = Server();
 app.add(( event )=>{
-	event.sendError( 'Error', 500 ); // This will call the error Handler
-	event.next( 'Error', 500 ); // This will call the error Handler
-	event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
+    event.sendError( 'Error', 500 ); // This will call the error Handler
+    event.next( 'Error', 500 ); // This will call the error Handler
+    event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
 });
 app.listen( 80 );
 ~~~
@@ -1541,7 +1578,7 @@ app.listen( 80 );
 - If you want to add a custom BodyParser you can do:
 
 ~~~javascript
-const BodyParserPlugin	= require( 'event_request/server/plugins/available_plugins/body_parser_plugin' );
+const BodyParserPlugin    = require( 'event_request/server/plugins/available_plugins/body_parser_plugin' );
 
 class CustomBodyParser
 {
@@ -1801,11 +1838,11 @@ Server {
 - Generally all the integrated plug-ins begin with `er_`
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server    = require( 'event_request' );
 const app   = Server();
 
-const PluginManager	= app.getPluginManager();
-const timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
+const PluginManager    = app.getPluginManager();
+const timeoutPlugin    = PluginManager.getPlugin( 'er_timeout' );
 
 timeoutPlugin.setOptions( { timeout : 10 * 1000 } );
 app.apply( timeoutPlugin );
@@ -1910,7 +1947,7 @@ The plugin Manager exports the following functions:
 ####Example:
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server    = require( 'event_request' );
 const app   = Server();
 
 app.apply( 'er_timeout', { timeout: 10000 } );
@@ -1922,8 +1959,8 @@ app.apply( 'er_timeout' );
 app.apply( app.er_timeout );
 
 // OR
-const PluginManager	= app.getPluginManager();
-const timeoutPlugin	= PluginManager.getPlugin( 'er_timeout' );
+const PluginManager    = app.getPluginManager();
+const timeoutPlugin    = PluginManager.getPlugin( 'er_timeout' );
 
 timeoutPlugin.setOptions( { timeout : 10000 } ); // 10 seconds
 app.apply( timeoutPlugin );
@@ -1975,7 +2012,7 @@ app.apply( timeoutPlugin );
 ####Example:
 
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server    = require( 'event_request' );
 const app   = Server();
 
 app.apply( app.er_static_resources, { paths : ['public'] } );
@@ -1990,8 +2027,8 @@ app.apply( 'er_static_resources' );
 app.apply( app.er_static_resources );
 
 //OR
-const PluginManager			= app.getPluginManager();
-const staticResourcesPlugin	= PluginManager.getPlugin( 'er_static_resources' );
+const PluginManager            = app.getPluginManager();
+const staticResourcesPlugin    = PluginManager.getPlugin( 'er_static_resources' );
 
 staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
 app.apply( staticResourcesPlugin );
@@ -2047,7 +2084,7 @@ app.apply( staticResourcesPlugin );
 
 - You can add the plugin like:
 ~~~javascript
-const Server	= require( 'event_request' );
+const Server    = require( 'event_request' );
 const app   = Server();
 
 app.apply( 'er_data_server' );
@@ -2064,12 +2101,12 @@ app.apply( app.er_data_server, { dataServerOptions: { persist: false, ttl: 200, 
 
 - The plugin can be used like:
 ~~~javascript
-const { Loggur }	= require( 'event_request' );
+const { Loggur }    = require( 'event_request' );
 
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app			= require( 'event_request' )();
+const app            = require( 'event_request' )();
  
 app.apply( app.er_data_server, { persist: false } );
  
@@ -2177,53 +2214,53 @@ app.listen( 80, ()=>{
 
 - You can use the session like this:
 ~~~javascript
-const { Loggur }	= require( 'event_request' );
+const { Loggur }    = require( 'event_request' );
 
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app			= require( 'event_request' )();
+const app            = require( 'event_request' )();
 
 // Initialize the session
 app.add( async ( event )=>{
-	event.initSession( event.next ).catch( event.next );
+    event.initSession( event.next ).catch( event.next );
 });
 
 // Redirect to login if authenticated is not true
 app.add(( event )=>{
-	if (
-		event.path !== '/login'
-		&& ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
-	) {
-		event.redirect( '/login' );
-		return;
-	}
+    if (
+        event.path !== '/login'
+        && ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
+    ) {
+        event.redirect( '/login' );
+        return;
+    }
 
-	event.next();
+    event.next();
 });
 
 app.post( '/login', async ( event )=>{
-	const result	= event.validationHandler.validate( event.body, { username : 'filled||string', password : 'filled||string' } );
+    const result    = event.validation.validate( event.body, { username : 'filled||string', password : 'filled||string' } );
 
-	if ( result.hasValidationFailed() )
-	{
-		event.render( '/login' );
-		return;
-	}
+    if ( result.hasValidationFailed() )
+    {
+        event.render( '/login' );
+        return;
+    }
 
-	const { username, password }	= result.getValidationResult();
+    const { username, password }    = result.getValidationResult();
 
-	if ( username === 'username' && password === 'password' )
-	{
-		event.session.add( 'username', username );
-		event.session.add( 'authenticated', true );
+    if ( username === 'username' && password === 'password' )
+    {
+        event.session.add( 'username', username );
+        event.session.add( 'authenticated', true );
 
-		event.redirect( '/' );
-	}
-	else
-	{
-		event.render( '/login' );
-	}
+        event.redirect( '/' );
+    }
+    else
+    {
+        event.render( '/login' );
+    }
 });
 
 app.listen( 80, ()=>{
@@ -2295,9 +2332,9 @@ app.listen( 80, ()=>{
 
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app	= require( 'event_request' )();
+const app    = require( 'event_request' )();
 
 app.apply( app.er_templating_engine, { templateDir: path.join( __dirname, './public' ) } );
 
@@ -2308,8 +2345,8 @@ app.apply( 'er_templating_engine' );
 app.apply( app.er_templating_engine );
 
 // OR
-const PluginManager				= server.getPluginManager();
-const templatingEnginePlugin	= PluginManager.getPlugin( app.er_templating_engine );
+const PluginManager                = server.getPluginManager();
+const templatingEnginePlugin    = PluginManager.getPlugin( app.er_templating_engine );
 
 templatingEnginePlugin.setOptions( { templateDir : path.join( __dirname, './public' ), engine : someEngineConstructor } ); 
 app.apply( templatingEnginePlugin );
@@ -2317,12 +2354,12 @@ app.apply( templatingEnginePlugin );
 // THEN
 
 router.get( '/preview', ( event ) => {
-		// If you have a templating engine that supports parameters:
-		event.render( 'preview', { type: 'test', src: '/data' }, event.next );
+        // If you have a templating engine that supports parameters:
+        event.render( 'preview', { type: 'test', src: '/data' }, event.next );
 
-		// Otherwise the default one can only render html
-		event.render( 'preview', {}, event.next );
-	}
+        // Otherwise the default one can only render html
+        event.render( 'preview', {}, event.next );
+    }
 );
 ~~~
 
@@ -2386,12 +2423,12 @@ router.get( '/preview', ( event ) => {
 
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app			= require( 'event_request' )();
+const app            = require( 'event_request' )();
 
-const PluginManager		= app.getPluginManager();
-const fileStreamPlugin	= PluginManager.getPlugin( 'er_file_stream' );
+const PluginManager        = app.getPluginManager();
+const fileStreamPlugin    = PluginManager.getPlugin( 'er_file_stream' );
 app.apply( fileStreamPlugin );
 
 // OR
@@ -2406,40 +2443,40 @@ app.apply( 'er_file_stream' );
 const fs = require( 'fs' );
 
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app	= require( 'event_request' )();
+const app    = require( 'event_request' )();
 
 app.get( '/data', ( event ) =>{
-		const result	= event.validationHandler.validate( event.queryString, { file: 'filled||string||min:1' } );
-		const file		= ! result.hasValidationFailed() ? result.getValidationResult().file : false;
+        const result    = event.validation.validate( event.queryString, { file: 'filled||string||min:1' } );
+        const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
 
-		if ( ! file || ! fs.existsSync( file ) )
-		{
-			event.next( 'File does not exist' );
-		}
-		else
-		{
-			// You can use this if you want to maybe pipe the file stream to a transformation stream or in general
-			// do something else than piping it to the event.response
-			event.getFileStream( file ).pipe( event.response );
-		}
-	}
+        if ( ! file || ! fs.existsSync( file ) )
+        {
+            event.next( 'File does not exist' );
+        }
+        else
+        {
+            // You can use this if you want to maybe pipe the file stream to a transformation stream or in general
+            // do something else than piping it to the event.response
+            event.getFileStream( file ).pipe( event.response );
+        }
+    }
 );
 
 app.get( '/dataTwo', ( event ) =>{
-		const result	= event.validationHandler.validate( event.queryString, { file: 'filled||string||min:1' } );
-		const file		= ! result.hasValidationFailed() ? result.getValidationResult().file : false;
+        const result    = event.validation.validate( event.queryString, { file: 'filled||string||min:1' } );
+        const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
 
-		if ( ! file || ! fs.existsSync( file ) )
-		{
-			event.next( 'File does not exist' );
-		}
-		else
-		{
-			event.streamFile( file );
-		}
-	}
+        if ( ! file || ! fs.existsSync( file ) )
+        {
+            event.next( 'File does not exist' );
+        }
+        else
+        {
+            event.streamFile( file );
+        }
+    }
 );
 ~~~
 
@@ -2495,12 +2532,12 @@ app.get( '/dataTwo', ( event ) =>{
 
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app			= require( 'event_request' )();
+const app            = require( 'event_request' )();
 
-const PluginManager	= app.getPluginManager();
-const loggerPlugin	= PluginManager.getPlugin( 'er_logger' );
+const PluginManager    = app.getPluginManager();
+const loggerPlugin    = PluginManager.getPlugin( 'er_logger' );
 app.apply( loggerPlugin );
 
 //OR
@@ -2608,9 +2645,9 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app			= require( 'event_request' )();
+const app            = require( 'event_request' )();
 
 // Add Body Parsers
 app.apply( app.er_body_parser_json );
@@ -2679,35 +2716,35 @@ Middleware: **cache.request**
 
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app			= require( 'event_request' )();
+const app            = require( 'event_request' )();
 
-const PluginManager		= app.getPluginManager();
-const cacheServer		= PluginManager.getPlugin( app.er_data_server );
+const PluginManager        = app.getPluginManager();
+const cacheServer        = PluginManager.getPlugin( app.er_data_server );
 
 app.apply( cacheServer );
 app.apply( PluginManager.getPlugin( app.er_response_cache ) );
 
 // call event.cacheCurrentRequest() where you want to cache.
 app.add({
-	route	: '/',
-	method	: 'GET',
-	handler	: ( event )=>{
-		event.cacheCurrentRequest();
-	}
+    route    : '/',
+    method    : 'GET',
+    handler    : ( event )=>{
+        event.cacheCurrentRequest();
+    }
 });
 
 // OR  You can create your own middleware that will be added to all requests
 // you want to cache, no need to do it separately
 app.add( async ( event )=>{
-	const pathsToCache = ['/', '/sth', 'test'];
-	if ( pathsToCache.indexOf( event.path ) !== -1 )
+    const pathsToCache = ['/', '/sth', 'test'];
+    if ( pathsToCache.indexOf( event.path ) !== -1 )
     {
         await event.cacheCurrentRequest().catch( event.next );
     }
-	
-	// Or use the router to match RegExp
+    
+    // Or use the router to match RegExp
 });
 
 // When setting a request to be cached, ttl and useIp may be passed that will overwrite the default options
@@ -2720,10 +2757,10 @@ app.add( async ( event )=>{
 
 // You can add it via a middleware to a specific route
 app.get( '/', ( event )=> 
-	{
-		event.send( 'Hello World!' );
-	}, 
-	'cache.request'
+    {
+        event.send( 'Hello World!' );
+    }, 
+    'cache.request'
 );
 ~~~
 
@@ -2772,15 +2809,15 @@ app.get( '/', ( event )=>
 
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app	= require( 'event_request' )();
+const app    = require( 'event_request' )();
 
 app.apply( 'er_env' );
 app.add(( event )=>{
-	console.log( process.env );
+    console.log( process.env );
 
-	event.send( 'Done' );
+    event.send( 'Done' );
 });
 app.listen( 80 );
 ~~~
@@ -2893,11 +2930,11 @@ Rate limit rule options:
 *** 
 ####POLICIES:
 
-**PERMISSIVE_POLICY**	= 'permissive';
+**PERMISSIVE_POLICY**    = 'permissive';
 
 This policy will let the client connect freely but a flag will be set that it was rate limited
 
-**CONNECTION_DELAY_POLICY**	= 'connection_delay';
+**CONNECTION_DELAY_POLICY**    = 'connection_delay';
 
 This policy will rate limit normally the request and will hold the connection until a token is freed
 If this is the policy specified then **delayTime** and **delayRetries** must be given. This will be the time after
@@ -2906,7 +2943,7 @@ The first connection delay policy hit in the case of many will be used to determ
 all buckets affected by such a connection delay will be affected
 
 
-**STRICT_POLICY**	= 'strict';
+**STRICT_POLICY**    = 'strict';
 
 This policy will instantly reject if there are not enough tokens and return an empty response with a 429 header.
 This will also include a Retry-After header. If this policy is triggered, stopPropagation will be ignored and
@@ -2933,21 +2970,21 @@ the request will be immediately canceled
 
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app				= require( 'event_request' )();
-const { Server }		= require( 'event_request' );
-const RateLimitsPlugin	= require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
-const DataServer		= require( 'event_request/server/components/caching/data_server' );
+const app                = require( 'event_request' )();
+const { Server }        = require( 'event_request' );
+const RateLimitsPlugin    = require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
+const DataServer        = require( 'event_request/server/components/caching/data_server' );
 
 app.apply( app.er_rate_limits );
 
 // If you implement a custom distributed DataServer you can sync between servers
 // Two servers
-const dataStore	= new DataServer( { persist: false, ttl: 90000 } );
+const dataStore    = new DataServer( { persist: false, ttl: 90000 } );
 
-const appOne	= new Server();
-const appTwo	= new Server();
+const appOne    = new Server();
+const appTwo    = new Server();
 
 appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
@@ -2956,12 +2993,12 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 - Adding with rules directly:
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app				= require( 'event_request' )();
-const { Server }		= require( 'event_request' );
-const RateLimitsPlugin	= require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
-const DataServer		= require( 'event_request/server/components/caching/data_server' );
+const app                = require( 'event_request' )();
+const { Server }        = require( 'event_request' );
+const RateLimitsPlugin    = require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
+const DataServer        = require( 'event_request/server/components/caching/data_server' );
 
 const rules = [
   {
@@ -2994,10 +3031,10 @@ app.apply( app.er_rate_limits, { rules } );
 
 // If you implement a custom distributed DataServer you can sync between servers
 // Two servers
-const dataStore	= new DataServer( { persist: false, ttl: 90000 } );
+const dataStore    = new DataServer( { persist: false, ttl: 90000 } );
 
-const appOne	= new Server();
-const appTwo	= new Server();
+const appOne    = new Server();
+const appTwo    = new Server();
 
 appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
@@ -3395,9 +3432,9 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 - Apply the plugin with defaults
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app			= require( 'event_request' )();
+const app            = require( 'event_request' )();
 
 // It's a good idea to do this first before attaching any other plugins or adding routes
 app.apply( app.er_security );
@@ -3423,30 +3460,30 @@ app.add(( event )=>{
 - Apply the plugin with custom directives
 ~~~javascript
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app	= require( 'event_request' )();
+const app    = require( 'event_request' )();
 
 app.apply( app.er_security, {
-	csp	: {
-		directives	: {
-			'font-src'	: ['https://fonts.gstatic.com'],
-			'script-src': ['https://example.com'],
-			'style-src': ['https://example.com', 'unsafe-eval'],
-		},
-		xss: true
-	},
+    csp    : {
+        directives    : {
+            'font-src'    : ['https://fonts.gstatic.com'],
+            'script-src': ['https://example.com'],
+            'style-src': ['https://example.com', 'unsafe-eval'],
+        },
+        xss: true
+    },
     ect : {
         maxAge: '300'
     },
     hsts    : {
-		maxAge: '300',
+        maxAge: '300',
         preload: false
     },
     cto : {
         enabled: false
     },
-	build: true
+    build: true
 });
 ~~~
 
@@ -3454,41 +3491,41 @@ app.apply( app.er_security, {
 ~~~javascript
 
 /**
- * @brief	Instantiate the server
+ * @brief    Instantiate the server
  */
-const app			= require( 'event_request' )();
+const app            = require( 'event_request' )();
 app.apply( app.er_security, { csp : { xss: false } } );
 
 app.add(( event )=>{
 
-	// self is repeated twice but will be shown only once and with single quotes
-	event.$security.csp.addFontSrc( 'self' );
-	event.$security.csp.addFontSrc( "'self'" );
-	event.$security.csp.addFontSrc( 'test' );
-	event.$security.csp.upgradeInsecureRequests();
-	event.$security.csp.enableSelf();
-	event.$security.csp.enableSandbox();
+    // self is repeated twice but will be shown only once and with single quotes
+    event.$security.csp.addFontSrc( 'self' );
+    event.$security.csp.addFontSrc( "'self'" );
+    event.$security.csp.addFontSrc( 'test' );
+    event.$security.csp.upgradeInsecureRequests();
+    event.$security.csp.enableSelf();
+    event.$security.csp.enableSandbox();
 
-	event.$security.ect.setEnabled( false );
-	event.$security.ect.setMaxAge( 30000 );
+    event.$security.ect.setEnabled( false );
+    event.$security.ect.setMaxAge( 30000 );
 
-	event.$security.hsts.setMaxAge( 300 );
-	// null and 'string' are invalid for max age so 300 will be left
-	event.$security.hsts.setMaxAge( null );
-	event.$security.hsts.setMaxAge( 'string' );
-	event.$security.hsts.preload();
-	event.$security.hsts.includeSubDomains( false );
+    event.$security.hsts.setMaxAge( 300 );
+    // null and 'string' are invalid for max age so 300 will be left
+    event.$security.hsts.setMaxAge( null );
+    event.$security.hsts.setMaxAge( 'string' );
+    event.$security.hsts.preload();
+    event.$security.hsts.includeSubDomains( false );
 
-	event.$security.build();
+    event.$security.build();
 
-	// This will actually add a new script-src to the csp and will disable the cto component
-	event.$security.csp.addScriptSrc( 'test' );
-	event.$security.cto.setEnabled( false );
+    // This will actually add a new script-src to the csp and will disable the cto component
+    event.$security.csp.addScriptSrc( 'test' );
+    event.$security.cto.setEnabled( false );
 
-	// This will overwrite the previous build and set the new modified headers
-	event.$security.build();
+    // This will overwrite the previous build and set the new modified headers
+    event.$security.build();
 
-	event.next();
+    event.next();
 });
 ~~~
 
