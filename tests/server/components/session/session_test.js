@@ -3,7 +3,7 @@
 // Dependencies
 const { assert, test, helpers }	= require( '../../../test_helper' );
 const Session					= require( './../../../../server/components/session/session' );
-const EventRequest				= require( './../../../../server/event' );
+const EventRequest				= require( './../../../../server/event_request' );
 
 test({
 	message	: 'Session constructor on default throws',

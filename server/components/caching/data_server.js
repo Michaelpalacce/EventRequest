@@ -43,7 +43,7 @@ class DataServer extends EventEmitter
 	 *
 	 * @details	This is intentionally separated from the constructor so that it could be overwritten in any other implementations of the caching.
 	 *
-	 * @param	Object options
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */
@@ -51,28 +51,28 @@ class DataServer extends EventEmitter
 	{
 		this.server				= {};
 
-		this.defaultTtl			= typeof options['ttl'] === 'number'
-								? options['ttl']
+		this.defaultTtl			= typeof options.ttl === 'number'
+								? options.ttl
 								: DEFAULT_TTL;
 		this.defaultTtl			= this.defaultTtl === -1 ? Infinity : this.defaultTtl;
 
-		this.persistPath		= typeof options['persistPath'] === 'string'
-								? options['persistPath']
+		this.persistPath		= typeof options.persistPath === 'string'
+								? options.persistPath
 								: DEFAULT_PERSIST_FILE;
 
-		this.persistInterval	= typeof options['persistInterval'] === 'number'
-								? options['persistInterval']
+		this.persistInterval	= typeof options.persistInterval === 'number'
+								? options.persistInterval
 								: DEFAULT_PERSIST_INTERVAL;
 		this.persistInterval	= this.persistInterval * 1000;
 
-		let gcInterval			= typeof options['gcInterval'] === 'number'
-								? options['gcInterval']
+		let gcInterval			= typeof options.gcInterval === 'number'
+								? options.gcInterval
 								: DEFAULT_GARBAGE_COLLECT_INTERVAL;
 
 		gcInterval				= gcInterval * 1000;
 
-		this.persist			= typeof options['persist'] === 'boolean'
-								? options['persist']
+		this.persist			= typeof options.persist === 'boolean'
+								? options.persist
 								: DEFAULT_PERSIST_RULE;
 
 		if ( this.persist )
@@ -96,6 +96,8 @@ class DataServer extends EventEmitter
 
 	/**
 	 * @brief	Flushes data from memory, deletes the Cache file and stops all the intervals. Also removes all events
+	 *
+	 * @return	void
 	 */
 	stop()
 	{
@@ -142,8 +144,8 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Gets the value from the server
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
 	 * @return	Promise|null
 	 */
@@ -161,7 +163,7 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Any operations with the data server should reject if the data server is not responding
 	 *
-	 * @return	mixed
+	 * @return	void
 	 */
 	_handleServerDown()
 	{
@@ -176,8 +178,8 @@ class DataServer extends EventEmitter
 	 *
 	 * @details	Prunes the data if it is expired
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -198,10 +200,10 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Sets the value to the data server
 	 *
-	 * @param	key String
-	 * @param	value mixed
-	 * @param	ttl Number
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{*} value
+	 * @param	{Number} [ttl=0]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -225,10 +227,10 @@ class DataServer extends EventEmitter
 	 *
 	 * @details	Resolves the data if it was correctly set, otherwise resolves to null
 	 *
-	 * @param	key String
-	 * @param	value mixed
-	 * @param	ttl Number
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{*} value
+	 * @param	{Number} [ttl=0]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -245,9 +247,9 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Increment a numeric key value
 	 *
-	 * @param	key String
-	 * @param	value Number
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Number} [value=1]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise|null
 	 */
@@ -271,9 +273,9 @@ class DataServer extends EventEmitter
 	 *
 	 * @details	Does no async operations intentionally
 	 *
-	 * @param	key String
-	 * @param	value Number
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Number} [value=1]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -304,9 +306,9 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Decrements a numeric key value
 	 *
-	 * @param	key String
-	 * @param	value Number
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Number} [value=1]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise|null
 	 */
@@ -330,9 +332,9 @@ class DataServer extends EventEmitter
 	 *
 	 * @details	Does no async operations intentionally
 	 *
-	 * @param	key String
-	 * @param	value Number
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Number} [value=1]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -363,8 +365,8 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Locking mechanism. Will return a boolean if the lock was ok
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -383,12 +385,12 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Locking mechanism. Will return a boolean if the lock was ok
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Boolean
 	 */
-	async _lock( key, options )
+	async _lock( key, options = {} )
 	{
 		return new Promise(( resolve )=>{
 			const ttl		= -1;
@@ -408,8 +410,8 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Releases the lock
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -428,12 +430,12 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Releases the key
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Boolean
 	 */
-	async _unlock( key, options )
+	async _unlock( key, options = {} )
 	{
 		return new Promise(( resolve )=>{
 			const exists	= typeof this.server[key] !== 'undefined';
@@ -450,10 +452,10 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Makes a new dataSet from the data
 	 *
-	 * @param	String key
-	 * @param	mixed value
-	 * @param	Number ttl
-	 * @param	Boolean persist
+	 * @param	{String} key
+	 * @param	{*} value
+	 * @param	{Number} ttl
+	 * @param	{Boolean} persist
 	 *
 	 * @return	Object
 	 */
@@ -468,9 +470,9 @@ class DataServer extends EventEmitter
 	 *
 	 * @details	Checks if the arguments are correct
 	 *
-	 * @param	key String
-	 * @param	ttl Number
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Number} [ttl=0]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -490,9 +492,9 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Touches the key
 	 *
-	 * @param	key String
-	 * @param	ttl Number
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Number} [ttl=0]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -515,8 +517,8 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Removes a key if it is expired, otherwise, return it
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -549,8 +551,8 @@ class DataServer extends EventEmitter
 	 *
 	 * @details	Returns true on success and false on failure. If the key does not exist, false will be returned
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -571,8 +573,8 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Deletes the key from the server
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
@@ -693,7 +695,7 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Gets the ttl depending on the values given
 	 *
-	 * @param	ttl Number
+	 * @param	{Number} [ttl=-1]
 	 *
 	 * @return	Number
 	 */
@@ -710,7 +712,7 @@ class DataServer extends EventEmitter
 	/**
 	 * @brief	Gets the expiration date of the record given the ttl
 	 *
-	 * @param	ttl Number
+	 * @param	{Number} [ttl=-1]
 	 *
 	 * @return	Number
 	 */

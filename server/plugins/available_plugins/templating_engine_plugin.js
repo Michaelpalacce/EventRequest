@@ -15,7 +15,7 @@ class TemplatingEnginePlugin extends PluginInterface
 	/**
 	 * @brief	Attaches a render function to the event request
 	 *
-	 * @param	eventRequest EventRequest
+	 * @param	{EventRequest} eventRequest
 	 *
 	 * @return	void
 	 */
@@ -24,9 +24,9 @@ class TemplatingEnginePlugin extends PluginInterface
 		/**
 		 * @brief	Renders the template given
 		 *
-		 * @param	templateName String
-		 * @param	variables Object
-		 * @param	errorCallback Callable
+		 * @param	{String} templateName
+		 * @param	{Object} variables
+		 * @param	{CallableFunction} errorCallback
 		 *
 		 * @return	Promise
 		 */

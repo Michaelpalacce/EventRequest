@@ -22,9 +22,9 @@ const PROJECT_ROOT		= path.parse( require.main.filename ).dir + '\\';
 class Log
 {
 	/**
-	 * @param	log mixed
-	 * @param	level Number
-	 * @param	isRaw Boolean
+	 * @param	{*} log
+	 * @param	{Number} level
+	 * @param	{Boolean} isRaw
 	 */
 	constructor( log, level, isRaw )
 	{
@@ -91,9 +91,9 @@ class Log
 	/**
 	 * @brief	Processes the given log
 	 *
-	 * @param	message mixed
-	 * @param	level Number
-	 * @param	isRaw Boolean
+	 * @param	{*} [message='']
+	 * @param	{Number} [level=LOG_LEVELS.error]
+	 * @param	{Boolean} [isRaw=false]
 	 *
 	 * @return	void
 	 */
@@ -186,7 +186,7 @@ class Log
 	}
 
 	/**
-	 * @param	uniqueId String
+	 * @param	{String} uniqueId
 	 *
 	 * @return	void
 	 */
@@ -208,9 +208,9 @@ class Log
 	/**
 	 * @brief	Get a new instance of the Log
 	 *
-	 * @param	log mixed
-	 * @param	level Number
-	 * @param	isRaw Boolean
+	 * @param	{*} log
+	 * @param	{Number} level
+	 * @param	{Boolean} isRaw
 	 *
 	 * @return	Log
 	 */

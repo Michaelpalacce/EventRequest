@@ -435,6 +435,109 @@ test({
 });
 
 test({
+	message	: 'Router.getExecutionBlockForCurrentEvent.caches.if.caching.is.enabled',
+	test	: ( done )=>{
+		const eventRequest					= helpers.getEventRequest( 'GET', '/test', {} );
+		const expectedExecutionBlockCount	= 1;
+		const router						= new Router();
+		const route							= new Route(
+			{
+				route: '/test',
+				method: 'GET',
+				handler: ()=>{}
+			}
+		);
+
+		router.add( route );
+
+		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
+		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
+		assert.equal( typeof router.cache[`${route.getRoute()}${route.getMethod()}`] === 'object', true );
+		assert.equal( typeof router.cache[`${route.getRoute()}${route.getMethod()}`].block !== 'undefined', true );
+		assert.equal( Array.isArray( router.cache[`${route.getRoute()}${route.getMethod()}`].block ), true );
+		assert.deepStrictEqual( router.cache[`${route.getRoute()}${route.getMethod()}`].block, [route.getHandler()] );
+		assert.equal( typeof router.cache[`${route.getRoute()}${route.getMethod()}`].date === 'number', true );
+		assert.equal( typeof router.cache[`${route.getRoute()}${route.getMethod()}`].params === 'object', true );
+		assert.deepStrictEqual( router.cache[`${route.getRoute()}${route.getMethod()}`].params, {} );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.setKeyLimit.and._isCacheFull',
+	test	: ( done )=>{
+		const eventRequest		= helpers.getEventRequest( 'GET', '/test', {} );
+		const eventRequestTwo	= helpers.getEventRequest( 'GET', '/testTwo', {} );
+
+		const router			= new Router();
+
+		const route				= new Route( { route: '/test', method: 'GET', handler: ()=>{} } );
+		const routeTwo			= new Route( { route: '/testTwo', method: 'GET', handler: ()=>{} } );
+
+		router.add( route ).add( routeTwo );
+
+		router.getExecutionBlockForCurrentEvent( eventRequest );
+		router.getExecutionBlockForCurrentEvent( eventRequestTwo );
+
+		assert.equal( router.keyLimit, 5000 );
+		assert.equal( router._isCacheFull(), false );
+
+		router.setKeyLimit( 1 );
+
+		assert.equal( router.keyLimit, 1 );
+		assert.equal( router._isCacheFull(), true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.enableCaching',
+	test	: ( done )=>{
+		const router	= new Router();
+
+		assert.equal( router.cachingIsEnabled, true );
+
+		router.enableCaching( false );
+
+		assert.equal( router.cachingIsEnabled, false );
+
+		router.enableCaching( true );
+
+		assert.equal( router.cachingIsEnabled, true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.getExecutionBlockForCurrentEvent.does.not.cache.if.caching.is.disabled',
+	test	: ( done )=>{
+		const eventRequest					= helpers.getEventRequest( 'GET', '/test', {} );
+
+		const expectedExecutionBlockCount	= 1;
+		const router						= new Router();
+		const route							= new Route(
+			{
+				route: '/test',
+				method: 'GET',
+				handler: ()=>{}
+			}
+		);
+
+		router.add( route );
+
+		router.enableCaching( false );
+
+		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
+		assert.deepStrictEqual( router.cache, {} );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Router.getExecutionBlockForCurrentEvent fails if route has a non existing global middleware',
 	test	: ( done )=>{
 		const router					= new Router();

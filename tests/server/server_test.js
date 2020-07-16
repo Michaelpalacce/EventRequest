@@ -3262,3 +3262,79 @@ test({
 		} ).catch( done );
 	}
 });
+
+test({
+	message	: 'Server.testErCors',
+	test	: ( done )=>{
+		app.apply( app.er_cors, {
+			origin: 'http://example.com',
+			methods: ['GET', 'POST'],
+			headers: ['Accepts', 'X-Requested-With'],
+			exposedHeaders: ['Accepts'],
+			status: 200,
+			maxAge: 200,
+			credentials: true,
+		});
+
+		app.get( '/testErCors', ( event )=>{
+			event.send( 'ok' );
+		});
+
+		helpers.sendServerRequest( `/testErCors` ).then( ( response )=>{
+			assert.equal( response.headers['access-control-allow-origin'], 'http://example.com' );
+			assert.equal( response.headers['access-control-allow-headers'], 'Accepts, X-Requested-With' );
+			assert.equal( response.headers['access-control-expose-headers'], 'Accepts' );
+			assert.equal( response.headers['access-control-max-age'], '200' );
+			assert.equal( response.headers['access-control-allow-credentials'], 'true' );
+			assert.equal( response.headers['access-control-allow-methods'], undefined );
+		} ).then(()=>{
+			return helpers.sendServerRequest( `/testErCors`, 'options' ).then( ( response )=>{
+				assert.equal( response.headers['access-control-allow-origin'], 'http://example.com' );
+				assert.equal( response.headers['access-control-allow-headers'], 'Accepts, X-Requested-With' );
+				assert.equal( response.headers['access-control-expose-headers'], 'Accepts' );
+				assert.equal( response.headers['access-control-max-age'], '200' );
+				assert.equal( response.headers['access-control-allow-credentials'], 'true' );
+				assert.equal( response.headers['access-control-allow-methods'], 'GET, POST' );
+				done();
+			});
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.testErCorsWithErrors',
+	test	: ( done )=>{
+		app.apply( app.er_cors, {
+			origin: 10,
+			methods: 'GET',
+			headers: 'Accepts',
+			exposedHeaders: 12,
+			status: 'test',
+			maxAge: '200',
+			credentials: null,
+		});
+
+		app.get( '/testErCorsWithErrors', ( event )=>{
+			event.send( 'ok' );
+		});
+
+		helpers.sendServerRequest( `/testErCors`, 'GET', 200 ).then( ( response )=>{
+			assert.equal( response.headers['access-control-allow-origin'], '*' );
+			assert.equal( response.headers['access-control-allow-headers'], '*' );
+			assert.equal( response.headers['access-control-expose-headers'], undefined );
+			assert.equal( response.headers['access-control-max-age'], undefined );
+			assert.equal( response.headers['access-control-allow-credentials'], undefined );
+			assert.equal( response.headers['access-control-allow-methods'], undefined );
+		} ).then(()=>{
+			return helpers.sendServerRequest( `/testErCors`, 'options', 204 ).then( ( response )=>{
+				assert.equal( response.headers['access-control-allow-origin'], '*' );
+				assert.equal( response.headers['access-control-allow-headers'], '*' );
+				assert.equal( response.headers['access-control-expose-headers'], undefined );
+				assert.equal( response.headers['access-control-max-age'], undefined );
+				assert.equal( response.headers['access-control-allow-credentials'], undefined );
+				assert.equal( response.headers['access-control-allow-methods'], 'POST, PUT, GET, DELETE, HEAD, PATCH, COPY' );
+				done();
+			});
+		}).catch( done );
+	}
+});

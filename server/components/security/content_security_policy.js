@@ -55,7 +55,7 @@ class ContentSecurityPolicy
 	/**
 	 * @brief	Parses the given options and sets the different directives in keys
 	 *
-	 * @param	options Object
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */
@@ -126,7 +126,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	mimeType String
+	 * @param	{String} mimeType
 	 *
 	 * @return	void
 	 */
@@ -139,7 +139,7 @@ class ContentSecurityPolicy
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @param	enabled Boolean
+	 * @param	{Boolean} [enabled=true]
 	 *
 	 * @return	void
 	 */
@@ -161,7 +161,7 @@ class ContentSecurityPolicy
 	/**
 	 * @brief	Sets the header to be in report only mode
 	 *
-	 * @param	uri String
+	 * @param	{String} uri
 	 *
 	 * @return	void
 	 */
@@ -182,7 +182,7 @@ class ContentSecurityPolicy
 	 *
 	 * @details	The report-uri header won't be added for you, you have to specify that yourself
 	 *
-	 * @param	uri String
+	 * @param	{String} uri
 	 *
 	 * @return	void
 	 */
@@ -215,7 +215,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	value String
+	 * @param	{String} value
 	 *
 	 * @return	void
 	 */
@@ -255,7 +255,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -265,7 +265,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -275,7 +275,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -285,7 +285,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -295,7 +295,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -315,7 +315,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -325,7 +325,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -335,7 +335,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -345,7 +345,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -355,7 +355,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -365,7 +365,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	void
 	 */
@@ -415,7 +415,7 @@ class ContentSecurityPolicy
 	 *
 	 * @details	Adds quotes when needed
 	 *
-	 * @param	source String
+	 * @param	{String} source
 	 *
 	 * @return	String
 	 */
@@ -432,8 +432,8 @@ class ContentSecurityPolicy
 	/**
 	 * @brief	Adds a new directive
 	 *
-	 * @param	directive String
-	 * @param	value String
+	 * @param	{String} directive
+	 * @param	{String} [value='']
 	 *
 	 * @return	void
 	 */

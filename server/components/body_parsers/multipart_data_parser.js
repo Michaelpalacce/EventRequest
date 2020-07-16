@@ -50,11 +50,11 @@ const ERROR_RESOURCE_TAKEN						= 106;
 class MultipartDataParser extends EventEmitter
 {
 	/**
-	 * @param	Object options
-	 * 			Accepts options:
-	 * 			- maxPayload - Number - Maximum payload in bytes to parse if set to 0 means infinite
-	 * 			- tempDir - String - The directory where to keep the uploaded files before moving
-	 * 			- cleanUpItemsTimeoutMS - String - After what time should the files be deleted if any. Defaults to 100
+	 * @param	{Object} options
+	 * 				Accepts options:
+	 * 					- maxPayload - Number - Maximum payload in bytes to parse if set to 0 means infinite
+	 * 					- tempDir - String - The directory where to keep the uploaded files before moving
+	 * 					- cleanUpItemsTimeoutMS - String - After what time should the files be deleted if any. Defaults to 100
 	 */
 	constructor( options = {} )
 	{
@@ -128,7 +128,7 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Upgrades the given data part and adds it DATA_TYPE_FILE properties
 	 *
-	 * @param	Object part
+	 * @param	{Object} part
 	 *
 	 * @return	void
 	 */
@@ -142,7 +142,7 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Upgrades the given data part and adds it DATA_TYPE_PARAMETER properties
 	 *
-	 * @param	Object part
+	 * @param	{Object} part
 	 *
 	 * @return	void
 	 */
@@ -154,8 +154,6 @@ class MultipartDataParser extends EventEmitter
 
 	/**
 	 * @brief	Removes data part properties to prepare the part for exposure
-	 *
-	 * @param	Object part
 	 *
 	 * @return	void
 	 */
@@ -202,7 +200,7 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Determines the OS line end and sets it for future use
 	 *
-	 * @param	Buffer chunk
+	 * @param	{Buffer} chunk
 	 *
 	 * @return	void
 	 */
@@ -228,7 +226,7 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Callback called when data is received by the server
 	 *
-	 * @param	Buffer chunk
+	 * @param	{Buffer} chunk
 	 *
 	 * @return	void
 	 */
@@ -247,8 +245,8 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Flushes the given buffer to the part.file stream
 	 *
-	 * @param	Object part
-	 * @param	Buffer buffer
+	 * @param	{Object} part
+	 * @param	{Buffer} buffer
 	 *
 	 * @return	void
 	 */
@@ -273,7 +271,7 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Extracts chunk data as they come in
 	 *
-	 * @param	Buffer chunk
+	 * @param	{Buffer} chunk
 	 *
 	 * @return	void
 	 */
@@ -516,7 +514,7 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Emits an event with an error
 	 *
-	 * @param	mixed message
+	 * @param	{*} message
 	 *
 	 * @return	void
 	 */
@@ -528,7 +526,7 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Get a random file name given a size
 	 *
-	 * @param	Number size
+	 * @param	{Number} size
 	 *
 	 * @return	String
 	 */
@@ -546,7 +544,7 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Return if the current body type is supported by the current body parser
 	 *
-	 * @param	EventRequest event
+	 * @param	{EventRequest} event
 	 *
 	 * @return	Boolean
 	 */
@@ -561,7 +559,7 @@ class MultipartDataParser extends EventEmitter
 	 *
 	 * @details	Will return false on error
 	 *
-	 * @param	Object headers
+	 * @param	{Object} headers
 	 *
 	 * @return	Object|Boolean
 	 */
@@ -595,6 +593,8 @@ class MultipartDataParser extends EventEmitter
 
 	/**
 	 * @brief	Parses the body
+	 *
+	 * @param	{EventRequest} event
 	 *
 	 * @return	Promise
 	 */
@@ -642,7 +642,7 @@ class MultipartDataParser extends EventEmitter
 	 *
 	 * @brief	Returns an error and header data in the callback
 	 *
-	 * @param	Function callback
+	 * @param	{Function} callback
 	 *
 	 * @return	void
 	 */

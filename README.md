@@ -147,6 +147,15 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 
 ***
 #Router and Routing
+- The router is used to route request to the appropriate middleware
+
+#### Router Caching:
+- The router has an internal middleware chain cache ( in case of repeating requests the middlewares that have to be executed will be cached. This is done to speed up the matching ). 
+- The cache also saves any params (router wildcards and RegExp matches ) and sets them back in the next request if the cache is hit.
+- The keys to be saved can be configured
+- The caching can be turned on or off
+- The keys will be deleted if they have not been hit for more than one hour
+- The router will attempt to clear the cache of stagnated entries on every request but it will get triggered at most every minute
 
 ***
 ####Functions exported by the Router:
@@ -172,6 +181,13 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 
 **get/post/head/put/delete...( String route, Function middleware ): void**
 - Defines a get/post/head/put/delete middlewares for the given route
+
+**enableCaching( Boolean enable = true ): void**
+- Enables or disables the middleware block caching mechanism
+
+**setKeyLimit( Number keyLimit = 5000 ): void**
+- Sets the amount of keys the cache will have
+- One key is a combination of the event.path and the event.method
 
 ***
 ####Adding routes
@@ -1863,6 +1879,7 @@ Server {
   er_logger: 'er_logger',
   er_session: 'er_session',
   er_security: 'er_security',
+  er_cors: 'er_cors',
   er_response_cache: 'er_response_cache',
   er_body_parser_json: 'er_body_parser_json',
   er_body_parser_form: 'er_body_parser_form',
@@ -2854,6 +2871,119 @@ app.add(( event )=>{
 
     event.send( 'Done' );
 });
+app.listen( 80 );
+~~~
+
+***
+***
+***
+
+#er_cors 
+- Adds commonly used CORS headers
+- In case of an options request returns 204 status code
+- Defaults to:
+
+~~~javascript
+const defaults = {
+	 'Access-Control-Allow-Origin': '*',
+	 'Access-Control-Allow-Headers': '*',
+	 'Access-Control-Allow-Methods': 'POST, PUT, GET, DELETE, HEAD, PATCH, COPY',
+};
+~~~
+
+***
+####Dependencies:
+
+**NONE**
+
+***
+####Accepted Options:
+
+**origin: String**
+- The allowed origins 
+- Sets Access-Control-Allow-Origin
+- Defaults to '*'
+
+**headers: Array**
+- he Access-Control-Allow-Headers response header is used in response to a preflight request which includes the Access-Control-Request-Headers to indicate which HTTP headers can be used during the actual request.
+- Sets Access-Control-Allow-Headers
+- Defaults to '*'
+
+**exposedHeader: Array**
+- Response header indicates which headers can be exposed as part of the response by listing their names.
+- Sets Access-Control-Expose-Headers
+- Defaults to '*'
+
+**methods: Array**
+- The Allowed methods
+- Only returned in case of an OPTIONS request  
+- Sets Access-Control-Allow-Methods
+- Defaults to 'POST, PUT, GET, DELETE, HEAD, PATCH, COPY'
+
+**status: Number**
+- The status code that will be returned in case of an options request
+- Only returned in case of an OPTIONS request  
+- Defaults to 204
+
+**credentials: Boolean**
+- response header tells browsers whether to expose the response to frontend JavaScript code when the request's credentials mode (Request.credentials) is include.
+- Sets Access-Control-Allow-Credentials
+- Omitted by default
+
+**maxAge: Number**
+- indicates how long the results of a preflight request (that is the information contained in the Access-Control-Allow-Methods and Access-Control-Allow-Headers headers) can be cached.
+- Sets Access-Control-Max-Age
+- Maximum number of seconds the results can be cached.
+- Firefox caps this at 24 hours (86400 seconds).
+- Chromium (prior to v76) caps at 10 minutes (600 seconds).
+- Chromium (starting in v76) caps at 2 hours (7200 seconds).
+- Chromium also specifies a default value of 5 seconds.
+- A value of -1 will disable caching, requiring a preflight OPTIONS check for all calls.
+- Omitted by default
+
+***
+####Events:
+
+**NONE**
+
+***
+####Exported Functions:
+
+**NONE**
+
+***
+####Attached Functionality:
+
+**NONE**
+
+***
+####Exported Plugin Functions:
+
+**NONE**
+
+***
+####Example:
+
+~~~javascript
+/**
+ * @brief    Instantiate the server
+ */
+const app    = require( 'event_request' )();
+
+app.apply( app.er_cors, {
+	origin: 'http://example.com',
+	methods: ['GET', 'POST'],
+	headers: ['Accepts', 'X-Requested-With'],
+	exposedHeaders: ['Accepts'],
+	status: 200,
+	maxAge: 200,
+	credentials: true,
+});
+
+app.add(( event )=>{
+    event.send( event.response.headers );
+});
+
 app.listen( 80 );
 ~~~
 

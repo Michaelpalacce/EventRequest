@@ -61,7 +61,7 @@ class FileStreamHandler
 	 *
 	 * @details	Returns null if a file streamer is not found
 	 *
-	 * @param	file String
+	 * @param	{String} file
 	 *
 	 * @return	FileStream
 	 */

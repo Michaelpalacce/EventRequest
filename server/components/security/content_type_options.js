@@ -20,7 +20,7 @@ class ContentTypeOptions
 	/**
 	 * @brief	Parses the options given to the ContentTypeOptions class
 	 *
-	 * @param	options Object
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */
@@ -32,7 +32,7 @@ class ContentTypeOptions
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @param	enabled Boolean
+	 * @param	{Boolean} [enabled=true]
 	 *
 	 * @return	void
 	 */

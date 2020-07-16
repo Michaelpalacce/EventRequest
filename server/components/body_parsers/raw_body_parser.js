@@ -4,19 +4,14 @@
 const { EventEmitter }		= require( 'events' );
 
 /**
- * @brief	Constants
- */
-const CONTENT_LENGTH_HEADER	= 'content-length';
-
-/**
  * @brief	RawBodyParser responsible for parsing any body sent
  */
 class RawBodyParser extends EventEmitter
 {
 	/**
-	 * @param	options Object
-	 * 			Accepts options:
-	 * 			- maxPayloadLength - Number - The max size of the body to be parsed
+	 * @param	{Object} options
+	 * 				Accepts options:
+	 * 					- maxPayloadLength - Number - The max size of the body to be parsed
 	 */
 	constructor( options = {} )
 	{
@@ -32,6 +27,8 @@ class RawBodyParser extends EventEmitter
 	/**
 	 * @brief	Returns a boolean if the current body parser supports the request
 	 *
+	 * @param	{EventRequest} event
+	 *
 	 * @return	boolean
 	 */
 	supports( event )
@@ -41,6 +38,8 @@ class RawBodyParser extends EventEmitter
 
 	/**
 	 * @brief	Parses the request
+	 *
+	 * @param	{EventRequest} event
 	 *
 	 * @return	Promise
 	 */

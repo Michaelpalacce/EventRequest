@@ -8,8 +8,8 @@
 class PluginInterface
 {
 	/**
-	 * @param	pluginId String
-	 * @param	options Object
+	 * @param	{String} pluginId
+	 * @param	{Object} [options={}]
 	 */
 	constructor( pluginId, options = {} )
 	{
@@ -44,7 +44,7 @@ class PluginInterface
 	 *
 	 * @details	This method should attach to any events dispatched by the server
 	 *
-	 * @param	server Server
+	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */
@@ -55,7 +55,7 @@ class PluginInterface
 	/**
 	 * @brief	Sets new options for the plugin
 	 *
-	 * @param	options Object
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */

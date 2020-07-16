@@ -8,9 +8,9 @@ class ErrorHandler
 	/**
 	 * @brief	Handle the error
 	 *
-	 * @param	EventRequest event
-	 * @param	mixed error
-	 * @param	Number code
+	 * @param	{EventRequest} event
+	 * @param	{*} error
+	 * @param	{Number} [code=500]
 	 *
 	 * @return	void
 	 */
@@ -24,7 +24,7 @@ class ErrorHandler
 	/**
 	 * @brief	Gets the error to be emitted
 	 *
-	 * @param	error Error
+	 * @param	{*} error
 	 *
 	 * @return	mixed
 	 */
@@ -41,7 +41,7 @@ class ErrorHandler
 	/**
 	 * @brief	Formats the error in a presentable format
 	 *
-	 * @param	error Error
+	 * @param	{*} error
 	 *
 	 * @return	Object
 	 */
@@ -58,9 +58,9 @@ class ErrorHandler
 	/**
 	 * @brief	Sends the error
 	 *
-	 * @param	event EventRequest
-	 * @param	error mixed
-	 * @param	code Number
+	 * @param	{EventRequest} event
+	 * @param	{*} error
+	 * @param	{Number} code
 	 *
 	 * @return	void
 	 */

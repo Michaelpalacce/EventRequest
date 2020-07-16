@@ -2,7 +2,7 @@
 
 // Dependencies
 const { Tester, Mock, Mocker }						= require( './../server/tester/tester' );
-const EventRequest									= require( './../server/event' );
+const EventRequest									= require( './../server/event_request' );
 const assert										= require( 'assert' );
 const fs											= require( 'fs' );
 const path											= require( 'path' );

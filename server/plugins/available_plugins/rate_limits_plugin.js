@@ -81,7 +81,7 @@ class RateLimitsPlugin extends PluginInterface
 	}
 
 	/**
-	 * @copydodc	PluginInterface::setOptions
+	 * @inheritDoc
 	 */
 	setOptions( options )
 	{
@@ -137,7 +137,7 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Parses and sanitizes the config
 	 *
-	 * @param	config Array
+	 * @param	{Array} [config=[]]
 	 *
 	 * @return	void
 	 */
@@ -145,22 +145,22 @@ class RateLimitsPlugin extends PluginInterface
 	{
 		config.forEach( async ( options )=>{
 			if (
-				typeof options['maxAmount'] === 'number'
-				&& typeof options['refillTime'] === 'number'
-				&& typeof options['refillAmount'] === 'number'
-				&& typeof options['methods'] !== 'undefined'
-				&& Array.isArray( options['methods'] )
-				&& typeof options['path'] === 'string'
-				&& typeof options['policy'] === 'string'
-				&& typeof options['stopPropagation'] === 'boolean'
-				&& typeof options['ipLimit'] === 'boolean'
+				typeof options.maxAmount === 'number'
+				&& typeof options.refillTime === 'number'
+				&& typeof options.refillAmount === 'number'
+				&& typeof options.methods !== 'undefined'
+				&& Array.isArray( options.methods )
+				&& typeof options.path === 'string'
+				&& typeof options.policy === 'string'
+				&& typeof options.stopPropagation === 'boolean'
+				&& typeof options.ipLimit === 'boolean'
 			) {
-				const policy	= options['policy'];
+				const policy	= options.policy;
 
 				if (
 					policy === CONNECTION_DELAY_POLICY
-					&& typeof options['delayTime'] !== 'number'
-					&& typeof options['delayRetries'] !== 'number'
+					&& typeof options.delayTime !== 'number'
+					&& typeof options.delayRetries !== 'number'
 				) {
 					throw new Error( `Rate limit with ${CONNECTION_DELAY_POLICY} must have delayTime set` );
 				}
@@ -177,16 +177,16 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Gets a new Bucket from the rule options
 	 *
-	 * @param	key String
-	 * @param	options Object
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
 	 * @return	Bucket
 	 */
 	async getNewBucketFromOptions( key, options )
 	{
-		const maxAmount		= options['maxAmount'];
-		const refillTime	= options['refillTime'];
-		const refillAmount	= options['refillAmount'];
+		const maxAmount		= options.maxAmount;
+		const refillTime	= options.refillTime;
+		const refillAmount	= options.refillAmount;
 
 		const bucket		= new Bucket( refillAmount, refillTime, maxAmount, null, key, this.dataStore );
 
@@ -200,7 +200,7 @@ class RateLimitsPlugin extends PluginInterface
 	 *
 	 * @details	Loads the config, attaches a process that will clear the IP based buckets if they are full once every 60 minutes
 	 *
-	 * @param	server Server
+	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */
@@ -238,7 +238,7 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Checks whether the client's ip has reached the limit of requests
 	 *
-	 * @param	eventRequest EventRequest
+	 * @param	{EventRequest} eventRequest
 	 *
 	 * @return	void
 	 */
@@ -268,13 +268,13 @@ class RateLimitsPlugin extends PluginInterface
 		for ( let i = 0; i < this.rules.length; ++ i )
 		{
 			const rule			= this.rules[i];
-			const ruleMethod	= rule['methods'];
-			const rulePath		= rule['path'];
+			const ruleMethod	= rule.methods;
+			const rulePath		= rule.path;
 
 			if ( Router.matchMethod( method, ruleMethod ) && Router.matchRoute( path, rulePath ) )
 			{
-				const ipLimit	= rule['ipLimit'];
-				const policy	= rule['policy'];
+				const ipLimit	= rule.ipLimit;
+				const policy	= rule.policy;
 
 				let bucketKey	= Bucket.DEFAULT_PREFIX;
 				bucketKey	+= `${rulePath}${policy}`;
@@ -289,7 +289,7 @@ class RateLimitsPlugin extends PluginInterface
 
 				if ( ! hasToken )
 				{
-					const refillTime			= rule['refillTime'];
+					const refillTime			= rule.refillTime;
 					eventRequest.rateLimited	= true;
 					eventRequest.emit( 'rateLimited', { policy, rule } );
 					bucketsHit.push( bucket );
@@ -313,7 +313,7 @@ class RateLimitsPlugin extends PluginInterface
 							return;
 					}
 
-					if ( rule['stopPropagation'] === true )
+					if ( rule.stopPropagation === true )
 					{
 						break;
 					}
@@ -325,9 +325,9 @@ class RateLimitsPlugin extends PluginInterface
 		{
 			const rule			= connectionDelayPolicyOptions;
 			const buckets		= bucketsHit;
-			const delayTime		= rule['delayTime'];
-			const delayRetries	= rule['delayRetries'];
-			const refillTime	= rule['refillTime'];
+			const delayTime		= rule.delayTime;
+			const delayRetries	= rule.delayRetries;
+			const refillTime	= rule.refillTime;
 
 			let tries			= 0;
 
@@ -362,8 +362,8 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Sends a 429 response
 	 *
-	 * @param	eventRequest EventRequest
-	 * @param	retryAfterTime Number
+	 * @param	{EventRequest} eventRequest
+	 * @param	{Number} retryAfterTime
 	 *
 	 * @return	void
 	 */

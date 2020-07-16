@@ -54,8 +54,8 @@ class Loggur
 	 *
 	 * @details	Configuration for the logger can be passed here and if valid the logger will be created and added
 	 *
-	 * @param	String loggerId
-	 * @param	Logger|Object logger
+	 * @param	{String} loggerId
+	 * @param	{Logger|Object} [logger={}]
 	 *
 	 * @return	Boolean
 	 */
@@ -80,7 +80,7 @@ class Loggur
 	 *
 	 * @details	Returns false if the logger is not added
 	 *
-	 * @param	String loggerId
+	 * @param	{String} loggerId
 	 *
 	 * @return	Logger|Boolean
 	 */
@@ -98,7 +98,7 @@ class Loggur
 	/**
 	 * @brief	Create a new logger
 	 *
-	 * @param	Object loggerConfig
+	 * @param	{Object} [loggerConfig={}]
 	 *
 	 * @return	Logger
 	 */
@@ -156,7 +156,7 @@ class Loggur
 	/**
 	 * @brief	Sets the Log Level of all the attached Loggers
 	 *
-	 * @param	Number logLevel
+	 * @param	{Number} logLevel
 	 *
 	 * @return	void
 	 */

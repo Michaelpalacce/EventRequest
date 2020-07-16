@@ -15,7 +15,7 @@ const RESET		= '\u001b[0m';
 /**
  * @brief	Colorize the logs
  *
- * @param	log String
+ * @param	{String} log
  *
  * @return	String
  */

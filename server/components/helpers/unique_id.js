@@ -5,7 +5,7 @@ let uniqueId	= {};
 /**
  * @brief	Helper method that generates a random string
  *
- * @param	Number length
+ * @param	{Number} length
  *
  * @return	String
  */

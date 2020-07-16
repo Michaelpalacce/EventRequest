@@ -2,7 +2,7 @@
 
 // Dependencies
 const http						= require( 'http' );
-const EventRequest				= require( './event' );
+const EventRequest				= require( './event_request' );
 const { EventEmitter }			= require( 'events' );
 const RouterClass				= require( './components/routing/router' );
 const PluginInterface			= require( './plugins/plugin_interface' );
@@ -33,9 +33,6 @@ class Server extends EventEmitter
 
 	/**
 	 * @brief	Adds a new middleware to the router
-	 *
-	 * @param	middlewareName String
-	 * @param	middleware Function
 	 *
 	 * @return	Server
 	 */
@@ -74,6 +71,7 @@ class Server extends EventEmitter
 		this.er_logger					= 'er_logger';
 		this.er_session					= 'er_session';
 		this.er_security				= 'er_security';
+		this.er_cors					= 'er_cors';
 		this.er_response_cache			= 'er_response_cache';
 		this.er_body_parser_json		= 'er_body_parser_json';
 		this.er_body_parser_form		= 'er_body_parser_form';
@@ -107,8 +105,8 @@ class Server extends EventEmitter
 	 * @details	The plugin manager can be used to extract and set up plugins and then add them to the server just by
 	 * 			giving their plugin ids
 	 *
-	 * @param	plugin PluginInterface|String
-	 * @param	options Object
+	 * @param	{PluginInterface|String} plugin
+	 * @param	{Object} options
 	 *
 	 * @return	Server
 	 */
@@ -139,7 +137,7 @@ class Server extends EventEmitter
 	/**
 	 * @brief	Attaches a PluginInterface to the server
 	 *
-	 * @param	plugin PluginInterface
+	 * @param	{PluginInterface} plugin
 	 *
 	 * @return	void
 	 */
@@ -171,7 +169,7 @@ class Server extends EventEmitter
 	 *
 	 * @details	Will throw if the plugin is not attached
 	 *
-	 * @param	pluginId String
+	 * @param	{String} pluginId
 	 *
 	 * @return	PluginInterface
 	 */
@@ -190,7 +188,7 @@ class Server extends EventEmitter
 	/**
 	 * @brief	Checks whether the server has a plugin with the given id
 	 *
-	 * @param	pluginId String
+	 * @param	{String} pluginId
 	 *
 	 * @return	Boolean
 	 */

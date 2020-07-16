@@ -2,7 +2,7 @@
 
 // Dependencies
 const { Mock, assert, test, helpers }	= require( '../test_helper' );
-const EventRequest						= require( './../../server/event' );
+const EventRequest						= require( './../../server/event_request' );
 const fs								= require( 'fs' );
 const ErrorHandler						= require( '../../server/components/error/error_handler' );
 
@@ -853,7 +853,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.getHeaders returns all headers',
+	message	: 'EventRequest.getRequestHeaders returns all request headers',
 	test	: ( done )=>{
 		const headers	= {
 			headerOne: 'valueOne',
@@ -863,7 +863,7 @@ test({
 
 		const eventRequest	= helpers.getEventRequest( '', '/', headers );
 
-		assert.equal( eventRequest.getHeaders(), headers );
+		assert.equal( eventRequest.getRequestHeaders(), headers );
 
 		done();
 	}

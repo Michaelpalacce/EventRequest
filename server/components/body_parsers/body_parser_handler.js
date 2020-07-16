@@ -1,6 +1,6 @@
 'use strict';
 
-const RawBodyParser	= require( './raw_body_parser' )
+const RawBodyParser	= require( './raw_body_parser' );
 
 /**
  * @brief	BodyParserHandler responsible for parsing the body of the request
@@ -17,7 +17,7 @@ class BodyParserHandler
 	/**
 	 * @brief	Adds a new parser to the Body Parser Handler
 	 *
-	 * @param	mixed parser
+	 * @param	{*} parser
 	 *
 	 * @return	void
 	 */
@@ -34,8 +34,7 @@ class BodyParserHandler
 	/**
 	 * @brief	Goes through all the parsers and tries to parse the payload. If it cannot be parsed then an error is set
 	 *
-	 * @param	EventRequest event
-	 * @param	Function callback
+	 * @param	{EventRequest} event
 	 *
 	 * @return	Promise
 	 */

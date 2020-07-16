@@ -6,9 +6,9 @@ const BodyParserHandler	= require( './../../components/body_parsers/body_parser_
 class BodyParserPlugin extends PluginInterface
 {
 	/**
-	 * @param	parser BodyParser
-	 * @param	pluginId String
-	 * @param	options Object
+	 * @param	{JsonBodyParser|MultipartDataParser|RawBodyParser|FormBodyParser} parser
+	 * @param	{String} pluginId
+	 * @param	{Object} [options={}]
 	 */
 	constructor( parser, pluginId, options = {} )
 	{
@@ -24,7 +24,7 @@ class BodyParserPlugin extends PluginInterface
 	/**
 	 * @brief	Set the parser if given
 	 *
-	 * @param	options
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	void
 	 */
@@ -38,7 +38,7 @@ class BodyParserPlugin extends PluginInterface
 	/**
 	 * @brief	Creates the server body parsers if they do not exist
 	 *
-	 * @param	server Server
+	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */

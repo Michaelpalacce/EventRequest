@@ -1,3 +1,13 @@
+22.0.0
+- Small Documentation improvements
+- Added router block caching. This caches the execution block of the request and in case of the same path the same parameters will be applied as well as the same block will be returned. This should result in faster requests and nothing else. 
+- Added documentation about router caching
+- Added extra package keywords to reflect new functionality
+- Converted all params to JSDoc @params
+- Renamed the event.js to event_request.js
+- Renamed the getHeaders in the event request to getRequestHeaders
+- Added CORS support -> er_cors plugin
+
 21.0.0
 - Updated the documentation
 - The validationHandler in the event is now called just validation

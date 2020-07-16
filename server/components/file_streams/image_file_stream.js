@@ -18,7 +18,7 @@ const STREAM_TYPE	= 'image';
 class ImageFileStream
 {
 	/**
-	 * @param	options Object
+	 * @param	{Object} options
 	 */
 	constructor( options )
 	{
@@ -32,7 +32,7 @@ class ImageFileStream
 	/**
 	 * @brief	Check whether the given file is supported by the file stream
 	 *
-	 * @param	file String
+	 * @param	{String} file
 	 *
 	 * @return	Boolean
 	 */
@@ -55,9 +55,9 @@ class ImageFileStream
 	/**
 	 * @brief	Gets the file stream for the file
 	 *
-	 * @param	event EventRequest
-	 * @param	file String
-	 * @param	options Object
+	 * @param	{EventRequest} event
+	 * @param	{String} file
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	ReadableStream
 	 */

@@ -1,7 +1,6 @@
 'use strict';
-
 // Dependencies
-const EventRequest		= require( '../../event' );
+const EventRequest		= require( '../../event_request' );
 const Route				= require( './route' );
 const PluginInterface	= require( './../../plugins/plugin_interface' );
 
@@ -17,16 +16,46 @@ class Router extends PluginInterface
 	{
 		super( 'er_router', {} );
 
-		this.middleware			= [];
-		this.globalMiddlewares	= {};
+		this.middleware				= [];
+		this.globalMiddlewares		= {};
+
+		this.cache					= {};
+		this.cachingIsEnabled		= true;
+		this.keyLimit				= 5000;
+		this.lastClearCacheAttempt	= 0;
+
 		this.setUpHttpMethodsToObject( this );
+	}
+
+	/**
+	 * @brief	Enables or disables caching
+	 *
+	 * @param	{Boolean} [enable=true]
+	 *
+	 * @return	void
+	 */
+	enableCaching( enable = true )
+	{
+		this.cachingIsEnabled	= enable;
+	}
+
+	/**
+	 * @brief	Sets the caching key limit
+	 *
+	 * @param	{Number} [keyLimit=5000]
+	 *
+	 * @return	void
+	 */
+	setKeyLimit( keyLimit = 5000 )
+	{
+		this.keyLimit	= keyLimit;
 	}
 
 	/**
 	 * @brief	Defines a middleware to be used globally
 	 *
-	 * @param	middlewareName String
-	 * @param	middleware Function
+	 * @param	{String} middlewareName
+	 * @param	{Function} middleware
 	 *
 	 * @return	Router
 	 */
@@ -48,7 +77,7 @@ class Router extends PluginInterface
 	/**
 	 * @brief	Attaches methods to the server on runtime
 	 *
-	 * @param	server Server
+	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */
@@ -215,7 +244,7 @@ class Router extends PluginInterface
 	/**
 	 * @brief	This will process the request and return the appropriate block chain
 	 *
-	 * @param	event EventRequest
+	 * @param	{EventRequest} event
 	 *
 	 * @return	Array
 	 */
@@ -226,12 +255,26 @@ class Router extends PluginInterface
 			throw new Error( 'Invalid EventRequest provided' );
 		}
 
-		const block	= [];
+		const blockKey	= `${event.path}${event.method}`;
+		const block		= [];
+
+		if ( this.cachingIsEnabled )
+		{
+			this._clearCache();
+
+			if ( typeof this.cache[blockKey] === 'object' )
+			{
+				event.params				= Object.assign( event.params, this.cache[blockKey].params );
+				this.cache[blockKey].date	= Date.now();
+
+				return this.cache[blockKey].block.slice();
+			}
+		}
 
 		for ( let index in this.middleware )
 		{
 			let route	= this.middleware[index];
-			let params	= [];
+			let params	= {};
 
 			if ( Router.matchMethod( event.method, route ) )
 			{
@@ -252,6 +295,15 @@ class Router extends PluginInterface
 					block.push( route.getHandler() );
 				}
 			}
+		}
+
+		if ( this.cachingIsEnabled && ! this._isCacheFull() )
+		{
+			let params				= {};
+			params					= Object.assign( params, event.params );
+			const date				= Date.now();
+
+			this.cache[blockKey]	= { block: block.slice(), params, date };
 		}
 
 		return block;
@@ -282,8 +334,8 @@ class Router extends PluginInterface
 	 *
 	 * @details	If a string or an array is passed, then it will be converted to a Route
 	 *
-	 * @param	requestedMethod String
-	 * @param	method Route|Array|String
+	 * @param	{String} requestedMethod
+	 * @param	{Route|Array|String} method
 	 *
 	 * @return	Boolean
 	 */
@@ -315,9 +367,9 @@ class Router extends PluginInterface
 	 *
 	 * @details	Returns bool if there was a successful match
 	 *
-	 * @param	requestedRoute String
-	 * @param	route String|RegExp|Route
-	 * @param	matchedParams Array
+	 * @param	{String} requestedRoute
+	 * @param	{String|RegExp|Route} route
+	 * @param	{Object} [matchedParams={}]
 	 *
 	 * @return	Boolean
 	 */
@@ -336,6 +388,58 @@ class Router extends PluginInterface
 		}
 
 		return route.matchPath( requestedRoute, matchedParams );
+	}
+
+	/**
+	 * @brief	Attempts to keep the cache in check by clearing keys that are not in use
+	 *
+	 * @param	{Number} [ttl=3600000]
+	 * @param	{Number} [lastClearCacheAttemptTtl=60000]
+	 *
+	 * @private
+	 *
+	 * @return	void
+	 */
+	_clearCache( ttl = 60 * 60 * 1000, lastClearCacheAttemptTtl = 60 * 1000 )
+	{
+		if ( this.lastClearCacheAttempt + lastClearCacheAttemptTtl > Date.now() )
+		{
+			return;
+		}
+
+		this.lastClearCacheAttempt	= Date.now();
+
+		if ( this._isCacheFull() )
+		{
+			for ( const key in this.cache )
+			{
+				const data	= this.cache[key];
+
+				if ( ( data.date + ttl ) <= Date.now() )
+				{
+					delete this.cache[key];
+				}
+			}
+		}
+	}
+
+	/**
+	 * @brief	Returns if the cache is full
+	 *
+	 * @details	If the keyLimit is set to 0 then the cache will have an unlimited size
+	 *
+	 * @private
+	 *
+	 * @return	Boolean
+	 */
+	_isCacheFull()
+	{
+		if ( this.keyLimit === 0 )
+		{
+			return false;
+		}
+
+		return Object.keys( this.cache ).length > this.keyLimit;
 	}
 }
 

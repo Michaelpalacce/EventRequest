@@ -41,6 +41,8 @@ class Tester
 	 *
 	 * @details	This is done so we can run the test many times per instance
 	 *
+	 * @param	{Object} options
+	 *
 	 * @return	void
 	 */
 	initialize( options )
@@ -113,7 +115,7 @@ class Tester
 	/**
 	 * @brief	Formats the given test object by adding needed internal fields
 	 *
-	 * @param	test Object
+	 * @param	{Object} test
 	 *
 	 * @return	Array
 	 */
@@ -179,7 +181,7 @@ class Tester
 	/**
 	 * @brief	Adds the given test to the queue
 	 *
-	 * @param	test Object
+	 * @param	{Object} test
 	 *
 	 * @return	void
 	 */
@@ -205,8 +207,8 @@ class Tester
 	/**
 	 * @brief	Called if there is an error in the test
 	 *
-	 * @param	test Object
-	 * @param	error mixed
+	 * @param	{Object} test
+	 * @param	{*} error
 	 */
 	errorCallback( test, error )
 	{
@@ -261,8 +263,8 @@ class Tester
 	/**
 	 * @brief	Called by the done function of the tests
 	 *
-	 * @param	test Object
-	 * @param	err mixed
+	 * @param	{Object} test
+	 * @param	{*} err
 	 *
 	 * @return	void
 	 */
@@ -288,7 +290,7 @@ class Tester
 	/**
 	 * @brief	Checks the given test's status and determines what should happen
 	 *
-	 * @param	test Object
+	 * @param	{Object} test
 	 *
 	 * @return	Boolean
 	 */
@@ -380,7 +382,7 @@ class Tester
 	 *
 	 * @details	This will produce an output directly to the console of the user
 	 *
-	 * @param	options Object
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */

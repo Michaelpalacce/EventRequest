@@ -42,7 +42,7 @@ class Route
 	/**
 	 * @brief	Sets Route options
 	 *
-	 * @param	routeConfig Object
+	 * @param	{Object} routeConfig
 	 *
 	 * @return	void
 	 */
@@ -122,7 +122,7 @@ class Route
 	/**
 	 * @brief	Matches the requestedMethod with the route's one
 	 *
-	 * @param	requestedMethod String
+	 * @param	{String} requestedMethod
 	 *
 	 * @return	Boolean
 	 */
@@ -140,8 +140,8 @@ class Route
 	 *
 	 * @details	Sets the matchedParams with any parameters found
 	 *
-	 * @param	requestedRoute String
-	 * @param	matchedParams Object
+	 * @param	{String} requestedRoute
+	 * @param	{Object} [matchedParams={}]
 	 *
 	 * @return	Object
 	 */

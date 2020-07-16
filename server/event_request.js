@@ -17,8 +17,8 @@ const X_POWERED_BY_HEADER_VALUE				= 'ER';
 class EventRequest extends EventEmitter
 {
 	/**
-	 * @param	request Object
-	 * @param	response Object
+	 * @param	{IncomingMessage} request
+	 * @param	{ServerResponse} response
 	 */
 	constructor( request, response )
 	{
@@ -101,9 +101,9 @@ class EventRequest extends EventEmitter
 	 * 			The options should be an object where all the keys will be taken as is as well as the values
 	 * 			And they will be used to make an cookie header
 	 *
-	 * @param	name String
-	 * @param	value String
-	 * @param	options Object
+	 * @param	{String} name
+	 * @param	{String} value
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Boolean
 	 */
@@ -168,9 +168,9 @@ class EventRequest extends EventEmitter
 	 * 			If set to false, then the response passed will be returned in a JSON format if is not already a valid string
 	 * 			If it is a valid string, then it will be returned as is
 	 *
-	 * @param	response mixed
-	 * @param	code Number
-	 * @param	raw Boolean
+	 * @param	{*} [response='']
+	 * @param	{Number} [code=200]
+	 * @param	{Boolean} [raw=false]
 	 *
 	 * @return	void
 	 */
@@ -224,8 +224,8 @@ class EventRequest extends EventEmitter
 	 *
 	 * @details	Will throw an error if response is sent ( but server error that will not kill the execution )
 	 *
-	 * @param	key String
-	 * @param	value String
+	 * @param	{String} key
+	 * @param	{String} value
 	 *
 	 * @return	void
 	 */
@@ -246,7 +246,7 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Removes a set header
 	 *
-	 * @param	key String
+	 * @param	{String} key
 	 *
 	 * @return	void
 	 */
@@ -269,8 +269,8 @@ class EventRequest extends EventEmitter
 	 *
 	 * @details	If the key does not exist, then return the default value if passed. Defaults to NULL
 	 *
-	 * @param	key String
-	 * @param	defaultValue String
+	 * @param	{String} key
+	 * @param	{String} [defaultValue=null]
 	 *
 	 * @return	mixed
 	 */
@@ -286,7 +286,7 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	Object
 	 */
-	getHeaders()
+	getRequestHeaders()
 	{
 		return this.headers;
 	}
@@ -294,7 +294,7 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Checks if the desired header exists
 	 *
-	 * @param	key String
+	 * @param	{String} key
 	 *
 	 * @return	Boolean
 	 */
@@ -306,7 +306,7 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Sets the status code of the response
 	 *
-	 * @param	code Number
+	 * @param	{Number} code
 	 *
 	 * @return	void
 	 */
@@ -318,7 +318,8 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Used to send a redirect response to a given redirectUrl
 	 *
-	 * @param	redirectUrl String
+	 * @param	{String} redirectUrl
+	 * @param	{Number} [statusCode=302]
 	 *
 	 * @return	void
 	 */
@@ -350,7 +351,7 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Sets the current execution block
 	 *
-	 * @param	block Array
+	 * @param	{Array} block
 	 *
 	 * @return	void
 	 */
@@ -366,8 +367,8 @@ class EventRequest extends EventEmitter
 	 * 			if the event is stopped and the response has not been set then send a server error
 	 * 			This function is wrapped by the next() function
 	 *
-	 * @param	err Error
-	 * @param	code Number
+	 * @param	{*} err
+	 * @param	{Number} code
 	 *
 	 * @return	void
 	 */
@@ -410,7 +411,7 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Will send a server error in case a response has not been already sent
 	 *
-	 * @param	args Array
+	 * @param	{Array} args
 	 *
 	 * @return	void
 	 */

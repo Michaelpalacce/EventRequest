@@ -63,7 +63,7 @@ class EnvPlugin extends PluginInterface
 	/**
 	 * @brief	Loads the env variables on runtime
 	 *
-	 * @param	server Server
+	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */
@@ -87,8 +87,6 @@ class EnvPlugin extends PluginInterface
 
 	/**
 	 * @brief	Attach a file watcher to the env file to reload the env variables on change
-	 *
-	 * @param	absFilePath String
 	 *
 	 * @return	void
 	 */

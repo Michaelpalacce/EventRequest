@@ -36,7 +36,7 @@ class Console extends Transport
 	 * 			- color - Boolean - Whether the log should be colored -> Defaults to TRANSPORT_DEFAULT_SHOULD_COLOR
 	 * 			- logColors - Object - The colors to use -> Defaults to TRANSPORT_DEFAULT_COLORS
 	 *
-	 * @param	options Object
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */
@@ -56,7 +56,7 @@ class Console extends Transport
 	/**
 	 * @brief	Format the given log
 	 *
-	 * @param	log Log
+	 * @param	{Log} log
 	 *
 	 * @return	Array
 	 */
@@ -108,11 +108,11 @@ class Console extends Transport
 	/**
 	 * @brief	Logs the data
 	 *
-	 * @param	log Log
-	 * @param	resolve Function
-	 * @param	reject Function
+	 * @param	{Log} log
+	 * @param	{Function} resolve
+	 * @param	{Function} reject
 	 *
-	 * @return	Promise
+	 * @return	void
 	 */
 	_log( log, resolve, reject )
 	{

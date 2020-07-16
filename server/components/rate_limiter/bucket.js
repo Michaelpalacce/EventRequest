@@ -17,13 +17,13 @@ class Bucket
 	 * 			key should be passed if this Bucket wants to connect to another one in the datastore or you want to specify your own key
 	 * 			dataStoreRefetchInterval will be how often to retry the dataStore in ms, should be 1 or 2 but may be increased if the dataStore can't handle the traffice
 	 *
-	 * @param	refillAmount Number
-	 * @param	refillTime Number
-	 * @param	maxAmount Number
-	 * @param	prefix String
-	 * @param	key String
-	 * @param	dataStore DataServer
-	 * @param	dataStoreRefetchInterval Number
+	 * @param	{Number} [refillAmount=100]
+	 * @param	{Number} [refillTime=60]
+	 * @param	{Number} [maxAmount=1000]
+	 * @param	{String} [prefix=Bucket.DEFAULT_PREFIX]
+	 * @param	{String} [key=null]
+	 * @param	{DataServer} [dataStore=null]
+	 * @param	{Number} [dataStoreRefetchInterval=1]
 	 */
 	constructor(
 		refillAmount = 100,
@@ -77,7 +77,7 @@ class Bucket
 	/**
 	 * @brief	Handles promise errors
 	 *
-	 * @param	error Error
+	 * @param	{Error} error
 	 *
 	 * @return	void
 	 */
@@ -129,7 +129,7 @@ class Bucket
 	/**
 	 * @brief	Sets the value
 	 *
-	 * @param	value Number
+	 * @param	{Number} value
 	 *
 	 * @return	void
 	 */
@@ -161,7 +161,7 @@ class Bucket
 	/**
 	 * @brief	Sets the lastUpdate
 	 *
-	 * @param	lastUpdate Number
+	 * @param	{Number} lastUpdate
 	 *u
 	 * @return	void
 	 */
@@ -209,9 +209,9 @@ class Bucket
 	/**
 	 * @brief	Implement a locking mechanism
 	 *
-	 * @param	resolve Function
-	 * @param	reject Function
-	 * @param	counter Number
+	 * @param	{Function} resolve
+	 * @param	{Function} reject
+	 * @param	{Number} counter
 	 *
 	 * @return	Promise
 	 */
@@ -250,7 +250,7 @@ class Bucket
 	 *
 	 * @details	The data does not need to be passed ( it is passed from the reduce function to reduce calls to the data store )
 	 *
-	 * @param	data Object
+	 * @param	{Object} data
 	 *
 	 * @return	Promise
 	 */
@@ -270,7 +270,7 @@ class Bucket
 	 *
 	 * @details	Resolves to true if there are tokens left otherwise, rejects to false
 	 *
-	 * @param	tokens Number
+	 * @param	{Number} [tokens=1]
 	 *
 	 * @return	Boolean
 	 */
@@ -305,7 +305,7 @@ class Bucket
 	/**
 	 * @brief	How much should be refilled given the last update
 	 *
-	 * @param	lastUpdate Number
+	 * @param	{Number} lastUpdate
 	 *
 	 * @return	Number
 	 */

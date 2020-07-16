@@ -8,8 +8,8 @@ const ValidationAttribute	= require( './validation_attribute' );
 class ValidationResult
 {
 	/**
-	 * @param	validationInput Object
-	 * @param	skeleton Object
+	 * @param	{Object} validationInput
+	 * @param	{Object} skeleton
 	 */
 	constructor( validationInput, skeleton )
 	{
@@ -47,10 +47,10 @@ class ValidationResult
 	/**
 	 * @brief	Forms the result using recursion
 	 *
-	 * @param	validationInput Object
-	 * @param	skeleton Object
-	 * @param	result Object
-	 * @param	failures Object
+	 * @param	{Object} validationInput
+	 * @param	{Object} skeleton
+	 * @param	{Object} result
+	 * @param	{Object} failures
 	 *
 	 * @private
 	 *
@@ -101,7 +101,7 @@ class ValidationResult
 	/**
 	 * @brief	Sanitizes the failures object to not report any empty properties
 	 *
-	 * @param	failures Object
+	 * @param	{Object} failures
 	 *
 	 * @private
 	 *

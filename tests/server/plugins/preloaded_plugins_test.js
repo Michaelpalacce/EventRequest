@@ -15,6 +15,7 @@ test({
 			PreLoadedPluginManager.getPlugin( 'er_data_server' );
 			PreLoadedPluginManager.getPlugin( 'er_session' );
 			PreLoadedPluginManager.getPlugin( 'er_security' );
+			PreLoadedPluginManager.getPlugin( 'er_cors' );
 			PreLoadedPluginManager.getPlugin( 'er_templating_engine' );
 			PreLoadedPluginManager.getPlugin( 'er_file_stream' );
 			PreLoadedPluginManager.getPlugin( 'er_logger' );

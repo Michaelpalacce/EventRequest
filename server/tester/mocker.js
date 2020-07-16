@@ -73,6 +73,8 @@ class Mocker
 	/**
 	 * @brief	Assert whether correct with arguments are passed
 	 *
+	 * @param	{Array} args
+	 *
 	 * @return	void
 	 */
 	assertWithArguments( args )
@@ -148,7 +150,7 @@ class Mocker
 	/**
 	 * @brief	Gets the next function to execute
 	 *
-	 * @param	Array args
+	 * @param	{Array} args
 	 *
 	 * @return	mixed
 	 */

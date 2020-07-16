@@ -94,10 +94,10 @@ class ValidationAttribute
 	/**
 	 * @brief	Validates each rule separately
 	 *
-	 * @param	rule String
-	 * @param	index Number
-	 * @param	params Object
-	 * @param	allRules Array
+	 * @param	{String} rule
+	 * @param	{Number} index
+	 * @param	{Object} params
+	 * @param	{Array} allRules
 	 *
 	 * @return	String|Boolean
 	 */
@@ -258,7 +258,7 @@ class ValidationAttribute
 	/**
 	 * @brief	Splits the rule additionally and returns any params found
 	 *
-	 * @param	rule String
+	 * @param	{String} rule
 	 *
 	 * @return	Object
 	 */

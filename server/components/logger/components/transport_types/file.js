@@ -28,7 +28,7 @@ class File extends Transport
 	 * @details	Accepted options:
 	 * 			- filePath - String - the location of the file to log to -> if it is not provided the transport will not log
 	 *
-	 * @param	options Object
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */
@@ -106,7 +106,7 @@ class File extends Transport
 	/**
 	 * @brief	Format the given log
 	 *
-	 * @param	log Log
+	 * @param	{Log} log
 	 *
 	 * @return	String
 	 */
@@ -132,9 +132,9 @@ class File extends Transport
 	/**
 	 * @brief	Logs the log in a file
 	 *
-	 * @param	log Log
-	 * @param	resolve Function
-	 * @param	reject Function
+	 * @param	{Log} log
+	 * @param	{Function} resolve
+	 * @param	{Function} reject
 	 *
 	 * @return	Promise
 	 */

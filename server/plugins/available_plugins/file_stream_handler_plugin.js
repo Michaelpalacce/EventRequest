@@ -11,7 +11,7 @@ class FileStreamHandlerPlugin extends PluginInterface
 	/**
 	 * @brief	Attaches the function stream file to the event
 	 *
-	 * @param	event EventRequest
+	 * @param	{EventRequest} event
 	 *
 	 * @return	void
 	 */
@@ -22,9 +22,32 @@ class FileStreamHandlerPlugin extends PluginInterface
 		 *
 		 * @details	The file must be the absolute path to the file to be streamed
 		 *
-		 * @param	file String
-		 * @param	options Object
-		 * @param	errCallback Function
+		 * @param	{String} file
+		 * @param	{Object} [options={}]
+		 *
+		 * @return	ReadableStream | null
+		 */
+		event.getFileStream	= function( file, options = {} )
+		{
+			const fileStream	= this.fileStreamHandler.getFileStreamerForType( file );
+
+			if ( fileStream !== null )
+			{
+				return fileStream.getFileStream( event, file, options );
+			}
+			else
+			{
+				return null;
+			}
+		};
+		/**
+		 * @brief	Streams files
+		 *
+		 * @details	The file must be the absolute path to the file to be streamed
+		 *
+		 * @param	{String }file
+		 * @param	{Object} [options={}]
+		 * @param	{Function }errCallback
 		 *
 		 * @return	void
 		 */
@@ -46,30 +69,6 @@ class FileStreamHandlerPlugin extends PluginInterface
 				{
 					errCallback();
 				}
-			}
-		};
-
-		/**
-		 * @brief	Streams files
-		 *
-		 * @details	The file must be the absolute path to the file to be streamed
-		 *
-		 * @param	file String
-		 * @param	options Object
-		 *
-		 * @return	ReadableStream | null
-		 */
-		event.getFileStream	= function( file, options = {} )
-		{
-			const fileStream	= this.fileStreamHandler.getFileStreamerForType( file );
-
-			if ( fileStream !== null )
-			{
-				return fileStream.getFileStream( event, file, options );
-			}
-			else
-			{
-				return null;
 			}
 		};
 	}

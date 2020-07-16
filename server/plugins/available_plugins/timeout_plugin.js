@@ -31,7 +31,8 @@ class TimeoutPlugin extends PluginInterface
 	/**
 	 * @brief	Set a timeout to the eventRequest
 	 *
-	 * @param	event EventRequest
+	 * @param	{EventRequest} event
+	 * @param	{Number} timeout
 	 *
 	 * @return	void
 	 */
@@ -50,7 +51,7 @@ class TimeoutPlugin extends PluginInterface
 	/**
 	 * @brief	Adds a new function to the event: clearTimeout
 	 *
-	 * @param	event EventRequest
+	 * @param	{EventRequest} event
 	 *
 	 * @return	void
 	 */
@@ -71,7 +72,7 @@ class TimeoutPlugin extends PluginInterface
 	/**
 	 * @brief	Clean up the internal timeout on cleanUp event
 	 *
-	 * @param	event EventRequest
+	 * @param	{EventRequest} event
 	 *
 	 * @return	void
 	 */

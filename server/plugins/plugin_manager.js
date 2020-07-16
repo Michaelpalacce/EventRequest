@@ -15,7 +15,7 @@ class PluginManager
 	/**
 	 * @brief	Adds a plugin to the Manager
 	 *
-	 * @param	plugin PluginInterface
+	 * @param	{PluginInterface} plugin
 	 *
 	 * @return	void
 	 */
@@ -34,7 +34,7 @@ class PluginManager
 	/**
 	 * @brief	Checks whether the given plugin id corresponds to a plugin added to the manager
 	 *
-	 * @param	id String
+	 * @param	{String} id
 	 *
 	 * @return	Boolean
 	 */
@@ -46,7 +46,7 @@ class PluginManager
 	/**
 	 * @brief	Removes a plugin by id
 	 *
-	 * @param	id String
+	 * @param	{String} id
 	 *
 	 * @return	void
 	 */
@@ -68,7 +68,7 @@ class PluginManager
 	/**
 	 * @brief	Gets a plugin given an id
 	 *
-	 * @param	id String
+	 * @param	{String} id
 	 *
 	 * @return	PluginInterface
 	 */

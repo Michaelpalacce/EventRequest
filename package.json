@@ -2,7 +2,6 @@
   "author": {
     "name": "Stefan Genov"
   },
-  "bundleDependencies": false,
   "dependencies": {},
   "deprecated": false,
   "description": "A Backend Server",
@@ -24,11 +23,25 @@
     "file-streams",
     "middleware",
     "logging",
+	"xss",
+	"security-headers",
+	"rate-limiting",
+	"rate-limiter",
+	"leaky-bucket",
     "console-logging",
     "file-logging",
     "static-resources",
     "caching",
     "error-handling",
+    "env-loader",
+    "response-cache",
+    "request-timeout",
+    "timeout",
+    "tests",
+    "test",
+    "testing",
+    "tester",
+    "testing-framework",
     "input-validation"
   ],
   "license": "GPL-3.0",
@@ -46,5 +59,5 @@
     "test": "node test.js",
     "deploy": "npm run test && npm publish"
   },
-  "version": "21.0.0"
+  "version": "22.0.0"
 }

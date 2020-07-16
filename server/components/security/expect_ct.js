@@ -42,13 +42,13 @@ class ExpectCT
 	/**
 	 * @brief	Parses the options given to the ExpectCT class
 	 *
-	 * @param	options Object
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	void
 	 */
 	parseOptions( options = {} )
 	{
-		this.setEnabled( options['enabled'] );
+		this.setEnabled( options.enabled );
 
 		this.maxAge		= typeof options[OPTIONS_MAX_AGE_KEY] === 'number'
 						? options[OPTIONS_MAX_AGE_KEY]
@@ -66,7 +66,7 @@ class ExpectCT
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @param	enabled Boolean
+	 * @param	{Boolean} [enabled=true]
 	 *
 	 * @return	void
 	 */
@@ -78,7 +78,7 @@ class ExpectCT
 	/**
 	 * @brief	Sets the enforce flag
 	 *
-	 * @param	enforce Boolean
+	 * @param	{Boolean} [enforce=true]
 	 *
 	 * @return	void
 	 */
@@ -90,7 +90,7 @@ class ExpectCT
 	/**
 	 * @brief	Sets the enforce flag
 	 *
-	 * @param	maxAge Number
+	 * @param	{Number} maxAge
 	 *
 	 * @return	void
 	 */
@@ -102,7 +102,7 @@ class ExpectCT
 	/**
 	 * @brief	Sets the reportUri
 	 *
-	 * @param	reportUri String
+	 * @param	{String} reportUri
 	 *
 	 * @return	void
 	 */

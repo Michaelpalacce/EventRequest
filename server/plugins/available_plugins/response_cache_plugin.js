@@ -29,7 +29,7 @@ class ResponseCachePlugin extends PluginInterface
 	/**
 	 * @brief	Creates a rcp namespace to be used
 	 *
-	 * @param	server Server
+	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */
@@ -45,7 +45,7 @@ class ResponseCachePlugin extends PluginInterface
 	/**
 	 * @brief	Attaches an event to cache the response on send
 	 *
-	 * @param	event EventRequest
+	 * @param	{EventRequest} event
 	 *
 	 * @return	void
 	 */
@@ -72,7 +72,7 @@ class ResponseCachePlugin extends PluginInterface
 	 *
 	 * @details	This will check if this request should be cached using the client's ip or not
 	 *
-	 * @param	event EventRequest
+	 * @param	{EventRequest} event
 	 *
 	 * @return	String
 	 */
@@ -81,10 +81,10 @@ class ResponseCachePlugin extends PluginInterface
 		let cacheId		= event.path;
 		const config	= event.currentResponseCacheConfig;
 
-		const useIp		= typeof config !== 'undefined' && typeof config['useIp'] === 'boolean'
-						? config['useIp']
-						: typeof this.options !== 'undefined' && typeof this.options['useIp'] === 'boolean'
-						? this.options['useIp']
+		const useIp		= typeof config !== 'undefined' && typeof config.useIp === 'boolean'
+						? config.useIp
+						: typeof this.options !== 'undefined' && typeof this.options.useIp === 'boolean'
+						? this.options.useIp
 						: DEFAULT_USE_IP;
 
 		if ( useIp === true )
@@ -98,7 +98,7 @@ class ResponseCachePlugin extends PluginInterface
 	/**
 	 * @brief	Gets the time to live from the config passed or not from the options set
 	 *
-	 * @param	event EventRequest
+	 * @param	{EventRequest} event
 	 *
 	 * @return	Number
 	 */
@@ -106,10 +106,10 @@ class ResponseCachePlugin extends PluginInterface
 	{
 		const config	= event.currentResponseCacheConfig;
 
-		return typeof config !== 'undefined' && typeof config['ttl'] === 'number'
-				? config['ttl']
-				: typeof this.options !== 'undefined' && typeof this.options['ttl'] === 'number'
-				? this.options['ttl']
+		return typeof config !== 'undefined' && typeof config.ttl === 'number'
+				? config.ttl
+				: typeof this.options !== 'undefined' && typeof this.options.ttl === 'number'
+				? this.options.ttl
 				: DEFAULT_TTL;
 	}
 

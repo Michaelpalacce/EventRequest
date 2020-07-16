@@ -41,13 +41,13 @@ class HttpStrictTransportSecurity
 	/**
 	 * @brief	Parses the options given to the HSTS class
 	 *
-	 * @param	options Object
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	void
 	 */
 	parseOptions( options = {} )
 	{
-		this.setEnabled( options['enabled'] );
+		this.setEnabled( options.enabled );
 
 		this.maxAge					= typeof options[OPTIONS_MAX_AGE_KEY] === 'number'
 									? options[OPTIONS_MAX_AGE_KEY]
@@ -65,7 +65,7 @@ class HttpStrictTransportSecurity
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @param	enabled Boolean
+	 * @param	{Boolean} [enabled=true]
 	 *
 	 * @return	void
 	 */
@@ -77,7 +77,7 @@ class HttpStrictTransportSecurity
 	/**
 	 * @brief	Sets the component's to either be preloaded or not
 	 *
-	 * @param	preload Boolean
+	 * @param	{Boolean} [preload=true]
 	 *
 	 * @return	void
 	 */
@@ -89,7 +89,7 @@ class HttpStrictTransportSecurity
 	/**
 	 * @brief	Sets the enforce flag
 	 *
-	 * @param	maxAge Number
+	 * @param	{Number} maxAge
 	 *
 	 * @return	void
 	 */
@@ -101,7 +101,7 @@ class HttpStrictTransportSecurity
 	/**
 	 * @brief	Enable or disable includeSubDomains
 	 *
-	 * @param	include Boolean
+	 * @param	{Boolean} [include=true]
 	 *
 	 * @return	void
 	 */

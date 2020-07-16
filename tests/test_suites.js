@@ -3,7 +3,7 @@
 let testSuites	= {};
 
 testSuites.eventSuite		= ()=>{
-	require( './server/event_test' );
+	require( './server/event_request_test' );
 };
 
 testSuites.serverSuite		= ()=>{

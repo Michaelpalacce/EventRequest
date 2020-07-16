@@ -16,10 +16,10 @@ const CONTENT_TYPE_HEADER			= 'content-type';
 class FormBodyParser extends EventEmitter
 {
 	/**
-	 * @param	Object options
-	 * 			Accepts options:
-	 * 			- maxPayloadLength - Number - The max size of the body to be parsed
-	 * 			- strict - Boolean - Whether the received payload must match the content-length
+	 * @param	{Object} options
+	 * 				Accepts options:
+	 * 					- maxPayloadLength - Number - The max size of the body to be parsed
+	 * 					- strict - Boolean - Whether the received payload must match the content-length
 	 */
 	constructor( options = {} )
 	{
@@ -39,7 +39,9 @@ class FormBodyParser extends EventEmitter
 	/**
 	 * @brief	Returns true if the current body parser supports teh given request
 	 *
-	 * @return	void
+	 * @param	{EventRequest} event
+	 *
+	 * @return	Boolean
 	 */
 	supports( event )
 	{
@@ -48,7 +50,7 @@ class FormBodyParser extends EventEmitter
 	}
 
 	/**
-	 * @see	BodyParser::parse()
+	 * @inheritDoc
 	 */
 	parse( event )
 	{

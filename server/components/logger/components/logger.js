@@ -15,6 +15,10 @@ const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
  */
 class Logger
 {
+	/**
+	 * @param	{Object} [options={}]
+	 * @param	{Boolean} [uniqueId=false]
+	 */
 	constructor( options = {}, uniqueId = false )
 	{
 		Object.defineProperty( this, 'uniqueId', {
@@ -44,7 +48,7 @@ class Logger
 	 * 			- dieOnCapture - Boolean - If the process should exit in case of a caught exception -> Defaults to true
 	 * 			- unhandledExceptionLevel - Number - What level should the unhandled exceptions be logged at -> Defaults to error
 	 *
-	 * @param	options Object
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */
@@ -96,7 +100,7 @@ class Logger
 	/**
 	 * @brief	Sets the Log Level of the Logger
 	 *
-	 * @param	logLevel Number
+	 * @param	{Number} logLevel
 	 *
 	 * @return	void
 	 */
@@ -168,7 +172,7 @@ class Logger
 	/**
 	 * @brief	Add a transport to the logger
 	 *
-	 * @param	transport mixed
+	 * @param	{*} transport
 	 *
 	 * @return	Boolean
 	 */
@@ -191,7 +195,7 @@ class Logger
 	/**
 	 * @brief	Checks whether the given log's level matches the supported log levels by this transport
 	 *
-	 * @brief	Object log
+	 * @brief	{*} log
 	 *
 	 * @return	Boolean
 	 */
@@ -220,9 +224,9 @@ class Logger
 	/**
 	 * @brief	Logs the given data
 	 *
-	 * @param	log mixed
-	 * @param	level Number
-	 * @param	isRaw Boolean
+	 * @param	{*} log
+	 * @param	{Number} [level=null]
+	 * @param	{Boolean} [isRaw=false]
 	 *
 	 * @return	Promise
 	 */

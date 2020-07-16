@@ -17,7 +17,7 @@ const STREAM_TYPE	= 'text';
 class TextFileStream
 {
 	/**
-	 * @param	options Object
+	 * @param	{Object} options
 	 */
 	constructor( options )
 	{
@@ -35,7 +35,7 @@ class TextFileStream
 	/**
 	 * @brief	Check whether the given file is supported by the file stream
 	 *
-	 * @param	file String
+	 * @param	{String} file
 	 *
 	 * @return	Boolean
 	 */
@@ -48,6 +48,8 @@ class TextFileStream
 	/**
 	 * @brief	Gets an instance of file stream
 	 *
+	 * @paramm	{Object} options
+	 *
 	 * @return	AudioFileStream
 	 */
 	static getInstance( options )
@@ -58,9 +60,9 @@ class TextFileStream
 	/**
 	 * @brief	Gets the file stream for the file
 	 *
-	 * @param	event EventRequest
-	 * @param	file String
-	 * @param	options Object
+	 * @param	{EventRequest} event
+	 * @param	{String} file
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	ReadableStream
 	 */
