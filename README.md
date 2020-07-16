@@ -2182,8 +2182,8 @@ app.listen( 80, ()=>{
 
 #er_session 
 - Adds a Session class.
-- The session works with a cookie.
-- The cookie will be sent back to the client who must then return the cookie back.
+- The session works with a cookie or a header.
+- The cookie/header will be sent back to the client who must then return the cookie/header back.
 
 ***
 ####Dependencies:
@@ -2204,6 +2204,10 @@ app.listen( 80, ()=>{
 **sessionIdLength: Number**
 - The size of the session name. 
 - Defaults to 32
+
+**isCookieSession: Boolean**
+- Flag that determines if the session is in a cookie or a header
+- Defaults to true ( session cookie )
 
 ***
 ####Events:
@@ -2235,6 +2239,7 @@ app.listen( 80, ()=>{
 
 **removeSession(): Promise: void**
 - Deletes the current session from the caching server directly
+- Deletes the cookie as well
 
 **newSession(): Promise: String||Boolean**
 - Resolves to the new sessionId or to false if failed
@@ -2462,8 +2467,8 @@ router.get( '/preview', ( event ) => {
 ***
 ####Attached Functionality:
 
-**event.fileStreamHandler: FileStreamHandler**
-- The file stream handler used to create file streams
+**event.fileStreamHandler: Object**
+- Object containing one function: **getFileStreamerForType( String file ): FileStream**
 
 ***
 ####Exported Plugin Functions:

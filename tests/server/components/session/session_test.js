@@ -31,6 +31,7 @@ test({
 		assert.equal( true, typeof session.options === 'object' );
 		assert.equal( 7776000, session.ttl );
 		assert.equal( 'sid', session.sessionKey );
+		assert.equal( true, session.isCookieSession );
 		assert.equal( 32, session.sessionIdLength );
 		assert.equal( null, session.sessionId );
 		assert.equal( true, typeof session.session === 'object' );
@@ -51,7 +52,7 @@ test({
 		let sessionIdLength			= 1000;
 
 		let options	= {
-			ttl, sessionKey, sessionIdLength
+			ttl, sessionKey, sessionIdLength, isCookieSession: false
 		};
 
 		assert.doesNotThrow(()=>{
@@ -61,6 +62,7 @@ test({
 		assert.equal( true, session.event instanceof EventRequest );
 		assert.equal( true, typeof session.server !== 'undefined' );
 		assert.equal( true, typeof session.options === 'object' );
+		assert.equal( true, session.isCookieSession === false );
 		assert.equal( ttl, session.ttl );
 		assert.equal( sessionKey, session.sessionKey );
 		assert.equal( sessionIdLength, session.sessionIdLength );
@@ -80,6 +82,24 @@ test({
 
 		assert.doesNotThrow(()=>{
 			session	= new Session( eventRequest )
+		});
+
+		assert.equal( sessionId, session.getSessionId() );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Session constructor on custom arguments with headers',
+	test	: ( done )=>{
+		let sessionId				= 'sessionId';
+		let eventRequest			= helpers.getEventRequest( undefined, undefined, { testSid : sessionId } );
+		eventRequest.cachingServer	= helpers.getCachingServer();
+		let session					= null;
+
+		assert.doesNotThrow(()=>{
+			session	= new Session( eventRequest, { isCookieSession: false, sessionKey: 'testSid' } )
 		});
 
 		assert.equal( sessionId, session.getSessionId() );

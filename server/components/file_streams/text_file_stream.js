@@ -1,8 +1,8 @@
 'use strict';
 
 // Dependencies
-const path			= require( 'path' );
-const fs			= require( 'fs' );
+const path	= require( 'path' );
+const fs	= require( 'fs' );
 
 /**
  * @brief	The type of file this stream supports
@@ -16,12 +16,8 @@ const STREAM_TYPE	= 'text';
  */
 class TextFileStream
 {
-	/**
-	 * @param	{Object} options
-	 */
-	constructor( options )
+	constructor()
 	{
-		this.options			= options;
 		this.SUPPORTED_FORMATS	= [
 			'.txt', '.js', '.php', '.html', '.json', '.cpp', '.h',
 			'.md', '.bat', '.log', '.yml', '.ini', '.ts', '.ejs', '.twig',
@@ -43,18 +39,6 @@ class TextFileStream
 	{
 		file	= path.parse( file );
 		return this.SUPPORTED_FORMATS.indexOf( file.ext.toLowerCase() ) !== -1;
-	}
-
-	/**
-	 * @brief	Gets an instance of file stream
-	 *
-	 * @paramm	{Object} options
-	 *
-	 * @return	AudioFileStream
-	 */
-	static getInstance( options )
-	{
-		return new this( options );
 	}
 
 	/**

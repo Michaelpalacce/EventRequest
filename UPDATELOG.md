@@ -1,3 +1,11 @@
+22.1.0
+- Added extra tests
+- Made the file stream handler an object and not a class
+- Removed unnecessary logic
+- Fixed an issue with the headers where they may not be retrieved correctly. Now they should be truly case insensitive
+- Added an option to the session to be header based
+- Tested the new header session
+
 22.0.0
 - Small Documentation improvements
 - Added router block caching. This caches the execution block of the request and in case of the same path the same parameters will be applied as well as the same block will be returned. This should result in faster requests and nothing else. 

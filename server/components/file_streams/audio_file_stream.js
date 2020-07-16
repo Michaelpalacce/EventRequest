@@ -16,12 +16,8 @@ const STREAM_TYPE	= 'audio';
  */
 class AudioFileStream
 {
-	/**
-	 * @param	{Object} options
-	 */
-	constructor( options )
+	constructor()
 	{
-		this.options			= options;
 		this.SUPPORTED_FORMATS	= ['.mp3', '.flac', '.wav', '.aiff', '.aac'];
 		this._streamType		= STREAM_TYPE;
 	}
@@ -37,18 +33,6 @@ class AudioFileStream
 	{
 		file	= path.parse( file );
 		return this.SUPPORTED_FORMATS.indexOf( file.ext ) !== -1;
-	}
-
-	/**
-	 * @brief	Gets an instance of file stream
-	 *
-	 * @param	{Object} options
-	 *
-	 * @return	AudioFileStream
-	 */
-	static getInstance( options )
-	{
-		return new this( options );
 	}
 
 	/**

@@ -2975,6 +2975,30 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_router.caches.correctly',
+	test	: ( done )=>{
+		const name	= 'testErRouterCaches';
+
+		app.get( `/${name}/:id:`, ( event )=>{
+			event.send( event.params );
+		} );
+
+		helpers.sendServerRequest( `/${name}/idOne` ).then(( response )=>{
+			assert.equal( JSON.parse( response.body.toString() ).id, 'idOne' );
+			return helpers.sendServerRequest( `/${name}/idTwo` );
+		}).then(( response )=>{
+			assert.equal( JSON.parse( response.body.toString() ).id, 'idTwo' );
+
+			return helpers.sendServerRequest( `/${name}/idTwo` );
+		}).then(( response )=>{
+			assert.equal( JSON.parse( response.body.toString() ).id, 'idTwo' );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test er_session works as expected',
 	test	: ( done )=>{
 		const name	= 'testErSession';
@@ -3035,6 +3059,70 @@ test({
 			assert.equal( response.headers.authenticated, 1 );
 
 			const headers	= { cookie: `sid=wrong`};
+
+			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			assert.equal( typeof response.headers.authenticated === 'undefined', true );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.er_session.works.as.expected.with.headers',
+	test	: ( done )=>{
+		const name	= 'testErSessionWithHeaders';
+
+		assert.throws(()=>{
+			const appOne	= new Server();
+			appOne.apply( appOne.er_session );
+		});
+
+		app.apply( app.er_data_server );
+		app.apply( app.er_session, { isCookieSession: false } );
+
+		app.get( `/${name}`, ( event )=>{
+			event.initSession( event.next ).catch( event.next );
+		} );
+
+		app.get( `/${name}`, async ( event )=>{
+			assert.equal( event.session instanceof Session, true );
+			const session	= event.session;
+
+			if ( session.has( 'authenticated' ) === false )
+			{
+				assert.throws(()=>{
+					session.get( 'authenticated' );
+				});
+
+				session.add( 'authenticated', true );
+			}
+			else
+			{
+				assert.equal( session.get( 'authenticated' ), true );
+				event.setResponseHeader( 'authenticated', 1 );
+			}
+
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			assert.equal( typeof response.headers.sid !== 'undefined', true );
+
+			const sid		= response.headers.sid;
+			const headers	= { sid };
+
+			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
+		}).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+
+			assert.equal( typeof response.headers.authenticated !== 'undefined', true );
+			assert.equal( response.headers.authenticated, 1 );
+
+			const headers	= { sid: 'wrong' };
 
 			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
 		}).then(( response )=>{

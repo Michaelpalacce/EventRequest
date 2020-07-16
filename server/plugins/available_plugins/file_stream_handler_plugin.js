@@ -1,7 +1,7 @@
 'use strict';
 
-const PluginInterface		= require( '../plugin_interface' );
-const { FileStreamHandler }	= require( '../../components/file_streams/file_stream_handler' );
+const PluginInterface	= require( '../plugin_interface' );
+const fileStreamHandler	= require( '../../components/file_streams/file_stream_handler' );
 
 /**
  * @brief	File stream handler responsible for attaching FileStreams to the eventRequest
@@ -82,14 +82,14 @@ class FileStreamHandlerPlugin extends PluginInterface
 	{
 		return [{
 			handler	: ( event ) => {
-				event.fileStreamHandler	= new FileStreamHandler();
+				event.fileStreamHandler	= fileStreamHandler;
 
 				this.attachFunctions( event );
 
 				event.on( 'cleanUp', ()=>{
-					event.fileStreamHandler		= undefined;
-					event.getFileStream			= undefined;
-					event.streamFile			= undefined;
+					event.fileStreamHandler	= undefined;
+					event.getFileStream		= undefined;
+					event.streamFile		= undefined;
 				} );
 
 				event.next();

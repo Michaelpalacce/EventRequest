@@ -17,12 +17,8 @@ const STREAM_TYPE	= 'image';
  */
 class ImageFileStream
 {
-	/**
-	 * @param	{Object} options
-	 */
-	constructor( options )
+	constructor()
 	{
-		this.options			= options;
 		this.SUPPORTED_FORMATS	= [
 			'.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
 		];
@@ -40,16 +36,6 @@ class ImageFileStream
 	{
 		file	= path.parse( file );
 		return this.SUPPORTED_FORMATS.indexOf( file.ext ) !== -1;
-	}
-
-	/**
-	 * @brief	Gets an instance of file stream
-	 *
-	 * @return	AudioFileStream
-	 */
-	static getInstance( options )
-	{
-		return new this( options );
 	}
 
 	/**

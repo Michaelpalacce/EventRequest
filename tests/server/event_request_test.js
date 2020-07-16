@@ -796,7 +796,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.getRequestHeader should return header regardless of case',
+	message	: 'EventRequest.getRequestHeader is case insensitive',
 	test	: ( done )=>{
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';

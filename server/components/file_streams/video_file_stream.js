@@ -16,12 +16,8 @@ const STREAM_TYPE	= 'video';
  */
 class VideoFileStream
 {
-	/**
-	 * @param	{Object} options
-	 */
-	constructor( options )
+	constructor()
 	{
-		this.options			= options;
 		this.SUPPORTED_FORMATS	= ['.mp4', '.webm'];
 		this._streamType		= STREAM_TYPE;
 	}
@@ -37,18 +33,6 @@ class VideoFileStream
 	{
 		file	= path.parse( file );
 		return this.SUPPORTED_FORMATS.indexOf( file.ext ) !== -1;
-	}
-
-	/**
-	 * @brief	Gets an instance of file stream
-	 *
-	 * @param	{Object} options
-	 *
-	 * @return	AudioFileStream
-	 */
-	static getInstance( options )
-	{
-		return new this( options );
 	}
 
 	/**

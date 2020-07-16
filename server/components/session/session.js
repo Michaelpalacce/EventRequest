@@ -31,9 +31,17 @@ class Session
 								? this.options.sessionIdLength
 								: 32;
 
-		this.sessionId			= typeof event.cookies[this.sessionKey] !== 'undefined'
-								? event.cookies[this.sessionKey]
-								: null;
+		this.isCookieSession	= typeof this.options.isCookieSession === 'boolean'
+								? this.options.isCookieSession
+								: true;
+
+		this.sessionId			= this.isCookieSession ?
+									typeof event.cookies[this.sessionKey] !== 'undefined'
+									? event.cookies[this.sessionKey]
+									: null
+								: event.hasRequestHeader( this.sessionKey )
+									? event.getRequestHeader( this.sessionKey )
+									: null;
 
 		this.session			= {};
 
@@ -79,7 +87,10 @@ class Session
 	{
 		await this.server.delete( this.sessionId );
 
-		this.event.setCookie( this.sessionKey, this.sessionId, { expires: - this.ttl } );
+		if ( this.isCookieSession )
+		{
+			this.event.setCookie( this.sessionKey, this.sessionId, { expires: - this.ttl } );
+		}
 	}
 
 	/**
@@ -101,7 +112,15 @@ class Session
 		else
 		{
 			this.sessionId	= sessionId;
-			this.event.setCookie( this.sessionKey, this.sessionId, { expires: this.ttl } );
+
+			if ( this.isCookieSession )
+			{
+				this.event.setCookie( this.sessionKey, this.sessionId, { expires: this.ttl } );
+			}
+			else
+			{
+				this.event.setResponseHeader( this.sessionKey, this.sessionId );
+			}
 
 			return sessionId;
 		}
