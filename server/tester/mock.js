@@ -6,7 +6,7 @@ const Mocker	= require( './mocker' );
 /**
  * @brief	Used to create a MockedObject
  *
- * @param	{Object} objectToMock
+ * @param	{*} objectToMock
  *
  * @return	MockedClass
  */

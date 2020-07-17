@@ -1,6 +1,7 @@
 'use strict';
 
 // Dependencies
+const fs				= require( 'fs' );
 const VideoFileStream	= require( './video_file_stream' );
 const AudioFileStream	= require( './audio_file_stream' );
 const TextFileStream	= require( './text_file_stream' );
@@ -14,7 +15,7 @@ module.exports			= {
 	 *
 	 * @param	{String} file
 	 *
-	 * @return	FileStream
+	 * @return	VideoFileStream|AudioFileStream|ImageFileStream|TextFileStream|null
 	 */
 	getFileStreamerForType	: function( file )
 	{
@@ -24,6 +25,9 @@ module.exports			= {
 			new ImageFileStream(),
 			new TextFileStream()
 		];
+
+		if ( ! fs.existsSync( file ) )
+			return null;
 
 		for ( const index in fileStreams )
 		{

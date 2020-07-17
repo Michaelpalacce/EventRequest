@@ -37,8 +37,8 @@ class TextFileStream
 	 */
 	supports( file )
 	{
-		file	= path.parse( file );
-		return this.SUPPORTED_FORMATS.indexOf( file.ext.toLowerCase() ) !== -1;
+		const parsedPath	= path.parse( file );
+		return this.SUPPORTED_FORMATS.indexOf( parsedPath.ext.toLowerCase() ) !== -1;
 	}
 
 	/**
@@ -48,18 +48,15 @@ class TextFileStream
 	 * @param	{String} file
 	 * @param	{Object} [options={}]
 	 *
-	 * @return	ReadableStream
+	 * @return	ReadStream
 	 */
 	getFileStream( event, file, options = {} )
 	{
-		if ( ! fs.existsSync( file ) )
-		{
-			return null;
-		}
+		const stream	= fs.createReadStream( file, options );
 
-		event.emit( 'stream_start' );
+		event.emit( 'stream_start', { stream } );
 
-		return fs.createReadStream( file );
+		return stream;
 	}
 
 	/**

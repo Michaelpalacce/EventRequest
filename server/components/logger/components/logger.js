@@ -27,9 +27,7 @@ class Logger
 		});
 
 		if ( this.uniqueId === false )
-		{
 			throw new Error( 'Logger created without an uniqueId' );
-		}
 
 		this.sanitizeConfig( options );
 	}
@@ -138,9 +136,7 @@ class Logger
 
 				this.log( uncaughtExceptionLog ).finally(()=>{
 					if ( this.dieOnCapture )
-					{
 						process.exit( 1 );
-					}
 				});
 			});
 		}
@@ -179,9 +175,7 @@ class Logger
 	addTransport( transport )
 	{
 		if ( ! Array.isArray( this.transports ) )
-		{
 			this.transports	= [];
-		}
 
 		if ( transport instanceof Transport )
 		{
@@ -201,10 +195,8 @@ class Logger
 	 */
 	supports( log )
 	{
-		if ( ( log instanceof Log ) === false )
-		{
+		if ( ! ( log instanceof Log ) )
 			return false;
-		}
 
 		return this.logLevel >= log.getLevel();
 	}

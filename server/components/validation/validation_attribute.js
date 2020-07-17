@@ -63,9 +63,7 @@ class ValidationAttribute
 		}
 
 		if ( this.rules === undefined || typeof this.rules !== 'string' )
-		{
 			return VALIDATION_ERRORS.rules;
-		}
 
 		let allRules	= this.rules.split( '||' );
 		let index, rule, result, params, validationErrors	= [];
@@ -76,16 +74,12 @@ class ValidationAttribute
 			params	= this.getRuleParams( rule );
 
 			if ( params.rule === VALIDATION_ERRORS.optional && assert.assertIsEmpty( this.value ) )
-			{
 				return false;
-			}
 
 			result	= this.validateRule( rule, index, params, allRules );
 
 			if ( result !== false )
-			{
 				validationErrors.push( result );
-			}
 		}
 
 		return validationErrors.length > 0 ? validationErrors : false;
@@ -157,33 +151,29 @@ class ValidationAttribute
 			case VALIDATION_ERRORS.range:
 				let range	= params.params[0].split( '-' );
 				valueLength	= assert.getLength( this.value );
-				if ( range.length !== 2 || assert.assertIsEmpty( range[0] ) || assert.assertIsEmpty( range[1] ) )
-				{
-					return VALIDATION_ERRORS.rules;
-				}
 
-				return assert.assertBiggerOrEqual( valueLength, Number( range[0] ) )
-						&& assert.assertSmallerOrEqual( valueLength, Number( range[1] ) )
+				if ( range.length !== 2 || assert.assertIsEmpty( range[0] ) || assert.assertIsEmpty( range[1] ) )
+					return VALIDATION_ERRORS.rules;
+
+				return assert.assertBiggerOrEqual( valueLength, Number( range[0] ) ) && assert.assertSmallerOrEqual( valueLength, Number( range[1] ) )
 						? false
 						: VALIDATION_ERRORS.range;
 
 			case VALIDATION_ERRORS.min:
 				valueLength	= assert.getLength( this.value );
 				let min		= params.params[0];
+
 				if ( params.params.length !== 1 || assert.assertIsEmpty( min ) )
-				{
 					return VALIDATION_ERRORS.rules;
-				}
 
 				return assert.assertBiggerOrEqual( valueLength, Number( min ) ) ? false : VALIDATION_ERRORS.min;
 
 			case VALIDATION_ERRORS.max:
 				valueLength	= assert.getLength( this.value );
 				let max		= params.params[0];
+
 				if ( params.params.length !== 1 || assert.assertIsEmpty( max ) )
-				{
 					return VALIDATION_ERRORS.rules;
-				}
 
 				return assert.assertSmallerOrEqual( valueLength, Number( max ) ) ? false : VALIDATION_ERRORS.max;
 
@@ -223,30 +213,29 @@ class ValidationAttribute
 
 			case VALIDATION_ERRORS.same:
 				sameEntry	= params.params[0];
+
 				if ( params.params.length !== 1 )
-				{
 					return VALIDATION_ERRORS.rules;
-				}
+
 				inputEntry	= this.data[sameEntry];
 
 				return assert.assertStrictEqual( this.value, inputEntry ) ? false : VALIDATION_ERRORS.same;
 
 			case VALIDATION_ERRORS.different:
 				sameEntry	= params.params[0];
+
 				if ( params.params.length !== 1 )
-				{
 					return VALIDATION_ERRORS.rules;
-				}
+
 				inputEntry	= this.data[sameEntry];
 
 				return assert.assertStrictNotEqual( this.value, inputEntry ) ? false : VALIDATION_ERRORS.different;
 
 			case VALIDATION_ERRORS.equals:
 				let comparator	= params.params[0];
+
 				if ( params.params.length !== 1)
-				{
 					return VALIDATION_ERRORS.rules;
-				}
 
 				return assert.assertStrictEqual( this.value, comparator ) ? false : VALIDATION_ERRORS.equals;
 
@@ -264,11 +253,11 @@ class ValidationAttribute
 	 */
 	getRuleParams( rule )
 	{
-		rule	= rule.split( ':' );
+		const ruleParams	= rule.split( ':' );
 
 		return{
-			rule	: rule.shift(),
-			params	: rule
+			rule	: ruleParams.shift(),
+			params	: ruleParams
 		}
 	}
 }

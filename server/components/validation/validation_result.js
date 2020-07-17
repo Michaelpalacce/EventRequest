@@ -68,9 +68,7 @@ class ValidationResult
 			if ( typeof rules === 'object' && typeof rules.$default === 'undefined' && typeof rules.$rules === 'undefined' )
 			{
 				if ( value === undefined )
-				{
 					value	= {};
-				}
 
 				result[key]		= {};
 				failures[key]	= {};
@@ -122,9 +120,7 @@ class ValidationResult
 					this._sanitizeFailures( failures[key] );
 
 					if ( Object.keys( failures[key] ).length === 0 )
-					{
 						delete failures[key];
-					}
 				}
 			}
 		}

@@ -1,3 +1,7 @@
+22.1.2
+- General code cleanup
+- General Documentation cleanup
+
 22.1.1
 - Small documentation fix
 

@@ -58,9 +58,7 @@ class SecurityPlugin extends PluginInterface
 			};
 
 			if ( typeof this.options.build === 'boolean' ? this.options.build : true )
-			{
 				event.$security.build();
-			}
 
 			event.on( 'cleanUp', ()=>{
 				event.$security	= undefined;

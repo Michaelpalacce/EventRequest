@@ -25,20 +25,16 @@ class FileStreamHandlerPlugin extends PluginInterface
 		 * @param	{String} file
 		 * @param	{Object} [options={}]
 		 *
-		 * @return	ReadableStream | null
+		 * @return	ReadStream|null
 		 */
 		event.getFileStream	= function( file, options = {} )
 		{
 			const fileStream	= this.fileStreamHandler.getFileStreamerForType( file );
 
 			if ( fileStream !== null )
-			{
 				return fileStream.getFileStream( event, file, options );
-			}
 			else
-			{
 				return null;
-			}
 		};
 		/**
 		 * @brief	Streams files
@@ -62,13 +58,9 @@ class FileStreamHandlerPlugin extends PluginInterface
 			else
 			{
 				if ( typeof errCallback !== 'function' )
-				{
 					this.next( 'Could not find a FileStream that supports that format', 400 )
-				}
 				else
-				{
 					errCallback();
-				}
 			}
 		};
 	}

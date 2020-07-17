@@ -32,6 +32,7 @@ class DataServer extends EventEmitter
 	{
 		super();
 		this.setMaxListeners( 0 );
+
 		this.intervals	= [];
 		this.server		= null;
 
@@ -152,9 +153,7 @@ class DataServer extends EventEmitter
 	async get( key, options = {} )
 	{
 		if ( typeof key !== 'string' || typeof options !== 'object' )
-		{
 			return null;
-		}
 
 		this.emit( 'get', { key, options } );
 		return this._get( key, options ).catch( this._handleServerDown.bind( this ) ) || null;
@@ -189,9 +188,7 @@ class DataServer extends EventEmitter
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
-			{
 				return resolve( dataSet );
-			}
 
 			return resolve( dataSet.value );
 		});
@@ -285,14 +282,10 @@ class DataServer extends EventEmitter
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
-			{
 				resolve( false );
-			}
 
 			if ( typeof dataSet.value !== 'number' )
-			{
 				resolve( false );
-			}
 
 			dataSet.value	+= value;
 			dataSet.ttl		= this._getExpirationDateFromTtl( dataSet.ttl );
@@ -344,14 +337,10 @@ class DataServer extends EventEmitter
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
-			{
 				resolve( false );
-			}
 
 			if ( typeof dataSet.value !== 'number' )
-			{
 				resolve( false );
-			}
 
 			dataSet.value	-= value;
 			dataSet.ttl		= this._getExpirationDateFromTtl( dataSet.ttl );
@@ -373,9 +362,7 @@ class DataServer extends EventEmitter
 	async lock( key, options = {} )
 	{
 		if ( typeof key !== 'string' || typeof options !== 'object' )
-		{
 			return false;
-		}
 
 		this.emit( 'lock', { key, options } );
 
@@ -399,9 +386,7 @@ class DataServer extends EventEmitter
 			const isNew		= typeof this.server[key] === 'undefined';
 
 			if ( isNew )
-			{
 				this.server[key]	= this._makeDataSet( key, DataServer.LOCK_VALUE, ttl, persist );
-			}
 
 			resolve( isNew );
 		});
@@ -418,9 +403,7 @@ class DataServer extends EventEmitter
 	async unlock( key, options = {} )
 	{
 		if ( typeof key !== 'string' || typeof options !== 'object' )
-		{
 			return false;
-		}
 
 		this.emit( 'unlock', { key, options } );
 
@@ -441,9 +424,7 @@ class DataServer extends EventEmitter
 			const exists	= typeof this.server[key] !== 'undefined';
 
 			if ( exists )
-			{
 				delete this.server[key];
-			}
 
 			resolve( true )
 		});
@@ -504,9 +485,7 @@ class DataServer extends EventEmitter
 			const dataSet	= await this._prune( key );
 
 			if ( dataSet === null )
-			{
 				return resolve( false );
-			}
 
 			ttl						= ttl === 0 ? dataSet.ttl : ttl;
 			dataSet.expirationDate	= this._getExpirationDateFromTtl( ttl );
@@ -531,9 +510,7 @@ class DataServer extends EventEmitter
 							: null;
 
 			if ( dataSet !== null && this.server[key].expirationDate === null )
-			{
 				this.server[key].expirationDate	= Infinity;
-			}
 
 			if ( dataSet === null || now > dataSet.expirationDate )
 			{
@@ -582,9 +559,7 @@ class DataServer extends EventEmitter
 	{
 		return new Promise(( resolve )=>{
 			if ( typeof this.server[key] === 'undefined' )
-			{
 				return resolve( true );
-			}
 
 			this.server[key]	= undefined;
 			delete this.server[key];
@@ -613,9 +588,7 @@ class DataServer extends EventEmitter
 	_garbageCollect()
 	{
 		for ( const key in this.server )
-		{
 			this._get( key ).catch( this._handleServerDown.bind( this ) );
-		}
 	}
 
 	/**
@@ -631,9 +604,7 @@ class DataServer extends EventEmitter
 			const dataSet	= this.server[key];
 
 			if ( dataSet.persist === true )
-			{
 				serverData[key]	= dataSet;
-			}
 		}
 
 		const tmpFile		= `${this.persistPath}.tmp`;
@@ -702,9 +673,7 @@ class DataServer extends EventEmitter
 	_getTtl( ttl = -1 )
 	{
 		if ( ttl === -1 )
-		{
 			return Infinity;
-		}
 
 		return ttl > 0 ? ttl : this.defaultTtl;
 	}

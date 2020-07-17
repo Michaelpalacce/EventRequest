@@ -14,9 +14,7 @@ module.exports	= {
 	 */
 	validate	: ( validationInput, skeleton )=>{
 		if ( typeof validationInput !== 'object' )
-		{
 			validationInput	= {};
-		}
 
 		return new ValidationResult( validationInput, skeleton );
 	}

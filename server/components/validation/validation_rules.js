@@ -25,29 +25,19 @@ function getType( value )
 function getLength( value )
 {
 	if ( value === undefined )
-	{
 		return -1;
-	}
 
 	if ( Array.isArray( value ) )
-	{
 		return value.length;
-	}
 
 	if( getType( value ) === 'number' )
-	{
 		return value;
-	}
 
 	if( getType( value ) === 'string' )
-	{
 		return value.length;
-	}
 
 	if ( getType( value ) === 'object'  )
-	{
 		return Object.keys( value ).length;
-	}
 
 	return -1;
 }
@@ -200,19 +190,13 @@ assert.assertIsEmpty		= ( actual ) => {
  */
 assert.assertNotEmpty		= ( actual ) => {
 	if ( actual === undefined || actual === null )
-	{
 		return false;
-	}
 
 	if ( Array.isArray( actual ) )
-	{
 		return actual.length > 0;
-	}
 
 	if ( getType( actual ) === 'object' )
-	{
 		return Object.keys( actual ).length > 0;
-	}
 
 	return actual !== '';
 };
@@ -388,19 +372,13 @@ assert.assertNotBoolean			= ( actual ) => {
  */
 assert.assertTrue				= ( actual ) => {
 	if ( assert.assertIsInternalType( actual, 'boolean' ) )
-	{
 		return actual === true;
-	}
 
 	if ( assert.assertIsInternalType( actual, 'number' ) )
-	{
 		return actual === 1;
-	}
 
 	if ( assert.assertIsInternalType( actual, 'string' ) )
-	{
 		return actual === 'true' || actual === '1';
-	}
 
 	return false;
 };
@@ -414,19 +392,13 @@ assert.assertTrue				= ( actual ) => {
  */
 assert.assertFalse			= ( actual ) => {
 	if ( assert.assertIsInternalType( actual, 'boolean' ) )
-	{
 		return actual === false;
-	}
 
 	if ( assert.assertIsInternalType( actual, 'number' ) )
-	{
 		return actual === 0;
-	}
 
 	if ( assert.assertIsInternalType( actual, 'string' ) )
-	{
 		return actual === 'false' || actual === '0';
-	}
 
 	return false;
 };

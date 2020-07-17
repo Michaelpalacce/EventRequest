@@ -7,6 +7,7 @@ const fs				= require( 'fs' );
 const { promisify }		= require( 'util' );
 const { EventEmitter }	= require( 'events' );
 const { Loggur }		= require( '../logger/loggur' );
+const { makeId }		= require( '../helpers/unique_id' );
 const unlink			= promisify( fs.unlink );
 
 /**
@@ -406,7 +407,7 @@ class MultipartDataParser extends EventEmitter
 					{
 						// File input being parsed
 						this.upgradeToFileTypePart( part );
-						part.path		= path.join( this.tempDir, this.getRandomFileName( RANDOM_NAME_LENGTH ) );
+						part.path		= path.join( this.tempDir, makeId( RANDOM_NAME_LENGTH ) );
 						part.name		= filename;
 					}
 					else if ( name !== null )
@@ -521,24 +522,6 @@ class MultipartDataParser extends EventEmitter
 	handleError( message )
 	{
 		throw new Error( message );
-	}
-
-	/**
-	 * @brief	Get a random file name given a size
-	 *
-	 * @param	{Number} size
-	 *
-	 * @return	String
-	 */
-	getRandomFileName( size )
-	{
-		let text		= "";
-		let possible	= "abcdefghijklmnopqrstuvwxyz0123456789";
-
-		for ( let i = 0; i < size; ++ i )
-			text	+= possible.charAt( Math.floor( Math.random() * possible.length ) );
-
-		return text;
 	}
 
 	/**
@@ -665,15 +648,6 @@ class MultipartDataParser extends EventEmitter
 	}
 
 	/**
-	 * @brief	Attach events to the callback
-	 *
-	 * @return	void
-	 */
-	attachEvents()
-	{
-	}
-
-	/**
 	 * @brief	CLean up items
 	 *
 	 * @return	void
@@ -698,9 +672,7 @@ class MultipartDataParser extends EventEmitter
 					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
 					{
 						if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
-						{
 							part.file.end();
-						}
 
 						part.file.on( 'end',()=>{
 							unlink( part.path ).catch(( e )=>{
@@ -728,16 +700,12 @@ class MultipartDataParser extends EventEmitter
 
 		this.parts.forEach( ( part ) =>{
 			if ( part.type === DATA_TYPE_FILE )
-			{
 				parts.$files.push( part );
-			}
 
 			if ( part.type === DATA_TYPE_PARAMETER )
 			{
 				if ( typeof parts[part.name] === 'undefined' )
-				{
 					parts[part.name]	= part.data.toString();
-				}
 			}
 		});
 
@@ -751,19 +719,18 @@ class MultipartDataParser extends EventEmitter
 	 */
 	absorbStream()
 	{
-		this.event.request.on( 'data', ( chunk ) =>
-		{
+		this.event.request.on( 'data', ( chunk ) => {
+
 			if ( ! this.hasFinished() )
-			{
 				this.onDataReceivedCallback( chunk );
-			}
+
 		});
 
 		this.event.request.on( 'end', () => {
+
 			if ( ! this.hasFinished() )
-			{
 				this.emit( 'end' );
-			}
+
 		});
 	}
 
@@ -777,9 +744,7 @@ class MultipartDataParser extends EventEmitter
 		const lastPart	= this.getPartData();
 
 		if ( lastPart.state !== STATE_END )
-		{
 			this.parts.pop();
-		}
 	}
 }
 

@@ -33,14 +33,10 @@ class Mocker
 								: null;
 
 		if ( shouldReturn === null && onConsecutiveCalls === null )
-		{
 			shouldReturn	= '';
-		}
 
 		if ( this.mockedClass === undefined || this.method === null )
-		{
 			throw new Error( 'Invalid mock options provided' );
-		}
 
 		this.executionBlock	= shouldReturn === null ? onConsecutiveCalls : [shouldReturn];
 
@@ -60,9 +56,7 @@ class Mocker
 			functionCalled ++;
 
 			if ( this.executionTimes !== null && this.executionTimes < functionCalled )
-			{
 				throw new Error( `Method ${this.method} was not expected to be called more than ${this.executionTimes} times.` );
-			}
 
 			this.assertWithArguments( args );
 
@@ -90,9 +84,7 @@ class Mocker
 			{
 				let value	= currentArguments[index];
 				if ( value === undefined )
-				{
 					continue;
-				}
 
 				assert.deepStrictEqual( value, args[index], `Failed asserting that ${this.method} was called `
 					+ ` with correct argument at position ${index}. `
@@ -114,17 +106,13 @@ class Mocker
 							: this.mockedClass.prototype;
 
 		if ( typeof prototypeSpider[this.method] === 'undefined' )
-		{
 			throw new Error( 'Trying to mock a method that does not exist.' );
-		}
+
 		else if ( typeof prototypeSpider[this.method] === 'function' )
-		{
 			prototypeSpider[this.method]	= this.mockedMethod;
-		}
+
 		else
-		{
 			prototypeSpider[this.method]	= this.getNextExecutionFunction( [] );
-		}
 	}
 
 	/**
@@ -159,13 +147,10 @@ class Mocker
 		let functionToExecute	= this.executionBlock.length > 1 ? this.executionBlock.shift() : this.executionBlock[0];
 
 		if ( typeof functionToExecute === 'function' )
-		{
-			return functionToExecute.apply( this.mockedClass, args )
-		}
+			return functionToExecute.apply( this.mockedClass, args );
+
 		else
-		{
 			return functionToExecute;
-		}
 	}
 }
 

@@ -91,15 +91,19 @@ class Tester
 				case command.match( /--filter=/ ) !== null:
 					this.filter	= command.substring( 9 );
 					break;
+
 				case command.match( /--silent/ ) !== null:
 					this.silent	= true;
 					break;
+
 				case command.match( /--debug/ ) !== null:
 					this.debug	= true;
 					break;
+
 				case command.match( /--dieOnFirstError=/ ) !== null:
 					this.dieOnFirstError	= command.substring( 18 ) == 1;
 					break;
+
 				default:
 					break;
 			}
@@ -122,23 +126,18 @@ class Tester
 	formatTest( test )
 	{
 		if ( typeof test !== 'object' || typeof test.message !== 'string' || typeof test.test !== 'function' )
-		{
 			throw new Error( 'Invalid test provided' );
-		}
+
 		let tests	= [];
 
 		if ( test.skipped === true )
-		{
 			test.status	= TEST_STATUSES.skipped;
-		}
+
 		else if ( test.incomplete === true )
-		{
 			test.status	= TEST_STATUSES.incomplete;
-		}
+
 		else
-		{
 			test.status	= TEST_STATUSES.pending;
-		}
 
 		if ( Array.isArray( test.dataProvider ) )
 		{
@@ -215,13 +214,10 @@ class Tester
 		if ( error instanceof Error )
 		{
 			if ( this.debug )
-			{
 				error	= error.stack;
-			}
+
 			else
-			{
 				error	= error.message;
-			}
 		}
 
 		test.status	= TEST_STATUSES.failed;
@@ -271,18 +267,13 @@ class Tester
 	doneCallback( test, err )
 	{
 		if ( this.hasFinished || this.stop )
-		{
 			throw new Error( 'Done called after finishing up. There could be a potential error!' );
-		}
 
 		if ( err )
-		{
 			this.errorCallback( test, err );
-		}
+
 		else
-		{
 			this.successCallback( test );
-		}
 
 		this.done();
 	}
@@ -367,13 +358,10 @@ class Tester
 		catch ( error )
 		{
 			if ( ! this.stop && ! this.hasFinished )
-			{
 				this.doneCallback( test, error );
-			}
+
 			else
-			{
 				throw error;
-			}
 		}
 	}
 
@@ -390,10 +378,9 @@ class Tester
 	{
 		this.initialize( options );
 		this.consoleLogger.error( `${this.tests.length} tests found.` );
+
 		if ( this.filter !== false )
-		{
 			this.consoleLogger.warning( `Filtering according to: ${this.filter}` );
-		}
 
 		this.done();
 	}

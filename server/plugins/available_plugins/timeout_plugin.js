@@ -21,9 +21,7 @@ class TimeoutPlugin extends PluginInterface
 	getTimeout()
 	{
 		if ( this.timeout === null )
-		{
 			this.timeout	= typeof this.options.timeout === 'number' ? parseInt( this.options.timeout ) : 60 * 1000;
-		}
 
 		return this.timeout;
 	}
@@ -40,9 +38,7 @@ class TimeoutPlugin extends PluginInterface
 	{
 		event.internalTimeout	= setTimeout( () => {
 				if ( ! event.isFinished() )
-				{
 					event.next( `Request timed out in: ${timeout}` );
-				}
 			},
 			timeout
 		);
@@ -81,15 +77,15 @@ class TimeoutPlugin extends PluginInterface
 		event.on( 'cleanUp', ()=>
 		{
 			event.clearTimeout();
-		} );
+		});
 
 		event.on( 'stream_start', ()=>{
 			event.clearTimeout();
-		} );
+		});
 
 		event.on( 'stream_end', ()=>{
 			this.setTimeout( event, this.getTimeout() );
-		} );
+		});
 	}
 
 	/**

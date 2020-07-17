@@ -31,9 +31,7 @@ class ErrorHandler
 	_getErrorToEmit( error )
 	{
 		if ( error instanceof Error )
-		{
 			error	= error.stack;
-		}
 
 		return error;
 	}
@@ -48,9 +46,7 @@ class ErrorHandler
 	_formatError( error )
 	{
 		if ( error instanceof Error )
-		{
 			error	= error.message;
-		}
 
 		return { error };
 	}
@@ -67,9 +63,7 @@ class ErrorHandler
 	_sendError( event, error, code )
 	{
 		if ( ! event.isFinished() )
-		{
 			event.send( error, code );
-		}
 	}
 }
 

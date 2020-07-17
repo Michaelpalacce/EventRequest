@@ -74,7 +74,7 @@ class File extends Transport
 				autoClose	: true
 			});
 
-			this.fileStream.on( 'error',( error )=>{} )
+			this.fileStream.on( 'error',()=>{} )
 		}
 
 		return this.fileStream;
@@ -144,13 +144,9 @@ class File extends Transport
 
 		this.getWriteStream().write( message + SYSTEM_EOL, 'utf8', ( err ) =>{
 			if ( err )
-			{
 				reject( err );
-			}
 			else
-			{
 				resolve();
-			}
 		});
 	}
 }

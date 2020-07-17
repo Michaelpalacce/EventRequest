@@ -117,9 +117,7 @@ class Bucket
 		const result	= await this.dataStore.get( `${this.key}//value` ).catch( this.handleError );
 
 		if ( result !== null )
-		{
 			return result;
-		}
 
 		await this._setValue( this.maxAmount ).catch( this.handleError );
 
@@ -148,9 +146,7 @@ class Bucket
 		const result	= await this.dataStore.get( `${this.key}//lastUpdate` ).catch( this.handleError );
 
 		if ( result !== null )
-		{
 			return result;
-		}
 
 		const currTime	= this._getCurrentTime();
 		await this._setLastUpdate( currTime ).catch( this.handleError );
@@ -228,9 +224,8 @@ class Bucket
 			counter++;
 
 			if ( counter > this.maxCounter )
-			{
 				return resolve( false );
-			}
+
 			this._doLock( resolve, reject, counter );
 		}, this.dataStoreRefetchInterval );
 	}
@@ -257,9 +252,7 @@ class Bucket
 	async get( data = null )
 	{
 		if ( data === null )
-		{
 			data	= await this._fetchData().catch( this.handleError );
-		}
 
 		const refillCount	= this._refillCount( data.lastUpdate );
 		return data.value	= Math.min( this.maxAmount, data.value + refillCount * this.refillAmount );
@@ -279,9 +272,7 @@ class Bucket
 		const lockHandle	= await this._lock().catch( this.handleError );
 
 		if ( lockHandle === false )
-		{
 			return false;
-		}
 
 		const data	= await this._fetchData().catch( this.handleError );
 		await this.get( data ).catch( this.handleError );

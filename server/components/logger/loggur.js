@@ -62,9 +62,7 @@ class Loggur
 	addLogger( loggerId, logger = {} )
 	{
 		if ( typeof logger === 'object' && ( logger instanceof Logger ) === false )
-		{
 			logger	= this.createLogger( logger );
-		}
 
 		if ( logger instanceof Logger && typeof this.loggers[loggerId] === 'undefined')
 		{
@@ -88,9 +86,7 @@ class Loggur
 	{
 		let logger	= this.loggers[loggerId];
 		if ( logger === undefined )
-		{
 			return false;
-		}
 
 		return logger;
 	}
@@ -165,16 +161,12 @@ class Loggur
 		if ( Object.keys( this.loggers ).length !== 0 )
 		{
 			for ( let loggerId in this.loggers )
-			{
 				this.loggers[loggerId].setLogLevel( logLevel );
-			}
 		}
 		else
 		{
 			if ( this.enableDefaultLogger )
-			{
 				this.getDefaultLogger().setLogLevel( logLevel );
-			}
 		}
 	}
 }

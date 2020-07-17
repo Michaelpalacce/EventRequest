@@ -22,13 +22,9 @@ class PluginManager
 	addPlugin( plugin )
 	{
 		if ( plugin instanceof PluginInterface )
-		{
 			this.plugins[plugin.getPluginId()]	= plugin;
-		}
 		else
-		{
 			throw new Error( 'Cannot add plugin' );
-		}
 	}
 
 	/**
@@ -75,9 +71,7 @@ class PluginManager
 	getPlugin( id )
 	{
 		if ( ! this.hasPlugin( id ) )
-		{
 			throw new Error( 'Plugin cannot be found' );
-		}
 
 		return this.plugins[id];
 	}

@@ -38,9 +38,7 @@ class Log
 		this.processLog( log, level, isRaw );
 
 		if ( this.level	=== LOG_LEVELS.debug )
-		{
 			this.message	+= Log.getStackTrace();
-		}
 	}
 
 	/**
@@ -71,9 +69,8 @@ class Log
 
 		stackParts.forEach(( stackPart )=>{
 			if ( removing === true && stackPart.indexOf( __filename ) !== -1 )
-			{
 				return;
-			}
+
 			// Stop searching
 			removing	= false;
 
@@ -102,21 +99,23 @@ class Log
 		let logType	= typeof message;
 		this.level	= typeof level === 'number' ? level : DEFAULT_LOG_LEVEL;
 
-		if ( message instanceof Error )
+		switch ( true )
 		{
-			this.message	= message.stack;
-		}
-		else if ( logType === 'string' )
-		{
-			this.message	= message;
-		}
-		else if ( logType === 'undefined' )
-		{
-			this.message	= '';
-		}
-		else
-		{
-			this.message	= JSON.stringify( message );
+			case message instanceof Error:
+				this.message	= message.stack;
+				break;
+
+			case logType === 'string':
+				this.message	= message;
+				break;
+
+			case logType === 'undefined':
+				this.message	= '';
+				break;
+
+			default:
+				this.message	= JSON.stringify( message );
+				break;
 		}
 
 		this.rawMessage	= logType === 'undefined' ? '' : message;
@@ -219,9 +218,7 @@ class Log
 		if ( log instanceof Log )
 		{
 			if ( typeof level === 'number' )
-			{
 				log.level	= level;
-			}
 
 			return log;
 		}

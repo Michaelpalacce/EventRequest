@@ -88,9 +88,7 @@ class ResponseCachePlugin extends PluginInterface
 						: DEFAULT_USE_IP;
 
 		if ( useIp === true )
-		{
 			cacheId	+= event.clientIp;
-		}
 
 		return cacheId;
 	}
@@ -140,9 +138,7 @@ class ResponseCachePlugin extends PluginInterface
 						const status	= await this.cachingServer.touch( cacheId, ttl );
 
 						if ( ! status )
-						{
 							await this.cachingServer.set( cacheId, cachedDataSet, ttl, { persist: false } );
-						}
 
 						const { response, code, headers }	= cachedDataSet;
 						const headersKeys					= Object.keys( headers );

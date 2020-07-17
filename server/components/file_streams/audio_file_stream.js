@@ -31,8 +31,8 @@ class AudioFileStream
 	 */
 	supports( file )
 	{
-		file	= path.parse( file );
-		return this.SUPPORTED_FORMATS.indexOf( file.ext ) !== -1;
+		const parsedPath	= path.parse( file );
+		return this.SUPPORTED_FORMATS.indexOf( parsedPath.ext.toLowerCase() ) !== -1;
 	}
 
 	/**
@@ -42,15 +42,10 @@ class AudioFileStream
 	 * @param	{String} file
 	 * @param	{Object} [options={}]
 	 *
-	 * @return	ReadableStream|null
+	 * @return	ReadStream
 	 */
 	getFileStream( event, file, options = {} )
 	{
-		if ( ! fs.existsSync( file ) )
-		{
-			return null;
-		}
-
 		let stream		= null;
 		const stat		= fs.statSync( file );
 		const fileSize	= stat.size;

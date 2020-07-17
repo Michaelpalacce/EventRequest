@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-const { EventEmitter }		= require( 'events' );
+const { EventEmitter }	= require( 'events' );
 
 /**
  * @brief	RawBodyParser responsible for parsing any body sent

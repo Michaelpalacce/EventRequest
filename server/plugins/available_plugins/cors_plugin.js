@@ -48,19 +48,13 @@ class CorsPlugin extends PluginInterface
 		event.setResponseHeader( 'Access-Control-Allow-Headers', headers );
 
 		if ( exposedHeader !== null )
-		{
 			event.setResponseHeader( 'Access-Control-Expose-Headers', exposedHeader );
-		}
 
 		if ( maxAge !== null )
-		{
 			event.setResponseHeader( 'Access-Control-Max-Age', maxAge );
-		}
 
 		if ( credentials === true )
-		{
 			event.setResponseHeader( 'Access-Control-Allow-Credentials', 'true' );
-		}
 
 		if ( event.method === 'OPTIONS' )
 		{

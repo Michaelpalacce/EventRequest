@@ -174,22 +174,16 @@ class Router extends PluginInterface
 				const routerMiddlewares	= first.globalMiddlewares;
 
 				for ( const [key, value] of Object.entries( routerMiddlewares ) )
-				{
 					this.define( key, value );
-				}
 
 				return this;
 			}
 
 			if ( typeof first === 'function' )
-			{
 				first	= new Route( { handler: first } );
-			}
 
 			if ( ! ( first instanceof Route ) )
-			{
 				first	= new Route( first );
-			}
 
 			this.middleware.push( first );
 		}
@@ -205,18 +199,14 @@ class Router extends PluginInterface
 				for ( const middleware of secondMiddleware )
 				{
 					if ( middleware.route === '/' )
-					{
 						middleware.route	= '';
-					}
 
 					if ( middleware.route instanceof RegExp )
 					{
 						let regex	= middleware.route.source;
 
 						if ( regex.startsWith( '^' ) )
-						{
 							regex	= regex.substring( 1 );
-						}
 
 						middleware.route	= new RegExp( `${first}${regex}`, middleware.route.flags );
 						continue;
@@ -228,9 +218,7 @@ class Router extends PluginInterface
 				this.middleware			= this.middleware.concat( secondMiddleware );
 				const routerMiddlewares	= second.globalMiddlewares;
 				for ( const [key, value] of Object.entries( routerMiddlewares ) )
-				{
 					this.define( key, value );
-				}
 			}
 		}
 		else
@@ -251,9 +239,7 @@ class Router extends PluginInterface
 	getExecutionBlockForCurrentEvent( event )
 	{
 		if ( ! ( event instanceof EventRequest ) )
-		{
 			throw new Error( 'Invalid EventRequest provided' );
-		}
 
 		const blockKey	= `${event.path}${event.method}`;
 		const block		= [];
@@ -285,9 +271,7 @@ class Router extends PluginInterface
 					for ( const middlewareName of route.getMiddlewares() )
 					{
 						if ( typeof this.globalMiddlewares[middlewareName] !== 'function' )
-						{
 							throw new Error( `Could not find middleware ${middlewareName}` );
-						}
 
 						block.push( this.globalMiddlewares[middlewareName] );
 					}
@@ -349,15 +333,14 @@ class Router extends PluginInterface
 			case Array.isArray( method ):
 				route	= new Route( { method } );
 				break;
+
 			default:
 				route	= method;
 				break;
 		}
 
 		if ( ! ( route instanceof Route ) )
-		{
 			return false;
-		}
 
 		return route.matchMethod( requestedMethod );
 	}
@@ -383,9 +366,7 @@ class Router extends PluginInterface
 		}
 
 		if ( ! ( route instanceof Route ) )
-		{
 			return false;
-		}
 
 		return route.matchPath( requestedRoute, matchedParams );
 	}
@@ -403,9 +384,7 @@ class Router extends PluginInterface
 	_clearCache( ttl = 60 * 60 * 1000, lastClearCacheAttemptTtl = 60 * 1000 )
 	{
 		if ( this.lastClearCacheAttempt + lastClearCacheAttemptTtl > Date.now() )
-		{
 			return;
-		}
 
 		this.lastClearCacheAttempt	= Date.now();
 
@@ -416,9 +395,7 @@ class Router extends PluginInterface
 				const data	= this.cache[key];
 
 				if ( ( data.date + ttl ) <= Date.now() )
-				{
 					delete this.cache[key];
-				}
 			}
 		}
 	}
@@ -435,9 +412,7 @@ class Router extends PluginInterface
 	_isCacheFull()
 	{
 		if ( this.keyLimit === 0 )
-		{
 			return false;
-		}
 
 		return Object.keys( this.cache ).length > this.keyLimit;
 	}

@@ -344,9 +344,7 @@ class RateLimitsPlugin extends PluginInterface
 					const bucket	= buckets[b];
 
 					if ( ! await bucket.reduce() )
-					{
 						return;
-					}
 				}
 
 				clearInterval( interval );

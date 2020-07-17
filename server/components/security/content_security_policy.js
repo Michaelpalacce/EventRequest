@@ -68,9 +68,7 @@ class ContentSecurityPolicy
 							: {};
 
 		for ( const directiveName in this.directives )
-		{
 			this.directives[directiveName]	= this.directives[directiveName].map( ( attribute )=>{ return this._decorateFetchDirectiveSource( attribute ); } );
-		}
 
 		const reportUri		= typeof options[OPTIONS_REPORT_URI] === 'string'
 							? options[OPTIONS_REPORT_URI]
@@ -79,28 +77,18 @@ class ContentSecurityPolicy
 		const useReportTo	= options[OPTIONS_USE_REPORT_TO] === true;
 
 		if ( useReportTo === true && reportUri !== null )
-		{
 			this.setReportOnlyWithReportTo( reportUri );
-		}
 		else if ( reportUri !== null )
-		{
 			this.setReportOnly( reportUri );
-		}
 
 		if ( typeof options[OPTIONS_ENABLE_XSS] === 'boolean' ? options[OPTIONS_ENABLE_XSS] :  true )
-		{
 			this.xss();
-		}
 
 		if ( options[OPTIONS_ENABLE_SELF] === true )
-		{
 			this.enableSelf();
-		}
 
 		if ( options[OPTIONS_ENABLE_SANDBOX] === true )
-		{
 			this.enableSandbox();
-		}
 	}
 
 	/**
@@ -168,9 +156,7 @@ class ContentSecurityPolicy
 	setReportOnly( uri )
 	{
 		if ( typeof uri !== 'string' || uri === '' )
-		{
 			return;
-		}
 
 		this.reportOnly	= true;
 
@@ -189,9 +175,7 @@ class ContentSecurityPolicy
 	setReportOnlyWithReportTo( uri )
 	{
 		if ( typeof uri !== 'string' || uri === '' )
-		{
 			return;
-		}
 
 		this.reportOnly	= true;
 
@@ -225,7 +209,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	uri String
+	 * @param	{String} uri
 	 *
 	 * @return	void
 	 */
@@ -235,7 +219,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	uri String
+	 * @param	{String} uri
 	 *
 	 * @return	void
 	 */
@@ -245,7 +229,7 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	uri String
+	 * @param	{String} uri
 	 *
 	 * @return	void
 	 */
@@ -394,9 +378,7 @@ class ContentSecurityPolicy
 
 			// Add Space only if needed, not critical but it is according to specification
 			if ( attributes !== '' )
-			{
 				attributes	= ` ${attributes}`;
-			}
 
 			if ( directives !== '' )
 				directives			+= ' ';
@@ -422,9 +404,7 @@ class ContentSecurityPolicy
 	_decorateFetchDirectiveSource( source )
 	{
 		if ( DIRECTIVES_SPECIAL_ARGUMENTS.includes( source ) )
-		{
 			return `'${source}'`;
-		}
 
 		return source;
 	}
@@ -440,9 +420,7 @@ class ContentSecurityPolicy
 	_addDirective( directive, value = '' )
 	{
 		if ( typeof this.directives[directive] === 'undefined' )
-		{
 			this.directives[directive]	= [];
-		}
 
 		if ( value !== '' )
 			this.directives[directive].push( value );

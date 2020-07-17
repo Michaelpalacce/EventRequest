@@ -59,15 +59,11 @@ class Transport
 	 */
 	supports( log )
 	{
-		if ( ( log instanceof Log ) === false )
-		{
+		if ( ! ( log instanceof Log ) )
 			return false;
-		}
 
 		if ( this.supportedLevels.indexOf( log.getLevel() ) === -1 )
-		{
 			return false;
-		}
 
 		return this.logLevel >= log.getLevel();
 	}
@@ -77,7 +73,7 @@ class Transport
 	 *
 	 * @param	{Log} log
 	 *
-	 * @return	String|mixed
+	 * @return	*
 	 */
 	format( log )
 	{

@@ -26,9 +26,7 @@ class EventRequest extends EventEmitter
 		this.setMaxListeners( 0 );
 
 		if ( ! ( request instanceof IncomingMessage ) || ! ( response instanceof ServerResponse ) )
-		{
 			throw new Error( 'Invalid parameters passed to EventRequest' );
-		}
 
 		const parsedUrl	= url.parse( request.url, true );
 		const list		= {},
@@ -119,18 +117,14 @@ class EventRequest extends EventEmitter
 		);
 
 		if ( result.hasValidationFailed() )
-		{
 			return false;
-		}
 
 		let cookie	= `${name}=${value};`;
 
 		for( const optionName in options )
 		{
 			if ( optionName.toLowerCase() === 'expires' || optionName.toLowerCase() === 'max-age' )
-			{
 				options[optionName]	= new Date( new Date().getTime() + options[optionName] * 1000 )
-			}
 
 			cookie	+= ` ${optionName}=${options[optionName]};`;
 		}
@@ -147,7 +141,9 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-	 * @copydoc	EventRequest::_send
+1	 * @param	{*} [response='']
+	 * @param	{Number} [code=200]
+	 * @param	{Boolean} [raw=false]
 	 */
 	send( response = '', code = 200, raw = false )
 	{
@@ -162,7 +158,7 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-	 * @brief	Sends the response to the usern
+	 * @brief	Sends the response to the user
 	 *
 	 * @details	Raw is a flag to tell the eventRequest how to send the data
 	 * 			If set to false, then the response passed will be returned in a JSON format if is not already a valid string
@@ -179,9 +175,7 @@ class EventRequest extends EventEmitter
 		let isRaw	= raw;
 
 		if ( code !== 200 )
-		{
 			this.setStatusCode( code );
-		}
 
 		if (
 			response != null
@@ -234,13 +228,10 @@ class EventRequest extends EventEmitter
 		this.emit( 'setResponseHeader', { key, value } );
 
 		if ( ! this.isFinished() )
-		{
 			this.response.setHeader( key, value );
-		}
+
 		else
-		{
 			this.next( 'Trying to set header when response is already sent' );
-		}
 	}
 
 	/**
@@ -255,13 +246,10 @@ class EventRequest extends EventEmitter
 		this.emit( 'removeResponseHeader', { key } );
 
 		if ( ! this.isFinished() )
-		{
-			this.response.removeHeader( key )
-		}
+			this.response.removeHeader( key );
+
 		else
-		{
 			this.next( 'Trying to remove header when response is already sent' );
-		}
 	}
 
 	/**
@@ -397,10 +385,10 @@ class EventRequest extends EventEmitter
 				{
 					response.catch(( error )=>{
 						setImmediate(()=>{
+
 							if ( ! this.isFinished() )
-							{
 								this.next( error );
-							}
+
 						});
 					});
 				}

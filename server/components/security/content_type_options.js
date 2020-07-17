@@ -26,7 +26,7 @@ class ContentTypeOptions
 	 */
 	parseOptions( options = {} )
 	{
-		this.setEnabled( options['enabled'] );
+		this.setEnabled( options.enabled );
 	}
 
 	/**

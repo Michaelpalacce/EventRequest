@@ -61,9 +61,7 @@ class SessionPlugin extends PluginInterface
 
 					event.on( 'send', async ()=>{
 						if ( Object.keys( event.session.session ).length !== 0 )
-						{
 							await event.session.saveSession();
-						}
 					} );
 				}
 
@@ -77,13 +75,9 @@ class SessionPlugin extends PluginInterface
 					const hasSession	= await event.session.hasSession();
 
 					if ( ! hasSession )
-					{
 						callback( await event.session.newSession() === false );
-					}
 					else
-					{
 						callback( await event.session.fetchSession() === false );
-					}
 				};
 
 				event.next();

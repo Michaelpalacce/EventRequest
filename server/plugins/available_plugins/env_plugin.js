@@ -94,9 +94,7 @@ class EnvPlugin extends PluginInterface
 	{
 		fs.watch( this.getEnvFileAbsPath(), ( eventType )=>{
 			if ( eventType === CHANGE_EVENT )
-			{
 				this.loadFileInEnv();
-			}
 		});
 	}
 }

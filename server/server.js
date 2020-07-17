@@ -125,9 +125,7 @@ class Server extends EventEmitter
 		}
 
 		if ( options != null )
-		{
 			plugin.setOptions( options );
-		}
 
 		this._attachPlugin( plugin );
 
@@ -147,10 +145,10 @@ class Server extends EventEmitter
 		const pluginId				= plugin.getPluginId();
 
 		pluginDependencies.forEach(( dependency )=>{
+
 			if ( ! this.hasPlugin( dependency ) )
-			{
 				throw new Error( 'The plugin ' + pluginId + ' requires ' + dependency + ' which is missing.' );
-			}
+
 		});
 
 		plugin.setServerOnRuntime( this );
@@ -176,13 +174,10 @@ class Server extends EventEmitter
 	getPlugin( pluginId )
 	{
 		if ( this.hasPlugin( pluginId ) )
-		{
 			return this.plugins[pluginId];
-		}
+
 		else
-		{
 			throw new Error( `The plugin ${pluginId} is not attached to the server` );
-		}
 	}
 
 	/**
@@ -249,9 +244,7 @@ class Server extends EventEmitter
 					this.emit( 'eventRequestError', { eventRequest, error } );
 
 					if ( eventRequest.logger === null )
-					{
 						Loggur.log( error, LOG_LEVELS.error );
-					}
 				};
 
 				eventRequest.on( 'error', onErrorCallback );
@@ -264,9 +257,7 @@ class Server extends EventEmitter
 				this.emit( 'eventRequestThrow', { eventRequest, error } );
 
 				if ( ! eventRequest.isFinished() )
-				{
 					eventRequest.next( error );
-				}
 			}
 		}
 	}

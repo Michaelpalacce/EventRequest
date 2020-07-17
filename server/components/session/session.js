@@ -37,18 +37,16 @@ class Session
 
 		this.sessionId			= this.isCookieSession ?
 									typeof event.cookies[this.sessionKey] !== 'undefined'
-									? event.cookies[this.sessionKey]
-									: null
-								: event.hasRequestHeader( this.sessionKey )
-									? event.getRequestHeader( this.sessionKey )
-									: null;
+										? event.cookies[this.sessionKey]
+										: null
+									: event.hasRequestHeader( this.sessionKey )
+										? event.getRequestHeader( this.sessionKey )
+										: null;
 
 		this.session			= {};
 
 		if ( typeof event.cachingServer === 'undefined' )
-		{
 			throw new Error( 'Could not create session. No caching container is set in the event' );
-		}
 
 		this.server				= event.cachingServer;
 	}
@@ -71,9 +69,7 @@ class Session
 	async hasSession()
 	{
 		if ( this.sessionId === null )
-		{
 			return false;
-		}
 
 		return await this.server.get( this.sessionId ) !== null
 	}
@@ -88,9 +84,7 @@ class Session
 		await this.server.delete( this.sessionId );
 
 		if ( this.isCookieSession )
-		{
 			this.event.setCookie( this.sessionKey, this.sessionId, { expires: - this.ttl } );
-		}
 	}
 
 	/**
@@ -114,13 +108,9 @@ class Session
 			this.sessionId	= sessionId;
 
 			if ( this.isCookieSession )
-			{
 				this.event.setCookie( this.sessionKey, this.sessionId, { expires: this.ttl } );
-			}
 			else
-			{
 				this.event.setResponseHeader( this.sessionKey, this.sessionId );
-			}
 
 			return sessionId;
 		}
@@ -173,9 +163,7 @@ class Session
 	get( name )
 	{
 		if ( ! this.has( name ) )
-		{
 			throw new Error( `The session does not have a value set for: ${name}` );
-		}
 
 		return this.session[name];
 	}
@@ -192,9 +180,7 @@ class Session
 	async saveSession( sessionId = this.sessionId )
 	{
 		if ( sessionId === null )
-		{
 			return false;
-		}
 
 		return await this.server.set( sessionId, this.session, this.ttl ) !== null;
 	}
@@ -209,9 +195,7 @@ class Session
 	async fetchSession()
 	{
 		if ( ! await this.server.touch( this.sessionId ) )
-		{
 			return false;
-		}
 
 		this.session	= await this.server.get( this.sessionId );
 
