@@ -1,3 +1,6 @@
+22.1.1
+- Small documentation fix
+
 22.1.0
 - Added extra tests
 - Made the file stream handler an object and not a class

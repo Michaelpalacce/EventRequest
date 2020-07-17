@@ -2986,7 +2986,7 @@ app.apply( app.er_cors, {
 });
 
 app.add(( event )=>{
-    event.send( event.response.headers );
+    event.send( event.response.getHeaders() );
 });
 
 app.listen( 80 );
