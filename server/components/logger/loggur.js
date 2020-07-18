@@ -64,7 +64,7 @@ class Loggur
 		if ( typeof logger === 'object' && ( logger instanceof Logger ) === false )
 			logger	= this.createLogger( logger );
 
-		if ( logger instanceof Logger && typeof this.loggers[loggerId] === 'undefined')
+		if ( logger instanceof Logger && typeof this.loggers[loggerId] === 'undefined' )
 		{
 			this.loggers[loggerId]	= logger;
 			return true;

@@ -141,8 +141,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 
 #Plugins:
 - Plugins are parts of the server that attach functionality to the EventRequest
-- They can be retrieved from event_request/server/plugins
-- They can also be retrieved from Server() ( look at the plugins section for more info )
+- They can be retrieved from Server() ( look at the plugins section for more info )
 
 ***
 ***
@@ -288,7 +287,7 @@ app.listen( 80, ()=>{
 - Optional if omitted none will be called
 
 - server.add accepts a object that must contain **handler** but **route**, **method** and **middlewares** are optional.
-- ( { method: '', route: '', handler:()=>{} } )
+- ( { method: '', route: '', handler:()=>{}, middlewares: [] } )
 
 ***
 ####Adding Routers:
@@ -297,12 +296,16 @@ app.listen( 80, ()=>{
 - All the global middleware will be merged as well
 
 ~~~javascript
-const Server = require( 'event_request' );
-Server().add( router );
+const App = require( 'event_request' );
+
+const router = App().Router();
+router.get(( event )=>{ event.send( 'ok' ); } );
+
+App().add( router );
 
 // OR
-const routerOne = Server().Router();
-const routerTwo = Server().Router();
+const routerOne = App().Router();
+const routerTwo = App().Router();
 routerOne.add( routerTwo )
 ~~~
 
@@ -313,19 +316,19 @@ routerOne.add( routerTwo )
 - All the global middleware will be merged as well
 
 ~~~javascript
-const Server = require( 'event_request' );
+const App = require( 'event_request' );
 
-const routerOne = Server().Router();
-const routerTwo = Server().Router();
+const routerOne = App().Router();
+const routerTwo = App().Router();
 
 routerOne.add( '/test', routerTwo )
 ~~~
 
 ~~~javascript
-const Server = require( 'event_request' );
+const App = require( 'event_request' );
 
 // You can also attach the router to a route
-const userRouter = Server().Router();
+const userRouter = App().Router();
 userRouter.get( '/list', ( event )=>{
     event.send( { userOne: {}, userTwo: {} } );
 });
@@ -335,15 +338,15 @@ userRouter.post( '/add/:username:', ( event )=>{
     event.send( 'ok' );
 });
 
-Server().add( '/user', userRouter );
+App().add( '/user', userRouter );
 ~~~
 
 ####FUNCTION:
 - server.add can also accept a function that will be transformed into a route without method or route ( Function route )
 ~~~javascript
-const Server = require( 'event_request' );
+const App = require( 'event_request' );
 
-const routerOne = Server().Router();
+const routerOne = App().Router();
 
 routerOne.add( ( event )=>{    
     event.next()
@@ -351,10 +354,10 @@ routerOne.add( ( event )=>{
 ~~~
 
 ~~~javascript
-const Server = require( 'event_request' );
+const App = require( 'event_request' );
 
 // Adding a route
-Server().add({
+App().add({
     route : '/',
     method : 'GET',
     handler : ( event ) => {
@@ -364,10 +367,10 @@ Server().add({
 ~~~
 
 ~~~javascript
-const Server = require( 'event_request' );
+const App = require( 'event_request' );
 
 // You can create your own router
-const router = Server().Router();
+const router = App().Router();
 router.add({
     route : '/',
     method : 'GET',
@@ -378,28 +381,28 @@ router.add({
 ~~~
 
 ~~~javascript
-const Server = require( 'event_request' );
+const App = require( 'event_request' );
 
 // Adding a middleware without a method or route
-Server().add( ( event )=>{
+App().add( ( event )=>{
     event.next();
 });
 
-Server().add( ( event )=>{
+App().add( ( event )=>{
     event.send( '<h1>Hello World x2!</h1>' );
 });
 ~~~
 
 ~~~javascript
-const Server = require( 'event_request' );
+const App = require( 'event_request' );
 
 // To attach a router to the server simply call the add function of the server.
 // Just like you would do to add a normal route.
-Server().add( router );
+App().add( router );
 ~~~
 
 ~~~javascript
-const Server = require( 'event_request' );
+const App = require( 'event_request' );
 
 // You can also get the router attached to the Server and use that directly
 const serverRouter = Server().router;
@@ -554,7 +557,7 @@ App().listen( 80, ()=>{
 });
 ~~~
 
-# Event Request
+# EventRequest
 The event request is an object that is created by the server and passed through every single middleware.
 
 ***
@@ -741,8 +744,8 @@ The main object of the framework.
 
 - To retrieve the Server class do:
 ~~~javascript
-const { Server } = require( 'event_request' );
-const app = Server();
+const { App } = require( 'event_request' );
+const app = App();
 ~~~
 
 - To start the Server you can do:
@@ -864,9 +867,17 @@ app.listen( '80',()=>{
 ***
 # Logging
 
+- Logging is done by using the Loggur class mainly. 
+- The Loggur can create different loggers who can have different transports
+- For example you can have an access logger with a file transport and another error logger with console transport,
+calling Loggur.log you will call both of the loggers.
+- You should configure these loggers per project.
+- If you need finer control then you can always use the loggers created by the Loggur.
+- The Loggur and any Logger class are hot swappable in regards to the log function.
+
 The `Logging` Suite exported by the module contains the following:
-- Loggur -> instance of Loggur used to log data and create Loggers
-- Logger -> The Logger class
+- Loggur -> instance of Loggur used to log data and create Loggers. Generally this class can be used to log data
+- Logger -> The Logger class. Every logger can be attached to the Loggur, which will call all the loggers
 - Transport -> The interface used by the loggers
 - Console -> Transport that logs to the console
 - File -> Transport that logs to a file
@@ -874,15 +885,83 @@ The `Logging` Suite exported by the module contains the following:
 - LOG_LEVELS -> The Default log levels
 - The Loggur can be accessed directly from the server { Loggur }
 
-### Default Logger:
+## Default Logger:
 - The default logger is attached directly to the Loggur instance. it can be enabled or disabled by calling Loggur.enableDefault() or Loggur.disableDefault(). 
 - The default Logger has a log level of `300` and logs up until level `600` which is the debug level.
 
-- The Loggur can create Loggers with Loggur.createLogger({});
+***
+***
+***
+
+## Loggur:
+- Loggur used to create, store and use different loggers
+- Every logger added to the Loggur will be called when doing Loggur.log
+- Loggur.log returns a promise which will be resolved when the logging is complete
+
+
+#### Functions:
+**enableDefault(): void** 
+- Enables the default logger
+
+**disableDefault(): void** 
+- Disables the default logger
+
+**addLogger( String loggerId, Logger|Object logger ): void**
+- This function adds a logger to the Loggur
+- You can pass a Logger instance or an object of logger options 
+- Passing logger options will attempt to create a new Logger
+
+**getDefaultLogger(): void**
+- Gets the default Logger
+
+**log( Log||String||mixed log, Number level, Boolean isRaw ): Promise**
+- log determines what should be logged
+- The level is the log level that we should log at. This is optional. Defaults to the default logLevel of the logger
+- The isRaw flag determines whether we should attempt to log the data raw. Only specific transport types support raw. Defaults to false
+
+~~~javascript
+    Loggur.log( 'Log' ); // This logs by default to an error level
+    Loggur.log( 'Log', LOG_LEVELS.debug ); // LOG_LEVELS.debug === Number, this will log 'Log' with debug level
+    Loggur.log( { test: 'value' }, LOG_LEVELS.debug, true ); // This will log on debug and will try to log the data raw
+~~~
+
+**setLogLevel( Number level ): void**
+- Sets the Loggur default log level
+
+**createLogger( Object options ): Logger**
+- You can create a new logger by calling Loggur.createLogger({});
+- The newly created logger can be attached to the Loggur instance by calling Loggur.addLogger( 'loggerId', logger );
 
 ***
-####Loggur.createLogger options:
+- If you want to change the log level of a logger it can easily be done with .setLogLevel( logLevel )
+~~~javascript
+logger.setLogLevel( 600 );
+~~~
 
+Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log, which will call all the loggers added to it
+~~~javascript
+const { Loggur } = require( 'event_request' );
+
+const logger = Loggur.createLogger({
+    transports : [
+        new Console( { logLevel : LOG_LEVELS.notice } ),
+    ]
+});
+
+Loggur.addLogger( 'logger_id', logger );
+~~~
+
+***
+***
+***
+
+##Logger:
+- Logger class that can be configured for specific logging purposes like access logs or error logs
+- Each Logger can have it's own transport layers.
+- Every transport layer will be called when calling logger.log
+- Logger.log returns a promise which will be resolved when the logging is complete
+
+####Accepted options
 **serverName: String** 
 - The name of the server to be concatenated with the uniqueId 
 - Defaults to empty
@@ -916,43 +995,12 @@ The `Logging` Suite exported by the module contains the following:
 - What level should the unhandled exceptions be logged at 
 - Defaults to error
 
-***
-- If you want to change the log level of a logger it can easily be done with .setLogLevel( logLevel )
-~~~javascript
-logger.setLogLevel( 600 );
-~~~
+####Functions:
 
-Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log and will call all added Loggers
-~~~javascript
-const { Loggur } = require( 'event_request' );
-
-const logger = Loggur.createLogger({
-    transports : [
-        new Console( { logLevel : LOG_LEVELS.notice } ),
-    ]
-});
-
-Loggur.addLogger( 'logger_id', logger );
-~~~
-
-####Logging:
-
-
-#####Logger.log: 
-- Every logger has a log function that supports the following parameters: 
-
-**Log: Log||String||mixed**
-- What should be logged
-
-**level: Number**
-- The log level that we should log at
-- optional
-- Defaults to the default logLevel of the logger
-
-**isRaw: Boolean**
-- Whether we should attempt to log the data raw
-- Only specific transport types support raw
-- Defaults to false
+**log( Log||String||mixed log, Number level, Boolean isRaw ): Promise**
+- log determines what should be logged
+- The level is the log level that we should log at. This is optional. Defaults to the default logLevel of the logger
+- The isRaw flag determines whether we should attempt to log the data raw. Only specific transport types support raw. Defaults to false
 
 ~~~javascript
     logger.log( 'Log' ); // This logs by default to an error level
@@ -960,49 +1008,35 @@ Loggur.addLogger( 'logger_id', logger );
     logger.log( { test: 'value' }, LOG_LEVELS.debug, true ); // This will log on debug and will try to log the data raw
 ~~~
 
-#####Loggur.log: 
-- The main Loggur has a log function that calls all the loggers added to it
-- If there are no loggers it will call it's default logger if enabled
-
-**Log: Log||String||mixed**
-- What should be logged
-
-**level: Number**
-- The log level that we should log at
-- optional
-- Defaults to the default logLevel of the logger
-
-**isRaw: Boolean**
-- Whether we should attempt to log the data raw
-- Only specific transport types support raw
-- Defaults to false
-
-~~~javascript
-    Loggur.log( 'Log' ); // This logs by default to an error level
-    Loggur.log( 'Log', LOG_LEVELS.debug ); // LOG_LEVELS.debug === Number, this will log 'Log' with debug level
-    Loggur.log( { test: 'value' }, LOG_LEVELS.debug, true ); // This will log on debug and will try to log the data raw
-~~~
-
-#####logger.error || logger.debug etc: 
-- Every logger attaches all the give log levels as functions that accept the following arguments:
-
-**Log: Log||String||mixed**
-- What should be logged
-
-**isRaw: Boolean**
-- Whether we should attempt to log the data raw
-- Only specific transport types support raw
-- Defaults to false
+**error(): Promise** || **notice(): Promise ||** **warning(): Promise** || ...
+- Every logger attaches all the log levels as functions that accept log and isRaw as arguments
+- The level will be determined by the function being called
+- All the rules that apply to log apply to these too
 
 ~~~javascript
     logger.error( 'Log' ); // This logs by default to an error level
     logger.debug( 'Log', true ); // This will log on debug and will try to log the data raw
 ~~~
 
-Each Logger can have it's own transport layers.
-There are 2 predefined transport layers:
+**setLogLevel( Number level ): void**
+- Sets the logger default log level
+- Each logger attaches itself to the unhandledRejection and uncaughtException of the process
+- It is recomended you have a single logger that handles these and the others should be set not to capture
 
-###Console
+**addTransport( Transport transport ): Boolean**
+- Adds a new transport to the logger ( console/file )
+
+**supports( Log log ): true**
+- Returns true or false if the log is supported by the logger ( determined by the log level )
+
+**getUniqueId(): String**
+- Returns a unique id to be set in the log
+
+***
+***
+***
+
+##Console
 - Logs data in the console
 - It can log raw logs
 
@@ -1106,6 +1140,15 @@ The validation is done by using:
 ~~~javascript
     const objectToValidate  = { username: 'user@test.com', password: 'pass' };
 
+    event.validate( 
+        objectToValidate, 
+        { 
+            username: 'filled||string||email||max:255', 
+            password: 'filled||string||range:6-255' 
+        } 
+    );
+
+    // OR
     event.validation.validate( 
         objectToValidate, 
         { 

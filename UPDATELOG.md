@@ -1,3 +1,6 @@
+24.0.1
+- Documentation Updates
+
 24.0.0
 - Added Cors plugin unit tests
 - Changed the queryString property of the EventRequest to just query
