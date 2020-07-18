@@ -52,6 +52,7 @@ const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
 const OPTIONS_FILE_PATH					= 'fileLocation';
 const OPTIONS_DATA_STORE				= 'dataStore';
 const OPTIONS_RULES						= 'rules';
+const OPTIONS_USE_FILE					= 'useFile';
 
 const DEFAULT_FILE_LOCATION				= path.join( PROJECT_ROOT, 'rate_limits.json' );
 const DEFAULT_DATA_STORE				= null;
@@ -87,6 +88,10 @@ class RateLimitsPlugin extends PluginInterface
 	{
 		super.setOptions( options );
 
+		this.useFile		= typeof options[OPTIONS_USE_FILE] === 'boolean'
+							? options[OPTIONS_USE_FILE]
+							: false;
+
 		this.rules			= Array.isArray( options[OPTIONS_RULES] )
 							? options[OPTIONS_RULES]
 							: [];
@@ -113,18 +118,17 @@ class RateLimitsPlugin extends PluginInterface
 		{
 			config	= this.rules;
 		}
-		else if ( ! fs.existsSync( this.fileLocation ) )
+		else if ( ! fs.existsSync( this.fileLocation ) && this.useFile )
 		{
 			const writeStream	= fs.createWriteStream( this.fileLocation );
-			const config		= [DEFAULT_RULE];
 
 			writeStream.write( JSON.stringify( config ) );
 			writeStream.end();
 		}
-		else
+		else if ( this.useFile )
 		{
 			const buffer	= fs.readFileSync( this.fileLocation );
-			config		= '[]';
+
 			try
 			{
 				config	= JSON.parse( buffer.toString( 'utf-8' ) || '[]' );
@@ -143,35 +147,51 @@ class RateLimitsPlugin extends PluginInterface
 	 */
 	sanitizeConfig( config = [] )
 	{
-		config.forEach( async ( options )=>{
-			if (
-				typeof options.maxAmount === 'number'
-				&& typeof options.refillTime === 'number'
-				&& typeof options.refillAmount === 'number'
-				&& typeof options.methods !== 'undefined'
-				&& Array.isArray( options.methods )
-				&& typeof options.path === 'string'
-				&& typeof options.policy === 'string'
-				&& typeof options.stopPropagation === 'boolean'
-				&& typeof options.ipLimit === 'boolean'
-			) {
-				const policy	= options.policy;
-
-				if (
-					policy === CONNECTION_DELAY_POLICY
-					&& typeof options.delayTime !== 'number'
-					&& typeof options.delayRetries !== 'number'
-				) {
-					throw new Error( `Rate limit with ${CONNECTION_DELAY_POLICY} must have delayTime set` );
-				}
-			}
-			else
-			{
-				throw new Error( 'Invalid rate limit options set: ' + JSON.stringify( options ) );
-			}
-		});
+		config.forEach( this.validateRule );
 
 		this.rules	= config;
+	}
+
+	/**
+	 * @brief	Does rule validation
+	 *
+	 * @param	{Object} options
+	 *
+	 * @return	void
+	 */
+	validateRule( options )
+	{
+		if (
+			typeof options.maxAmount === 'number'
+			&& typeof options.refillTime === 'number'
+			&& typeof options.refillAmount === 'number'
+			&& typeof options.methods !== 'undefined'
+			&& Array.isArray( options.methods )
+			&& typeof options.path === 'string'
+			&& typeof options.policy === 'string'
+		) {
+			const policy	= options.policy;
+
+			if (
+				policy === CONNECTION_DELAY_POLICY
+				&& typeof options.delayTime !== 'number'
+				&& typeof options.delayRetries !== 'number'
+			) {
+				throw new Error( `Rate limit with ${CONNECTION_DELAY_POLICY} must have delayTime set` );
+			}
+
+			if ( typeof options.stopPropagation !== 'boolean' )
+				options.stopPropagation	= false;
+
+
+			if ( typeof typeof options.ipLimit !== 'boolean' )
+				options.ipLimit	= false;
+
+		}
+		else
+		{
+			throw new Error( 'Invalid rate limit options set: ' + JSON.stringify( options ) );
+		}
 	}
 
 	/**
@@ -224,6 +244,41 @@ class RateLimitsPlugin extends PluginInterface
 	}
 
 	/**
+	 * @brief	Global middleware that can be used to dynamically rate limit requests
+	 *
+	 * @details	Cretes a default data store if one is not set
+	 *
+	 * @param	{Object} rule
+	 *
+	 * @return	Function
+	 */
+	rateLimit( rule )
+	{
+		if ( this.dataStore === null )
+		{
+			this.dataStore	= new DataServer({
+				ttl		: -1,
+				persist	: false
+			});
+		}
+
+		rule.path		= '';
+		rule.methods	= [''];
+
+		this.validateRule( rule );
+
+		return ( event )=>{
+			rule.path		= event.path;
+			rule.methods	= [event.method];
+
+			const rules	= this.rules.slice( 0 );
+			rules.unshift( rule );
+
+			this._rateLimit( event, rules );
+		}
+	}
+
+	/**
 	 * @brief	Gets the plugin middlewares
 	 *
 	 * @returns	Array
@@ -231,7 +286,9 @@ class RateLimitsPlugin extends PluginInterface
 	getPluginMiddleware()
 	{
 		return [{
-			handler: this.rateLimit.bind( this )
+			handler: ( event )=>{
+				this._rateLimit( event, this.rules.slice() );
+			}
 		}];
 	}
 
@@ -239,10 +296,11 @@ class RateLimitsPlugin extends PluginInterface
 	 * @brief	Checks whether the client's ip has reached the limit of requests
 	 *
 	 * @param	{EventRequest} eventRequest
+	 * @param	{Array} rules
 	 *
 	 * @return	void
 	 */
-	async rateLimit( eventRequest )
+	async _rateLimit( eventRequest, rules )
 	{
 		if ( eventRequest.isFinished() )
 		{
@@ -250,7 +308,7 @@ class RateLimitsPlugin extends PluginInterface
 		}
 
 		eventRequest.rateLimited		= false;
-		eventRequest.erRateLimitRules	= this.rules;
+		eventRequest.erRateLimitRules	= rules;
 
 		eventRequest.on( 'cleanUp', ()=>{
 			eventRequest.rateLimited		= undefined;
@@ -265,9 +323,9 @@ class RateLimitsPlugin extends PluginInterface
 		let connectionDelayPolicyOptions	= null;
 		let bucketsHit						= [];
 
-		for ( let i = 0; i < this.rules.length; ++ i )
+		for ( let i = 0; i < rules.length; ++ i )
 		{
-			const rule			= this.rules[i];
+			const rule			= rules[i];
 			const ruleMethod	= rule.methods;
 			const rulePath		= rule.path;
 

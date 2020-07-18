@@ -65,15 +65,41 @@ class Route
 							? routeConfig.handler
 							: DEFAULT_ROUTE_HANDLER;
 
-		this.middlewares	= Array.isArray( routeConfig.middlewares )
-							? routeConfig.middlewares
-							: typeof routeConfig.middlewares === 'string'
-							? [routeConfig.middlewares]
-							: [];
+		this.middlewares	= this.parseGlobalMiddlewares( routeConfig );
 
 		if ( this.handler === null )
 		{
 			throw new Error( 'Invalid middleware added!' );
+		}
+	}
+
+	/**
+	 * @brief	Parses the global middlewares passed
+	 *
+	 * @details	Accepts one of the following:
+	 * 			Array ( of strings or of functions )
+	 * 			String
+	 * 			Function
+	 *
+	 * @param	{Object} routeConfig
+	 *
+	 * @return	*
+	 */
+	parseGlobalMiddlewares( routeConfig )
+	{
+		switch ( true )
+		{
+			case Array.isArray( routeConfig.middlewares ):
+				return routeConfig.middlewares;
+
+			case typeof routeConfig.middlewares === 'string':
+				return [routeConfig.middlewares];
+
+			case typeof routeConfig.middlewares === 'function':
+				return [routeConfig.middlewares];
+
+			default:
+				return [];
 		}
 	}
 

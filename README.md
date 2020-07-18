@@ -116,6 +116,9 @@ const app = require( 'event_request' )();
 Middlewares are callbacks attached to specific routes. They are called in order of addition.
 Global middlewares are the same as normal middlewares but they are defined differently than the normal middlewares and are attached to them. They are called before the middleware they are attached to.
 
+Dynamic Middlewares are added together with the Global Middlewares but they are functions ( or an array of functions ). They can be
+used to attach dynamic functionality to routes
+
 EventRequest is an object passed to each middleware. It holds all data about the request and has a lot of helpful functionality used for sending responses.
 
 The framework has a set of components. These components are individual and can be used outside of the framework.
@@ -216,15 +219,15 @@ app.get( ( event )=>{
     event.next();
 });
 
-app.get( ( event )=>{
+app.get( 'default', ( event )=>{
     Loggur.log( 'After hitting the default global middleware' );
     event.next();
-}, 'default' );
+} );
 
-app.get( ( event )=>{
+app.get( ['default', 'defaultTwo'], ( event )=>{
     Loggur.log( 'After hitting the default global middleware with an ARRAY!' );
     event.next();
-}, ['default', 'defaultTwo'] );
+} );
 
 app.get( '/', ( event )=>{
     event.send( '<h1>Hello World!</h1>');
@@ -280,7 +283,7 @@ app.listen( 80, ()=>{
 - The method(s) to be matched for the route 
 - Optional if omitted the handler will be called on every request as long as the route matches
 
-**middlewares: String|Array[String]**
+**middlewares: String|Function|Array[Function]|Array[String]**
 - The global middlewares if any to be called before this middleware
 - Optional if omitted none will be called
 
@@ -445,13 +448,19 @@ App().get( '/todos/:id:', ( event)=>{
 ~~~
 
 ***
-####Router global middlewares:
+####Router Global and Dynamic middlewares:
 
 - You can `define` middlewares in any router or the server. Middlewares will be merged if you add a router to another router.
 - These global middlewares can be used to call a function before another step in the chain.You can add multiple middlewares per route.
  
-- When adding middlewares to routes it can either be a single string or multiple strings in an array.
-- They are added as a final value in .app, .get, .post, etc, or using the key `middlewares` if using the .add method
+ - Dynamic middlewares will accept the same parameters as Global Middlewares
+ 
+- When adding global middlewares to routes they can either be a single string or multiple strings in an array.
+- When adding Dynamic Middlewares to routes they can either be a single function or multiple functions in an array.
+- You can also add a mix with both dynamic and global middlewares
+- They are added before the handler in .app, .get, .post, etc, or using the key `middlewares` if using the .add method
+- Due to global middlewares being before the handler if you want to add a global middleware by calling get/post/etc then the first parameter CANNOT be a string. That will be interpreted as a route
+
 ~~~javascript
 const { App, Loggur } = require( 'event_request' );
 
@@ -462,19 +471,76 @@ router.define( 'test', ( event )=>{
     event.next();
 });
 
+// Dynamic middleware
+const setHeader = ( key, value )=>{
+    return ( event )=>{
+        event.setResponseHeader( key, value );
+    }
+}
+
 App().define( 'test2', ( event )=>{
     Loggur.log( 'Middleware Two!' );
     event.next();
 });
 
-App().get( '/', ( event )=>{
+//this will work
+App().get( ['test','test2'], ( event )=>{
     event.send( 'TEST' );
-}, ['test','test2'] );
+});
+
+//this will NOT work !!!
+App().get( 'test', ( event )=>{
+    event.send( 'TEST' );
+});
+
+//this will work !!!
+App().get( ['test'], ( event )=>{
+    event.send( 'TEST' );
+});
+
+//this will work !!!
+App().get( setHeader( 'keyOne', 'valueOne' ), ( event )=>{
+    event.send( 'TEST' );
+});
+
+//this will work !!!
+App().get( [setHeader( 'keyOne', 'valueOne' ), 'test'], ( event )=>{
+    event.send( 'TEST' );
+});
+
+//this will work !!!
+App().get( [setHeader( 'keyOne', 'valueOne' ), setHeader( 'keyTwo', 'valueTwo' )], ( event )=>{
+    event.send( 'TEST' );
+});
+
+App().get( '/', ['test','test2'], ( event )=>{
+    event.send( 'TEST' );
+} );
 
 App().add({
     route: '/test',
     method: 'GET',
     middlewares: 'test',
+    handler: ( event )=>{
+        Loggur.log( 'Test!' );
+        event.send( 'Test2' );
+    }
+});
+
+App().add({
+    route: '/test',
+    method: 'GET',
+    middlewares: ['test'],
+    handler: ( event )=>{
+        Loggur.log( 'Test!' );
+        event.send( 'Test2' );
+    }
+});
+
+App().add({
+    route: '/test',
+    method: 'GET',
+    middlewares: ['test', setHeader( 'value', 'key' )],
     handler: ( event )=>{
         Loggur.log( 'Test!' );
         event.send( 'Test2' );
@@ -738,11 +804,11 @@ app.listen( '80',()=>{
 - Applies a new plugin with the specified options
 - It first calls setOptions, then checks for dependencies, then calls plugin.setServerOnRuntime then calls plugin.getPluginMiddleware
 
-**getPlugin( String pluginId ): PluginInterface** 
+**getPlugin( String|PluginInterface pluginId ): PluginInterface** 
 - PluginInterface returns the desired plugin
 - Throws if plugin is not attached
 
-**hasPlugin( String pluginId ): Boolean**  
+**hasPlugin( String|PluginInterface pluginId ): Boolean**  
 - Checks whether a plugin has been added to the server. 
 - This does not work with the plugin manager but the server's plugins
 
@@ -1869,22 +1935,22 @@ However if the global persist is set to false, this will not work
 ~~~
 Server {
   ...
-  er_timeout: 'er_timeout',
-  er_env: 'er_env',
-  er_rate_limits: 'er_rate_limits',
-  er_static_resources: 'er_static_resources',
-  er_data_server: 'er_data_server',
-  er_templating_engine: 'er_templating_engine',
-  er_file_stream: 'er_file_stream',
-  er_logger: 'er_logger',
-  er_session: 'er_session',
-  er_security: 'er_security',
-  er_cors: 'er_cors',
-  er_response_cache: 'er_response_cache',
-  er_body_parser_json: 'er_body_parser_json',
-  er_body_parser_form: 'er_body_parser_form',
-  er_body_parser_multipart: 'er_body_parser_multipart'
-  er_body_parser_raw: 'er_body_parser_raw'
+  er_timeout,
+  er_env,
+  er_rate_limits,
+  er_static_resources,
+  er_data_server,
+  er_templating_engine,
+  er_file_stream,
+  er_logger,
+  er_session,
+  er_security,
+  er_cors,
+  er_response_cache,
+  er_body_parser_json,
+  er_body_parser_form,
+  er_body_parser_multipar,
+  er_body_parser_raw,
 }
 ~~~
 - Generally all the integrated plug-ins begin with `er_`
@@ -2813,11 +2879,10 @@ app.add( async ( event )=>{
 });
 
 // You can add it via a middleware to a specific route
-app.get( '/', ( event )=> 
+app.get( '/', 'cache.request', ( event )=> 
     {
         event.send( 'Hello World!' );
-    }, 
-    'cache.request'
+    }
 );
 ~~~
 
@@ -2999,7 +3064,7 @@ app.listen( 80 );
 # er_rate_limits
 - Adds a Rate limits plugin to the server. 
 - The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
-- The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist. 
+- The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist and useFile is set to true
 - If one exists, then the existing one's configuration will be taken. 
 - Instead of passing fileLocation you can pass the rules directly as an array
 - If you provide the same dataStore to two servers they should work without an issue
@@ -3029,6 +3094,10 @@ app.listen( 80 );
 - The rules will be validated.
 - Defaults to empty
 
+**useFile**
+- Optional parameter that determines if the rate limits should be fetched from a file ( specified by fileLocation ) or not
+- Defaults to false
+
 ***
 ####Events:
 
@@ -3041,7 +3110,14 @@ app.listen( 80 );
 ***
 ####Exported Functions:
 
-**NONE**
+**rateLimit( Object rule ): Function**
+- This function generates a Dynamic Middleware
+- The rule provided will apply ONLY for this route. 
+- It will ALWAYS match
+- You don't need to provide path or methods for this rule, they will be determined dynamically
+- If you want multiple rate limiting rules to be applied then you can call this function as many times as you would like and pass the array of functions
+- You don't have to apply the plugin in order to use the rateLimit function but if you want to provide a custom data store for a distributed environment then you have to.
+- !!!WARNING!!!: Due to the way that middlewares work, this will be fired very very late. If you want to limit things like file transfers or authorization ( operations that cost resources ), then this approach may not be the best. Alternatively you can add a new middleware with the same route/method as the one you want to rate limit just before these costly operations and rate limit that.
 
 ***
 ####Attached Functionality:
@@ -3093,9 +3169,13 @@ Rate limit rule options:
 
 **stopPropagation: Boolean** 
 - Whether to stop if the rate limiting rule matches and ignore other rules
+- Defaults to false
+- Optional
 
 **ipLimit: Boolean**
 - whether the rate limiting should be done per ip
+- Defaults to false
+- Optional
 
 *** 
 ####POLICIES:
@@ -3158,6 +3238,50 @@ const appTwo    = new Server();
 
 appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
+~~~
+
+- Using the global middleware
+~~~javascript
+/**
+ * @brief    Instantiate the server
+ */
+const app                = require( 'event_request' )();
+
+const rule			= {
+	"maxAmount":1,
+	"refillTime":100,
+	"refillAmount":1,
+	"policy": 'strict',
+	"delayTime": 3,
+	"delayRetries": 5,
+	"stopPropagation": false,
+	"ipLimit": false
+};
+
+// No need to apply this
+app.apply( app.er_rate_limits );
+
+app.get( '/testRoute', app.er_rate_limits.rateLimit( rule ), ( event )=>{
+	event.send( name );
+});
+
+const ruleTwo			= {
+	"maxAmount":1,
+	"refillTime":100,
+	"refillAmount":1,
+	"policy": 'permissive',
+	"delayTime": 3,
+	"delayRetries": 5,
+	"stopPropagation": false,
+	"ipLimit": false
+};
+
+app.get( '/testRouteTwo', [
+   app.er_rate_limits.rateLimit( ruleTwo ),
+   app.er_rate_limits.rateLimit( rule )
+], ( event )=>{
+	event.send( name );
+});
 ~~~
 
 - Adding with rules directly:

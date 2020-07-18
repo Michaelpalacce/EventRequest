@@ -145,7 +145,7 @@ class EventRequest extends EventEmitter
 	 * @param	{Number} [code=200]
 	 * @param	{Boolean} [raw=false]
 	 */
-	send( response = '', code = 200, raw = false )
+	send( response = '', code = null, raw = false )
 	{
 		try
 		{
@@ -165,16 +165,16 @@ class EventRequest extends EventEmitter
 	 * 			If it is a valid string, then it will be returned as is
 	 *
 	 * @param	{*} [response='']
-	 * @param	{Number} [code=200]
+	 * @param	{Number} [code=null]
 	 * @param	{Boolean} [raw=false]
 	 *
 	 * @return	void
 	 */
-	_send( response = '', code = 200, raw = false )
+	_send( response = '', code = null, raw = false )
 	{
 		let isRaw	= raw;
 
-		if ( code !== 200 )
+		if ( code !== null && typeof code === 'number' )
 			this.setStatusCode( code );
 
 		if (

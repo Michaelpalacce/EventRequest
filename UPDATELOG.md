@@ -1,3 +1,13 @@
+23.0.0
+- Major Global Middlewares rework
+- Added New test for this rework
+- Rewrote the documentation
+- Added A Dynamic Middleware for the rate limits plugin
+- Made the ipLimit and stopPropagation in the rules optional
+- Added a new useFile option for the rate limits plugin. By default it is false
+- The plugins attached to the server are now the actual instances instead of just the strings
+- The getPlugin and hasPlugin now support passing in PluginInterface directly
+
 22.1.2
 - General code cleanup
 - General Documentation cleanup

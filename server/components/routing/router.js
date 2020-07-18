@@ -109,6 +109,10 @@ class Router extends PluginInterface
 	{
 		const methods	= ['POST', 'PUT', 'GET', 'DELETE', 'HEAD', 'PATCH', 'COPY'];
 
+		const isGlobalMiddleware	= ( argument )=>{
+			return typeof argument === 'function' || typeof argument === 'string' || Array.isArray( argument )
+		};
+
 		methods.forEach(( method )=>{
 			object[method.toLocaleLowerCase()]	= ( ...args )=>{
 				const firstArgument	= args[0];
@@ -121,13 +125,25 @@ class Router extends PluginInterface
 					case typeof firstArgument === 'function':
 						route		= '';
 						handler		= firstArgument;
-						middlewares	= typeof args[1] === 'undefined' ? [] : args[1];
+						middlewares	= [];
+						break;
+
+					case ( typeof firstArgument === 'string' || firstArgument instanceof RegExp ) && isGlobalMiddleware( args[1] ) && typeof args[2] === 'function':
+						route		= firstArgument;
+						handler		= args[2];
+						middlewares	= args[1];
 						break;
 
 					case ( typeof firstArgument === 'string' || firstArgument instanceof RegExp ) && typeof args[1] === 'function':
 						route		= firstArgument;
-						handler		= typeof args[1] === 'function' ? args[1] : null;
-						middlewares	= args[2];
+						handler		= args[1];
+						middlewares	= [];
+						break;
+
+					case isGlobalMiddleware( firstArgument ) && typeof args[1] === 'function':
+						route		= '';
+						handler		= args[1];
+						middlewares	= firstArgument;
 						break;
 
 					default:
@@ -268,12 +284,24 @@ class Router extends PluginInterface
 				{
 					event.params	= Object.assign( event.params, params );
 
-					for ( const middlewareName of route.getMiddlewares() )
+					for ( const middleware of route.getMiddlewares() )
 					{
-						if ( typeof this.globalMiddlewares[middlewareName] !== 'function' )
-							throw new Error( `Could not find middleware ${middlewareName}` );
+						switch ( true )
+						{
+							case typeof middleware === 'string':
+								if ( typeof this.globalMiddlewares[middleware] !== 'function' )
+									throw new Error( `Could not find middleware ${middleware}` );
 
-						block.push( this.globalMiddlewares[middlewareName] );
+								block.push( this.globalMiddlewares[middleware] );
+								break;
+
+							case typeof middleware === 'function':
+								block.push( middleware );
+								break;
+
+							default:
+								throw new Error( `Could not find middleware ${middleware}` );
+						}
 					}
 
 					block.push( route.getHandler() );

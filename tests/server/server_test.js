@@ -2,7 +2,6 @@
 
 // Dependencies
 const { assert, test, helpers, Mock }	= require( '../test_helper' );
-const Server							= require( './../../server/server' );
 const path								= require( 'path' );
 const http								= require( 'http' );
 const fs								= require( 'fs' );
@@ -14,7 +13,7 @@ const querystring						= require( 'querystring' );
 const PreloadedPluginManager			= require( './../../server/plugins/preloaded_plugins' );
 const RateLimitsPlugin					= require( './../../server/plugins/available_plugins/rate_limits_plugin' );
 
-const App								= require( './../../index' );
+const { App, Server }					= require( './../../index' );
 const app								= App();
 
 test({
@@ -47,20 +46,20 @@ test({
 		assert.equal( typeof server.pluginBag === 'object', true );
 		assert.deepStrictEqual( server.pluginManager, PreloadedPluginManager );
 
-		assert.equal( typeof server.er_timeout === 'string', true );
-		assert.equal( typeof server.er_env === 'string', true );
-		assert.equal( typeof server.er_rate_limits === 'string', true );
-		assert.equal( typeof server.er_static_resources === 'string', true );
-		assert.equal( typeof server.er_data_server === 'string', true );
-		assert.equal( typeof server.er_templating_engine === 'string', true );
-		assert.equal( typeof server.er_file_stream === 'string', true );
-		assert.equal( typeof server.er_logger === 'string', true );
-		assert.equal( typeof server.er_session === 'string', true );
-		assert.equal( typeof server.er_response_cache === 'string', true );
-		assert.equal( typeof server.er_body_parser_json === 'string', true );
-		assert.equal( typeof server.er_body_parser_form === 'string', true );
-		assert.equal( typeof server.er_body_parser_multipart === 'string', true );
-		assert.equal( typeof server.er_body_parser_raw === 'string', true );
+		assert.equal( typeof server.er_timeout === 'object', true );
+		assert.equal( typeof server.er_env === 'object', true );
+		assert.equal( typeof server.er_rate_limits === 'object', true );
+		assert.equal( typeof server.er_static_resources === 'object', true );
+		assert.equal( typeof server.er_data_server === 'object', true );
+		assert.equal( typeof server.er_templating_engine === 'object', true );
+		assert.equal( typeof server.er_file_stream === 'object', true );
+		assert.equal( typeof server.er_logger === 'object', true );
+		assert.equal( typeof server.er_session === 'object', true );
+		assert.equal( typeof server.er_response_cache === 'object', true );
+		assert.equal( typeof server.er_body_parser_json === 'object', true );
+		assert.equal( typeof server.er_body_parser_form === 'object', true );
+		assert.equal( typeof server.er_body_parser_multipart === 'object', true );
+		assert.equal( typeof server.er_body_parser_raw === 'object', true );
 
 		done();
 	}
@@ -956,7 +955,7 @@ test({
 });
 
 test({
-	message	: 'Server.test middlewares',
+	message	: 'Server.test.global.middlewares',
 	test	: ( done )=>{
 		const body			= 'testGETWithMiddlewares';
 		const headerName	= 'testGETWithMiddlewares';
@@ -967,9 +966,9 @@ test({
 			event.next();
 		} );
 
-		app.get( '/testGETWithMiddlewares', ( event )=>{
+		app.get( '/testGETWithMiddlewares', 'testGETWithMiddlewaresMiddleware', ( event )=>{
 			event.send( body );
-		}, 'testGETWithMiddlewaresMiddleware' );
+		} );
 
 		helpers.sendServerRequest( '/testGETWithMiddlewares' ).then(( response )=>{
 			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
@@ -1000,9 +999,9 @@ test({
 			event.next();
 		} );
 
-		app.get( '/testGETWithMultipleMiddlewares', ( event )=>{
+		app.get( '/testGETWithMultipleMiddlewares', ['testGETWithMultipleMiddlewaresMiddlewareOne', 'testGETWithMultipleMiddlewaresMiddlewareTwo'], ( event )=>{
 			event.send( body );
-		}, ['testGETWithMultipleMiddlewaresMiddlewareOne', 'testGETWithMultipleMiddlewaresMiddlewareTwo'] );
+		} );
 
 		helpers.sendServerRequest( '/testGETWithMultipleMiddlewares' ).then(( response )=>{
 			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
@@ -1080,6 +1079,23 @@ test({
 
 		app.get( `/${name}`, ( event )=>{
 			event.setStatusCode( expectedStatusCode );
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}`, 'GET', expectedStatusCode ).then(( response )=>{
+			assert.equal( response.body.toString(), name );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.eventRequest.send.without.specifying.a.status.code',
+	test	: ( done )=>{
+		const name					= 'testSendWithoutSpecifyingAStatusCode';
+		const expectedStatusCode	= 200;
+
+		app.get( `/${name}`, ( event )=>{
 			event.send( name );
 		} );
 
@@ -2246,7 +2262,7 @@ test({
 			app.apply( app.er_response_cache );
 		}
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, 'cache.request', ( event )=>{
 			if ( i === 0 )
 			{
 				i ++;
@@ -2254,7 +2270,7 @@ test({
 			}
 
 			event.sendError( 'ERROR', 501 );
-		}, 'cache.request' );
+		} );
 
 		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
 			assert.equal( response.body.toString(), name );
@@ -2445,7 +2461,7 @@ test({
 				setTimeout(()=>{
 					server.close();
 					assert.equal( response.body.toString(), name );
-					fs.unlinkSync( fileLocation );
+					assert.equal( fs.existsSync( fileLocation ), false );
 					done();
 				}, 200 );
 			}).catch( done );
@@ -2462,7 +2478,7 @@ test({
 		const server		= http.createServer( app.attach() );
 
 		const rule			= {
-			"path":name,
+			"path":`/${name}`,
 			"methods":['GET'],
 			"maxAmount":1,
 			"refillTime":100,
@@ -2482,11 +2498,11 @@ test({
 
 		server.listen( 4001, ()=>{
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
-				return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 );
+				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
 			}).then(( response )=>{
 				setTimeout(()=>{
 					server.close();
-					assert.equal( response.body.toString(), name );
+					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
 					done();
 				}, 200 );
 			}).catch( done );
@@ -2495,7 +2511,85 @@ test({
 });
 
 test({
-	message	: 'Server.test.er_rate_limits bucket works cross apps',
+	message	: 'Server.test.er_rate_limits.with.dynamic.middleware',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithDynamicGlobalMiddleware';
+
+		const app			= new Server();
+		const server		= http.createServer( app.attach() );
+
+		const rule			= {
+			"maxAmount":1,
+			"refillTime":100,
+			"refillAmount":1,
+			"policy": 'strict',
+			"delayTime": 3,
+			"delayRetries": 5
+		};
+
+		app.apply( app.er_rate_limits );
+
+		app.get( `/${name}`, app.getPlugin( app.er_rate_limits ).rateLimit( rule ), ( event )=>{
+			event.send( name );
+		} );
+
+		server.listen( 4001, ()=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
+				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
+			}).then(( response )=>{
+				setTimeout(()=>{
+					server.close();
+					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+					done();
+				}, 200 );
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.with.dynamic.middleware.ignores.path.and.methods',
+	test	: ( done )=>{
+		const name			= 'testErRateLimitsWithDynamicGlobalMiddlewareIgnoresPathAndMethods';
+
+		const app			= new Server();
+		const server		= http.createServer( app.attach() );
+
+		const rule			= {
+			"path": ['wrong', 123],
+			"methods": 123,
+			"maxAmount":1,
+			"refillTime":100,
+			"refillAmount":1,
+			"policy": 'strict',
+			"delayTime": 3,
+			"delayRetries": 5,
+			"stopPropagation": false,
+			"ipLimit": false
+		};
+
+		app.apply( app.er_rate_limits );
+
+		app.get( `/${name}`, app.getPlugin( app.er_rate_limits ).rateLimit( rule ), ( event )=>{
+			event.send( name );
+		} );
+
+		server.listen( 4001, ()=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
+				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
+			}).then(( response )=>{
+				setTimeout(()=>{
+					server.close();
+					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+					done();
+				}, 200 );
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.bucket.works.cross.apps',
 	test	: ( done )=>{
 		const dataStore	= new DataServer( { persist: false, ttl: 90000 } );
 
@@ -2505,8 +2599,8 @@ test({
 		const name			= 'testErRateLimitsBucketWorksCrossApps';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
-		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore } );
-		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore } );
+		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
+		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
 
 		appOne.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2537,7 +2631,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}/:test:`, ( event )=>{
 			event.send( name );
@@ -2557,7 +2651,7 @@ test({
 		let called			= 0;
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			called ++;
@@ -2590,7 +2684,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			assert.equal( event.rateLimited, false );
@@ -2616,7 +2710,7 @@ test({
 		const now			= Math.floor( new Date().getTime() / 1000 );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2640,7 +2734,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2662,7 +2756,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2695,7 +2789,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2717,7 +2811,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2739,7 +2833,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2762,7 +2856,7 @@ test({
 		let called			= 0;
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			called ++;
@@ -2795,7 +2889,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2817,7 +2911,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2839,7 +2933,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2862,7 +2956,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			event.send( name );
@@ -2884,7 +2978,7 @@ test({
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation } );
+			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
 		app.get( `/${name}`, ( event )=>{
 			try
@@ -3348,6 +3442,362 @@ test({
 
 			done();
 		} ).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.testGlobalMiddlewaresWithFunctions',
+	test	: ( done )=>{
+
+		const setHeader	= function( key, value )
+		{
+			return ( event )=>{
+				event.setResponseHeader( key, value );
+				event.next();
+			}
+		}
+
+		const setStatus	= function( status )
+		{
+			return ( event )=>{
+				event.setStatusCode( status );
+				event.next();
+			}
+		}
+
+		const app	= new App.Server();
+
+		app.define( 'setHeader', ( event )=>{
+			event.setResponseHeader( 'globalMiddleware', 'value' );
+			event.next();
+		});
+
+		app.define( '/setHeader', ( event )=>{
+			event.setResponseHeader( 'globalMiddlewareTwo', 'value' );
+			event.next();
+		});
+
+		app.get( '/testOne', setHeader( 'testOne', 'value' ), ( event )=>{
+			event.send( 'ok' );
+		});
+
+		app.get( '/testTwo', 'setHeader', ( event )=>{
+			event.send( 'ok' );
+		});
+
+		app.get( '/testThree', [setStatus(403), setHeader( 'testThree', 'value' )], ( event )=>{
+			event.send( 'ok' );
+		});
+
+		app.get( '/testFour', [setStatus(400), 'setHeader'], ( event )=>{
+			event.send( 'ok' );
+		});
+
+		app.get( ['setHeader', setHeader( 'testFive', 'value' )], ( event )=>{
+			event.send( 'ok' );
+		});
+
+		// This will NOT activate the global middleware but be a route
+		app.get( '/setHeader', ( event )=>{
+			event.send( 'ok' );
+		});
+
+		app.listen( 4100 );
+
+		const promises	= [];
+
+		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4100, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.testone === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4100, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 403, '', {}, 4100, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.testthree === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4100, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testFiveThisDoesNotMatter', 'GET', 200, '', {}, 4100, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+			assert.equal( response.headers.testfive === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/setHeader', 'GET', 200, '', {}, 4100, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+			assert.equal( typeof response.headers.globalMiddlewaretwo === 'undefined', true );
+		}) );
+
+		Promise.all( promises ).then( ()=>{ done(); } ).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.testGlobalMiddlewaresFromAnotherRouter',
+	test	: ( done )=>{
+
+		const setHeader	= function( key, value )
+		{
+			return ( event )=>{
+				event.setResponseHeader( key, value );
+				event.next();
+			}
+		}
+
+		const setStatus	= function( status )
+		{
+			return ( event )=>{
+				event.setStatusCode( status );
+				event.next();
+			}
+		}
+
+		const app		= new App.Server();
+		const routerOne	= app.Router();
+
+		routerOne.define( 'setHeader', ( event )=>{
+			event.setResponseHeader( 'globalMiddleware', 'value' );
+			event.next();
+		});
+
+		routerOne.get( '/testOne', setHeader( 'testOne', 'value' ), ( event )=>{
+			event.send( 'ok' );
+		});
+
+		routerOne.get( '/testTwo', 'setHeader', ( event )=>{
+			event.send( 'ok' );
+		});
+
+		routerOne.get( '/testThree', [setStatus(404), setHeader( 'testThree', 'value' )], ( event )=>{
+			event.send( 'ok' );
+		});
+
+		routerOne.get( '/testFour', [setStatus(400), 'setHeader'], ( event )=>{
+			event.send( 'ok' );
+		});
+
+		routerOne.get( ['setHeader', setHeader( 'testFive', 'value' )], ( event )=>{
+			event.send( 'ok' );
+		});
+
+		app.add( routerOne );
+
+		app.listen( 4102 );
+
+		const promises	= [];
+
+		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4102, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.testone === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4102, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 404, '', {}, 4102, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.testthree === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4102, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testFiveThisDoesNotMatter', 'GET', 200, '', {}, 4102, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+			assert.equal( response.headers.testfive === 'value', true );
+		}) );
+
+		Promise.all( promises ).then( ()=>{ done(); } ).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.testGlobalMiddlewaresFromAnotherRouterMixed',
+	test	: ( done )=>{
+
+		const setHeader	= function( key, value )
+		{
+			return ( event )=>{
+				event.setResponseHeader( key, value );
+				event.next();
+			}
+		}
+
+		const setStatus	= function( status )
+		{
+			return ( event )=>{
+				event.setStatusCode( status );
+				event.next();
+			}
+		}
+
+		const app		= new App.Server();
+		const routerOne	= app.Router();
+
+		app.define( 'setHeader', ( event )=>{
+			event.setResponseHeader( 'globalMiddleware', 'value' );
+			event.next();
+		});
+
+		app.get( '/testOne', setHeader( 'testOne', 'value' ), ( event )=>{
+			event.send( 'ok' );
+		});
+
+		routerOne.get( '/testTwo', 'setHeader', ( event )=>{
+			event.send( 'ok' );
+		});
+
+		app.get( '/testThree', [setStatus(404), setHeader( 'testThree', 'value' )], ( event )=>{
+			event.send( 'ok' );
+		});
+
+		routerOne.get( '/testFour', [setStatus(400), 'setHeader'], ( event )=>{
+			event.send( 'ok' );
+		});
+
+		routerOne.get( ['setHeader', setHeader( 'testFive', 'value' )], ( event )=>{
+			event.send( 'ok' );
+		});
+
+		app.add( routerOne );
+
+		app.listen( 4103 );
+
+		const promises	= [];
+
+		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4103, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.testone === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4103, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 404, '', {}, 4103, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.testthree === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4103, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testFiveThisDoesNotMatter', 'GET', 200, '', {}, 4103, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+			assert.equal( response.headers.testfive === 'value', true );
+		}) );
+
+		Promise.all( promises ).then( ()=>{ done(); } ).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.testGlobalMiddlewaresWithFunctionsWithAdd',
+	test	: ( done )=>{
+
+		const setHeader	= function( key, value )
+		{
+			return ( event )=>{
+				event.setResponseHeader( key, value );
+				event.next();
+			}
+		}
+
+		const setStatus	= function( status )
+		{
+			return ( event )=>{
+				event.setStatusCode( status );
+				event.next();
+			}
+		}
+
+		const app	= new App.Server();
+
+		app.define( 'setHeader', ( event )=>{
+			event.setResponseHeader( 'globalMiddleware', 'value' );
+			event.next();
+		});
+
+		app.add({
+			method		: 'GET',
+			route		: '/testOne',
+			handler		: ( event )=>{
+				event.send( 'ok' );
+			},
+			middlewares	: setHeader( 'testOne', 'value' )
+		});
+
+		app.add({
+			method		: 'GET',
+			route		: '/testTwo',
+			handler		: ( event )=>{
+				event.send( 'ok' );
+			},
+			middlewares	: 'setHeader'
+		});
+
+		app.add({
+			method		: 'GET',
+			route		: '/testThree',
+			handler		: ( event )=>{
+				event.send( 'ok' );
+			},
+			middlewares	: [setStatus(404), setHeader( 'testThree', 'value' )]
+		});
+
+		app.add({
+			method		: 'GET',
+			route		: '/testFour',
+			handler		: ( event )=>{
+				event.send( 'ok' );
+			},
+			middlewares	: [setStatus(400), 'setHeader']
+		});
+
+		app.listen( 4101 );
+
+		const promises	= [];
+
+		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4101, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.testone === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4101, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 404, '', {}, 4101, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.testthree === 'value', true );
+		}) );
+
+		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4101, 'ok' ).then(( response )=>{
+			assert.equal( typeof response.headers === 'object', true );
+			assert.equal( response.headers.globalmiddleware === 'value', true );
+		}) );
+
+		Promise.all( promises ).then( ()=>{ done(); } ).catch( done );
 	}
 });
 

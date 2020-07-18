@@ -61,22 +61,22 @@ class Server extends EventEmitter
 		});
 
 		// attached like this to enable smart autocomplete in IDE's
-		this.er_timeout					= 'er_timeout';
-		this.er_env						= 'er_env';
-		this.er_rate_limits				= 'er_rate_limits';
-		this.er_static_resources		= 'er_static_resources';
-		this.er_data_server				= 'er_data_server';
-		this.er_templating_engine		= 'er_templating_engine';
-		this.er_file_stream				= 'er_file_stream';
-		this.er_logger					= 'er_logger';
-		this.er_session					= 'er_session';
-		this.er_security				= 'er_security';
-		this.er_cors					= 'er_cors';
-		this.er_response_cache			= 'er_response_cache';
-		this.er_body_parser_json		= 'er_body_parser_json';
-		this.er_body_parser_form		= 'er_body_parser_form';
-		this.er_body_parser_multipart	= 'er_body_parser_multipart';
-		this.er_body_parser_raw			= 'er_body_parser_raw';
+		this.er_timeout					= this.pluginManager.getPlugin( 'er_timeout' );
+		this.er_env						= this.pluginManager.getPlugin( 'er_env' );
+		this.er_rate_limits				= this.pluginManager.getPlugin( 'er_rate_limits' );
+		this.er_static_resources		= this.pluginManager.getPlugin( 'er_static_resources' );
+		this.er_data_server				= this.pluginManager.getPlugin( 'er_data_server' );
+		this.er_templating_engine		= this.pluginManager.getPlugin( 'er_templating_engine' );
+		this.er_file_stream				= this.pluginManager.getPlugin( 'er_file_stream' );
+		this.er_logger					= this.pluginManager.getPlugin( 'er_logger' );
+		this.er_session					= this.pluginManager.getPlugin( 'er_session' );
+		this.er_security				= this.pluginManager.getPlugin( 'er_security' );
+		this.er_cors					= this.pluginManager.getPlugin( 'er_cors' );
+		this.er_response_cache			= this.pluginManager.getPlugin( 'er_response_cache' );
+		this.er_body_parser_json		= this.pluginManager.getPlugin( 'er_body_parser_json' );
+		this.er_body_parser_form		= this.pluginManager.getPlugin( 'er_body_parser_form' );
+		this.er_body_parser_multipart	= this.pluginManager.getPlugin( 'er_body_parser_multipart' );
+		this.er_body_parser_raw			= this.pluginManager.getPlugin( 'er_body_parser_raw' );
 	}
 
 	/**
@@ -167,29 +167,33 @@ class Server extends EventEmitter
 	 *
 	 * @details	Will throw if the plugin is not attached
 	 *
-	 * @param	{String} pluginId
+	 * @param	{String|PluginInterface} pluginId
 	 *
 	 * @return	PluginInterface
 	 */
 	getPlugin( pluginId )
 	{
-		if ( this.hasPlugin( pluginId ) )
-			return this.plugins[pluginId];
+		const id	= typeof pluginId === 'string' ? pluginId : pluginId.getPluginId();
+
+		if ( this.hasPlugin( id ) )
+			return this.plugins[id];
 
 		else
-			throw new Error( `The plugin ${pluginId} is not attached to the server` );
+			throw new Error( `The plugin ${id} is not attached to the server` );
 	}
 
 	/**
 	 * @brief	Checks whether the server has a plugin with the given id
 	 *
-	 * @param	{String} pluginId
+	 * @param	{String|PluginInterface} pluginId
 	 *
 	 * @return	Boolean
 	 */
 	hasPlugin( pluginId )
 	{
-		return typeof this.plugins[pluginId] !== 'undefined';
+		const id	= typeof pluginId === 'string' ? pluginId : pluginId.getPluginId();
+
+		return typeof this.plugins[id] !== 'undefined';
 	}
 
 	/**
