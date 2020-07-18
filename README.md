@@ -560,8 +560,8 @@ The event request is an object that is created by the server and passed through 
 ***
 ####Properties of eventRequest:
 
-**queryString: Object** 
-- The query string
+**query: Object** 
+- The query parameters
 - Will contain all query parameters in a JS object format
 
 **path: String** 
@@ -674,6 +674,10 @@ The event request is an object that is created by the server and passed through 
 **sendError( mixed error = '', Number code = 500 ): void** 
 - Like send but used to send errors. 
 - It will call the errorHandler directly with all the arguments specified ( in case of a custom error handler, you can send extra parameters with the first one being the EventRequest )
+
+**validate( ...args ): ValidationResult**
+- Shorthand for event.validation.validate 
+- This function will pass any arguments passed to the event.validation.validate function
 
 ***
 ####Events emitted by the EventRequest
@@ -1644,13 +1648,8 @@ The TestingTools export:
 ***
 ####Attached Functionality:
 
-**event.errorHandler**
+**event.errorHandler: ErrorHandler**
 - By default it is attached to the EventRequest but can be overwritten at any point
-
-***
-####Exported Plugin Functions:
-
-**NONE**
 
 ***
 ####Example:
@@ -1951,6 +1950,7 @@ Server {
   er_body_parser_form,
   er_body_parser_multipar,
   er_body_parser_raw,
+  er_validation,
 }
 ~~~
 - Generally all the integrated plug-ins begin with `er_`
@@ -2044,9 +2044,9 @@ The plugin Manager exports the following functions:
 - Emitted when the event.clearTimeout() function is called if there was a timeout to be cleared
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
-**clearTimeout(): void**
+**event.clearTimeout(): void**
 - Clears the Request Timeout
 - Will do nothing if there is no timeout
 
@@ -2112,7 +2112,7 @@ app.apply( timeoutPlugin );
 **NONE**
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
 **NONE**
 
@@ -2180,7 +2180,7 @@ app.apply( staticResourcesPlugin );
 **NONE**
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
 **NONE**
 
@@ -2281,9 +2281,9 @@ app.listen( 80, ()=>{
 **NONE**
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
-**initSession( Function callback ): Promise** 
+**event.initSession( Function callback ): Promise** 
 - Initializes the session. This should be called in the beginning when you want to start the user sesion
 - This will initialize a new session if one does not exist and fetch the old one if one exists
 - The callback will return false if there was no error
@@ -2292,7 +2292,6 @@ app.listen( 80, ()=>{
 ####Attached Functionality:
 
 **event.session: Session**
-
 - This is the main class that should be used to manipulate the user session.
 - There is no need to save the changes done to the session, that will be done automatically at the end of the request
 
@@ -2424,9 +2423,9 @@ app.listen( 80, ()=>{
 
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
-**render( String templateName, Object variables = {}, Function errorCallback = null ): Promise**
+**event.render( String templateName, Object variables = {}, Function errorCallback = null ): Promise**
 - templateName will be the name of the file without the '.html' extension starting from the tempateDir given as a base ( folders are ok )
 - The variables should be an object that will be given to the templating engine
 - The promise will be resolved in case of a successful render. Note: you don't have to take any further actions, at this point the html has already been streamed
@@ -2520,13 +2519,13 @@ router.get( '/preview', ( event ) => {
 - Emitted when the stream is successfully started
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
-**streamFile( String file, Object options = {}, errCallback ): void** 
+**event.streamFile( String file, Object options = {}, errCallback ): void** 
 - This function accepts the absolute file name ( file ) and any options that should be given to the file stream ( options )
 - This function may accept an errCallback that will be called if there are no fileStreams that can handle the given file, otherwise call it will call event.next() with an error and a status code of 400
 
-**getFileStream( file, options = {} ): FileStream | null**
+**event.getFileStream( file, options = {} ): FileStream | null**
 - This function accepts the absolute file name ( file ) and any options that should be given to the file stream ( options )
 - This function will return null if no file streams were found or in case of another error
 
@@ -2571,7 +2570,7 @@ const fs = require( 'fs' );
 const app    = require( 'event_request' )();
 
 app.get( '/data', ( event ) =>{
-        const result    = event.validation.validate( event.queryString, { file: 'filled||string||min:1' } );
+        const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
         const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
 
         if ( ! file || ! fs.existsSync( file ) )
@@ -2588,7 +2587,7 @@ app.get( '/data', ( event ) =>{
 );
 
 app.get( '/dataTwo', ( event ) =>{
-        const result    = event.validation.validate( event.queryString, { file: 'filled||string||min:1' } );
+        const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
         const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
 
         if ( ! file || ! fs.existsSync( file ) )
@@ -2632,7 +2631,7 @@ app.get( '/dataTwo', ( event ) =>{
 **NONE**
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
 **NONE**
 
@@ -2741,7 +2740,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 **NONE**
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
 **NONE**
 
@@ -2815,7 +2814,7 @@ Adds a response caching mechanism.
 **NONE**
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
 **NONE**
 
@@ -2912,7 +2911,7 @@ app.get( '/', 'cache.request', ( event )=>
 **NONE**
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
 **NONE**
 
@@ -2942,6 +2941,189 @@ app.add(( event )=>{
     event.send( 'Done' );
 });
 app.listen( 80 );
+~~~
+
+***
+***
+***
+
+#er_validation 
+- Does not attach any functionality
+- Provides a Dynamic Middleware that can validate any EventRequest properties
+
+***
+####Dependencies:
+
+**NONE**
+
+***
+####Accepted Options:
+
+**failureCallback: Function**
+- The plugin can be attached or setup to have a default failureCallback which will be taken if one is not provided
+
+***
+####Events:
+
+**NONE**
+
+***
+####EventRequest Attached Functions
+
+**NONE**
+
+***
+####Attached Functionality:
+
+**NONE**
+
+***
+####Exported Plugin Functions:
+
+**validate( Object validationRules, Function failureCallback): Function**
+- This function generates a Dynamic Middleware
+- This can validate any parameter of the EventRequest like: body/query/headers/etc
+- It can validate multiple parameters at one time
+- The validationRules must be an object with parametersToValidate pointing to validation skeletons
+- If no failureCallback is provided then a generic error will be sent with the validation error directly
+- if one is provided it must accept 3 parameters: ( EventRequest eventRequest, String validationParameter, ValidationResult validatrionResult )
+- If the parameter you are trying to validate does not exist in the EventRequest object, then an Error is thrown
+- After validation the validated params will be set in the EventRequest parameter that was validated: if you validated query for example the validated parameters will be set in the query object ( this way if any conversion was done by asserting a key is numeric or string for example, the correct type will be kept )
+- You don't have to validate all the keys, the objects will be merged
+- This plugin uses the built in validation suite
+
+***
+####Example:
+
+~~~javascript
+/**
+ * @brief    Instantiate the server
+ */
+const app    = require( 'event_request' )();
+
+app.apply( app.er_body_parser_multipart );
+
+// This will validate the query parameters and the body
+app.post( '/',
+    app.er_validation.validate( { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255'} } ),
+    ( event )=>{
+        event.send( { query: event.query, body: event.body } );
+    }
+);
+
+app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
+~~~
+
+- Passing a custom failure callback
+~~~javascript
+/**
+ * @brief    Instantiate the server
+ */
+const app    = require( 'event_request' )();
+
+app.apply( app.er_body_parser_multipart );
+
+// This will validate the query parameters and the body and will call the error callback 
+app.post( '/',
+    app.er_validation.validate(
+        { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } },
+        ( event, validationParameter, validationResult )=>{
+            console.log( validationParameter );
+            console.log( validationResult );
+
+            event.send( 'ok' );
+        }   
+    ),
+    ( event )=>{
+        event.send( { query: event.query, body: event.body } );
+    }
+);
+
+app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
+~~~
+
+- When passing a default one and a custom one, the custom one will be used
+~~~javascript
+/**
+ * @brief    Instantiate the server
+ */
+const app    = require( 'event_request' )();
+
+// You have to apply the validation plugin
+app.apply(
+    app.er_validation,
+    {
+         failureCallback: ( event, validationParameter, validationResult )=>{
+            console.log( validationParameter );
+            console.log( validationResult );
+
+            event.send( 'ok' );
+         }
+    }
+);
+
+// Alternatively you can do:
+app.er_validation.setOptions({
+     failureCallback: ( event, validationParameter, validationResult )=>{
+        console.log( validationParameter );
+        console.log( validationResult );
+
+        event.send( 'ok' );
+     }
+});
+
+app.apply( app.er_body_parser_multipart );
+
+// This will validate the query parameters and the body and will call the error callback 
+app.post( '/',
+    app.er_validation.validate(
+        { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } },
+        ( event, validationParameter, validationResult )=>{
+            console.log( validationParameter );
+            console.log( validationResult );
+
+            event.send( 'ok' );
+        }   
+    ),
+    ( event )=>{
+        event.send( { query: event.query, body: event.body } );
+    }
+);
+
+app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
+~~~
+
+- When passing a default one if no failure callback is provided then the default one will be used
+~~~javascript
+/**
+ * @brief    Instantiate the server
+ */
+const app    = require( 'event_request' )();
+app.apply(
+    app.er_validation,
+    {
+        failureCallback: ( event, validationParameter, validationResult )=>{
+         console.log( validationParameter );
+         console.log( validationResult );
+        
+         event.send( 'ok' );
+        }
+    }
+);
+
+app.apply( app.er_body_parser_multipart );
+
+// This will validate the query parameters and the body and will call the error callback 
+app.post( '/',
+    app.er_validation.validate(
+        { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } }
+    ),
+    ( event )=>{
+        event.send( { query: event.query, body: event.body } );
+    }
+);
+
+app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
 ~~~
 
 ***
@@ -3017,7 +3199,7 @@ const defaults = {
 **NONE**
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
 **NONE**
 
@@ -3108,16 +3290,9 @@ app.listen( 80 );
 - This is emitted before any actions are taken
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
-**rateLimit( Object rule ): Function**
-- This function generates a Dynamic Middleware
-- The rule provided will apply ONLY for this route. 
-- It will ALWAYS match
-- You don't need to provide path or methods for this rule, they will be determined dynamically
-- If you want multiple rate limiting rules to be applied then you can call this function as many times as you would like and pass the array of functions
-- You don't have to apply the plugin in order to use the rateLimit function but if you want to provide a custom data store for a distributed environment then you have to.
-- !!!WARNING!!!: Due to the way that middlewares work, this will be fired very very late. If you want to limit things like file transfers or authorization ( operations that cost resources ), then this approach may not be the best. Alternatively you can add a new middleware with the same route/method as the one you want to rate limit just before these costly operations and rate limit that.
+**NONE**
 
 ***
 ####Attached Functionality:
@@ -3131,7 +3306,14 @@ app.listen( 80 );
 ***
 ####Exported Plugin Functions:
 
-**NONE**
+**rateLimit( Object rule ): Function**
+- This function generates a Dynamic Middleware
+- The rule provided will apply ONLY for this route. 
+- It will ALWAYS match
+- You don't need to provide path or methods for this rule, they will be determined dynamically
+- If you want multiple rate limiting rules to be applied then you can call this function as many times as you would like and pass the array of functions
+- You don't have to apply the plugin in order to use the rateLimit function but if you want to provide a custom data store for a distributed environment then you have to.
+- !!!WARNING!!!: Due to the way that middlewares work, this will be fired very very late. If you want to limit things like file transfers or authorization ( operations that cost resources ), then this approach may not be the best. Alternatively you can add a new middleware with the same route/method as the one you want to rate limit just before these costly operations and rate limit that.
 
 ***
 ####Notes:
@@ -3384,7 +3566,7 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 **NONE**
 
 ***
-####Exported Functions:
+####EventRequest Attached Functions
 
 **event.$security.build(): void**
 - This function accepts no arguments. 

@@ -77,6 +77,7 @@ class Server extends EventEmitter
 		this.er_body_parser_form		= this.pluginManager.getPlugin( 'er_body_parser_form' );
 		this.er_body_parser_multipart	= this.pluginManager.getPlugin( 'er_body_parser_multipart' );
 		this.er_body_parser_raw			= this.pluginManager.getPlugin( 'er_body_parser_raw' );
+		this.er_validation				= this.pluginManager.getPlugin( 'er_validation' );
 	}
 
 	/**

@@ -37,24 +37,24 @@ class EventRequest extends EventEmitter
 			list[parts.shift().trim()]	= decodeURI( parts.join( '=' ) );
 		});
 
-		this.queryString		= parsedUrl.query;
-		this.clientIp			= request.connection === undefined ? false : request.connection.remoteAddress;
-		this.path				= parsedUrl.pathname.trim();
-		this.method				= request.method.toUpperCase();
-		this.headers			= request.headers;
-		this.validation			= ValidationHandler;
-		this.request			= request;
-		this.response			= response;
-		this.cookies			= list;
-		this.finished			= false;
-		this.extra				= {};
-		this.params				= {};
-		this.block				= {};
-		this.errorHandler		= new ErrorHandler();
+		this.query			= parsedUrl.query;
+		this.clientIp		= request.connection === undefined ? false : request.connection.remoteAddress;
+		this.path			= parsedUrl.pathname.trim();
+		this.method			= request.method.toUpperCase();
+		this.headers		= request.headers;
+		this.validation		= ValidationHandler;
+		this.request		= request;
+		this.response		= response;
+		this.cookies		= list;
+		this.finished		= false;
+		this.extra			= {};
+		this.params			= {};
+		this.block			= {};
+		this.errorHandler	= new ErrorHandler();
 
 		// We do this so we can pass the event.next function by reference
-		const self	= this;
-		this.next	= ( ...args )=>{
+		const self			= this;
+		this.next			= ( ...args )=>{
 			self._next.apply( self, args );
 		};
 
@@ -76,7 +76,7 @@ class EventRequest extends EventEmitter
 
 		this.block				= undefined;
 		this.errorHandler		= undefined;
-		this.queryString		= undefined;
+		this.query				= undefined;
 		this.headers			= undefined;
 		this.method				= undefined;
 		this.path				= undefined;
@@ -90,6 +90,18 @@ class EventRequest extends EventEmitter
 
 		this.emit( 'finished' );
 		this.removeAllListeners();
+	}
+
+	/**
+	 * @brief	Easier access to the validation
+	 *
+	 * @param	{*} args
+	 *
+	 * @return	ValidationResult
+	 */
+	validate( ...args )
+	{
+		return this.validation.validate.apply( this.validation, args );
 	}
 
 	/**
@@ -108,7 +120,7 @@ class EventRequest extends EventEmitter
 	setCookie( name, value, options = {} )
 	{
 		const cookieHeaderName	= 'set-cookie';
-		const result			= this.validation.validate(
+		const result			= this.validate(
 			{ name, value },
 			{
 				name: 'filled',

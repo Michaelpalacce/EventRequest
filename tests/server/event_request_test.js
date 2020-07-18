@@ -34,7 +34,7 @@ test({
 		let eventRequest	= helpers.getEventRequest( '', '/test?testParam=testValue' );
 
 		assert.equal( eventRequest.path, '/test', 'EventRequest could not parse path' );
-		assert.deepEqual( eventRequest.queryString, { testParam : 'testValue' }, 'EventRequest could not parse query' );
+		assert.deepEqual( eventRequest.query, { testParam : 'testValue' }, 'EventRequest could not parse query' );
 
 		done();
 	}
@@ -138,7 +138,7 @@ test({
 		eventRequest._cleanUp();
 
 		assert.equal( eventRequest.internalTimeout, undefined );
-		assert.equal( eventRequest.queryString, undefined );
+		assert.equal( eventRequest.query, undefined );
 		assert.equal( eventRequest.headers, undefined );
 		assert.equal( eventRequest.method, undefined );
 		assert.equal( eventRequest.path, undefined );

@@ -1,3 +1,12 @@
+24.0.0
+- Added Cors plugin unit tests
+- Changed the queryString property of the EventRequest to just query
+- Added a new validate function of the EventRequest that is a shorthand for event.validation.validate
+- Added Validation plugin that allows validation of query/header/body/etc params from the request
+- Added test for the validation plugin
+- Added documentation
+- Documentation improvements
+
 23.0.0
 - Major Global Middlewares rework
 - Added New test for this rework

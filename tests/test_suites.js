@@ -77,6 +77,8 @@ testSuites.pluginsSuite		= ()=>{
 	require( './server/plugins/available_plugins/templating_engine_plugin_test' );
 	require( './server/plugins/available_plugins/logger_plugin_test' );
 	require( './server/plugins/available_plugins/response_cache_plugin_test' );
+	require( './server/plugins/available_plugins/cors_plugin_test' );
+	require( './server/plugins/available_plugins/validation_plugin_test' );
 };
 
 module.exports	= testSuites;

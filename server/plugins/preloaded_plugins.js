@@ -14,6 +14,7 @@ const ResponseCachePlugin		= require( './available_plugins/response_cache_plugin
 const SessionPlugin				= require( './available_plugins/session_plugin' );
 const SecurityPlugin			= require( './available_plugins/security_plugin' );
 const CorsPlugin				= require( './available_plugins/cors_plugin' );
+const ValidationPlugin			= require( './available_plugins/validation_plugin' );
 const JsonBodyParser			= require( './../components/body_parsers/json_body_parser' );
 const MultipartDataParser		= require( './../components/body_parsers/multipart_data_parser' );
 const FormBodyParser			= require( './../components/body_parsers/form_body_parser' );
@@ -40,5 +41,6 @@ pluginManager.addPlugin( new BodyParserPlugin( JsonBodyParser, 'er_body_parser_j
 pluginManager.addPlugin( new BodyParserPlugin( FormBodyParser, 'er_body_parser_form' ) );
 pluginManager.addPlugin( new BodyParserPlugin( MultipartDataParser, 'er_body_parser_multipart' ) );
 pluginManager.addPlugin( new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' ) );
+pluginManager.addPlugin( new ValidationPlugin( 'er_validation' ) );
 
 module.exports	= pluginManager;
