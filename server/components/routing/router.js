@@ -91,7 +91,6 @@ class Router extends PluginInterface
 		 * @returns	Server
 		 */
 		server.add	= ( ...args )=>{
-			server.emit( 'addRoute', args );
 			this.add.apply( this, args );
 
 			return server;

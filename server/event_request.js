@@ -25,9 +25,6 @@ class EventRequest extends EventEmitter
 		super();
 		this.setMaxListeners( 0 );
 
-		if ( ! ( request instanceof IncomingMessage ) || ! ( response instanceof ServerResponse ) )
-			throw new Error( 'Invalid parameters passed to EventRequest' );
-
 		const parsedUrl	= url.parse( request.url, true );
 		const list		= {},
 			rc			= request.headers.cookie;
@@ -50,15 +47,13 @@ class EventRequest extends EventEmitter
 		this.extra			= {};
 		this.params			= {};
 		this.block			= {};
-		this.errorHandler	= new ErrorHandler();
+		this.errorHandler	= null;
 
 		// We do this so we can pass the event.next function by reference
 		const self			= this;
 		this.next			= ( ...args )=>{
 			self._next.apply( self, args );
 		};
-
-		this.setResponseHeader( X_POWERED_BY_HEADER, X_POWERED_BY_HEADER_VALUE );
 	}
 
 	/**
@@ -421,7 +416,7 @@ class EventRequest extends EventEmitter
 	 */
 	sendError( ...args )
 	{
-		if ( typeof this.errorHandler.handleError !== 'function' )
+		if ( this.errorHandler === null || typeof this.errorHandler === 'undefined' || typeof this.errorHandler.handleError !== 'function' )
 			this.errorHandler	= new ErrorHandler();
 
 		args.unshift( this );

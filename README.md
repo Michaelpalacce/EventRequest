@@ -835,36 +835,12 @@ app.listen( '80',()=>{
 ***
 ####Events emitted by the server
 
-**addRoute ( mixed route )**  
-- When a new route is being added
-
-**eventRequestResolved ( EventRequest eventRequest, IncomingMessage request, ServerResponse response )**  
-- When the event request is first created
-
-**eventRequestRequestClosed( EventRequest eventRequest, IncomingMessage request )** 
-- When the request gets closed
-
-**eventRequestResponseFinish( EventRequest eventRequest, ServerResponse response )** 
-- When the response is finished
-
-**eventRequestResponseError ( EventRequest eventRequest, ServerResponse response, Error error )** 
-- When there is an error with the response
-
-**eventRequestBlockSetting( EventRequest eventRequest, Array block )** 
-- called when the block is retrieved from the router
-
-**eventRequestBlockSet( EventRequest eventRequest, Array block )** 
-- called when the block is set in the eventRequest
-
-**eventRequestError( EventRequest eventRequest, Error error )** 
-- called when there is an error event emitted by the eventRequest
-
-**eventRequestThrow( EventRequest eventRequest, Error error )** 
-- called when an error is thrown from the eventRequest
+**NONE**  
 
 ***
 ***
 ***
+
 # Logging
 
 - Logging is done by using the Loggur class mainly. 

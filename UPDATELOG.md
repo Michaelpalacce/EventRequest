@@ -1,3 +1,9 @@
+25.0.0
+- Removed X-Powered-By header
+- Removed a check in the event request constructor for the request and the response
+- Removed creation of the Error Handler in the constructor ( now it is created when it is needed, you can still pass a custom one )
+- Removed all events dispatched by the server
+
 24.0.1
 - Documentation Updates
 

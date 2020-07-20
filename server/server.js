@@ -206,11 +206,8 @@ class Server extends EventEmitter
 	{
 		return ( request, response )=>{
 			let eventRequest	= new EventRequest( request, response );
-			this.emit( 'eventRequestResolved', { eventRequest, request, response  } );
 
 			request.on( 'close', ()=> {
-				this.emit( 'eventRequestRequestClosed', { eventRequest, request } );
-
 				if ( eventRequest != null )
 				{
 					eventRequest._cleanUp();
@@ -219,8 +216,6 @@ class Server extends EventEmitter
 			});
 
 			response.on( 'finish', () => {
-				this.emit( 'eventRequestResponseFinish', { eventRequest, response } );
-
 				if ( eventRequest != null )
 				{
 					eventRequest._cleanUp();
@@ -229,8 +224,6 @@ class Server extends EventEmitter
 			});
 
 			response.on( 'error', ( error ) => {
-				this.emit( 'eventRequestResponseError', { eventRequest, response, error } );
-
 				if ( eventRequest != null )
 				{
 					eventRequest.next( error );
@@ -241,13 +234,10 @@ class Server extends EventEmitter
 			try
 			{
 				let block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
-				this.emit( 'eventRequestBlockSetting', { eventRequest, block } );
+
 				eventRequest._setBlock( block );
-				this.emit( 'eventRequestBlockSet', { eventRequest, block } );
 
 				const onErrorCallback	= ( error ) =>{
-					this.emit( 'eventRequestError', { eventRequest, error } );
-
 					if ( eventRequest.logger === null )
 						Loggur.log( error, LOG_LEVELS.error );
 				};
@@ -259,8 +249,6 @@ class Server extends EventEmitter
 			}
 			catch ( error )
 			{
-				this.emit( 'eventRequestThrow', { eventRequest, error } );
-
 				if ( ! eventRequest.isFinished() )
 					eventRequest.next( error );
 			}

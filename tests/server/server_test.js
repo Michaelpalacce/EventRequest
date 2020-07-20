@@ -3432,14 +3432,13 @@ test({
 });
 
 test({
-	message	: 'Server.testServerAddsXPoweredBy',
+	message	: 'Server.testServerAddsXPoweredBy.does.not.anymore',
 	test	: ( done )=>{
 		app.get( '/textServerAddsXPoweredBy', event => event.send( 'ok' ) );
 
 		helpers.sendServerRequest( `/textServerAddsXPoweredBy` ).then( ( response )=>{
 			assert.equal( response.body.toString(), 'ok' );
-			assert.equal( typeof response.headers['x-powered-by'] !== 'undefined', true );
-			assert.equal( response.headers['x-powered-by'], 'ER' );
+			assert.equal( typeof response.headers['x-powered-by'] === 'undefined', true );
 
 			done();
 		} ).catch( done );
