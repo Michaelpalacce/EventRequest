@@ -1,3 +1,6 @@
+25.0.1
+- Added Benchmarks link
+
 25.0.0
 - Removed X-Powered-By header
 - Removed a check in the event request constructor for the request and the response
