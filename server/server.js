@@ -27,6 +27,7 @@ class Server extends EventEmitter
 		this.pluginManager	= PluginManager;
 		this.pluginBag		= {};
 		this.router			= this.Router();
+		this.Loggur			= Loggur;
 
 		this.setUpDefaultPlugins();
 	}

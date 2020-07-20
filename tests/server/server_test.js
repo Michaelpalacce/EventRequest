@@ -2209,6 +2209,8 @@ test({
 
 		const app		= new Server();
 
+		assert.deepStrictEqual( app.Loggur, Loggur );
+
 		app.apply( app.er_logger, { logger, attachToProcess: true } );
 
 		app.get( `/${name}`, ( event )=>{

@@ -9,7 +9,6 @@ A highly customizable backend server in NodeJs
 ~~~javascript
 // Framework Singleton instance
 const app = require( 'event_request' )();
-const { Loggur } = require( 'event_request' );
 
 // Add a new Route
 app.get( '/', ( event ) => {
@@ -18,7 +17,7 @@ app.get( '/', ( event ) => {
 
 // Start Listening
 app.listen( 80, ()=>{
- Loggur.log( 'Server started' );
+ app.Loggur.log( 'Server started' );
 });
 ~~~
 
@@ -34,15 +33,15 @@ const app = App();
 
 # Multiple Servers Setup:
 ~~~javascript
-const { Server, Loggur } = require( 'event_request' );
+const { App, Loggur } = require( 'event_request' );
 
 /**
  * @brief    Instantiate the server
  */
-// With this setup you'll have to work only with the variables appOne and appTwo. You cannot call Server() to get any of them in different parts of the project
+// With this setup you'll have to work only with the variables appOne and appTwo. You cannot call App() to get any of them in different parts of the project
 // This can be remedied a bit by creating routers in different controllers and then exporting them to be later on added 
-const appOne = new Server();
-const appTwo = new Server();
+const appOne = new App();
+const appTwo = new App();
 
 // Add a new Route
 appOne.get( '/', ( event ) => {
@@ -65,21 +64,21 @@ appTwo.listen( 3335, ()=>{
 # Custom http Server setup:
 ~~~javascript
 const http = require( 'http' );
-const { App, Loggur } = require( 'event_request' );
-const app = http.createServer( App().attach() );
+const app = require( 'event_request' )();
+const server = http.createServer( app.attach() );
 
 // No problem adding routes like this
-Server().get( '/',( event )=>{
-    event.send( 'ok' );
-} );
+App().get( '/',( event )=>{
+	event.send( 'ok' );
+});
 
 // OR like this
 app.get( '/test',( event )=>{
-    event.send( 'ok' );
-} );
+	event.send( 'ok' );
+});
 
-app.listen( '80',()=>{
-    Loggur.log( 'Server is up and running on port 80' )
+server.listen( '80',()=>{
+	app.Loggur.log( 'Server is up and running on port 80' )
 });
 ~~~
 
@@ -141,7 +140,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 
 #Plugins:
 - Plugins are parts of the server that attach functionality to the EventRequest
-- They can be retrieved from Server() ( look at the plugins section for more info )
+- They can be retrieved from App() ( look at the plugins section for more info )
 
 ***
 ***
@@ -405,7 +404,7 @@ App().add( router );
 const App = require( 'event_request' );
 
 // You can also get the router attached to the Server and use that directly
-const serverRouter = Server().router;
+const serverRouter = App().router;
 serverRouter.add(
     //
 );
@@ -864,6 +863,15 @@ The `Logging` Suite exported by the module contains the following:
 ## Default Logger:
 - The default logger is attached directly to the Loggur instance. it can be enabled or disabled by calling Loggur.enableDefault() or Loggur.disableDefault(). 
 - The default Logger has a log level of `300` and logs up until level `600` which is the debug level.
+
+## Retrieving the Loggur from the framework instance
+- You can also retrieve the Loggur directly form the framework instance by doing `app().Loggur`
+
+~~~javascript
+const app = require( 'event_request' )();
+
+app.Loggur.log( 'TEST' );
+~~~
 
 ***
 ***
@@ -1674,9 +1682,9 @@ The TestingTools export:
 ####Example:
 
 ~~~javascript
-const Server    = require( 'event_request' );
+const App    = require( 'event_request' );
 
-const app       = Server();
+const app       = App();
 app.add(( event )=>{
     event.sendError( 'Error', 500 ); // This will call the error Handler
     event.next( 'Error', 500 ); // This will call the error Handler
@@ -1975,8 +1983,8 @@ Server {
 - Generally all the integrated plug-ins begin with `er_`
 
 ~~~javascript
-const Server    = require( 'event_request' );
-const app   = Server();
+const App = require( 'event_request' );
+const app = App();
 
 const PluginManager    = app.getPluginManager();
 const timeoutPlugin    = PluginManager.getPlugin( 'er_timeout' );
@@ -2084,8 +2092,8 @@ The plugin Manager exports the following functions:
 ####Example:
 
 ~~~javascript
-const Server    = require( 'event_request' );
-const app   = Server();
+const App = require( 'event_request' );
+const app = App();
 
 app.apply( 'er_timeout', { timeout: 10000 } );
 
@@ -2149,8 +2157,8 @@ app.apply( timeoutPlugin );
 ####Example:
 
 ~~~javascript
-const Server    = require( 'event_request' );
-const app   = Server();
+const App = require( 'event_request' );
+const app = App();
 
 app.apply( app.er_static_resources, { paths : ['public'] } );
 
@@ -2221,8 +2229,8 @@ app.apply( staticResourcesPlugin );
 
 - You can add the plugin like:
 ~~~javascript
-const Server    = require( 'event_request' );
-const app   = Server();
+const App = require( 'event_request' );
+const app = App();
 
 app.apply( 'er_data_server' );
 
@@ -3423,19 +3431,20 @@ the request will be immediately canceled
 /**
  * @brief    Instantiate the server
  */
-const app                = require( 'event_request' )();
-const { Server }        = require( 'event_request' );
-const RateLimitsPlugin    = require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
-const DataServer        = require( 'event_request/server/components/caching/data_server' );
+const app = require( 'event_request' )();
 
 app.apply( app.er_rate_limits );
 
 // If you implement a custom distributed DataServer you can sync between servers
 // Two servers
-const dataStore    = new DataServer( { persist: false, ttl: 90000 } );
 
-const appOne    = new Server();
-const appTwo    = new Server();
+const { App } = require( 'event_request' );
+const RateLimitsPlugin = require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
+const DataServer = require( 'event_request/server/components/caching/data_server' );
+const dataStore = new DataServer( { persist: false, ttl: 90000 } );
+
+const appOne = new App();
+const appTwo = new App();
 
 appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
@@ -3490,10 +3499,7 @@ app.get( '/testRouteTwo', [
 /**
  * @brief    Instantiate the server
  */
-const app                = require( 'event_request' )();
-const { Server }        = require( 'event_request' );
-const RateLimitsPlugin    = require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
-const DataServer        = require( 'event_request/server/components/caching/data_server' );
+const app = require( 'event_request' )();
 
 const rules = [
   {
@@ -3523,16 +3529,6 @@ const rules = [
 ];
 
 app.apply( app.er_rate_limits, { rules } );
-
-// If you implement a custom distributed DataServer you can sync between servers
-// Two servers
-const dataStore    = new DataServer( { persist: false, ttl: 90000 } );
-
-const appOne    = new Server();
-const appTwo    = new Server();
-
-appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
-appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 ~~~
 
 ***

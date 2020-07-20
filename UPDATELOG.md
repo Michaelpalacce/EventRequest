@@ -1,3 +1,7 @@
+25.1.0
+- Added Loggur to the server ( app.Loggur )
+- Fixed a lot of documentation examples
+
 25.0.1
 - Added Benchmarks link
 
