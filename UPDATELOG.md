@@ -1,3 +1,6 @@
+25.1.1
+- Documentation fixes
+
 25.1.0
 - Added Loggur to the server ( app.Loggur )
 - Fixed a lot of documentation examples

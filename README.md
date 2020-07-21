@@ -35,9 +35,6 @@ const app = App();
 ~~~javascript
 const { App, Loggur } = require( 'event_request' );
 
-/**
- * @brief    Instantiate the server
- */
 // With this setup you'll have to work only with the variables appOne and appTwo. You cannot call App() to get any of them in different parts of the project
 // This can be remedied a bit by creating routers in different controllers and then exporting them to be later on added 
 const appOne = new App();
@@ -55,10 +52,10 @@ appTwo.get( '/', ( event ) => {
 
 appOne.listen( 3334, ()=>{
     Loggur.log( 'Server one started at port: 3334' );
-} );
+});
 appTwo.listen( 3335, ()=>{
     Loggur.log( 'Server two started at port: 3335' );
-} );
+});
 ~~~
 
 # Custom http Server setup:
@@ -220,12 +217,12 @@ app.get( ( event )=>{
 app.get( 'default', ( event )=>{
     Loggur.log( 'After hitting the default global middleware' );
     event.next();
-} );
+});
 
 app.get( ['default', 'defaultTwo'], ( event )=>{
     Loggur.log( 'After hitting the default global middleware with an ARRAY!' );
     event.next();
-} );
+});
 
 app.get( '/', ( event )=>{
     event.send( '<h1>Hello World!</h1>');
@@ -455,7 +452,7 @@ App().get( '/todos/:id:', ( event)=>{
 - You can `define` middlewares in any router or the server. Middlewares will be merged if you add a router to another router.
 - These global middlewares can be used to call a function before another step in the chain.You can add multiple middlewares per route.
  
- - Dynamic middlewares will accept the same parameters as Global Middlewares
+- Dynamic middlewares will accept the same parameters as Global Middlewares
  
 - When adding global middlewares to routes they can either be a single string or multiple strings in an array.
 - When adding Dynamic Middlewares to routes they can either be a single function or multiple functions in an array.
@@ -464,8 +461,7 @@ App().get( '/todos/:id:', ( event)=>{
 - Due to global middlewares being before the handler if you want to add a global middleware by calling get/post/etc then the first parameter CANNOT be a string. That will be interpreted as a route
 
 ~~~javascript
-const { App, Loggur } = require( 'event_request' );
-
+const App = require( 'event_request' );
 const router = App().Router();
 
 router.define( 'test', ( event )=>{
@@ -481,7 +477,7 @@ const setHeader = ( key, value )=>{
 }
 
 App().define( 'test2', ( event )=>{
-    Loggur.log( 'Middleware Two!' );
+    App().Loggur.log( 'Middleware Two!' );
     event.next();
 });
 
@@ -524,7 +520,7 @@ App().add({
     method: 'GET',
     middlewares: 'test',
     handler: ( event )=>{
-        Loggur.log( 'Test!' );
+        App().Loggur.log( 'Test!' );
         event.send( 'Test2' );
     }
 });
@@ -534,7 +530,7 @@ App().add({
     method: 'GET',
     middlewares: ['test'],
     handler: ( event )=>{
-        Loggur.log( 'Test!' );
+        App().Loggur.log( 'Test!' );
         event.send( 'Test2' );
     }
 });
@@ -544,7 +540,7 @@ App().add({
     method: 'GET',
     middlewares: ['test', setHeader( 'value', 'key' )],
     handler: ( event )=>{
-        Loggur.log( 'Test!' );
+        App().Loggur.log( 'Test!' );
         event.send( 'Test2' );
     }
 });
@@ -552,7 +548,7 @@ App().add({
 App().add( router );
 
 App().listen( 80, ()=>{
-    Loggur.log( 'Server started' );
+    App().Loggur.log( 'Server started' );
 });
 ~~~
 
@@ -1047,12 +1043,12 @@ Loggur.addLogger( 'logger_id', logger );
 **logColors: Object** 
 - The colors to use 
 - Defaults to
-    - [LOG_LEVELS.error]    : 'red',
-    - [LOG_LEVELS.warning]    : 'yellow',
-    - [LOG_LEVELS.notice]    : 'green',
-    - [LOG_LEVELS.info]        : 'blue',
-    - [LOG_LEVELS.verbose]    : 'cyan',
-    - [LOG_LEVELS.debug]    : 'white'
+    - [LOG_LEVELS.error]   : 'red',
+    - [LOG_LEVELS.warning] : 'yellow',
+    - [LOG_LEVELS.notice]  : 'green',
+    - [LOG_LEVELS.info]    : 'blue',
+    - [LOG_LEVELS.verbose] : 'cyan',
+    - [LOG_LEVELS.debug]   : 'white'
 
 ###File
 - Logs data to a file
@@ -1079,11 +1075,11 @@ Loggur.addLogger( 'logger_id', logger );
 - If it is not provided the transport will not log
 
 ~~~javascript
-const { Logging }                              = require( 'event_request' );
-const { Loggur, LOG_LEVELS, Console, File }    = Logging;
+const { Logging } = require( 'event_request' );
+const { Loggur, LOG_LEVELS, Console, File } = Logging;
 
 // Create a custom Logger
-const logger    = Loggur.createLogger({
+const logger = Loggur.createLogger({
     serverName    : 'Test', // The name of the logger
     logLevel    : LOG_LEVELS.debug, // The logLevel for which the logger should be fired
     capture        : false, // Do not capture thrown errors
@@ -1122,7 +1118,7 @@ const logger    = Loggur.createLogger({
 The validation is done by using:
 
 ~~~javascript
-    const objectToValidate  = { username: 'user@test.com', password: 'pass' };
+    const objectToValidate = { username: 'user@test.com', password: 'pass' };
 
     event.validate( 
         objectToValidate, 
@@ -1252,7 +1248,7 @@ When validation is done a ValidationResult is returned. It has 2 methods:
     hasValidationFailed that returns a boolean whether there is an error
 
 ~~~javascript
-     const result    = event.validation.validate(
+     const result = event.validation.validate(
         event.body,
         { 
             username : 'filled||string||range:6-32',
@@ -1285,7 +1281,7 @@ The extra if not passed will default to 'def'
 - The $rules must be optional otherwise validation will fail
 - In case where the parameters have NOT been passed, the default value will be used.
 ~~~javascript
-     const result    = event.validation.validate(
+     const result = event.validation.validate(
         event.body,
         { 
             username : { $rules: 'optional||string', $default: 'root' }, 
@@ -1420,14 +1416,14 @@ This class can be used to limit data in one way or another.
 ####Example:
 
 ~~~javascript
-     const LeakyBucket  = require( 'event_request/server/components/rate_limiter/bucket' );
+     const LeakyBucket = require( 'event_request/server/components/rate_limiter/bucket' );
 ~~~
 
 # Testing
 If you need to test your project, then you can use the Testing tools included in the project.
 
 ~~~javascript
-     const { Testing }  = require( 'event_request' );
+     const { Testing } = require( 'event_request' );
 ~~~
 
 #### Accepted CLI arguments
@@ -1453,13 +1449,14 @@ If you need to test your project, then you can use the Testing tools included in
 The testing tools include a mocker. The mocker class can be retrieved with:
 
 ~~~javascript
-     const { Mock }    = Testing;
+     const { Mock } = Testing;
 ~~~
 The exported Mock is a Function that should be used directly on the constructor of the class you want to mock. For example:
 
 ~~~javascript
-     class Test { mockThis(){} };  
-     const MockedTest    = Mock( Test );  
+     class Test { mockThis(){} }; 
+ 
+     const MockedTest = Mock( Test );  
 ~~~
 
 This will return the same class but with an extra _mock function added directly to it so make sure your original class does NOT
@@ -1467,7 +1464,7 @@ have a _mock function otherwise it will be overwritten. From here you can use th
 that is attached to the 'Test' class:
 
 ~~~javascript
-     const testDouble    = new MockedTest();  
+     const testDouble = new MockedTest();  
        testDouble._mock({  
        method        : 'mockThis',  
        shouldReturn  : ''  
@@ -1478,7 +1475,7 @@ Note: As you can see when you mock a class you MUST specify what it should retur
 on what should be returned on consecutive calls to this method like so :
 
 ~~~javascript
-     const testDouble    = new MockedTest();  
+     const testDouble = new MockedTest();  
        testDouble._mock({  
        method              : 'mockThis',  
        onConsecutiveCalls  : ['first', 'secondAndOnwards']  
@@ -1495,7 +1492,7 @@ When making a mock of a class you can specify the MAX amount of times an object 
 an async approach and relies heavily on callbacks, a minimum cannot be set.
 
 ~~~javascript
-     const testDouble    = new MockedTest();  
+     const testDouble = new MockedTest();  
         testDouble._mock({  
         method        : 'mockThis',  
         shouldReturn  : '',  
@@ -1507,7 +1504,7 @@ This way if the method mockThis is called more than once an error will be thrown
 
 You can also Specify the arguments that should be provided to the mocked method like so:
 ~~~javascript
-     const testDouble    = new MockedTest();  
+     const testDouble = new MockedTest();  
        testDouble._mock({  
        method        : 'mockThis',  
        shouldReturn  : '',  
@@ -1528,7 +1525,7 @@ If you do not want the mocker to check one of the arguments, then undefined shou
 If you wan an environment to run your tests then you can use the test and runAllTests provided by the testing tools:
 
 ~~~javascript
-     const { test, runAllTests }    = TestingTools;
+     const { test, runAllTests } = TestingTools;
 ~~~
 
 The 'runAllTests' function accepts an object that accepts the following options:
@@ -1682,9 +1679,9 @@ The TestingTools export:
 ####Example:
 
 ~~~javascript
-const App    = require( 'event_request' );
+const App = require( 'event_request' );
 
-const app       = App();
+const app = App();
 app.add(( event )=>{
     event.sendError( 'Error', 500 ); // This will call the error Handler
     event.next( 'Error', 500 ); // This will call the error Handler
@@ -1721,7 +1718,7 @@ app.listen( 80 );
 - If you want to add a custom BodyParser you can do:
 
 ~~~javascript
-const BodyParserPlugin    = require( 'event_request/server/plugins/available_plugins/body_parser_plugin' );
+const BodyParserPlugin = require( 'event_request/server/plugins/available_plugins/body_parser_plugin' );
 
 class CustomBodyParser
 {
@@ -2246,12 +2243,8 @@ app.apply( app.er_data_server, { dataServerOptions: { persist: false, ttl: 200, 
 
 - The plugin can be used like:
 ~~~javascript
-const { Loggur }    = require( 'event_request' );
-
-/**
- * @brief    Instantiate the server
- */
-const app            = require( 'event_request' )();
+const { Loggur, App } = require( 'event_request' );
+const app = App();
  
 app.apply( app.er_data_server, { persist: false } );
  
@@ -2363,12 +2356,8 @@ app.listen( 80, ()=>{
 
 - You can use the session like this:
 ~~~javascript
-const { Loggur }    = require( 'event_request' );
-
-/**
- * @brief    Instantiate the server
- */
-const app            = require( 'event_request' )();
+const { Loggur, App } = require( 'event_request' );
+const app = App();
 
 // Initialize the session
 app.add( async ( event )=>{
@@ -2480,10 +2469,7 @@ app.listen( 80, ()=>{
 ####Example:
 
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app    = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 app.apply( app.er_templating_engine, { templateDir: path.join( __dirname, './public' ) } );
 
@@ -2571,13 +2557,10 @@ router.get( '/preview', ( event ) => {
 ####Example:
 
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app            = require( 'event_request' )();
+const app = require( 'event_request' )();
 
-const PluginManager        = app.getPluginManager();
-const fileStreamPlugin    = PluginManager.getPlugin( 'er_file_stream' );
+const PluginManager = app.getPluginManager();
+const fileStreamPlugin = PluginManager.getPlugin( 'er_file_stream' );
 app.apply( fileStreamPlugin );
 
 // OR
@@ -2590,11 +2573,7 @@ app.apply( 'er_file_stream' );
 - Example of streaming data:
 ~~~javascript
 const fs = require( 'fs' );
-
-/**
- * @brief    Instantiate the server
- */
-const app    = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 app.get( '/data', ( event ) =>{
         const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
@@ -2680,13 +2659,10 @@ app.get( '/dataTwo', ( event ) =>{
 ####Example:
 
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app            = require( 'event_request' )();
+const app = require( 'event_request' )();
 
-const PluginManager    = app.getPluginManager();
-const loggerPlugin    = PluginManager.getPlugin( 'er_logger' );
+const PluginManager = app.getPluginManager();
+const loggerPlugin = PluginManager.getPlugin( 'er_logger' );
 app.apply( loggerPlugin );
 
 //OR
@@ -2793,10 +2769,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 ####Example:
 
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app            = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 // Add Body Parsers
 app.apply( app.er_body_parser_json );
@@ -2864,22 +2837,19 @@ Middleware: **cache.request**
 ####Example:
 
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app            = require( 'event_request' )();
+const app = require( 'event_request' )();
 
-const PluginManager        = app.getPluginManager();
-const cacheServer        = PluginManager.getPlugin( app.er_data_server );
+const PluginManager = app.getPluginManager();
+const cacheServer = PluginManager.getPlugin( app.er_data_server );
 
 app.apply( cacheServer );
 app.apply( PluginManager.getPlugin( app.er_response_cache ) );
 
 // call event.cacheCurrentRequest() where you want to cache.
 app.add({
-    route    : '/',
-    method    : 'GET',
-    handler    : ( event )=>{
+    route : '/',
+    method : 'GET',
+    handler : ( event )=>{
         event.cacheCurrentRequest();
     }
 });
@@ -2956,10 +2926,7 @@ app.get( '/', 'cache.request', ( event )=>
 ####Example:
 
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app    = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 app.apply( 'er_env' );
 app.add(( event )=>{
@@ -3023,10 +2990,7 @@ app.listen( 80 );
 ####Example:
 
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app    = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 app.apply( app.er_body_parser_multipart );
 
@@ -3043,10 +3007,7 @@ app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
 
 - Passing a custom failure callback
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app    = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 app.apply( app.er_body_parser_multipart );
 
@@ -3071,10 +3032,7 @@ app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
 
 - When passing a default one and a custom one, the custom one will be used
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app    = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 // You have to apply the validation plugin
 app.apply(
@@ -3122,9 +3080,6 @@ app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
 
 - When passing a default one if no failure callback is provided then the default one will be used
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
 const app    = require( 'event_request' )();
 app.apply(
     app.er_validation,
@@ -3244,10 +3199,7 @@ const defaults = {
 ####Example:
 
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app    = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 app.apply( app.er_cors, {
 	origin: 'http://example.com',
@@ -3428,9 +3380,6 @@ the request will be immediately canceled
 ~~~
 
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
 const app = require( 'event_request' )();
 
 app.apply( app.er_rate_limits );
@@ -3452,9 +3401,6 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 
 - Using the global middleware
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
 const app                = require( 'event_request' )();
 
 const rule			= {
@@ -3922,10 +3868,7 @@ app.apply( app.er_rate_limits, { rules } );
 
 - Apply the plugin with defaults
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app            = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 // It's a good idea to do this first before attaching any other plugins or adding routes
 app.apply( app.er_security );
@@ -3950,10 +3893,7 @@ app.add(( event )=>{
 
 - Apply the plugin with custom directives
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
-const app    = require( 'event_request' )();
+const app = require( 'event_request' )();
 
 app.apply( app.er_security, {
     csp    : {
@@ -3980,10 +3920,6 @@ app.apply( app.er_security, {
 
 - Apply the plugin with a lot of different commands later, as well as rebuilding
 ~~~javascript
-
-/**
- * @brief    Instantiate the server
- */
 const app = require( 'event_request' )();
 app.apply( app.er_security, { csp : { xss: false } } );
 
