@@ -13,7 +13,7 @@ class ResponseCachePlugin extends PluginInterface
 	constructor( id, options = {} )
 	{
 		super( id, options );
-		this.cachingServer	= null;
+		this.dataServer	= null;
 	}
 
 	/**
@@ -35,7 +35,7 @@ class ResponseCachePlugin extends PluginInterface
 	 */
 	setServerOnRuntime( server )
 	{
-		this.cachingServer	= server.getPlugin( 'er_data_server' ).getServer();
+		this.dataServer	= server.getPlugin( 'er_data_server' ).getServer();
 
 		server.define( 'cache.request', ( event )=>{
 			event.cacheCurrentRequest();
@@ -62,7 +62,7 @@ class ResponseCachePlugin extends PluginInterface
 				const ttl			= this.getTimeToLive( event );
 				const recordName	= this.getCacheId( event );
 
-				await this.cachingServer.set( recordName, { response, code, headers }, ttl, { persist: false } );
+				await this.dataServer.set( recordName, { response, code, headers }, ttl, { persist: false } );
 			}
 		} );
 	}
@@ -125,7 +125,7 @@ class ResponseCachePlugin extends PluginInterface
 				event.cacheCurrentRequest	= async ( options = {} )=>{
 					event.currentResponseCacheConfig	= options;
 					const cacheId						= this.getCacheId( event );
-					const cachedDataSet					= await this.cachingServer.get( cacheId );
+					const cachedDataSet					= await this.dataServer.get( cacheId );
 
 					if ( cachedDataSet === null )
 					{
@@ -135,10 +135,10 @@ class ResponseCachePlugin extends PluginInterface
 					else
 					{
 						const ttl		= this.getTimeToLive( event );
-						const status	= await this.cachingServer.touch( cacheId, ttl );
+						const status	= await this.dataServer.touch( cacheId, ttl );
 
 						if ( ! status )
-							await this.cachingServer.set( cacheId, cachedDataSet, ttl, { persist: false } );
+							await this.dataServer.set( cacheId, cachedDataSet, ttl, { persist: false } );
 
 						const { response, code, headers }	= cachedDataSet;
 						const headersKeys					= Object.keys( headers );

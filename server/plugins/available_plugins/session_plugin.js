@@ -34,7 +34,7 @@ class SessionPlugin extends PluginInterface
 	 */
 	setServerOnRuntime( server )
 	{
-		this.cachingServer	= server.getPlugin( 'er_data_server' ).getServer();
+		this.dataServer	= server.getPlugin( 'er_data_server' ).getServer();
 	}
 
 	/**

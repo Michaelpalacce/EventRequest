@@ -8,7 +8,7 @@ const fs											= require( 'fs' );
 const path											= require( 'path' );
 const { Loggur }									= require( './../server/components/logger/loggur' );
 const MockLoggur									= Mock( Loggur.constructor );
-const { server, cachingServer }						= require( './test_bootstrap' );
+const { server, dataServer }						= require( './test_bootstrap' );
 let { IncomingMessage, ServerResponse, request }	= require( 'http' );
 
 ServerResponse	= Mock( ServerResponse );
@@ -30,8 +30,8 @@ helpers.getServer	= ()=>{
  *
  * @return	Server
  */
-helpers.getCachingServer	= ()=>{
-	return cachingServer;
+helpers.getDataServer	= ()=>{
+	return dataServer;
 };
 
 /**

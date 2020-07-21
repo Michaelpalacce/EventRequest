@@ -1812,9 +1812,7 @@ The 'runAllTests' function accepts an object that accepts the following options:
        test        : ( done, first, second ) =>{  
           console.log( first ); //this will log 'first', then on the second iterration 'firstTwo'
           console.log( second ); //this will log 2, then on the second iterration 21
-          let one = 1;  
-
-         one === 1 ? done() : done( 'One does not equal to one what are you doing?!' );  
+          done()
        }  
      });  
 ~~~
@@ -1904,9 +1902,11 @@ const App = require( 'event_request' );
 
 const app = App();
 app.add(( event )=>{
-    event.sendError( 'Error', 500 ); // This will call the error Handler
-    event.next( 'Error', 500 ); // This will call the error Handler
-    event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
+	event.sendError( 'Error', 500 ); // This will call the error Handler
+
+	// event.next( 'Error', 500 ); // This will call the error Handler
+
+	// event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
 });
 app.listen( 80 );
 ~~~
@@ -1929,10 +1929,10 @@ app.listen( 80 );
 - It must return a Boolean
 - If a parser returns that it supports the given request, no further body parsers will be called
 
-**parse( EventRequest event ): Promise: body**
+**parse( EventRequest event ): Promise: Object**
 - Returns a promise
 - This is called only if the body parser is supported.
-- It resolves with a body that is then attached to event.body or rejects with an error
+- It must resolve with an object containing two parameters: { body : {}, rawBody: * } 
 
 #### Examples
 
@@ -1958,7 +1958,6 @@ const plugin    = new BodyParserPlugin( CustomBodyParser, 'custom_body_parser', 
 ***
 
 # DataServer
-- DataServer is a class that is exported through the Server.Development suite that stores data **IN MEMORY**
 - Is an EventEmitter
 - Can be extended
 
@@ -2204,16 +2203,28 @@ Server {
 const App = require( 'event_request' );
 const app = App();
 
-const PluginManager    = app.getPluginManager();
-const timeoutPlugin    = PluginManager.getPlugin( 'er_timeout' );
+const PluginManager = app.getPluginManager();
+const timeoutPlugin = PluginManager.getPlugin( 'er_timeout' );
 
-timeoutPlugin.setOptions( { timeout : 10 * 1000 } );
+timeoutPlugin.setOptions( { timeout : 5 * 1000 } );
 app.apply( timeoutPlugin );
-app.apply( timeoutPlugin, {  timeout : 10 * 1000 } );// This will accomplish the same thing as the rows above
-app.apply( 'er_timeout' ); // This is also valid.
-app.apply( 'er_timeout', {  timeout : 10 * 1000 } ); // This is also valid.
-app.apply( app.er_timeout ); // This is also valid.
-app.apply( app.er_timeout, {  timeout : 10 * 1000 } ); // This is also valid.
+
+// app.er_timeout.setOptions( { timeout : 5 * 1000 } );
+// app.apply( app.er_timeout );
+
+// app.apply( timeoutPlugin, {  timeout : 5 * 1000 } );// This will accomplish the same thing as the rows above
+//
+// app.apply( 'er_timeout' ); // This is also valid.
+// app.apply( 'er_timeout', {  timeout : 5 * 1000 } ); // This is also valid.
+//
+// app.apply( app.er_timeout ); // This is also valid.
+// app.apply( app.er_timeout, {  timeout : 5 * 1000 } ); // This is also valid.
+
+app.get('/',()=>{});
+
+app.listen( 80, ()=>{
+	app.Loggur.log( 'Try opening http://localhost and wait for 5 seconds' )
+} );
 ~~~
 
 ***
@@ -2279,8 +2290,21 @@ The plugin Manager exports the following functions:
 ***
 ####Accepted Options:
 
-**timeout**
+**timeout: Number**
 - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds or 60000 milliseconds
+
+**callback: Function**
+- The callback that should be called in case the timeout is reached.
+- The callback must accept the event request as the first parameter
+- Defaults to:
+
+~~~javascript
+function callback( event )
+{
+	event.next( `Request timed out in: ${this.timeout/1000} seconds`, 503 );
+}
+~~~
+
 
 ***
 ####Events:
@@ -2313,20 +2337,34 @@ The plugin Manager exports the following functions:
 const App = require( 'event_request' );
 const app = App();
 
-app.apply( 'er_timeout', { timeout: 10000 } );
+const PluginManager = app.getPluginManager();
+const timeoutPlugin = PluginManager.getPlugin( 'er_timeout' );
 
-// OR
-app.apply( 'er_timeout' );
+// timeoutPlugin.setOptions( { timeout : 2 * 1000 } );
+// app.apply( timeoutPlugin );
 
-// OR
-app.apply( app.er_timeout );
+// app.er_timeout.setOptions( { timeout : 2 * 1000 } );
+// app.apply( app.er_timeout );
 
-// OR
-const PluginManager    = app.getPluginManager();
-const timeoutPlugin    = PluginManager.getPlugin( 'er_timeout' );
+// app.apply( timeoutPlugin, {  timeout : 2 * 1000 } );// This will accomplish the same thing as the rows above
+//
+// app.apply( 'er_timeout' ); // This is also valid.
+// app.apply( 'er_timeout', {  timeout : 2 * 1000 } ); // This is also valid.
+//
+// app.apply( app.er_timeout ); // This is also valid.
+// app.apply( app.er_timeout, {  timeout : 2 * 1000 } ); // This is also valid.
 
-timeoutPlugin.setOptions( { timeout : 10000 } ); // 10 seconds
-app.apply( timeoutPlugin );
+// This attaches a timeout of 2 seconds with a custom callback
+app.apply( app.er_timeout, { timeout: 2 * 1000, callback: ( event )=>{
+        event.send( 'You timed out!', 200 );
+    }
+});
+
+app.get('/',()=>{});
+
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Try opening http://localhost and wait for 2 seconds' )
+});
 ~~~
 
 ***
@@ -2378,23 +2416,30 @@ app.apply( timeoutPlugin );
 const App = require( 'event_request' );
 const app = App();
 
-app.apply( app.er_static_resources, { paths : ['public'] } );
+// This will serve everything in folder public and favicon.ico on the main folder
+app.apply( app.er_static_resources, { paths : ['public', 'favicon.ico'] } );
 
 //OR
-app.apply( 'er_static_resources', { paths : ['public'] } );
+// This will serve everything in folder public and favicon.ico on the main folder
+app.apply( 'er_static_resources', { paths : ['public', 'favicon.ico'] } );
 
 //OR
+// This will act according to the defaults
 app.apply( 'er_static_resources' );
 
 //OR
+// This will act according to the defaults
 app.apply( app.er_static_resources );
 
 //OR
 const PluginManager            = app.getPluginManager();
 const staticResourcesPlugin    = PluginManager.getPlugin( 'er_static_resources' );
 
+// This will serve everything in folder public and favicon.ico on the main folder
 staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
 app.apply( staticResourcesPlugin );
+
+app.listen( 80 );
 ~~~
 
 ***
@@ -2403,7 +2448,7 @@ app.apply( staticResourcesPlugin );
 
 #er_data_server
 - Adds a Caching Server using the DataServer provided in the constructor if any.
-- This plugin will add a DataServer to: `event.cachingServer` 
+- This plugin will add a DataServer to: `event.dataServer` 
 
 ***
 ####Dependencies:
@@ -2432,8 +2477,8 @@ app.apply( staticResourcesPlugin );
 ***
 ####Attached Functionality:
 
-**event.cachingServer: DataServer**
-- The caching server will be available to be used within the EventRequest after it has been applied in the middleware block
+**event.dataServer: DataServer**
+- The data server will be available to be used within the EventRequest after it has been applied in the middleware block
 - You can retrieve the DataServer from any other plugin after this one has been applied by doing: server.getPlugin( 'er_data_server' ).getServer()
 
 ***
@@ -2455,31 +2500,20 @@ app.apply( 'er_data_server' );
 // OR
 app.apply( app.er_data_server );
 
-// OR if you have made a child of the DataServer:
-app.apply( app.er_data_server, { dataServer: new CustomDataServer() } );
-
 // OR if you want to pass specific parameters to the default DataServer:
 app.apply( app.er_data_server, { dataServerOptions: { persist: false, ttl: 200, persistPath: '/root' } } );
-~~~
 
-- The plugin can be used like:
-~~~javascript
-const { Loggur, App } = require( 'event_request' );
-const app = App();
- 
-app.apply( app.er_data_server, { persist: false } );
- 
-// Add a new Route
-app.get( '/', ( event ) => {
-    event.cachingServer.set( 'key', 'value' );
+app.get( '/', async ( event )=>{
+	const value	= await event.dataServer.get( 'testKey' );
 
-    console.log( event.cachingServer.get( 'key' ) );
+	if ( value !== 'testValue' )
+		await event.dataServer.set( 'testKey', 'testValue' );
 
-    event.send( '<h1>Hello World!</h1>' );
+	event.send( value )
 });
- 
-app.listen( 80, ()=>{
-    Loggur.log( 'Server started' );
+
+app.listen( 80 , ()=>{
+	app.Loggur.log( 'Server started, try going to http://localhost twice!' );
 });
 ~~~
 
@@ -2580,50 +2614,64 @@ app.listen( 80, ()=>{
 const { Loggur, App } = require( 'event_request' );
 const app = App();
 
+app.apply( app.er_body_parser_json );
+app.apply( app.er_body_parser_form );
+app.apply( app.er_body_parser_multipart );
+app.apply( app.er_data_server );
+app.apply( app.er_session );
+
 // Initialize the session
 app.add( async ( event )=>{
-    event.initSession( event.next ).catch( event.next );
+	event.initSession( event.next ).catch( event.next );
 });
 
 // Redirect to login if authenticated is not true
 app.add(( event )=>{
-    if (
-        event.path !== '/login'
-        && ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
-    ) {
-        event.redirect( '/login' );
-        return;
-    }
+	if (
+		event.path !== '/login'
+		&& ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
+	) {
+		event.redirect( '/login' );
+		return;
+	}
 
-    event.next();
+	event.next();
 });
 
 app.post( '/login', async ( event )=>{
-    const result    = event.validation.validate( event.body, { username : 'filled||string', password : 'filled||string' } );
+	const result = event.validate( event.body, { username : 'filled||string', password : 'filled||string' } );
 
-    if ( result.hasValidationFailed() )
-    {
-        event.render( '/login' );
-        return;
-    }
+	if ( result.hasValidationFailed() )
+	{
+		event.redirect( '/login' );
+		return;
+	}
 
-    const { username, password }    = result.getValidationResult();
+	const { username, password } = result.getValidationResult();
 
-    if ( username === 'username' && password === 'password' )
-    {
-        event.session.add( 'username', username );
-        event.session.add( 'authenticated', true );
+	if ( username === 'username' && password === 'password' )
+	{
+		event.session.add( 'username', username );
+		event.session.add( 'authenticated', true );
 
-        event.redirect( '/' );
-    }
-    else
-    {
-        event.render( '/login' );
-    }
+		event.redirect( '/' );
+	}
+	else
+	{
+		event.redirect( '/login' );
+	}
+});
+
+app.get( '/login', ( event )=>{
+	event.send( 'Try to post to /login with { username: "username", password: "password" } in the body. Make sure to send the cookie you get back!' );
+})
+
+app.get( '/',( event )=>{
+	event.send( 'LOGGED IN!' );
 });
 
 app.listen( 80, ()=>{
-    Loggur.log( 'Server started' );
+	Loggur.log( 'Server started' );
 });
 ~~~
 
@@ -2634,6 +2682,7 @@ app.listen( 80, ()=>{
 #er_templating_engine
 - Adds a templating engine to the event request ( the default templating engine is used just to render static HTML )
 - If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
+- Use this ONLY if you want to serve static data or when testing
 
 ***
 ####Dependencies:
@@ -2750,7 +2799,7 @@ router.get( '/preview', ( event ) => {
 ####Events:
 
 **stream_start ( FileStream stream )**
-- Emitted when the stream is successfully started
+- Emitted when the stream is started successfully
 
 ***
 ####EventRequest Attached Functions
@@ -2796,37 +2845,43 @@ app.apply( 'er_file_stream' );
 const fs = require( 'fs' );
 const app = require( 'event_request' )();
 
-app.get( '/data', ( event ) =>{
-        const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
-        const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
+app.apply( app.er_file_stream );
 
-        if ( ! file || ! fs.existsSync( file ) )
-        {
-            event.next( 'File does not exist' );
-        }
-        else
-        {
-            // You can use this if you want to maybe pipe the file stream to a transformation stream or in general
-            // do something else than piping it to the event.response
-            event.getFileStream( file ).pipe( event.response );
-        }
-    }
+app.get( '/data', ( event ) =>{
+		const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
+		const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
+
+		if ( ! file || ! fs.existsSync( file ) )
+		{
+			event.next( 'File does not exist' );
+		}
+		else
+		{
+			// You can use this if you want to maybe pipe the file stream to a transformation stream or in general
+			// do something else than piping it to the event.response
+			event.getFileStream( file ).pipe( event.response );
+		}
+	}
 );
 
 app.get( '/dataTwo', ( event ) =>{
-        const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
-        const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
+		const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
+		const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
 
-        if ( ! file || ! fs.existsSync( file ) )
-        {
-            event.next( 'File does not exist' );
-        }
-        else
-        {
-            event.streamFile( file );
-        }
-    }
+		if ( ! file || ! fs.existsSync( file ) )
+		{
+			event.next( 'File does not exist' );
+		}
+		else
+		{
+			event.streamFile( file );
+		}
+	}
 );
+
+app.listen( '80', ()=>{
+	app.Loggur.log( 'Try hitting http://localhost/data?file={someFileInTheCurrentProjectRoot}' );
+});
 ~~~
 
 ***
@@ -3060,47 +3115,97 @@ Middleware: **cache.request**
 ~~~javascript
 const app = require( 'event_request' )();
 
-const PluginManager = app.getPluginManager();
-const cacheServer = PluginManager.getPlugin( app.er_data_server );
+app.apply( app.er_data_server );
+app.apply( app.er_response_cache );
 
-app.apply( cacheServer );
-app.apply( PluginManager.getPlugin( app.er_response_cache ) );
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // call event.cacheCurrentRequest() where you want to cache.
 app.add({
-    route : '/',
-    method : 'GET',
-    handler : ( event )=>{
-        event.cacheCurrentRequest();
-    }
+	route : '/',
+	method : 'GET',
+	handler : ( event )=>{
+		event.cacheCurrentRequest().catch( event.next );
+		// Nothing else should be done after calling cache current request in the same middleware, a new one needs to be added
+		// cacheCurrentRequest calls next inside it if it is not cached and caches it, if it is cached, then it will return the cached result
+	}
 });
+
+// OR
+// When setting a request to be cached, ttl and useIp may be passed that will overwrite the default options
+// app.add( ( event )=>{
+// 	//**useIp** -> whether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
+// 	//**ttl** -> time to live for the record. Defaults to 60 * 5000 ms
+//
+// 	event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } ).catch( event.next );
+// });
+
+
+let counter	= 0;
+
+// call event.cacheCurrentRequest() where you want to cache.
+app.add({
+	route : '/',
+	method : 'GET',
+	handler : ( event )=>{
+		counter ++;
+
+		if ( counter > 1 )
+			event.send( 'NOT CACHED', 500 );
+
+		event.send( 'ok' );
+	}
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // OR  You can create your own middleware that will be added to all requests
 // you want to cache, no need to do it separately
-app.add( async ( event )=>{
-    const pathsToCache = ['/', '/sth', 'test'];
-    if ( pathsToCache.indexOf( event.path ) !== -1 )
-    {
-        await event.cacheCurrentRequest().catch( event.next );
-    }
-    
-    // Or use the router to match RegExp
+let counterTwo		= 0;
+let counterThree	= 0;
+
+app.get( /\/test/, ( event )=>{
+	event.cacheCurrentRequest().catch( event.next );
 });
 
-// When setting a request to be cached, ttl and useIp may be passed that will overwrite the default options
-app.add( async ( event )=>{
-    //**useIp** -> whether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
-    //**ttl** -> time to live for the record. Defaults to 60 * 5000 ms
+app.get( '/testTwo', async ( event )=>{
+	counterTwo ++;
 
-    await event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } ).catch( event.next );
+	if ( counterTwo > 1 )
+		event.send( 'NOT CACHED', 500 );
+
+	event.send( 'ok' );
 });
+
+app.get( '/testThree', async ( event )=>{
+	counterThree ++;
+
+	if ( counterThree > 1 )
+		event.send( 'NOT CACHED', 500 );
+
+	event.send( 'ok' );
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+let counterFour = 0;
 
 // You can add it via a middleware to a specific route
-app.get( '/', 'cache.request', ( event )=> 
-    {
-        event.send( 'Hello World!' );
-    }
+app.get( '/testFour', 'cache.request', ( event )=>
+	{
+		counterFour ++;
+
+		if ( counterFour > 1 )
+			event.send( 'NOT CACHED', 500 );
+
+		event.send( 'ok' );
+	}
 );
+
+app.listen( 80, ()=>{
+	app.Loggur.log( 'Try going to http://localhost, http://localhost/testTwo, http://localhost/testThree, http://localhost/testFour' );
+});
 ~~~
 
 ***
@@ -3146,16 +3251,15 @@ app.get( '/', 'cache.request', ( event )=>
 ***
 ####Example:
 
+- Create a new .env file with the following content: `KEY=TEST`
 ~~~javascript
 const app = require( 'event_request' )();
 
 app.apply( 'er_env' );
-app.add(( event )=>{
-    console.log( process.env );
 
-    event.send( 'Done' );
-});
-app.listen( 80 );
+console.log( process.env );
+
+console.log( process.env.KEY );
 ~~~
 
 ***

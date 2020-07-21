@@ -3,7 +3,7 @@
 // Dependencies
 const { assert, test, helpers, Mock }	= require( '../../../test_helper' );
 const SessionPlugin						= require( './../../../../server/plugins/available_plugins/session_plugin' );
-const CachingServerPlugin				= require( '../../../../server/plugins/available_plugins/data_server_plugin' );
+const DataServerPlugin					= require( '../../../../server/plugins/available_plugins/data_server_plugin' );
 const Session							= require( './../../../../server/components/session/session' );
 const Router							= require( '../../../../server/components/routing/router' );
 
@@ -21,13 +21,13 @@ test({
 test({
 	message	: 'SessionPlugin attaches functions to the eventRequest',
 	test	: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let sessionPlugin			= new SessionPlugin( 'id' );
-		let router					= new Router();
-		let called					= 0;
+		let eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		let sessionPlugin		= new SessionPlugin( 'id' );
+		let router				= new Router();
+		let called				= 0;
 
-		let pluginMiddlewares		= sessionPlugin.getPluginMiddleware();
+		let pluginMiddlewares	= sessionPlugin.getPluginMiddleware();
 
 		assert.equal( 2, pluginMiddlewares.length );
 
@@ -61,15 +61,15 @@ test({
 test({
 	message	: 'SessionPlugin does not save session on send if not inited',
 	test	: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let sessionPlugin			= new SessionPlugin( 'id' );
-		let MockSession				= Mock( Session );
-		let session					= new MockSession( eventRequest );
-		let router					= new Router();
-		let called					= false;
+		let eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		let sessionPlugin		= new SessionPlugin( 'id' );
+		let MockSession			= Mock( Session );
+		let session				= new MockSession( eventRequest );
+		let router				= new Router();
+		let called				= false;
 
-		let pluginMiddlewares		= sessionPlugin.getPluginMiddleware();
+		let pluginMiddlewares	= sessionPlugin.getPluginMiddleware();
 
 		session._mock({
 			method			: 'saveSession',
@@ -99,15 +99,15 @@ test({
 test({
 	message	: 'SessionPlugin saves session on send',
 	test	: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let sessionPlugin			= new SessionPlugin( 'id' );
-		let MockSession				= Mock( Session );
-		let session					= new MockSession( eventRequest );
-		let router					= new Router();
-		let called					= false;
+		let eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		let sessionPlugin		= new SessionPlugin( 'id' );
+		let MockSession			= Mock( Session );
+		let session				= new MockSession( eventRequest );
+		let router				= new Router();
+		let called				= false;
 
-		let pluginMiddlewares		= sessionPlugin.getPluginMiddleware();
+		let pluginMiddlewares	= sessionPlugin.getPluginMiddleware();
 
 		session._mock({
 			method			: 'saveSession',
@@ -138,32 +138,32 @@ test({
 test({
 	message	: 'SessionPlugin.serServerOnRuntime and initSession initializes a session if it doesn\'t exist',
 	test	: ( done )=>{
-		let MockServer					= Mock( helpers.getServer().constructor );
-		let MockCachingServerPlugin		= Mock( CachingServerPlugin );
-		let MockCachingServer			= Mock( helpers.getCachingServer().constructor );
-		let cachingServer				= new MockCachingServer();
-		let cachingServerPlugin			= new MockCachingServerPlugin();
-		let server						= new MockServer();
+		let MockServer				= Mock( helpers.getServer().constructor );
+		let MockDataServerPlugin	= Mock( DataServerPlugin );
+		let MockDataServer			= Mock( helpers.getDataServer().constructor );
+		let dataServer				= new MockDataServer();
+		let dataServerPlugin		= new MockDataServerPlugin();
+		let server					= new MockServer();
 
-		cachingServerPlugin._mock({
+		dataServerPlugin._mock({
 			method			: 'getServer',
-			shouldReturn	: cachingServer
+			shouldReturn	: dataServer
 		});
 
 		server._mock({
 			method			: 'getPlugin',
 			with			: [['er_data_server']],
-			shouldReturn	: cachingServerPlugin
+			shouldReturn	: dataServerPlugin
 		});
 
 		let sessionPlugin			= new SessionPlugin( 'id' );
 
 		sessionPlugin.setOptions({
 			callback	: ( err )=>{
-				let router					= new Router();
-				let eventRequest			= helpers.getEventRequest();
-				eventRequest.cachingServer	= cachingServer;
-				let pluginMiddlewares		= sessionPlugin.getPluginMiddleware();
+				let router				= new Router();
+				let eventRequest		= helpers.getEventRequest();
+				eventRequest.dataServer	= dataServer;
+				let pluginMiddlewares	= sessionPlugin.getPluginMiddleware();
 
 				router.add( pluginMiddlewares[0] );
 				router.add( pluginMiddlewares[1] );
@@ -190,10 +190,10 @@ test({
 test({
 	message	: 'SessionPlugin initSession fetches a session if it exists',
 	test	: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let sessionPlugin			= new SessionPlugin( 'id' );
-		let router					= new Router();
+		let eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		let sessionPlugin		= new SessionPlugin( 'id' );
+		let router				= new Router();
 
 		let pluginMiddlewares		= sessionPlugin.getPluginMiddleware();
 

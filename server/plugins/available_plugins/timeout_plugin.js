@@ -10,20 +10,29 @@ class TimeoutPlugin extends PluginInterface
 	constructor( id, options = {} )
 	{
 		super( id, options );
+
 		this.timeout	= null;
+		this.callback	= null;
+
+		this.setOptions( options );
 	}
 
 	/**
-	 * @brief	Gets the timeout
-	 *
-	 * @return	Number
+	 * @inheritDoc
 	 */
-	getTimeout()
+	setOptions( options )
 	{
-		if ( this.timeout === null )
-			this.timeout	= typeof this.options.timeout === 'number' ? parseInt( this.options.timeout ) : 60 * 1000;
+		super.setOptions( options );
 
-		return this.timeout;
+		this.timeout	= typeof this.options.timeout === 'number'
+						? parseInt( this.options.timeout )
+						: 60 * 1000;
+
+		this.callback	= typeof this.options.callback === 'function'
+						? this.options.callback :
+						( event )=>{
+							event.next( `Request timed out in: ${this.timeout/1000} seconds`, 503 );
+						};
 	}
 
 	/**
@@ -38,7 +47,7 @@ class TimeoutPlugin extends PluginInterface
 	{
 		event.internalTimeout	= setTimeout( () => {
 				if ( ! event.isFinished() )
-					event.next( `Request timed out in: ${timeout}` );
+					this.callback( event );
 			},
 			timeout
 		);
@@ -84,7 +93,7 @@ class TimeoutPlugin extends PluginInterface
 		});
 
 		event.on( 'stream_end', ()=>{
-			this.setTimeout( event, this.getTimeout() );
+			this.setTimeout( event, this.timeout );
 		});
 	}
 
@@ -100,7 +109,7 @@ class TimeoutPlugin extends PluginInterface
 	{
 		const pluginMiddleware	= {
 			handler	: ( event ) => {
-				this.setTimeout( event, this.getTimeout() );
+				this.setTimeout( event, this.timeout );
 				this.addEventFunctionality( event );
 				this.setEvents( event );
 

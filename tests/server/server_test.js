@@ -2261,7 +2261,7 @@ test({
 
 		if ( ! app.hasPlugin( app.er_response_cache ) )
 		{
-			app.apply( app.er_data_server, { dataServer: helpers.getCachingServer() } );
+			app.apply( app.er_data_server, { dataServer: helpers.getDataServer() } );
 			app.apply( app.er_response_cache );
 		}
 
@@ -2295,7 +2295,7 @@ test({
 
 		if ( ! app.hasPlugin( app.er_response_cache ) )
 		{
-			app.apply( app.er_data_server, { dataServer: helpers.getCachingServer() } );
+			app.apply( app.er_data_server, { dataServer: helpers.getDataServer() } );
 			app.apply( app.er_response_cache );
 		}
 
@@ -2329,7 +2329,7 @@ test({
 
 		if ( ! app.hasPlugin( app.er_response_cache ) )
 		{
-			app.apply( app.er_data_server, { dataServer: helpers.getCachingServer() } );
+			app.apply( app.er_data_server, { dataServer: helpers.getDataServer() } );
 			app.apply( app.er_response_cache );
 		}
 
@@ -2407,8 +2407,8 @@ test({
 
 		app.get( '/testTimeoutWithReachingTimeout', ( event )=>{} );
 
-		helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 500 ).then(( response )=>{
-			assert.equal( response.body.toString(), JSON.stringify( { error: `Request timed out in: ${timeout}`} ) );
+		helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 503 ).then(( response )=>{
+			assert.equal( response.body.toString(), JSON.stringify( { error: `Request timed out in: ${timeout/1000} seconds`} ) );
 			assert.equal( timeoutCalled, 1 );
 
 			app.add({
@@ -2420,6 +2420,38 @@ test({
 
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.er_timeout.with.reaching.timeout.and.custom.callback',
+	test	: ( done )=>{
+		const timeout	= 100;
+		let timeoutCalled	= 0;
+
+		const app	= new Server();
+
+		app.apply( app.er_timeout, { timeout, callback: ( event )=>{ event.send( 'It is all good', 200 ) } } );
+
+		app.add(
+			( event )=>{
+				event.on( 'clearTimeout', ()=>{
+					timeoutCalled++;
+				});
+
+				event.next();
+			}
+		);
+
+		app.get( '/testTimeoutWithReachingTimeoutAndCustomCallback', ( event )=>{} );
+
+		app.listen( 4120, ()=>{
+			helpers.sendServerRequest( '/testTimeoutWithReachingTimeoutAndCustomCallback', 'GET', 200, '', {}, 4120, 'It is all good'  ).then(( response )=>{
+				assert.equal( timeoutCalled, 1 );
+
+				done();
+			}).catch( done );
+		});
 	}
 });
 
@@ -3242,23 +3274,23 @@ test({
 		app.apply( app.er_data_server, { dataServerOptions: { persist: false } } );
 
 		app.get( `/${name}`, async ( event )=>{
-			assert.equal( event.cachingServer instanceof DataServer, true );
+			assert.equal( event.dataServer instanceof DataServer, true );
 
-			await event.cachingServer.set( key, value ).catch( done );
-			await event.cachingServer.set( `${key}_delete`, value ).catch( done );
+			await event.dataServer.set( key, value ).catch( done );
+			await event.dataServer.set( `${key}_delete`, value ).catch( done );
 
-			await event.cachingServer.delete( `${key}_delete` ).catch( done );
+			await event.dataServer.delete( `${key}_delete` ).catch( done );
 
 			event.send( name );
 		});
 
 		app.get( secondName, async ( event )=>{
-			assert.equal( event.cachingServer instanceof DataServer, true );
+			assert.equal( event.dataServer instanceof DataServer, true );
 
-			const cacheValue	= await event.cachingServer.get( key ).catch( done );
+			const cacheValue	= await event.dataServer.get( key ).catch( done );
 
 			assert.equal( cacheValue, value );
-			assert.equal( await event.cachingServer.get( `${key}_delete` ).catch( done ), null );
+			assert.equal( await event.dataServer.get( `${key}_delete` ).catch( done ), null );
 
 			event.send( secondName );
 		});

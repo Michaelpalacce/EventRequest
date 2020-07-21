@@ -39,6 +39,34 @@ test({
 });
 
 test({
+	message	: 'TimeoutPlugin times out when added with custom callback',
+	test	: ( done )=>{
+		let eventRequest		= helpers.getEventRequest();
+
+		const callback			= ( event )=>{
+			assert.deepStrictEqual( event, eventRequest );
+			assert.equal( true, typeof eventRequest.clearTimeout !== 'undefined' );
+			assert.equal( true, typeof eventRequest.internalTimeout !== 'undefined' );
+
+			done();
+		};
+
+		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0, callback } );
+		let router				= new Router();
+
+		let pluginMiddlewares	= timeoutPlugin.getPluginMiddleware();
+
+		assert.equal( 1, pluginMiddlewares.length );
+
+		router.add( pluginMiddlewares[0] );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest.next();
+	}
+});
+
+test({
 	message	: 'TimeoutPlugin stream_start',
 	test	: ( done )=>{
 		let eventRequest		= helpers.getEventRequest();

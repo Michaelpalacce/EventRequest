@@ -43,10 +43,10 @@ class DataServerPlugin extends PluginInterface
 	{
 		const pluginMiddleware	= {
 			handler	: ( event )=>{
-				event.cachingServer	= this.getServer();
+				event.dataServer	= this.getServer();
 
 				event.on( 'cleanUp', ()=>{
-					event.cachingServer	= null;
+					event.dataServer	= null;
 				} );
 
 				event.next();

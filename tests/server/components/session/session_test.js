@@ -19,9 +19,9 @@ test({
 test({
 	message	: 'Session constructor on correct arguments does not throw',
 	test	: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
+		let eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= null;
 		assert.doesNotThrow(()=>{
 			session	= new Session( eventRequest )
 		});
@@ -43,13 +43,13 @@ test({
 test({
 	message	: 'Session constructor on custom arguments',
 	test	: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
+		let eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= null;
 
-		let ttl						= 10;
-		let sessionKey				= 'differentSid';
-		let sessionIdLength			= 1000;
+		let ttl					= 10;
+		let sessionKey			= 'differentSid';
+		let sessionIdLength		= 1000;
 
 		let options	= {
 			ttl, sessionKey, sessionIdLength, isCookieSession: false
@@ -75,10 +75,10 @@ test({
 test({
 	message	: 'Session constructor on custom arguments',
 	test	: ( done )=>{
-		let sessionId				= 'sessionId';
-		let eventRequest			= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
+		let sessionId			= 'sessionId';
+		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= null;
 
 		assert.doesNotThrow(()=>{
 			session	= new Session( eventRequest )
@@ -93,10 +93,10 @@ test({
 test({
 	message	: 'Session constructor on custom arguments with headers',
 	test	: ( done )=>{
-		let sessionId				= 'sessionId';
-		let eventRequest			= helpers.getEventRequest( undefined, undefined, { testSid : sessionId } );
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
+		let sessionId			= 'sessionId';
+		let eventRequest		= helpers.getEventRequest( undefined, undefined, { testSid : sessionId } );
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= null;
 
 		assert.doesNotThrow(()=>{
 			session	= new Session( eventRequest, { isCookieSession: false, sessionKey: 'testSid' } )
@@ -111,10 +111,10 @@ test({
 test({
 	message	: 'Session _makeNewSessionId returns an id depending on the sessionKeyLength',
 	test	: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
-		let sessionIdLength			= 10;
+		let eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= null;
+		let sessionIdLength		= 10;
 
 		assert.doesNotThrow(()=>{
 			session	= new Session( eventRequest, { sessionIdLength } );
@@ -129,10 +129,10 @@ test({
 test({
 	message	: 'Session hasSession when there is no session',
 	test	: ( done )=>{
-		let sessionId				= 'sessionId';
-		let eventRequest			= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= null;
+		let sessionId			= 'sessionId';
+		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= null;
 
 		assert.doesNotThrow( async ()=>{
 			session	= new Session( eventRequest );
@@ -144,11 +144,11 @@ test({
 test({
 	message	: 'Session hasSession, newSession and removeSession when there is a session',
 	test	: async ( done )=>{
-		let sessionId				= 'sessionId';
-		let eventRequest			= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= new Session( eventRequest );
-		let setCookie				= false;
+		let sessionId			= 'sessionId';
+		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= new Session( eventRequest );
+		let setCookie			= false;
 
 		eventRequest._mock({
 			method			: 'setCookie',
@@ -202,9 +202,9 @@ test({
 test({
 	message	: 'Session add, has adds a variable in the session',
 	test	: ( done )=>{
-		let eventRequest			= helpers.getEventRequest();
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= new Session( eventRequest );
+		let eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= new Session( eventRequest );
 
 		assert.deepStrictEqual( {}, session.session );
 		session.add( 'key', 'value' );
@@ -224,10 +224,10 @@ test({
 test({
 	message	: 'Session fetchSession if session does not exist',
 	test	: async ( done )=>{
-		let sessionId				= 'sessionId2';
-		let eventRequest			= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= new Session( eventRequest );
+		let sessionId			= 'sessionId2';
+		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= new Session( eventRequest );
 
 		await session.fetchSession() === false ? done() : done( 'There should be no session to fetch' );
 	}
@@ -236,10 +236,10 @@ test({
 test({
 	message	: 'Session fetchSession if session exists',
 	test	: async ( done )=>{
-		let sessionId				= 'sessionId2';
-		let eventRequest			= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= new Session( eventRequest );
+		let sessionId			= 'sessionId2';
+		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= new Session( eventRequest );
 
 		await session.saveSession();
 		await session.fetchSession() !== false ? done() : done( 'There should be a session to fetch' );
@@ -249,10 +249,10 @@ test({
 test({
 	message	: 'Session getSessionId returns sessionId',
 	test	: ( done )=>{
-		let sessionId				= 'sessionId2';
-		let eventRequest			= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
-		eventRequest.cachingServer	= helpers.getCachingServer();
-		let session					= new Session( eventRequest );
+		let sessionId			= 'sessionId2';
+		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= new Session( eventRequest );
 
 		assert.equal( sessionId, session.getSessionId() );
 

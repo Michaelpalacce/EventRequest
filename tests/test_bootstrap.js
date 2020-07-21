@@ -17,8 +17,8 @@ app.add({
 app.listen( 3333, ()=>{});
 
 // Set up a memory server to be used by the tests
-const cachingServer	= new DataServer({ persist: false, persistPath: path.join( TEST_ROOT, './fixture/cache' )});
+const dataServer	= new DataServer({ persist: false, persistPath: path.join( TEST_ROOT, './fixture/cache' )});
 
 module.exports	= {
-	server: app, cachingServer
+	server: app, dataServer
 };

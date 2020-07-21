@@ -1,3 +1,10 @@
+26.0.0
+- Documentation fixes
+- Documentation example fixes
+- Timeout error message changed a bit, also the status code will be 503
+- event.cachingServer is now event.dataServer
+- Timeout plugin now accepts a new callback options that will be called in case of a timeout
+
 25.1.1
 - Documentation fixes
 - Documentation examples fixes

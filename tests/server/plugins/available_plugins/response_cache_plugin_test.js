@@ -34,12 +34,12 @@ test({
 		let eventRequest		= helpers.getEventRequest( 'GET', '/test/responseCachePlugin/attachesEvent' );
 		let eventRequest2		= helpers.getEventRequest( 'GET', '/test/responseCachePlugin/attachesEvent' );
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
-		let cachingServer		= helpers.getCachingServer();
+		let dataServer			= helpers.getDataServer();
 		let router				= new Router();
 		let cached				= false;
 
-		responseCachePlugin.cachingServer	= cachingServer;
-		let pluginMiddlewares				= responseCachePlugin.getPluginMiddleware();
+		responseCachePlugin.dataServer	= dataServer;
+		let pluginMiddlewares			= responseCachePlugin.getPluginMiddleware();
 
 		eventRequest2.on( 'cachedResponse', ()=>{
 			done();
@@ -47,8 +47,8 @@ test({
 
 		assert.equal( 1, pluginMiddlewares.length );
 
-		eventRequest.cachingServer	= cachingServer;
-		eventRequest2.cachingServer	= cachingServer;
+		eventRequest.dataServer		= dataServer;
+		eventRequest2.dataServer	= dataServer;
 		router.add( pluginMiddlewares[0] );
 		router.add({
 			route	: '/test/responseCachePlugin/attachesEvent',

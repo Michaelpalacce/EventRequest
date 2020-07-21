@@ -45,10 +45,10 @@ class Session
 
 		this.session			= {};
 
-		if ( typeof event.cachingServer === 'undefined' )
-			throw new Error( 'Could not create session. No caching container is set in the event' );
+		if ( typeof event.dataServer === 'undefined' )
+			throw new Error( 'Could not create session. No data server is set in the event' );
 
-		this.server				= event.cachingServer;
+		this.server				= event.dataServer;
 	}
 
 	/**

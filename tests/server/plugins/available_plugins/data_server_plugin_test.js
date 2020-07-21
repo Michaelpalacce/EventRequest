@@ -55,7 +55,7 @@ test({
 });
 
 test({
-	message	: 'DataServerPlugin.getPluginMiddleware returns a middleware that adds a cachingServer',
+	message	: 'DataServerPlugin.getPluginMiddleware returns a middleware that adds a dataServer',
 	test	: ( done )=>{
 		const options					= { dataServerOptions: { persist: false } };
 		const memoryDataServerPlugin	= new DataServerPlugin( 'id', options );
@@ -80,11 +80,11 @@ test({
 		router.add( middleware[0] );
 		router.add( {
 			handler	: ( event )=>{
-				assert.equal( typeof event.cachingServer !== 'undefined', true );
-				assert.equal( event.cachingServer instanceof DataServer, true );
+				assert.equal( typeof event.dataServer !== 'undefined', true );
+				assert.equal( event.dataServer instanceof DataServer, true );
 				assert.equal( called, 1 );
 
-				removeCache( event.cachingServer );
+				removeCache( event.dataServer );
 				done();
 			}
 		} );
