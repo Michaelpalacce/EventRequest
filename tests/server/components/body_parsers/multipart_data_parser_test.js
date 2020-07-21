@@ -76,7 +76,7 @@ test({
 test({
 	message		: 'MultipartDataParser.parse parses multipart data',
 	test		: ( done )=>{
-		let tempDir			= path.join( __dirname, './fixture/testUploads');
+		let tempDir			= path.join( __dirname, './fixture/testUploads' );
 		let multipartParser	= new MockMultipartDataParser( { tempDir } );
 		let eventRequest	= helpers.getEventRequest(
 			undefined,

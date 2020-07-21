@@ -709,6 +709,11 @@ class MultipartDataParser extends EventEmitter
 			}
 		});
 
+		if ( parts.$files.count === 0 )
+		{
+			delete parts.$files;
+		}
+
 		this.parts	= parts;
 	}
 

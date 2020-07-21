@@ -33,12 +33,12 @@ const app = App();
 
 # Multiple Servers Setup:
 ~~~javascript
-const { App, Loggur } = require( 'event_request' );
+const { Server, Loggur } = require( 'event_request' );
 
 // With this setup you'll have to work only with the variables appOne and appTwo. You cannot call App() to get any of them in different parts of the project
 // This can be remedied a bit by creating routers in different controllers and then exporting them to be later on added 
-const appOne = new App();
-const appTwo = new App();
+const appOne = new Server();
+const appTwo = new Server();
 
 // Add a new Route
 appOne.get( '/', ( event ) => {
@@ -61,21 +61,22 @@ appTwo.listen( 3335, ()=>{
 # Custom http Server setup:
 ~~~javascript
 const http = require( 'http' );
+const App = require( 'event_request' );
 const app = require( 'event_request' )();
 const server = http.createServer( app.attach() );
 
 // No problem adding routes like this
 App().get( '/',( event )=>{
-	event.send( 'ok' );
+    event.send( 'ok' );
 });
 
 // OR like this
 app.get( '/test',( event )=>{
-	event.send( 'ok' );
+    event.send( 'ok' );
 });
 
 server.listen( '80',()=>{
-	app.Loggur.log( 'Server is up and running on port 80' )
+    app.Loggur.log( 'Server is up and running on port 80' )
 });
 ~~~
 
@@ -295,14 +296,17 @@ app.listen( 80, ()=>{
 const App = require( 'event_request' );
 
 const router = App().Router();
-router.get(( event )=>{ event.send( 'ok' ); } );
+router.get( '/', ( event )=>{ event.send( 'ok' ); } );
 
 App().add( router );
 
-// OR
-const routerOne = App().Router();
+// OR you can add it directly to the router
+// You can merge any 2 routers
 const routerTwo = App().Router();
-routerOne.add( routerTwo )
+routerTwo.get( '/test', ( event )=>{ event.send( 'okx2' ); } );
+App().router.add( routerTwo )
+
+App().listen( 80 );
 ~~~
 
 ***
@@ -312,29 +316,61 @@ routerOne.add( routerTwo )
 - All the global middleware will be merged as well
 
 ~~~javascript
-const App = require( 'event_request' );
+const app = require( 'event_request' )();
 
-const routerOne = App().Router();
-const routerTwo = App().Router();
+const routerOne = app.Router();
 
-routerOne.add( '/test', routerTwo )
-~~~
-
-~~~javascript
-const App = require( 'event_request' );
-
-// You can also attach the router to a route
-const userRouter = App().Router();
-userRouter.get( '/list', ( event )=>{
-    event.send( { userOne: {}, userTwo: {} } );
-});
-
-userRouter.post( '/add/:username:', ( event )=>{
-    // Add user to db or somewhere else
+routerOne.get( '/route', ( event ) => {
     event.send( 'ok' );
 });
 
-App().add( '/user', userRouter );
+app.add( '/test', routerOne );
+
+app.listen( 80, ()=>{
+    app.Loggur.log( 'If you go to http://localhost/test there will be a 404 error, but if you go to http://localhost/test/route it will return ok' );
+});
+~~~
+
+- You can do it with a post and also with a wildcard
+~~~javascript
+const app = require( 'event_request' )();
+const users = { userOne: {} };
+
+// You can also attach the router to a route
+const userRouter = app.Router();
+userRouter.get( '/list', ( event )=>{
+    event.send( users );
+});
+
+// Add a new user, validate that the username parameter is a string
+userRouter.post( '/add/:username:', app.er_validation.validate( { params: { username: 'string' } } ), ( event )=>{
+    users[event.params.username] = {};
+    event.send( event.params );
+});
+
+app.add( '/user', userRouter );
+
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Try going to http://localhost/user/list and after that try posting to http://localhost/user/add/John, when you fetch list again your new user should be added to the list' );
+});
+~~~
+
+- You can also pass a RegExp
+~~~javascript
+const app = require( 'event_request' )();
+
+// You can also attach the router to a route
+const userRouter = app.Router();
+
+userRouter.get( /\/path/, ( event )=>{
+    event.send( event.params );
+});
+
+app.add( '/user', userRouter );
+
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Try going to http://localhost/user/path and then to http://localhost/user/notPath' );
+});
 ~~~
 
 ####FUNCTION:
@@ -344,29 +380,40 @@ const App = require( 'event_request' );
 
 const routerOne = App().Router();
 
-routerOne.add( ( event )=>{    
-    event.next()
+routerOne.add( ( event )=>{
+    event.send( 'ok' );
+});
+
+App().add( routerOne );
+
+App().listen( 80, ()=>{
+    App().Loggur.log( 'Try hitting http://localhost regardless of path or method ' )
 });
 ~~~
 
 ~~~javascript
-const App = require( 'event_request' );
+const app = require( 'event_request' )();
 
 // Adding a route
-App().add({
+app.add({
     route : '/',
     method : 'GET',
     handler : ( event ) => {
         event.send( '<h1>Hello World!</h1>' )
     }
 });
+
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Try going to http://localhost' );
+});
 ~~~
 
 ~~~javascript
 const App = require( 'event_request' );
+const app = App();
 
 // You can create your own router
-const router = App().Router();
+const router = app.Router();
 router.add({
     route : '/',
     method : 'GET',
@@ -374,18 +421,30 @@ router.add({
         event.send( '<h1>Hello World</h1>' );
     }
 });
+
+app.add( router );
+
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Try going to http://localhost' )
+});
 ~~~
 
 ~~~javascript
-const App = require( 'event_request' );
+const app = require( 'event_request' )();
 
 // Adding a middleware without a method or route
-App().add( ( event )=>{
+app.add( ( event )=>{
+    console.log( 'Should be called always!' );
+    event.extra    = { key: 'value' };
     event.next();
 });
 
-App().add( ( event )=>{
-    event.send( '<h1>Hello World x2!</h1>' );
+app.add( ( event )=>{
+    event.send( `<h1>Hello World with extra: ${JSON.stringify(event.extra)} !</h1>` );
+});
+
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Try going to http://localhost' )
 });
 ~~~
 
@@ -398,30 +457,15 @@ App().add( router );
 ~~~
 
 ~~~javascript
-const App = require( 'event_request' );
+const app = require( 'event_request' )();
 
 // You can also get the router attached to the Server and use that directly
-const serverRouter = App().router;
-serverRouter.add(
-    //
-);
-~~~
+const serverRouter = app.router;
+serverRouter.add( { handler: ( event ) => event.send( 'ok' ) } );
 
-~~~javascript
-const App = require( 'event_request' );
-
-// You can also attach the router to a route
-const userRouter = App().Router();
-userRouter.get( '/list', ( event )=>{
-    event.send( { userOne: {}, userTwo: {} } );
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Try going to http://localhost' );
 });
-
-userRouter.post( '/add/:username:', ( event )=>{
-    // Add user to db or somewhere else
-    event.send( 'ok' );
-});
-
-App().add( '/user', userRouter );
 ~~~
 
 ***
@@ -430,7 +474,9 @@ App().add( '/user', userRouter );
 ~~~javascript
 const { App, Loggur } = require( 'event_request' );
 
-App().add({
+const app = App();
+
+app.add({
     route : '/todos/:id:',
     method : 'GET',
     handler: ( event)=>{
@@ -440,9 +486,13 @@ App().add({
 });
 
 // Or
-App().get( '/todos/:id:', ( event)=>{
+app.get( '/todos/:id:', ( event)=>{
     Loggur.log( event.params.id );
     event.send( '<h1>Hello World</h1>' );
+});
+
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Try going to http://localhost' )
 });
 ~~~
 
@@ -463,9 +513,10 @@ App().get( '/todos/:id:', ( event)=>{
 ~~~javascript
 const App = require( 'event_request' );
 const router = App().Router();
+const app = App();
 
 router.define( 'test', ( event )=>{
-    Loggur.log( 'Middleware One!' );
+    app.Loggur.log( 'Middleware One!' );
     event.next();
 });
 
@@ -476,79 +527,79 @@ const setHeader = ( key, value )=>{
     }
 }
 
-App().define( 'test2', ( event )=>{
-    App().Loggur.log( 'Middleware Two!' );
+app.define( 'test2', ( event )=>{
+    app.Loggur.log( 'Middleware Two!' );
     event.next();
 });
 
 //this will work
-App().get( ['test','test2'], ( event )=>{
+app.get( ['test','test2'], ( event )=>{
     event.send( 'TEST' );
 });
 
 //this will NOT work !!!
-App().get( 'test', ( event )=>{
+app.get( 'test', ( event )=>{
+    event.send( 'Error', 400 );
+});
+
+//this will work !!!
+app.get( ['test'], ( event )=>{
     event.send( 'TEST' );
 });
 
 //this will work !!!
-App().get( ['test'], ( event )=>{
+app.get( setHeader( 'keyOne', 'valueOne' ), ( event )=>{
     event.send( 'TEST' );
 });
 
 //this will work !!!
-App().get( setHeader( 'keyOne', 'valueOne' ), ( event )=>{
+app.get( [setHeader( 'keyOne', 'valueOne' ), 'test'], ( event )=>{
     event.send( 'TEST' );
 });
 
 //this will work !!!
-App().get( [setHeader( 'keyOne', 'valueOne' ), 'test'], ( event )=>{
+app.get( [setHeader( 'keyOne', 'valueOne' ), setHeader( 'keyTwo', 'valueTwo' )], ( event )=>{
     event.send( 'TEST' );
 });
 
-//this will work !!!
-App().get( [setHeader( 'keyOne', 'valueOne' ), setHeader( 'keyTwo', 'valueTwo' )], ( event )=>{
-    event.send( 'TEST' );
-});
-
-App().get( '/', ['test','test2'], ( event )=>{
+app.get( '/', ['test','test2'], ( event )=>{
     event.send( 'TEST' );
 } );
 
-App().add({
+app.add({
     route: '/test',
     method: 'GET',
     middlewares: 'test',
     handler: ( event )=>{
-        App().Loggur.log( 'Test!' );
+        app.Loggur.log( 'Test!' );
         event.send( 'Test2' );
     }
 });
 
-App().add({
+app.add({
     route: '/test',
     method: 'GET',
     middlewares: ['test'],
     handler: ( event )=>{
-        App().Loggur.log( 'Test!' );
+        app.Loggur.log( 'Test!' );
         event.send( 'Test2' );
     }
 });
 
-App().add({
+app.add({
     route: '/test',
     method: 'GET',
     middlewares: ['test', setHeader( 'value', 'key' )],
     handler: ( event )=>{
-        App().Loggur.log( 'Test!' );
+        app.Loggur.log( 'Test!' );
         event.send( 'Test2' );
     }
 });
 
-App().add( router );
+app.add( router );
 
-App().listen( 80, ()=>{
-    App().Loggur.log( 'Server started' );
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Server started' );
 });
 ~~~
 
@@ -741,6 +792,9 @@ The main object of the framework.
 ~~~javascript
 const { App } = require( 'event_request' );
 const app = App();
+
+// You could also do
+const app = require( 'request_event' )();
 ~~~
 
 - To start the Server you can do:
@@ -767,13 +821,14 @@ App().cleanUp();
 ~~~
 NOTES: 
 - This will stop the httpServer and set the internal variable of server to null
-- You may need to do `app = App()` again since they app variable is still a pointer to the old server
+- You may need to do `app = App()` again since the app variable is still a pointer to the old server
 
 - If you want to start the server using your own http/https server:
 ~~~javascript
 const http = require( 'http' );
-const { App, Loggur } = require( 'event_request' );
-const app = http.createServer( App().attach() );
+const App = require( 'event_request' );
+const app = require( 'event_request' )();
+const server = http.createServer( app.attach() );
 
 // No problem adding routes like this
 App().get( '/',( event )=>{
@@ -785,8 +840,8 @@ app.get( '/test',( event )=>{
     event.send( 'ok' );
 });
 
-app.listen( '80',()=>{
-    Loggur.log( 'Server is UN' )
+server.listen( '80',()=>{
+    app.Loggur.log( 'Server is up and running on port 80' )
 });
 ~~~
 
@@ -920,7 +975,7 @@ logger.setLogLevel( 600 );
 
 Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log, which will call all the loggers added to it
 ~~~javascript
-const { Loggur } = require( 'event_request' );
+const { Loggur, Console, LOG_LEVELS } = require( 'event_request' ).Logging;
 
 const logger = Loggur.createLogger({
     transports : [
@@ -929,6 +984,8 @@ const logger = Loggur.createLogger({
 });
 
 Loggur.addLogger( 'logger_id', logger );
+
+console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 ~~~
 
 ***
@@ -1075,8 +1132,7 @@ Loggur.addLogger( 'logger_id', logger );
 - If it is not provided the transport will not log
 
 ~~~javascript
-const { Logging } = require( 'event_request' );
-const { Loggur, LOG_LEVELS, Console, File } = Logging;
+const { Loggur, LOG_LEVELS, Console, File } = require( 'event_request' ).Logging;
 
 // Create a custom Logger
 const logger = Loggur.createLogger({
@@ -1088,7 +1144,7 @@ const logger = Loggur.createLogger({
         new File({ // File logger
             logLevel    : LOG_LEVELS.notice, // Logs everything below notice
             filePath    : '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
-            logLevels    : { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level )
+            logLevels    : { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level, combining this with the er_logging plugin that logs all request paths to a notice level, you have a nice access log. Alternatively you can log to notice yourself )
         }),
         new File({
             logLevel    : LOG_LEVELS.error,
@@ -1100,6 +1156,10 @@ const logger = Loggur.createLogger({
         })
     ]
 });
+
+Loggur.addLogger( 'serverLogger', logger );
+
+console.log( typeof Loggur.loggers['serverLogger'] !== 'undefined' );
 ~~~
 
 ### Default log levels:
@@ -1118,24 +1178,64 @@ const logger = Loggur.createLogger({
 The validation is done by using:
 
 ~~~javascript
+const app = require( 'event_request' )();
+
+app.get( '/', ( event )=>{
     const objectToValidate = { username: 'user@test.com', password: 'pass' };
 
-    event.validate( 
-        objectToValidate, 
-        { 
-            username: 'filled||string||email||max:255', 
-            password: 'filled||string||range:6-255' 
-        } 
+    // Validation shorthand
+    // Password will not fit the range
+    const resultOne    = event.validate(
+        objectToValidate,
+        {
+            username: 'filled||string||email||max:255',
+            password: 'filled||string||range:6-255'
+        }
     );
 
-    // OR
-    event.validation.validate( 
-        objectToValidate, 
-        { 
-            username: 'filled||string||email||max:255', 
-            password: 'filled||string||range:6-255' 
-        } 
+    // You can also do validation like this
+    // Password will fit the range
+    const resultTwo    = event.validation.validate(
+        objectToValidate,
+        {
+            username: 'filled||string||email||max:255',
+            password: 'filled||string||range:1-255'
+        }
     );
+
+    event.send({
+        resultOne    : {
+            hasValidationFailed    : resultOne.hasValidationFailed(),
+            validationResult    : resultOne.getValidationResult()
+        },
+        resultTwo    : {
+            hasValidationFailed    : resultTwo.hasValidationFailed(),
+            validationResult    : resultTwo.getValidationResult()
+        }
+    });
+});
+
+app.listen( 80, ()=>{
+    app.Loggur.log( 'Try hitting http://localhost')
+});
+~~~
+
+- You can also fetch the ValidationHandler and do validation using it anywhere:
+
+~~~javascript
+const validationHandler = require( 'event_request/server/components/validation/validation_handler' )
+
+const result = validationHandler.validate(
+    {
+        key: 'value'
+    },
+    {
+        key: 'string||range:1-10'
+    }
+);
+
+console.log( result.hasValidationFailed() );
+console.log( result.getValidationResult() );
 ~~~
 
 - skeleton must have the keys that are to be validated that point to a string of rules separated by ||
@@ -1248,23 +1348,56 @@ When validation is done a ValidationResult is returned. It has 2 methods:
     hasValidationFailed that returns a boolean whether there is an error
 
 ~~~javascript
-     const result = event.validation.validate(
-        event.body,
-        { 
-            username : 'filled||string||range:6-32',
-            password : 'filled||string',
-            customerNumber: 'numeric||max:32', 
-            address: { street: 'string', number: 'numeric' },
-            extra : { $rules: 'optional||string', $default: 'def' }
-        } 
-    );
+const validationHandler = require( 'event_request/server/components/validation/validation_handler' )
 
-    console.log( result.hasValidationFailed() );
-    console.log( result.getValidationResult() );
-    
-    // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
-    // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
-    // { 'username':'username', 'password': 'password', 'customerNumber': 16, address: { street: 'street', number: 64 }, extra: 'def' }
+const body = {
+    username: 'test@example.com',
+    password: 'test',
+    customerNumber: 30,
+    address : {
+        street: 'Test str',
+        number:'64',
+        numberTwo: 64 // THIS WILL NOT FAIL
+        // numberTwo: '64' // THIS WILL FAIL since it is weakNumeric
+    }
+}
+
+const bodyWhereEverythingFails = {
+    username: 123,
+    password: true,
+    customerNumber: 'x'.repeat( 33 ),
+    address : {
+        street: 123,
+        number:'wrong',
+        numberTwo: '64'
+    },
+    extra: true
+}
+
+const skeleton    = {
+    username : 'filled||string||email||range:6-32',
+    password : 'filled||string',
+    customerNumber: 'numeric||max:32',
+    address: { street: 'string', number: 'numeric', numberTwo: 'weakNumeric' },
+    extra : { $rules: 'optional||string', $default: 'def' }
+};
+
+const result = validationHandler.validate( body, skeleton );
+
+const resultWithFails = validationHandler.validate( bodyWhereEverythingFails, skeleton );
+
+console.log( 'Validiation passes:' );
+console.log( result.hasValidationFailed() );
+console.log( result.getValidationResult() );
+console.log( '=============================' );
+
+console.log( 'Validation fails:' );
+console.log( resultWithFails.hasValidationFailed() );
+console.log( resultWithFails.getValidationResult() );
+
+// If errors were found hasValidationFailed would return true and getValidationResult will have a map
+// of which input failed for whatever reason. Otherwise getValidationResult will return an object :
+// { 'username':'username', 'password': 'password', 'customerNumber': 16, address: { street: 'street', number: 64, numberTwo: 62 }, extra: 'def' }
 ~~~
 
 The example will validate that the username is filled is a string and is within a range of 6-32 characters
@@ -1281,76 +1414,164 @@ The extra if not passed will default to 'def'
 - The $rules must be optional otherwise validation will fail
 - In case where the parameters have NOT been passed, the default value will be used.
 ~~~javascript
-     const result = event.validation.validate(
-        event.body,
-        { 
-            username : { $rules: 'optional||string', $default: 'root' }, 
-            password : { $rules: 'optional||string', $default: 'toor' } 
-        } 
-     );
+const validationHandler = require( 'event_request/server/components/validation/validation_handler' )
 
-    console.log( result.hasValidationFailed() );
-    console.log( result.getValidationResult() );
-    
-    // If errors were found hasValidationFailed would return true and getValidationResult will have a map 
-    // of which input failed for whatever reason. Otherwise getValidationResult will return an object :
-    // { 'username':'username', 'password': 'password'}
+//IF no values are provided then the defaults will be taken
+const body = {};
+const result = validationHandler.validate(
+    body,
+    {
+        username : { $rules: 'optional||string', $default: 'root' },
+        password : { $rules: 'optional||string', $default: 'toor' }
+    }
+);
+
+console.log( result.hasValidationFailed() );
+console.log( result.getValidationResult() );
+
+//IF the values do exist then they will be validated
+const bodyTwo = { username: 'u', password: 'p' };
+const resultTwo = validationHandler.validate(
+    bodyTwo,
+    {
+        username : { $rules: 'optional||string||min:5', $default: 'root' },
+        password : { $rules: 'optional||string||min:5', $default: 'toor' }
+    }
+);
+
+console.log( resultTwo.hasValidationFailed() );
+console.log( resultTwo.getValidationResult() );
 ~~~
 
 
 ~~~javascript
+const validationHandler = require( 'event_request/server/components/validation/validation_handler' )
+
 const dataToValidate    = {
-            testOne    : 123,
-            testTwo    : '123',
-            123            : [1,2,3,4,5],
-            testThree    : {
-                'deepOne'    : 123,
-                deepTwo    : {
-                    deeperOne    : 123,
-                    deeperTwo    : '123'
-                }
-            },
-            testFour    : true,
-            testFive    : 'true',
-            testSix        : '1',
-        };
+    testOne    : 123,
+    testTwo    : '123',
+    123            : [1,2,3,4,5],
+    testThree    : {
+        'deepOne'    : 123,
+        deepTwo    : {
+            deeperOne    : 123,
+            deeperTwo    : '123',
+            deeperFour    : '4'
+        }
+    },
+    testFour    : true,
+    testFive    : 'true',
+    testSix        : '1',
+};
 
-        const result    = event.validation.validate(
-            dataToValidate,
-            {
-                testOne        : 'string||range:2-4',
-                testTwo        : 'numeric||range:123-124',
-                123            : 'array||range:4-6',
-                testThree    : {
-                    deepOne    : 'numeric||range:122-124',
-                    deepTwo    : {
-                        deeperOne    : 'string||range:2-4',
-                        deeperTwo    : 'numeric||range:123-124'
-                    }
-                },
-                testFour    : 'boolean',
-                testFive    : 'boolean',
-                testSix        : 'boolean'
+const result    = validationHandler.validate(
+    dataToValidate,
+    {
+        testOne        : 'string||range:2-4',
+        testTwo        : 'numeric||range:123-124',
+        123            : 'array||range:4-6',
+        testThree    : {
+            deepOne    : 'numeric||range:122-124',
+            deepTwo    : {
+                deeperOne    : 'string||range:2-4',
+                deeperTwo    : 'numeric||range:123-124',
+                deeperThree    : { $rules: 'optional||min:2||max:5', $default: 4 },
+                deeperFour    : { $rules: 'optional||numeric||min:2||max:5', $default: 4 }
             }
-        );
+        },
+        testFour    : 'boolean',
+        testFive    : 'boolean',
+        testSix        : 'boolean',
+        testSeven    : { $rules: 'optional||min:2||max:5', $default: 4 }
+    }
+);
+console.log( result.hasValidationFailed() );
+console.log( result.getValidationResult() );
 
-        console.log( result.hasValidationFailed() ); // false
-        console.log( result.getValidationResult() );
-        //{
-        //    '123'    : [1,2,3,4,5],
-        //    testOne    : '123',
-        //    testTwo    : 123,
-        //    testThree    : {
-        //        deepOne    : 123,
-        //        deepTwo    : {
-        //            deeperOne    : '123',
-        //            deeperTwo    : 123
-        //        }
-        //    },
-        //    testFour    : true,
-        //    testFive    : true,
-        //    testSix        : true,
-        //}
+// false
+
+// {
+//   '123': [ 1, 2, 3, 4, 5 ],
+//   testOne: '123',
+//   testTwo: 123,
+//   testThree: {
+//     deepOne: 123,
+//     deepTwo: { deeperOne: '123', deeperTwo: 123, deeperThree: 4, deeperFour: 4 }
+//   },
+//   testFour: true,
+//   testFive: true,
+//   testSix: true,
+//   testSeven: 4
+// }
+~~~
+
+- Really deep validations
+~~~javascript
+const validationHandler = require( 'event_request/server/components/validation/validation_handler' )
+
+const dataToValidate	= {
+	testOne	: 123,
+	testTwo	: '123',
+	123			: [1,2,3,4,5],
+	testThree	: {
+		'deepOne'	: 123,
+		deepTwo	: {
+			deeperOne	: 123,
+			deeperTwo	: '123',
+			deeperFour	: '4'
+		}
+	},
+	testFour	: true,
+	testFive	: 'true',
+	testSix		: '1',
+	testNine	: {
+		weakString	: 'weakString',
+		weakBoolean	: true,
+		weakNumeric	: 123,
+		weakIsTrue	: true,
+		weakIsFalse	: false,
+	}
+};
+
+const result	= validationHandler.validate(
+	dataToValidate,
+	{
+		testOne		: 'string||range:2-4',
+		testTwo		: 'numeric||range:123-124',
+		123			: 'array||range:4-6',
+		testThree	: {
+			deepOne	: 'numeric||range:122-124',
+			deepTwo	: {
+				deeperOne	: 'string||range:2-4',
+				deeperTwo	: 'numeric||range:123-124',
+				deeperThree	: { $rules: 'optional||min:2||max:5', $default: 4 },
+				deeperFour	: { $rules: 'optional||numeric||min:2||max:5', $default: 4 }
+			}
+		},
+		testFour	: 'boolean',
+		testFive	: 'boolean',
+		testSix		: 'boolean',
+		testSeven	: { $rules: 'optional||min:2||max:5', $default: 4 },
+		testEight	: 'numeric',
+		testNine	: {
+			weakString	: 'weakString',
+			weakBoolean	: 'weakBoolean',
+			weakNumeric	: 'weakNumeric',
+			weakIsTrue	: 'weakIsTrue',
+			weakIsFalse	: 'weakIsFalse',
+			deep	: {
+				deeper	: {
+					deepest: 'string'
+				}
+			}
+		}
+	}
+);
+console.log( result.hasValidationFailed() );
+console.log( result.getValidationResult() );
+
+// true
+//{ testEight: [ 'numeric' ], testNine: { deep: { deeper: deepest: ['string'] } } }
 ~~~
 
 ***
@@ -3119,9 +3340,9 @@ app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
 
 ~~~javascript
 const defaults = {
-	 'Access-Control-Allow-Origin': '*',
-	 'Access-Control-Allow-Headers': '*',
-	 'Access-Control-Allow-Methods': 'POST, PUT, GET, DELETE, HEAD, PATCH, COPY',
+     'Access-Control-Allow-Origin': '*',
+     'Access-Control-Allow-Headers': '*',
+     'Access-Control-Allow-Methods': 'POST, PUT, GET, DELETE, HEAD, PATCH, COPY',
 };
 ~~~
 
@@ -3202,13 +3423,13 @@ const defaults = {
 const app = require( 'event_request' )();
 
 app.apply( app.er_cors, {
-	origin: 'http://example.com',
-	methods: ['GET', 'POST'],
-	headers: ['Accepts', 'X-Requested-With'],
-	exposedHeaders: ['Accepts'],
-	status: 200,
-	maxAge: 200,
-	credentials: true,
+    origin: 'http://example.com',
+    methods: ['GET', 'POST'],
+    headers: ['Accepts', 'X-Requested-With'],
+    exposedHeaders: ['Accepts'],
+    status: 200,
+    maxAge: 200,
+    credentials: true,
 });
 
 app.add(( event )=>{
@@ -3403,40 +3624,40 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 ~~~javascript
 const app                = require( 'event_request' )();
 
-const rule			= {
-	"maxAmount":1,
-	"refillTime":100,
-	"refillAmount":1,
-	"policy": 'strict',
-	"delayTime": 3,
-	"delayRetries": 5,
-	"stopPropagation": false,
-	"ipLimit": false
+const rule            = {
+    "maxAmount":1,
+    "refillTime":100,
+    "refillAmount":1,
+    "policy": 'strict',
+    "delayTime": 3,
+    "delayRetries": 5,
+    "stopPropagation": false,
+    "ipLimit": false
 };
 
 // No need to apply this
 app.apply( app.er_rate_limits );
 
 app.get( '/testRoute', app.er_rate_limits.rateLimit( rule ), ( event )=>{
-	event.send( name );
+    event.send( name );
 });
 
-const ruleTwo			= {
-	"maxAmount":1,
-	"refillTime":100,
-	"refillAmount":1,
-	"policy": 'permissive',
-	"delayTime": 3,
-	"delayRetries": 5,
-	"stopPropagation": false,
-	"ipLimit": false
+const ruleTwo            = {
+    "maxAmount":1,
+    "refillTime":100,
+    "refillAmount":1,
+    "policy": 'permissive',
+    "delayTime": 3,
+    "delayRetries": 5,
+    "stopPropagation": false,
+    "ipLimit": false
 };
 
 app.get( '/testRouteTwo', [
    app.er_rate_limits.rateLimit( ruleTwo ),
    app.er_rate_limits.rateLimit( rule )
 ], ( event )=>{
-	event.send( name );
+    event.send( name );
 });
 ~~~
 

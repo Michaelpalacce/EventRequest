@@ -8,9 +8,6 @@ const Streams								= require( 'stream' );
 const ValidationHandler						= require( './components/validation/validation_handler' );
 const { IncomingMessage, ServerResponse }	= require( 'http' );
 
-const X_POWERED_BY_HEADER					= 'X-Powered-By';
-const X_POWERED_BY_HEADER_VALUE				= 'ER';
-
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
  */

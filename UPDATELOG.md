@@ -1,5 +1,7 @@
 25.1.1
 - Documentation fixes
+- Documentation examples fixes
+- When the request is a multipart data, the $files key will not be present IF there are no files
 
 25.1.0
 - Added Loggur to the server ( app.Loggur )
