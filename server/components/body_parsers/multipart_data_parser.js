@@ -18,8 +18,8 @@ const CONTENT_TYPE_INDEX						= 1;
 const CONTENT_LENGTH_HEADER						= 'content-length';
 const CONTENT_TYPE_HEADER						= 'content-type';
 const BOUNDARY_REGEX							= /boundary=(\S+[^\s])/;
-const CONTENT_DISPOSITION_NAME_CHECK_REGEX		= /\b(name=)/;
-const CONTENT_DISPOSITION_FILENAME_CHECK_REGEX	= /\b(filename=)/;
+const CONTENT_DISPOSITION_NAME_CHECK_REGEX		= /\bname="[^"]+"/;
+const CONTENT_DISPOSITION_FILENAME_CHECK_REGEX	= /\bfilename="[^"]+"/;
 const CONTENT_DISPOSITION_NAME_REGEX			= /\bname="([^"]+)"/;
 const CONTENT_DISPOSITION_FILENAME_REGEX		= /\bfilename="([^"]+)"/;
 const CONTENT_TYPE_GET_TYPE_REGEX				= /Content-Type:\s+(.+)$/;
@@ -33,7 +33,6 @@ const DATA_TYPE_PARAMETER						= 'parameter';
 const STATE_START								= 0;
 const STATE_START_BOUNDARY						= 1;
 const STATE_HEADER_FIELD_START					= 2;
-const STATE_HEADERS_DONE						= 3;
 const STATE_PART_DATA_START						= 4;
 const STATE_PART_DATA							= 5;
 const STATE_CLOSE_BOUNDARY						= 6;
@@ -209,10 +208,11 @@ class MultipartDataParser extends EventEmitter
 	{
 		const data		= chunk.toString( DEFAULT_BUFFER_ENCODING );
 		const lineEnds	= ['\r\n', '\n', '\r'];
+		const boundry	= this.boundary.substr( 2 );
 
 		for ( const lineEnd of lineEnds )
 		{
-			if ( data.indexOf( `${this.boundary}${lineEnd}` ) !== -1 )
+			if ( data.indexOf( `${boundry}${lineEnd}` ) !== -1 )
 			{
 				this.EOL		= lineEnd;
 				this.EOL_LENGTH	= lineEnd.length;
@@ -220,8 +220,8 @@ class MultipartDataParser extends EventEmitter
 			}
 		}
 
-		this.EOL	= '\r\n';
-		this.EOL	= this.EOL.length;
+		this.EOL		= '\r\n';
+		this.EOL_LENGTH	= this.EOL.length;
 	}
 
 	/**
@@ -287,32 +287,26 @@ class MultipartDataParser extends EventEmitter
 			switch ( part.state )
 			{
 				case STATE_START:
-					// Starting
 					part.state	= STATE_START_BOUNDARY;
 
-					if ( this.EOL === null )
-					{
-						this.determineEOL( chunk );
-					}
-
-					break;
 				case STATE_START_BOUNDARY:
 					// Receive chunks until we find the first boundary if the end has been finished, throw an error
 					boundaryOffset	= part.buffer.indexOf( this.boundary );
-					if ( boundaryOffset === -1 )
+					if ( boundaryOffset === -1 || part.buffer.length < boundaryOffset + this.boundary.length + 10 )
 					{
 						if ( this.hasFinished() )
-						{
 							this.handleError( ERROR_INCORRECT_END_OF_STREAM );
-						}
 
 						return;
 					}
 
+					if ( this.EOL === null )
+						this.determineEOL( part.buffer );
+
 					// Get the data after the boundary on the next line -> + this.EOL_LENGTH
 					part.buffer	= part.buffer.slice( boundaryOffset + this.boundary.length + this.EOL_LENGTH );
 					part.state	= STATE_HEADER_FIELD_START;
-					break;
+
 				case STATE_HEADER_FIELD_START:
 					let lineCount				= 0;
 					let contentTypeLine			= null;
@@ -325,6 +319,12 @@ class MultipartDataParser extends EventEmitter
 					while ( ( idx = read.indexOf( this.EOL, idxStart ) ) !== -1 )
 					{
 						line	= read.substring( idxStart, idx );
+
+						if ( line === '' && lineCount === 0 )
+						{
+							idxStart	= idx + this.EOL_LENGTH;
+							continue;
+						}
 
 						if ( lineCount === CONTENT_DISPOSITION_INDEX )
 						{
@@ -347,9 +347,7 @@ class MultipartDataParser extends EventEmitter
 					if ( contentDispositionLine === null || contentTypeLine === null || lineCount < 2 )
 					{
 						if ( this.hasFinished() )
-						{
 							this.handleError( ERROR_INVALID_METADATA );
-						}
 						return;
 					}
 
@@ -360,15 +358,12 @@ class MultipartDataParser extends EventEmitter
 					let nameCheck		= contentDispositionLine.match( CONTENT_DISPOSITION_NAME_CHECK_REGEX );
 					let filename		= null;
 					let name			= null;
-
 					if ( filenameCheck !== null )
 					{
 						filename	= contentDispositionLine.match( CONTENT_DISPOSITION_FILENAME_REGEX );
 
 						if ( filename === null )
-						{
 							this.handleError( ERROR_INVALID_METADATA );
-						}
 
 						filename	= filename[1];
 					}
@@ -378,13 +373,9 @@ class MultipartDataParser extends EventEmitter
 						name	= contentDispositionLine.match( CONTENT_DISPOSITION_NAME_REGEX );
 
 						if ( name === null )
-						{
 							this.handleError( ERROR_INVALID_METADATA );
-						}
 						else
-						{
 							name	= name[1];
-						}
 					}
 					else
 					{
@@ -397,8 +388,12 @@ class MultipartDataParser extends EventEmitter
 					let contentType	= contentTypeLine.match( CONTENT_TYPE_GET_TYPE_REGEX );
 					if ( contentType !== null )
 					{
-						// Cut the extra empty line in this case
-						part.buffer			= part.buffer.slice( this.EOL_LENGTH );
+						if ( part.buffer.indexOf( this.EOL ) === 0 )
+						{
+							// Cut the extra empty line in this case
+							part.buffer			= part.buffer.slice( this.EOL_LENGTH );
+						}
+
 						// Set the file content type
 						part.contentType	= contentType[1];
 					}
@@ -422,11 +417,8 @@ class MultipartDataParser extends EventEmitter
 						return;
 					}
 
-					part.state	= STATE_HEADERS_DONE;
-					break;
-				case STATE_HEADERS_DONE:
-					part.state		= STATE_PART_DATA_START;
-					break;
+					part.state	= STATE_PART_DATA_START;
+
 				case STATE_PART_DATA_START:
 					if ( part.type === DATA_TYPE_FILE )
 					{
@@ -442,7 +434,7 @@ class MultipartDataParser extends EventEmitter
 					}
 
 					part.state	= STATE_PART_DATA;
-					break;
+
 				case STATE_PART_DATA:
 					boundaryOffset	= part.buffer.indexOf( this.boundary );
 					if ( boundaryOffset === -1 )
@@ -454,17 +446,17 @@ class MultipartDataParser extends EventEmitter
 
 						// Flush out the buffer and set it to an empty buffer so next time we set the data correctly
 						// leave buffer is used as a redundancy check
-						let leaveBuffer		= 5;
-						let bufferToFlush	= part.buffer.slice( 0, part.buffer.length - leaveBuffer );
+						let leaveBuffer		= this.boundary.length + 10;
+						let bufferToFlush	= part.buffer.slice( 0, Math.max( part.buffer.length - leaveBuffer, 0 ) );
 						this.flushBuffer( part, bufferToFlush );
-						part.buffer	= part.buffer.slice( part.buffer.length - leaveBuffer );
+						part.buffer	= part.buffer.slice( Math.max( part.buffer.length - leaveBuffer, 0 ) );
 
 						// Fetch more data
 						return;
 					}
 					else
 					{
-						this.flushBuffer( part, part.buffer.slice( 0, boundaryOffset - this.EOL_LENGTH ) );
+						this.flushBuffer( part, part.buffer.slice( 0, Math.max( boundaryOffset - this.EOL_LENGTH, 0 ) ) );
 						if ( part.type === DATA_TYPE_FILE )
 						{
 							part.file.end();
@@ -496,6 +488,7 @@ class MultipartDataParser extends EventEmitter
 
 					this.parts.push( nextPart );
 					break;
+
 				default:
 					this.handleError( ERROR_INVALID_STATE );
 			}

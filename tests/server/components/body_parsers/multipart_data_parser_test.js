@@ -74,7 +74,7 @@ test({
 });
 
 test({
-	message		: 'MultipartDataParser.parse parses multipart data',
+	message		: 'MultipartDataParser.parse.parses.multipart.data',
 	test		: ( done )=>{
 		let tempDir			= path.join( __dirname, './fixture/testUploads' );
 		let multipartParser	= new MockMultipartDataParser( { tempDir } );
@@ -112,6 +112,7 @@ test({
 			setTimeout(()=>{
 				assert.deepStrictEqual( parsedData.rawBody, {} );
 				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
+				assert.equal( body.text, 'text default' );
 				assert.equal( body.$files[0].name, 'a.txt' );
 				assert.equal( body.$files[0].contentType, 'text/plain' );
 				assert.equal( fs.readFileSync( body.$files[1].path ).toString().includes( '<!DOCTYPE html><title>Content of a.html.</title>' ), true );
@@ -120,7 +121,133 @@ test({
 
 				multipartParser.terminate();
 				done();
-			}, 1000 );
+			}, 50 );
+
+		}).catch( done );
+	}
+});
+
+const placesToSplitProvider	= [];
+const dataLength			= multipartData.toString().length;
+
+for ( let i = 0; i < dataLength; i ++ )
+{
+	placesToSplitProvider.push( [i] );
+}
+
+test({
+	message			: 'MultipartDataParser.parse.parses.multipart.data.with.different.cuts',
+	dataProvider	: placesToSplitProvider,
+	test			: ( done, placeToSplit )=>{
+		let tempDir			= path.join( __dirname, './fixture/testUploads' );
+		let multipartParser	= new MockMultipartDataParser( { tempDir } );
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'multipart/form-data; boundary=---------------------------9051914041544843365972754266',
+				'content-length'	: '10000',
+			}
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback )=>{
+				if ( event === 'data' )
+				{
+					let data			= multipartData.toString();
+					let firstPart		= data.substr( 0, placeToSplit );
+					let secondPart		= data.substr( placeToSplit );
+					callback( Buffer.from( firstPart ) );
+					callback( Buffer.from( secondPart ) );
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+
+		multipartParser.parse( eventRequest ).then(( parsedData )=>{
+			const body	= parsedData.body;
+
+			// Sync delay
+			setTimeout(()=>{
+				assert.deepStrictEqual( parsedData.rawBody, {} );
+				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
+				assert.equal( body.text, 'text default' );
+				assert.equal( body.$files[0].name, 'a.txt' );
+				assert.equal( body.$files[0].contentType, 'text/plain' );
+				assert.equal( fs.readFileSync( body.$files[1].path ).toString().includes( '<!DOCTYPE html><title>Content of a.html.</title>' ), true );
+				assert.equal( body.$files[1].name, 'a.html' );
+				assert.equal( body.$files[1].contentType, 'text/html' );
+
+				multipartParser.terminate();
+				done();
+			}, 50 );
+
+		}).catch( done );
+	}
+});
+
+
+test({
+	message			: 'MultipartDataParser.parse.parses.multipart.data.with.2.bytes.at.a.time',
+	test			: ( done )=>{
+		let tempDir			= path.join( __dirname, './fixture/testUploads' );
+		let multipartParser	= new MockMultipartDataParser( { tempDir } );
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'multipart/form-data; boundary=---------------------------9051914041544843365972754266',
+				'content-length'	: '10000',
+			}
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback )=>{
+				if ( event === 'data' )
+				{
+					let data			= multipartData.toString();
+					let current	= 0;
+					let step	= 2;
+
+					while ( true )
+					{
+						const currentData	= data.substr( current, step );
+
+						if ( currentData === '' )
+							break;
+
+						current	+= step;
+
+						callback( Buffer.from( currentData ) );
+					}
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+
+		multipartParser.parse( eventRequest ).then(( parsedData )=>{
+			const body	= parsedData.body;
+
+			// Sync delay
+			setTimeout(()=>{
+				assert.deepStrictEqual( parsedData.rawBody, {} );
+				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
+				assert.equal( body.text, 'text default' );
+				assert.equal( body.$files[0].name, 'a.txt' );
+				assert.equal( body.$files[0].contentType, 'text/plain' );
+				assert.equal( fs.readFileSync( body.$files[1].path ).toString().includes( '<!DOCTYPE html><title>Content of a.html.</title>' ), true );
+				assert.equal( body.$files[1].name, 'a.html' );
+				assert.equal( body.$files[1].contentType, 'text/html' );
+
+				multipartParser.terminate();
+				done();
+			}, 50 );
 
 		}).catch( done );
 	}

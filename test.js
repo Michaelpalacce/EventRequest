@@ -12,12 +12,12 @@ const startTests	= ()=>{
 	testSuites.errorSuite();
 	testSuites.routingSuite();
 	testSuites.loggingSuite();
-	testSuites.bodyParserSuite();
 	testSuites.validationSuite();
 	testSuites.pluginsSuite();
 	testSuites.serverSuite();
 	testSuites.cachingSuite();
 	testSuites.rateLimiterSuite();
+	testSuites.bodyParserSuite();
 
 	runAllTests();
 };

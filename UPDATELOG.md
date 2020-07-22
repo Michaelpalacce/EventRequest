@@ -1,3 +1,7 @@
+26.0.1
+- Big bug fixes with the body parser plugin
+- Added test so that this will never happen again... test that should have been added 2 years ago *smile*
+
 26.0.0
 - Documentation fixes
 - Documentation example fixes

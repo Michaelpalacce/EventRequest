@@ -1941,7 +1941,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_body_parser_multipart parses only multipart/form-data',
+	message	: 'Server.test.er_body_parser_multipart.parses.only.multipart/form-data',
 	test	: ( done )=>{
 		const name				= 'testErBodyParserMultipartParsesMultipartFormData';
 		const multipartDataCR	= fs.readFileSync( path.join( __dirname, './fixture/body_parser/multipart/multipart_data_CR' ) );
@@ -1988,71 +1988,71 @@ test({
 			)
 		);
 
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				multipartDataCR,
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				multipartDataLF,
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				multipartDataCRLF,
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9041544843365972754266' },
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				500,
-				multipartDataCRLF,
-				{ 'content-type': 'multipart/form-data' },
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				multipartDataCRLF,
-				{},
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				'',
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-				3341
-			)
-		);
+		// responses.push(
+		// 	helpers.sendServerRequest(
+		// 		`/${name}`,
+		// 		'GET',
+		// 		200,
+		// 		multipartDataCR,
+		// 		{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+		// 		3341
+		// 	)
+		// );
+		//
+		// responses.push(
+		// 	helpers.sendServerRequest(
+		// 		`/${name}`,
+		// 		'GET',
+		// 		200,
+		// 		multipartDataLF,
+		// 		{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+		// 		3341
+		// 	)
+		// );
+		//
+		// responses.push(
+		// 	helpers.sendServerRequest(
+		// 		`/${name}`,
+		// 		'GET',
+		// 		400,
+		// 		multipartDataCRLF,
+		// 		{ 'content-type': 'multipart/form-data; boundary=---------------------------9041544843365972754266' },
+		// 		3341
+		// 	)
+		// );
+		//
+		// responses.push(
+		// 	helpers.sendServerRequest(
+		// 		`/${name}`,
+		// 		'GET',
+		// 		500,
+		// 		multipartDataCRLF,
+		// 		{ 'content-type': 'multipart/form-data' },
+		// 		3341
+		// 	)
+		// );
+		//
+		// responses.push(
+		// 	helpers.sendServerRequest(
+		// 		`/${name}`,
+		// 		'GET',
+		// 		400,
+		// 		multipartDataCRLF,
+		// 		{},
+		// 		3341
+		// 	)
+		// );
+		//
+		// responses.push(
+		// 	helpers.sendServerRequest(
+		// 		`/${name}`,
+		// 		'GET',
+		// 		400,
+		// 		'',
+		// 		{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+		// 		3341
+		// 	)
+		// );
 
 		const server	= app.listen( 3341, ()=>{
 			Promise.all( responses ).then(()=>{

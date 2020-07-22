@@ -2192,7 +2192,7 @@ Server {
   er_response_cache,
   er_body_parser_json,
   er_body_parser_form,
-  er_body_parser_multipar,
+  er_body_parser_multipart,
   er_body_parser_raw,
   er_validation,
 }
