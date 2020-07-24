@@ -1,6 +1,7 @@
 # EventRequest
 A highly customizable backend server in NodeJs
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/85f23b07e60f4145869606f08316304d)](https://app.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&utm_medium=referral&utm_content=Michaelpalacce/EventRequest&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest) [![Inline docs](http://inch-ci.org/github/Michaelpalacce/EventRequest.svg?branch=master)](http://inch-ci.org/github/Michaelpalacce/EventRequest) [![Dependencies](https://david-dm.org/Michaelpalacce/EventRequest.svg)](https://david-dm.org/Michaelpalacce/EventRequest.svg) [![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json) [![npm version](https://badge.fury.io/js/event_request.svg)](https://badge.fury.io/js/event_request)  [![codecov](https://codecov.io/gh/Michaelpalacce/EventRequest/branch/master/graph/badge.svg)](https://codecov.io/gh/Michaelpalacce/EventRequest)
 
 [**CHANGELOG**](https://github.com/Michaelpalacce/EventRequest/blob/master/UPDATELOG.md) || [**BENCHMARKS**](https://github.com/Michaelpalacce/EventRequest-Benchmarks)
