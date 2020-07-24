@@ -1,17 +1,16 @@
 os:
   - linux
-  - windows
 
 language: node_js
 node_js:
   - 12
 
 before_install:
-  - if [ $TRAVIS_OS_NAME = linux ]; then pip install --user codecov; else ; fi
+  - pip install --user codecov
   - npm update
 
 after_success:
-  - if [ $TRAVIS_OS_NAME = linux ]; then codecov --file coverage/lcov.info --disable search; else ; fi
+  - codecov --file coverage/lcov.info --disable search
 
 env:
   - CODECOV_TOKEN=2ad21418-8e84-42c8-8e73-62c031c5ddc4

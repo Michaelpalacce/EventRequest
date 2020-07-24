@@ -6,3 +6,4 @@ node_modules
 /rate_limits.json
 cache
 .vagrant
+/coverage/lcov-report/*
