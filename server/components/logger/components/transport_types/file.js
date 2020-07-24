@@ -64,11 +64,6 @@ class File extends Transport
 
 		if ( this.fileStream === null || ! fs.existsSync( this.getFileName() ) )
 		{
-			if ( this.fileStream instanceof WriteStream )
-			{
-				this.fileStream.end();
-			}
-
 			this.fileStream	= fs.createWriteStream( this.getFileName(), {
 				flags		: 'a',
 				autoClose	: true
@@ -136,7 +131,7 @@ class File extends Transport
 	 * @param	{Function} resolve
 	 * @param	{Function} reject
 	 *
-	 * @return	Promise
+	 * @return	void
 	 */
 	_log( log, resolve, reject )
 	{

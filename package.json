@@ -59,7 +59,7 @@
     "test": "./node_modules/.bin/istanbul cover test.js",
     "deploy": "npm run test && npm publish"
   },
-  "version": "26.0.2",
+  "version": "26.0.3",
   "devDependencies": {
     "istanbul": "^0.4.5"
   }

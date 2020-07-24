@@ -20,6 +20,62 @@ test({
 });
 
 test({
+	message	: 'File.getWriteStream.when.directory.does.not.exist',
+	test	: ( done )=>{
+		const dir			= `./tests/server/components/logger/components/transport_types/fixtures/unexisting_dir${Math.random()}/` ;
+		const fileName		= 'file.log';
+
+		const fileTransport	= new File( { filePath: dir + fileName } );
+
+		fileTransport.getWriteStream();
+
+		assert.deepStrictEqual( fs.existsSync( dir ), true );
+
+		fs.unlinkSync( fileTransport.getFileName() );
+
+		fs.unlink( dir, ()=>{
+			done();
+		});
+	}
+});
+
+test({
+	message	: 'File.log.if.rejected',
+	test	: ( done )=>{
+		const filePath			= './tests/server/components/logger/components/transport_types/fixtures/file.log';
+
+		const MockedFile		= Mock( File );
+		const MockedWritable	= Mock( Writable );
+		const writable			= new MockedWritable();
+		const expectedError		= 'someError';
+
+		const fileTransport		= new MockedFile( { filePath } );
+
+		fileTransport._mock({
+			method			: 'getWriteStream',
+			shouldReturn	: () => {
+				writable._mock({
+					method			: 'write',
+					shouldReturn	: ( text, type, callback )=>{
+						callback( expectedError );
+					}
+				});
+
+				return writable;
+			},
+			called			: 1
+		});
+		fileTransport.log( Log.getInstance( 'test' ) ).then(()=>{
+			done( 'Should have rejected!' )
+		}).catch( ( err )=>{
+			assert.deepStrictEqual( err, expectedError );
+			helpers.clearUpTestFile();
+			done();
+		});
+	}
+});
+
+test({
 	message	: 'File.constructor on invalid configuration',
 	test	: ( done )=>{
 		let file	= new File({

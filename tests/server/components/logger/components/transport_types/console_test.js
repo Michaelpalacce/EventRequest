@@ -165,6 +165,54 @@ test({
 });
 
 test({
+	message	: 'Console.format.when.the.log.color.is.not.defined',
+	test	: ( done )=>{
+		let ConsoleMock			= Mock( Console );
+		let consoleTransport	= new ConsoleMock();
+
+		const formattedData		= consoleTransport.format( Log.getInstance( 'testLog', 1111 ) );
+
+		assert.deepStrictEqual( formattedData.length, 1 );
+		assert.deepStrictEqual( formattedData[0].includes( '\u001b[31mtestLog' ), true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Console.format.when.the.log.color.is.defined.but.colorize.does.not.have.that.color',
+	test	: ( done )=>{
+		const ConsoleMock		= Mock( Console );
+		const consoleTransport	= new ConsoleMock( { logColors: {
+				100: 'wrong'
+			}
+		});
+
+		const formattedData		= consoleTransport.format( Log.getInstance( 'testLog', 100 ) );
+
+		assert.deepStrictEqual( formattedData.length, 1 );
+		assert.deepStrictEqual( formattedData[0].includes( '\u001b[31mtestLog' ), true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Console.format.when.color.is.disabled',
+	test	: ( done )=>{
+		const ConsoleMock		= Mock( Console );
+		const consoleTransport	= new ConsoleMock( { color: false } );
+
+		const formattedData		= consoleTransport.format( Log.getInstance( 'testLog', 100 ) );
+
+		assert.deepStrictEqual( formattedData.length, 1 );
+		assert.deepStrictEqual( formattedData[0].includes( '\u001b[3' ), false );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Console.log does not log if the transport does not support it',
 	test	: ( done )=>{
 		let called				= 0;

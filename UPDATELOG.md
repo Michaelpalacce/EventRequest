@@ -1,3 +1,7 @@
+26.0.3
+- Added tests
+- Removed an impossible case in the file transport
+
 26.0.2
 - Lowered the max retry attempts by 10 for the leaky bucket
 - Added badges

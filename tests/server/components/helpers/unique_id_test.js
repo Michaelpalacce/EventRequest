@@ -17,3 +17,16 @@ test({
 	}
 });
 
+test({
+	message	: 'UniqueId.makeId.with.not.a.number.argument',
+	test	: ( done )=>{
+		const idOne	= uniqueId.makeId( 10 );
+		const idTwo	= uniqueId.makeId( 'wrong' );
+
+		assert.equal( idOne.length, 10 );
+		assert.equal( idTwo.length, 10 );
+		assert.notEqual( idOne, idTwo );
+
+		done();
+	}
+});
