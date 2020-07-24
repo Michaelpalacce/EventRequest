@@ -4,6 +4,7 @@
 - Added some convention changes
 - Removed code smell
 - Added a coverage tool integration
+- Added Codacy integration. Next major release will be focusing on code improvements according to codacy
 
 26.0.1
 - Big bug fixes with the body parser plugin
