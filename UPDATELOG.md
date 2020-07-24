@@ -1,3 +1,6 @@
+26.0.2
+- Lowered the max retry attempts by 10 for the leaky bucket
+
 26.0.1
 - Big bug fixes with the body parser plugin
 - Added test so that this will never happen again... test that should have been added 2 years ago *smile*

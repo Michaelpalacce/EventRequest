@@ -1,0 +1,11 @@
+{
+  "files": {
+    "included": [
+      "server/*"
+    ],
+    "excluded": [
+      "public/*",
+      "tests/*"
+    ]
+  }
+}
