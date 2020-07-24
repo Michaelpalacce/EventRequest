@@ -19,7 +19,7 @@ const app								= App();
 test({
 	message	: 'Server.constructor starts without crashing with defaults',
 	test	: ( done )=>{
-		assert.doesNotThrow( ()=>{
+		assert.doesNotThrow( () => {
 			const server	= new Server();
 
 			assert.equal( 1, server.router.middleware.length );
@@ -69,7 +69,7 @@ test({
 test({
 	message	: 'Server is started',
 	test	: ( done ) =>{
-		helpers.sendServerRequest( '/ping' ).then(()=>{
+		helpers.sendServerRequest( '/ping' ).then(() => {
 			done();
 		}).catch( done );
 	}
@@ -92,23 +92,23 @@ test({
 		const server	= new Server();
 
 		server.add({
-			handler	:()=>{}
+			handler	:() => {}
 		});
 
 		server.add({
 			route	: '/',
-			handler	:()=>{}
+			handler	:() => {}
 		});
 
 		server.add({
 			route	: '/',
 			method	: 'GET',
-			handler	:()=>{}
+			handler	:() => {}
 		});
 
 		server.add({
 			method	: 'GET',
-			handler	:()=>{}
+			handler	:() => {}
 		});
 
 		server.add({
@@ -116,7 +116,7 @@ test({
 			method	: 'GET'
 		});
 
-		server.add(()=>{});
+		server.add(() => {});
 
 		// 5 added 1 pre loaded
 		assert.equal( 7, server.router.middleware.length );
@@ -197,7 +197,7 @@ test({
 		promises.push( helpers.sendServerRequest( `/testAdding`, 'PATCH', 200, '', {}, 3333, name ) );
 		promises.push( helpers.sendServerRequest( `/testAdding${name}/randomUser`, 'GET', 200, '', {}, 3333, 'randomUser' ) );
 
-		Promise.all( promises ).then(()=>{
+		Promise.all( promises ).then(() => {
 			done();
 		}).catch( done );
 	}
@@ -237,7 +237,7 @@ test({
 			)
 		);
 
-		Promise.all( promises ).then(()=>{
+		Promise.all( promises ).then(() => {
 			done();
 		}).catch( done );
 	}
@@ -254,11 +254,11 @@ test({
 		server.apply( staticResources );
 		server.apply( 'er_static_resources' );
 
-		assert.throws(()=>{
+		assert.throws(() => {
 			server.apply( 'wrong' );
 		});
 
-		assert.throws(()=>{
+		assert.throws(() => {
 			server.apply( {} );
 		});
 
@@ -388,14 +388,14 @@ test({
 
 		router._mock({
 			method			: 'define',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called	= true;
 			}
 		});
 
 		server.router			= router;
 
-		server.define( middlewareName, ()=>{} );
+		server.define( middlewareName, () => {} );
 
 		called === true ? done() : done( 'Router.define was not called but should have been' );
 	}
@@ -449,7 +449,7 @@ test({
 			event.send( 'wrong' );
 		});
 
-		server.listen( 3352,()=>{
+		server.listen( 3352,() => {
 			helpers.sendServerRequest( name, 'GET', 200, '', {}, 3352 ).then(( response )=>{
 				assert.equal( response.body.toString(), name );
 
@@ -465,10 +465,10 @@ test({
 		const server	= App();
 		const serverTwo	= App();
 
-		server.define( 'testMiddleware', ()=>{} );
+		server.define( 'testMiddleware', () => {} );
 
-		assert.throws( ()=>{
-			serverTwo.define( 'testMiddleware', ()=>{} );
+		assert.throws( () => {
+			serverTwo.define( 'testMiddleware', () => {} );
 		});
 
 		App.cleanUp();
@@ -482,15 +482,15 @@ test({
 	test	: ( done )=>{
 		const server	= App();
 
-		server.define( 'testMiddleware', ()=>{} );
+		server.define( 'testMiddleware', () => {} );
 
-		assert.throws( ()=>{
-			server.define( 'testMiddleware', ()=>{} );
+		assert.throws( () => {
+			server.define( 'testMiddleware', () => {} );
 		});
 
 		App.cleanUp();
 
-		App().define( 'testMiddleware', ()=>{} );
+		App().define( 'testMiddleware', () => {} );
 
 		done();
 	}
@@ -521,8 +521,8 @@ test({
 
 		server.listen( port );
 
-		server.on( 'listening', ()=>{
-			helpers.sendServerRequest( '/attachUsingHttpServer', 'GET',  201, '', {}, port ).then(()=>{
+		server.on( 'listening', () => {
+			helpers.sendServerRequest( '/attachUsingHttpServer', 'GET',  201, '', {}, port ).then(() => {
 				server.close();
 				done();
 			}).catch( done );
@@ -544,17 +544,17 @@ test({
 
 		server.listen( 3335 );
 
-		helpers.sendServerRequest( '/testGET', 'POST', 404, '', {}, 3335 ).then(()=>{
+		helpers.sendServerRequest( '/testGET', 'POST', 404, '', {}, 3335 ).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'DELETE', 404, '', {}, 3335 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'PUT', 404, '', {}, 3335 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'HEAD', 404, '', {}, 3335 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'COPY', 404, '', {}, 3335 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'PATCH', 404, '', {}, 3335 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'GET', 200, '', {}, 3335 );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -572,17 +572,17 @@ test({
 			event.send( body );
 		});
 
-		helpers.sendServerRequest( '/testGET', 'POST', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testGET', 'POST', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGET' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -600,17 +600,17 @@ test({
 			event.send( body );
 		});
 
-		helpers.sendServerRequest( '/testPOST', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testPOST', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testPOST', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOST', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOST', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOST', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOST', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOST', 'POST' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -628,17 +628,17 @@ test({
 			event.send( body );
 		});
 
-		helpers.sendServerRequest( '/testDELETE', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testDELETE', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testDELETE', 'POST', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETE', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETE', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETE', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETE', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETE', 'DELETE' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -656,17 +656,17 @@ test({
 			event.send( body );
 		});
 
-		helpers.sendServerRequest( '/testPUT', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testPUT', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testPUT', 'POST', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUT', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUT', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUT', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUT', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUT', 'PUT' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -684,17 +684,17 @@ test({
 			event.send( body );
 		});
 
-		helpers.sendServerRequest( '/testHEAD', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testHEAD', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testHEAD', 'POST', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEAD', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEAD', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEAD', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEAD', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEAD', 'HEAD' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), '' );
@@ -712,17 +712,17 @@ test({
 			event.send( body );
 		});
 
-		helpers.sendServerRequest( '/testPATCH', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testPATCH', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testPATCH', 'POST', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCH', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCH', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCH', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCH', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCH', 'PATCH' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -744,17 +744,17 @@ test({
 			}
 		});
 
-		helpers.sendServerRequest( '/testGETWithAdd', 'POST', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testGETWithAdd', 'POST', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testGETWithAdd', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGETWithAdd', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGETWithAdd', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGETWithAdd', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGETWithAdd', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testGETWithAdd' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -776,17 +776,17 @@ test({
 			}
 		});
 
-		helpers.sendServerRequest( '/testPOSTWithAdd', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testPOSTWithAdd', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testPOSTWithAdd', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOSTWithAdd', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOSTWithAdd', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOSTWithAdd', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOSTWithAdd', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPOSTWithAdd', 'POST' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -808,17 +808,17 @@ test({
 			}
 		});
 
-		helpers.sendServerRequest( '/testDELETEWithAdd', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testDELETEWithAdd', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testDELETEWithAdd', 'POST', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETEWithAdd', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETEWithAdd', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETEWithAdd', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETEWithAdd', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETEWithAdd', 'DELETE' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -840,17 +840,17 @@ test({
 			}
 		});
 
-		helpers.sendServerRequest( '/testPUTWithAdd', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testPUTWithAdd', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testPUTWithAdd', 'POST', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUTWithAdd', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUTWithAdd', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUTWithAdd', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUTWithAdd', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPUTWithAdd', 'PUT' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -872,17 +872,17 @@ test({
 			}
 		});
 
-		helpers.sendServerRequest( '/testHEADWithAdd', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testHEADWithAdd', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testHEADWithAdd', 'POST', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEADWithAdd', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEADWithAdd', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEADWithAdd', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEADWithAdd', 'PATCH', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testHEADWithAdd', 'HEAD' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), '' );
@@ -904,17 +904,17 @@ test({
 			}
 		});
 
-		helpers.sendServerRequest( '/testPATCHWithAdd', 'GET', 404 ).then(()=>{
+		helpers.sendServerRequest( '/testPATCHWithAdd', 'GET', 404 ).then(() => {
 			return helpers.sendServerRequest( '/testPATCHWithAdd', 'POST', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCHWithAdd', 'DELETE', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCHWithAdd', 'PUT', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCHWithAdd', 'COPY', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCHWithAdd', 'HEAD', 404 );
-		}).then(()=>{
+		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCHWithAdd', 'PATCH' );
 		}).then(( response )=>{
 			assert.equal( response.body.toString(), body );
@@ -1406,7 +1406,7 @@ test({
 			event.send( name );
 		} );
 
-		app.listen( port, ()=>{
+		app.listen( port, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
@@ -1444,7 +1444,7 @@ test({
 			event.send( name );
 		});
 
-		app.listen( port, ()=>{
+		app.listen( port, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
@@ -1500,7 +1500,7 @@ test({
 			event.send( name );
 		});
 
-		app.listen( port, ()=>{
+		app.listen( port, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
@@ -1558,7 +1558,7 @@ test({
 			event.send( name );
 		});
 
-		app.listen( port, ()=>{
+		app.listen( port, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
@@ -1619,7 +1619,7 @@ test({
 			event.send( name );
 		});
 
-		app.listen( port, ()=>{
+		app.listen( port, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
@@ -1764,8 +1764,8 @@ test({
 			)
 		);
 
-		const server	= app.listen( 3337, ()=>{
-			Promise.all( responses ).then(()=>{
+		const server	= app.listen( 3337, () => {
+			Promise.all( responses ).then(() => {
 				server.close();
 				done();
 			}).catch( done );
@@ -1803,8 +1803,8 @@ test({
 			)
 		);
 
-		const server	= app.listen( 3338, ()=>{
-			Promise.all( responses ).then(()=>{
+		const server	= app.listen( 3338, () => {
+			Promise.all( responses ).then(() => {
 				server.close();
 				done();
 			}).catch( done );
@@ -1892,8 +1892,8 @@ test({
 			)
 		);
 
-		const server	= app.listen( 3339, ()=>{
-			Promise.all( responses ).then(()=>{
+		const server	= app.listen( 3339, () => {
+			Promise.all( responses ).then(() => {
 				server.close();
 				done();
 			}).catch( done );
@@ -1931,8 +1931,8 @@ test({
 			)
 		);
 
-		const server	= app.listen( 3340, ()=>{
-			Promise.all( responses ).then(()=>{
+		const server	= app.listen( 3340, () => {
+			Promise.all( responses ).then(() => {
 				server.close();
 				done();
 			}).catch( done );
@@ -2054,9 +2054,9 @@ test({
 		// 	)
 		// );
 
-		const server	= app.listen( 3341, ()=>{
-			Promise.all( responses ).then(()=>{
-				setTimeout(()=>{
+		const server	= app.listen( 3341, () => {
+			Promise.all( responses ).then(() => {
+				setTimeout(() => {
 					server.close();
 					done();
 				}, 500 );
@@ -2092,9 +2092,9 @@ test({
 			)
 		);
 
-		const server	= app.listen( 3342, ()=>{
-			Promise.all( responses ).then(()=>{
-				setTimeout(()=>{
+		const server	= app.listen( 3342, () => {
+			Promise.all( responses ).then(() => {
+				setTimeout(() => {
 					server.close();
 					done();
 				}, 500 );
@@ -2129,9 +2129,9 @@ test({
 			)
 		);
 
-		const server	= app.listen( 3901, ()=>{
-			Promise.all( responses ).then(()=>{
-				setTimeout(()=>{
+		const server	= app.listen( 3901, () => {
+			Promise.all( responses ).then(() => {
+				setTimeout(() => {
 					server.close();
 					done();
 				}, 500 );
@@ -2179,9 +2179,9 @@ test({
 			)
 		);
 
-		const server	= app.listen( 3902, ()=>{
-			Promise.all( responses ).then(()=>{
-				setTimeout(()=>{
+		const server	= app.listen( 3902, () => {
+			Promise.all( responses ).then(() => {
+				setTimeout(() => {
 					server.close();
 					done();
 				}, 500 );
@@ -2224,10 +2224,10 @@ test({
 			event.send( name );
 		} );
 
-		const server	= app.listen( 3336, ()=>{
+		const server	= app.listen( 3336, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { headerName: 'value' }, 3336 ).then(( response )=>{
 				fileTransport.getWriteStream().end();
-				setTimeout(()=>{
+				setTimeout(() => {
 					process.dumpStack	= undefined;
 					process.log			= undefined;
 
@@ -2366,7 +2366,7 @@ test({
 			app.apply( app.er_timeout, { timeout } );
 
 		app.add( ( event )=>{
-				event.on( 'clearTimeout', ()=>{
+				event.on( 'clearTimeout', () => {
 					timeoutCalled++;
 				});
 
@@ -2397,7 +2397,7 @@ test({
 
 		app.add({
 			handler	: ( event )=>{
-				event.on( 'clearTimeout', ()=>{
+				event.on( 'clearTimeout', () => {
 					timeoutCalled++;
 				});
 
@@ -2435,7 +2435,7 @@ test({
 
 		app.add(
 			( event )=>{
-				event.on( 'clearTimeout', ()=>{
+				event.on( 'clearTimeout', () => {
 					timeoutCalled++;
 				});
 
@@ -2445,7 +2445,7 @@ test({
 
 		app.get( '/testTimeoutWithReachingTimeoutAndCustomCallback', ( event )=>{} );
 
-		app.listen( 4120, ()=>{
+		app.listen( 4120, () => {
 			helpers.sendServerRequest( '/testTimeoutWithReachingTimeoutAndCustomCallback', 'GET', 200, '', {}, 4120, 'It is all good'  ).then(( response )=>{
 				assert.equal( timeoutCalled, 1 );
 
@@ -2491,9 +2491,9 @@ test({
 			event.send( name );
 		} );
 
-		server.listen( 3334, ()=>{
+		server.listen( 3334, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3334 ).then(( response )=>{
-				setTimeout(()=>{
+				setTimeout(() => {
 					server.close();
 					assert.equal( response.body.toString(), name );
 					assert.equal( fs.existsSync( fileLocation ), false );
@@ -2531,11 +2531,11 @@ test({
 			event.send( name );
 		} );
 
-		server.listen( 4001, ()=>{
+		server.listen( 4001, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
 			}).then(( response )=>{
-				setTimeout(()=>{
+				setTimeout(() => {
 					server.close();
 					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
 					done();
@@ -2568,11 +2568,11 @@ test({
 			event.send( name );
 		} );
 
-		server.listen( 4001, ()=>{
+		server.listen( 4001, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
 			}).then(( response )=>{
-				setTimeout(()=>{
+				setTimeout(() => {
 					server.close();
 					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
 					done();
@@ -2609,11 +2609,11 @@ test({
 			event.send( name );
 		} );
 
-		server.listen( 4001, ()=>{
+		server.listen( 4001, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
 			}).then(( response )=>{
-				setTimeout(()=>{
+				setTimeout(() => {
 					server.close();
 					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
 					done();
@@ -2648,7 +2648,7 @@ test({
 		appOne.listen( 3360 );
 		appTwo.listen( 3361 );
 
-		setTimeout(()=>{
+		setTimeout(() => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3360 ).then(( response )=>{
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 3361 );
 			}).then(( response )=>{
@@ -2674,7 +2674,7 @@ test({
 
 		helpers.sendServerRequest( `/${name}/testTwo`, 'GET', 200, '', {} ).then(( response )=>{
 			return helpers.sendServerRequest( `/${name}/testTwo`, 'GET', 429, '', {} );
-		}).then( ()=>{ done(); } ).catch( done );
+		}).then( () => { done(); } ).catch( done );
 	}
 });
 
@@ -2727,7 +2727,7 @@ test({
 		} );
 
 		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
-			setTimeout(()=>{
+			setTimeout(() => {
 				helpers.sendServerRequest( `/${name}` ).then(( response )=>{
 					assert.equal( response.body.toString(), name );
 					done();
@@ -2804,13 +2804,13 @@ test({
 			promises.push( helpers.sendServerRequest( `/${name}` ) );
 		}
 
-		setTimeout(()=>{
+		setTimeout(() => {
 			for ( let i = 0; i < 50; i ++ )
 			{
 				promises.push( helpers.sendServerRequest( `/${name}` ) );
 			}
 
-			Promise.all( promises).then(()=>{
+			Promise.all( promises).then(() => {
 				done();
 			}).catch( done );
 		}, 2100 );
@@ -3031,7 +3031,7 @@ test({
 			event.send( name );
 		} );
 
-		setTimeout(()=>{
+		setTimeout(() => {
 			helpers.sendServerRequest( `/${name}` ).then(( response )=>{
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
 			}).then(( response )=>{
@@ -3054,7 +3054,7 @@ test({
 
 		app.add({
 			handler	: ( event )=>{
-				event.on( 'render', ()=>{
+				event.on( 'render', () => {
 					renderCalled++;
 				} );
 
@@ -3132,7 +3132,7 @@ test({
 	test	: ( done )=>{
 		const name	= 'testErSession';
 
-		assert.throws(()=>{
+		assert.throws(() => {
 			const appOne	= new Server();
 			appOne.apply( appOne.er_session );
 		});
@@ -3150,7 +3150,7 @@ test({
 
 			if ( session.has( 'authenticated' ) === false )
 			{
-				assert.throws(()=>{
+				assert.throws(() => {
 					session.get( 'authenticated' );
 				});
 
@@ -3204,7 +3204,7 @@ test({
 	test	: ( done )=>{
 		const name	= 'testErSessionWithHeaders';
 
-		assert.throws(()=>{
+		assert.throws(() => {
 			const appOne	= new Server();
 			appOne.apply( appOne.er_session );
 		});
@@ -3222,7 +3222,7 @@ test({
 
 			if ( session.has( 'authenticated' ) === false )
 			{
-				assert.throws(()=>{
+				assert.throws(() => {
 					session.get( 'authenticated' );
 				});
 
@@ -3442,7 +3442,7 @@ test({
 		responses.push( helpers.sendServerRequest( `/testErFileStreamImage` ) );
 		responses.push( helpers.sendServerRequest( `/testErFileStreamText` ) );
 
-		Promise.all( responses ).then( ()=>{
+		Promise.all( responses ).then( () => {
 			done();
 		}).catch( done );
 	}
@@ -3803,7 +3803,7 @@ test({
 			assert.equal( typeof response.headers.globalMiddlewaretwo === 'undefined', true );
 		}) );
 
-		Promise.all( promises ).then( ()=>{ done(); } ).catch( done );
+		Promise.all( promises ).then( () => { done(); } ).catch( done );
 	}
 });
 
@@ -3887,7 +3887,7 @@ test({
 			assert.equal( response.headers.testfive === 'value', true );
 		}) );
 
-		Promise.all( promises ).then( ()=>{ done(); } ).catch( done );
+		Promise.all( promises ).then( () => { done(); } ).catch( done );
 	}
 });
 
@@ -3971,7 +3971,7 @@ test({
 			assert.equal( response.headers.testfive === 'value', true );
 		}) );
 
-		Promise.all( promises ).then( ()=>{ done(); } ).catch( done );
+		Promise.all( promises ).then( () => { done(); } ).catch( done );
 	}
 });
 
@@ -4062,7 +4062,7 @@ test({
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 		}) );
 
-		Promise.all( promises ).then( ()=>{ done(); } ).catch( done );
+		Promise.all( promises ).then( () => { done(); } ).catch( done );
 	}
 });
 
@@ -4090,7 +4090,7 @@ test({
 			assert.equal( response.headers['access-control-max-age'], '200' );
 			assert.equal( response.headers['access-control-allow-credentials'], 'true' );
 			assert.equal( response.headers['access-control-allow-methods'], undefined );
-		} ).then(()=>{
+		} ).then(() => {
 			return helpers.sendServerRequest( `/testErCors`, 'options' ).then( ( response )=>{
 				assert.equal( response.headers['access-control-allow-origin'], 'http://example.com' );
 				assert.equal( response.headers['access-control-allow-headers'], 'Accepts, X-Requested-With' );
@@ -4128,7 +4128,7 @@ test({
 			assert.equal( response.headers['access-control-max-age'], undefined );
 			assert.equal( response.headers['access-control-allow-credentials'], undefined );
 			assert.equal( response.headers['access-control-allow-methods'], undefined );
-		} ).then(()=>{
+		} ).then(() => {
 			return helpers.sendServerRequest( `/testErCors`, 'options', 204 ).then( ( response )=>{
 				assert.equal( response.headers['access-control-allow-origin'], '*' );
 				assert.equal( response.headers['access-control-allow-headers'], '*' );

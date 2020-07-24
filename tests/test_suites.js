@@ -2,15 +2,15 @@
 
 let testSuites	= {};
 
-testSuites.eventSuite		= ()=>{
+testSuites.eventSuite		= () => {
 	require( './server/event_request_test' );
 };
 
-testSuites.serverSuite		= ()=>{
+testSuites.serverSuite		= () => {
 	require( './server/server_test' );
 };
 
-testSuites.securitySuite		= ()=>{
+testSuites.securitySuite		= () => {
 	require( './server/components/session/session_test' );
 	require( './server/components/security/content_security_policy_test' );
 	require( './server/components/security/content_type_options_test' );
@@ -18,12 +18,12 @@ testSuites.securitySuite		= ()=>{
 	require( './server/components/security/http_strict_transport_security' );
 };
 
-testSuites.routingSuite		= ()=>{
+testSuites.routingSuite		= () => {
 	require( './server/components/routing/route_test' );
 	require( './server/components/routing/router_test' );
 };
 
-testSuites.loggingSuite		= ()=>{
+testSuites.loggingSuite		= () => {
 	require( './server/components/logger/loggur_test' );
 	require( './server/components/logger/components/log_test' );
 	require( './server/components/logger/components/logger_test' );
@@ -32,41 +32,41 @@ testSuites.loggingSuite		= ()=>{
 	require( './server/components/logger/components/transport_types/file_test' );
 };
 
-testSuites.cachingSuite		= ()=>{
+testSuites.cachingSuite		= () => {
 	require( './server/components/caching/data_server_test' );
 };
 
-testSuites.templatingEngine		= ()=>{
+testSuites.templatingEngine		= () => {
 	require( './server/components/templating_engine/default_templating_engine_test' );
 };
 
-testSuites.rateLimiterSuite		= ()=>{
+testSuites.rateLimiterSuite		= () => {
 	require( './server/components/rate_limiter/bucket_test' );
 };
 
-testSuites.errorSuite		= ()=>{
+testSuites.errorSuite		= () => {
 	require( './server/components/error/error_handler_test' );
 };
 
-testSuites.helpersSuite		= ()=>{
+testSuites.helpersSuite		= () => {
 	require( './server/components/helpers/unique_id_test' );
 };
 
-testSuites.bodyParserSuite	= ()=>{
+testSuites.bodyParserSuite	= () => {
 	require( './server/components/body_parsers/body_parser_handler_test' );
 	require( './server/components/body_parsers/form_body_parser_test' );
 	require( './server/components/body_parsers/json_body_parser_test' );
 	require( './server/components/body_parsers/multipart_data_parser_test' );
 };
 
-testSuites.validationSuite	= ()=>{
+testSuites.validationSuite	= () => {
 	require( './server/components/validation/validation_rules_test' );
 	require( './server/components/validation/validation_attribute_test' );
 	require( './server/components/validation/validation_result_test' );
 	require( './server/components/validation/validation_handler_test' );
 };
 
-testSuites.pluginsSuite		= ()=>{
+testSuites.pluginsSuite		= () => {
 	require( './server/plugins/available_plugins/data_server_plugin_test' );
 	require( './server/plugins/available_plugins/timeout_plugin_test' );
 	require( './server/plugins/available_plugins/env_plugin_test' );

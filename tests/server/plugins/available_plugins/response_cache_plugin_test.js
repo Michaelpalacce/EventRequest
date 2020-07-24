@@ -41,7 +41,7 @@ test({
 		responseCachePlugin.dataServer	= dataServer;
 		let pluginMiddlewares			= responseCachePlugin.getPluginMiddleware();
 
-		eventRequest2.on( 'cachedResponse', ()=>{
+		eventRequest2.on( 'cachedResponse', () => {
 			done();
 		} );
 
@@ -66,7 +66,7 @@ test({
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
-		setTimeout(()=>{
+		setTimeout(() => {
 			eventRequest2._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest2 ) );
 			eventRequest2.next();
 		}, 5000 );

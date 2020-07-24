@@ -29,7 +29,7 @@ function removeCache( dataServer )
 test({
 	message	: 'DataServerPlugin.constructor does not throw',
 	test	: ( done )=>{
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			new DataServerPlugin( 'plugin_id', { key: 'value' } );
 		});
 
@@ -66,7 +66,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'on',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called	++;
 			},
 			with			: [
@@ -90,7 +90,7 @@ test({
 		} );
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		setTimeout(()=>{
+		setTimeout(() => {
 			eventRequest.next();
 		}, 250 );
 	}

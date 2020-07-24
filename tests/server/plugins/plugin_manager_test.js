@@ -25,7 +25,7 @@ test({
 	test	: ( done )=>{
 		let pluginManager	= new PluginManager();
 
-		assert.throws(()=>{
+		assert.throws(() => {
 			pluginManager.addPlugin( {} );
 		});
 
@@ -42,7 +42,7 @@ test({
 
 		pluginManager.addPlugin( timeoutPluginOne );
 
-		assert.doesNotThrow( ()=>{
+		assert.doesNotThrow( () => {
 			pluginManager.addPlugin( timeoutPluginTwo );
 		});
 
@@ -111,7 +111,7 @@ test({
 
 		pluginManager.addPlugin( timeoutPlugin );
 
-		assert.throws(()=>{
+		assert.throws(() => {
 			pluginManager.getPlugin( 'wrongid' );
 		});
 

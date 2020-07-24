@@ -78,7 +78,7 @@ class FileStreamHandlerPlugin extends PluginInterface
 
 				this.attachFunctions( event );
 
-				event.on( 'cleanUp', ()=>{
+				event.on( 'cleanUp', () => {
 					event.fileStreamHandler	= undefined;
 					event.getFileStream		= undefined;
 					event.streamFile		= undefined;

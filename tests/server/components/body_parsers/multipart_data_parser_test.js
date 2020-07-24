@@ -55,10 +55,10 @@ test({
 		multipartParser.ended			= true;
 
 		multipartParser.event			= helpers.getEventRequest();
-		multipartParser.callback		= ()=>{};
+		multipartParser.callback		= () => {};
 		multipartParser.headerData		= {};
 		multipartParser.boundary		= 'test';
-		multipartParser.on( 'test', ()=>{} );
+		multipartParser.on( 'test', () => {} );
 -
 		multipartParser.terminate();
 
@@ -109,7 +109,7 @@ test({
 			const body	= parsedData.body;
 
 			// Sync delay
-			setTimeout(()=>{
+			setTimeout(() => {
 				assert.deepStrictEqual( parsedData.rawBody, {} );
 				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
 				assert.equal( body.text, 'text default' );
@@ -171,7 +171,7 @@ test({
 			const body	= parsedData.body;
 
 			// Sync delay
-			setTimeout(()=>{
+			setTimeout(() => {
 				assert.deepStrictEqual( parsedData.rawBody, {} );
 				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
 				assert.equal( body.text, 'text default' );
@@ -235,7 +235,7 @@ test({
 			const body	= parsedData.body;
 
 			// Sync delay
-			setTimeout(()=>{
+			setTimeout(() => {
 				assert.deepStrictEqual( parsedData.rawBody, {} );
 				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
 				assert.equal( body.text, 'text default' );

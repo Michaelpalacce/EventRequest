@@ -8,7 +8,7 @@ test({
 	message	: 'PluginManager does not throw when getting plugins',
 	test	: ( done )=>{
 
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			PreLoadedPluginManager.getPlugin( 'er_timeout' );
 			PreLoadedPluginManager.getPlugin( 'er_env' );
 			PreLoadedPluginManager.getPlugin( 'er_static_resources' );

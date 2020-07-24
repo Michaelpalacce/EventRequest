@@ -388,7 +388,7 @@ class EventRequest extends EventEmitter
 				if ( response instanceof Promise )
 				{
 					response.catch(( error )=>{
-						setImmediate(()=>{
+						setImmediate(() => {
 
 							if ( ! this.isFinished() )
 								this.next( error );

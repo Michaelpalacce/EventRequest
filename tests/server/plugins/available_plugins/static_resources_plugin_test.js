@@ -22,7 +22,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'setResponseHeader',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called	++;
 			},
 			with			: [
@@ -56,7 +56,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'setResponseHeader',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called	++;
 			},
 			with			: [

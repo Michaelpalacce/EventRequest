@@ -74,7 +74,7 @@ class File extends Transport
 				autoClose	: true
 			});
 
-			this.fileStream.on( 'error',()=>{} )
+			this.fileStream.on( 'error',() => {} )
 		}
 
 		return this.fileStream;

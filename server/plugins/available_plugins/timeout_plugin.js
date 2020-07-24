@@ -88,11 +88,11 @@ class TimeoutPlugin extends PluginInterface
 			event.clearTimeout();
 		});
 
-		event.on( 'stream_start', ()=>{
+		event.on( 'stream_start', () => {
 			event.clearTimeout();
 		});
 
-		event.on( 'stream_end', ()=>{
+		event.on( 'stream_end', () => {
 			this.setTimeout( event, this.timeout );
 		});
 	}

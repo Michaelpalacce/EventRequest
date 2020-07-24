@@ -27,7 +27,7 @@ class LoggerPlugin extends PluginInterface
 	{
 		if ( this.options.attachToProcess === true )
 		{
-			process.dumpStack	= ()=>{
+			process.dumpStack	= () => {
 				return Loggur.log( Log.getStackTrace() );
 			};
 
@@ -82,7 +82,7 @@ class LoggerPlugin extends PluginInterface
 			logger.error( `Error : ${error}` );
 		});
 
-		event.on( 'finished', () =>{
+		event.on( 'finished', () => {
 			logger.info( 'Event finished' )
 		});
 
@@ -90,11 +90,11 @@ class LoggerPlugin extends PluginInterface
 			logger.info( `Redirect to: ${redirect.redirectUrl} with status code: ${redirect.statusCode}` )
 		});
 
-		event.on( 'cachedResponse', () =>{
+		event.on( 'cachedResponse', () => {
 			logger.info( `Response to ${requestURL} send from cache` )
 		});
 
-		event.on( 'stop', () =>{
+		event.on( 'stop', () => {
 			logger.verbose( 'Event stopped' )
 		});
 
@@ -102,11 +102,11 @@ class LoggerPlugin extends PluginInterface
 			logger.verbose( `Header set: ${header.key} with value: ${header.value}` )
 		});
 
-		event.on( 'cleanUp', () =>{
+		event.on( 'cleanUp', () => {
 			logger.verbose( 'Event is cleaning up' )
 		});
 
-		event.on( 'clearTimeout', () =>{
+		event.on( 'clearTimeout', () => {
 			logger.verbose( 'Timeout cleared' )
 		});
 	}
@@ -124,7 +124,7 @@ class LoggerPlugin extends PluginInterface
 			handler	: ( event ) =>{
 				const requestURL	= event.request.url;
 
-				event.on( 'cleanUp', () =>{
+				event.on( 'cleanUp', () => {
 					const userAgent	= typeof event.headers['user-agent'] === 'undefined' ? 'UNKNOWN' : event.headers['user-agent'];
 					logger.notice( `${event.method} ${requestURL} ${event.response.statusCode} ||| ${event.clientIp} ||| ${userAgent}` );
 				});

@@ -57,12 +57,10 @@
   "name": "event_request",
   "scripts": {
     "test": "./node_modules/.bin/istanbul cover test.js",
-    "lint": "./node_modules/.bin/goodparts server/",
     "deploy": "npm run test && npm publish"
   },
   "version": "26.0.1",
   "devDependencies": {
-    "goodparts": "^1.3.0",
     "istanbul": "^0.4.5"
   }
 }

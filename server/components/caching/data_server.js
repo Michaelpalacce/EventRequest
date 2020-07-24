@@ -80,7 +80,7 @@ class DataServer extends EventEmitter
 		{
 			this._setUpPersistence();
 
-			const persistInterval	= setInterval(()=>{
+			const persistInterval	= setInterval(() => {
 				this._garbageCollect();
 				this._saveData();
 			}, this.persistInterval );
@@ -88,7 +88,7 @@ class DataServer extends EventEmitter
 			this.intervals.push( persistInterval );
 		}
 
-		const garbageCollectInterval	= setInterval(()=>{
+		const garbageCollectInterval	= setInterval(() => {
 			this._garbageCollect();
 		}, gcInterval );
 
@@ -615,7 +615,7 @@ class DataServer extends EventEmitter
 		writeStream.write( JSON.stringify( serverData ) );
 		writeStream.end();
 
-		writeStream.on( 'close', ()=>{
+		writeStream.on( 'close', () => {
 			const readableStream	= fs.createReadStream( tmpFile );
 			const writeStream		= fs.createWriteStream( this.persistPath );
 			readableStream.pipe( writeStream );
@@ -630,7 +630,7 @@ class DataServer extends EventEmitter
 				this.emit( '_saveDataError', { error } );
 			});
 
-			writeStream.on( 'close', ()=>{
+			writeStream.on( 'close', () => {
 				this.emit( '_saveData' );
 				unlink( tmpFile ).catch( ( error )=>{
 					Loggur.log( error, Loggur.LOG_LEVELS.error );

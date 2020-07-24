@@ -223,7 +223,7 @@ test({
 		);
 		let jsonBodyParser	= new JsonBodyParser( { strict: false } );
 
-		jsonBodyParser.parse( eventRequest ).then(()=>{ done( 'Should have rejected' ); } ).catch(( err )=>{
+		jsonBodyParser.parse( eventRequest ).then(() => { done( 'Should have rejected' ); } ).catch(( err )=>{
 			assert.equal( err !== false, true );
 			done();
 		});

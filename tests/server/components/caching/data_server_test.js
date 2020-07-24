@@ -79,7 +79,7 @@ test({
 		};
 
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( () => {
 			fs.writeFileSync( DEFAULT_PERSIST_FILE, JSON.stringify( data ) );
 
 			const dataServer	= new DataServer();
@@ -110,7 +110,7 @@ test({
 		};
 
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( () => {
 			fs.writeFileSync( DEFAULT_PERSIST_FILE, JSON.stringify( data ) );
 
 			const dataServer	= new DataServer( { persist: false } );
@@ -128,7 +128,7 @@ test({
 	message	: 'DataServer.set sets data',
 	test	: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( () => {
 			const dataServer	= new DataServer();
 			const key			= 'key';
 			const value			= 'value';
@@ -140,7 +140,7 @@ test({
 			assert.equal( dataServer.intervals.length, 2 );
 			assert.deepStrictEqual( dataServer.server, {} );
 
-			dataServer.on( 'set', ()=>{
+			dataServer.on( 'set', () => {
 				called ++;
 			});
 
@@ -167,7 +167,7 @@ test({
 	message	: 'DataServer.set sets data without options',
 	test	: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( () => {
 			const dataServer	= new DataServer();
 			const key			= 'key';
 			const value			= 'value';
@@ -200,7 +200,7 @@ test({
 	message	: 'DataServer.set with ttl === -1',
 	test	: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( () => {
 			const dataServer	= new DataServer( { persist: false } );
 			const key			= 'key';
 			const value			= 'value';
@@ -244,7 +244,7 @@ test({
 	],
 	test			: ( done, key, value, ttl, options )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 
 			assert.equal( await dataServer.set( key, value, ttl, options ), null );
@@ -261,7 +261,7 @@ test({
 	test	: ( done )=>{
 		removeCache();
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 			const key			= 'key';
 			const value			= 'value';
@@ -270,7 +270,7 @@ test({
 			const expected		= { key: { key, value, ttl, persist } };
 			let called			= 0;
 
-			dataServer.on( 'get', ()=>{
+			dataServer.on( 'get', () => {
 				called ++;
 			});
 
@@ -310,7 +310,7 @@ test({
 	test			: ( done, key, options )=>{
 		removeCache();
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 
 			assert.equal( await dataServer.get( key, options ), null );
@@ -325,7 +325,7 @@ test({
 	message	: 'DataServer.get prunes',
 	test	: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 			const key			= 'key';
 			const value			= 'value';
@@ -339,7 +339,7 @@ test({
 
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 
-			setTimeout( async ()=>{
+			setTimeout( async () => {
 				const dataSet	= await dataServer.get( key );
 
 				assert.equal( dataSet, null );
@@ -355,7 +355,7 @@ test({
 	message	: 'DataServer.touch updates expirationDate',
 	test	: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 			const key			= 'key';
 			const value			= 'value';
@@ -363,7 +363,7 @@ test({
 			const persist		= true;
 			let called			= 0;
 
-			dataServer.on( 'touch', ()=>{
+			dataServer.on( 'touch', () => {
 				called ++;
 			});
 
@@ -375,7 +375,7 @@ test({
 			assert.equal( typeof dataServer.server[key] === 'object', true );
 			const { expirationDate }	= dataServer.server[key];
 
-			setTimeout( async ()=>{
+			setTimeout( async () => {
 				await dataServer.touch( key );
 				const dataSet	= await dataServer.get( key );
 
@@ -411,7 +411,7 @@ test({
 	],
 	test			: ( done, key, ttl, options )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 			await dataServer.set( key, '123' );
 
@@ -427,7 +427,7 @@ test({
 	message	: 'DataServer._getExpirationDateFromTtl returns the correct time',
 	test	: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( () => {
 			const dataServer	= new DataServer( { persist: false } );
 			const now			= Math.floor( ( new Date().getTime() / 1000 ) );
 
@@ -447,14 +447,14 @@ test({
 		removeCache();
 
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const key	= 'key';
 			const dataServer	= new DataServer( { gcInterval: 1, ttl: 1 } );
 			await dataServer.set( key, 'value' );
 
 			assert.notEqual( await dataServer.get( key ), null );
 
-			setTimeout( async ()=>{
+			setTimeout( async () => {
 				assert.equal( await dataServer.get( key ), null );
 
 				removeCache( dataServer );
@@ -470,14 +470,14 @@ test({
 		removeCache();
 
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( () => {
 			const key			= 'key';
 			const keyTwo		= 'keyTwo';
 			const keyThree		= 'keyThree';
 			const dataServer	= new DataServer( { persistInterval: 2, persistPath: DEFAULT_PERSIST_FILE + '1' } );
 			let saveCalled		= false;
 
-			dataServer.on( '_saveData', ()=>{
+			dataServer.on( '_saveData', () => {
 				saveCalled	= true;
 			});
 
@@ -489,7 +489,7 @@ test({
 			assert.notEqual( dataServer.get( keyTwo ), null );
 			assert.notEqual( dataServer.get( keyThree ), null );
 
-			setTimeout(()=>{
+			setTimeout(() => {
 				const content	= fs.readFileSync( DEFAULT_PERSIST_FILE + '1' );
 				const data		= JSON.parse( content.toString( 'utf8' ) );
 
@@ -509,14 +509,14 @@ test({
 		removeCache();
 
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( ()=>{
+		setTimeout( () => {
 			const dataServer	= new DataServer();
 			const key			= 'key';
 			const value			= { test: 'value' };
 
 			let stopCalled		= false;
 
-			dataServer.on( 'stop', ()=>{
+			dataServer.on( 'stop', () => {
 				stopCalled	= true;
 			});
 
@@ -544,13 +544,13 @@ test({
 		removeCache();
 
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer({ persist: false });
 			const key			= 'key';
 			const value			= { test: 'value' };
 			let called			= 0;
 
-			dataServer.on( 'delete', ()=>{
+			dataServer.on( 'delete', () => {
 				called ++;
 			});
 
@@ -591,7 +591,7 @@ test({
 		const key			= 'key';
 		let called			= 0;
 
-		dataServer.on( 'increment', ()=>{
+		dataServer.on( 'increment', () => {
 			called ++;
 		});
 
@@ -642,7 +642,7 @@ test({
 		const key			= 'key';
 		let called			= 0;
 
-		dataServer.on( 'decrement', ()=>{
+		dataServer.on( 'decrement', () => {
 			called ++;
 		});
 
@@ -689,7 +689,7 @@ test({
 	],
 	test			: ( done, key, value, ttl, persist )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 
 			assert.equal( dataServer.intervals.length, 1 );
@@ -707,7 +707,7 @@ test({
 	message			: 'DataServer.constructor on ttl === -1 saves data forever',
 	test			: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false, ttl: -1 } );
 
 			assert.deepStrictEqual( dataServer.server, {} );
@@ -726,11 +726,11 @@ test({
 	message			: 'DataServer.lock locks data correctly',
 	test			: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 			let called			= 0;
 
-			dataServer.on( 'lock', ()=>{
+			dataServer.on( 'lock', () => {
 				called ++;
 			});
 
@@ -752,7 +752,7 @@ test({
 	message			: 'DataServer.lock locks data correctly with double unlock',
 	test			: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 
 			assert.equal( await dataServer.lock( 'key' ), true );
@@ -772,11 +772,11 @@ test({
 	message			: 'DataServer.unlock always returns true',
 	test			: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 			let called			= 0;
 
-			dataServer.on( 'unlock', ()=>{
+			dataServer.on( 'unlock', () => {
 				called ++;
 			});
 
@@ -796,7 +796,7 @@ test({
 	message			: 'DataServer.lock acquires only one lock',
 	test			: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 			const promises		= [];
 
@@ -824,7 +824,7 @@ test({
 	message			: 'DataServer.lock acquires another lock with burst of locks',
 	test			: ( done )=>{
 		// Wait in case the file has not been deleted from the FS
-		setTimeout( async ()=>{
+		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
 			const promises		= [];
 

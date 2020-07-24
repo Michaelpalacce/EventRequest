@@ -12,7 +12,7 @@ test({
 	message	: 'EventRequest should throw an error with invalid constructor parameters',
 	test	: function ( done )
 	{
-		assert.throws( ()=>{
+		assert.throws( () => {
 			new EventRequest();
 		});
 
@@ -71,7 +71,7 @@ test({
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 
-		assert.doesNotThrow( () =>{
+		assert.doesNotThrow( () => {
 			eventRequest.errorHandler	= new ErrorHandler();
 			eventRequest.errorHandler	= {};
 		});
@@ -91,7 +91,7 @@ test({
 		eventRequest._mock({
 			method			: 'send',
 			called			: 1,
-			shouldReturn	: ()=>{ called = true; }
+			shouldReturn	: () => { called = true; }
 		});
 
 		eventRequest.sendError( errorToThrow );
@@ -106,7 +106,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
 
-		eventRequest.on( 'cleanUp', ()=>{ cleanUp = true; });
+		eventRequest.on( 'cleanUp', () => { cleanUp = true; });
 
 		eventRequest._cleanUp();
 
@@ -119,7 +119,7 @@ test({
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let finished		= false;
-		eventRequest.on( 'finished', ()=>{ finished = true; });
+		eventRequest.on( 'finished', () => { finished = true; });
 
 		eventRequest._cleanUp();
 
@@ -131,7 +131,7 @@ test({
 	message	: 'EventRequest _cleanUp cleans up data',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		eventRequest.on( 'test', ()=>{} );
+		eventRequest.on( 'test', () => {} );
 
 		assert.equal( eventRequest.listeners( 'test' ).length, 1 );
 
@@ -167,7 +167,7 @@ test({
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
-			shouldReturn	: ()=>{ send = true; },
+			shouldReturn	: () => { send = true; },
 			called			: 1
 		});
 
@@ -184,7 +184,7 @@ test({
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
-			shouldReturn	: ()=>{ send = true; },
+			shouldReturn	: () => { send = true; },
 			called			: 1
 		});
 
@@ -201,10 +201,10 @@ test({
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
-			shouldReturn	: ()=>{}
+			shouldReturn	: () => {}
 		});
 
-		eventRequest.on( 'send', () =>{
+		eventRequest.on( 'send', () => {
 			send	= true;
 		});
 
@@ -221,7 +221,7 @@ test({
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
-			shouldReturn	: ()=>{}
+			shouldReturn	: () => {}
 		});
 
 		eventRequest.on( 'send', ( payload ) =>{
@@ -242,7 +242,7 @@ test({
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
-			shouldReturn	: ()=>{}
+			shouldReturn	: () => {}
 		});
 
 		eventRequest.on( 'send', ( payload ) =>{
@@ -268,7 +268,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		eventRequest.response._mock({
 			method			: 'end',
-			shouldReturn	: ()=>{}
+			shouldReturn	: () => {}
 		});
 
 		let statusCode	= 200;
@@ -285,7 +285,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
 
-		eventRequest.on( 'cleanUp', ()=>{ cleanUp = true; });
+		eventRequest.on( 'cleanUp', () => { cleanUp = true; });
 
 		eventRequest.send( '' );
 
@@ -299,7 +299,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
 
-		eventRequest.on( 'cleanUp', ()=>{ cleanUp = true; });
+		eventRequest.on( 'cleanUp', () => { cleanUp = true; });
 
 		eventRequest.send( '' );
 
@@ -313,7 +313,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		let setResponseHeader		= false;
 
-		eventRequest.on( 'setResponseHeader', ()=>{ setResponseHeader = true; });
+		eventRequest.on( 'setResponseHeader', () => { setResponseHeader = true; });
 
 		eventRequest.setResponseHeader( 'key', 'value' );
 
@@ -327,7 +327,7 @@ test({
 		let eventRequest	= helpers.getEventRequest();
 		let removeHeader	= false;
 
-		eventRequest.on( 'removeResponseHeader', ()=>{ removeHeader = true; });
+		eventRequest.on( 'removeResponseHeader', () => { removeHeader = true; });
 
 		eventRequest.removeResponseHeader( 'key' );
 
@@ -358,7 +358,7 @@ test({
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
-			shouldReturn	: ()=>{ setHeader = true; },
+			shouldReturn	: () => { setHeader = true; },
 			called			: 1,
 			with			: [['key', 'value']]
 		});
@@ -377,7 +377,7 @@ test({
 
 		eventRequest.response._mock({
 			method			: 'removeHeader',
-			shouldReturn	: ()=>{ removeHeader = true; },
+			shouldReturn	: () => { removeHeader = true; },
 			called			: 1,
 			with			: [['key']]
 		});
@@ -398,7 +398,7 @@ test({
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				throw new Error( 'EventRequest setHeader should not have called response.setHeader' );
 			}
 		});
@@ -433,7 +433,7 @@ test({
 
 		eventRequest.response._mock({
 			method			: 'removeHeader',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				throw new Error( 'EventRequest removeResponseHeader should not have called response.removeHeader' );
 			}
 		});
@@ -486,7 +486,7 @@ test({
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
-			shouldReturn	: ()=>{ setResponseHeader = true; },
+			shouldReturn	: () => { setResponseHeader = true; },
 			with			: [['Location', redirectUrl]],
 			called			: 1
 		});
@@ -509,7 +509,7 @@ test({
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				throw new Error( 'EventRequest setHeader should not have called response.setHeader' );
 			}
 		});
@@ -579,7 +579,7 @@ test({
 			firstCalled	= true;
 			event.next();
 		};
-		const callbackTwo	= () =>{
+		const callbackTwo	= () => {
 			secondCalled	= true;
 		};
 
@@ -603,12 +603,12 @@ test({
 		eventRequest.errorHandler	= new MockedErrorHandler();
 		eventRequest.errorHandler._mock({
 			method			: 'handleError',
-			shouldReturn	: ()=>{ error = true; },
+			shouldReturn	: () => { error = true; },
 			with			: [[eventRequest, errorToThrow]],
 			called			: 1
 		});
 
-		const callbackOne	= () =>{
+		const callbackOne	= () => {
 			firstCalled	= true;
 			throw errorToThrow;
 		};
@@ -633,12 +633,12 @@ test({
 		eventRequest.errorHandler	= new MockedErrorHandler();
 		eventRequest.errorHandler._mock({
 			method			: 'handleError',
-			shouldReturn	: ()=>{ error = true; },
+			shouldReturn	: () => { error = true; },
 			with			: [[eventRequest, errorToThrow]],
 			called			: 1
 		});
 
-		const callbackOne	= async () =>{
+		const callbackOne	= async () => {
 			firstCalled	= true;
 			throw errorToThrow;
 		};
@@ -648,7 +648,7 @@ test({
 
 		eventRequest.next();
 
-		setTimeout(()=>{
+		setTimeout(() => {
 			firstCalled && error ? done() : done( 'EventRequest.next error did not get handled' );
 		}, 100 );
 	}
@@ -665,12 +665,12 @@ test({
 		eventRequest.errorHandler	= new MockedErrorHandler();
 		eventRequest.errorHandler._mock({
 			method			: 'handleError',
-			shouldReturn	: ()=>{ error = true; },
+			shouldReturn	: () => { error = true; },
 			with			: [[eventRequest, errorToSend]],
 			called			: 1
 		});
 
-		let callback	= ()=>{};
+		let callback	= () => {};
 
 		let block		= [callback];
 		eventRequest._setBlock( block );
@@ -690,7 +690,7 @@ test({
 		eventRequest.errorHandler	= new MockedErrorHandler();
 		eventRequest.errorHandler._mock({
 			method			: 'handleError',
-			shouldReturn	: ()=>{ error = true; },
+			shouldReturn	: () => { error = true; },
 			with			: [[eventRequest, undefined]],
 			called			: 1
 		});
@@ -717,7 +717,7 @@ test({
 			method			: 'handleError',
 			called			: 1,
 			with			: [[eventRequest, errorToThrow]],
-			shouldReturn	: ()=>{ error = true; }
+			shouldReturn	: () => { error = true; }
 		});
 
 		eventRequest.sendError( errorToThrow );

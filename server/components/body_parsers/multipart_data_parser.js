@@ -590,7 +590,7 @@ class MultipartDataParser extends EventEmitter
 						reject( err );
 					});
 
-					this.on( 'end', ()=>{
+					this.on( 'end', () => {
 						this.ended	= true;
 						this.stripDataFromParts();
 						this.separateParts();
@@ -647,7 +647,7 @@ class MultipartDataParser extends EventEmitter
 	 */
 	cleanUpItems()
 	{
-		setTimeout(()=>{
+		setTimeout(() => {
 			if ( typeof this.parts.$files !== 'undefined' )
 			{
 				this.parts.$files.forEach( ( part ) =>{
@@ -667,7 +667,7 @@ class MultipartDataParser extends EventEmitter
 						if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
 							part.file.end();
 
-						part.file.on( 'end',()=>{
+						part.file.on( 'end',() => {
 							unlink( part.path ).catch(( e )=>{
 								Loggur.log( e, Loggur.LOG_LEVELS.error );
 							});

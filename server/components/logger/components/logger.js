@@ -125,7 +125,7 @@ class Logger
 					message	: [reason + ' Unhandled Rejection at Promise: ' + p]
 				});
 
-				this.log( unhandledRejectionLog ).then( ()=>{}, ()=>{} );
+				this.log( unhandledRejectionLog ).then( () => {}, () => {} );
 			});
 
 			process.on( 'uncaughtException', ( err ) => {
@@ -134,7 +134,7 @@ class Logger
 					message	: err.stack
 				});
 
-				this.log( uncaughtExceptionLog ).finally(()=>{
+				this.log( uncaughtExceptionLog ).finally(() => {
 					if ( this.dieOnCapture )
 						process.exit( 1 );
 				});
@@ -233,10 +233,10 @@ class Logger
 
 			this.transports.forEach( ( transport ) =>{
 				let logPromise	= new Promise( ( resolve, reject )=>{
-					setImmediate(()=>{
+					setImmediate(() => {
 						const transportPromise	= transport.log( log );
 
-						transportPromise.then(()=>{
+						transportPromise.then(() => {
 							resolve();
 						}).catch( reject );
 					});

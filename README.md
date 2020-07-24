@@ -1,7 +1,7 @@
 # EventRequest
 A highly customizable backend server in NodeJs
 
-[![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest) [![Inline docs](http://inch-ci.org/github/Michaelpalacce/EventRequest.svg?branch=master)](http://inch-ci.org/github/Michaelpalacce/EventRequest) [![Dependencies](https://david-dm.org/Michaelpalacce/EventRequest.svg)](https://david-dm.org/Michaelpalacce/EventRequest.svg) [![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json) [![npm version](https://badge.fury.io/js/event_request.svg)](https://badge.fury.io/js/event_request)  [![codecov](https://codecov.io/gh/Michaelpalacce/EventRequest/branch/master/graph/badge.svg)](https://codecov.io/gh/Michaelpalacce/EventRequest)
+[![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest) [![Inline docs](http://inch-ci.org/github/Michaelpalacce/EventRequest.svg?branch=master)](http://inch-ci.org/github/Michaelpalacce/EventRequest) [![Dependencies](https://david-dm.org/Michaelpalacce/EventRequest.svg)](https://david-dm.org/Michaelpalacce/EventRequest.svg) [![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json) [![npm version](https://badge.fury.io/js/event_request.svg)](https://badge.fury.io/js/event_request)  [![codecov](https://codecov.io/gh/Michaelpalacce/EventRequest/branch/master/graph/badge.svg)](https://codecov.io/gh/Michaelpalacce/EventRequest) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3c843dd2bc454f06b10eb60820dc6d1b)](https://www.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Michaelpalacce/EventRequest&amp;utm_campaign=Badge_Grade)
 
 [**CHANGELOG**](https://github.com/Michaelpalacce/EventRequest/blob/master/UPDATELOG.md) || [**BENCHMARKS**](https://github.com/Michaelpalacce/EventRequest-Benchmarks)
 
@@ -16,7 +16,7 @@ app.get( '/', ( event ) => {
 });
 
 // Start Listening
-app.listen( 80, ()=>{
+app.listen( 80, () => {
  app.Loggur.log( 'Server started' );
 });
 ~~~
@@ -50,10 +50,10 @@ appTwo.get( '/', ( event ) => {
     event.send( '<h1>Hello World x2!</h1>' );
 });
 
-appOne.listen( 3334, ()=>{
+appOne.listen( 3334, () => {
     Loggur.log( 'Server one started at port: 3334' );
 });
-appTwo.listen( 3335, ()=>{
+appTwo.listen( 3335, () => {
     Loggur.log( 'Server two started at port: 3335' );
 });
 ~~~
@@ -75,7 +75,7 @@ app.get( '/test',( event )=>{
     event.send( 'ok' );
 });
 
-server.listen( '80',()=>{
+server.listen( '80',() => {
     app.Loggur.log( 'Server is up and running on port 80' )
 });
 ~~~
@@ -256,7 +256,7 @@ app.get( /\/pa/, ( event )=>{
     event.send( 'ok' );
 });
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     Loggur.log( 'Server Started, try going to http://localhost and then to http://localhost/path. Don\'t forget to check the console logs ' );
 });
 ~~~
@@ -284,7 +284,7 @@ app.listen( 80, ()=>{
 - Optional if omitted none will be called
 
 - server.add accepts a object that must contain **handler** but **route**, **method** and **middlewares** are optional.
-- ( { method: '', route: '', handler:()=>{}, middlewares: [] } )
+- ( { method: '', route: '', handler:() => {}, middlewares: [] } )
 
 ***
 ####Adding Routers:
@@ -326,7 +326,7 @@ routerOne.get( '/route', ( event ) => {
 
 app.add( '/test', routerOne );
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'If you go to http://localhost/test there will be a 404 error, but if you go to http://localhost/test/route it will return ok' );
 });
 ~~~
@@ -350,7 +350,7 @@ userRouter.post( '/add/:username:', app.er_validation.validate( { params: { user
 
 app.add( '/user', userRouter );
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Try going to http://localhost/user/list and after that try posting to http://localhost/user/add/John, when you fetch list again your new user should be added to the list' );
 });
 ~~~
@@ -368,7 +368,7 @@ userRouter.get( /\/path/, ( event )=>{
 
 app.add( '/user', userRouter );
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Try going to http://localhost/user/path and then to http://localhost/user/notPath' );
 });
 ~~~
@@ -386,7 +386,7 @@ routerOne.add( ( event )=>{
 
 App().add( routerOne );
 
-App().listen( 80, ()=>{
+App().listen( 80, () => {
     App().Loggur.log( 'Try hitting http://localhost regardless of path or method ' )
 });
 ~~~
@@ -403,7 +403,7 @@ app.add({
     }
 });
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Try going to http://localhost' );
 });
 ~~~
@@ -424,7 +424,7 @@ router.add({
 
 app.add( router );
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Try going to http://localhost' )
 });
 ~~~
@@ -443,7 +443,7 @@ app.add( ( event )=>{
     event.send( `<h1>Hello World with extra: ${JSON.stringify(event.extra)} !</h1>` );
 });
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Try going to http://localhost' )
 });
 ~~~
@@ -463,7 +463,7 @@ const app = require( 'event_request' )();
 const serverRouter = app.router;
 serverRouter.add( { handler: ( event ) => event.send( 'ok' ) } );
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Try going to http://localhost' );
 });
 ~~~
@@ -491,7 +491,7 @@ app.get( '/todos/:id:', ( event)=>{
     event.send( '<h1>Hello World</h1>' );
 });
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Try going to http://localhost' )
 });
 ~~~
@@ -598,7 +598,7 @@ app.add({
 
 app.add( router );
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Server started' );
 });
 ~~~
@@ -802,7 +802,7 @@ const app = require( 'request_event' )();
 const { App, Loggur } = require( 'event_request' );
 const app = App();
 
-app.listen( '80', ()=>{
+app.listen( '80', () => {
     Loggur.log( 'Server is running' );
 });
 ~~~
@@ -812,7 +812,7 @@ app.listen( '80', ()=>{
 const { App, Loggur } = require( 'event_request' );
 const app = App();
 
-const httpServer = app.listen( '80', ()=>{
+const httpServer = app.listen( '80', () => {
     Loggur.log( 'Server is running' );
 });
 
@@ -840,7 +840,7 @@ app.get( '/test',( event )=>{
     event.send( 'ok' );
 });
 
-server.listen( '80',()=>{
+server.listen( '80',() => {
     app.Loggur.log( 'Server is up and running on port 80' )
 });
 ~~~
@@ -1215,7 +1215,7 @@ app.get( '/', ( event )=>{
     });
 });
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Try hitting http://localhost')
 });
 ~~~
@@ -2220,9 +2220,9 @@ app.apply( timeoutPlugin );
 // app.apply( app.er_timeout ); // This is also valid.
 // app.apply( app.er_timeout, {  timeout : 5 * 1000 } ); // This is also valid.
 
-app.get('/',()=>{});
+app.get('/',() => {});
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
 	app.Loggur.log( 'Try opening http://localhost and wait for 5 seconds' )
 } );
 ~~~
@@ -2360,9 +2360,9 @@ app.apply( app.er_timeout, { timeout: 2 * 1000, callback: ( event )=>{
     }
 });
 
-app.get('/',()=>{});
+app.get('/',() => {});
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
     app.Loggur.log( 'Try opening http://localhost and wait for 2 seconds' )
 });
 ~~~
@@ -2512,7 +2512,7 @@ app.get( '/', async ( event )=>{
 	event.send( value )
 });
 
-app.listen( 80 , ()=>{
+app.listen( 80 , () => {
 	app.Loggur.log( 'Server started, try going to http://localhost twice!' );
 });
 ~~~
@@ -2670,7 +2670,7 @@ app.get( '/',( event )=>{
 	event.send( 'LOGGED IN!' );
 });
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
 	Loggur.log( 'Server started' );
 });
 ~~~
@@ -2879,7 +2879,7 @@ app.get( '/dataTwo', ( event ) =>{
 	}
 );
 
-app.listen( '80', ()=>{
+app.listen( '80', () => {
 	app.Loggur.log( 'Try hitting http://localhost/data?file={someFileInTheCurrentProjectRoot}' );
 });
 ~~~
@@ -3203,7 +3203,7 @@ app.get( '/testFour', 'cache.request', ( event )=>
 	}
 );
 
-app.listen( 80, ()=>{
+app.listen( 80, () => {
 	app.Loggur.log( 'Try going to http://localhost, http://localhost/testTwo, http://localhost/testThree, http://localhost/testFour' );
 });
 ~~~
@@ -3327,7 +3327,7 @@ app.post( '/',
     }
 );
 
-app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
+app.listen( 80, () => { console.log( 'Server started on port 80' ); } );
 ~~~
 
 - Passing a custom failure callback
@@ -3352,7 +3352,7 @@ app.post( '/',
     }
 );
 
-app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
+app.listen( 80, () => { console.log( 'Server started on port 80' ); } );
 ~~~
 
 - When passing a default one and a custom one, the custom one will be used
@@ -3400,7 +3400,7 @@ app.post( '/',
     }
 );
 
-app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
+app.listen( 80, () => { console.log( 'Server started on port 80' ); } );
 ~~~
 
 - When passing a default one if no failure callback is provided then the default one will be used
@@ -3430,7 +3430,7 @@ app.post( '/',
     }
 );
 
-app.listen( 80, ()=>{ console.log( 'Server started on port 80' ); } );
+app.listen( 80, () => { console.log( 'Server started on port 80' ); } );
 ~~~
 
 ***

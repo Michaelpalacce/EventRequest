@@ -8,7 +8,7 @@ test({
 	test	: ( done )=>{
 		const bucket	= new Bucket();
 
-		bucket.init().then(()=>{
+		bucket.init().then(() => {
 			assert.equal( bucket.refillTime, 60000 );
 			assert.equal( bucket.maxAmount, 1000 );
 			assert.equal( bucket.refillAmount, 100 );
@@ -22,7 +22,7 @@ test({
 	test	: ( done )=>{
 		const bucket	= new Bucket();
 
-		bucket.init().then( async ()=>{
+		bucket.init().then( async () => {
 			await bucket.reduce();
 
 			const lastUpdate	= bucket.lastUpdate;
@@ -30,7 +30,7 @@ test({
 			assert.equal( await bucket._getValue(), 999 );
 			assert.notEqual( await bucket._getValue(), bucket.maxAmount );
 
-			setTimeout( async ()=>{
+			setTimeout( async () => {
 				await bucket.reset();
 
 				assert.notEqual( await bucket._getLastUpdate(), lastUpdate );
@@ -47,7 +47,7 @@ test({
 	test	: ( done )=>{
 		const bucket	= new Bucket();
 
-		bucket.init().then( async ()=>{
+		bucket.init().then( async () => {
 			assert.equal( await bucket.get(), bucket.maxAmount );
 			await bucket.reduce();
 			assert.equal( await bucket.get(), 999 );
@@ -62,7 +62,7 @@ test({
 	test	: ( done )=>{
 		const bucket	= new Bucket( 1, 1, 10 );
 
-		bucket.init().then( async ()=>{
+		bucket.init().then( async () => {
 			assert.equal( await bucket.get(), bucket.maxAmount );
 			assert.equal( await bucket.reduce(), true );
 			assert.equal( await bucket.get(), 9 );
@@ -77,7 +77,7 @@ test({
 	test	: ( done )=>{
 		const bucket	= new Bucket( 1, 1, 10 );
 
-		bucket.init().then( async ()=>{
+		bucket.init().then( async () => {
 			assert.equal( await bucket.get(), bucket.maxAmount );
 			assert.equal( await bucket.reduce( 11 ), false );
 			assert.equal( await bucket.get(), bucket.maxAmount );
@@ -92,10 +92,10 @@ test({
 	test	: ( done )=>{
 		const bucket	= new Bucket( 1, 1, 10 );
 
-		bucket.init().then( async ()=>{
+		bucket.init().then( async () => {
 			assert.equal( await bucket.get(), bucket.maxAmount );
 			assert.equal( await bucket.reduce(), true );
-			setTimeout( async ()=>{
+			setTimeout( async () => {
 				assert.equal( await bucket.get(), bucket.maxAmount );
 				done();
 			}, 1050 );
@@ -108,12 +108,12 @@ test({
 	test	: ( done )=>{
 		const bucket	= new Bucket( 1, 1, 10 );
 
-		bucket.init().then( async ()=>{
+		bucket.init().then( async () => {
 			assert.equal( await bucket.get(), bucket.maxAmount );
 			assert.equal( await bucket.reduce(), true );
 			assert.equal( await bucket.get(), 9 );
 
-			setTimeout( async()=>{
+			setTimeout( async() => {
 				// Should have refilled twice but is refilled only once ( and minus one token is 9 )
 				assert.equal( await bucket.reduce(), true );
 				assert.equal( await bucket.get(), 9 );
@@ -128,7 +128,7 @@ test({
 	test	: ( done )=>{
 		const bucket	= new Bucket( 1, 100, 10000 );
 
-		bucket.init().then( async ()=>{
+		bucket.init().then( async () => {
 			assert.equal( await bucket.get(), bucket.maxAmount );
 
 			const promises	= [];
@@ -159,7 +159,7 @@ test({
 		const bucket				= new Bucket( 1, 100, 10000 );
 		const expectedFalseTokens	= 500;
 
-		bucket.init().then( async ()=>{
+		bucket.init().then( async () => {
 			assert.equal( await bucket.get(), bucket.maxAmount );
 
 			const promises	= [];
@@ -195,7 +195,7 @@ test({
 		const bucket				= new Bucket( 5000, 1, 10000 );
 		const expectedFalseTokens	= 5000;
 
-		bucket.init().then( async ()=>{
+		bucket.init().then( async () => {
 			assert.equal( await bucket.get(), bucket.maxAmount );
 
 			const promises	= [];
@@ -205,7 +205,7 @@ test({
 				promises.push( bucket.reduce() );
 			}
 
-			setTimeout( async ()=>{
+			setTimeout( async () => {
 				assert.equal( await bucket.isFull(), true )
 
 				for ( let i = 0; i < 15000; i ++ )

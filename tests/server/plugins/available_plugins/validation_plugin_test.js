@@ -7,7 +7,7 @@ const ValidationPlugin					= require( '../../../../server/plugins/available_plug
 test({
 	message	: 'ValidationPlugin.constructor.on.defaults.does.not.throw',
 	test	: ( done )=>{
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			const plugin	= new ValidationPlugin();
 
 			assert.equal( plugin.getPluginId(), undefined );
@@ -34,11 +34,11 @@ test({
 	test	: ( done )=>{
 		const plugin				= new ValidationPlugin();
 		const eventRequest			= helpers.getEventRequest( 'GET', '/?testKey=123&testKeyTwo=123', { headerTest: '123', headerTestTwo: 123 } );
-		const validationCallback	= plugin.validate( { query: { testKey: 'numeric||range:1-255' }, headers: { headerTest: 'numeric||range:1-255' } }, ()=>{ done( 'Validation Failed' ); } );
+		const validationCallback	= plugin.validate( { query: { testKey: 'numeric||range:1-255' }, headers: { headerTest: 'numeric||range:1-255' } }, () => { done( 'Validation Failed' ); } );
 
 		eventRequest._mock({
 			method			: 'next',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 
 				assert.deepStrictEqual( eventRequest.query.testKey, 123 );
 				assert.deepStrictEqual( eventRequest.query.testKeyTwo, '123' );
@@ -51,7 +51,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'send',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done( 'Should not be called' );
 			}
 		});
@@ -77,14 +77,14 @@ test({
 
 		eventRequest._mock({
 			method			: 'next',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done( 'Should not be called' );
 			}
 		});
 
 		eventRequest._mock({
 			method			: 'send',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done( 'Should not be called' );
 			}
 		});
@@ -104,7 +104,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'next',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done( 'Should not be called' );
 			}
 		});
@@ -115,7 +115,7 @@ test({
 			with			: [
 				[{ query: { testKey: ['numeric'] } }]
 			],
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done();
 			}
 		});
@@ -135,7 +135,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'next',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done( 'Should not be called' );
 			}
 		});
@@ -146,7 +146,7 @@ test({
 			with			: [
 				[{ query: { testKey: ['numeric'] } }]
 			],
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done();
 			}
 		});
@@ -174,7 +174,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'next',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done( 'Should not be called' );
 			}
 		});
@@ -185,7 +185,7 @@ test({
 			with			: [
 				['error']
 			],
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done();
 			}
 		});

@@ -49,7 +49,7 @@ test({
 		let MockedFile		= Mock( File );
 		Mocker( MockedFile, {
 			method			: 'getWriteStream',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				++ called;
 				return new Writable();
 			},
@@ -85,7 +85,7 @@ test({
 
 		Mocker( MockedFile, {
 			method			: 'getWriteStream',
-			shouldReturn	: ()=>{},
+			shouldReturn	: () => {},
 			called			: 1
 		} );
 
@@ -173,7 +173,7 @@ test({
 
 		Mocker( MockedFile, {
 			method			: 'getWriteStream',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				return fs.createWriteStream( path.join( __dirname, './fixtures/testfile' ), {
 					flags		: 'w',
 					autoClose	: true
@@ -194,7 +194,7 @@ test({
 		assert.equal( promise instanceof Promise, true );
 
 		promise.then(
-			()=>{
+			() => {
 				let data	= fs.readFileSync( path.join( __dirname, './fixtures/testfile' ) );
 				assert.equal( data.toString().indexOf( logData ) !== -1, true );
 

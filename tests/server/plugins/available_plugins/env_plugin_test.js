@@ -31,7 +31,7 @@ test({
 
 		fs.writeFileSync( fileLocation, 'TEST=VALUE' );
 
-		setTimeout(()=>{
+		setTimeout(() => {
 			assert.equal( 'VALUE', process.env.TEST );
 			assert.equal( true, typeof process.env.TESTKEY === 'undefined' );
 			assert.equal( true, typeof process.env.TESTKEYTWO === 'undefined' );

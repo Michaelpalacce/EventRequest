@@ -25,7 +25,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'send',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called	++;
 			},
 			with			: [['rendered', 200]],
@@ -34,7 +34,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'setResponseHeader',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				setHeaderCalled	++;
 			},
 			called			: 1
@@ -50,7 +50,7 @@ test({
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
-		eventRequest.render( 'test', {}, done ).then(()=>{
+		eventRequest.render( 'test', {}, done ).then(() => {
 			assert.equal( 1, called );
 			assert.equal( 1, setHeaderCalled );
 			assert.equal( false, typeof eventRequest.render === 'undefined' );

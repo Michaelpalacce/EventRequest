@@ -45,7 +45,7 @@ class DataServerPlugin extends PluginInterface
 			handler	: ( event )=>{
 				event.dataServer	= this.getServer();
 
-				event.on( 'cleanUp', ()=>{
+				event.on( 'cleanUp', () => {
 					event.dataServer	= null;
 				} );
 

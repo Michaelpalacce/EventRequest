@@ -9,7 +9,7 @@ const Server							= require( '../../../../server/server' );
 test({
 	message	: 'Router.constructor does not die',
 	test	: ( done )=>{
-		assert.doesNotThrow( ()=>{
+		assert.doesNotThrow( () => {
 			new Router();
 		});
 
@@ -21,7 +21,7 @@ test({
 	message	: 'Router.add throws an exception on invalid middleware',
 	test	: ( done )=>{
 		let router	= new Router();
-		assert.throws( ()=>{
+		assert.throws( () => {
 			router.add( null );
 		});
 		done();
@@ -34,7 +34,7 @@ test({
 		let router			= new Router();
 		let defaultRoute	= new Route({});
 
-		assert.doesNotThrow( ()=>{
+		assert.doesNotThrow( () => {
 			router.add({});
 		});
 
@@ -49,7 +49,7 @@ test({
 		const router		= new Router();
 		const defaultRoute	= new Route({});
 
-		assert.doesNotThrow( ()=>{
+		assert.doesNotThrow( () => {
 			assert.deepStrictEqual( router.add({}), router );
 		});
 
@@ -63,7 +63,7 @@ test({
 	test	: ( done )=>{
 		const router		= new Router();
 
-		assert.throws( ()=>{
+		assert.throws( () => {
 			router.add();
 		});
 
@@ -120,10 +120,10 @@ test({
 		routerOne.add({
 			route	: '/test',
 			method	: 'GET',
-			handler	: ()=>{}
+			handler	: () => {}
 		});
-		routerOne.get( '/routre', ()=>{} );
-		routerOne.post( '/routrePOST', ()=>{} );
+		routerOne.get( '/routre', () => {} );
+		routerOne.post( '/routrePOST', () => {} );
 
 		routerTwo.add( '/route', routerOne );
 
@@ -142,7 +142,7 @@ test({
 		let routerOne		= new Router();
 		let routerTwo		= new Router();
 
-		routerOne.get( /\/(value)/g, ()=>{} );
+		routerOne.get( /\/(value)/g, () => {} );
 
 		routerTwo.add( '/route', routerOne );
 
@@ -295,7 +295,7 @@ test({
 	test	: ( done )=>{
 		const router	= new Router();
 
-		assert.throws( ()=>{
+		assert.throws( () => {
 			router.getExecutionBlockForCurrentEvent( {} );
 		});
 
@@ -371,11 +371,11 @@ test({
 		const middlewareName	= 'test';
 		const router			= new Router();
 
-		assert.doesNotThrow( ()=>{
+		assert.doesNotThrow( () => {
 			router.define( middlewareName, ( event )=>{} );
 		});
 
-		assert.throws( ()=>{
+		assert.throws( () => {
 			router.define( middlewareName, ( event )=>{} );
 		});
 
@@ -388,7 +388,7 @@ test({
 	test	: ( done )=>{
 		const router	= new Router();
 
-		assert.throws( ()=>{
+		assert.throws( () => {
 			router.define( 123, ( event )=>{} );
 		});
 
@@ -401,7 +401,7 @@ test({
 	test	: ( done )=>{
 		const router	= new Router();
 
-		assert.throws( ()=>{
+		assert.throws( () => {
 			router.define( 'test', 'bad' );
 		});
 
@@ -419,13 +419,13 @@ test({
 			{
 				route: '/test',
 				method: 'GET',
-				handler: ()=>{},
+				handler: () => {},
 				middlewares: ['test', 'test2']
 			}
 		);
 
-		router.define( 'test', ()=>{} );
-		router.define( 'test2', ()=>{} );
+		router.define( 'test', () => {} );
+		router.define( 'test2', () => {} );
 		router.add( routeWIthRouteTestAndGet );
 
 		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
@@ -444,7 +444,7 @@ test({
 			{
 				route: '/test',
 				method: 'GET',
-				handler: ()=>{}
+				handler: () => {}
 			}
 		);
 
@@ -472,8 +472,8 @@ test({
 
 		const router			= new Router();
 
-		const route				= new Route( { route: '/test', method: 'GET', handler: ()=>{} } );
-		const routeTwo			= new Route( { route: '/testTwo', method: 'GET', handler: ()=>{} } );
+		const route				= new Route( { route: '/test', method: 'GET', handler: () => {} } );
+		const routeTwo			= new Route( { route: '/testTwo', method: 'GET', handler: () => {} } );
 
 		router.add( route ).add( routeTwo );
 
@@ -522,7 +522,7 @@ test({
 			{
 				route: '/test',
 				method: 'GET',
-				handler: ()=>{}
+				handler: () => {}
 			}
 		);
 
@@ -547,14 +547,14 @@ test({
 			{
 				route: '/test',
 				method: 'GET',
-				handler: ()=>{},
+				handler: () => {},
 				middlewares: ['test', 'test2']
 			}
 		);
 
 		router.add( routeWIthRouteTestAndGet );
 
-		assert.throws( ()=>{
+		assert.throws( () => {
 			router.getExecutionBlockForCurrentEvent( eventRequest );
 		} );
 
@@ -568,8 +568,8 @@ test({
 		const routerOne	= new Router();
 		const routerTwo	= new Router();
 
-		routerOne.define( 'test1', ()=>{} );
-		routerTwo.define( 'test2', ()=>{} );
+		routerOne.define( 'test1', () => {} );
+		routerTwo.define( 'test2', () => {} );
 
 		routerOne.add( routerTwo );
 
@@ -585,10 +585,10 @@ test({
 		const routerOne	= new Router();
 		const routerTwo	= new Router();
 
-		routerOne.define( 'test', ()=>{} );
-		routerTwo.define( 'test', ()=>{} );
+		routerOne.define( 'test', () => {} );
+		routerTwo.define( 'test', () => {} );
 
-		assert.throws(()=>{
+		assert.throws(() => {
 			routerOne.add( routerTwo );
 		});
 
@@ -642,25 +642,25 @@ test({
 		assert.equal( typeof router.patch !== 'undefined', true );
 		assert.equal( typeof router.copy !== 'undefined', true );
 
-		assert.deepStrictEqual( server.add( { handler: ()=>{} } ) instanceof Server, true );
-		assert.deepStrictEqual( server.add( ()=>{} ) instanceof Server, true );
-		assert.deepStrictEqual( server.get( ()=>{} ) instanceof Server, true );
-		assert.deepStrictEqual( server.post( ()=>{} ) instanceof Server, true );
-		assert.deepStrictEqual( server.put( ()=>{} ) instanceof Server, true );
-		assert.deepStrictEqual( server.delete( ()=>{} ) instanceof Server, true );
-		assert.deepStrictEqual( server.head( ()=>{} ) instanceof Server, true );
-		assert.deepStrictEqual( server.patch( ()=>{} ) instanceof Server, true );
-		assert.deepStrictEqual( server.copy( ()=>{} ) instanceof Server, true );
+		assert.deepStrictEqual( server.add( { handler: () => {} } ) instanceof Server, true );
+		assert.deepStrictEqual( server.add( () => {} ) instanceof Server, true );
+		assert.deepStrictEqual( server.get( () => {} ) instanceof Server, true );
+		assert.deepStrictEqual( server.post( () => {} ) instanceof Server, true );
+		assert.deepStrictEqual( server.put( () => {} ) instanceof Server, true );
+		assert.deepStrictEqual( server.delete( () => {} ) instanceof Server, true );
+		assert.deepStrictEqual( server.head( () => {} ) instanceof Server, true );
+		assert.deepStrictEqual( server.patch( () => {} ) instanceof Server, true );
+		assert.deepStrictEqual( server.copy( () => {} ) instanceof Server, true );
 
-		assert.deepStrictEqual( router.add( { handler: ()=>{} } ) instanceof Router, true );
-		assert.deepStrictEqual( router.add( ()=>{} ) instanceof Router, true );
-		assert.deepStrictEqual( router.get( ()=>{} ) instanceof Router, true );
-		assert.deepStrictEqual( router.post( ()=>{} ) instanceof Router, true );
-		assert.deepStrictEqual( router.put( ()=>{} ) instanceof Router, true );
-		assert.deepStrictEqual( router.delete( ()=>{} ) instanceof Router, true );
-		assert.deepStrictEqual( router.head( ()=>{} ) instanceof Router, true );
-		assert.deepStrictEqual( router.patch( ()=>{} ) instanceof Router, true );
-		assert.deepStrictEqual( router.copy( ()=>{} ) instanceof Router, true );
+		assert.deepStrictEqual( router.add( { handler: () => {} } ) instanceof Router, true );
+		assert.deepStrictEqual( router.add( () => {} ) instanceof Router, true );
+		assert.deepStrictEqual( router.get( () => {} ) instanceof Router, true );
+		assert.deepStrictEqual( router.post( () => {} ) instanceof Router, true );
+		assert.deepStrictEqual( router.put( () => {} ) instanceof Router, true );
+		assert.deepStrictEqual( router.delete( () => {} ) instanceof Router, true );
+		assert.deepStrictEqual( router.head( () => {} ) instanceof Router, true );
+		assert.deepStrictEqual( router.patch( () => {} ) instanceof Router, true );
+		assert.deepStrictEqual( router.copy( () => {} ) instanceof Router, true );
 
 		done();
 	}

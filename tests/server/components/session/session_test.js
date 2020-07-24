@@ -8,7 +8,7 @@ const EventRequest				= require( './../../../../server/event_request' );
 test({
 	message	: 'Session constructor on default throws',
 	test	: ( done )=>{
-		assert.throws(()=>{
+		assert.throws(() => {
 			new Session()
 		});
 
@@ -22,7 +22,7 @@ test({
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= null;
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			session	= new Session( eventRequest )
 		});
 
@@ -55,7 +55,7 @@ test({
 			ttl, sessionKey, sessionIdLength, isCookieSession: false
 		};
 
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			session	= new Session( eventRequest, options )
 		});
 
@@ -80,7 +80,7 @@ test({
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= null;
 
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			session	= new Session( eventRequest )
 		});
 
@@ -98,7 +98,7 @@ test({
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= null;
 
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			session	= new Session( eventRequest, { isCookieSession: false, sessionKey: 'testSid' } )
 		});
 
@@ -116,7 +116,7 @@ test({
 		let session				= null;
 		let sessionIdLength		= 10;
 
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			session	= new Session( eventRequest, { sessionIdLength } );
 		});
 
@@ -134,7 +134,7 @@ test({
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= null;
 
-		assert.doesNotThrow( async ()=>{
+		assert.doesNotThrow( async () => {
 			session	= new Session( eventRequest );
 			await session.hasSession() ? done( 'There is a sesion but there shouldn\'t be one' ) : done();
 		});
@@ -152,7 +152,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'setCookie',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				setCookie	= true;
 			},
 			called			: 2
@@ -213,7 +213,7 @@ test({
 		assert.equal( true, session.has( 'key') );
 		assert.equal( 'value', session.get( 'key' ) );
 		session.delete( 'key' );
-		assert.throws(()=>{
+		assert.throws(() => {
 			session.get( 'key' );
 		});
 

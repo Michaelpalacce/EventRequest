@@ -14,7 +14,7 @@ const Route				= require( '../../../../server/components/routing/route' );
  *
  * @return	Route
  */
-function getRoute( handler = ()=>{}, route = '', method = '', middlewares = [] )
+function getRoute( handler = () => {}, route = '', method = '', middlewares = [] )
 {
 	return new Route({
 		handler,
@@ -36,7 +36,7 @@ test({
 test({
 	message	: 'Route.constructor throws with invalid arguments',
 	test	: ( done ) =>{
-		assert.throws( ()=>{
+		assert.throws( () => {
 			new Route();
 		});
 

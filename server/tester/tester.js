@@ -157,7 +157,7 @@ class Tester
 					if ( response instanceof Promise )
 					{
 						response.catch(( error )=>{
-							setImmediate(()=>{
+							setImmediate(() => {
 								done( error );
 							});
 						});
@@ -251,7 +251,7 @@ class Tester
 		logPromises.push( this.consoleLogger.warning( `There were ${this.incomplete.length} incomplete tests` ) );
 
 		// Done so logging can occur by adding this to the end of the event loop
-		Promise.all( logPromises ).then(()=>{
+		Promise.all( logPromises ).then(() => {
 			this.callback( this.errors.length > 0 ? 'Errors while testing' : false );
 		});
 	};
@@ -349,7 +349,7 @@ class Tester
 			if ( response instanceof Promise )
 			{
 				response.catch(( error )=>{
-					setImmediate(()=>{
+					setImmediate(() => {
 						this.doneCallback( test, error );
 					});
 				});

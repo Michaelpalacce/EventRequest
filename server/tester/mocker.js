@@ -10,7 +10,7 @@ class Mocker
 	constructor( mockedClass, mockMethodOptions )
 	{
 		this.mockedClass		= mockedClass;
-		this.mockedMethod		= ()=>{};
+		this.mockedMethod		= () => {};
 
 		this.method				= typeof mockMethodOptions.method === 'string'
 								? mockMethodOptions.method

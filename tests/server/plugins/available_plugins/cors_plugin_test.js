@@ -8,7 +8,7 @@ const Server							= require( '../../../../server/server' );
 test({
 	message	: 'CorsPlugin.constructor.on.defaults.does.not.throw',
 	test	: ( done )=>{
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			const plugin	= new CorsPlugin();
 
 			assert.equal( plugin.getPluginId(), undefined );
@@ -51,14 +51,14 @@ test({
 				[ 'Access-Control-Allow-Origin', '*' ],
 				[ 'Access-Control-Allow-Headers', '*' ],
 			],
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called++;
 			}
 		});
 
 		eventRequest._mock({
 			method			: 'next',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called === 2 ? done() : done( 'The setResponseHeader was not called enough times' );
 			}
 		});
@@ -96,14 +96,14 @@ test({
 				[ 'Access-Control-Max-Age', 500 ],
 				[ 'Access-Control-Allow-Credentials', 'true' ],
 			],
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called++;
 			}
 		});
 
 		eventRequest._mock({
 			method			: 'next',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called === 5 ? done() : done( 'The setResponseHeader was not called enough times' );
 			}
 		});
@@ -145,14 +145,14 @@ test({
 				[ 'Access-Control-Allow-Credentials', 'true' ],
 				[ 'Access-Control-Allow-Methods', 'POST, PUT, GET' ],
 			],
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called++;
 			}
 		});
 
 		eventRequest._mock({
 			method			: 'next',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				done( 'eventRequest next should not have been called' );
 			}
 		});
@@ -163,7 +163,7 @@ test({
 			with			: [
 				[undefined, 201]
 			],
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called === 6 ? done() : done( 'The setResponseHeader was not called enough times' );
 			}
 		});

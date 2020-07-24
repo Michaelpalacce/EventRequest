@@ -169,7 +169,7 @@ class Router extends PluginInterface
 	 * 			- method - String|Array - The methods(s) to be matched for the route - optional
 	 * 			- route - String|RegExp - The route to match - optional
 	 * 			- middlewares - Array|String - Handler to be called - ! optional
-	 * 			( { method: '', route: '', handler:()=>{}, middlewares: '' } )
+	 * 			( { method: '', route: '', handler:() => {}, middlewares: '' } )
 	 *
 	 * 			Accepts an instance of router ( Router router )
 	 *

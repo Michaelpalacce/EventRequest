@@ -37,7 +37,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'on',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called ++;
 			},
 			with			: [
@@ -73,7 +73,7 @@ test({
 
 		session._mock({
 			method			: 'saveSession',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called	= true;
 			},
 			called			: 1
@@ -111,7 +111,7 @@ test({
 
 		session._mock({
 			method			: 'saveSession',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called	= true;
 			},
 			called			: 1
@@ -122,7 +122,7 @@ test({
 		router.add({
 			handler	: ( event )=>{
 				event.session	= session;
-				event.initSession( ()=>{
+				event.initSession( () => {
 					assert.equal( true, called );
 
 					done();
@@ -180,7 +180,7 @@ test({
 			}
 		});
 
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			sessionPlugin.setServerOnRuntime( server );
 		});
 		done();
@@ -210,7 +210,7 @@ test({
 				}
 				else
 				{
-					event.initSession( ()=>{
+					event.initSession( () => {
 						assert.equal( true, event.session.has( 'test' ) );
 						assert.equal( 'value', event.session.get( 'test' ) );
 						done();

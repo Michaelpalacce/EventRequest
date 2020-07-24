@@ -75,7 +75,7 @@ class BodyParserPlugin extends PluginInterface
 				{
 					event.body	= {};
 
-					event.on( 'cleanUp', ()=>{
+					event.on( 'cleanUp', () => {
 						event.body	= undefined;
 					} );
 				}

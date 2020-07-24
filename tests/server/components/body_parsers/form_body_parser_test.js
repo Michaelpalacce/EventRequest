@@ -162,7 +162,7 @@ test({
 		});
 		const formBodyParser	= new FormBodyParser( { strict: false, maxPayloadLength : 1 } );
 
-		formBodyParser.parse( eventRequest ).then(()=>{
+		formBodyParser.parse( eventRequest ).then(() => {
 			done();
 		}).catch( done );
 	}
@@ -181,7 +181,7 @@ test({
 		);
 		let formBodyParser	= new FormBodyParser();
 
-		formBodyParser.parse( eventRequest ).then(()=>{
+		formBodyParser.parse( eventRequest ).then(() => {
 			done( 'Should have rejected' )
 		}).catch(( err )=>{
 			assert.equal( err !== false, true );

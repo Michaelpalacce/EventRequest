@@ -132,7 +132,7 @@ test({
 
 		transport._mock({
 			method			: 'log',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				++ logged;
 				return new Promise(( resolve, reject )=>{
 					resolve();
@@ -147,9 +147,9 @@ test({
 			transports	: [transport],
 		}, 'id' );
 
-		logger.log( 'Error', LOG_LEVELS.error ).then(()=>{
+		logger.log( 'Error', LOG_LEVELS.error ).then(() => {
 			return logger.log( 'Warning', LOG_LEVELS.warning );
-		}).then(()=>{
+		}).then(() => {
 			logged === 1 ? done() : done( 'Transport logged called more than once when it should have been called just once' );
 		}).catch(( err )=>{
 			done( err );

@@ -146,7 +146,7 @@ test({
 
 		logger._mock({
 			method			: 'log',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				++ logged;
 				return new Promise(( resolve, reject )=>{
 					resolve();

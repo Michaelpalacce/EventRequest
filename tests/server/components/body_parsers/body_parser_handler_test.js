@@ -8,7 +8,7 @@ const RawBodyParser								= require( '../../../../server/components/body_parser
 test({
 	message	: 'BodyParserHandler.constructor does not throw with valid arguments',
 	test	: ( done )=>{
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			new BodyParserHandler();
 		});
 		done();
@@ -18,12 +18,12 @@ test({
 test({
 	message	: 'BodyParserHandler.addParser does not throw with valid parser',
 	test	: ( done )=>{
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			const bodyParserHandler	= new BodyParserHandler();
 
 			const bodyParser		= {
-				parse		: ()=>{},
-				supports	: ()=>{}
+				parse		: () => {},
+				supports	: () => {}
 			};
 
 			bodyParserHandler.addParser( bodyParser );
@@ -35,7 +35,7 @@ test({
 test({
 	message	: 'BodyParserHandler.addParser throws with invalid parser',
 	test	: ( done )=>{
-		assert.throws(()=>{
+		assert.throws(() => {
 			const bodyParserHandler	= new BodyParserHandler();
 
 			bodyParserHandler.addParser( {} );
@@ -47,7 +47,7 @@ test({
 test({
 	message	: 'BodyParserHandler.parseBody if no parsers support it',
 	test	: ( done )=>{
-		assert.doesNotThrow(()=>{
+		assert.doesNotThrow(() => {
 			const MockBodyParser	= Mock( RawBodyParser );
 			const fallbackParser	= new MockBodyParser();
 			const testBody			= 'Test';
@@ -59,7 +59,7 @@ test({
 
 			fallbackParser._mock({
 				method			: 'parse',
-				shouldReturn	: ()=>{
+				shouldReturn	: () => {
 					return new Promise(( resolve, reject )=>{
 						resolve( testBody );
 					})
@@ -88,7 +88,7 @@ test({
 		} );
 		Mocker( MockBodyParser, {
 			method			: 'parse',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				return new Promise(( resolve, reject )=>{
 					resolve( testBody );
 				})
@@ -129,7 +129,7 @@ test({
 
 		fallbackParser._mock({
 			method			: 'parse',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				return new Promise(( resolve, reject )=>{
 					resolve( { body: {}, rawBody: {} } );
 				})
@@ -213,7 +213,7 @@ test({
 		const bodyParserHandler	= new BodyParserHandler();
 
 		bodyParserHandler.addParser( new MockBodyParser() );
-		bodyParserHandler.parseBody( event ).then(()=>{
+		bodyParserHandler.parseBody( event ).then(() => {
 			done( 'Should have rejected!' );
 		}).catch( ( err )=>{
 			assert.equal( err, error );

@@ -55,11 +55,11 @@ class SessionPlugin extends PluginInterface
 				{
 					event.session	= new Session( event, this.options );
 
-					event.on( 'cleanUp', ()=>{
+					event.on( 'cleanUp', () => {
 						event.session	= undefined;
 					} );
 
-					event.on( 'send', async ()=>{
+					event.on( 'send', async () => {
 						if ( Object.keys( event.session.session ).length !== 0 )
 							await event.session.saveSession();
 					} );

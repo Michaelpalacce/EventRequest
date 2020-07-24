@@ -32,7 +32,7 @@ test({
 		assert.equal( true, typeof eventRequest.internalTimeout !== 'undefined' );
 
 		// Since the timeout is in the event loop, add the done callback at the end of the event loop
-		setTimeout(()=>{
+		setTimeout(() => {
 			error ? done() : done( 'Request did not time out and it should have' );
 		});
 	}
@@ -86,14 +86,14 @@ test({
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
-		eventRequest.on( 'clearTimeout', ()=>{
+		eventRequest.on( 'clearTimeout', () => {
 			called	= true;
 		});
 
 		eventRequest.emit( 'stream_start' );
 		assert.equal( false, typeof eventRequest.internalTimeout !== 'undefined' );
 
-		setTimeout(()=>{
+		setTimeout(() => {
 			called ? done() : done( 'clearTimeout not called' );
 		});
 	}

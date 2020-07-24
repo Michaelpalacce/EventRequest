@@ -83,7 +83,7 @@ class Bucket
 	 */
 	handleError( error )
 	{
-		setImmediate(()=>{
+		setImmediate(() => {
 			throw error;
 		});
 	}
@@ -220,7 +220,7 @@ class Bucket
 			return resolve( true );
 		}
 
-		setTimeout(()=>{
+		setTimeout(() => {
 			counter++;
 
 			if ( counter > this.maxCounter )

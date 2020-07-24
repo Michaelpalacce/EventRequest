@@ -40,7 +40,7 @@ class SecurityPlugin extends PluginInterface
 				cto		: new ContentTypeOptions( typeof this.options.cto === 'object' ? this.options.cto : {} )
 			};
 
-			event.$security.build	= ()=>{
+			event.$security.build	= () => {
 				for ( const index in event.$security )
 				{
 					if ( index === 'build' )
@@ -60,7 +60,7 @@ class SecurityPlugin extends PluginInterface
 			if ( typeof this.options.build === 'boolean' ? this.options.build : true )
 				event.$security.build();
 
-			event.on( 'cleanUp', ()=>{
+			event.on( 'cleanUp', () => {
 				event.$security	= undefined;
 			});
 

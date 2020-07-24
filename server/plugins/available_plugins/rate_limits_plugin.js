@@ -310,7 +310,7 @@ class RateLimitsPlugin extends PluginInterface
 		eventRequest.rateLimited		= false;
 		eventRequest.erRateLimitRules	= rules;
 
-		eventRequest.on( 'cleanUp', ()=>{
+		eventRequest.on( 'cleanUp', () => {
 			eventRequest.rateLimited		= undefined;
 			eventRequest.erRateLimitRules	= undefined;
 		} );
@@ -389,7 +389,7 @@ class RateLimitsPlugin extends PluginInterface
 
 			let tries			= 0;
 
-			const interval		= setInterval( async()=>{
+			const interval		= setInterval( async() => {
 				if ( ++ tries >= delayRetries )
 				{
 					clearInterval( interval );

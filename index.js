@@ -13,7 +13,7 @@ let server		= null;
  *
  * @returns	Server
  */
-const App		= ()=>{
+const App		= () => {
 	return server || ( server = new Server() );
 };
 
@@ -22,7 +22,7 @@ const App		= ()=>{
  *
  * @return	void
  */
-App.cleanUp		= ()=>{
+App.cleanUp		= () => {
 	server	= null;
 };
 

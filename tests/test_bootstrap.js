@@ -14,7 +14,7 @@ app.add({
 	}
 });
 
-app.listen( 3333, ()=>{});
+app.listen( 3333, () => {});
 
 // Set up a memory server to be used by the tests
 const dataServer	= new DataServer({ persist: false, persistPath: path.join( TEST_ROOT, './fixture/cache' )});

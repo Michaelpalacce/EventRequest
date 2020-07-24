@@ -21,7 +21,7 @@ let helpers	= {};
  *
  * @return	Server
  */
-helpers.getServer	= ()=>{
+helpers.getServer	= () => {
 	return server;
 };
 
@@ -30,7 +30,7 @@ helpers.getServer	= ()=>{
  *
  * @return	Server
  */
-helpers.getDataServer	= ()=>{
+helpers.getDataServer	= () => {
 	return dataServer;
 };
 
@@ -39,7 +39,7 @@ helpers.getDataServer	= ()=>{
  *
  * @return	Boolean
  */
-helpers.clearUpTestFile	= ()=> {
+helpers.clearUpTestFile	= () => {
 	try{
 		fs.unlinkSync( helpers.getTestFilePath() )
 	}
@@ -49,14 +49,14 @@ helpers.clearUpTestFile	= ()=> {
 /**
  * @return	String
  */
-helpers.getTestFile	= ()=> {
+helpers.getTestFile	= () => {
 	return './testfile';
 };
 
 /**
  * @return	String
  */
-helpers.getTestFilePath	= ()=> {
+helpers.getTestFilePath	= () => {
 	return path.join( path.dirname( require.main.filename ), helpers.getTestFile() );
 };
 
@@ -65,7 +65,7 @@ helpers.getTestFilePath	= ()=> {
  *
  * @return	Loggur
  */
-helpers.getMockedLoggur		= ()=>{
+helpers.getMockedLoggur		= () => {
 	return new MockLoggur();
 };
 
@@ -74,7 +74,7 @@ helpers.getMockedLoggur		= ()=>{
  *
  * @return	Object
  */
-helpers.getEmptyMiddleware	= ()=>{
+helpers.getEmptyMiddleware	= () => {
 	return {
 		route	: '',
 		handler	: ( event )=>{}
@@ -144,7 +144,7 @@ helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '',
 				bodyParts.push( chunk );
 			} );
 
-			res.on( 'end',()=>{
+			res.on( 'end',() => {
 				res.body	= Buffer.concat( bodyParts );
 
 				if ( res.statusCode !== statusCode )

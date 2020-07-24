@@ -91,7 +91,7 @@ class TemplatingEnginePlugin extends PluginInterface
 				event.templateDir		= templateDir;
 				event.templatingEngine	= templatingEngine;
 
-				event.on( 'cleanUp', ()=>{
+				event.on( 'cleanUp', () => {
 					event.templateDir		= undefined;
 					event.templatingEngine	= undefined;
 				} );

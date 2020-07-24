@@ -208,7 +208,7 @@ class Server extends EventEmitter
 		return ( request, response )=>{
 			let eventRequest	= new EventRequest( request, response );
 
-			request.on( 'close', ()=> {
+			request.on( 'close', () => {
 				if ( eventRequest != null )
 				{
 					eventRequest._cleanUp();

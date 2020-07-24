@@ -39,7 +39,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'on',
-			shouldReturn	: ()=>{
+			shouldReturn	: () => {
 				called	++;
 			},
 			with			: [
@@ -64,7 +64,7 @@ test({
 		eventRequest.next();
 
 		// DO this to wait for the log to complete
-		setImmediate(()=>{
+		setImmediate(() => {
 			assert.equal( called, 10 );
 			assert.equal( true, eventRequest.logger instanceof Logger );
 

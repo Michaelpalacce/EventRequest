@@ -118,7 +118,7 @@ class ResponseCachePlugin extends PluginInterface
 	{
 		const pluginMiddleware	= {
 			handler	: ( event )	=>{
-				event.on( 'cleanUp', ()=>{
+				event.on( 'cleanUp', () => {
 					event.cacheCurrentRequest	= undefined;
 				} );
 
