@@ -1,7 +1,7 @@
 # EventRequest
 A highly customizable backend server in NodeJs
 
-[![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest)
+[![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest) [![Inline docs](http://inch-ci.org/github/Michaelpalacce/EventRequest.svg?branch=master)](http://inch-ci.org/github/Michaelpalacce/EventRequest) [![Dependencies](https://david-dm.org/Michaelpalacce/EventRequest.svg)](https://david-dm.org/Michaelpalacce/EventRequest.svg) [![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json) [![npm version](https://badge.fury.io/js/event_request.svg)](https://badge.fury.io/js/event_request) 
 
 [**CHANGELOG**](https://github.com/Michaelpalacce/EventRequest/blob/master/UPDATELOG.md) || [**BENCHMARKS**](https://github.com/Michaelpalacce/EventRequest-Benchmarks)
 

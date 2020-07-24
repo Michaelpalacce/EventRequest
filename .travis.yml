@@ -5,5 +5,13 @@ os:
 language: node_js
 node_js:
   - 12
+
 before_install:
+  - pip install --user codecov
   - npm update
+
+after_success:
+  - codecov --file coverage/lcov.info --disable search
+
+env:
+  - CODECOV_TOKEN=2ad21418-8e84-42c8-8e73-62c031c5ddc4
