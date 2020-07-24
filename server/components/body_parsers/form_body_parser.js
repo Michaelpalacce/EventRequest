@@ -110,7 +110,7 @@ class FormBodyParser extends EventEmitter
 					resolve( { body, rawBody } );
 				}
 			});
-		})
+		});
 	}
 }
 

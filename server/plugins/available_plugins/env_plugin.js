@@ -27,7 +27,7 @@ class EnvPlugin extends PluginInterface
 	 */
 	removeOldEnvVariables()
 	{
-		this.envVariableKeys.forEach(( envKey )=>{
+		this.envVariableKeys.forEach(( envKey ) => {
 			delete process.env[envKey];
 		})
 	}
@@ -82,7 +82,7 @@ class EnvPlugin extends PluginInterface
 	{
 		return typeof this.options.fileLocation === 'string'
 			? this.options.fileLocation
-			: path.join( path.parse( require.main.filename ).dir, ENV_FILENAME )
+			: path.join( path.parse( require.main.filename ).dir, ENV_FILENAME );
 	}
 
 	/**
@@ -92,7 +92,7 @@ class EnvPlugin extends PluginInterface
 	 */
 	attachFileWatcherToEnvFile()
 	{
-		fs.watch( this.getEnvFileAbsPath(), ( eventType )=>{
+		fs.watch( this.getEnvFileAbsPath(), ( eventType ) => {
 			if ( eventType === CHANGE_EVENT )
 				this.loadFileInEnv();
 		});

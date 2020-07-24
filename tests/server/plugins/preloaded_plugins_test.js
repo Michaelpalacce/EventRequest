@@ -6,7 +6,7 @@ const PreLoadedPluginManager	= require( './../../../server/plugins/preloaded_plu
 
 test({
 	message	: 'PluginManager does not throw when getting plugins',
-	test	: ( done )=>{
+	test	: ( done ) => {
 
 		assert.doesNotThrow(() => {
 			PreLoadedPluginManager.getPlugin( 'er_timeout' );

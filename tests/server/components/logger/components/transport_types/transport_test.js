@@ -11,7 +11,7 @@ const TRANSPORT_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
 
 test({
 	message	: 'Transport.constructor on defaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		new Transport();
 
 		done();
@@ -20,7 +20,7 @@ test({
 
 test({
 	message	: 'Transport.constructor on invalid configuration',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let transport	= new Transport({
 			logLevel	: 'test',
 			logLevels	: 'test'
@@ -36,7 +36,7 @@ test({
 
 test({
 	message	: 'Transport.constructor on valid configuration',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logLevel	= 500;
 		let logLevels	= { warning : 500, error : 100 };
 		let transport	= new Transport({
@@ -54,7 +54,7 @@ test({
 
 test({
 	message	: 'Transport.getInstance returns an instance of Transport',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let transportBase	= new Transport();
 		let transportTest	= Transport.getInstance();
 
@@ -66,7 +66,7 @@ test({
 
 test({
 	message	: 'Transport.supports supports only instances of Log',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let transport	= new Transport();
 
 		assert.equal( transport.supports( new Error( 'test' ) ), false );
@@ -85,7 +85,7 @@ test({
 
 test({
 	message	: 'Transport.supports supports logLevels that are present',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let transport	= new Transport({
 			logLevel	: LOG_LEVELS.info,
 			logLevels	: { error : 100, notice : 300, verbose : 500 }
@@ -104,7 +104,7 @@ test({
 
 test({
 	message	: 'Transport.format does nothing',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let transport	= new Transport();
 		let log			= Log.getInstance( 'test' );
 
@@ -116,7 +116,7 @@ test({
 
 test({
 	message	: 'Transport.log returns a promise',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let transport	= new Transport();
 		let log			= Log.getInstance( 'test' );
 

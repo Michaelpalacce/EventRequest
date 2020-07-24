@@ -5,7 +5,7 @@ const FormBodyParser			= require( '../../../../server/components/body_parsers/fo
 
 test({
 	message	: 'FormBodyParser.constructor on defaults does not die',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let formBodyParser	= new FormBodyParser();
 		assert.equal( formBodyParser.maxPayloadLength, 10 * 1048576 );
 		assert.equal( formBodyParser.strict, false );
@@ -16,7 +16,7 @@ test({
 
 test({
 	message	: 'FormBodyParser.constructor on correct arguments',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let maxPayloadLength	= 1;
 		let strict				= false;
 
@@ -30,7 +30,7 @@ test({
 
 test({
 	message	: 'FormBodyParser.constructor on incorrect arguments',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let maxPayloadLength	= 'test';
 		let strict				= 'test';
 
@@ -44,7 +44,7 @@ test({
 
 test({
 	message	: 'FormBodyParser.supports returns correct results',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let formBodyParser	= new FormBodyParser();
 		assert.equal( formBodyParser.supports( helpers.getEventRequest() ), false );
 		assert.equal( formBodyParser.supports(
@@ -68,7 +68,7 @@ test({
 
 test({
 	message	: 'FormBodyParser.parse parses event request body',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let expectedBody	= { body: { key: 'value' }, rawBody: 'key=value' };
 		let bodyToStream	= 'key=value';
 		let eventRequest	= helpers.getEventRequest(
@@ -78,7 +78,7 @@ test({
 		);
 		eventRequest.request._mock({
 			method			: 'on',
-			shouldReturn	: ( event, callback )=>{
+			shouldReturn	: ( event, callback ) => {
 				if ( event === 'data' )
 				{
 					callback( Buffer.from( bodyToStream ) )
@@ -91,7 +91,7 @@ test({
 		});
 		let formBodyParser	= new FormBodyParser( { strict: false } );
 
-		formBodyParser.parse( eventRequest ).then(( body )=>{
+		formBodyParser.parse( eventRequest ).then(( body ) => {
 			assert.deepStrictEqual( body, expectedBody );
 			done();
 		}).catch( done );
@@ -100,7 +100,7 @@ test({
 
 test({
 	message	: 'FormBodyParser.parse does not parse if maxPayloadLength is reached',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let bodyToStream	= 'key=value';
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
@@ -112,7 +112,7 @@ test({
 		);
 		eventRequest.request._mock({
 			method			: 'on',
-			shouldReturn	: ( event, callback )=>{
+			shouldReturn	: ( event, callback ) => {
 				if ( event === 'data' )
 				{
 					callback( Buffer.from( bodyToStream ) )
@@ -125,11 +125,11 @@ test({
 		});
 		const formBodyParser	= new FormBodyParser( { strict: true, maxPayloadLength : 1 } );
 
-		formBodyParser.parse( eventRequest ).then(( body )=>{
+		formBodyParser.parse( eventRequest ).then(( body ) => {
 			assert.deepStrictEqual( body, { body: {}, rawBody: {} } );
 
 			done();
-		}).catch(( err )=>{
+		}).catch(( err ) => {
 			done( err );
 		});
 	}
@@ -137,7 +137,7 @@ test({
 
 test({
 	message	: 'FormBodyParser.parse parses if maxPayloadLength is reached and not strict',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let bodyToStream	= 'key=value';
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
@@ -149,7 +149,7 @@ test({
 		);
 		eventRequest.request._mock({
 			method			: 'on',
-			shouldReturn	: ( event, callback )=>{
+			shouldReturn	: ( event, callback ) => {
 				if ( event === 'data' )
 				{
 					callback( Buffer.from( bodyToStream ) )
@@ -170,7 +170,7 @@ test({
 
 test({
 	message	: 'FormBodyParser.parse does not parse if content-type is not application/x-www-form-urlencoded',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
 			undefined,
@@ -183,7 +183,7 @@ test({
 
 		formBodyParser.parse( eventRequest ).then(() => {
 			done( 'Should have rejected' )
-		}).catch(( err )=>{
+		}).catch(( err ) => {
 			assert.equal( err !== false, true );
 			done();
 		});

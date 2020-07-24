@@ -26,7 +26,7 @@ const XSS_EXPECTED_DIRECTIVES	= {
 
 test({
 	message	: 'CSP.constructorOnDefault',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const csp					= new CSP();
 
 		assert.deepStrictEqual( csp.directives, XSS_EXPECTED_DIRECTIVES );
@@ -153,7 +153,7 @@ test({
 			``
 		],
 	],
-	test			: ( done, options, expectedDirectives, expectedReportOnly, expectedEnabled, expectedHeaderName, expectedHeader )=>{
+	test			: ( done, options, expectedDirectives, expectedReportOnly, expectedEnabled, expectedHeaderName, expectedHeader ) => {
 		const csp	= new CSP( options );
 
 		assert.deepStrictEqual( csp.directives, expectedDirectives );
@@ -169,7 +169,7 @@ test({
 
 test({
 	message	: 'CSP.xssEnablesXssIfInitiallyItWasOff',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= XSS_EXPECTED_HEADER;
@@ -192,7 +192,7 @@ test({
 
 test({
 	message	: 'CSP.xssEnablesXssIfInitiallyItWasOffTwice',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= XSS_EXPECTED_HEADER;
@@ -216,7 +216,7 @@ test({
 
 test({
 	message	: 'CSP.xssDoesNothingIfInitiallyItWasOn',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const csp					= new CSP( { xss: true } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= XSS_EXPECTED_HEADER;
@@ -239,7 +239,7 @@ test({
 
 test({
 	message	: 'CSP.xssDoesNothingIfInitiallyItWasOnTwice',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const csp					= new CSP( { xss: true } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= XSS_EXPECTED_HEADER;
@@ -269,7 +269,7 @@ test({
 		['text/html'],
 		['text/css']
 	],
-	test			: ( done, mimeType )=>{
+	test			: ( done, mimeType ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `plugin-types ${mimeType};`;
@@ -298,7 +298,7 @@ test({
 		['text/html'],
 		['text/css']
 	],
-	test			: ( done, mimeType )=>{
+	test			: ( done, mimeType ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `plugin-types ${mimeType};`;
@@ -330,7 +330,7 @@ test({
 		['application/json!'],
 		['application/json#']
 	],
-	test			: ( done, mimeType )=>{
+	test			: ( done, mimeType ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= '';
@@ -353,7 +353,7 @@ test({
 
 test({
 	message			: 'CSP.setEnabledEnablesIfDisabled',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { enabled: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= XSS_EXPECTED_HEADER;
@@ -376,7 +376,7 @@ test({
 
 test({
 	message			: 'CSP.setEnabledDoesNothingIfAlreadyEnabled',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { enabled: true } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= XSS_EXPECTED_HEADER;
@@ -399,7 +399,7 @@ test({
 
 test({
 	message			: 'CSP.setEnabledDoesNothingIfAlreadyEnabledTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { enabled: true } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= XSS_EXPECTED_HEADER;
@@ -423,7 +423,7 @@ test({
 
 test({
 	message			: 'CSP.setReportOnly',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= REPORT_ONLY_HEADER_NAME;
 		const expectedHeader		= 'report-uri /testUri;';
@@ -447,7 +447,7 @@ test({
 
 test({
 	message			: 'CSP.setReportOnlyTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= REPORT_ONLY_HEADER_NAME;
 		const expectedHeader		= 'report-uri /testUri;';
@@ -472,7 +472,7 @@ test({
 
 test({
 	message			: 'CSP.setReportOnlyWithItAlreadyEnabled',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false, reportUri: '/someUri' } );
 		const expectedHeaderName	= REPORT_ONLY_HEADER_NAME;
 		const expectedHeader		= 'report-uri /someUri /testUri;';
@@ -505,7 +505,7 @@ test({
 		[false],
 		[''],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= '';
@@ -529,7 +529,7 @@ test({
 
 test({
 	message			: 'CSP.setReportOnlyWithReportTo',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= REPORT_ONLY_HEADER_NAME;
 		const expectedHeader		= 'report-to /testUri;';
@@ -553,7 +553,7 @@ test({
 
 test({
 	message			: 'CSP.setReportOnlyWithReportToTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= REPORT_ONLY_HEADER_NAME;
 		const expectedHeader		= 'report-to /testUri;';
@@ -578,7 +578,7 @@ test({
 
 test({
 	message			: 'CSP.setReportOnlyWithReportToWithAlreadyEnabled',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false, reportUri: '/someUri', useReportTo: true } );
 		const expectedHeaderName	= REPORT_ONLY_HEADER_NAME;
 		const expectedHeader		= 'report-to /someUri /testUri;';
@@ -611,7 +611,7 @@ test({
 		[false],
 		[''],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= '';
@@ -635,7 +635,7 @@ test({
 
 test({
 	message			: 'CSP.enableSandbox',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'sandbox;';
@@ -659,7 +659,7 @@ test({
 
 test({
 	message			: 'CSP.enableSandboxTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'sandbox;';
@@ -684,7 +684,7 @@ test({
 
 test({
 	message			: 'CSP.enableSandboxWhenAlreadyEnabled',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false, sandbox: true } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'sandbox;';
@@ -708,7 +708,7 @@ test({
 
 test({
 	message			: 'CSP.upgradeInsecureRequests',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'upgrade-insecure-requests;';
@@ -732,7 +732,7 @@ test({
 
 test({
 	message			: 'CSP.upgradeInsecureRequestsTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'upgrade-insecure-requests;';
@@ -757,7 +757,7 @@ test({
 
 test({
 	message			: 'CSP.allowSandboxValue',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'sandbox allow-scripts allow-same-origin;';
@@ -782,7 +782,7 @@ test({
 
 test({
 	message			: 'CSP.allowSandboxValueTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'sandbox allow-scripts allow-same-origin;';
@@ -809,7 +809,7 @@ test({
 
 test({
 	message			: 'CSP.addBaseUri',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'base-uri /some/uri;';
@@ -840,7 +840,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, baseUri )=>{
+	test			: ( done, baseUri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `base-uri '${baseUri}';`;
@@ -871,7 +871,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, baseUri )=>{
+	test			: ( done, baseUri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `base-uri '${baseUri}';`;
@@ -896,7 +896,7 @@ test({
 
 test({
 	message			: 'CSP.addBaseUriTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'base-uri /some/uri;';
@@ -921,7 +921,7 @@ test({
 
 test({
 	message			: 'CSP.restrictFormActionUrl',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'form-action /some/uri;';
@@ -952,7 +952,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, baseUri )=>{
+	test			: ( done, baseUri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `form-action '${baseUri}';`;
@@ -983,7 +983,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, baseUri )=>{
+	test			: ( done, baseUri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `form-action '${baseUri}';`;
@@ -1008,7 +1008,7 @@ test({
 
 test({
 	message			: 'CSP.restrictFormActionUrlTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'form-action /some/uri;';
@@ -1033,7 +1033,7 @@ test({
 
 test({
 	message			: 'CSP.addFrameAncestors',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'frame-ancestors /some/uri;';
@@ -1064,7 +1064,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `frame-ancestors '${uri}';`;
@@ -1095,7 +1095,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `frame-ancestors '${uri}';`;
@@ -1120,7 +1120,7 @@ test({
 
 test({
 	message			: 'CSP.addFrameAncestorsTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'frame-ancestors /some/uri;';
@@ -1145,7 +1145,7 @@ test({
 
 test({
 	message			: 'CSP.addScriptSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'script-src /some/uri;';
@@ -1176,7 +1176,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `script-src '${uri}';`;
@@ -1207,7 +1207,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `script-src '${uri}';`;
@@ -1232,7 +1232,7 @@ test({
 
 test({
 	message			: 'CSP.addScriptSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'script-src /some/uri;';
@@ -1257,7 +1257,7 @@ test({
 
 test({
 	message			: 'CSP.addImgSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'img-src /some/uri;';
@@ -1288,7 +1288,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `img-src '${uri}';`;
@@ -1319,7 +1319,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `img-src '${uri}';`;
@@ -1344,7 +1344,7 @@ test({
 
 test({
 	message			: 'CSP.addImgSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'img-src /some/uri;';
@@ -1369,7 +1369,7 @@ test({
 
 test({
 	message			: 'CSP.addChildSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'child-src /some/uri;';
@@ -1400,7 +1400,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `child-src '${uri}';`;
@@ -1431,7 +1431,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `child-src '${uri}';`;
@@ -1456,7 +1456,7 @@ test({
 
 test({
 	message			: 'CSP.addChildSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'child-src /some/uri;';
@@ -1481,7 +1481,7 @@ test({
 
 test({
 	message			: 'CSP.addConnectSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'connect-src /some/uri;';
@@ -1512,7 +1512,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `connect-src '${uri}';`;
@@ -1543,7 +1543,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `connect-src '${uri}';`;
@@ -1568,7 +1568,7 @@ test({
 
 test({
 	message			: 'CSP.addConnectSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'connect-src /some/uri;';
@@ -1593,7 +1593,7 @@ test({
 
 test({
 	message			: 'CSP.addDefaultSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'default-src /some/uri;';
@@ -1624,7 +1624,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `default-src '${uri}';`;
@@ -1655,7 +1655,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `default-src '${uri}';`;
@@ -1680,7 +1680,7 @@ test({
 
 test({
 	message			: 'CSP.addDefaultSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'default-src /some/uri;';
@@ -1705,7 +1705,7 @@ test({
 
 test({
 	message			: 'CSP.addFontSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'font-src /some/uri;';
@@ -1736,7 +1736,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `font-src '${uri}';`;
@@ -1767,7 +1767,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `font-src '${uri}';`;
@@ -1792,7 +1792,7 @@ test({
 
 test({
 	message			: 'CSP.addFontSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'font-src /some/uri;';
@@ -1817,7 +1817,7 @@ test({
 
 test({
 	message			: 'CSP.addFrameSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'frame-src /some/uri;';
@@ -1848,7 +1848,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `frame-src '${uri}';`;
@@ -1879,7 +1879,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `frame-src '${uri}';`;
@@ -1904,7 +1904,7 @@ test({
 
 test({
 	message			: 'CSP.addFrameSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'frame-src /some/uri;';
@@ -1929,7 +1929,7 @@ test({
 
 test({
 	message			: 'CSP.addManifestSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'manifest-src /some/uri;';
@@ -1960,7 +1960,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `manifest-src '${uri}';`;
@@ -1991,7 +1991,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `manifest-src '${uri}';`;
@@ -2016,7 +2016,7 @@ test({
 
 test({
 	message			: 'CSP.addManifestSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'manifest-src /some/uri;';
@@ -2041,7 +2041,7 @@ test({
 
 test({
 	message			: 'CSP.addMediaSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'media-src /some/uri;';
@@ -2072,7 +2072,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `media-src '${uri}';`;
@@ -2103,7 +2103,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `media-src '${uri}';`;
@@ -2128,7 +2128,7 @@ test({
 
 test({
 	message			: 'CSP.addMediaSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'media-src /some/uri;';
@@ -2153,7 +2153,7 @@ test({
 
 test({
 	message			: 'CSP.addObjectSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'object-src /some/uri;';
@@ -2184,7 +2184,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `object-src '${uri}';`;
@@ -2215,7 +2215,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `object-src '${uri}';`;
@@ -2240,7 +2240,7 @@ test({
 
 test({
 	message			: 'CSP.addObjectSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'object-src /some/uri;';
@@ -2265,7 +2265,7 @@ test({
 
 test({
 	message			: 'CSP.addStyleSrc',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'style-src /some/uri;';
@@ -2296,7 +2296,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `style-src '${uri}';`;
@@ -2327,7 +2327,7 @@ test({
 		['unsafe-inline'],
 		['none'],
 	],
-	test			: ( done, uri )=>{
+	test			: ( done, uri ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= `style-src '${uri}';`;
@@ -2352,7 +2352,7 @@ test({
 
 test({
 	message			: 'CSP.addStyleSrcTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= 'style-src /some/uri;';
@@ -2377,7 +2377,7 @@ test({
 
 test({
 	message			: 'CSP.enableSelf',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= "default-src 'self';";
@@ -2401,7 +2401,7 @@ test({
 
 test({
 	message			: 'CSP.enableSelfTwice',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: false } );
 		const expectedHeaderName	= HEADER_NAME;
 		const expectedHeader		= "default-src 'self';";
@@ -2425,7 +2425,7 @@ test({
 
 test({
 	message			: 'CSP.buildWithComplexDirectives',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const csp					= new CSP( { xss: true, self: true } );
 		const expectedHeaderName	= REPORT_ONLY_HEADER_NAME;
 

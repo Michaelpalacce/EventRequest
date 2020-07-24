@@ -12,7 +12,7 @@ module.exports	= {
 	 *
 	 * @return	ValidationResult
 	 */
-	validate	: ( validationInput, skeleton )=>{
+	validate	: ( validationInput, skeleton ) => {
 		if ( typeof validationInput !== 'object' )
 			validationInput	= {};
 

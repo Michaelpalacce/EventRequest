@@ -5,7 +5,7 @@ const TemplatingEngine	= require( '../../../../server/components/templating_engi
 
 test({
 	message	: 'TemplatingEngine.render returns html as it is',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const html	= '<h1>Test</h1>{{ testKey }}';
 
 		assert.equal( new TemplatingEngine().render( html, { testKey: 'hey' } ), html );

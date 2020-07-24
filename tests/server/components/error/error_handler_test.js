@@ -11,7 +11,7 @@ test({
 		[['test'], {error: ['test']}],
 		[{ key: 'value' }, { error: { key: 'value' } }],
 	],
-	test			: ( done, errorToFormat, expected )=>{
+	test			: ( done, errorToFormat, expected ) => {
 		const errorHandler	= new ErrorHandler();
 
 		assert.deepStrictEqual( errorHandler._formatError( errorToFormat ), expected );
@@ -23,7 +23,7 @@ test({
 
 test({
 	message			: 'ErrorHandler.handleError handles an Error successfully by emitting the stack on_error and sending the message to event.send',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const eventRequest	= helpers.getEventRequest();
 		const errorHandler	= new ErrorHandler();
 		const error			= new Error( 'An Error Has Occurred' );
@@ -32,7 +32,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'send',
-			shouldReturn	: ( errorMessage, code )=>{
+			shouldReturn	: ( errorMessage, code ) => {
 				assert.deepStrictEqual( errorMessage, { error : 'An Error Has Occurred' } );
 				assert.equal( 501, code );
 				called	= true;
@@ -41,7 +41,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'emit',
-			shouldReturn	: ( event, emittedError )=>{
+			shouldReturn	: ( event, emittedError ) => {
 				emitCalled	++;
 				assert.equal( event, 'on_error' );
 				assert.equal( emittedError, error.stack );
@@ -63,7 +63,7 @@ test({
 
 test({
 	message			: 'ErrorHandler.sendError sends an error',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const eventRequest	= helpers.getEventRequest();
 		const errorHandler	= new ErrorHandler();
 		const error			= new Error( 'An Error Has Occurred' );
@@ -71,7 +71,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'send',
-			shouldReturn	: ( errorMessage, code )=>{
+			shouldReturn	: ( errorMessage, code ) => {
 				assert.deepStrictEqual( errorMessage instanceof Error, true );
 				assert.equal( 501, code );
 				called	= true;
@@ -88,7 +88,7 @@ test({
 
 test({
 	message			: 'ErrorHandler.sendError does not send an error if response is finished',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		const eventRequest	= helpers.getEventRequest();
 		const errorHandler	= new ErrorHandler();
 		const error			= new Error( 'An Error Has Occurred' );

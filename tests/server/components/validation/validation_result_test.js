@@ -5,7 +5,7 @@ const ValidationResult	= require( './../../../../server/components/validation/va
 
 test({
 	message	: 'ValidationResult validateAllAttributes doesn\'t validate if already validated',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const result		= new ValidationResult( { key: 123 }, { key: 'numeric' } );
 
 		result.validateAllAttributes();
@@ -22,7 +22,7 @@ test({
 
 test({
 	message	: 'ValidationResult hasValidationFailed',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const result		= new ValidationResult( { key: 123 }, { key: 'numeric' } );
 
 		result.validateAllAttributes();
@@ -34,7 +34,7 @@ test({
 
 test({
 	message	: 'ValidationResult hasValidationFailed if one has failed',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const result		= new ValidationResult( { key: 123 }, { key: 'array' } );
 
 		result.validateAllAttributes();
@@ -46,7 +46,7 @@ test({
 
 test({
 	message	: 'ValidationResult getValidationResult',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const result		= new ValidationResult( { key: 123 }, { key: 'string' } );
 
 		result.validateAllAttributes();
@@ -58,7 +58,7 @@ test({
 
 test({
 	message	: 'ValidationResult getValidationResult when something has failed',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const result		= new ValidationResult( { key: 123 }, { key: 'array' } );
 
 		result.validateAllAttributes();

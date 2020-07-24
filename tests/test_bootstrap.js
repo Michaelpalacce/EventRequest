@@ -9,7 +9,7 @@ const TEST_ROOT		= path.parse( __dirname ).dir;
 app.add({
 	route	: '/ping',
 	method	: 'GET',
-	handler	: ( event )=>{
+	handler	: ( event ) => {
 		event.send( 'pong', 200 );
 	}
 });

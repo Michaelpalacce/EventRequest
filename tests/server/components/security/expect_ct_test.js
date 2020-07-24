@@ -8,7 +8,7 @@ const HEADER_NAME		= 'Expect-CT';
 
 test({
 	message	: 'ECT.constructorOnDefaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		assert.equal( ect.enabled, true );
@@ -21,7 +21,7 @@ test({
 
 test({
 	message	: 'ECT.enforceOnDefault',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.enforce();
@@ -36,7 +36,7 @@ test({
 
 test({
 	message	: 'ECT.enforceWithFalse',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.enforce( false );
@@ -51,7 +51,7 @@ test({
 
 test({
 	message	: 'ECT.enforceWithFalseThenTrue',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.enforce( false );
@@ -67,7 +67,7 @@ test({
 
 test({
 	message	: 'ECT.enforceTwice',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.enforce();
@@ -90,7 +90,7 @@ test({
 		[{}],
 		[[]]
 	],
-	test	: ( done, data )=>{
+	test	: ( done, data ) => {
 		const ect	= new ECT();
 
 		ect.enforce( false );
@@ -106,7 +106,7 @@ test({
 
 test({
 	message	: 'ECT.setReportUriWithString',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.setReportUri( '/test' );
@@ -121,7 +121,7 @@ test({
 
 test({
 	message	: 'ECT.setReportUriWithStringTwice',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.setReportUri( '/test' );
@@ -137,7 +137,7 @@ test({
 
 test({
 	message	: 'ECT.setReportUriWithStringTwiceWithDifferentData',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.setReportUri( '/test' );
@@ -161,7 +161,7 @@ test({
 		[{}],
 		[[]],
 	],
-	test	: ( done, data )=>{
+	test	: ( done, data ) => {
 		const ect	= new ECT();
 
 		ect.setReportUri( '/test' );
@@ -177,7 +177,7 @@ test({
 
 test({
 	message	: 'ECT.setMaxAgeWithNumber',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.setMaxAge( 300 );
@@ -192,7 +192,7 @@ test({
 
 test({
 	message	: 'ECT.setMaxAgeTwice',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.setMaxAge( 300 );
@@ -208,7 +208,7 @@ test({
 
 test({
 	message	: 'ECT.setMaxAgeTwiceWithDifferentValue',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ect	= new ECT();
 
 		ect.setMaxAge( 300 );
@@ -233,7 +233,7 @@ test({
 		[{}],
 		[[]],
 	],
-	test	: ( done, data )=>{
+	test	: ( done, data ) => {
 		const ect	= new ECT();
 
 		ect.setMaxAge( 300 );
@@ -306,7 +306,7 @@ test({
 			''
 		],
 	],
-	test			: ( done, options, expectedEnabled, expectedBuild )=>{
+	test			: ( done, options, expectedEnabled, expectedBuild ) => {
 		const ect	= new ECT( options );
 
 		assert.equal( ect.enabled, expectedEnabled );

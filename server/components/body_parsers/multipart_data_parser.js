@@ -122,7 +122,7 @@ class MultipartDataParser extends EventEmitter
 			size		: 0,
 			state		: STATE_START,
 			buffer		: Buffer.alloc( 0 )
-		}
+		};
 	}
 
 	/**
@@ -307,6 +307,7 @@ class MultipartDataParser extends EventEmitter
 					part.buffer	= part.buffer.slice( boundaryOffset + this.boundary.length + this.EOL_LENGTH );
 					part.state	= STATE_HEADER_FIELD_START;
 
+					break;
 				case STATE_HEADER_FIELD_START:
 					let lineCount				= 0;
 					let contentTypeLine			= null;
@@ -579,13 +580,13 @@ class MultipartDataParser extends EventEmitter
 		return new Promise(( resolve, reject ) => {
 			this.event		= event;
 
-			this.integrityCheck( ( err, headerData ) =>{
+			this.integrityCheck( ( err, headerData ) => {
 				if ( ! err && headerData )
 				{
 					this.headerData	= headerData;
 					this.boundary	= DEFAULT_BOUNDARY_PREFIX + this.headerData.boundary;
 
-					this.on( 'onError', ( err )=>{
+					this.on( 'onError', ( err ) => {
 						this.parsingError	= true;
 						reject( err );
 					});
@@ -624,8 +625,8 @@ class MultipartDataParser extends EventEmitter
 	 */
 	integrityCheck( callback )
 	{
-		let headerData;
-		if ( ! ( headerData = MultipartDataParser.getHeaderData( this.event.headers ) ) )
+		let headerData	= MultipartDataParser.getHeaderData( this.event.headers );
+		if ( ! headerData )
 		{
 			callback( 'Could not retrieve the header data' );
 			return;
@@ -650,10 +651,10 @@ class MultipartDataParser extends EventEmitter
 		setTimeout(() => {
 			if ( typeof this.parts.$files !== 'undefined' )
 			{
-				this.parts.$files.forEach( ( part ) =>{
+				this.parts.$files.forEach( ( part ) => {
 					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
 					{
-						unlink( part.path ).catch(( e )=>{
+						unlink( part.path ).catch(( e ) => {
 							Loggur.log( e, Loggur.LOG_LEVELS.error );
 						});
 					}
@@ -661,14 +662,14 @@ class MultipartDataParser extends EventEmitter
 			}
 			else
 			{
-				this.parts.forEach( ( part ) =>{
+				this.parts.forEach( ( part ) => {
 					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
 					{
 						if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
 							part.file.end();
 
 						part.file.on( 'end',() => {
-							unlink( part.path ).catch(( e )=>{
+							unlink( part.path ).catch(( e ) => {
 								Loggur.log( e, Loggur.LOG_LEVELS.error );
 							});
 						});
@@ -691,7 +692,7 @@ class MultipartDataParser extends EventEmitter
 			$files	: []
 		};
 
-		this.parts.forEach( ( part ) =>{
+		this.parts.forEach( ( part ) => {
 			if ( part.type === DATA_TYPE_FILE )
 				parts.$files.push( part );
 

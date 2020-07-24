@@ -27,7 +27,7 @@ class ValidationPlugin extends PluginInterface
 
 		this.failureCallback	= typeof options.failureCallback === 'function'
 								? options.failureCallback
-								: ( event, validationParameter, validationResult )=>{
+								: ( event, validationParameter, validationResult ) => {
 									event.send( { [validationParameter]: validationResult.getValidationResult() } );
 								};
 	}
@@ -46,7 +46,7 @@ class ValidationPlugin extends PluginInterface
 	{
 		failureCallback	= typeof failureCallback === 'undefined' ? this.failureCallback : failureCallback;
 
-		return ( event )=>{
+		return ( event ) => {
 			for ( const toValidate in validationRules )
 			{
 				if ( typeof event[toValidate] !== 'object' )

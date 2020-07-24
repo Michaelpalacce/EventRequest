@@ -58,7 +58,7 @@ class Route
 		this.method			= typeof routeConfig.method === 'string'
 							? routeConfig.method.toUpperCase()
 							: routeConfig.method instanceof Array
-							? routeConfig.method.map( ( x )=>{ return x.toUpperCase() } )
+							? routeConfig.method.map( ( x ) => { return x.toUpperCase() } )
 							: '';
 
 		this.handler		= routeConfig.handler instanceof Function
@@ -199,7 +199,7 @@ class Route
 
 		if ( requestedRouteParts.length === routeParts.length )
 		{
-			routeParts.forEach(( pathPart, index )=>{
+			routeParts.forEach(( pathPart, index ) => {
 				if ( hasWrongPart )
 					return;
 

@@ -8,7 +8,7 @@ const Router									= require( '../../../../server/components/routing/router' )
 
 test({
 	message	: 'LoggerPlugin attaches correctly',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let router			= new Router();
 		let called			= 0;
@@ -29,7 +29,7 @@ test({
 
 		transport._mock({
 			method			: '_log',
-			shouldReturn	: ( log, resolve, reject )=>{
+			shouldReturn	: ( log, resolve, reject ) => {
 				calledLog++;
 
 				resolve();
@@ -75,7 +75,7 @@ test({
 
 test({
 	message	: 'LoggerPlugin setServerOnRuntime attaches process',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let MockServer		= Mock( helpers.getServer().constructor );
 		let server			= new MockServer();
 		let noAttachPlugin	= new LoggerPlugin( 'id', {} );

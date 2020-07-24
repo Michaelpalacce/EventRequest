@@ -22,7 +22,7 @@ test({
 
 test({
 	message	: 'EventRequest should not throw an error in case of valid constructor parameters',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		helpers.getEventRequest();
 		done();
 	}
@@ -30,7 +30,7 @@ test({
 
 test({
 	message	: 'EventRequest should parse url',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest( '', '/test?testParam=testValue' );
 
 		assert.equal( eventRequest.path, '/test', 'EventRequest could not parse path' );
@@ -42,9 +42,9 @@ test({
 
 test({
 	message	: 'EventRequest parses methods',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let methods	= ['GET', 'DELETE', 'PUT', 'POST'];
-		methods.forEach( ( method )=>{
+		methods.forEach( ( method ) => {
 			let eventRequest	= helpers.getEventRequest( method );
 
 			assert.equal( eventRequest.method, method, `Could not validate that ${eventRequest.method} and ${method} are equal!` );
@@ -56,7 +56,7 @@ test({
 
 test({
 	message	: 'EventRequest parses headers',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let headers			= { headerKey : 'headerValue' };
 		let eventRequest	= helpers.getEventRequest( undefined, undefined, headers );
 
@@ -162,7 +162,7 @@ test({
 
 test({
 	message	: 'EventRequest send calls response.end when not raw',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
 		eventRequest.response._mock({
@@ -179,7 +179,7 @@ test({
 
 test({
 	message	: 'EventRequest send calls response.end when raw',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
 		eventRequest.response._mock({
@@ -196,7 +196,7 @@ test({
 
 test({
 	message	: 'EventRequest send emits send event',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
 		eventRequest.response._mock({
@@ -216,7 +216,7 @@ test({
 
 test({
 	message	: 'EventRequest send emits send event with response even if isRaw is true of the response is a string',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
 		eventRequest.response._mock({
@@ -224,7 +224,7 @@ test({
 			shouldReturn	: () => {}
 		});
 
-		eventRequest.on( 'send', ( payload ) =>{
+		eventRequest.on( 'send', ( payload ) => {
 			if ( typeof payload.response !== 'undefined' )
 				send	= true;
 		});
@@ -237,7 +237,7 @@ test({
 
 test({
 	message	: 'EventRequest send emits send event without response if response is raw or stream',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
 		eventRequest.response._mock({
@@ -245,7 +245,7 @@ test({
 			shouldReturn	: () => {}
 		});
 
-		eventRequest.on( 'send', ( payload ) =>{
+		eventRequest.on( 'send', ( payload ) => {
 			if ( typeof payload.response !== 'undefined' )
 				send	= true;
 		});
@@ -264,7 +264,7 @@ test({
 
 test({
 	message	: 'EventRequest sets status code',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		eventRequest.response._mock({
 			method			: 'end',
@@ -459,13 +459,13 @@ test({
 
 test({
 	message	: 'EventRequest.redirect emits a redirect event',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		let redirectUrl			= '/test';
 		let redirectStatusCode	= 302;
 		let redirect			= false;
 
-		eventRequest.on( 'redirect', ( redirectOptions )=>{
+		eventRequest.on( 'redirect', ( redirectOptions ) => {
 			assert.equal( redirectOptions.redirectUrl, redirectUrl );
 			assert.equal( redirectOptions.statusCode, redirectStatusCode );
 			redirect	= true;
@@ -479,7 +479,7 @@ test({
 
 test({
 	message	: 'EventRequest.redirect sets header',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let setResponseHeader		= false;
 		let redirectUrl		= '/test';
@@ -499,7 +499,7 @@ test({
 
 test({
 	message	: 'EventRequest.redirect does not redirect if response is finished',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		let MockedErrorHandler	= Mock( ErrorHandler );
 		let errorHandler		= new MockedErrorHandler();
@@ -535,7 +535,7 @@ test({
 
 test({
 	message	: 'EventRequest.isFinished returns response.finished',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		eventRequest.response._mock({
 			method			: 'finished',
@@ -557,7 +557,7 @@ test({
 
 test({
 	message	: 'EventRequest._setBlock should set block',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let block			= ['test'];
 		eventRequest._setBlock( block );
@@ -570,12 +570,12 @@ test({
 
 test({
 	message	: 'EventRequest.next calls next middleware',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const eventRequest	= helpers.getEventRequest();
 		let firstCalled		= false;
 		let secondCalled	= false;
 
-		const callbackOne	= ( event ) =>{
+		const callbackOne	= ( event ) => {
 			firstCalled	= true;
 			event.next();
 		};
@@ -594,7 +594,7 @@ test({
 
 test({
 	message	: 'EventRequest.next handles thrown errors',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const eventRequest			= helpers.getEventRequest();
 		let error					= false;
 		let firstCalled				= false;
@@ -624,7 +624,7 @@ test({
 
 test({
 	message	: 'EventRequest.next handles thrown errors if async',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const eventRequest			= helpers.getEventRequest();
 		let error					= false;
 		let firstCalled				= false;
@@ -656,7 +656,7 @@ test({
 
 test({
 	message	: 'EventRequest.next sends error on error',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest			= helpers.getEventRequest();
 		let error					= false;
 		let errorToSend				= 'Error was thrown.';
@@ -683,7 +683,7 @@ test({
 
 test({
 	message	: 'EventRequest.next calls errorHandler on no more middleware',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest			= helpers.getEventRequest();
 		let error					= false;
 
@@ -706,7 +706,7 @@ test({
 
 test({
 	message	: 'EventRequest.sendError emits an error event',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let eventRequest			= helpers.getEventRequest();
 		let errorToThrow			= 'Error to throw';
 		let error					= false;
@@ -728,7 +728,7 @@ test({
 
 test({
 	message: 'EventRequest should have a validation handler',
-	test: ( done )=>{
+	test: ( done ) => {
 		const eventRequest		= helpers.getEventRequest();
 		const ValidationHandler	= require( '../../server/components/validation/validation_handler' );
 
@@ -755,7 +755,7 @@ test({
 		[undefined, 'value', {}, false],
 		[undefined, undefined, {}, false],
 	],
-	test: ( done, name, value, options, shouldReturnTrue )=>{
+	test: ( done, name, value, options, shouldReturnTrue ) => {
 		const eventRequest		= helpers.getEventRequest();
 		let setCookieArguments	= [name, value, options];
 		let wasCalled			= false;
@@ -763,7 +763,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'setResponseHeader',
-			shouldReturn	: ( headerName, cookie )=>{
+			shouldReturn	: ( headerName, cookie ) => {
 				wasCalled	= true;
 				cookieSet	= cookie[0];
 			}
@@ -783,7 +783,7 @@ test({
 
 test({
 	message	: 'EventRequest.getRequestHeader should return header',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
@@ -797,7 +797,7 @@ test({
 
 test({
 	message	: 'EventRequest.getRequestHeader is case insensitive',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
@@ -812,7 +812,7 @@ test({
 
 test({
 	message	: 'EventRequest.getRequestHeader should return default if header is not set',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
@@ -827,7 +827,7 @@ test({
 
 test({
 	message	: 'EventRequest.hasRequestHeader returns false if header does not exist',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const headerName	= 'test';
 
 		const eventRequest	= helpers.getEventRequest();
@@ -840,7 +840,7 @@ test({
 
 test({
 	message	: 'EventRequest.hasRequestHeader returns true if header exists',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
 
@@ -854,7 +854,7 @@ test({
 
 test({
 	message	: 'EventRequest.getRequestHeaders returns all request headers',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const headers	= {
 			headerOne: 'valueOne',
 			headerTwo: 'valueTwo',
@@ -872,13 +872,13 @@ test({
 
 test({
 	message	: 'EventRequest.next sends 404 if route does not exist',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const eventRequest	= helpers.getEventRequest( '/', 'GET' );
 		let called			= false;
 
 		eventRequest._mock({
 			method: 'send',
-			shouldReturn: ( one, two )=> {
+			shouldReturn: ( one, two ) => {
 				assert.deepStrictEqual( one, { error: 'Cannot / GET' } );
 				assert.equal( 404, two );
 				called	= true;

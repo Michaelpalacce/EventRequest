@@ -231,8 +231,8 @@ class Logger
 		{
 			log.setUniqueId( this.getUniqueId() );
 
-			this.transports.forEach( ( transport ) =>{
-				let logPromise	= new Promise( ( resolve, reject )=>{
+			this.transports.forEach( ( transport ) => {
+				let logPromise	= new Promise( ( resolve, reject ) => {
 					setImmediate(() => {
 						const transportPromise	= transport.log( log );
 
@@ -249,7 +249,7 @@ class Logger
 		if ( transportPromises.length === 0 )
 		{
 			// Do not reject the log if not supported
-			transportPromises.push( new Promise(( resolve )=>{
+			transportPromises.push( new Promise(( resolve ) => {
 				resolve();
 			}));
 		}

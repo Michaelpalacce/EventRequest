@@ -5,7 +5,7 @@ const validationHandler	= require( './../../../../server/components/validation/v
 
 test({
 	message	: 'ValidationHandler.validation',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const dataToValidate	= {
 			testOne	: 123,
 			testTwo	: '123',
@@ -74,7 +74,7 @@ test({
 
 test({
 	message	: 'ValidationHandler.validation.with.missing',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const dataToValidate	= {
 			testOne	: 123,
 			testTwo	: '123',

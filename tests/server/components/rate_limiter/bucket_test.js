@@ -5,7 +5,7 @@ const Bucket			= require( '../../../../server/components/rate_limiter/bucket' );
 
 test({
 	message	: 'Bucket.constructor on defaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket	= new Bucket();
 
 		bucket.init().then(() => {
@@ -19,7 +19,7 @@ test({
 
 test({
 	message	: 'Bucket.reset resets the value to maxAmount and updates lastUpdate',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket	= new Bucket();
 
 		bucket.init().then( async () => {
@@ -44,7 +44,7 @@ test({
 
 test({
 	message	: 'Bucket.get gets the current amount of tokens',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket	= new Bucket();
 
 		bucket.init().then( async () => {
@@ -59,7 +59,7 @@ test({
 
 test({
 	message	: 'Bucket.reduce reduces the amount of tokens and returns true',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket	= new Bucket( 1, 1, 10 );
 
 		bucket.init().then( async () => {
@@ -74,7 +74,7 @@ test({
 
 test({
 	message	: 'Bucket.reduce reduces the amount of tokens and returns false if not enough tokens',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket	= new Bucket( 1, 1, 10 );
 
 		bucket.init().then( async () => {
@@ -89,7 +89,7 @@ test({
 
 test({
 	message	: 'Bucket.reduce reduces the amount of tokens and refills after time',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket	= new Bucket( 1, 1, 10 );
 
 		bucket.init().then( async () => {
@@ -105,7 +105,7 @@ test({
 
 test({
 	message	: 'Bucket.reduce does not refill more than max',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket	= new Bucket( 1, 1, 10 );
 
 		bucket.init().then( async () => {
@@ -125,7 +125,7 @@ test({
 
 test({
 	message	: 'Bucket.reduceRaceCondition',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket	= new Bucket( 1, 100, 10000 );
 
 		bucket.init().then( async () => {
@@ -138,7 +138,7 @@ test({
 				promises.push( bucket.reduce() );
 			}
 
-			Promise.all( promises ).then(( responses )=>{
+			Promise.all( promises ).then(( responses ) => {
 				for ( const response of responses )
 				{
 					if ( response === false )
@@ -155,7 +155,7 @@ test({
 
 test({
 	message	: 'Bucket.reduceRaceCondition fails after a set amount',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket				= new Bucket( 1, 100, 10000 );
 		const expectedFalseTokens	= 500;
 
@@ -169,7 +169,7 @@ test({
 				promises.push( bucket.reduce() );
 			}
 
-			Promise.all( promises ).then(( responses )=>{
+			Promise.all( promises ).then(( responses ) => {
 				let falseResponses	= 0;
 				for ( const response of responses )
 				{
@@ -191,7 +191,7 @@ test({
 
 test({
 	message	: 'Bucket.reduceRaceConditionWithRefill',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const bucket				= new Bucket( 5000, 1, 10000 );
 		const expectedFalseTokens	= 5000;
 
@@ -213,7 +213,7 @@ test({
 					promises.push( bucket.reduce() );
 				}
 
-				Promise.all( promises ).then(( responses )=>{
+				Promise.all( promises ).then(( responses ) => {
 					let falseResponses	= 0;
 					for ( const response of responses )
 					{

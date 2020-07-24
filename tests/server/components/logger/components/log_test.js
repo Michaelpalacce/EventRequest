@@ -22,7 +22,7 @@ const WRONG_LOG_DEFAULT_MESSAGE	= '';
 
 test({
 	message	: 'Log.constructor on default',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let log	= new Log();
 
 		assert.equal( log.message, WRONG_LOG_DEFAULT_MESSAGE );
@@ -37,7 +37,7 @@ test({
 
 test({
 	message	: 'Log.constructor on string',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logMessage	= 'test';
 		let log			= new Log( logMessage );
 
@@ -53,7 +53,7 @@ test({
 
 test({
 	message	: 'Log.constructor on object',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logMessage	= 'test';
 		let isRaw		= true;
 		let logLevel	= LOG_LEVELS.error;
@@ -71,7 +71,7 @@ test({
 
 test({
 	message	: 'Log.constructor on invalid',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let log			= new Log();
 
 		assert.equal( log.message, WRONG_LOG_DEFAULT_MESSAGE );
@@ -86,7 +86,7 @@ test({
 
 test({
 	message	: 'Log.constructor on object message',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logMessage	= { key	: 'value' };
 		let log			= new Log( logMessage );
 
@@ -102,7 +102,7 @@ test({
 
 test({
 	message	: 'Log.getLevel returns the level',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let log	= new Log();
 
 		assert.equal( log.getLevel(), WRONG_LOG_DEFAULT_LEVEL );
@@ -113,7 +113,7 @@ test({
 
 test({
 	message	: 'Log.getIsRaw returns the boolean',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let log	= new Log();
 
 		assert.equal( log.getIsRaw(), false );
@@ -124,7 +124,7 @@ test({
 
 test({
 	message	: 'Log.getStackTrace returns string',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.equal( 'string', typeof Log.getStackTrace() );
 
 		done();
@@ -133,7 +133,7 @@ test({
 
 test({
 	message	: 'Log.getMessage returns the message',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let log	= new Log();
 
 		assert.equal( log.getMessage(), WRONG_LOG_DEFAULT_MESSAGE );
@@ -144,7 +144,7 @@ test({
 
 test({
 	message	: 'Log.getTimestamp returns a number',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let log	= new Log();
 
 		assert.equal( typeof log.getTimestamp(), 'number' );
@@ -155,7 +155,7 @@ test({
 
 test({
 	message	: 'Log.setUniqueId and geUniqueId',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let log	= new Log();
 		log.setUniqueId( 'testID' );
 		assert.equal( log.getUniqueId(), 'testID' );
@@ -166,7 +166,7 @@ test({
 
 test({
 	message	: 'Log.toString returns a string',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let log	= new Log();
 
 		assert.equal( typeof log.toString(), 'string' );
@@ -177,7 +177,7 @@ test({
 
 test({
 	message	: 'Log.getInstance if an instance of Log is given returns it',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logOne	= new Log( 'test' );
 		let logTwo	= Log.getInstance( logOne );
 
@@ -189,7 +189,7 @@ test({
 
 test({
 	message	: 'Log.getInstance if an instance of Log is given returns it',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logOne	= new Log( 'test' );
 		let logTwo	= Log.getInstance( logOne );
 
@@ -201,7 +201,7 @@ test({
 
 test({
 	message	: 'Log.getUNIXTime returns a number',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.deepStrictEqual( typeof Log.getUNIXTime(), 'number' );
 
 		done();

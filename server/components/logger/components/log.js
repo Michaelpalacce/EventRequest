@@ -67,7 +67,7 @@ class Log
 		// Remove the first empty log
 		stackParts.shift();
 
-		stackParts.forEach(( stackPart )=>{
+		stackParts.forEach(( stackPart ) => {
 			if ( removing === true && stackPart.indexOf( __filename ) !== -1 )
 				return;
 

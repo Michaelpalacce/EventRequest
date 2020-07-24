@@ -8,7 +8,7 @@ const HEADER_NAME		= 'X-Content-Type-Options';
 
 test({
 	message	: 'CTO.constructorOnDefaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const cto	= new CTO();
 
 		assert.equal( cto.enabled, true );
@@ -21,7 +21,7 @@ test({
 
 test({
 	message	: 'CTO.constructorOnDisable',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const cto	= new CTO( { enabled: false } );
 
 		assert.equal( cto.enabled, false );
@@ -34,7 +34,7 @@ test({
 
 test({
 	message	: 'CTO.setEnabledEnablesThePlugin',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const cto	= new CTO( { enabled: false } );
 
 		assert.equal( cto.enabled, false );
@@ -53,7 +53,7 @@ test({
 
 test({
 	message	: 'CTO.setEnabledTwiceDoesNothing',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const cto	= new CTO( { enabled: false } );
 
 		assert.equal( cto.enabled, false );
@@ -73,7 +73,7 @@ test({
 
 test({
 	message	: 'CTO.setEnabledDisablesIfFalse',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const cto	= new CTO();
 
 		assert.equal( cto.enabled, true );

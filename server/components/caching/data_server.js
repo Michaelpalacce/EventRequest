@@ -184,7 +184,7 @@ class DataServer extends EventEmitter
 	 */
 	async _get( key, options = {} )
 	{
-		return new Promise( async ( resolve )=>{
+		return new Promise( async ( resolve ) => {
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
@@ -233,7 +233,7 @@ class DataServer extends EventEmitter
 	 */
 	async _set( key, value, ttl, options = {} )
 	{
-		return new Promise(( resolve )=>{
+		return new Promise(( resolve ) => {
 			const persist	= typeof options.persist !== 'boolean' || options.persist == null ? this.persist : options.persist;
 
 			const dataSet	= this._makeDataSet( key, value, ttl, persist );
@@ -278,7 +278,7 @@ class DataServer extends EventEmitter
 	 */
 	async _increment( key, value = 1, options = {} )
 	{
-		return new Promise( async ( resolve, reject )=>{
+		return new Promise( async ( resolve, reject ) => {
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
@@ -333,7 +333,7 @@ class DataServer extends EventEmitter
 	 */
 	async _decrement( key, value = 1, options = {} )
 	{
-		return new Promise( async ( resolve, reject )=>{
+		return new Promise( async ( resolve, reject ) => {
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
@@ -379,7 +379,7 @@ class DataServer extends EventEmitter
 	 */
 	async _lock( key, options = {} )
 	{
-		return new Promise(( resolve )=>{
+		return new Promise(( resolve ) => {
 			const ttl		= -1;
 			const persist	= false;
 
@@ -420,13 +420,13 @@ class DataServer extends EventEmitter
 	 */
 	async _unlock( key, options = {} )
 	{
-		return new Promise(( resolve )=>{
+		return new Promise(( resolve ) => {
 			const exists	= typeof this.server[key] !== 'undefined';
 
 			if ( exists )
 				delete this.server[key];
 
-			resolve( true )
+			resolve( true );
 		});
 	}
 
@@ -461,7 +461,7 @@ class DataServer extends EventEmitter
 	{
 		if ( typeof key !== 'string' || typeof ttl !== 'number' || typeof options !== 'object' )
 		{
-			return new Promise(( resolve )=>{
+			return new Promise(( resolve ) => {
 				resolve( false );
 			});
 		}
@@ -481,7 +481,7 @@ class DataServer extends EventEmitter
 	 */
 	async _touch( key, ttl = 0, options = {} )
 	{
-		return new Promise( async ( resolve )=>{
+		return new Promise( async ( resolve ) => {
 			const dataSet	= await this._prune( key );
 
 			if ( dataSet === null )
@@ -503,7 +503,7 @@ class DataServer extends EventEmitter
 	 */
 	async _prune( key, options = {} )
 	{
-		return new Promise( async ( resolve )=>{
+		return new Promise( async ( resolve ) => {
 			const now		= new Date().getTime() / 1000;
 			const dataSet	= typeof this.server[key] === 'object' && typeof this.server[key].expirationDate !== 'undefined'
 							? this.server[key]
@@ -542,7 +542,7 @@ class DataServer extends EventEmitter
 			return this._delete( key, options ).catch( this._handleServerDown.bind( this ) );
 		}
 
-		return new Promise(( resolve )=>{
+		return new Promise(( resolve ) => {
 			resolve( false );
 		});
 	}
@@ -557,7 +557,7 @@ class DataServer extends EventEmitter
 	 */
 	_delete( key, options = {} )
 	{
-		return new Promise(( resolve )=>{
+		return new Promise(( resolve ) => {
 			if ( typeof this.server[key] === 'undefined' )
 				return resolve( true );
 
@@ -620,19 +620,19 @@ class DataServer extends EventEmitter
 			const writeStream		= fs.createWriteStream( this.persistPath );
 			readableStream.pipe( writeStream );
 
-			readableStream.on( 'error', ( error )=>{
+			readableStream.on( 'error', ( error ) => {
 				Loggur.log( error, Loggur.LOG_LEVELS.error );
 				this.emit( '_saveDataError', { error } );
 			});
 
-			writeStream.on( 'error', ( error )=>{
+			writeStream.on( 'error', ( error ) => {
 				Loggur.log( error, Loggur.LOG_LEVELS.error );
 				this.emit( '_saveDataError', { error } );
 			});
 
 			writeStream.on( 'close', () => {
 				this.emit( '_saveData' );
-				unlink( tmpFile ).catch( ( error )=>{
+				unlink( tmpFile ).catch( ( error ) => {
 					Loggur.log( error, Loggur.LOG_LEVELS.error );
 					this.emit( '_saveDataError', { error } );
 				});

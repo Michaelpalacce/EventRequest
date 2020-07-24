@@ -19,7 +19,7 @@ const TRANSPORT_DEFAULT_COLORS			= {
 
 test({
 	message	: 'Console.constructor on default',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let consoleTransport	= new Console();
 
 		assert.deepStrictEqual( consoleTransport.logLevel, LOG_LEVELS.info );
@@ -34,7 +34,7 @@ test({
 
 test({
 	message	: 'Console.constructor on invalid configuration',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let consoleTransport	= new Console({
 			logLevel	: 'test',
 			logLevels	: 'test',
@@ -54,7 +54,7 @@ test({
 
 test({
 	message	: 'Console.constructor on valid configuration',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logLevel	= LOG_LEVELS.error;
 		let logLevels	= { error : 100, warning : 200 };
 		let color		= false;
@@ -74,7 +74,7 @@ test({
 
 test({
 	message	: 'Console.format returns Array',
-	test	: ( done )=>{
+	test	: ( done ) => {
 
 		let consoleTransport	= new Console();
 
@@ -86,7 +86,7 @@ test({
 
 test({
 	message	: 'Console.format checks if is raw with not raw',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let LogMock				= Mock( Log );
 		let consoleTransport	= new Console();
 		let log					= new LogMock( 'test', 100, false );
@@ -117,7 +117,7 @@ test({
 
 test({
 	message	: 'Console.format checks if is raw with raw',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let LogMock				= Mock( Log );
 		let consoleTransport	= new Console();
 		let log					= new LogMock( 'test', 100, true );
@@ -148,12 +148,12 @@ test({
 
 test({
 	message	: 'Console.log returns a Promise',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let ConsoleMock			= Mock( Console );
 		let consoleTransport	= new ConsoleMock();
 		consoleTransport._mock({
 			method			: '_log',
-			shouldReturn	: ( log, resolve, reject )=>{
+			shouldReturn	: ( log, resolve, reject ) => {
 				resolve();
 			}
 		});
@@ -166,7 +166,7 @@ test({
 
 test({
 	message	: 'Console.format.when.the.log.color.is.not.defined',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let ConsoleMock			= Mock( Console );
 		let consoleTransport	= new ConsoleMock();
 
@@ -181,7 +181,7 @@ test({
 
 test({
 	message	: 'Console.format.when.the.log.color.is.defined.but.colorize.does.not.have.that.color',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ConsoleMock		= Mock( Console );
 		const consoleTransport	= new ConsoleMock( { logColors: {
 				100: 'wrong'
@@ -199,7 +199,7 @@ test({
 
 test({
 	message	: 'Console.format.when.color.is.disabled',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const ConsoleMock		= Mock( Console );
 		const consoleTransport	= new ConsoleMock( { color: false } );
 
@@ -214,13 +214,13 @@ test({
 
 test({
 	message	: 'Console.log does not log if the transport does not support it',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let called				= 0;
 		let ConsoleMock			= Mock( Console );
 		let consoleTransport	= new ConsoleMock();
 		consoleTransport._mock({
 			method			: '_log',
-			shouldReturn	: ( log, resolve, reject )=>{
+			shouldReturn	: ( log, resolve, reject ) => {
 				++ called;
 			},
 			called			: 0

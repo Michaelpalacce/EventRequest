@@ -28,7 +28,7 @@ function removeCache( dataServer )
 
 test({
 	message	: 'DataServerPlugin.constructor does not throw',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.doesNotThrow(() => {
 			new DataServerPlugin( 'plugin_id', { key: 'value' } );
 		});
@@ -39,7 +39,7 @@ test({
 
 test({
 	message	: 'DataServerPlugin.getServer returns a DataServer',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const options					= { dataServerOptions: { ttl: 100, persist: false } };
 		const memoryDataServerPlugin	= new DataServerPlugin( 'plugin_id', options );
 
@@ -56,7 +56,7 @@ test({
 
 test({
 	message	: 'DataServerPlugin.getPluginMiddleware returns a middleware that adds a dataServer',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const options					= { dataServerOptions: { persist: false } };
 		const memoryDataServerPlugin	= new DataServerPlugin( 'id', options );
 		const eventRequest				= helpers.getEventRequest();
@@ -79,7 +79,7 @@ test({
 
 		router.add( middleware[0] );
 		router.add( {
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				assert.equal( typeof event.dataServer !== 'undefined', true );
 				assert.equal( event.dataServer instanceof DataServer, true );
 				assert.equal( called, 1 );

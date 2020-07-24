@@ -13,7 +13,7 @@ const MockMultipartDataParser					= Mocker( Mock( MultipartDataParser ), {
 
 test({
 	message	: 'MultipartDataParser.constructor does not throw on defaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		new MockMultipartDataParser();
 
 		done();
@@ -22,7 +22,7 @@ test({
 
 test({
 	message	: 'MultipartDataParser.constructor on correct arguments',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let tempDir					= '/test';
 		let maxPayload				= 100;
 		let cleanUpItemsTimeoutMS	= 100;
@@ -42,7 +42,7 @@ test({
 
 test({
 	message	: 'MultipartDataParser.terminate terminates the parser',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let tempDir			= '/test';
 		let maxPayload		= 10;
 		let multipartParser	= new MockMultipartDataParser({
@@ -75,7 +75,7 @@ test({
 
 test({
 	message		: 'MultipartDataParser.parse.parses.multipart.data',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let tempDir			= path.join( __dirname, './fixture/testUploads' );
 		let multipartParser	= new MockMultipartDataParser( { tempDir } );
 		let eventRequest	= helpers.getEventRequest(
@@ -88,7 +88,7 @@ test({
 		);
 		eventRequest.request._mock({
 			method			: 'on',
-			shouldReturn	: ( event, callback )=>{
+			shouldReturn	: ( event, callback ) => {
 				if ( event === 'data' )
 				{
 					let data			= multipartData.toString();
@@ -105,7 +105,7 @@ test({
 			}
 		});
 
-		multipartParser.parse( eventRequest ).then(( parsedData )=>{
+		multipartParser.parse( eventRequest ).then(( parsedData ) => {
 			const body	= parsedData.body;
 
 			// Sync delay
@@ -138,7 +138,7 @@ for ( let i = 0; i < dataLength; i ++ )
 test({
 	message			: 'MultipartDataParser.parse.parses.multipart.data.with.different.cuts',
 	dataProvider	: placesToSplitProvider,
-	test			: ( done, placeToSplit )=>{
+	test			: ( done, placeToSplit ) => {
 		let tempDir			= path.join( __dirname, './fixture/testUploads' );
 		let multipartParser	= new MockMultipartDataParser( { tempDir } );
 		let eventRequest	= helpers.getEventRequest(
@@ -151,7 +151,7 @@ test({
 		);
 		eventRequest.request._mock({
 			method			: 'on',
-			shouldReturn	: ( event, callback )=>{
+			shouldReturn	: ( event, callback ) => {
 				if ( event === 'data' )
 				{
 					let data			= multipartData.toString();
@@ -167,7 +167,7 @@ test({
 			}
 		});
 
-		multipartParser.parse( eventRequest ).then(( parsedData )=>{
+		multipartParser.parse( eventRequest ).then(( parsedData ) => {
 			const body	= parsedData.body;
 
 			// Sync delay
@@ -192,7 +192,7 @@ test({
 
 test({
 	message			: 'MultipartDataParser.parse.parses.multipart.data.with.2.bytes.at.a.time',
-	test			: ( done )=>{
+	test			: ( done ) => {
 		let tempDir			= path.join( __dirname, './fixture/testUploads' );
 		let multipartParser	= new MockMultipartDataParser( { tempDir } );
 		let eventRequest	= helpers.getEventRequest(
@@ -205,7 +205,7 @@ test({
 		);
 		eventRequest.request._mock({
 			method			: 'on',
-			shouldReturn	: ( event, callback )=>{
+			shouldReturn	: ( event, callback ) => {
 				if ( event === 'data' )
 				{
 					let data			= multipartData.toString();
@@ -231,7 +231,7 @@ test({
 			}
 		});
 
-		multipartParser.parse( eventRequest ).then(( parsedData )=>{
+		multipartParser.parse( eventRequest ).then(( parsedData ) => {
 			const body	= parsedData.body;
 
 			// Sync delay

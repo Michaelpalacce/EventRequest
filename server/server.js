@@ -57,7 +57,7 @@ class Server extends EventEmitter
 			{ plugin : 'er_static_resources', options: { paths: ['favicon.ico'] } },
 		];
 
-		pluginsToApply.forEach(( pluginConfig )=>{
+		pluginsToApply.forEach(( pluginConfig ) => {
 			this.apply( pluginConfig.plugin, pluginConfig.options );
 		});
 
@@ -146,7 +146,7 @@ class Server extends EventEmitter
 		const pluginDependencies	= plugin.getPluginDependencies();
 		const pluginId				= plugin.getPluginId();
 
-		pluginDependencies.forEach(( dependency )=>{
+		pluginDependencies.forEach(( dependency ) => {
 
 			if ( ! this.hasPlugin( dependency ) )
 				throw new Error( 'The plugin ' + pluginId + ' requires ' + dependency + ' which is missing.' );
@@ -157,7 +157,7 @@ class Server extends EventEmitter
 
 		const pluginMiddleware	= plugin.getPluginMiddleware();
 
-		pluginMiddleware.forEach( ( route )=>{
+		pluginMiddleware.forEach( ( route ) => {
 			this.add( route );
 		});
 
@@ -205,7 +205,7 @@ class Server extends EventEmitter
 	 */
 	attach()
 	{
-		return ( request, response )=>{
+		return ( request, response ) => {
 			let eventRequest	= new EventRequest( request, response );
 
 			request.on( 'close', () => {
@@ -238,7 +238,7 @@ class Server extends EventEmitter
 
 				eventRequest._setBlock( block );
 
-				const onErrorCallback	= ( error ) =>{
+				const onErrorCallback	= ( error ) => {
 					if ( eventRequest.logger === null )
 						Loggur.log( error, LOG_LEVELS.error );
 				};

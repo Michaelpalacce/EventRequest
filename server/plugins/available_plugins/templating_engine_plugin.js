@@ -32,7 +32,7 @@ class TemplatingEnginePlugin extends PluginInterface
 		 */
 		eventRequest.render	= function( templateName, variables = {}, errorCallback = null )
 		{
-			const renderPromise	= new Promise(( resolve,reject )=>{
+			const renderPromise	= new Promise(( resolve,reject ) => {
 				templateName	= typeof templateName === 'string' && templateName.length > 0
 								? templateName + '.html'
 								: 'index.html';
@@ -87,7 +87,7 @@ class TemplatingEnginePlugin extends PluginInterface
 								: DEFAULT_TEMPLATING_DIR;
 
 		const pluginMiddleware	= {
-			handler	: ( event ) =>{
+			handler	: ( event ) => {
 				event.templateDir		= templateDir;
 				event.templatingEngine	= templatingEngine;
 

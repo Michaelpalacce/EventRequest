@@ -42,7 +42,7 @@ class DataServerPlugin extends PluginInterface
 	getPluginMiddleware()
 	{
 		const pluginMiddleware	= {
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.dataServer	= this.getServer();
 
 				event.on( 'cleanUp', () => {

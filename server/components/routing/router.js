@@ -90,7 +90,7 @@ class Router extends PluginInterface
 		 *
 		 * @returns	Server
 		 */
-		server.add	= ( ...args )=>{
+		server.add	= ( ...args ) => {
 			this.add.apply( this, args );
 
 			return server;
@@ -108,12 +108,12 @@ class Router extends PluginInterface
 	{
 		const methods	= ['POST', 'PUT', 'GET', 'DELETE', 'HEAD', 'PATCH', 'COPY'];
 
-		const isGlobalMiddleware	= ( argument )=>{
+		const isGlobalMiddleware	= ( argument ) => {
 			return typeof argument === 'function' || typeof argument === 'string' || Array.isArray( argument )
 		};
 
-		methods.forEach(( method )=>{
-			object[method.toLocaleLowerCase()]	= ( ...args )=>{
+		methods.forEach(( method ) => {
+			object[method.toLocaleLowerCase()]	= ( ...args ) => {
 				const firstArgument	= args[0];
 				let route			= null;
 				let handler			= null;

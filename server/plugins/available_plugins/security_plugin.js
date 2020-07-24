@@ -32,7 +32,7 @@ class SecurityPlugin extends PluginInterface
 	{
 		const middlewares	= [];
 
-		middlewares.push(( event )=>{
+		middlewares.push(( event ) => {
 			event.$security		= {
 				csp		: new CSP( typeof this.options.csp === 'object' ? this.options.csp : {} ),
 				hsts	: new HSTS( typeof this.options.hsts === 'object' ? this.options.hsts : {} ),

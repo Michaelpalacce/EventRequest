@@ -45,7 +45,7 @@ class RawBodyParser extends EventEmitter
 	 */
 	parse( event )
 	{
-		return new Promise(( resolve, reject )=>{
+		return new Promise(( resolve, reject ) => {
 			let rawBody		= [];
 			let payloadLength	= 0;
 

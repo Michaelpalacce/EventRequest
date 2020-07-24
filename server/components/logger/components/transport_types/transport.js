@@ -105,7 +105,7 @@ class Transport
 	 */
 	log( log )
 	{
-		return new Promise(( resolve, reject )=>{
+		return new Promise(( resolve, reject ) => {
 			if ( ! this.supports( log ) )
 			{
 				resolve();

@@ -7,7 +7,7 @@ const Router					= require( '../../../../server/components/routing/router' );
 
 test({
 	message		: 'StaticResourcesPlugin setsHeader for text/css in case of css',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.css', { accept : 'text/css' } );
 		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
 		let router					= new Router();
@@ -41,7 +41,7 @@ test({
 
 test({
 	message		: 'StaticResourcesPlugin setsHeader to application/javascript in case of js',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.js' );
 		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
 		let router					= new Router();

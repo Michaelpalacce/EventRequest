@@ -137,7 +137,7 @@ class File extends Transport
 	{
 		let message	= this.format( log );
 
-		this.getWriteStream().write( message + SYSTEM_EOL, 'utf8', ( err ) =>{
+		this.getWriteStream().write( message + SYSTEM_EOL, 'utf8', ( err ) => {
 			if ( err )
 				reject( err );
 			else

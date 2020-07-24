@@ -8,7 +8,7 @@ const Server							= require( '../../../../server/server' );
 
 test({
 	message	: 'Router.constructor does not die',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.doesNotThrow( () => {
 			new Router();
 		});
@@ -19,7 +19,7 @@ test({
 
 test({
 	message	: 'Router.add throws an exception on invalid middleware',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let router	= new Router();
 		assert.throws( () => {
 			router.add( null );
@@ -30,7 +30,7 @@ test({
 
 test({
 	message	: 'Router.add adds a valid middleware',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let router			= new Router();
 		let defaultRoute	= new Route({});
 
@@ -45,7 +45,7 @@ test({
 
 test({
 	message	: 'Router.add returns self',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router		= new Router();
 		const defaultRoute	= new Route({});
 
@@ -60,7 +60,7 @@ test({
 
 test({
 	message	: 'Router.add with invalid middleware throws',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router		= new Router();
 
 		assert.throws( () => {
@@ -73,7 +73,7 @@ test({
 
 test({
 	message	: 'Router.add adds another router\'s middleware if passed',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let routerOne		= new Router();
 		let routerTwo		= new Router();
 
@@ -94,7 +94,7 @@ test({
 
 test({
 	message	: 'Router.add adds another router to a given route',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let routerOne		= new Router();
 		let routerTwo		= new Router();
 
@@ -138,7 +138,7 @@ test({
 
 test({
 	message	: 'Router.add adds another router to a given route with regexp',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let routerOne		= new Router();
 		let routerTwo		= new Router();
 
@@ -157,7 +157,7 @@ test({
 
 test({
 	message	: 'Router.match method matches String requestedMethod and String method',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.equal( Router.matchMethod( 'GET', 'GET' ), true );
 		assert.equal( Router.matchMethod( 'POST', 'GET' ), false );
 
@@ -167,7 +167,7 @@ test({
 
 test({
 	message	: 'Router.match method matches String requestedMethod and String method for instance router',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
 		assert.equal( router.matchMethod( 'GET', 'GET' ), true );
@@ -179,7 +179,7 @@ test({
 
 test({
 	message	: 'Router.match method matches String requestedMethod and Route method',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let getRoute	= new Route( { method : 'GET' } );
 
 		assert.equal( Router.matchMethod( 'GET', getRoute ), true );
@@ -191,7 +191,7 @@ test({
 
 test({
 	message	: 'Router.match method matches String requestedMethod and Route method for instance router',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 		let getRoute	= new Route( { method : 'GET' } );
 
@@ -204,7 +204,7 @@ test({
 
 test({
 	message	: 'Router.match method matches  String requestedMethod and Array method',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.equal( Router.matchMethod( 'GET', ['GET','POST'] ), true );
 		assert.equal( Router.matchMethod( 'PUT', ['GET','POST'] ), false );
 
@@ -214,7 +214,7 @@ test({
 
 test({
 	message	: 'Router.match method matches  String requestedMethod and Array method for instance router',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
 		assert.equal( router.matchMethod( 'GET', ['GET','POST'] ), true );
@@ -226,7 +226,7 @@ test({
 
 test({
 	message	: 'Router.matchRoute matches String requestedRoute and String route',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.deepStrictEqual( Router.matchRoute( '/test', '/test' ), true );
 		assert.deepStrictEqual( Router.matchRoute( '/test', '/notTest' ), false );
 
@@ -236,7 +236,7 @@ test({
 
 test({
 	message	: 'Router.matchRoute matches String requestedRoute and String route  for instance router',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
 		assert.deepStrictEqual( router.matchRoute( '/test', '/test' ), true );
@@ -248,7 +248,7 @@ test({
 
 test({
 	message	: 'Router.matchRoute matches String requestedRoute and RegExp route',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.deepStrictEqual( Router.matchRoute( '/test', new RegExp( '\/test' ) ), true );
 		assert.deepStrictEqual( Router.matchRoute( '/notTest', new RegExp( '\/test' ) ), false );
 
@@ -258,7 +258,7 @@ test({
 
 test({
 	message	: 'Router.matchRoute matches String requestedRoute and RegExp route for instance router',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
 		assert.deepStrictEqual( router.matchRoute( '/test', new RegExp( '\/test' ) ), true );
@@ -270,7 +270,7 @@ test({
 
 test({
 	message	: 'Router.matchRoute matches String requestedRoute and Route route',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.deepStrictEqual( Router.matchRoute( '/test', new Route( { route: '/test' } ) ), true );
 		assert.deepStrictEqual( Router.matchRoute( '/notTest', new Route( { route: '/test' } ) ), false );
 
@@ -280,7 +280,7 @@ test({
 
 test({
 	message	: 'Router.matchRoute matches String requestedRoute and Route route for instance router',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
 		assert.deepStrictEqual( router.matchRoute( '/test', new Route( { route: '/test' } ) ), true );
@@ -292,7 +292,7 @@ test({
 
 test({
 	message	: 'Router.getExecutionBlockForCurrentEvent throws on invalid EventRequest',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
 		assert.throws( () => {
@@ -305,7 +305,7 @@ test({
 
 test({
 	message	: 'Router.getExecutionBlockForCurrentEvent returns correct execution block',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router						= new Router();
 		const eventRequest					= helpers.getEventRequest( 'GET', '/test', {} );
 		const emptyRoute					= new Route({}); // SHOULD BE ADDED
@@ -338,13 +338,13 @@ test({
 
 test({
 	message	: 'Router.define adds a new global middleware',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const middlewareName	= 'test';
 		const router			= new Router();
 		assert.deepStrictEqual( router.globalMiddlewares, {} );
 		assert.equal( Object.keys( router.globalMiddlewares ).length, 0 );
 
-		router.define( middlewareName, ( event )=>{} );
+		router.define( middlewareName, ( event ) => {} );
 		const globalMiddlewareKeys	= Object.keys( router.globalMiddlewares );
 
 		assert.equal( globalMiddlewareKeys.length, 1 );
@@ -356,10 +356,10 @@ test({
 
 test({
 	message	: 'Router.define returns router',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
-		assert.deepStrictEqual( router.define( 'test', ( event )=>{} ), router );
+		assert.deepStrictEqual( router.define( 'test', ( event ) => {} ), router );
 
 		done();
 	}
@@ -367,16 +367,16 @@ test({
 
 test({
 	message	: 'Router.define throws if trying to define a middleware with the same name',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const middlewareName	= 'test';
 		const router			= new Router();
 
 		assert.doesNotThrow( () => {
-			router.define( middlewareName, ( event )=>{} );
+			router.define( middlewareName, ( event ) => {} );
 		});
 
 		assert.throws( () => {
-			router.define( middlewareName, ( event )=>{} );
+			router.define( middlewareName, ( event ) => {} );
 		});
 
 		done();
@@ -385,11 +385,11 @@ test({
 
 test({
 	message	: 'Router.define throws if middlewareName has invalid name',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
 		assert.throws( () => {
-			router.define( 123, ( event )=>{} );
+			router.define( 123, ( event ) => {} );
 		});
 
 		done();
@@ -398,7 +398,7 @@ test({
 
 test({
 	message	: 'Router.define throws if middleware is not a function',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
 		assert.throws( () => {
@@ -411,7 +411,7 @@ test({
 
 test({
 	message	: 'Router.getExecutionBlockForCurrentEvent adds global middlewares',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const eventRequest				= helpers.getEventRequest( 'GET', '/test', {} );
 		const expectedExecutionBlockCount	= 3;
 		const router						= new Router();
@@ -436,7 +436,7 @@ test({
 
 test({
 	message	: 'Router.getExecutionBlockForCurrentEvent.caches.if.caching.is.enabled',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const eventRequest					= helpers.getEventRequest( 'GET', '/test', {} );
 		const expectedExecutionBlockCount	= 1;
 		const router						= new Router();
@@ -466,7 +466,7 @@ test({
 
 test({
 	message	: 'Router.setKeyLimit.and._isCacheFull',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const eventRequest		= helpers.getEventRequest( 'GET', '/test', {} );
 		const eventRequestTwo	= helpers.getEventRequest( 'GET', '/testTwo', {} );
 
@@ -494,7 +494,7 @@ test({
 
 test({
 	message	: 'Router.enableCaching',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router	= new Router();
 
 		assert.equal( router.cachingIsEnabled, true );
@@ -513,7 +513,7 @@ test({
 
 test({
 	message	: 'Router.getExecutionBlockForCurrentEvent.does.not.cache.if.caching.is.disabled',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const eventRequest					= helpers.getEventRequest( 'GET', '/test', {} );
 
 		const expectedExecutionBlockCount	= 1;
@@ -539,7 +539,7 @@ test({
 
 test({
 	message	: 'Router.getExecutionBlockForCurrentEvent fails if route has a non existing global middleware',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const router					= new Router();
 		const eventRequest				= helpers.getEventRequest( 'GET', '/test', {} );
 
@@ -564,7 +564,7 @@ test({
 
 test({
 	message	: 'Router.add adds another router\'s GLOBAL middleware if passed',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const routerOne	= new Router();
 		const routerTwo	= new Router();
 
@@ -581,7 +581,7 @@ test({
 
 test({
 	message	: 'Router.add doesn\'t add another router\'s GLOBAL middleware if it has duplicates',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const routerOne	= new Router();
 		const routerTwo	= new Router();
 
@@ -598,7 +598,7 @@ test({
 
 test({
 	message	: 'Router.setServerOnRuntime adds methods to the Server and to itself that return instances of themselves',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const server	= new Server();
 		const router	= server.router;
 

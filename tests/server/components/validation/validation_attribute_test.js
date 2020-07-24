@@ -110,7 +110,7 @@ test({
 		['testKey', null, 'weakIsFalse', ['weakIsFalse']],
 		['testKey', [], 'weakIsFalse', ['weakIsFalse']],
 	],
-	test			: ( done, key, value, rules, anythingInvalid )=>{
+	test			: ( done, key, value, rules, anythingInvalid ) => {
 		let dataToValidate		= {
 			[key]	: value
 		};
@@ -150,7 +150,7 @@ test({
 		['testKey', 1, 'numeric', 1],
 		['testKey', 50, 'numeric||min:50', 50],
 	],
-	test			: ( done, key, value, rules, expectedValue )=>{
+	test			: ( done, key, value, rules, expectedValue ) => {
 		let dataToValidate		= {
 			[key]	: value
 		};
@@ -171,7 +171,7 @@ test({
 		['testKey', 'test', 'different:testKey2', { testKey: 'test', testKey2: 'test' }, ['different']],
 		['testKey', 'test', 'different:testKey2', { testKey: 'test', testKey2: 'test2' }, false],
 	],
-	test			: ( done, key, value, rules, data, anythingInvalid )=>{
+	test			: ( done, key, value, rules, data, anythingInvalid ) => {
 		let validationAttribute	= new ValidationAttribute( key, value, rules, data );
 
 		assert.deepStrictEqual( validationAttribute.validateSelf(), anythingInvalid );

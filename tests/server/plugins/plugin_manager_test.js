@@ -8,7 +8,7 @@ const PluginInterface	= require( '../../../server/plugins/plugin_interface' );
 
 test({
 	message	: 'PluginManager addPlugin',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let pluginManager		= new PluginManager();
 		let timeoutPluginOne	= new TimeoutPlugin( 'id1', {} );
 		let timeoutPluginTwo	= new TimeoutPlugin( 'id2', {} );
@@ -22,7 +22,7 @@ test({
 
 test({
 	message	: 'PluginManager addPlugin throws if plugin is incorrect',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let pluginManager	= new PluginManager();
 
 		assert.throws(() => {
@@ -35,7 +35,7 @@ test({
 
 test({
 	message	: 'PluginManager addPlugin does not throw if plugin id exists',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let pluginManager		= new PluginManager();
 		let timeoutPluginOne	= new TimeoutPlugin( 'id', {} );
 		let timeoutPluginTwo	= new TimeoutPlugin( 'id', {} );
@@ -52,7 +52,7 @@ test({
 
 test({
 	message	: 'PluginManager removePlugin',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let pluginManager		= new PluginManager();
 		let timeoutPluginOne	= new TimeoutPlugin( 'id1', {} );
 		let timeoutPluginTwo	= new TimeoutPlugin( 'id2', {} );
@@ -73,7 +73,7 @@ test({
 
 test({
 	message	: 'PluginManager getAllPluginIds',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let pluginManager		= new PluginManager();
 		let timeoutPluginOne	= new TimeoutPlugin( 'id1', {} );
 		let timeoutPluginTwo	= new TimeoutPlugin( 'id2', {} );
@@ -90,7 +90,7 @@ test({
 
 test({
 	message	: 'PluginManager getPlugin',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let pluginId		= 'id1';
 		let pluginManager	= new PluginManager();
 		let timeoutPlugin	= new TimeoutPlugin( pluginId, {} );
@@ -105,7 +105,7 @@ test({
 
 test({
 	message	: 'PluginManager throws if plugin does not exist',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let pluginManager	= new PluginManager();
 		let timeoutPlugin	= new TimeoutPlugin( 'id1', {} );
 
@@ -121,7 +121,7 @@ test({
 
 test({
 	message	: 'PluginManager hasPlugin',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let pluginManager	= new PluginManager();
 		let timeoutPlugin	= new TimeoutPlugin( 'id1', {} );
 

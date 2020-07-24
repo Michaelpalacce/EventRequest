@@ -197,7 +197,7 @@ class Bucket
 	 */
 	_lock()
 	{
-		return new Promise( async ( resolve, reject )=>{
+		return new Promise( async ( resolve, reject ) => {
 			await this._doLock( resolve, reject );
 		});
 	}

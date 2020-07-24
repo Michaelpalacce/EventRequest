@@ -26,7 +26,7 @@ function getRoute( handler = () => {}, route = '', method = '', middlewares = []
 
 test({
 	message	: 'Route.constructor does not die when with correct arguments',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		getRoute();
 
 		done();
@@ -35,7 +35,7 @@ test({
 
 test({
 	message	: 'Route.constructor throws with invalid arguments',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		assert.throws( () => {
 			new Route();
 		});
@@ -46,7 +46,7 @@ test({
 
 test({
 	message	: 'Route.constructor adds a defaults if they are not specified',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let route	= new Route({});
 
 		assert.equal( typeof route.getHandler() === 'function', true );
@@ -60,7 +60,7 @@ test({
 
 test({
 	message	: 'Route.matchMethod matches String when empty',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let route	= new Route({});
 
 		assert.equal( route.matchMethod( 'GET' ), true );
@@ -75,7 +75,7 @@ test({
 
 test({
 	message	: 'Route.matchMethod matches String when provided',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let route	= getRoute( undefined, undefined, 'GET' );
 
 		assert.equal( route.matchMethod( 'GET' ), true );
@@ -90,7 +90,7 @@ test({
 
 test({
 	message	: 'Route.matchMethod matches Array when empty',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		let route	= getRoute( undefined, undefined, [] );
 
 		assert.equal( route.matchMethod( 'GET' ), true );
@@ -105,7 +105,7 @@ test({
 
 test({
 	message	: 'Route.matchMethod matches Array when provided',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const route	= getRoute( undefined, undefined, ['GET', 'POST'] );
 
 		assert.equal( route.matchMethod( 'GET' ), true );
@@ -223,7 +223,7 @@ test({
 		[ 123, [] ],
 		[ '123', ['123'] ],
 	],
-	test			: ( done, middleware, expectedStructure )=>{
+	test			: ( done, middleware, expectedStructure ) => {
 		const route	= getRoute( undefined, undefined, undefined, middleware );
 
 		assert.deepStrictEqual( route.getMiddlewares(), expectedStructure );
@@ -234,7 +234,7 @@ test({
 
 test({
 	message	: 'Route.getMiddlewares returns an array of middlewares',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const middlewares	= ['test', 'test2'];
 		const route			= getRoute( undefined, undefined, undefined, middlewares );
 

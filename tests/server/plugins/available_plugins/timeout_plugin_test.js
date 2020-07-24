@@ -7,7 +7,7 @@ const Router					= require( '../../../../server/components/routing/router' );
 
 test({
 	message	: 'TimeoutPlugin times out when added',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0 } );
 		let router				= new Router();
@@ -20,7 +20,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.on( 'on_error', ( err )=>{
+		eventRequest.on( 'on_error', ( err ) => {
 			assert.equal( typeof err === 'string', true );
 			error	= true;
 		});
@@ -40,10 +40,10 @@ test({
 
 test({
 	message	: 'TimeoutPlugin times out when added with custom callback',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 
-		const callback			= ( event )=>{
+		const callback			= ( event ) => {
 			assert.deepStrictEqual( event, eventRequest );
 			assert.equal( true, typeof eventRequest.clearTimeout !== 'undefined' );
 			assert.equal( true, typeof eventRequest.internalTimeout !== 'undefined' );
@@ -68,7 +68,7 @@ test({
 
 test({
 	message	: 'TimeoutPlugin stream_start',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0 } );
 		let router				= new Router();
@@ -81,7 +81,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.on( 'error', ( err )=>{});
+		eventRequest.on( 'error', ( err ) => {});
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
@@ -101,7 +101,7 @@ test({
 
 test({
 	message	: 'TimeoutPlugin stream_end',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0 } );
 		let router				= new Router();
@@ -113,7 +113,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.on( 'error', ( err )=>{});
+		eventRequest.on( 'error', ( err ) => {});
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
@@ -130,7 +130,7 @@ test({
 
 test({
 	message	: 'TimeoutPlugin clearTimeout',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0 } );
 		let router				= new Router();
@@ -142,7 +142,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.on( 'error', ( err )=>{});
+		eventRequest.on( 'error', ( err ) => {});
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();

@@ -16,7 +16,7 @@ class TestTemplatingEngine
 
 test({
 	message		: 'TemplatingEnginePlugin calls the render function of the engine and sends the rendered html successfully and attaches a render function',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.css' );
 		let templatingEnginePlugin	= new TemplatingEnginePlugin( 'id', { engine : new TestTemplatingEngine(), templateDir: path.join( __dirname, './fixture/templates' ) } );
 		let router					= new Router();

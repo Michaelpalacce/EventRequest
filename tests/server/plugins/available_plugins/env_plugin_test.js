@@ -9,7 +9,7 @@ const fs						= require( 'fs' );
 
 test({
 	message	: 'EnvPlugin setServerOnRuntime and test file watcher',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const MockServer	= Mock( Server );
 		const server		= new MockServer();
 		const fileLocation	= path.join( __dirname, '/fixture/.env');

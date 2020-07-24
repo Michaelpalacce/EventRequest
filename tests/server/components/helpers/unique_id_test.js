@@ -5,7 +5,7 @@ const uniqueId			= require( '../../../../server/components/helpers/unique_id' );
 
 test({
 	message	: 'UniqueId.makeId makes a random ID with the correct length',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const idOne	= uniqueId.makeId( 10 );
 		const idTwo	= uniqueId.makeId( 20 );
 
@@ -19,7 +19,7 @@ test({
 
 test({
 	message	: 'UniqueId.makeId.with.not.a.number.argument',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const idOne	= uniqueId.makeId( 10 );
 		const idTwo	= uniqueId.makeId( 'wrong' );
 

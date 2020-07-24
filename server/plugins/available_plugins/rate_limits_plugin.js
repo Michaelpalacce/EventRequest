@@ -267,7 +267,7 @@ class RateLimitsPlugin extends PluginInterface
 
 		this.validateRule( rule );
 
-		return ( event )=>{
+		return ( event ) => {
 			rule.path		= event.path;
 			rule.methods	= [event.method];
 
@@ -286,7 +286,7 @@ class RateLimitsPlugin extends PluginInterface
 	getPluginMiddleware()
 	{
 		return [{
-			handler: ( event )=>{
+			handler: ( event ) => {
 				this._rateLimit( event, this.rules.slice() );
 			}
 		}];

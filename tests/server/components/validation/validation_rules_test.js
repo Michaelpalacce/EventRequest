@@ -14,7 +14,7 @@ test({
 		['string', 'wrong', false],
 		[0, false, false]
 	],
-	test			: ( done, first, second, shouldBeEqual )=>{
+	test			: ( done, first, second, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertStrictEqual( first, second ), shouldBeEqual );
 
 		done();
@@ -32,7 +32,7 @@ test({
 		['string', 'wrong', false],
 		[0, false, true]
 	],
-	test			: ( done, first, second, shouldBeEqual )=>{
+	test			: ( done, first, second, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertEqual( first, second ), shouldBeEqual );
 
 		done();
@@ -50,7 +50,7 @@ test({
 		['string', 'wrong', true],
 		[0, false, false]
 	],
-	test			: ( done, first, second, shouldBeEqual )=>{
+	test			: ( done, first, second, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertNotEqual( first, second ), shouldBeEqual );
 
 		done();
@@ -68,7 +68,7 @@ test({
 		['string', 'wrong', true],
 		[0, false, true]
 	],
-	test			: ( done, first, second, shouldBeEqual )=>{
+	test			: ( done, first, second, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertStrictNotEqual( first, second ), shouldBeEqual );
 		done();
 	}
@@ -83,7 +83,7 @@ test({
 		[false, false],
 		[[], false]
 	],
-	test			: ( done, value, shouldBeEqual ) =>{
+	test			: ( done, value, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertIsString( value ), shouldBeEqual );
 
 		done();
@@ -99,7 +99,7 @@ test({
 		[false, true],
 		[[], true]
 	],
-	test			: ( done, value, shouldBeEqual ) =>{
+	test			: ( done, value, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertNotString( value ), shouldBeEqual );
 
 		done();
@@ -115,7 +115,7 @@ test({
 		['string', false],
 		[NaN, false]
 	],
-	test			: ( done, value, shouldBeEqual ) =>{
+	test			: ( done, value, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertIsNumeric( value ), shouldBeEqual );
 
 		done();
@@ -132,7 +132,7 @@ test({
 		[false, false],
 		[1, false]
 	],
-	test			: ( done, value, shouldBeEqual ) =>{
+	test			: ( done, value, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertNotNumeric( value ), shouldBeEqual );
 
 		done();
@@ -151,7 +151,7 @@ test({
 		[[1,2,3], false],
 		['string', false]
 	],
-	test			: ( done, value, shouldBeEqual )=>{
+	test			: ( done, value, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertIsEmpty( value ), shouldBeEqual );
 
 		done();
@@ -169,7 +169,7 @@ test({
 		[{key:'value'}, true],
 		[[1,2,3], true]
 	],
-	test			: ( done, value, shouldBeEqual )=>{
+	test			: ( done, value, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertNotEmpty( value ), shouldBeEqual );
 		done();
 	}
@@ -186,7 +186,7 @@ test({
 		[{key:'value'}, false],
 		[[1,2,3], true]
 	],
-	test			: ( done, value, shouldBeEqual )=>{
+	test			: ( done, value, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertIsArray( value ), shouldBeEqual );
 		done();
 	}
@@ -203,7 +203,7 @@ test({
 		[{key:'value'}, true],
 		[[1,2,3], false]
 	],
-	test			: ( done, value, shouldBeEqual )=>{
+	test			: ( done, value, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertNotArray( value ), shouldBeEqual );
 		done();
 	}
@@ -215,7 +215,7 @@ test({
 		[new Date(), true],
 		['string', false]
 	],
-	test			: ( done, value, shouldBeEqual )=>{
+	test			: ( done, value, shouldBeEqual ) => {
 		assert.equal( ValidationRules.assertIsDateObject( value ), shouldBeEqual );
 
 		done();

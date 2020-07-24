@@ -7,7 +7,7 @@ const EventRequest				= require( './../../../../server/event_request' );
 
 test({
 	message	: 'Session constructor on default throws',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.throws(() => {
 			new Session()
 		});
@@ -18,7 +18,7 @@ test({
 
 test({
 	message	: 'Session constructor on correct arguments does not throw',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= null;
@@ -42,7 +42,7 @@ test({
 
 test({
 	message	: 'Session constructor on custom arguments',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= null;
@@ -74,7 +74,7 @@ test({
 
 test({
 	message	: 'Session constructor on custom arguments',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
 		eventRequest.dataServer	= helpers.getDataServer();
@@ -92,7 +92,7 @@ test({
 
 test({
 	message	: 'Session constructor on custom arguments with headers',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { testSid : sessionId } );
 		eventRequest.dataServer	= helpers.getDataServer();
@@ -110,7 +110,7 @@ test({
 
 test({
 	message	: 'Session _makeNewSessionId returns an id depending on the sessionKeyLength',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= null;
@@ -128,7 +128,7 @@ test({
 
 test({
 	message	: 'Session hasSession when there is no session',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
 		eventRequest.dataServer	= helpers.getDataServer();
@@ -143,7 +143,7 @@ test({
 
 test({
 	message	: 'Session hasSession, newSession and removeSession when there is a session',
-	test	: async ( done )=>{
+	test	: async ( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
 		eventRequest.dataServer	= helpers.getDataServer();
@@ -201,7 +201,7 @@ test({
 
 test({
 	message	: 'Session add, has adds a variable in the session',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= new Session( eventRequest );
@@ -223,7 +223,7 @@ test({
 
 test({
 	message	: 'Session fetchSession if session does not exist',
-	test	: async ( done )=>{
+	test	: async ( done ) => {
 		let sessionId			= 'sessionId2';
 		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
 		eventRequest.dataServer	= helpers.getDataServer();
@@ -235,7 +235,7 @@ test({
 
 test({
 	message	: 'Session fetchSession if session exists',
-	test	: async ( done )=>{
+	test	: async ( done ) => {
 		let sessionId			= 'sessionId2';
 		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
 		eventRequest.dataServer	= helpers.getDataServer();
@@ -248,7 +248,7 @@ test({
 
 test({
 	message	: 'Session getSessionId returns sessionId',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let sessionId			= 'sessionId2';
 		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
 		eventRequest.dataServer	= helpers.getDataServer();

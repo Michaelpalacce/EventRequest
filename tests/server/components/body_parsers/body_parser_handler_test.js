@@ -7,7 +7,7 @@ const RawBodyParser								= require( '../../../../server/components/body_parser
 
 test({
 	message	: 'BodyParserHandler.constructor does not throw with valid arguments',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.doesNotThrow(() => {
 			new BodyParserHandler();
 		});
@@ -17,7 +17,7 @@ test({
 
 test({
 	message	: 'BodyParserHandler.addParser does not throw with valid parser',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.doesNotThrow(() => {
 			const bodyParserHandler	= new BodyParserHandler();
 
@@ -34,7 +34,7 @@ test({
 
 test({
 	message	: 'BodyParserHandler.addParser throws with invalid parser',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.throws(() => {
 			const bodyParserHandler	= new BodyParserHandler();
 
@@ -46,7 +46,7 @@ test({
 
 test({
 	message	: 'BodyParserHandler.parseBody if no parsers support it',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.doesNotThrow(() => {
 			const MockBodyParser	= Mock( RawBodyParser );
 			const fallbackParser	= new MockBodyParser();
@@ -60,7 +60,7 @@ test({
 			fallbackParser._mock({
 				method			: 'parse',
 				shouldReturn	: () => {
-					return new Promise(( resolve, reject )=>{
+					return new Promise(( resolve, reject ) => {
 						resolve( testBody );
 					})
 				}
@@ -69,7 +69,7 @@ test({
 			const bodyParserHandler				= new BodyParserHandler();
 			bodyParserHandler.fallbackParser	= fallbackParser;
 
-			bodyParserHandler.parseBody( helpers.getEventRequest() ).then(( parsedData )=>{
+			bodyParserHandler.parseBody( helpers.getEventRequest() ).then(( parsedData ) => {
 				assert.deepStrictEqual( parsedData, testBody );
 				done();
 			});
@@ -79,7 +79,7 @@ test({
 
 test({
 	message	: 'BodyParserHandler.parseBody calls BodyParser parse if supported',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const MockBodyParser	= Mock( JsonBodyParser );
 		const testBody			= 'Test';
 		Mocker( MockBodyParser, {
@@ -89,7 +89,7 @@ test({
 		Mocker( MockBodyParser, {
 			method			: 'parse',
 			shouldReturn	: () => {
-				return new Promise(( resolve, reject )=>{
+				return new Promise(( resolve, reject ) => {
 					resolve( testBody );
 				})
 			}
@@ -98,7 +98,7 @@ test({
 		const bodyParserHandler	= new BodyParserHandler();
 
 		bodyParserHandler.addParser( new MockBodyParser() );
-		bodyParserHandler.parseBody( event ).then(( data )=>{
+		bodyParserHandler.parseBody( event ).then(( data ) => {
 			assert.equal( data, testBody );
 			done();
 		}).catch( done );
@@ -107,7 +107,7 @@ test({
 
 test({
 	message	: 'BodyParserHandler.parseBody does not parse if not supports and does not return an error',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const MockBodyParser	= Mock( JsonBodyParser );
 		const MockRawBodyParser	= Mock( RawBodyParser );
 		const fallbackParser	= new MockRawBodyParser();
@@ -130,7 +130,7 @@ test({
 		fallbackParser._mock({
 			method			: 'parse',
 			shouldReturn	: () => {
-				return new Promise(( resolve, reject )=>{
+				return new Promise(( resolve, reject ) => {
 					resolve( { body: {}, rawBody: {} } );
 				})
 			}
@@ -141,7 +141,7 @@ test({
 		bodyParserHandler.fallbackParser	= fallbackParser;
 
 		bodyParserHandler.addParser( new MockBodyParser() );
-		bodyParserHandler.parseBody( event ).then(( data )=>{
+		bodyParserHandler.parseBody( event ).then(( data ) => {
 			assert.deepStrictEqual( { body: {}, rawBody: {} }, data );
 			done();
 		}).catch( done );
@@ -150,7 +150,7 @@ test({
 
 test({
 	message	: 'BodyParserHandler.parseBody calls only the first one that supports it',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const MockBodyParser	= Mock( JsonBodyParser );
 		const MockBodyParserTwo	= Mock( JsonBodyParser );
 		const testBody			= 'Test';
@@ -171,8 +171,8 @@ test({
 
 		Mocker( MockBodyParser, {
 			method			: 'parse',
-			shouldReturn	: ( event, callback )=>{
-				return new Promise(( resolve )=>{
+			shouldReturn	: ( event, callback ) => {
+				return new Promise(( resolve ) => {
 					resolve( testBody)
 				});
 			}
@@ -183,7 +183,7 @@ test({
 
 		bodyParserHandler.addParser( new MockBodyParser() );
 		bodyParserHandler.addParser( new MockBodyParserTwo() );
-		bodyParserHandler.parseBody( event ).then(( body )=>{
+		bodyParserHandler.parseBody( event ).then(( body ) => {
 			assert.equal( body, testBody );
 			done();
 		}).catch( done );
@@ -192,7 +192,7 @@ test({
 
 test({
 	message	: 'BodyParserHandler.parseBody returns an error in case of an error in the body parser',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const MockBodyParser	= Mock( JsonBodyParser );
 		const error			= 'Not supported';
 		Mocker( MockBodyParser, {
@@ -202,8 +202,8 @@ test({
 
 		Mocker( MockBodyParser, {
 			method			: 'parse',
-			shouldReturn	: ( event, callback )=>{
-				return new Promise(( resolve, reject )=>{
+			shouldReturn	: ( event, callback ) => {
+				return new Promise(( resolve, reject ) => {
 					reject( error )
 				});
 			}
@@ -215,7 +215,7 @@ test({
 		bodyParserHandler.addParser( new MockBodyParser() );
 		bodyParserHandler.parseBody( event ).then(() => {
 			done( 'Should have rejected!' );
-		}).catch( ( err )=>{
+		}).catch( ( err ) => {
 			assert.equal( err, error );
 			done();
 		} );

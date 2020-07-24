@@ -7,7 +7,7 @@ const Router					= require( '../../../../server/components/routing/router' );
 
 test({
 	message		: 'ResponseCachePlugin adds a cacheCurrentRequest method',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let eventRequest		= helpers.getEventRequest( 'GET', '/tests' );
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 		let router				= new Router();
@@ -30,7 +30,7 @@ test({
 
 test({
 	message		: 'ResponseCachePlugin doesn\'t cache if already exists',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let eventRequest		= helpers.getEventRequest( 'GET', '/test/responseCachePlugin/attachesEvent' );
 		let eventRequest2		= helpers.getEventRequest( 'GET', '/test/responseCachePlugin/attachesEvent' );
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
@@ -52,12 +52,12 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add({
 			route	: '/test/responseCachePlugin/attachesEvent',
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.cacheCurrentRequest();
 			}
 		});
 		router.add({
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.send( 'Test' );
 			}
 		});
@@ -75,7 +75,7 @@ test({
 
 test({
 	message		: 'ResponseCachePlugin getCacheId doesn\'t use ip by default',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let path				= '/path';
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 		let eventRequest		= helpers.getEventRequest( 'GET', path );
@@ -89,7 +89,7 @@ test({
 
 test({
 	message		: 'ResponseCachePlugin getCacheId uses ip if set in config',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let path				= '/path';
 		let ipAddress			= '127.0.0.1';
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
@@ -116,7 +116,7 @@ test({
 
 test({
 	message		: 'ResponseCachePlugin getCacheId uses given options instead of config if any',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let path				= '/path';
 		let ipAddress			= '127.0.0.1';
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
@@ -147,7 +147,7 @@ test({
 
 test({
 	message		: 'ResponseCachePlugin getTimeToLive on default',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 		let eventRequest		= helpers.getEventRequest( 'GET', '/test' );
 
@@ -161,7 +161,7 @@ test({
 
 test({
 	message		: 'ResponseCachePlugin getTimeToLive if set on config',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let configTtl			= 10;
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 		let eventRequest		= helpers.getEventRequest( 'GET', '/test' );
@@ -178,7 +178,7 @@ test({
 
 test({
 	message		: 'ResponseCachePlugin getTimeToLive set on config is overwritten if passed',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let configTtl			= 10;
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 		let eventRequest		= helpers.getEventRequest( 'GET', '/test' );
@@ -200,7 +200,7 @@ test({
 
 test({
 	message		: 'ResponseCachePlugin getPluginDependencies depends on cache server',
-	test		: ( done )=>{
+	test		: ( done ) => {
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 
 		assert.deepStrictEqual( ['er_data_server'], responseCachePlugin.getPluginDependencies() );

@@ -1,3 +1,7 @@
+26.0.4
+- Added more tests
+- Codacy code improvements
+
 26.0.3
 - Added tests
 - Removed an impossible case in the file transport

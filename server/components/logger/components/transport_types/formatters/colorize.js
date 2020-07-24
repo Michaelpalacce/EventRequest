@@ -19,14 +19,14 @@ const RESET		= '\u001b[0m';
  *
  * @return	String
  */
-colorize.red		= log => { return RED + log; };
-colorize.black		= log => { return BLACK + log; };
-colorize.green		= log => { return GREEN + log; };
-colorize.yellow		= log => { return YELLOW + log; };
-colorize.blue		= log => { return BLUE + log; };
-colorize.magenta	= log => { return MAGENTA + log; };
-colorize.cyan		= log => { return CYAN + log; };
-colorize.white		= log => { return WHITE + log; };
-colorize.reset		= log => { return RESET + log; };
+colorize.red		= ( log ) => { return RED + log; };
+colorize.black		= ( log ) => { return BLACK + log; };
+colorize.green		= ( log ) => { return GREEN + log; };
+colorize.yellow		= ( log ) => { return YELLOW + log; };
+colorize.blue		= ( log ) => { return BLUE + log; };
+colorize.magenta	= ( log ) => { return MAGENTA + log; };
+colorize.cyan		= ( log ) => { return CYAN + log; };
+colorize.white		= ( log ) => { return WHITE + log; };
+colorize.reset		= ( log ) => { return RESET + log; };
 
 module.exports	= colorize;

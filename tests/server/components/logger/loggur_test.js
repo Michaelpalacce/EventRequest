@@ -6,7 +6,7 @@ const MockLoggur						= Mock( Loggur.constructor );
 
 test({
 	message	: 'Loggur constructor does not crash',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		new MockLoggur();
 
 		done();
@@ -15,7 +15,7 @@ test({
 
 test({
 	message	: 'Loggur constructor defaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur	= helpers.getMockedLoggur();
 		assert.deepStrictEqual( loggur.loggers, {} );
 		assert.deepStrictEqual( loggur.defaultLogger, null );
@@ -27,7 +27,7 @@ test({
 
 test({
 	message	: 'Loggur createLogger creates a logger',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur		= helpers.getMockedLoggur();
 		assert.equal( loggur.createLogger() instanceof Logger, true );
 
@@ -37,7 +37,7 @@ test({
 
 test({
 	message	: 'Loggur addLogger adds a logger with correct configuration',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur	= helpers.getMockedLoggur();
 		assert.equal( Object.keys( loggur.loggers ).length === 0, true );
 		assert.equal( loggur.addLogger( 'testLogger' ), true );
@@ -49,7 +49,7 @@ test({
 
 test({
 	message	: 'Loggur addLogger adds a logger with incorrect configuration ( ignores object and creates a default one )',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur	= helpers.getMockedLoggur();
 		assert.equal( Object.keys( loggur.loggers ).length === 0, true );
 		assert.equal( loggur.addLogger( 'testLogger', new Date() ), true );
@@ -61,7 +61,7 @@ test({
 
 test({
 	message	: 'Loggur addLogger does not add a logger if logger already exists',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur	= helpers.getMockedLoggur();
 		assert.equal( Object.keys( loggur.loggers ).length === 0, true );
 		assert.equal( loggur.addLogger( 'testLogger' ), true );
@@ -75,7 +75,7 @@ test({
 
 test({
 	message	: 'Loggur getLogger returns the logger',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur		= helpers.getMockedLoggur();
 		let loggerName	= 'testLogger';
 		let testLogger	= loggur.createLogger({});
@@ -89,7 +89,7 @@ test({
 
 test({
 	message	: 'Loggur getLogger returns false if no logger is found',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur		= helpers.getMockedLoggur();
 		let loggerName	= 'testLogger';
 		assert.equal( loggur.getLogger( loggerName ), false );
@@ -100,7 +100,7 @@ test({
 
 test({
 	message	: 'Loggur getDefaultLogger Singleton pattern',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur	= helpers.getMockedLoggur();
 		assert.equal( loggur.defaultLogger, null );
 		let defaultLogger	= loggur.getDefaultLogger();
@@ -114,7 +114,7 @@ test({
 
 test({
 	message	: 'Loggur getDefaultLogger configuration',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur			= helpers.getMockedLoggur();
 		let defaultLogger	= loggur.getDefaultLogger();
 
@@ -127,7 +127,7 @@ test({
 
 test({
 	message	: 'Loggur log returns a Promise',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur	= helpers.getMockedLoggur();
 		loggur.addLogger( 'nullLogger', { logLevel: 0 } );
 		assert.equal( loggur.log( 'test' ) instanceof Promise, true );
@@ -138,7 +138,7 @@ test({
 
 test({
 	message	: 'Loggur log logs to default logger if none are added',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let loggur		= helpers.getMockedLoggur();
 		let MockLogger	= Mock( Logger );
 		let logger		= new MockLogger( {}, 'id' );
@@ -148,7 +148,7 @@ test({
 			method			: 'log',
 			shouldReturn	: () => {
 				++ logged;
-				return new Promise(( resolve, reject )=>{
+				return new Promise(( resolve, reject ) => {
 					resolve();
 				});
 			}

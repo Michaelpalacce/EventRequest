@@ -77,7 +77,7 @@ helpers.getMockedLoggur		= () => {
 helpers.getEmptyMiddleware	= () => {
 	return {
 		route	: '',
-		handler	: ( event )=>{}
+		handler	: ( event ) => {}
 	};
 };
 
@@ -121,8 +121,8 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
  *
  * @return	Promise
  */
-helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '', headers = {}, port = 3333, expectedBody = null )=>{
-	return new Promise(( resolve,reject )=>{
+helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '', headers = {}, port = 3333, expectedBody = null ) => {
+	return new Promise(( resolve,reject ) => {
 		const predefinedHeaders	= {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'Content-Length': Buffer.byteLength( data )
@@ -138,9 +138,9 @@ helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '',
 			headers
 		};
 
-		const req	= request( options, ( res ) =>{
+		const req	= request( options, ( res ) => {
 			const bodyParts	= [];
-			res.on( 'data',( chunk )=>{
+			res.on( 'data',( chunk ) => {
 				bodyParts.push( chunk );
 			} );
 

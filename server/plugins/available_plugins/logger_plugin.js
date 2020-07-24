@@ -68,14 +68,14 @@ class LoggerPlugin extends PluginInterface
 		const logger		= this.getLogger();
 		const requestURL	= event.request.url;
 
-		event.on( 'error', ( error ) =>{
+		event.on( 'error', ( error ) => {
 			if ( error instanceof Error )
 				error	= error.stack;
 
 			logger.error( `Error : ${error}` );
 		});
 
-		event.on( 'on_error', ( error ) =>{
+		event.on( 'on_error', ( error ) => {
 			if ( error instanceof Error )
 				error	= error.stack;
 
@@ -83,31 +83,31 @@ class LoggerPlugin extends PluginInterface
 		});
 
 		event.on( 'finished', () => {
-			logger.info( 'Event finished' )
+			logger.info( 'Event finished' );
 		});
 
-		event.on( 'redirect', ( redirect ) =>{
-			logger.info( `Redirect to: ${redirect.redirectUrl} with status code: ${redirect.statusCode}` )
+		event.on( 'redirect', ( redirect ) => {
+			logger.info( `Redirect to: ${redirect.redirectUrl} with status code: ${redirect.statusCode}` );
 		});
 
 		event.on( 'cachedResponse', () => {
-			logger.info( `Response to ${requestURL} send from cache` )
+			logger.info( `Response to ${requestURL} send from cache` );
 		});
 
 		event.on( 'stop', () => {
-			logger.verbose( 'Event stopped' )
+			logger.verbose( 'Event stopped' );
 		});
 
-		event.on( 'setResponseHeader', ( header ) =>{
-			logger.verbose( `Header set: ${header.key} with value: ${header.value}` )
+		event.on( 'setResponseHeader', ( header ) => {
+			logger.verbose( `Header set: ${header.key} with value: ${header.value}` );
 		});
 
 		event.on( 'cleanUp', () => {
-			logger.verbose( 'Event is cleaning up' )
+			logger.verbose( 'Event is cleaning up' );
 		});
 
 		event.on( 'clearTimeout', () => {
-			logger.verbose( 'Timeout cleared' )
+			logger.verbose( 'Timeout cleared' );
 		});
 	}
 
@@ -121,7 +121,7 @@ class LoggerPlugin extends PluginInterface
 		const logger			= this.getLogger();
 
 		const pluginMiddleware	= {
-			handler	: ( event ) =>{
+			handler	: ( event ) => {
 				const requestURL	= event.request.url;
 
 				event.on( 'cleanUp', () => {

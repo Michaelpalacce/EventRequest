@@ -7,7 +7,7 @@ const Server							= require( '../../../../server/server' );
 
 test({
 	message	: 'CorsPlugin.constructor.on.defaults.does.not.throw',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.doesNotThrow(() => {
 			const plugin	= new CorsPlugin();
 
@@ -20,7 +20,7 @@ test({
 
 test({
 	message	: 'CorsPlugin.getPluginMiddleware',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const plugin	= new CorsPlugin();
 
 		const middleware	= plugin.getPluginMiddleware();
@@ -33,7 +33,7 @@ test({
 
 test({
 	message	: 'CorsPlugin.getPluginMiddleware',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const eventRequest	= helpers.getEventRequest();
 		const plugin		= new CorsPlugin();
 
@@ -69,7 +69,7 @@ test({
 
 test({
 	message	: 'CorsPlugin.getPluginMiddleware.with.non.default.settings',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const eventRequest	= helpers.getEventRequest();
 		const plugin		= new CorsPlugin( '', {
 			origin			: 'http://example.com',
@@ -115,7 +115,7 @@ test({
 
 test({
 	message	: 'CorsPlugin.getPluginMiddleware.with.non.default.settings.and.preflight.request',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const eventRequest	= helpers.getEventRequest( 'options' );
 		const plugin		= new CorsPlugin( '', {
 			origin			: 'http://example.com',

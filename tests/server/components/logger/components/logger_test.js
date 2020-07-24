@@ -11,7 +11,7 @@ const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
 
 test({
 	message	: 'Logger.constructor on valid arguments',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let serverName				= 'Test';
 		let logLevel				= LOG_LEVELS.debug;
 		let logLevels				= LOG_LEVELS;
@@ -51,7 +51,7 @@ test({
 
 test({
 	message	: 'Logger.constructor on invalid arguments',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let serverName				= new Error();
 		let logLevel				= new Error();
 		// These will be accepted and is currently the only flaw. No way around this since the logger accepts all objects
@@ -93,7 +93,7 @@ test({
 
 test({
 	message	: 'Logger.constructor logLevels attaches only given properties',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logLevels	= { error : 100, warning : 200 };
 		let logger		= new Logger( { logLevels }, 'id' );
 
@@ -111,7 +111,7 @@ test({
 
 test({
 	message	: 'Logger.constructor logLevels accepts custom levels',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logLevels	= { testOne : 100, testTwo : 200 };
 		let logger		= new Logger( { logLevels }, 'id' );
 
@@ -125,7 +125,7 @@ test({
 
 test({
 	message	: 'Logger.log logs only up to given log level and always returns a promise',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let TransportMock	= Mock( Transport );
 		let logged			= 0;
 		let transport		= new TransportMock({});
@@ -134,7 +134,7 @@ test({
 			method			: 'log',
 			shouldReturn	: () => {
 				++ logged;
-				return new Promise(( resolve, reject )=>{
+				return new Promise(( resolve, reject ) => {
 					resolve();
 				});
 			},
@@ -151,7 +151,7 @@ test({
 			return logger.log( 'Warning', LOG_LEVELS.warning );
 		}).then(() => {
 			logged === 1 ? done() : done( 'Transport logged called more than once when it should have been called just once' );
-		}).catch(( err )=>{
+		}).catch(( err ) => {
 			done( err );
 		});
 	}
@@ -159,7 +159,7 @@ test({
 
 test({
 	message	: 'Logger.addTransport adds only a transport that is an instance of Transport',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logger	= new Logger( {}, 'id' );
 		assert.equal( logger.addTransport( new Console( { logLevel : 0 } ) ), true );
 		assert.equal( logger.addTransport( new Error() ), false );
@@ -170,7 +170,7 @@ test({
 
 test({
 	message	: 'Logger.supports',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logger	= new Logger( {}, 'id' );
 
 		assert.equal( logger.supports( Log.getInstance( '',LOG_LEVELS.error ) ), true );
@@ -187,7 +187,7 @@ test({
 
 test({
 	message	: 'Logger.getUniqueId',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let uniqueId	= 'id';
 		let serverName	= 'Test';
 		let logger		= new Logger( {}, uniqueId );

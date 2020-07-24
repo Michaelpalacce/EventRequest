@@ -154,7 +154,7 @@ class Mocker
 	}
 }
 
-module.exports	= ( classToMock, mockMethodOptions )=>{
+module.exports	= ( classToMock, mockMethodOptions ) => {
 	let methodMock	= new Mocker( classToMock, mockMethodOptions );
 	methodMock.attachMockedMethod();
 	return classToMock;

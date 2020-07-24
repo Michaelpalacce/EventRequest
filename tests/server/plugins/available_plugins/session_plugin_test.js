@@ -9,7 +9,7 @@ const Router							= require( '../../../../server/components/routing/router' );
 
 test({
 	message	: 'SessionPlugin getPluginDependencies returns er_data_server',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let plugin	= new SessionPlugin( 'id' );
 
 		assert.deepStrictEqual( ['er_data_server'], plugin.getPluginDependencies() );
@@ -20,7 +20,7 @@ test({
 
 test({
 	message	: 'SessionPlugin attaches functions to the eventRequest',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let sessionPlugin		= new SessionPlugin( 'id' );
@@ -60,7 +60,7 @@ test({
 
 test({
 	message	: 'SessionPlugin does not save session on send if not inited',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let sessionPlugin		= new SessionPlugin( 'id' );
@@ -81,7 +81,7 @@ test({
 
 		router.add( pluginMiddlewares[0] );
 		router.add({
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				eventRequest.session	= session;
 				event.send( 'Test' );
 			}
@@ -98,7 +98,7 @@ test({
 
 test({
 	message	: 'SessionPlugin saves session on send',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let sessionPlugin		= new SessionPlugin( 'id' );
@@ -120,7 +120,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( pluginMiddlewares[1] );
 		router.add({
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.session	= session;
 				event.initSession( () => {
 					assert.equal( true, called );
@@ -137,7 +137,7 @@ test({
 
 test({
 	message	: 'SessionPlugin.serServerOnRuntime and initSession initializes a session if it doesn\'t exist',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let MockServer				= Mock( helpers.getServer().constructor );
 		let MockDataServerPlugin	= Mock( DataServerPlugin );
 		let MockDataServer			= Mock( helpers.getDataServer().constructor );
@@ -159,7 +159,7 @@ test({
 		let sessionPlugin			= new SessionPlugin( 'id' );
 
 		sessionPlugin.setOptions({
-			callback	: ( err )=>{
+			callback	: ( err ) => {
 				let router				= new Router();
 				let eventRequest		= helpers.getEventRequest();
 				eventRequest.dataServer	= dataServer;
@@ -168,8 +168,8 @@ test({
 				router.add( pluginMiddlewares[0] );
 				router.add( pluginMiddlewares[1] );
 				router.add({
-					handler	: ( event )=>{
-						event.initSession( ( error )=>{
+					handler	: ( event ) => {
+						event.initSession( ( error ) => {
 							error === false ? done() : done( 'Error while initializing the session' );
 						});
 					}
@@ -189,7 +189,7 @@ test({
 
 test({
 	message	: 'SessionPlugin initSession fetches a session if it exists',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let sessionPlugin		= new SessionPlugin( 'id' );
@@ -200,7 +200,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( pluginMiddlewares[1] );
 		router.add({
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.session.sessionId	= 'testSessionId';
 				event.session.add( 'test', 'value' );
 				if ( ! event.session.saveSession() )

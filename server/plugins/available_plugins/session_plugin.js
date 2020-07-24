@@ -70,8 +70,8 @@ class SessionPlugin extends PluginInterface
 		};
 
 		const initSessionForPathMiddleware	= {
-			handler	: ( event )=>{
-				event.initSession	= async ( callback )=>{
+			handler	: ( event ) => {
+				event.initSession	= async ( callback ) => {
 					const hasSession	= await event.session.hasSession();
 
 					if ( ! hasSession )

@@ -8,7 +8,7 @@ const HEADER_NAME		= 'Strict-Transport-Security';
 
 test({
 	message	: 'HSTS.constructorOnDefaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -25,7 +25,7 @@ test({
 
 test({
 	message	: 'HSTS.setMaxAge',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -44,7 +44,7 @@ test({
 
 test({
 	message	: 'HSTS.setMaxAgeTwice',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -64,7 +64,7 @@ test({
 
 test({
 	message	: 'HSTS.setMaxAgeTwiceWithDifferentValues',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -93,7 +93,7 @@ test({
 		[[1]],
 		[undefined],
 	],
-	test	: ( done, data )=>{
+	test	: ( done, data ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -112,7 +112,7 @@ test({
 
 test({
 	message	: 'HSTS.preload',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -131,7 +131,7 @@ test({
 
 test({
 	message	: 'HSTS.preloadTwice',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -151,7 +151,7 @@ test({
 
 test({
 	message	: 'HSTS.preloadTwiceWithDifferentValues',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -179,7 +179,7 @@ test({
 		[[]],
 		[[1]],
 	],
-	test	: ( done, data )=>{
+	test	: ( done, data ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -198,7 +198,7 @@ test({
 
 test({
 	message	: 'HSTS.includeSubDomains',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -217,7 +217,7 @@ test({
 
 test({
 	message	: 'HSTS.includeSubDomainsTwice',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -237,7 +237,7 @@ test({
 
 test({
 	message	: 'HSTS.includeSubDomainsTwiceWithDifferentValues',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -265,7 +265,7 @@ test({
 		[[]],
 		[[1]],
 	],
-	test	: ( done, data )=>{
+	test	: ( done, data ) => {
 		const hsts	= new HSTS();
 
 		assert.equal( hsts.enabled, true );
@@ -470,7 +470,7 @@ test({
 			'max-age=31536000;'
 		]
 	],
-	test	: ( done, options, expectedEnabled, expectedMaxAge, expectedDoPreload, expectedDoIncludeSubDomains, expectedResult )=>{
+	test	: ( done, options, expectedEnabled, expectedMaxAge, expectedDoPreload, expectedDoIncludeSubDomains, expectedResult ) => {
 		const hsts	= new HSTS( options );
 
 		assert.equal( hsts.enabled, expectedEnabled );

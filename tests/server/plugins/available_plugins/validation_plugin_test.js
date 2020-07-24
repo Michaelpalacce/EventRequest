@@ -6,7 +6,7 @@ const ValidationPlugin					= require( '../../../../server/plugins/available_plug
 
 test({
 	message	: 'ValidationPlugin.constructor.on.defaults.does.not.throw',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.doesNotThrow(() => {
 			const plugin	= new ValidationPlugin();
 
@@ -19,7 +19,7 @@ test({
 
 test({
 	message	: 'ValidationPlugin.getMiddleware',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const plugin	= new ValidationPlugin();
 
 		assert.equal( Array.isArray( plugin.getPluginMiddleware() ), true );
@@ -31,7 +31,7 @@ test({
 
 test({
 	message	: 'ValidationPlugin.validate',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const plugin				= new ValidationPlugin();
 		const eventRequest			= helpers.getEventRequest( 'GET', '/?testKey=123&testKeyTwo=123', { headerTest: '123', headerTestTwo: 123 } );
 		const validationCallback	= plugin.validate( { query: { testKey: 'numeric||range:1-255' }, headers: { headerTest: 'numeric||range:1-255' } }, () => { done( 'Validation Failed' ); } );
@@ -62,12 +62,12 @@ test({
 
 test({
 	message	: 'ValidationPlugin.validate.calls.provided.error.function.on.error',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const plugin				= new ValidationPlugin();
 		const eventRequest			= helpers.getEventRequest( 'GET', '/?testKey=wrong&testKeyTwo=123', { headerTest: '123', headerTestTwo: 123 } );
 		const validationCallback	= plugin.validate(
 			{ query: { testKey: 'numeric||range:1-255' }, headers: { headerTest: 'numeric||range:1-255' } },
-			( event, validationProperty, validationResult )=>{
+			( event, validationProperty, validationResult ) => {
 				assert.deepStrictEqual( eventRequest, event );
 				assert.deepStrictEqual( validationProperty, 'query' );
 				assert.deepStrictEqual( validationResult.getValidationResult(), { testKey: ['numeric'] } );
@@ -95,7 +95,7 @@ test({
 
 test({
 	message	: 'ValidationPlugin.validate.calls.event.send.if.no.error.function.provided',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const plugin				= new ValidationPlugin();
 		const eventRequest			= helpers.getEventRequest( 'GET', '/?testKey=wrong&testKeyTwo=123', { headerTest: '123', headerTestTwo: 123 } );
 		const validationCallback	= plugin.validate(
@@ -126,7 +126,7 @@ test({
 
 test({
 	message	: 'ValidationPlugin.validate.calls.event.send.if.no.error.function.provided.and.only.provides.the.first.error',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const plugin				= new ValidationPlugin();
 		const eventRequest			= helpers.getEventRequest( 'GET', '/?testKey=wrong&testKeyTwo=123', { headerTest: 'wrong', headerTestTwo: 123 } );
 		const validationCallback	= plugin.validate(
@@ -158,11 +158,11 @@ test({
 
 test({
 	message	: 'ValidationPlugin.validate.with.default.failureCallback',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const plugin				= new ValidationPlugin(
 			'er_validation',
 			{
-				failureCallback: ( event )=>{
+				failureCallback: ( event ) => {
 					event.send( 'error' );
 				}
 			}

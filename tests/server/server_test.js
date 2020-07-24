@@ -18,7 +18,7 @@ const app								= App();
 
 test({
 	message	: 'Server.constructor starts without crashing with defaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.doesNotThrow( () => {
 			const server	= new Server();
 
@@ -30,7 +30,7 @@ test({
 
 test({
 	message	: 'Server.App Returns the same as App()',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.deepStrictEqual( app, App.App() );
 		done();
 	}
@@ -38,7 +38,7 @@ test({
 
 test({
 	message	: 'Server.constructor defaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let server	= new Server();
 		assert.equal( true, server.router instanceof Router );
 		assert.equal( 1, server.router.middleware.length );
@@ -68,7 +68,7 @@ test({
 
 test({
 	message	: 'Server is started',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		helpers.sendServerRequest( '/ping' ).then(() => {
 			done();
 		}).catch( done );
@@ -77,7 +77,7 @@ test({
 
 test({
 	message	: 'Server.getPluginManager returns a pluginManager',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const server		= new Server();
 		const pluginManager	= server.getPluginManager();
 
@@ -88,7 +88,7 @@ test({
 
 test({
 	message	: 'Server.add adds a handler with different permutations',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const server	= new Server();
 
 		server.add({
@@ -127,47 +127,47 @@ test({
 
 test({
 	message	: 'Server.testAddingRoutersWithRoute',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name		= '/testAddingRoutersWithRoute';
 		const router	= new Router();
 
-		router.get( name, ( event )=>{
+		router.get( name, ( event ) => {
 			event.send( name )
 		});
 
-		router.post( name, ( event )=>{
+		router.post( name, ( event ) => {
 			event.send( name )
 		});
 
-		router.delete( name, ( event )=>{
+		router.delete( name, ( event ) => {
 			event.send( name )
 		});
 
-		router.patch( name, ( event )=>{
+		router.patch( name, ( event ) => {
 			event.send( name )
 		});
 
-		router.get( `${name}/:user:`, ( event )=>{
+		router.get( `${name}/:user:`, ( event ) => {
 			event.send( event.params.user )
 		});
 
-		router.get( '', ( event )=>{
+		router.get( '', ( event ) => {
 			event.send( name )
 		});
 
-		router.get( /\/(value)/, ( event )=>{
+		router.get( /\/(value)/, ( event ) => {
 			event.send( name )
 		});
 
-		router.post( ``, ( event )=>{
+		router.post( ``, ( event ) => {
 			event.send( name )
 		});
 
-		router.delete( `/`, ( event )=>{
+		router.delete( `/`, ( event ) => {
 			event.send( name )
 		});
 
-		router.patch( `/`, ( event )=>{
+		router.patch( `/`, ( event ) => {
 			event.send( name )
 		});
 
@@ -205,19 +205,19 @@ test({
 
 test({
 	message	: 'Server.testRouterWildCards',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= '/testRouterWildCards';
 		const value	= 'testValue';
 
-		app.get( `${name}/:value:`, ( event )=>{
+		app.get( `${name}/:value:`, ( event ) => {
 			event.send( event.params.value );
 		});
 
-		app.get( `${name}/:value:/somethingElse`, ( event )=>{
+		app.get( `${name}/:value:/somethingElse`, ( event ) => {
 			event.send( event.params.value );
 		});
 
-		app.get( `${name}/:value:/:anotherValue:`, ( event )=>{
+		app.get( `${name}/:value:/:anotherValue:`, ( event ) => {
 			event.send( event.params );
 		});
 
@@ -245,7 +245,7 @@ test({
 
 test({
 	message	: 'Server.apply applies only a PluginInterface and a valid string',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const server			= new Server();
 
 		const PluginManager		= server.getPluginManager();
@@ -271,19 +271,19 @@ test({
 
 test({
 	message	: 'Server.get works as intended',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const server		= new Server();
 		const eventRequest	= helpers.getEventRequest( 'GET', '/' );
 
-		server.get( '/', ( event )=>{
+		server.get( '/', ( event ) => {
 			event.next();
 		});
 
-		server.get( '/test', ( event )=>{
+		server.get( '/test', ( event ) => {
 			event.next();
 		});
 
-		server.get( ( event )=>{
+		server.get( ( event ) => {
 			event.next();
 		});
 
@@ -298,19 +298,19 @@ test({
 
 test({
 	message	: 'Server.post works as intended',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const server		= new Server();
 		const eventRequest	= helpers.getEventRequest( 'POST', '/' );
 
-		server.post( '/', ( event )=>{
+		server.post( '/', ( event ) => {
 			event.next();
 		});
 
-		server.post( '/test', ( event )=>{
+		server.post( '/test', ( event ) => {
 			event.next();
 		});
 
-		server.post( ( event )=>{
+		server.post( ( event ) => {
 			event.next();
 		});
 
@@ -325,19 +325,19 @@ test({
 
 test({
 	message	: 'Server.delete works as intended',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const server		= new Server();
 		const eventRequest	= helpers.getEventRequest( 'DELETE', '/' );
 
-		server.delete( '/', ( event )=>{
+		server.delete( '/', ( event ) => {
 			event.next();
 		});
 
-		server.delete( '/test', ( event )=>{
+		server.delete( '/test', ( event ) => {
 			event.next();
 		});
 
-		server.delete( ( event )=>{
+		server.delete( ( event ) => {
 			event.next();
 		});
 
@@ -352,19 +352,19 @@ test({
 
 test({
 	message	: 'Server.put works as intended',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const server		= new Server();
 		const eventRequest	= helpers.getEventRequest( 'PUT', '/' );
 
-		server.put( '/', ( event )=>{
+		server.put( '/', ( event ) => {
 			event.next();
 		});
 
-		server.put( '/test', ( event )=>{
+		server.put( '/test', ( event ) => {
 			event.next();
 		});
 
-		server.put( ( event )=>{
+		server.put( ( event ) => {
 			event.next();
 		});
 
@@ -379,7 +379,7 @@ test({
 
 test({
 	message	: 'Server.define calls router.define',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const RouterMock		= Mock( Router );
 		const middlewareName	= 'test';
 		const server			= new Server();
@@ -403,7 +403,7 @@ test({
 
 test({
 	message	: 'Server.Router returns a new router',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const router	= app.Router();
 		assert( router instanceof Router, true );
 
@@ -413,19 +413,19 @@ test({
 
 test({
 	message	: 'Server.Router can be attached back',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const server	= App();
 		const name		= '/testRouterCanBeAttachedBack';
 
 		const router	= server.Router();
 
-		router.get( name, ( event )=>{
+		router.get( name, ( event ) => {
 			event.send( name );
 		});
 
 		server.add( router );
 
-		helpers.sendServerRequest( name, 'GET', 200 ).then(( response )=>{
+		helpers.sendServerRequest( name, 'GET', 200 ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 
 			done();
@@ -435,22 +435,22 @@ test({
 
 test({
 	message	: 'Server.Router does not affect the original router if not applied back',
-	test	: ( done ) =>{
+	test	: ( done ) => {
 		const server	= App();
 		const name		= '/testRouterReturnsANewRouter';
 
 		const router	= server.Router();
 
-		server.get( name, ( event )=>{
+		server.get( name, ( event ) => {
 			event.send( name );
 		});
 
-		router.get( name, ( event )=>{
+		router.get( name, ( event ) => {
 			event.send( 'wrong' );
 		});
 
 		server.listen( 3352,() => {
-			helpers.sendServerRequest( name, 'GET', 200, '', {}, 3352 ).then(( response )=>{
+			helpers.sendServerRequest( name, 'GET', 200, '', {}, 3352 ).then(( response ) => {
 				assert.equal( response.body.toString(), name );
 
 				done();
@@ -461,7 +461,7 @@ test({
 
 test({
 	message	: 'Server() returns the same instance',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const server	= App();
 		const serverTwo	= App();
 
@@ -479,7 +479,7 @@ test({
 
 test({
 	message	: 'Server.cleanUp() cleans up',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const server	= App();
 
 		server.define( 'testMiddleware', () => {} );
@@ -498,7 +498,7 @@ test({
 
 test({
 	message	: 'App().attach() returns a function',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		assert.equal( typeof App().attach() === 'function', true );
 
 		done();
@@ -507,7 +507,7 @@ test({
 
 test({
 	message	: 'App().attach() using a httpServer works as expected',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const httpServer	= require( 'http' );
 		const body			= '<h1>Hello World!</h1>';
 		const port			= 1234;
@@ -532,11 +532,11 @@ test({
 
 test({
 	message	: 'Server testGETWithoutRoute ( skipped cause it will fail all the others )',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testGET';
 		const app	= new Server();
 
-		app.get( ( event )=>{
+		app.get( ( event ) => {
 			event.send( body );
 		});
 
@@ -556,7 +556,7 @@ test({
 			return helpers.sendServerRequest( '/testGET', 'PATCH', 404, '', {}, 3335 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testGET', 'GET', 200, '', {}, 3335 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -566,9 +566,9 @@ test({
 
 test({
 	message	: 'Server testGET',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testGET';
-		app.get( '/testGET', ( event )=>{
+		app.get( '/testGET', ( event ) => {
 			event.send( body );
 		});
 
@@ -584,7 +584,7 @@ test({
 			return helpers.sendServerRequest( '/testGET', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testGET' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -594,9 +594,9 @@ test({
 
 test({
 	message	: 'Server testPOST',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testPOST';
-		app.post( '/testPOST', ( event )=>{
+		app.post( '/testPOST', ( event ) => {
 			event.send( body );
 		});
 
@@ -612,7 +612,7 @@ test({
 			return helpers.sendServerRequest( '/testPOST', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testPOST', 'POST' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -622,9 +622,9 @@ test({
 
 test({
 	message	: 'Server testDELETE',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testDELETE';
-		app.delete( '/testDELETE', ( event )=>{
+		app.delete( '/testDELETE', ( event ) => {
 			event.send( body );
 		});
 
@@ -640,7 +640,7 @@ test({
 			return helpers.sendServerRequest( '/testDELETE', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETE', 'DELETE' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -650,9 +650,9 @@ test({
 
 test({
 	message	: 'Server testPUT',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testPUT';
-		app.put( '/testPUT', ( event )=>{
+		app.put( '/testPUT', ( event ) => {
 			event.send( body );
 		});
 
@@ -668,7 +668,7 @@ test({
 			return helpers.sendServerRequest( '/testPUT', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testPUT', 'PUT' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -678,9 +678,9 @@ test({
 
 test({
 	message	: 'Server testHEAD also head does not return body even if sent',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testHEAD';
-		app.head( '/testHEAD', ( event )=>{
+		app.head( '/testHEAD', ( event ) => {
 			event.send( body );
 		});
 
@@ -696,7 +696,7 @@ test({
 			return helpers.sendServerRequest( '/testHEAD', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testHEAD', 'HEAD' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), '' );
 
 			done();
@@ -706,9 +706,9 @@ test({
 
 test({
 	message	: 'Server testPATCH',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testPATCH';
-		app.patch( '/testPATCH', ( event )=>{
+		app.patch( '/testPATCH', ( event ) => {
 			event.send( body );
 		});
 
@@ -724,7 +724,7 @@ test({
 			return helpers.sendServerRequest( '/testPATCH', 'HEAD', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCH', 'PATCH' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -734,12 +734,12 @@ test({
 
 test({
 	message	: 'Server testGET with add',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testGETWithAdd';
 		app.add({
 			method	: 'GET',
 			route	: '/testGETWithAdd',
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.send( body );
 			}
 		});
@@ -756,7 +756,7 @@ test({
 			return helpers.sendServerRequest( '/testGETWithAdd', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testGETWithAdd' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -766,12 +766,12 @@ test({
 
 test({
 	message	: 'Server testPOST with add',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testPOSTWithAddWithAdd';
 		app.add({
 			method	: 'POST',
 			route	: '/testPOSTWithAdd',
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.send( body );
 			}
 		});
@@ -788,7 +788,7 @@ test({
 			return helpers.sendServerRequest( '/testPOSTWithAdd', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testPOSTWithAdd', 'POST' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -798,12 +798,12 @@ test({
 
 test({
 	message	: 'Server testDELETE with add',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testDELETEWithAdd';
 		app.add({
 			method	: 'DELETE',
 			route	: '/testDELETEWithAdd',
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.send( body );
 			}
 		});
@@ -820,7 +820,7 @@ test({
 			return helpers.sendServerRequest( '/testDELETEWithAdd', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testDELETEWithAdd', 'DELETE' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -830,12 +830,12 @@ test({
 
 test({
 	message	: 'Server testPUT with add',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testPUTWithAdd';
 		app.add({
 			method	: 'PUT',
 			route	: '/testPUTWithAdd',
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.send( body );
 			}
 		});
@@ -852,7 +852,7 @@ test({
 			return helpers.sendServerRequest( '/testPUTWithAdd', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testPUTWithAdd', 'PUT' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -862,12 +862,12 @@ test({
 
 test({
 	message	: 'Server testHEAD with add also head does not return body even if sent',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testHEADWithAdd';
 		app.add({
 			method	: 'HEAD',
 			route	: '/testHEADWithAdd',
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.send( body );
 			}
 		});
@@ -884,7 +884,7 @@ test({
 			return helpers.sendServerRequest( '/testHEADWithAdd', 'PATCH', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testHEADWithAdd', 'HEAD' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), '' );
 
 			done();
@@ -894,12 +894,12 @@ test({
 
 test({
 	message	: 'Server testPATCH with add',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body	= 'testPATCHWithAdd';
 		app.add({
 			method	: 'PATCH',
 			route	: '/testPATCHWithAdd',
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.send( body );
 			}
 		});
@@ -916,7 +916,7 @@ test({
 			return helpers.sendServerRequest( '/testPATCHWithAdd', 'HEAD', 404 );
 		}).then(() => {
 			return helpers.sendServerRequest( '/testPATCHWithAdd', 'PATCH' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 
 			done();
@@ -926,14 +926,14 @@ test({
 
 test({
 	message	: 'Server.test add is case insensitive',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body			= 'testGETCaseInsensitive';
 		const headerName	= 'testGETCaseInsensitive';
 		const headerValue	= 'value';
 		app.add({
 			method	: 'GET',
 			route	: '/testGETCaseInsensitive',
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.setResponseHeader( headerName, headerValue );
 				event.next();
 			}
@@ -942,12 +942,12 @@ test({
 		app.add({
 			method	: 'get',
 			route	: '/testGETCaseInsensitive',
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.send( body );
 			}
 		});
 
-		helpers.sendServerRequest( '/testGETCaseInsensitive' ).then(( response )=>{
+		helpers.sendServerRequest( '/testGETCaseInsensitive' ).then(( response ) => {
 			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
 			assert.equal( response.body.toString(), body );
 			done();
@@ -957,21 +957,21 @@ test({
 
 test({
 	message	: 'Server.test.global.middlewares',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body			= 'testGETWithMiddlewares';
 		const headerName	= 'testGETWithMiddlewares';
 		const headerValue	= 'value';
 
-		app.define( 'testGETWithMiddlewaresMiddleware', ( event )=>{
+		app.define( 'testGETWithMiddlewaresMiddleware', ( event ) => {
 			event.setResponseHeader( headerName, headerValue );
 			event.next();
 		} );
 
-		app.get( '/testGETWithMiddlewares', 'testGETWithMiddlewaresMiddleware', ( event )=>{
+		app.get( '/testGETWithMiddlewares', 'testGETWithMiddlewaresMiddleware', ( event ) => {
 			event.send( body );
 		} );
 
-		helpers.sendServerRequest( '/testGETWithMiddlewares' ).then(( response )=>{
+		helpers.sendServerRequest( '/testGETWithMiddlewares' ).then(( response ) => {
 			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
 			assert.equal( response.body.toString(), body );
 			done();
@@ -981,7 +981,7 @@ test({
 
 test({
 	message	: 'Server.test multiple middlewares',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body				= 'testGETWithMultipleMiddlewares';
 
 		const headerName		= 'testGETWithMultipleMiddlewaresOne';
@@ -990,21 +990,21 @@ test({
 		const headerNameTwo		= 'testGETWithMultipleMiddlewaresTwo';
 		const headerValueTwo	= 'valueTwo';
 
-		app.define( 'testGETWithMultipleMiddlewaresMiddlewareOne', ( event )=>{
+		app.define( 'testGETWithMultipleMiddlewaresMiddlewareOne', ( event ) => {
 			event.setResponseHeader( headerName, headerValue );
 			event.next();
 		} );
 
-		app.define( 'testGETWithMultipleMiddlewaresMiddlewareTwo', ( event )=>{
+		app.define( 'testGETWithMultipleMiddlewaresMiddlewareTwo', ( event ) => {
 			event.setResponseHeader( headerNameTwo, headerValueTwo );
 			event.next();
 		} );
 
-		app.get( '/testGETWithMultipleMiddlewares', ['testGETWithMultipleMiddlewaresMiddlewareOne', 'testGETWithMultipleMiddlewaresMiddlewareTwo'], ( event )=>{
+		app.get( '/testGETWithMultipleMiddlewares', ['testGETWithMultipleMiddlewaresMiddlewareOne', 'testGETWithMultipleMiddlewaresMiddlewareTwo'], ( event ) => {
 			event.send( body );
 		} );
 
-		helpers.sendServerRequest( '/testGETWithMultipleMiddlewares' ).then(( response )=>{
+		helpers.sendServerRequest( '/testGETWithMultipleMiddlewares' ).then(( response ) => {
 			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
 			assert.equal( response.headers[headerNameTwo.toLowerCase()], headerValueTwo );
 			assert.equal( response.body.toString(), body );
@@ -1015,21 +1015,21 @@ test({
 
 test({
 	message	: 'Server.test empty middleware',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body			= 'testEmptyMiddleware';
 		const headerName	= 'testEmptyMiddleware';
 		const headerValue	= 'valueOne';
 
-		app.add(( event )=>{
+		app.add(( event ) => {
 			event.setResponseHeader( headerName, headerValue );
 			event.next();
 		});
 
-		app.get( '/testEmptyMiddleware', ( event )=>{
+		app.get( '/testEmptyMiddleware', ( event ) => {
 			event.send( body );
 		} );
 
-		helpers.sendServerRequest( '/testEmptyMiddleware' ).then(( response )=>{
+		helpers.sendServerRequest( '/testEmptyMiddleware' ).then(( response ) => {
 			assert.equal( response.headers[headerName.toLowerCase()], headerValue );
 			assert.equal( response.body.toString(), body );
 			done();
@@ -1039,12 +1039,12 @@ test({
 
 test({
 	message	: 'Server.test eventRequest header functions',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testEventRequestHeaderFunctions';
 		const headerName	= 'testEventRequestHeaderFunctions';
 		const headerValue	= 'valueOne';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.setResponseHeader( 'testHeader', headerValue );
 			event.setResponseHeader( 'shouldNotExist', headerValue );
 			event.removeResponseHeader( 'shouldNotExist' );
@@ -1063,7 +1063,7 @@ test({
 			event.sendError( 'Error', 400 );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { [headerName]: headerValue } ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { [headerName]: headerValue } ).then(( response ) => {
 			assert.equal( response.headers['testheader'] === headerValue, true );
 			assert.equal( response.headers['shouldnotexist'] === undefined, true );
 			assert.equal( response.body.toString(), name );
@@ -1074,16 +1074,16 @@ test({
 
 test({
 	message	: 'Server.test eventRequest setStatusCode',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name					= 'testSetStatusCode';
 		const expectedStatusCode	= 201;
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.setStatusCode( expectedStatusCode );
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', expectedStatusCode ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}`, 'GET', expectedStatusCode ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
@@ -1092,15 +1092,15 @@ test({
 
 test({
 	message	: 'Server.test.eventRequest.send.without.specifying.a.status.code',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name					= 'testSendWithoutSpecifyingAStatusCode';
 		const expectedStatusCode	= 200;
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', expectedStatusCode ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}`, 'GET', expectedStatusCode ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
@@ -1110,16 +1110,16 @@ test({
 
 test({
 	message	: 'Server.test eventRequest redirect',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name					= 'testRedirect';
 		const expectedStatusCode	= 303;
 		const expectedRedirectRoute	= '/testRedirectedRoute';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.redirect( expectedRedirectRoute, expectedStatusCode );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', expectedStatusCode ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}`, 'GET', expectedStatusCode ).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { redirectUrl: expectedRedirectRoute } ) );
 			assert.equal( typeof response.headers.location === 'string', true );
 			assert.equal( response.headers.location === expectedRedirectRoute, true );
@@ -1130,15 +1130,15 @@ test({
 
 test({
 	message	: 'Server.test eventRequest redirect',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name					= 'testRedirectTwo';
 		const expectedRedirectRoute	= '/testRedirectedRouteTwo';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.redirect( expectedRedirectRoute );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', 302 ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}`, 'GET', 302 ).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { redirectUrl: expectedRedirectRoute } ) );
 			assert.equal( typeof response.headers.location === 'string', true );
 			assert.equal( response.headers.location === expectedRedirectRoute, true );
@@ -1149,10 +1149,10 @@ test({
 
 test({
 	message	: 'Server.test eventRequest isFinished',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name					= 'testIsFinished';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.response.finished	= true;
 
 			if ( ! event.isFinished() )
@@ -1175,7 +1175,7 @@ test({
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
@@ -1184,14 +1184,14 @@ test({
 
 test({
 	message	: 'Server.test eventRequest send string',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testSendString';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
@@ -1200,14 +1200,14 @@ test({
 
 test({
 	message	: 'Server.test eventRequest send object',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testSendObject';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( { name } );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { name } ) );
 			done();
 		}).catch( done );
@@ -1216,14 +1216,14 @@ test({
 
 test({
 	message	: 'Server.test eventRequest sendError',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testEventSendError';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.sendError( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: name } ) );
 			done();
 		}).catch( done );
@@ -1232,15 +1232,15 @@ test({
 
 test({
 	message	: 'Server.test eventRequest sendError send Error',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testEventSendErrorWithError';
 		const error	= new Error( 'test' );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.sendError( error );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'test' } ) );
 			done();
 		}).catch( done );
@@ -1249,14 +1249,14 @@ test({
 
 test({
 	message	: 'Server.test eventRequest sendError with different status',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testEventSendErrorWithDifferentStatus';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.sendError( name, 501 );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', 501 ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}`, 'GET', 501 ).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: name } ) );
 			done();
 		}).catch( done );
@@ -1265,15 +1265,15 @@ test({
 
 test({
 	message	: 'Server.test eventRequest send Error',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const error	= new Error( 'Error' );
 		const name	= 'testSendError';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( error );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( {} ) );
 			done();
 		}).catch( done );
@@ -1282,14 +1282,14 @@ test({
 
 test({
 	message	: 'Server.test eventRequest send raw',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testSendErrorRaw';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( '<h1>Test</h1>', 200, true );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), '<h1>Test</h1>' );
 			done();
 		}).catch( done );
@@ -1298,14 +1298,14 @@ test({
 
 test({
 	message	: 'Server.test eventRequest send stream',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testSendErrorStream';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( fs.createReadStream( path.join( __dirname, './fixture/send/fileToStream.txt' ) ) );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), 'test' );
 			done();
 		}).catch( done );
@@ -1314,10 +1314,10 @@ test({
 
 test({
 	message	: 'Server.test eventRequest isFinished',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name					= 'testIsFinished';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.response.finished	= true;
 
 			if ( ! event.isFinished() )
@@ -1340,7 +1340,7 @@ test({
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
@@ -1349,11 +1349,11 @@ test({
 
 test({
 	message	: 'Server.test eventRequest setCookie',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testSetCookie';
 		const cookiesValue	= 'ok';
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			if (
 				! event.setCookie( 'test1', cookiesValue )
 				|| event.setCookie( 'test2' )
@@ -1370,7 +1370,7 @@ test({
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			assert.equal( Array.isArray( response.headers['set-cookie'] ), true );
 			const presentCookies	= ['test1', 'test5', 'test6','test7'];
@@ -1395,19 +1395,19 @@ test({
 
 test({
 	message	: 'Server.er_securityOnDefaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const port	= 3370;
 		const name	= 'testErSecurityOnDefaults';
 		const app	= new Server();
 
 		app.apply( app.er_security );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
 		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
 				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
@@ -1428,7 +1428,7 @@ test({
 
 test({
 	message	: 'Server.er_securityWithChangesFromTheOptions',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const port	= 3371;
 		const name	= 'testErSecurityWithChangesFromTheOptions';
 		const app	= new Server();
@@ -1440,12 +1440,12 @@ test({
 			cto		: { enabled: true }
 		});
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		});
 
 		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
 				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
@@ -1466,14 +1466,14 @@ test({
 
 test({
 	message	: 'Server.er_securityWithChangesInline',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const port	= 3372;
 		const name	= 'testErSecurityWithChangesInline';
 		const app	= new Server();
 
 		app.apply( app.er_security, { csp : { xss: false } } );
 
-		app.add(( event )=>{
+		app.add(( event ) => {
 
 			event.$security.csp.addFontSrc( 'self' );
 			event.$security.csp.addFontSrc( "'self'" );
@@ -1496,12 +1496,12 @@ test({
 			event.next();
 		});
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		});
 
 		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
 				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
@@ -1522,14 +1522,14 @@ test({
 
 test({
 	message	: 'Server.er_securityCallingBuildMultipleTimes',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const port	= 3373;
 		const name	= 'testErSecurityWithChangesInline';
 		const app	= new Server();
 
 		app.apply( app.er_security, { csp : { xss: false } } );
 
-		app.add(( event )=>{
+		app.add(( event ) => {
 
 			event.$security.csp.addFontSrc( 'self' );
 			event.$security.csp.addFontSrc( "'self'" );
@@ -1554,12 +1554,12 @@ test({
 			event.next();
 		});
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		});
 
 		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
 				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
@@ -1580,14 +1580,14 @@ test({
 
 test({
 	message	: 'Server.er_securityCallingBuildMultipleTimesAppliesChangesIfAny',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const port	= 3374;
 		const name	= 'testErSecurityWithChangesInline';
 		const app	= new Server();
 
 		app.apply( app.er_security, { csp : { xss: false } } );
 
-		app.add(( event )=>{
+		app.add(( event ) => {
 
 			event.$security.csp.addFontSrc( 'self' );
 			event.$security.csp.addFontSrc( "'self'" );
@@ -1615,12 +1615,12 @@ test({
 			event.next();
 		});
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		});
 
 		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
 				assert.equal( response.body.toString(), name );
 				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
 				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
@@ -1641,7 +1641,7 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_json does not parse anything but application/json',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErJsonBodyParserParsesApplicationJson';
 		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
 		const formDataValue	= 'value';
@@ -1650,7 +1650,7 @@ test({
 
 		app.apply( app.er_body_parser_json, { maxPayloadLength: 60 } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			if (
 				typeof event.body === 'undefined'
 				|| typeof event.body[formDataKey] === 'undefined'
@@ -1775,7 +1775,7 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_json does not parse above the maxPayload if strict',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErJsonBodyParserParsesApplicationJson';
 		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
 		const formDataValue	= 'value';
@@ -1784,7 +1784,7 @@ test({
 
 		app.apply( app.er_body_parser_json, { maxPayloadLength: 60, strict: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			assert.deepStrictEqual( event.body, {} );
 
 			event.send( 'ok' );
@@ -1814,7 +1814,7 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_form parser above the maxPayload if not strict',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
 		const formDataKey	= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
 		const formDataValue	= 'value';
@@ -1823,7 +1823,7 @@ test({
 
 		app.apply( app.er_body_parser_form, { maxPayloadLength: 60, strict: false } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			if (
 				typeof event.body === 'undefined'
 				|| typeof event.body[formDataKey] === 'undefined'
@@ -1903,7 +1903,7 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_form does parse not above the maxPayload if strict',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
 		const formDataKey	= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
 		const formDataValue	= 'value';
@@ -1912,7 +1912,7 @@ test({
 
 		app.apply( app.er_body_parser_form, { maxPayloadLength: 60, strict: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			assert.deepStrictEqual( event.body, {} );
 
 			event.send( 'ok' );
@@ -1942,7 +1942,7 @@ test({
 
 test({
 	message	: 'Server.test.er_body_parser_multipart.parses.only.multipart/form-data',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name				= 'testErBodyParserMultipartParsesMultipartFormData';
 		const multipartDataCR	= fs.readFileSync( path.join( __dirname, './fixture/body_parser/multipart/multipart_data_CR' ) );
 		const multipartDataCRLF	= fs.readFileSync( path.join( __dirname, './fixture/body_parser/multipart/multipart_data_CRLF' ) );
@@ -1952,7 +1952,7 @@ test({
 
 		app.apply( app.er_body_parser_multipart, { tempDir } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			if (
 				typeof event.body === 'undefined'
 				|| typeof event.body.$files === 'undefined'
@@ -2067,7 +2067,7 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_multipart will not parse if limit is reached',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErBodyParserMultipartParsesMultipartFormData';
 		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/multipart_data_CRLF` ) );
 		const tempDir		= path.join( __dirname, './fixture/body_parser/multipart' );
@@ -2075,7 +2075,7 @@ test({
 
 		app.apply( app.er_body_parser_multipart, { tempDir, maxPayload: 10 } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( 'ok' );
 		} );
 
@@ -2105,13 +2105,13 @@ test({
 
 test({
 	message	: 'Server.test body_parser_handler fallback parser',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testBodyParserHandlerFallbackParser';
 		const app	= new Server();
 
 		app.apply( app.er_body_parser_json );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( { body: event.body, rawBody: event.rawBody } );
 		} );
 
@@ -2142,13 +2142,13 @@ test({
 
 test({
 	message	: 'Server.test er_body_parser_raw handles anything',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testErBodyParserRaw';
 		const app	= new Server();
 
 		app.apply( app.er_body_parser_raw, { maxPayloadLength: 15 } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( { body: event.body, rawBody: event.rawBody } );
 		} );
 
@@ -2192,7 +2192,7 @@ test({
 
 test({
 	message	: 'Server.test er_logger',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name					= 'testErLogger';
 		const relativeLogLocation	= './tests/server/fixture/logger/testLog.log';
 		const fileTransport			= new File({
@@ -2213,7 +2213,7 @@ test({
 
 		app.apply( app.er_logger, { logger, attachToProcess: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			if (
 				typeof process.dumpStack !== 'function'
 				|| typeof process.log !== 'function'
@@ -2225,7 +2225,7 @@ test({
 		} );
 
 		const server	= app.listen( 3336, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { headerName: 'value' }, 3336 ).then(( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { headerName: 'value' }, 3336 ).then(( response ) => {
 				fileTransport.getWriteStream().end();
 				setTimeout(() => {
 					process.dumpStack	= undefined;
@@ -2255,7 +2255,7 @@ test({
 
 test({
 	message	: 'Server.test er_response_cache caches',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testErResponseCacheCaches';
 		let i		= 0;
 
@@ -2265,7 +2265,7 @@ test({
 			app.apply( app.er_response_cache );
 		}
 
-		app.get( `/${name}`, 'cache.request', ( event )=>{
+		app.get( `/${name}`, 'cache.request', ( event ) => {
 			if ( i === 0 )
 			{
 				i ++;
@@ -2275,11 +2275,11 @@ test({
 			event.sendError( 'ERROR', 501 );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 
 			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 
 			done();
@@ -2289,7 +2289,7 @@ test({
 
 test({
 	message	: 'Server.test er_response_cache does not cache if not needed',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testErResponseCacheDoesNotCacheEverything';
 		let i		= 0;
 
@@ -2299,7 +2299,7 @@ test({
 			app.apply( app.er_response_cache );
 		}
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			if ( i === 0 )
 			{
 				i ++;
@@ -2309,11 +2309,11 @@ test({
 			event.sendError( 'ERROR', 501 );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 
 			return helpers.sendServerRequest( `/${name}`, 'GET', 501 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'ERROR' } ) );
 
 			done();
@@ -2323,7 +2323,7 @@ test({
 
 test({
 	message	: 'Server.test er_response_cache does not cache raw',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testErResponseCacheDoesNotCacheRaw';
 		let i		= 0;
 
@@ -2333,7 +2333,7 @@ test({
 			app.apply( app.er_response_cache );
 		}
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			if ( i === 0 )
 			{
 				i ++;
@@ -2343,11 +2343,11 @@ test({
 			event.sendError( 'ERROR', 501 );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 
 			return helpers.sendServerRequest( `/${name}`, 'GET', 501 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'ERROR' } ) );
 
 			done();
@@ -2357,7 +2357,7 @@ test({
 
 test({
 	message	: 'Server.test er_timeout without reaching timeout',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const body			= 'testTimeoutWithoutReachingTimeout';
 		const timeout		= 100;
 		let timeoutCalled	= 0;
@@ -2365,7 +2365,7 @@ test({
 		if ( ! app.hasPlugin( app.er_timeout ) )
 			app.apply( app.er_timeout, { timeout } );
 
-		app.add( ( event )=>{
+		app.add( ( event ) => {
 				event.on( 'clearTimeout', () => {
 					timeoutCalled++;
 				});
@@ -2374,11 +2374,11 @@ test({
 			}
 		);
 
-		app.get( '/testTimeoutWithoutReachingTimeout', ( event )=>{
+		app.get( '/testTimeoutWithoutReachingTimeout', ( event ) => {
 			event.send( body );
 		} );
 
-		helpers.sendServerRequest( '/testTimeoutWithoutReachingTimeout' ).then(( response )=>{
+		helpers.sendServerRequest( '/testTimeoutWithoutReachingTimeout' ).then(( response ) => {
 			assert.equal( response.body.toString(), body );
 			assert.equal( timeoutCalled, 1 );
 			done();
@@ -2388,7 +2388,7 @@ test({
 
 test({
 	message	: 'Server.test er_timeout with reaching timeout',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const timeout	= 100;
 		let timeoutCalled	= 0;
 
@@ -2396,7 +2396,7 @@ test({
 			app.apply( app.er_timeout, { timeout } );
 
 		app.add({
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.on( 'clearTimeout', () => {
 					timeoutCalled++;
 				});
@@ -2405,14 +2405,14 @@ test({
 			}
 		});
 
-		app.get( '/testTimeoutWithReachingTimeout', ( event )=>{} );
+		app.get( '/testTimeoutWithReachingTimeout', ( event ) => {} );
 
-		helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 503 ).then(( response )=>{
+		helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 503 ).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: `Request timed out in: ${timeout/1000} seconds`} ) );
 			assert.equal( timeoutCalled, 1 );
 
 			app.add({
-				handler	: ( event )=>{
+				handler	: ( event ) => {
 					event.clearTimeout();
 					event.next();
 				}
@@ -2425,16 +2425,16 @@ test({
 
 test({
 	message	: 'Server.test.er_timeout.with.reaching.timeout.and.custom.callback',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const timeout	= 100;
 		let timeoutCalled	= 0;
 
 		const app	= new Server();
 
-		app.apply( app.er_timeout, { timeout, callback: ( event )=>{ event.send( 'It is all good', 200 ) } } );
+		app.apply( app.er_timeout, { timeout, callback: ( event ) => { event.send( 'It is all good', 200 ) } } );
 
 		app.add(
-			( event )=>{
+			( event ) => {
 				event.on( 'clearTimeout', () => {
 					timeoutCalled++;
 				});
@@ -2443,10 +2443,10 @@ test({
 			}
 		);
 
-		app.get( '/testTimeoutWithReachingTimeoutAndCustomCallback', ( event )=>{} );
+		app.get( '/testTimeoutWithReachingTimeoutAndCustomCallback', ( event ) => {} );
 
 		app.listen( 4120, () => {
-			helpers.sendServerRequest( '/testTimeoutWithReachingTimeoutAndCustomCallback', 'GET', 200, '', {}, 4120, 'It is all good'  ).then(( response )=>{
+			helpers.sendServerRequest( '/testTimeoutWithReachingTimeoutAndCustomCallback', 'GET', 200, '', {}, 4120, 'It is all good'  ).then(( response ) => {
 				assert.equal( timeoutCalled, 1 );
 
 				done();
@@ -2457,19 +2457,19 @@ test({
 
 test({
 	message	: 'Server.test er_env attaches environment variables to process',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErEnvAttachesVariablesToProcess';
 		const fileLocation	= path.join( __dirname, './fixture/.env' );
 		app.apply( app.er_env, { fileLocation } );
 
 		assert.equal( process.env.TESTKEY, 'TESTVALUE' );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			assert.equal( process.env.TESTKEY, 'TESTVALUE' );
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
@@ -2478,7 +2478,7 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits does not die without any parameters',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsDoesNotDie';
 		const fileLocation	= path.join( __dirname, './../../rate_limits.json' );
 
@@ -2487,12 +2487,12 @@ test({
 
 		app.apply( app.er_rate_limits );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
 		server.listen( 3334, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3334 ).then(( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3334 ).then(( response ) => {
 				setTimeout(() => {
 					server.close();
 					assert.equal( response.body.toString(), name );
@@ -2506,7 +2506,7 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits with rules in an array instead of json',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithRulesInAnArray';
 
 		const app			= new Server();
@@ -2527,14 +2527,14 @@ test({
 
 		app.apply( app.er_rate_limits, { rules: [rule] } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
 		server.listen( 4001, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
-			}).then(( response )=>{
+			}).then(( response ) => {
 				setTimeout(() => {
 					server.close();
 					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
@@ -2547,7 +2547,7 @@ test({
 
 test({
 	message	: 'Server.test.er_rate_limits.with.dynamic.middleware',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithDynamicGlobalMiddleware';
 
 		const app			= new Server();
@@ -2564,14 +2564,14 @@ test({
 
 		app.apply( app.er_rate_limits );
 
-		app.get( `/${name}`, app.getPlugin( app.er_rate_limits ).rateLimit( rule ), ( event )=>{
+		app.get( `/${name}`, app.getPlugin( app.er_rate_limits ).rateLimit( rule ), ( event ) => {
 			event.send( name );
 		} );
 
 		server.listen( 4001, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
-			}).then(( response )=>{
+			}).then(( response ) => {
 				setTimeout(() => {
 					server.close();
 					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
@@ -2584,7 +2584,7 @@ test({
 
 test({
 	message	: 'Server.test.er_rate_limits.with.dynamic.middleware.ignores.path.and.methods',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithDynamicGlobalMiddlewareIgnoresPathAndMethods';
 
 		const app			= new Server();
@@ -2605,14 +2605,14 @@ test({
 
 		app.apply( app.er_rate_limits );
 
-		app.get( `/${name}`, app.getPlugin( app.er_rate_limits ).rateLimit( rule ), ( event )=>{
+		app.get( `/${name}`, app.getPlugin( app.er_rate_limits ).rateLimit( rule ), ( event ) => {
 			event.send( name );
 		} );
 
 		server.listen( 4001, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
-			}).then(( response )=>{
+			}).then(( response ) => {
 				setTimeout(() => {
 					server.close();
 					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
@@ -2625,7 +2625,7 @@ test({
 
 test({
 	message	: 'Server.test.er_rate_limits.bucket.works.cross.apps',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const dataStore	= new DataServer( { persist: false, ttl: 90000 } );
 
 		const appOne	= new Server();
@@ -2637,11 +2637,11 @@ test({
 		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
 		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
 
-		appOne.get( `/${name}`, ( event )=>{
+		appOne.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		appTwo.get( `/${name}`, ( event )=>{
+		appTwo.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
@@ -2649,9 +2649,9 @@ test({
 		appTwo.listen( 3361 );
 
 		setTimeout(() => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3360 ).then(( response )=>{
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3360 ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 3361 );
-			}).then(( response )=>{
+			}).then(( response ) => {
 				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 				done();
 			}).catch( done );
@@ -2661,18 +2661,18 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits.with.params',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithParams';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}/:test:`, ( event )=>{
+		app.get( `/${name}/:test:`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}/testTwo`, 'GET', 200, '', {} ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}/testTwo`, 'GET', 200, '', {} ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}/testTwo`, 'GET', 429, '', {} );
 		}).then( () => { done(); } ).catch( done );
 	}
@@ -2680,7 +2680,7 @@ test({
 
 test({
 	message	: 'Server.test.er_rate_limits.with.permissive.limiting',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithPermissiveLimiting';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 		let called			= 0;
@@ -2688,7 +2688,7 @@ test({
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			called ++;
 
 			if ( called > 1 )
@@ -2703,9 +2703,9 @@ test({
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
@@ -2714,21 +2714,21 @@ test({
 
 test({
 	message	: 'Server.test.er_rate_limits.with.permissive.limiting.refills',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithPermissiveLimitingRefills';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			assert.equal( event.rateLimited, false );
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			setTimeout(() => {
-				helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+				helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 					assert.equal( response.body.toString(), name );
 					done();
 				}).catch( done )
@@ -2739,7 +2739,7 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits with connection delay policy limiting',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithConnectionDelayPolicy';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 		const now			= Math.floor( new Date().getTime() / 1000 );
@@ -2747,13 +2747,13 @@ test({
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			assert.equal( ( Math.floor( new Date().getTime() / 1000 ) - now ) >= 2, true );
 
@@ -2764,20 +2764,20 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits with strict policy',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicy';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 			done();
 		}).catch( done );
@@ -2786,14 +2786,14 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limitsSTRESS with strict policy STRESS',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicyStress';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
@@ -2819,20 +2819,20 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits with specified methods matches',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethods';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 			done();
 		}).catch( done );
@@ -2841,20 +2841,20 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits with multiple specified methods matches',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicyWithMultipleSpecifiedMethods';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 			done();
 		}).catch( done );
@@ -2863,20 +2863,20 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits with specified methods does not match if method is not the same',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethodsThatDoNotMatch';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
@@ -2885,7 +2885,7 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits with stopPropagation',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithPropagation';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 		let called			= 0;
@@ -2893,7 +2893,7 @@ test({
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			called ++;
 
 			if ( called > 1 )
@@ -2908,9 +2908,9 @@ test({
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 200 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
@@ -2919,20 +2919,20 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits with multiple rules',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithMultipleRules';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 			done();
 		}).catch( done );
@@ -2941,20 +2941,20 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits strict overrides connection delay',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsStrictOverridesConnectionDelayPolicy';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 			done();
 		}).catch( done );
@@ -2963,20 +2963,20 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits connection delay overrides permissive',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsConnectionDelayOverridesPermissivePolicy';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 
 			done();
@@ -2986,20 +2986,20 @@ test({
 
 test({
 	message	: 'Server.test er_rate_limits connection delay returns 429 if no more retries',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsConnectionDelayReturns429IfNoMoreRetries';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 			done();
 		}).catch( done );
@@ -3008,14 +3008,14 @@ test({
 
 test({
 	message	: 'Server.tester_rate_limits.with.strict.policy.with.ip.limit',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicyWithIpLimit';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
 			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			try
 			{
 				assert.notEqual(
@@ -3032,9 +3032,9 @@ test({
 		} );
 
 		setTimeout(() => {
-			helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+			helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-			}).then(( response )=>{
+			}).then(( response ) => {
 				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 				done();
 			}).catch( done );
@@ -3044,7 +3044,7 @@ test({
 
 test({
 	message	: 'Server.test er_templating_engine attaches a render function that fetches files',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testTemplatingEngine';
 		const deepName		= 'testTemplatingEngineDeep';
 		const templateDir 	= path.join( __dirname, './fixture/templates' );
@@ -3053,7 +3053,7 @@ test({
 		app.apply( app.er_templating_engine, { templateDir } );
 
 		app.add({
-			handler	: ( event )=>{
+			handler	: ( event ) => {
 				event.on( 'render', () => {
 					renderCalled++;
 				} );
@@ -3062,20 +3062,20 @@ test({
 			}
 		});
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.render( 'index' );
 		} );
 
-		app.get( `/${deepName}`, ( event )=>{
+		app.get( `/${deepName}`, ( event ) => {
 			event.render( 'deep/directory/structure/file' );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString().includes( 'THIS_IS_THE_INDEX_HTML_FILE' ), true );
 			assert.equal( response.headers['content-type'], 'text/html' );
 
 			return helpers.sendServerRequest( `/${deepName}` );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString().includes( 'THIS_IS_THE_DEEP_HTML_FILE' ), true );
 			assert.equal( response.headers['content-type'], 'text/html' );
 
@@ -3087,17 +3087,17 @@ test({
 
 test({
 	message	: 'Server.tester_templating_engine attaches a render function that calls next on error',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testTemplatingEngineFail';
 		const templateDir 	= path.join( __dirname, './fixture/templates' );
 
 		app.apply( app.er_templating_engine, { templateDir } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.render( 'fail' );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
 			done();
 		}).catch( done );
 	}
@@ -3105,21 +3105,21 @@ test({
 
 test({
 	message	: 'Server.test.er_router.caches.correctly',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testErRouterCaches';
 
-		app.get( `/${name}/:id:`, ( event )=>{
+		app.get( `/${name}/:id:`, ( event ) => {
 			event.send( event.params );
 		} );
 
-		helpers.sendServerRequest( `/${name}/idOne` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}/idOne` ).then(( response ) => {
 			assert.equal( JSON.parse( response.body.toString() ).id, 'idOne' );
 			return helpers.sendServerRequest( `/${name}/idTwo` );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( JSON.parse( response.body.toString() ).id, 'idTwo' );
 
 			return helpers.sendServerRequest( `/${name}/idTwo` );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( JSON.parse( response.body.toString() ).id, 'idTwo' );
 
 			done();
@@ -3129,7 +3129,7 @@ test({
 
 test({
 	message	: 'Server.test er_session works as expected',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testErSession';
 
 		assert.throws(() => {
@@ -3140,11 +3140,11 @@ test({
 		app.apply( app.er_data_server );
 		app.apply( app.er_session );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.initSession( event.next ).catch( event.next );
 		} );
 
-		app.get( `/${name}`, async ( event )=>{
+		app.get( `/${name}`, async ( event ) => {
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -3165,7 +3165,7 @@ test({
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			assert.equal( typeof response.headers['set-cookie'] !== 'undefined', true );
 
@@ -3182,7 +3182,7 @@ test({
 			const headers	= { cookie: `sid=${cookies.sid}`};
 
 			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			assert.equal( typeof response.headers.authenticated !== 'undefined', true );
 			assert.equal( response.headers.authenticated, 1 );
@@ -3190,7 +3190,7 @@ test({
 			const headers	= { cookie: `sid=wrong`};
 
 			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			assert.equal( typeof response.headers.authenticated === 'undefined', true );
 
@@ -3201,7 +3201,7 @@ test({
 
 test({
 	message	: 'Server.test.er_session.works.as.expected.with.headers',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name	= 'testErSessionWithHeaders';
 
 		assert.throws(() => {
@@ -3212,11 +3212,11 @@ test({
 		app.apply( app.er_data_server );
 		app.apply( app.er_session, { isCookieSession: false } );
 
-		app.get( `/${name}`, ( event )=>{
+		app.get( `/${name}`, ( event ) => {
 			event.initSession( event.next ).catch( event.next );
 		} );
 
-		app.get( `/${name}`, async ( event )=>{
+		app.get( `/${name}`, async ( event ) => {
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -3237,7 +3237,7 @@ test({
 			event.send( name );
 		} );
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			assert.equal( typeof response.headers.sid !== 'undefined', true );
 
@@ -3245,7 +3245,7 @@ test({
 			const headers	= { sid };
 
 			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 
 			assert.equal( typeof response.headers.authenticated !== 'undefined', true );
@@ -3254,7 +3254,7 @@ test({
 			const headers	= { sid: 'wrong' };
 
 			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			assert.equal( typeof response.headers.authenticated === 'undefined', true );
 
@@ -3265,7 +3265,7 @@ test({
 
 test({
 	message	: 'Server.test er_data_server works as expected',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const name			= 'testCacheServer';
 		const secondName	= `/${name}Second`;
 		const key			= `${name}_KEY`;
@@ -3273,7 +3273,7 @@ test({
 
 		app.apply( app.er_data_server, { dataServerOptions: { persist: false } } );
 
-		app.get( `/${name}`, async ( event )=>{
+		app.get( `/${name}`, async ( event ) => {
 			assert.equal( event.dataServer instanceof DataServer, true );
 
 			await event.dataServer.set( key, value ).catch( done );
@@ -3284,7 +3284,7 @@ test({
 			event.send( name );
 		});
 
-		app.get( secondName, async ( event )=>{
+		app.get( secondName, async ( event ) => {
 			assert.equal( event.dataServer instanceof DataServer, true );
 
 			const cacheValue	= await event.dataServer.get( key ).catch( done );
@@ -3295,10 +3295,10 @@ test({
 			event.send( secondName );
 		});
 
-		helpers.sendServerRequest( `/${name}` ).then(( response )=>{
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );
 			return helpers.sendServerRequest( secondName );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString(), secondName );
 			done();
 		}).catch( done )
@@ -3307,8 +3307,8 @@ test({
 
 test({
 	message	: 'Server.test server does not export /public by default',
-	test	: ( done )=>{
-		helpers.sendServerRequest( `/public/test/index.html`, 'GET', 404 ).then(( response )=>{
+	test	: ( done ) => {
+		helpers.sendServerRequest( `/public/test/index.html`, 'GET', 404 ).then(( response ) => {
 			assert.equal( response.body.toString(), '{"error":"Cannot GET /public/test/index.html"}' );
 			done();
 		}).catch( done )
@@ -3317,20 +3317,20 @@ test({
 
 test({
 	message	: 'Server.test er_static_resources works as expected',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		app.apply( app.er_static_resources, { paths: ['tests/server/fixture/static'] } );
 
-		helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js` ).then(( response )=>{
+		helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js` ).then(( response ) => {
 			assert.equal( response.headers['content-type'], 'application/javascript' );
 			assert.equal( response.body.toString(), 'const test=\'123\';' );
 
 			return helpers.sendServerRequest( '/tests/server/fixture/static/test.css' );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.headers['content-type'], 'text/css' );
 			assert.equal( response.body.toString(), 'body{background:black;}' );
 
 			return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404 );
-		}).then(( response )=>{
+		}).then(( response ) => {
 			assert.equal( response.body.toString().includes( 'File not found' ), true );
 
 			done();
@@ -3340,10 +3340,10 @@ test({
 
 test({
 	message	: 'Server.test er_file_stream works as expected',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		app.apply( app.er_file_stream );
 
-		app.get( '/testErFileStreamVideoWithRange', ( event )=>{
+		app.get( '/testErFileStreamVideoWithRange', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
 				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
@@ -3359,7 +3359,7 @@ test({
 			event.send( 'ok' ) ;
 		});
 
-		app.get( '/testErFileStreamVideoWithOutRange', ( event )=>{
+		app.get( '/testErFileStreamVideoWithOutRange', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
 				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
@@ -3374,7 +3374,7 @@ test({
 			event.send( 'ok' ) ;
 		});
 
-		app.get( '/testErFileStreamAudioWithRange', ( event )=>{
+		app.get( '/testErFileStreamAudioWithRange', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp3' ) ) == null
 				|| event.response.getHeader( 'Content-Type' ) !== 'audio/mp3'
@@ -3390,7 +3390,7 @@ test({
 			event.send( 'ok' ) ;
 		});
 
-		app.get( '/testErFileStreamAudioWithOutRange', ( event )=>{
+		app.get( '/testErFileStreamAudioWithOutRange', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp3' ) ) == null
 				|| event.response.getHeader( 'Content-Type' ) !== 'audio/mp3'
@@ -3405,7 +3405,7 @@ test({
 			event.send( 'ok' ) ;
 		});
 
-		app.get( '/testErFileStreamImage', ( event )=>{
+		app.get( '/testErFileStreamImage', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/image.webp' ) ) === null
 				|| event.response.getHeader( 'Content-Length' ) != null
@@ -3419,7 +3419,7 @@ test({
 			event.send( 'ok' ) ;
 		});
 
-		app.get( '/testErFileStreamText', ( event )=>{
+		app.get( '/testErFileStreamText', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/text.txt' ) ) === null
 				|| event.response.getHeader( 'Content-Length' ) != null
@@ -3450,15 +3450,15 @@ test({
 
 test({
 	message	: 'Server.test calling next twice does not die critically',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const error	= 'An Error Has Occurred!';
 
-		app.get( '/testCallingNextTwiceDoesNotDieCritically', ( event )=>{
+		app.get( '/testCallingNextTwiceDoesNotDieCritically', ( event ) => {
 			event.next( error );
 			event.next();
 		});
 
-		helpers.sendServerRequest( `/testCallingNextTwiceDoesNotDieCritically`, 'GET', 500 ).then( ( response )=>{
+		helpers.sendServerRequest( `/testCallingNextTwiceDoesNotDieCritically`, 'GET', 500 ).then( ( response ) => {
 			assert.equal( response.body.toString(), JSON.stringify( { error } ) );
 			done();
 		} ).catch( done );
@@ -3467,10 +3467,10 @@ test({
 
 test({
 	message	: 'Server.testServerAddsXPoweredBy.does.not.anymore',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		app.get( '/textServerAddsXPoweredBy', event => event.send( 'ok' ) );
 
-		helpers.sendServerRequest( `/textServerAddsXPoweredBy` ).then( ( response )=>{
+		helpers.sendServerRequest( `/textServerAddsXPoweredBy` ).then( ( response ) => {
 			assert.equal( response.body.toString(), 'ok' );
 			assert.equal( typeof response.headers['x-powered-by'] === 'undefined', true );
 
@@ -3481,14 +3481,14 @@ test({
 
 test({
 	message	: 'Server.testValidation',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const app	= new Server();
 
 		app.apply( app.er_body_parser_json );
 
 		app.get( '/testValidation',
 			app.er_validation.validate( { query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } } ),
-			( event )=>{
+			( event ) => {
 			event.send( { query: event.query, body: event.body } );
 		} );
 
@@ -3499,7 +3499,7 @@ test({
 			JSON.stringify( { email: 'test@example.com' } ),
 			{ 'content-type': 'application/json' },
 			4110
-		).then(( response )=>{
+		).then(( response ) => {
 			assert.deepStrictEqual(
 				JSON.parse( response.body.toString() ),
 				{ query: { testKey: 50 }, body: { email: 'test@example.com' } }
@@ -3513,14 +3513,14 @@ test({
 
 test({
 	message	: 'Server.testValidation.when.validation.fails',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const app	= new Server();
 
 		app.apply( app.er_body_parser_json );
 
 		app.get( '/testValidation',
 			app.er_validation.validate( { query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } } ),
-			( event )=>{
+			( event ) => {
 			event.send( { query: event.query, body: event.body } );
 		} );
 
@@ -3531,7 +3531,7 @@ test({
 			JSON.stringify( { email: 'test' } ),
 			{ 'content-type': 'application/json' },
 			4111
-		).then(( response )=>{
+		).then(( response ) => {
 			assert.deepStrictEqual(
 				JSON.parse( response.body.toString() ),
 				{ body: { email: ['email'] } }
@@ -3545,14 +3545,14 @@ test({
 
 test({
 	message	: 'Server.testValidation.when.validation.fails.returns.first.only',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const app	= new Server();
 
 		app.apply( app.er_body_parser_json );
 
 		app.get( '/testValidation',
 			app.er_validation.validate( { query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } } ),
-			( event )=>{
+			( event ) => {
 			event.send( { query: event.query, body: event.body } );
 		} );
 
@@ -3563,7 +3563,7 @@ test({
 			JSON.stringify( { email: 'test' } ),
 			{ 'content-type': 'application/json' },
 			4112
-		).then(( response )=>{
+		).then(( response ) => {
 			assert.deepStrictEqual(
 				JSON.parse( response.body.toString() ),
 				{ query: { testKey: ['numeric'] } }
@@ -3577,7 +3577,7 @@ test({
 
 test({
 	message	: 'Server.testValidation.when.custom.error.callback',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const app	= new Server();
 
 		app.apply( app.er_body_parser_json );
@@ -3585,7 +3585,7 @@ test({
 		app.get( '/testValidation',
 			app.er_validation.validate(
 				{ query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } },
-				( event, validationParameter, validationResult )=>{
+				( event, validationParameter, validationResult ) => {
 
 					assert.deepStrictEqual( validationParameter, 'query' );
 					assert.deepStrictEqual( validationResult.getValidationResult(), { testKey: ['numeric'] } );
@@ -3593,7 +3593,7 @@ test({
 					event.send( 'ok' );
 				}
 			),
-			( event )=>{
+			( event ) => {
 				event.next( 'Error!' );
 			} );
 
@@ -3604,7 +3604,7 @@ test({
 			JSON.stringify( { email: 'test' } ),
 			{ 'content-type': 'application/json' },
 			4113
-		).then(( response )=>{
+		).then(( response ) => {
 			assert.deepStrictEqual(
 				response.body.toString(),
 				'ok'
@@ -3618,13 +3618,13 @@ test({
 
 test({
 	message	: 'Server.testValidation.when.default.error.callback',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const app	= new Server();
 
 		app.apply(
 			app.er_validation,
 			{
-				failureCallback: ( event, validationParameter, validationResult )=>{
+				failureCallback: ( event, validationParameter, validationResult ) => {
 					assert.deepStrictEqual( validationParameter, 'query' );
 					assert.deepStrictEqual( validationResult.getValidationResult(), { testKey: ['numeric'] } );
 
@@ -3638,7 +3638,7 @@ test({
 			app.er_validation.validate(
 				{ query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } }
 			),
-			( event )=>{
+			( event ) => {
 				event.next( 'Error!' );
 			} );
 
@@ -3649,7 +3649,7 @@ test({
 			JSON.stringify( { email: 'test' } ),
 			{ 'content-type': 'application/json' },
 			4114
-		).then(( response )=>{
+		).then(( response ) => {
 			assert.deepStrictEqual(
 				response.body.toString(),
 				'ok'
@@ -3663,13 +3663,13 @@ test({
 
 test({
 	message	: 'Server.testValidation.when.custom.error.callback.and.default.error.callback',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const app	= new Server();
 
 		app.apply(
 			app.er_validation,
 			{
-				failureCallback: ( event )=>{
+				failureCallback: ( event ) => {
 					event.next( 'Error!' );
 				}
 			}
@@ -3679,7 +3679,7 @@ test({
 		app.get( '/testValidation',
 			app.er_validation.validate(
 				{ query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } },
-				( event, validationParameter, validationResult )=>{
+				( event, validationParameter, validationResult ) => {
 
 					assert.deepStrictEqual( validationParameter, 'query' );
 					assert.deepStrictEqual( validationResult.getValidationResult(), { testKey: ['numeric'] } );
@@ -3687,7 +3687,7 @@ test({
 					event.send( 'ok' );
 				}
 			),
-			( event )=>{
+			( event ) => {
 				event.next( 'Error!' );
 			} );
 
@@ -3698,7 +3698,7 @@ test({
 			JSON.stringify( { email: 'test' } ),
 			{ 'content-type': 'application/json' },
 			4115
-		).then(( response )=>{
+		).then(( response ) => {
 			assert.deepStrictEqual(
 				response.body.toString(),
 				'ok'
@@ -3712,11 +3712,11 @@ test({
 
 test({
 	message	: 'Server.testGlobalMiddlewaresWithFunctions',
-	test	: ( done )=>{
+	test	: ( done ) => {
 
 		const setHeader	= function( key, value )
 		{
-			return ( event )=>{
+			return ( event ) => {
 				event.setResponseHeader( key, value );
 				event.next();
 			}
@@ -3724,7 +3724,7 @@ test({
 
 		const setStatus	= function( status )
 		{
-			return ( event )=>{
+			return ( event ) => {
 				event.setStatusCode( status );
 				event.next();
 			}
@@ -3732,38 +3732,38 @@ test({
 
 		const app	= new App.Server();
 
-		app.define( 'setHeader', ( event )=>{
+		app.define( 'setHeader', ( event ) => {
 			event.setResponseHeader( 'globalMiddleware', 'value' );
 			event.next();
 		});
 
-		app.define( '/setHeader', ( event )=>{
+		app.define( '/setHeader', ( event ) => {
 			event.setResponseHeader( 'globalMiddlewareTwo', 'value' );
 			event.next();
 		});
 
-		app.get( '/testOne', setHeader( 'testOne', 'value' ), ( event )=>{
+		app.get( '/testOne', setHeader( 'testOne', 'value' ), ( event ) => {
 			event.send( 'ok' );
 		});
 
-		app.get( '/testTwo', 'setHeader', ( event )=>{
+		app.get( '/testTwo', 'setHeader', ( event ) => {
 			event.send( 'ok' );
 		});
 
-		app.get( '/testThree', [setStatus(403), setHeader( 'testThree', 'value' )], ( event )=>{
+		app.get( '/testThree', [setStatus(403), setHeader( 'testThree', 'value' )], ( event ) => {
 			event.send( 'ok' );
 		});
 
-		app.get( '/testFour', [setStatus(400), 'setHeader'], ( event )=>{
+		app.get( '/testFour', [setStatus(400), 'setHeader'], ( event ) => {
 			event.send( 'ok' );
 		});
 
-		app.get( ['setHeader', setHeader( 'testFive', 'value' )], ( event )=>{
+		app.get( ['setHeader', setHeader( 'testFive', 'value' )], ( event ) => {
 			event.send( 'ok' );
 		});
 
 		// This will NOT activate the global middleware but be a route
-		app.get( '/setHeader', ( event )=>{
+		app.get( '/setHeader', ( event ) => {
 			event.send( 'ok' );
 		});
 
@@ -3771,33 +3771,33 @@ test({
 
 		const promises	= [];
 
-		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4100, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4100, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.testone === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4100, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4100, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 403, '', {}, 4100, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 403, '', {}, 4100, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.testthree === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4100, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4100, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testFiveThisDoesNotMatter', 'GET', 200, '', {}, 4100, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testFiveThisDoesNotMatter', 'GET', 200, '', {}, 4100, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 			assert.equal( response.headers.testfive === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/setHeader', 'GET', 200, '', {}, 4100, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/setHeader', 'GET', 200, '', {}, 4100, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 			assert.equal( typeof response.headers.globalMiddlewaretwo === 'undefined', true );
@@ -3809,11 +3809,11 @@ test({
 
 test({
 	message	: 'Server.testGlobalMiddlewaresFromAnotherRouter',
-	test	: ( done )=>{
+	test	: ( done ) => {
 
 		const setHeader	= function( key, value )
 		{
-			return ( event )=>{
+			return ( event ) => {
 				event.setResponseHeader( key, value );
 				event.next();
 			}
@@ -3821,7 +3821,7 @@ test({
 
 		const setStatus	= function( status )
 		{
-			return ( event )=>{
+			return ( event ) => {
 				event.setStatusCode( status );
 				event.next();
 			}
@@ -3830,28 +3830,28 @@ test({
 		const app		= new App.Server();
 		const routerOne	= app.Router();
 
-		routerOne.define( 'setHeader', ( event )=>{
+		routerOne.define( 'setHeader', ( event ) => {
 			event.setResponseHeader( 'globalMiddleware', 'value' );
 			event.next();
 		});
 
-		routerOne.get( '/testOne', setHeader( 'testOne', 'value' ), ( event )=>{
+		routerOne.get( '/testOne', setHeader( 'testOne', 'value' ), ( event ) => {
 			event.send( 'ok' );
 		});
 
-		routerOne.get( '/testTwo', 'setHeader', ( event )=>{
+		routerOne.get( '/testTwo', 'setHeader', ( event ) => {
 			event.send( 'ok' );
 		});
 
-		routerOne.get( '/testThree', [setStatus(404), setHeader( 'testThree', 'value' )], ( event )=>{
+		routerOne.get( '/testThree', [setStatus(404), setHeader( 'testThree', 'value' )], ( event ) => {
 			event.send( 'ok' );
 		});
 
-		routerOne.get( '/testFour', [setStatus(400), 'setHeader'], ( event )=>{
+		routerOne.get( '/testFour', [setStatus(400), 'setHeader'], ( event ) => {
 			event.send( 'ok' );
 		});
 
-		routerOne.get( ['setHeader', setHeader( 'testFive', 'value' )], ( event )=>{
+		routerOne.get( ['setHeader', setHeader( 'testFive', 'value' )], ( event ) => {
 			event.send( 'ok' );
 		});
 
@@ -3861,27 +3861,27 @@ test({
 
 		const promises	= [];
 
-		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4102, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4102, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.testone === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4102, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4102, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 404, '', {}, 4102, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 404, '', {}, 4102, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.testthree === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4102, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4102, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testFiveThisDoesNotMatter', 'GET', 200, '', {}, 4102, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testFiveThisDoesNotMatter', 'GET', 200, '', {}, 4102, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 			assert.equal( response.headers.testfive === 'value', true );
@@ -3893,11 +3893,11 @@ test({
 
 test({
 	message	: 'Server.testGlobalMiddlewaresFromAnotherRouterMixed',
-	test	: ( done )=>{
+	test	: ( done ) => {
 
 		const setHeader	= function( key, value )
 		{
-			return ( event )=>{
+			return ( event ) => {
 				event.setResponseHeader( key, value );
 				event.next();
 			}
@@ -3905,7 +3905,7 @@ test({
 
 		const setStatus	= function( status )
 		{
-			return ( event )=>{
+			return ( event ) => {
 				event.setStatusCode( status );
 				event.next();
 			}
@@ -3914,28 +3914,28 @@ test({
 		const app		= new App.Server();
 		const routerOne	= app.Router();
 
-		app.define( 'setHeader', ( event )=>{
+		app.define( 'setHeader', ( event ) => {
 			event.setResponseHeader( 'globalMiddleware', 'value' );
 			event.next();
 		});
 
-		app.get( '/testOne', setHeader( 'testOne', 'value' ), ( event )=>{
+		app.get( '/testOne', setHeader( 'testOne', 'value' ), ( event ) => {
 			event.send( 'ok' );
 		});
 
-		routerOne.get( '/testTwo', 'setHeader', ( event )=>{
+		routerOne.get( '/testTwo', 'setHeader', ( event ) => {
 			event.send( 'ok' );
 		});
 
-		app.get( '/testThree', [setStatus(404), setHeader( 'testThree', 'value' )], ( event )=>{
+		app.get( '/testThree', [setStatus(404), setHeader( 'testThree', 'value' )], ( event ) => {
 			event.send( 'ok' );
 		});
 
-		routerOne.get( '/testFour', [setStatus(400), 'setHeader'], ( event )=>{
+		routerOne.get( '/testFour', [setStatus(400), 'setHeader'], ( event ) => {
 			event.send( 'ok' );
 		});
 
-		routerOne.get( ['setHeader', setHeader( 'testFive', 'value' )], ( event )=>{
+		routerOne.get( ['setHeader', setHeader( 'testFive', 'value' )], ( event ) => {
 			event.send( 'ok' );
 		});
 
@@ -3945,27 +3945,27 @@ test({
 
 		const promises	= [];
 
-		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4103, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4103, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.testone === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4103, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4103, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 404, '', {}, 4103, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 404, '', {}, 4103, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.testthree === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4103, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4103, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testFiveThisDoesNotMatter', 'GET', 200, '', {}, 4103, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testFiveThisDoesNotMatter', 'GET', 200, '', {}, 4103, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 			assert.equal( response.headers.testfive === 'value', true );
@@ -3977,11 +3977,11 @@ test({
 
 test({
 	message	: 'Server.testGlobalMiddlewaresWithFunctionsWithAdd',
-	test	: ( done )=>{
+	test	: ( done ) => {
 
 		const setHeader	= function( key, value )
 		{
-			return ( event )=>{
+			return ( event ) => {
 				event.setResponseHeader( key, value );
 				event.next();
 			}
@@ -3989,7 +3989,7 @@ test({
 
 		const setStatus	= function( status )
 		{
-			return ( event )=>{
+			return ( event ) => {
 				event.setStatusCode( status );
 				event.next();
 			}
@@ -3997,7 +3997,7 @@ test({
 
 		const app	= new App.Server();
 
-		app.define( 'setHeader', ( event )=>{
+		app.define( 'setHeader', ( event ) => {
 			event.setResponseHeader( 'globalMiddleware', 'value' );
 			event.next();
 		});
@@ -4005,7 +4005,7 @@ test({
 		app.add({
 			method		: 'GET',
 			route		: '/testOne',
-			handler		: ( event )=>{
+			handler		: ( event ) => {
 				event.send( 'ok' );
 			},
 			middlewares	: setHeader( 'testOne', 'value' )
@@ -4014,7 +4014,7 @@ test({
 		app.add({
 			method		: 'GET',
 			route		: '/testTwo',
-			handler		: ( event )=>{
+			handler		: ( event ) => {
 				event.send( 'ok' );
 			},
 			middlewares	: 'setHeader'
@@ -4023,7 +4023,7 @@ test({
 		app.add({
 			method		: 'GET',
 			route		: '/testThree',
-			handler		: ( event )=>{
+			handler		: ( event ) => {
 				event.send( 'ok' );
 			},
 			middlewares	: [setStatus(404), setHeader( 'testThree', 'value' )]
@@ -4032,7 +4032,7 @@ test({
 		app.add({
 			method		: 'GET',
 			route		: '/testFour',
-			handler		: ( event )=>{
+			handler		: ( event ) => {
 				event.send( 'ok' );
 			},
 			middlewares	: [setStatus(400), 'setHeader']
@@ -4042,22 +4042,22 @@ test({
 
 		const promises	= [];
 
-		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4101, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testOne', 'GET', 200, '', {}, 4101, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.testone === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4101, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testTwo', 'GET', 200, '', {}, 4101, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 404, '', {}, 4101, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testThree', 'GET', 404, '', {}, 4101, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.testthree === 'value', true );
 		}) );
 
-		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4101, 'ok' ).then(( response )=>{
+		promises.push( helpers.sendServerRequest( '/testFour', 'GET', 400, '', {}, 4101, 'ok' ).then(( response ) => {
 			assert.equal( typeof response.headers === 'object', true );
 			assert.equal( response.headers.globalmiddleware === 'value', true );
 		}) );
@@ -4068,7 +4068,7 @@ test({
 
 test({
 	message	: 'Server.testErCors',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		app.apply( app.er_cors, {
 			origin: 'http://example.com',
 			methods: ['GET', 'POST'],
@@ -4079,11 +4079,11 @@ test({
 			credentials: true,
 		});
 
-		app.get( '/testErCors', ( event )=>{
+		app.get( '/testErCors', ( event ) => {
 			event.send( 'ok' );
 		});
 
-		helpers.sendServerRequest( `/testErCors` ).then( ( response )=>{
+		helpers.sendServerRequest( `/testErCors` ).then( ( response ) => {
 			assert.equal( response.headers['access-control-allow-origin'], 'http://example.com' );
 			assert.equal( response.headers['access-control-allow-headers'], 'Accepts, X-Requested-With' );
 			assert.equal( response.headers['access-control-expose-headers'], 'Accepts' );
@@ -4091,7 +4091,7 @@ test({
 			assert.equal( response.headers['access-control-allow-credentials'], 'true' );
 			assert.equal( response.headers['access-control-allow-methods'], undefined );
 		} ).then(() => {
-			return helpers.sendServerRequest( `/testErCors`, 'options' ).then( ( response )=>{
+			return helpers.sendServerRequest( `/testErCors`, 'options' ).then( ( response ) => {
 				assert.equal( response.headers['access-control-allow-origin'], 'http://example.com' );
 				assert.equal( response.headers['access-control-allow-headers'], 'Accepts, X-Requested-With' );
 				assert.equal( response.headers['access-control-expose-headers'], 'Accepts' );
@@ -4106,7 +4106,7 @@ test({
 
 test({
 	message	: 'Server.testErCorsWithErrors',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		app.apply( app.er_cors, {
 			origin: 10,
 			methods: 'GET',
@@ -4117,11 +4117,11 @@ test({
 			credentials: null,
 		});
 
-		app.get( '/testErCorsWithErrors', ( event )=>{
+		app.get( '/testErCorsWithErrors', ( event ) => {
 			event.send( 'ok' );
 		});
 
-		helpers.sendServerRequest( `/testErCors`, 'GET', 200 ).then( ( response )=>{
+		helpers.sendServerRequest( `/testErCors`, 'GET', 200 ).then( ( response ) => {
 			assert.equal( response.headers['access-control-allow-origin'], '*' );
 			assert.equal( response.headers['access-control-allow-headers'], '*' );
 			assert.equal( response.headers['access-control-expose-headers'], undefined );
@@ -4129,7 +4129,7 @@ test({
 			assert.equal( response.headers['access-control-allow-credentials'], undefined );
 			assert.equal( response.headers['access-control-allow-methods'], undefined );
 		} ).then(() => {
-			return helpers.sendServerRequest( `/testErCors`, 'options', 204 ).then( ( response )=>{
+			return helpers.sendServerRequest( `/testErCors`, 'options', 204 ).then( ( response ) => {
 				assert.equal( response.headers['access-control-allow-origin'], '*' );
 				assert.equal( response.headers['access-control-allow-headers'], '*' );
 				assert.equal( response.headers['access-control-expose-headers'], undefined );

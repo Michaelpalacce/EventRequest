@@ -66,12 +66,12 @@ const app = require( 'event_request' )();
 const server = http.createServer( app.attach() );
 
 // No problem adding routes like this
-App().get( '/',( event )=>{
+App().get( '/',( event ) => {
     event.send( 'ok' );
 });
 
 // OR like this
-app.get( '/test',( event )=>{
+app.get( '/test',( event ) => {
     event.send( 'ok' );
 });
 
@@ -200,57 +200,57 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 const { App, Loggur } = require( 'event_request' );
 const app = App();
 
-app.define( 'default', ( event )=>{
+app.define( 'default', ( event ) => {
     Loggur.log( 'Hit the default global middleware' );
     event.next();
 });
 
-app.define( 'defaultTwo', ( event )=>{
+app.define( 'defaultTwo', ( event ) => {
     Loggur.log( 'Hit the second default global middleware' );
     event.next();
 });
 
-app.get( ( event )=>{
+app.get( ( event ) => {
     Loggur.log( 'Always hits if method is get' );
     event.next();
 });
 
-app.get( 'default', ( event )=>{
+app.get( 'default', ( event ) => {
     Loggur.log( 'After hitting the default global middleware' );
     event.next();
 });
 
-app.get( ['default', 'defaultTwo'], ( event )=>{
+app.get( ['default', 'defaultTwo'], ( event ) => {
     Loggur.log( 'After hitting the default global middleware with an ARRAY!' );
     event.next();
 });
 
-app.get( '/', ( event )=>{
+app.get( '/', ( event ) => {
     event.send( '<h1>Hello World!</h1>');
 });
 
-app.post( '/', ( event )=>{
+app.post( '/', ( event ) => {
     event.send( 'ok' );
 });
 
-app.delete( '/', ( event )=>{
+app.delete( '/', ( event ) => {
     event.send( 'ok' );
 });
 
-app.head( '/', ( event )=>{
+app.head( '/', ( event ) => {
     event.send( 'ok' );
 });
 
-app.put( '/', ( event )=>{
+app.put( '/', ( event ) => {
     event.send( 'ok' );
 });
 
-app.get( '/users/:user:', ( event )=>{
+app.get( '/users/:user:', ( event ) => {
     Loggur.log( event.params, null, true ); // Will print out whatever is passed in the url ( /users/John => 'John' )
     event.send( event.params );
 });
 
-app.get( /\/pa/, ( event )=>{
+app.get( /\/pa/, ( event ) => {
     Loggur.log( event.params, null, true );
     // Will log { match: [ '/pa', index: 0, input: '/path', groups: undefined ] } if you hit the route /path
     event.send( 'ok' );
@@ -296,14 +296,14 @@ app.listen( 80, () => {
 const App = require( 'event_request' );
 
 const router = App().Router();
-router.get( '/', ( event )=>{ event.send( 'ok' ); } );
+router.get( '/', ( event ) => { event.send( 'ok' ); } );
 
 App().add( router );
 
 // OR you can add it directly to the router
 // You can merge any 2 routers
 const routerTwo = App().Router();
-routerTwo.get( '/test', ( event )=>{ event.send( 'okx2' ); } );
+routerTwo.get( '/test', ( event ) => { event.send( 'okx2' ); } );
 App().router.add( routerTwo )
 
 App().listen( 80 );
@@ -338,12 +338,12 @@ const users = { userOne: {} };
 
 // You can also attach the router to a route
 const userRouter = app.Router();
-userRouter.get( '/list', ( event )=>{
+userRouter.get( '/list', ( event ) => {
     event.send( users );
 });
 
 // Add a new user, validate that the username parameter is a string
-userRouter.post( '/add/:username:', app.er_validation.validate( { params: { username: 'string' } } ), ( event )=>{
+userRouter.post( '/add/:username:', app.er_validation.validate( { params: { username: 'string' } } ), ( event ) => {
     users[event.params.username] = {};
     event.send( event.params );
 });
@@ -362,7 +362,7 @@ const app = require( 'event_request' )();
 // You can also attach the router to a route
 const userRouter = app.Router();
 
-userRouter.get( /\/path/, ( event )=>{
+userRouter.get( /\/path/, ( event ) => {
     event.send( event.params );
 });
 
@@ -380,7 +380,7 @@ const App = require( 'event_request' );
 
 const routerOne = App().Router();
 
-routerOne.add( ( event )=>{
+routerOne.add( ( event ) => {
     event.send( 'ok' );
 });
 
@@ -417,7 +417,7 @@ const router = app.Router();
 router.add({
     route : '/',
     method : 'GET',
-    handler : ( event)=>{
+    handler : ( event) => {
         event.send( '<h1>Hello World</h1>' );
     }
 });
@@ -433,13 +433,13 @@ app.listen( 80, () => {
 const app = require( 'event_request' )();
 
 // Adding a middleware without a method or route
-app.add( ( event )=>{
+app.add( ( event ) => {
     console.log( 'Should be called always!' );
     event.extra    = { key: 'value' };
     event.next();
 });
 
-app.add( ( event )=>{
+app.add( ( event ) => {
     event.send( `<h1>Hello World with extra: ${JSON.stringify(event.extra)} !</h1>` );
 });
 
@@ -479,14 +479,14 @@ const app = App();
 app.add({
     route : '/todos/:id:',
     method : 'GET',
-    handler: ( event)=>{
+    handler: ( event) => {
         Loggur.log( event.params.id );
         event.send( '<h1>Hello World</h1>' );
     }
 });
 
 // Or
-app.get( '/todos/:id:', ( event)=>{
+app.get( '/todos/:id:', ( event) => {
     Loggur.log( event.params.id );
     event.send( '<h1>Hello World</h1>' );
 });
@@ -515,54 +515,54 @@ const App = require( 'event_request' );
 const router = App().Router();
 const app = App();
 
-router.define( 'test', ( event )=>{
+router.define( 'test', ( event ) => {
     app.Loggur.log( 'Middleware One!' );
     event.next();
 });
 
 // Dynamic middleware
-const setHeader = ( key, value )=>{
-    return ( event )=>{
+const setHeader = ( key, value ) => {
+    return ( event ) => {
         event.setResponseHeader( key, value );
     }
 }
 
-app.define( 'test2', ( event )=>{
+app.define( 'test2', ( event ) => {
     app.Loggur.log( 'Middleware Two!' );
     event.next();
 });
 
 //this will work
-app.get( ['test','test2'], ( event )=>{
+app.get( ['test','test2'], ( event ) => {
     event.send( 'TEST' );
 });
 
 //this will NOT work !!!
-app.get( 'test', ( event )=>{
+app.get( 'test', ( event ) => {
     event.send( 'Error', 400 );
 });
 
 //this will work !!!
-app.get( ['test'], ( event )=>{
+app.get( ['test'], ( event ) => {
     event.send( 'TEST' );
 });
 
 //this will work !!!
-app.get( setHeader( 'keyOne', 'valueOne' ), ( event )=>{
+app.get( setHeader( 'keyOne', 'valueOne' ), ( event ) => {
     event.send( 'TEST' );
 });
 
 //this will work !!!
-app.get( [setHeader( 'keyOne', 'valueOne' ), 'test'], ( event )=>{
+app.get( [setHeader( 'keyOne', 'valueOne' ), 'test'], ( event ) => {
     event.send( 'TEST' );
 });
 
 //this will work !!!
-app.get( [setHeader( 'keyOne', 'valueOne' ), setHeader( 'keyTwo', 'valueTwo' )], ( event )=>{
+app.get( [setHeader( 'keyOne', 'valueOne' ), setHeader( 'keyTwo', 'valueTwo' )], ( event ) => {
     event.send( 'TEST' );
 });
 
-app.get( '/', ['test','test2'], ( event )=>{
+app.get( '/', ['test','test2'], ( event ) => {
     event.send( 'TEST' );
 } );
 
@@ -570,7 +570,7 @@ app.add({
     route: '/test',
     method: 'GET',
     middlewares: 'test',
-    handler: ( event )=>{
+    handler: ( event ) => {
         app.Loggur.log( 'Test!' );
         event.send( 'Test2' );
     }
@@ -580,7 +580,7 @@ app.add({
     route: '/test',
     method: 'GET',
     middlewares: ['test'],
-    handler: ( event )=>{
+    handler: ( event ) => {
         app.Loggur.log( 'Test!' );
         event.send( 'Test2' );
     }
@@ -590,7 +590,7 @@ app.add({
     route: '/test',
     method: 'GET',
     middlewares: ['test', setHeader( 'value', 'key' )],
-    handler: ( event )=>{
+    handler: ( event ) => {
         app.Loggur.log( 'Test!' );
         event.send( 'Test2' );
     }
@@ -831,12 +831,12 @@ const app = require( 'event_request' )();
 const server = http.createServer( app.attach() );
 
 // No problem adding routes like this
-App().get( '/',( event )=>{
+App().get( '/',( event ) => {
     event.send( 'ok' );
 });
 
 // OR like this
-app.get( '/test',( event )=>{
+app.get( '/test',( event ) => {
     event.send( 'ok' );
 });
 
@@ -1180,7 +1180,7 @@ The validation is done by using:
 ~~~javascript
 const app = require( 'event_request' )();
 
-app.get( '/', ( event )=>{
+app.get( '/', ( event ) => {
     const objectToValidate = { username: 'user@test.com', password: 'pass' };
 
     // Validation shorthand
@@ -1809,7 +1809,7 @@ The 'runAllTests' function accepts an object that accepts the following options:
            ['first', 2 ],
            ['firstTwo', 21 ],
        ],
-       test        : ( done, first, second ) =>{  
+       test        : ( done, first, second ) => {  
           console.log( first ); //this will log 'first', then on the second iterration 'firstTwo'
           console.log( second ); //this will log 2, then on the second iterration 21
           done()
@@ -1901,7 +1901,7 @@ The TestingTools export:
 const App = require( 'event_request' );
 
 const app = App();
-app.add(( event )=>{
+app.add(( event ) => {
 	event.sendError( 'Error', 500 ); // This will call the error Handler
 
 	// event.next( 'Error', 500 ); // This will call the error Handler
@@ -2355,7 +2355,7 @@ const timeoutPlugin = PluginManager.getPlugin( 'er_timeout' );
 // app.apply( app.er_timeout, {  timeout : 2 * 1000 } ); // This is also valid.
 
 // This attaches a timeout of 2 seconds with a custom callback
-app.apply( app.er_timeout, { timeout: 2 * 1000, callback: ( event )=>{
+app.apply( app.er_timeout, { timeout: 2 * 1000, callback: ( event ) => {
         event.send( 'You timed out!', 200 );
     }
 });
@@ -2503,7 +2503,7 @@ app.apply( app.er_data_server );
 // OR if you want to pass specific parameters to the default DataServer:
 app.apply( app.er_data_server, { dataServerOptions: { persist: false, ttl: 200, persistPath: '/root' } } );
 
-app.get( '/', async ( event )=>{
+app.get( '/', async ( event ) => {
 	const value	= await event.dataServer.get( 'testKey' );
 
 	if ( value !== 'testValue' )
@@ -2621,12 +2621,12 @@ app.apply( app.er_data_server );
 app.apply( app.er_session );
 
 // Initialize the session
-app.add( async ( event )=>{
+app.add( async ( event ) => {
 	event.initSession( event.next ).catch( event.next );
 });
 
 // Redirect to login if authenticated is not true
-app.add(( event )=>{
+app.add(( event ) => {
 	if (
 		event.path !== '/login'
 		&& ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
@@ -2638,7 +2638,7 @@ app.add(( event )=>{
 	event.next();
 });
 
-app.post( '/login', async ( event )=>{
+app.post( '/login', async ( event ) => {
 	const result = event.validate( event.body, { username : 'filled||string', password : 'filled||string' } );
 
 	if ( result.hasValidationFailed() )
@@ -2662,11 +2662,11 @@ app.post( '/login', async ( event )=>{
 	}
 });
 
-app.get( '/login', ( event )=>{
+app.get( '/login', ( event ) => {
 	event.send( 'Try to post to /login with { username: "username", password: "password" } in the body. Make sure to send the cookie you get back!' );
 })
 
-app.get( '/',( event )=>{
+app.get( '/',( event ) => {
 	event.send( 'LOGGED IN!' );
 });
 
@@ -2847,7 +2847,7 @@ const app = require( 'event_request' )();
 
 app.apply( app.er_file_stream );
 
-app.get( '/data', ( event ) =>{
+app.get( '/data', ( event ) => {
 		const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
 		const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
 
@@ -2864,7 +2864,7 @@ app.get( '/data', ( event ) =>{
 	}
 );
 
-app.get( '/dataTwo', ( event ) =>{
+app.get( '/dataTwo', ( event ) => {
 		const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
 		const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
 
@@ -3059,7 +3059,7 @@ app.apply( app.er_body_parser_form, { maxPayloadLength: 10485760, strict: false 
 app.apply( app.er_body_parser_multipart, { cleanUpItemsTimeoutMS: 100, maxPayload: 0, tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
 app.apply( app.er_body_parser_raw, { maxPayloadLength: 10485760 } );
 
-app.post( '/submit', ( event )=>{
+app.post( '/submit', ( event ) => {
     console.log( event.body );
     console.log( event.rawBody );
 
@@ -3124,7 +3124,7 @@ app.apply( app.er_response_cache );
 app.add({
 	route : '/',
 	method : 'GET',
-	handler : ( event )=>{
+	handler : ( event ) => {
 		event.cacheCurrentRequest().catch( event.next );
 		// Nothing else should be done after calling cache current request in the same middleware, a new one needs to be added
 		// cacheCurrentRequest calls next inside it if it is not cached and caches it, if it is cached, then it will return the cached result
@@ -3133,7 +3133,7 @@ app.add({
 
 // OR
 // When setting a request to be cached, ttl and useIp may be passed that will overwrite the default options
-// app.add( ( event )=>{
+// app.add( ( event ) => {
 // 	//**useIp** -> whether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
 // 	//**ttl** -> time to live for the record. Defaults to 60 * 5000 ms
 //
@@ -3147,7 +3147,7 @@ let counter	= 0;
 app.add({
 	route : '/',
 	method : 'GET',
-	handler : ( event )=>{
+	handler : ( event ) => {
 		counter ++;
 
 		if ( counter > 1 )
@@ -3164,11 +3164,11 @@ app.add({
 let counterTwo		= 0;
 let counterThree	= 0;
 
-app.get( /\/test/, ( event )=>{
+app.get( /\/test/, ( event ) => {
 	event.cacheCurrentRequest().catch( event.next );
 });
 
-app.get( '/testTwo', async ( event )=>{
+app.get( '/testTwo', async ( event ) => {
 	counterTwo ++;
 
 	if ( counterTwo > 1 )
@@ -3177,7 +3177,7 @@ app.get( '/testTwo', async ( event )=>{
 	event.send( 'ok' );
 });
 
-app.get( '/testThree', async ( event )=>{
+app.get( '/testThree', async ( event ) => {
 	counterThree ++;
 
 	if ( counterThree > 1 )
@@ -3322,7 +3322,7 @@ app.apply( app.er_body_parser_multipart );
 // This will validate the query parameters and the body
 app.post( '/',
     app.er_validation.validate( { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255'} } ),
-    ( event )=>{
+    ( event ) => {
         event.send( { query: event.query, body: event.body } );
     }
 );
@@ -3340,14 +3340,14 @@ app.apply( app.er_body_parser_multipart );
 app.post( '/',
     app.er_validation.validate(
         { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } },
-        ( event, validationParameter, validationResult )=>{
+        ( event, validationParameter, validationResult ) => {
             console.log( validationParameter );
             console.log( validationResult );
 
             event.send( 'ok' );
         }   
     ),
-    ( event )=>{
+    ( event ) => {
         event.send( { query: event.query, body: event.body } );
     }
 );
@@ -3363,7 +3363,7 @@ const app = require( 'event_request' )();
 app.apply(
     app.er_validation,
     {
-         failureCallback: ( event, validationParameter, validationResult )=>{
+         failureCallback: ( event, validationParameter, validationResult ) => {
             console.log( validationParameter );
             console.log( validationResult );
 
@@ -3374,7 +3374,7 @@ app.apply(
 
 // Alternatively you can do:
 app.er_validation.setOptions({
-     failureCallback: ( event, validationParameter, validationResult )=>{
+     failureCallback: ( event, validationParameter, validationResult ) => {
         console.log( validationParameter );
         console.log( validationResult );
 
@@ -3388,14 +3388,14 @@ app.apply( app.er_body_parser_multipart );
 app.post( '/',
     app.er_validation.validate(
         { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } },
-        ( event, validationParameter, validationResult )=>{
+        ( event, validationParameter, validationResult ) => {
             console.log( validationParameter );
             console.log( validationResult );
 
             event.send( 'ok' );
         }   
     ),
-    ( event )=>{
+    ( event ) => {
         event.send( { query: event.query, body: event.body } );
     }
 );
@@ -3409,7 +3409,7 @@ const app    = require( 'event_request' )();
 app.apply(
     app.er_validation,
     {
-        failureCallback: ( event, validationParameter, validationResult )=>{
+        failureCallback: ( event, validationParameter, validationResult ) => {
          console.log( validationParameter );
          console.log( validationResult );
         
@@ -3425,7 +3425,7 @@ app.post( '/',
     app.er_validation.validate(
         { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } }
     ),
-    ( event )=>{
+    ( event ) => {
         event.send( { query: event.query, body: event.body } );
     }
 );
@@ -3536,7 +3536,7 @@ app.apply( app.er_cors, {
     credentials: true,
 });
 
-app.add(( event )=>{
+app.add(( event ) => {
     event.send( event.response.getHeaders() );
 });
 
@@ -3742,7 +3742,7 @@ const rule            = {
 // No need to apply this
 app.apply( app.er_rate_limits );
 
-app.get( '/testRoute', app.er_rate_limits.rateLimit( rule ), ( event )=>{
+app.get( '/testRoute', app.er_rate_limits.rateLimit( rule ), ( event ) => {
     event.send( name );
 });
 
@@ -3760,7 +3760,7 @@ const ruleTwo            = {
 app.get( '/testRouteTwo', [
    app.er_rate_limits.rateLimit( ruleTwo ),
    app.er_rate_limits.rateLimit( rule )
-], ( event )=>{
+], ( event ) => {
     event.send( name );
 });
 ~~~
@@ -4203,7 +4203,7 @@ app.apply( app.er_security );
 ~~~javascript
 app.apply( app.er_security );
 
-app.add(( event )=>{
+app.add(( event ) => {
     event.$security.csp.enableSandbox();
     event.$security.hsts.setEnabled( false );
     event.$security.cto.setEnabled( false );
@@ -4248,7 +4248,7 @@ app.apply( app.er_security, {
 const app = require( 'event_request' )();
 app.apply( app.er_security, { csp : { xss: false } } );
 
-app.add(( event )=>{
+app.add(( event ) => {
 
     // self is repeated twice but will be shown only once and with single quotes
     event.$security.csp.addFontSrc( 'self' );

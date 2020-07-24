@@ -75,7 +75,7 @@ class Tester
 		this.debug				= typeof options.debug === 'boolean' ? options.debug : false;
 		this.silent				= typeof options.silent === 'boolean' ? options.silent : false;
 		this.filter				= typeof options.filter === 'string' ? options.filter : false;
-		this.callback			= typeof options.callback === 'function' ? options.callback : ( err )=>{
+		this.callback			= typeof options.callback === 'function' ? options.callback : ( err ) => {
 			process.exit( err ? 1 : 0 );
 		};
 		this.stop			= false;
@@ -150,13 +150,13 @@ class Tester
 				newTest.message	= test.message + '#' + i;
 				newTest.status	= test.status;
 
-				newTest.test	= ( done )=>{
+				newTest.test	= ( done ) => {
 					const newData	= [done].concat( data );
 					const response	= test.test.apply( this, newData );
 
 					if ( response instanceof Promise )
 					{
-						response.catch(( error )=>{
+						response.catch(( error ) => {
 							setImmediate(() => {
 								done( error );
 							});
@@ -337,7 +337,7 @@ class Tester
 		/**
 		 * @brief	Wrapper for the done callback to add the test to the callback
 		 */
-		let callback	= ( err )=>{
+		let callback	= ( err ) => {
 			this.doneCallback( test, err );
 		};
 
@@ -348,7 +348,7 @@ class Tester
 
 			if ( response instanceof Promise )
 			{
-				response.catch(( error )=>{
+				response.catch(( error ) => {
 					setImmediate(() => {
 						this.doneCallback( test, error );
 					});

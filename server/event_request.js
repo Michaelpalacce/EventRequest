@@ -48,7 +48,7 @@ class EventRequest extends EventEmitter
 
 		// We do this so we can pass the event.next function by reference
 		const self			= this;
-		this.next			= ( ...args )=>{
+		this.next			= ( ...args ) => {
 			self._next.apply( self, args );
 		};
 	}
@@ -308,7 +308,7 @@ class EventRequest extends EventEmitter
 	 */
 	setStatusCode( code )
 	{
-		this.response.statusCode	= typeof code === 'number' ? code : 500
+		this.response.statusCode	= typeof code === 'number' ? code : 500;
 	}
 
 	/**
@@ -387,7 +387,7 @@ class EventRequest extends EventEmitter
 
 				if ( response instanceof Promise )
 				{
-					response.catch(( error )=>{
+					response.catch(( error ) => {
 						setImmediate(() => {
 
 							if ( ! this.isFinished() )

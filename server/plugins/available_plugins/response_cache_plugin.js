@@ -37,7 +37,7 @@ class ResponseCachePlugin extends PluginInterface
 	{
 		this.dataServer	= server.getPlugin( 'er_data_server' ).getServer();
 
-		server.define( 'cache.request', ( event )=>{
+		server.define( 'cache.request', ( event ) => {
 			event.cacheCurrentRequest();
 		} );
 	}
@@ -51,7 +51,7 @@ class ResponseCachePlugin extends PluginInterface
 	 */
 	attachCachingEvent( event )
 	{
-		event.on( 'send', async ( responseData )=>{
+		event.on( 'send', async ( responseData ) => {
 			if ( typeof responseData.response === 'undefined' )
 				return;
 
@@ -122,7 +122,7 @@ class ResponseCachePlugin extends PluginInterface
 					event.cacheCurrentRequest	= undefined;
 				} );
 
-				event.cacheCurrentRequest	= async ( options = {} )=>{
+				event.cacheCurrentRequest	= async ( options = {} ) => {
 					event.currentResponseCacheConfig	= options;
 					const cacheId						= this.getCacheId( event );
 					const cachedDataSet					= await this.dataServer.get( cacheId );
@@ -143,7 +143,7 @@ class ResponseCachePlugin extends PluginInterface
 						const { response, code, headers }	= cachedDataSet;
 						const headersKeys					= Object.keys( headers );
 
-						headersKeys.forEach(( headerKey )=>{
+						headersKeys.forEach(( headerKey ) => {
 							const headerValue	= headers[headerKey];
 
 							event.setResponseHeader( headerKey, headerValue );

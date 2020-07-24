@@ -12,7 +12,7 @@ helpers.clearUpTestFile();
 
 test({
 	message	: 'File.constructor on defaults',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		new File();
 
 		done();
@@ -21,7 +21,7 @@ test({
 
 test({
 	message	: 'File.getWriteStream.when.directory.does.not.exist',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const dir			= `./tests/server/components/logger/components/transport_types/fixtures/unexisting_dir${Math.random()}/` ;
 		const fileName		= 'file.log';
 
@@ -33,7 +33,7 @@ test({
 
 		fs.unlinkSync( fileTransport.getFileName() );
 
-		fs.unlink( dir, ()=>{
+		fs.unlink( dir, () => {
 			done();
 		});
 	}
@@ -41,7 +41,7 @@ test({
 
 test({
 	message	: 'File.log.if.rejected',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		const filePath			= './tests/server/components/logger/components/transport_types/fixtures/file.log';
 
 		const MockedFile		= Mock( File );
@@ -56,7 +56,7 @@ test({
 			shouldReturn	: () => {
 				writable._mock({
 					method			: 'write',
-					shouldReturn	: ( text, type, callback )=>{
+					shouldReturn	: ( text, type, callback ) => {
 						callback( expectedError );
 					}
 				});
@@ -65,9 +65,9 @@ test({
 			},
 			called			: 1
 		});
-		fileTransport.log( Log.getInstance( 'test' ) ).then(()=>{
+		fileTransport.log( Log.getInstance( 'test' ) ).then(() => {
 			done( 'Should have rejected!' )
-		}).catch( ( err )=>{
+		}).catch( ( err ) => {
 			assert.deepStrictEqual( err, expectedError );
 			helpers.clearUpTestFile();
 			done();
@@ -77,7 +77,7 @@ test({
 
 test({
 	message	: 'File.constructor on invalid configuration',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let file	= new File({
 			logLevel	: 'test',
 			logLevels	: 'test',
@@ -96,7 +96,7 @@ test({
 
 test({
 	message	: 'File.constructor on valid configuration',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logLevel		= LOG_LEVELS.error;
 		let logLevels		= LOG_LEVELS;
 		let called			= 0;
@@ -133,7 +133,7 @@ test({
 
 test({
 	message	: 'File.format returns a string',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logLevel	= LOG_LEVELS.error;
 		let logLevels	= LOG_LEVELS;
 		let filePath	= helpers.getTestFile();
@@ -161,7 +161,7 @@ test({
 
 test({
 	message	: 'File.getFileName adds timestamp',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logLevel		= LOG_LEVELS.error;
 		let logLevels		= LOG_LEVELS;
 		let filePath		= './server/components/logger/components/transport_types/fixtures/error.log';
@@ -195,7 +195,7 @@ test({
 
 test({
 	message	: 'File.getCurrentData gives the beginning of the day',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logLevel	= LOG_LEVELS.error;
 		let logLevels	= LOG_LEVELS;
 		let filePath	= './server/components/logger/components/transport_types/fixtures/error.log';
@@ -221,7 +221,7 @@ test({
 
 test({
 	message	: 'File.log returns a Promise',
-	test	: ( done )=>{
+	test	: ( done ) => {
 		let logLevel	= LOG_LEVELS.error;
 		let logLevels	= LOG_LEVELS;
 		let filePath	= helpers.getTestFile();
