@@ -1,5 +1,6 @@
 26.0.2
 - Lowered the max retry attempts by 10 for the leaky bucket
+- Added badges
 
 26.0.1
 - Big bug fixes with the body parser plugin
