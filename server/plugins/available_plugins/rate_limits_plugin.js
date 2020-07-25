@@ -275,7 +275,7 @@ class RateLimitsPlugin extends PluginInterface
 			rules.unshift( rule );
 
 			this._rateLimit( event, rules );
-		}
+		};
 	}
 
 	/**

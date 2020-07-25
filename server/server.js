@@ -216,14 +216,6 @@ class Server extends EventEmitter
 				}
 			});
 
-			response.on( 'finish', () => {
-				if ( eventRequest != null )
-				{
-					eventRequest._cleanUp();
-					eventRequest	= null;
-				}
-			});
-
 			response.on( 'error', ( error ) => {
 				if ( eventRequest != null )
 				{
@@ -239,7 +231,7 @@ class Server extends EventEmitter
 				eventRequest._setBlock( block );
 
 				const onErrorCallback	= ( error ) => {
-					if ( eventRequest.logger === null )
+					if ( eventRequest.logger == null )
 						Loggur.log( error, LOG_LEVELS.error );
 				};
 

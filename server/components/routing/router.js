@@ -109,7 +109,7 @@ class Router extends PluginInterface
 		const methods	= ['POST', 'PUT', 'GET', 'DELETE', 'HEAD', 'PATCH', 'COPY'];
 
 		const isGlobalMiddleware	= ( argument ) => {
-			return typeof argument === 'function' || typeof argument === 'string' || Array.isArray( argument )
+			return typeof argument === 'function' || typeof argument === 'string' || Array.isArray( argument );
 		};
 
 		methods.forEach(( method ) => {

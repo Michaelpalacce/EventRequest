@@ -20,6 +20,25 @@ test({
 });
 
 test({
+	message	: 'ECT.parseOptions.without.argument.sets.defaults',
+	test	: ( done ) => {
+		const ect	= new ECT( { maxAge: 100, reportUri: 'some-uri', isEnforce: false } );
+
+		assert.equal( ect.enabled, true );
+		assert.equal( ect.build(), 'max-age=100, enforce, report-uri="some-uri"' );
+		assert.equal( ect.getHeader(), HEADER_NAME );
+
+		ect.parseOptions();
+
+		assert.equal( ect.enabled, true );
+		assert.equal( ect.build(), 'max-age=86400, enforce' );
+		assert.equal( ect.getHeader(), HEADER_NAME );
+
+		done();
+	}
+});
+
+test({
 	message	: 'ECT.enforceOnDefault',
 	test	: ( done ) => {
 		const ect	= new ECT();
@@ -60,6 +79,32 @@ test({
 		assert.equal( ect.enabled, true );
 		assert.equal( ect.build(), 'max-age=86400, enforce' );
 		assert.equal( ect.getHeader(), HEADER_NAME );
+
+		done();
+	}
+});
+
+test({
+	message	: 'ECT.setEnabled',
+	test	: ( done ) => {
+		const ect	= new ECT();
+
+		ect.setEnabled();
+
+		assert.deepStrictEqual( ect.enabled, true );
+
+		ect.setEnabled( false );
+
+		assert.deepStrictEqual( ect.enabled, false );
+
+		ect.setEnabled();
+
+		assert.deepStrictEqual( ect.enabled, true );
+
+		ect.setEnabled( false );
+		ect.setEnabled( 'string' );
+
+		assert.deepStrictEqual( ect.enabled, true );
 
 		done();
 	}

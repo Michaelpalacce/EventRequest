@@ -2,11 +2,11 @@
 'use strict';
 
 // Dependencies
-const { assert, test, Mock, Mocker, helpers }	= require( '../../../../../test_helper' );
-const { LOG_LEVELS, File, Log }					= require( './../../../../../../server/components/logger/loggur' );
-const { Writable }								= require( 'stream' );
-const fs										= require( 'fs' );
-const path										= require( 'path' );
+const { assert, test, Mock, Mocker, helpers, tester }	= require( '../../../../../test_helper' );
+const { LOG_LEVELS, File, Log }							= require( './../../../../../../server/components/logger/loggur' );
+const { Writable }										= require( 'stream' );
+const fs												= require( 'fs' );
+const path												= require( 'path' );
 
 helpers.clearUpTestFile();
 
@@ -76,6 +76,42 @@ test({
 });
 
 test({
+	message	: 'File.log.if.fileStream.on.exception',
+	test	: ( done ) => {
+		const filePath			= './tests/server/components/logger/components/transport_types/fixtures/file.log';
+
+		const MockedFile		= Mock( File );
+		const MockedWritable	= Mock( Writable );
+		const writable			= new MockedWritable();
+		const expectedError		= 'someError';
+
+		const fileTransport		= new MockedFile( { filePath } );
+
+		fileTransport._mock({
+			method			: 'getWriteStream',
+			shouldReturn	: () => {
+				writable._mock({
+					method			: 'write',
+					shouldReturn	: ( text, type, callback ) => {
+						throw new Error( expectedError );
+					}
+				});
+
+				return writable;
+			},
+			called			: 1
+		});
+		fileTransport.log( Log.getInstance( 'test' ) ).then(() => {
+			done( 'Should have rejected!' )
+		}).catch( ( err ) => {
+			assert.deepStrictEqual( err, new Error( expectedError ) );
+			helpers.clearUpTestFile();
+			done();
+		});
+	}
+});
+
+test({
 	message	: 'File.constructor on invalid configuration',
 	test	: ( done ) => {
 		let file	= new File({
@@ -87,7 +123,7 @@ test({
 		assert.deepStrictEqual( file.logLevel, LOG_LEVELS.info );
 		assert.deepStrictEqual( file.logLevels, LOG_LEVELS );
 		assert.deepStrictEqual( file.supportedLevels, Object.values( LOG_LEVELS ) );
-		assert.deepStrictEqual( file.filePath, false );
+		assert.deepStrictEqual( file.filePath, null );
 		assert.deepStrictEqual( file.fileStream, null );
 
 		done();
@@ -183,7 +219,7 @@ test({
 		);
 
 		expectedPath	= path.parse( expectedPath );
-		expectedPath	= expectedPath.dir + '/' + expectedPath.name + timestamp + expectedPath.ext;
+		expectedPath	= expectedPath.name + timestamp + expectedPath.ext;
 
 		assert.equal( file.getFileName().indexOf( expectedPath ) !== -1, true );
 
@@ -260,5 +296,20 @@ test({
 			},
 			done
 		);
+	}
+});
+
+test({
+	message	: 'File.log.rejects.if.filePath.not.provided',
+	test	: ( done ) => {
+		const MockedFile	= Mock( File );
+
+		const file	= new MockedFile( { filePath: false } );
+
+		file.log( Log.getInstance( 'test' ) ).then( () => {
+			done( 'Should not resolve' );
+		}).catch( () => {
+			done();
+		});
 	}
 });

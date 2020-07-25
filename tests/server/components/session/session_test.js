@@ -41,6 +41,19 @@ test({
 });
 
 test({
+	message	: 'Session.constructor.throws.if.event.request.does.not.have.dataServer',
+	test	: ( done ) => {
+		let eventRequest		= helpers.getEventRequest();
+
+		assert.throws(() => {
+			new Session( eventRequest )
+		});
+
+		done();
+	}
+});
+
+test({
 	message	: 'Session constructor on custom arguments',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
@@ -175,9 +188,14 @@ test({
 					hasSession	= await session.hasSession();
 					if ( hasSession === true )
 					{
+						assert.deepStrictEqual( typeof session.session.id, 'string' );
+
 						await session.removeSession();
 
 						assert.equal( await session.hasSession(), false );
+
+						assert.deepStrictEqual( session.session, {} );
+						assert.deepStrictEqual( typeof session.session.id, 'undefined' );
 
 						done();
 					}
@@ -196,6 +214,91 @@ test({
 		{
 			done( 'There is a session but there shouldn\'t be one' );
 		}
+	}
+});
+
+test({
+	message	: 'Session.hasSession.newSession.and.removeSession.when.there.is.a.header.session',
+	test	: async ( done ) => {
+		let eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= new Session( eventRequest, { isCookieSession: false } );
+		let setCookie			= false;
+
+		eventRequest._mock({
+			method			: 'setCookie',
+			shouldReturn	: () => {
+				setCookie	= true;
+			},
+			called			: 0
+		});
+
+		let hasSession	= await session.hasSession();
+
+		if ( ! hasSession )
+		{
+			const sessionId	= await session.newSession();
+
+			if ( sessionId === false )
+			{
+				done( 'Could not create a new session' );
+			}
+			else
+			{
+				if ( setCookie === true )
+				{
+					done( 'Set cookie should NOT have been called when creating a new session but was' );
+				}
+				else
+				{
+					hasSession	= await session.hasSession();
+					if ( hasSession === true )
+					{
+						assert.deepStrictEqual( typeof session.session.id, 'string' );
+
+						await session.removeSession();
+
+						assert.equal( await session.hasSession(), false );
+
+						assert.deepStrictEqual( session.session, {} );
+						assert.deepStrictEqual( typeof session.session.id, 'undefined' );
+
+						done();
+					}
+					else
+					{
+						done( 'There is no session where there should have been' );
+					}
+				}
+			}
+		}
+		else
+		{
+			done( 'There is a session but there shouldn\'t be one' );
+		}
+	}
+});
+
+test({
+	message	: 'Session.removeSession.when.not.a.cookie.session',
+	test	: async ( done ) => {
+		const eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+
+		const session			= new Session( eventRequest, { isCookieSession: false } );
+		let setCookie			= false;
+
+		eventRequest._mock({
+			method			: 'setCookie',
+			shouldReturn	: () => {
+				setCookie	= true;
+			},
+			called			: 0
+		});
+
+		await session.removeSession();
+
+		setCookie === false ? done() : done( 'setCookie was called when removing session but should not have been!' );
 	}
 });
 
@@ -243,6 +346,20 @@ test({
 
 		await session.saveSession();
 		await session.fetchSession() !== false ? done() : done( 'There should be a session to fetch' );
+	}
+});
+
+test({
+	message	: 'Session.saveSession',
+	test	: async ( done ) => {
+		const eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+
+		const session			= new Session( eventRequest );
+
+		await session.saveSession().catch( done ) === false
+			? done()
+			: done( 'Save session did not return false but should have since there is no session id' );
 	}
 });
 

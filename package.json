@@ -56,11 +56,11 @@
   "main": "server.js",
   "name": "event_request",
   "scripts": {
-    "test": "./node_modules/.bin/istanbul cover test.js",
+    "test": "nyc --reporter=lcov --reporter=text-summary node test.js",
     "deploy": "npm run test && npm publish"
   },
   "version": "26.0.4",
   "devDependencies": {
-    "istanbul": "^0.4.5"
+    "nyc": "^15.1.0"
   }
 }

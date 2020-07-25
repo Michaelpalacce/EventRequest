@@ -183,8 +183,7 @@ test({
 
 				multipartParser.terminate();
 				done();
-			}, 50 );
-
+			}, 75 );
 		}).catch( done );
 	}
 });

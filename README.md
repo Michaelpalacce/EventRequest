@@ -1128,7 +1128,8 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - Defaults to LOG_LEVELS
 
 **filePath: String**
-- The location of the file to log to 
+- The location of the file to log to. 
+- Accepts Absolute and relative paths
 - If it is not provided the transport will not log
 
 ~~~javascript

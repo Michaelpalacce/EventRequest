@@ -18,10 +18,10 @@ const TEST_STATUSES	= {
 };
 
 const LOG_LEVELS	= {
-	error	: 100,
-	success	: 200,
-	info	: 300,
-	warning	: 400
+	error	: 1000,
+	success	: 2000,
+	info	: 3000,
+	warning	: 4000
 };
 
 const DEFAULT_LOG_LEVEL	= LOG_LEVELS.warning;
@@ -33,7 +33,8 @@ class Tester
 {
 	constructor()
 	{
-		this.tests	= [];
+		this.tests			= [];
+		this.consoleLogger	= null;
 	}
 
 	/**
@@ -62,10 +63,10 @@ class Tester
 					logLevels	: LOG_LEVELS,
 					logLevel	: DEFAULT_LOG_LEVEL,
 					logColors	: {
-						100	: 'red',
-						200	: 'green',
-						300	: 'cyan',
-						400	: 'magenta'
+						1000	: 'red',
+						2000	: 'green',
+						3000	: 'cyan',
+						4000	: 'magenta'
 					}
 				})
 			]
@@ -101,7 +102,7 @@ class Tester
 					break;
 
 				case command.match( /--dieOnFirstError=/ ) !== null:
-					this.dieOnFirstError	= command.substring( 18 ) == 1;
+					this.dieOnFirstError	= parseInt( command.substring( 18 ) ) === 1;
 					break;
 
 				default:
@@ -201,7 +202,7 @@ class Tester
 		test.status	= TEST_STATUSES.success;
 		this.successes.push( test );
 		this.consoleLogger.success( `${this.index}. ${test.message}` );
-	};
+	}
 
 	/**
 	 * @brief	Called if there is an error in the test

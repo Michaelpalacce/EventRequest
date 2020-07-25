@@ -30,6 +30,7 @@ testSuites.loggingSuite		= () => {
 	require( './server/components/logger/components/transport_types/transport_test' );
 	require( './server/components/logger/components/transport_types/console_test' );
 	require( './server/components/logger/components/transport_types/file_test' );
+	require( './server/components/logger/components/transport_types/formatters/colorize_test' );
 };
 
 testSuites.cachingSuite		= () => {

@@ -1,13 +1,24 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test }							= require( '../../../../test_helper' );
+const { Mock, Mocker, assert, test }					= require( '../../../../test_helper' );
 const { Logger, LOG_LEVELS, Console, Transport, Log }	= require( './../../../../../server/components/logger/loggur' );
 
 /**
  * @brief	Constants
  */
 const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
+
+test({
+	message	: 'Logger.constructor on defaults',
+	test	: ( done )=>{
+		assert.throws(()=>{
+			new Logger();
+		});
+
+		done();
+	}
+});
 
 test({
 	message	: 'Logger.constructor on valid arguments',
@@ -158,11 +169,51 @@ test({
 });
 
 test({
+	message	: 'Logger.attachUnhandledEventListener.on.uncaught.rejection',
+	test	: ( done ) => {
+		const MockLogger	= Mock( Logger );
+		let logger			= new MockLogger({
+			logLevels		: { error : 100, warning : 200 },
+			logLevel		: 100,
+			dieOnCapture	: false,
+			capture			: true
+		}, 'id' );
+
+		logger._mock({
+			method			: 'log',
+			shouldReturn	: async ( log ) => {
+				assert.deepStrictEqual( log.getLevel(), 100 );
+				done();
+			}
+		});
+
+		new Promise(( resolve, reject )=>{
+			reject();
+		})
+	}
+});
+
+test({
 	message	: 'Logger.addTransport adds only a transport that is an instance of Transport',
 	test	: ( done ) => {
 		let logger	= new Logger( {}, 'id' );
 		assert.equal( logger.addTransport( new Console( { logLevel : 0 } ) ), true );
 		assert.equal( logger.addTransport( new Error() ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Logger.attachLogLevelsToLogger.does.not.attach.if.already.exists',
+	test	: ( done ) => {
+		const logger	= new Logger( {
+			logLevels:	{
+				supports	: 5000
+			}
+		}, 'id' );
+
+		assert.deepStrictEqual( logger.supports( Log.getInstance( 'test', 100 ) ), true );
 
 		done();
 	}

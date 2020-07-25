@@ -5,7 +5,7 @@ const { assert, test, helpers, Mock }	= require( '../test_helper' );
 const path								= require( 'path' );
 const http								= require( 'http' );
 const fs								= require( 'fs' );
-const { Loggur, File }					= require( './../../server/components/logger/loggur' );
+const { Loggur, File, Logger }			= require( './../../server/components/logger/loggur' );
 const Router							= require( './../../server/components/routing/router' );
 const DataServer						= require( './../../server/components/caching/data_server' );
 const Session							= require( './../../server/components/session/session' );
@@ -82,6 +82,39 @@ test({
 		const pluginManager	= server.getPluginManager();
 
 		assert.equal( true, pluginManager instanceof PreloadedPluginManager.constructor );
+		done();
+	}
+});
+
+test({
+	message	: 'Server.getPlugin.when.has.plugin',
+	test	: ( done ) => {
+		const server	= new Server();
+
+		server.apply( server.er_cors );
+
+		assert.doesNotThrow(()=>{
+			server.getPlugin( 'er_cors' );
+			server.getPlugin( server.er_cors );
+		});
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.getPlugin.when.not.has.plugin',
+	test	: ( done ) => {
+		const server	= new Server();
+
+		assert.throws(()=>{
+			server.getPlugin( server.er_cors );
+		});
+
+		assert.throws(()=>{
+			server.getPlugin( 'er_cors' );
+		});
+
 		done();
 	}
 });
@@ -1988,71 +2021,71 @@ test({
 			)
 		);
 
-		// responses.push(
-		// 	helpers.sendServerRequest(
-		// 		`/${name}`,
-		// 		'GET',
-		// 		200,
-		// 		multipartDataCR,
-		// 		{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-		// 		3341
-		// 	)
-		// );
-		//
-		// responses.push(
-		// 	helpers.sendServerRequest(
-		// 		`/${name}`,
-		// 		'GET',
-		// 		200,
-		// 		multipartDataLF,
-		// 		{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-		// 		3341
-		// 	)
-		// );
-		//
-		// responses.push(
-		// 	helpers.sendServerRequest(
-		// 		`/${name}`,
-		// 		'GET',
-		// 		400,
-		// 		multipartDataCRLF,
-		// 		{ 'content-type': 'multipart/form-data; boundary=---------------------------9041544843365972754266' },
-		// 		3341
-		// 	)
-		// );
-		//
-		// responses.push(
-		// 	helpers.sendServerRequest(
-		// 		`/${name}`,
-		// 		'GET',
-		// 		500,
-		// 		multipartDataCRLF,
-		// 		{ 'content-type': 'multipart/form-data' },
-		// 		3341
-		// 	)
-		// );
-		//
-		// responses.push(
-		// 	helpers.sendServerRequest(
-		// 		`/${name}`,
-		// 		'GET',
-		// 		400,
-		// 		multipartDataCRLF,
-		// 		{},
-		// 		3341
-		// 	)
-		// );
-		//
-		// responses.push(
-		// 	helpers.sendServerRequest(
-		// 		`/${name}`,
-		// 		'GET',
-		// 		400,
-		// 		'',
-		// 		{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-		// 		3341
-		// 	)
-		// );
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				multipartDataCR,
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				multipartDataLF,
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				multipartDataCRLF,
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9041544843365972754266' },
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				500,
+				multipartDataCRLF,
+				{ 'content-type': 'multipart/form-data' },
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				multipartDataCRLF,
+				{},
+				3341
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				'',
+				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
+				3341
+			)
+		);
 
 		const server	= app.listen( 3341, () => {
 			Promise.all( responses ).then(() => {
@@ -3711,6 +3744,208 @@ test({
 });
 
 test({
+	message	: 'Server.attach.when.request.close.is.called.twice.does.not.throw',
+	test	: ( done ) => {
+		const app	= new Server();
+		let called	= 0;
+
+		app.get( '/testCloseTwice', ( event ) => {
+			const request	= event.request;
+
+			event.on( 'cleanUp',() => {
+				called	++;
+			});
+
+			event.send( '' );
+
+			request.emit( 'close' )
+		});
+
+		helpers.sendServerRequest(
+			'/testCloseTwice',
+			'GET',
+			200,
+			'',
+			{},
+			4210
+		).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), '' );
+			setTimeout(()=>{
+				called === 1 ? done() : done( 'cleanUp was called more than once' );
+			}, 25 );
+		}).catch( done );
+
+		app.listen( 4210 );
+	}
+});
+
+test({
+	message	: 'Server.eventRequest.on.error.without.a.logger',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.get( '/eventRequestOnErrorWithoutALogger', ( event ) => {
+			// This will call the Loggur.log ( cannot be mocked ) But it is called since there is no throw
+			event.emit( 'on_error', 'ERROR!' );
+
+			setImmediate(()=>{
+				event.send( 'ERROR!' );
+			});
+		});
+
+		helpers.sendServerRequest(
+			'/eventRequestOnErrorWithoutALogger',
+			'GET',
+			200,
+			'',
+			{},
+			4212
+		).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), 'ERROR!' );
+			done();
+		}).catch( done );
+
+		app.listen( 4212 );
+	}
+});
+
+test({
+	message	: 'Server.eventRequest.on.error.with.a.logger',
+	test	: ( done ) => {
+		const app			= new Server();
+		const MockLogger	= new Mock( Logger );
+
+		app.get( '/eventRequestOnErrorWithALogger', ( event ) => {
+			event.logger	= new MockLogger( {}, 'uniqueId' );
+
+			// This will also do nothing as the on( 'error' ) is meant to be called ONLY in case the logging plugin is not attached
+			event.emit( 'on_error', '' );
+
+			setImmediate(()=>{
+				event.send( 'ERRORx2!' );
+			});
+		});
+
+		helpers.sendServerRequest(
+			'/eventRequestOnErrorWithALogger',
+			'GET',
+			200,
+			'',
+			{},
+			4213
+		).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), 'ERRORx2!' );
+			done();
+		}).catch( done );
+
+		app.listen( 4213 );
+	}
+});
+
+test({
+	message	: 'Server.attach.when.there.is.an.error',
+	test	: ( done ) => {
+		const app			= new Server();
+		const MockRouter	= Mock( Router );
+		app.router			= new MockRouter();
+
+		app.router._mock({
+			method			: 'getExecutionBlockForCurrentEvent',
+			shouldReturn	: ()=>{
+				throw new Error( 'Error has occured!' );
+			}
+		});
+
+		helpers.sendServerRequest(
+			'/',
+			'GET',
+			500,
+			'',
+			{},
+			4215
+		).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), '{"error":"Error has occured!"}' );
+			done();
+		}).catch( done );
+
+		app.listen( 4215 );
+	}
+});
+
+test({
+	message	: 'Server.attach.when.there.is.an.error.and.response.is.finished',
+	test	: ( done ) => {
+		const app			= new Server();
+		const MockRouter	= Mock( Router );
+		app.router			= new MockRouter();
+
+		app.router._mock({
+			method			: 'getExecutionBlockForCurrentEvent',
+			shouldReturn	: ( eventRequest )=>{
+				eventRequest.isFinished	= ()=>{ return true };
+
+				setTimeout(()=>{
+					eventRequest.response.end( 'No Error' )
+				});
+
+				throw new Error( 'Error has occured!' );
+			}
+		});
+
+		helpers.sendServerRequest(
+			'/',
+			'GET',
+			200,
+			'',
+			{},
+			4214
+		).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), 'No Error' );
+			done();
+		}).catch( done );
+
+		app.listen( 4214 );
+	}
+});
+
+test({
+	message	: 'Server.attach.when.response.error.is.called.twice.does.not.throw',
+	test	: ( done ) => {
+		const app	= new Server();
+		let called	= 0;
+
+		app.get( '/testResponseErrorTwice', ( event ) => {
+			const response	= event.response;
+
+			event.on( 'cleanUp',() => {
+				called	++;
+			});
+
+			event.send( '' );
+
+			response.emit( 'error' );
+			response.emit( 'error' );
+		});
+
+		helpers.sendServerRequest(
+			'/testResponseErrorTwice',
+			'GET',
+			200,
+			'',
+			{},
+			4216
+		).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), '' );
+			setTimeout(()=>{
+				called === 1 ? done() : done( 'cleanUp was called more than once' );
+			}, 25 );
+		}).catch( done );
+
+		app.listen( 4216 );
+	}
+});
+
+test({
 	message	: 'Server.testGlobalMiddlewaresWithFunctions',
 	test	: ( done ) => {
 
@@ -3720,7 +3955,7 @@ test({
 				event.setResponseHeader( key, value );
 				event.next();
 			}
-		}
+		};
 
 		const setStatus	= function( status )
 		{
@@ -3728,7 +3963,7 @@ test({
 				event.setStatusCode( status );
 				event.next();
 			}
-		}
+		};
 
 		const app	= new App.Server();
 
@@ -3817,7 +4052,7 @@ test({
 				event.setResponseHeader( key, value );
 				event.next();
 			}
-		}
+		};
 
 		const setStatus	= function( status )
 		{
@@ -3825,7 +4060,7 @@ test({
 				event.setStatusCode( status );
 				event.next();
 			}
-		}
+		};
 
 		const app		= new App.Server();
 		const routerOne	= app.Router();
@@ -3901,7 +4136,7 @@ test({
 				event.setResponseHeader( key, value );
 				event.next();
 			}
-		}
+		};
 
 		const setStatus	= function( status )
 		{
@@ -3993,7 +4228,7 @@ test({
 				event.setStatusCode( status );
 				event.next();
 			}
-		}
+		};
 
 		const app	= new App.Server();
 

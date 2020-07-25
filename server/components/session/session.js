@@ -71,7 +71,7 @@ class Session
 		if ( this.sessionId === null )
 			return false;
 
-		return await this.server.get( this.sessionId ) !== null
+		return await this.server.get( this.sessionId ) !== null;
 	}
 
 	/**
@@ -82,6 +82,8 @@ class Session
 	async removeSession()
 	{
 		await this.server.delete( this.sessionId );
+
+		this.session	= {};
 
 		if ( this.isCookieSession )
 			this.event.setCookie( this.sessionKey, this.sessionId, { expires: - this.ttl } );

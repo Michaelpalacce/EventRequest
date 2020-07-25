@@ -37,8 +37,8 @@ class File extends Transport
 		super.sanitizeConfig( options );
 
 		this.filePath	= typeof options.filePath === "string"
-						? path.join( path.dirname( require.main.filename ), options.filePath )
-						: false;
+						? options.filePath
+						: null;
 
 		this.fileStream	= null;
 
@@ -68,8 +68,6 @@ class File extends Transport
 				flags		: 'a',
 				autoClose	: true
 			});
-
-			this.fileStream.on( 'error',() => {} )
 		}
 
 		return this.fileStream;
@@ -136,6 +134,9 @@ class File extends Transport
 	_log( log, resolve, reject )
 	{
 		let message	= this.format( log );
+
+		if ( ! this.filePath )
+			reject( 'File Path not provided' );
 
 		this.getWriteStream().write( message + SYSTEM_EOL, 'utf8', ( err ) => {
 			if ( err )

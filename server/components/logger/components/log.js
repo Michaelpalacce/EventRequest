@@ -109,7 +109,7 @@ class Log
 				this.message	= message;
 				break;
 
-			case logType === 'undefined':
+			case message == null:
 				this.message	= '';
 				break;
 
@@ -118,7 +118,7 @@ class Log
 				break;
 		}
 
-		this.rawMessage	= logType === 'undefined' ? '' : message;
+		this.rawMessage	= message;
 		this.isRaw		= isRaw;
 
 		this.timestamp	= Log.getUNIXTime();

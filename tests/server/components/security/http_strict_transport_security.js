@@ -24,6 +24,33 @@ test({
 });
 
 test({
+	message	: 'HSTS.parseOptions.without.argument.sets.default',
+	test	: ( done ) => {
+		const hsts	= new HSTS( { maxAge: 100, preload: true, includeSubDomains: true } );
+
+		assert.equal( hsts.enabled, true );
+		assert.equal( hsts.maxAge, 100 );
+		assert.equal( hsts.doPreload, true );
+		assert.equal( hsts.doIncludeSubDomains, true );
+
+		assert.equal( hsts.getHeader(), HEADER_NAME );
+		assert.equal( hsts.build(), 'max-age=100; includeSubDomains; preload;' );
+
+		hsts.parseOptions();
+
+		assert.equal( hsts.enabled, true );
+		assert.equal( hsts.maxAge, 31536000 );
+		assert.equal( hsts.doPreload, false );
+		assert.equal( hsts.doIncludeSubDomains, false );
+
+		assert.equal( hsts.getHeader(), HEADER_NAME );
+		assert.equal( hsts.build(), 'max-age=31536000;' );
+
+		done();
+	}
+});
+
+test({
 	message	: 'HSTS.setMaxAge',
 	test	: ( done ) => {
 		const hsts	= new HSTS();
@@ -37,6 +64,35 @@ test({
 
 		assert.equal( hsts.getHeader(), HEADER_NAME );
 		assert.equal( hsts.build(), 'max-age=300;' );
+
+		done();
+	}
+});
+
+test({
+	message	: 'HSTS.setEnabled',
+	test	: ( done ) => {
+		const hsts	= new HSTS();
+
+		assert.equal( hsts.enabled, true );
+
+		hsts.setEnabled( false );
+
+		assert.deepStrictEqual( hsts.enabled, false );
+
+		hsts.setEnabled( true );
+
+		assert.deepStrictEqual( hsts.enabled, true );
+
+		hsts.setEnabled( false );
+		hsts.setEnabled();
+
+		assert.deepStrictEqual( hsts.enabled, true );
+
+		hsts.setEnabled( false );
+		hsts.setEnabled( 'string' );
+
+		assert.deepStrictEqual( hsts.enabled, true );
 
 		done();
 	}

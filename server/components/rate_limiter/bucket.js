@@ -158,7 +158,7 @@ class Bucket
 	 * @brief	Sets the lastUpdate
 	 *
 	 * @param	{Number} lastUpdate
-	 *u
+	 *
 	 * @return	void
 	 */
 	async _setLastUpdate( lastUpdate )

@@ -375,6 +375,29 @@ test({
 });
 
 test({
+	message			: 'CSP.setEnabledIfEnabledIsNotABooleanDefaultsToTrue',
+	test			: ( done ) => {
+		const csp					= new CSP( { enabled: false } );
+		const expectedHeaderName	= HEADER_NAME;
+		const expectedHeader		= XSS_EXPECTED_HEADER;
+
+		assert.deepStrictEqual( csp.directives, XSS_EXPECTED_DIRECTIVES );
+		assert.equal( csp.reportOnly, false );
+		assert.equal( csp.enabled, false );
+
+		assert.equal( csp.build(), '' );
+		assert.equal( csp.getHeader(), expectedHeaderName );
+
+		csp.setEnabled( 'string' );
+
+		assert.equal( csp.build(), expectedHeader );
+		assert.equal( csp.getHeader(), expectedHeaderName );
+
+		done();
+	}
+});
+
+test({
 	message			: 'CSP.setEnabledDoesNothingIfAlreadyEnabled',
 	test			: ( done ) => {
 		const csp					= new CSP( { enabled: true } );

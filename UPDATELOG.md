@@ -1,6 +1,18 @@
 26.0.4
 - Added more tests
 - Codacy code improvements
+- File Transport cleanup for unnecessary events ( error )
+- File Transport no longer counts path from the project root onwards
+- EventRequest no longer checks if request.connection exists as it should ALWAYS exist
+- Session.removeSession now sets the session variable to {}
+- Removed response.on( 'finish' ) callback from the server as it was unneeded
+- EventRequest on_error and error events fixed so they now accept undefined as well as null for logger to use the default logger
+- Migrated to nyc from istanbul
+- Code improvements
+- Documentation improvements
+- Improvements to Log ( removed cases that were unreachable as well as general improvements )
+- Fixed a bug with the Logger that would allow you to change the internal functions of it if specific logLevels were passed
+- Logger cleanup
 
 26.0.3
 - Added tests

@@ -7,3 +7,4 @@ node_modules
 cache
 .vagrant
 /coverage/lcov-report/*
+.nyc_output/*

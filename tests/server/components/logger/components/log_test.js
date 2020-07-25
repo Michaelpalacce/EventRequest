@@ -207,3 +207,53 @@ test({
 		done();
 	}
 });
+
+test({
+	message	: 'Log.processLog.when.message.is.Error',
+	test	: ( done ) => {
+		const logMessage	= new Error( 'Test' );
+		const log			= new Log( logMessage );
+
+		assert.deepStrictEqual( log.getMessage(), logMessage.stack );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Log.processLog.when.message.null',
+	test	: ( done ) => {
+		const log			= new Log( null );
+
+		assert.deepStrictEqual( log.getMessage(), '' );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Log.getRawMessage',
+	test	: ( done ) => {
+		const log			= new Log( null );
+
+		assert.deepStrictEqual( log.getRawMessage(), null );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Log.getInstance.when.log.is.already.instance.of.log.and.number.is.provided.overwrites.log.number',
+	test	: ( done ) => {
+		const log	= new Log( 'test', 200 );
+
+		assert.deepStrictEqual( log.getLevel(), 200 );
+
+		const logTwo	= Log.getInstance( log, 300 );
+
+		assert.deepStrictEqual( log.getLevel(), 300 );
+		assert.deepStrictEqual( logTwo.getLevel(), 300 );
+
+		done();
+	}
+});

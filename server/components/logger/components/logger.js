@@ -120,16 +120,21 @@ class Logger
 		if ( this.capture )
 		{
 			process.on( 'unhandledRejection', ( reason, p ) => {
-				let unhandledRejectionLog	= Log.getInstance({
+				const unhandledRejectionLog	= Log.getInstance({
 					level	: this.unhandledExceptionLevel,
-					message	: [reason + ' Unhandled Rejection at Promise: ' + p]
+					message	: [reason,' Unhandled Rejection at Promise: ', p]
 				});
 
-				this.log( unhandledRejectionLog ).then( () => {}, () => {} );
+				this.log( unhandledRejectionLog ).finally(() => {
+					/* istanbul ignore next */
+					if ( this.dieOnCapture )
+						process.exit( 1 );
+				});
 			});
 
+			/* istanbul ignore next */
 			process.on( 'uncaughtException', ( err ) => {
-				let uncaughtExceptionLog	= Log.getInstance({
+				const uncaughtExceptionLog	= Log.getInstance({
 					level	: this.unhandledExceptionLevel,
 					message	: err.stack
 				});
@@ -154,7 +159,7 @@ class Logger
 			let logLevel			= this.logLevels[key];
 			let objectProperties	= Object.getOwnPropertyNames( this.constructor.prototype );
 
-			if ( ! ( key in objectProperties ) )
+			if ( ! objectProperties.includes( key ) )
 			{
 				this[key]	= ( log, isRaw = false ) => {
 					log	= Log.getInstance( log, logLevel, isRaw );
@@ -174,9 +179,6 @@ class Logger
 	 */
 	addTransport( transport )
 	{
-		if ( ! Array.isArray( this.transports ) )
-			this.transports	= [];
-
 		if ( transport instanceof Transport )
 		{
 			this.transports.push( transport );

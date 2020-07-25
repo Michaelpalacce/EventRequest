@@ -1,7 +1,0 @@
-instrumentation:
-  root: .
-  extensions:
-    - .js
-  default-excludes: true
-  excludes: ['**/server/tester/**']
-  include-all-sources: true() => {

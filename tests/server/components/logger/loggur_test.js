@@ -113,6 +113,72 @@ test({
 });
 
 test({
+	message	: 'Loggur.enableDefault.enables.default.logger',
+	test	: ( done ) => {
+		const loggur	= helpers.getMockedLoggur();
+
+		loggur.disableDefault();
+		assert.deepStrictEqual( loggur.enableDefaultLogger, false );
+
+		loggur.enableDefault();
+		assert.deepStrictEqual( loggur.enableDefaultLogger, true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Loggur.setLogLevel.sets.log.level.of.default.logger.if.no.loggers.given',
+	test	: ( done ) => {
+		const loggur	= helpers.getMockedLoggur();
+
+		assert.deepStrictEqual( loggur.getDefaultLogger().logLevel, 600 );
+
+		loggur.setLogLevel( 100 );
+
+		assert.deepStrictEqual( loggur.getDefaultLogger().logLevel, 100 );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Loggur.setLogLevel.does.not.set.log.level.of.default.logger.if.it.is.disabled',
+	test	: ( done ) => {
+		const loggur	= helpers.getMockedLoggur();
+
+		assert.deepStrictEqual( loggur.getDefaultLogger().logLevel, 600 );
+
+		loggur.disableDefault();
+		loggur.setLogLevel( 100 );
+
+		assert.deepStrictEqual( loggur.getDefaultLogger().logLevel, 600 );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Loggur.setLogLevel.sets.log.level.of.all.loggers.if.loggers.are.given',
+	test	: ( done ) => {
+		const loggur	= helpers.getMockedLoggur();
+
+		loggur.addLogger( 'test1', {} );
+		loggur.addLogger( 'test2', {} );
+
+		assert.deepStrictEqual( loggur.getDefaultLogger().logLevel, 600 );
+
+		loggur.setLogLevel( 100 );
+
+		assert.deepStrictEqual( loggur.getLogger( 'test1' ).logLevel, 100 );
+		assert.deepStrictEqual( loggur.getLogger( 'test2' ).logLevel, 100 );
+		assert.deepStrictEqual( loggur.getDefaultLogger().logLevel, 600 );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Loggur getDefaultLogger configuration',
 	test	: ( done ) => {
 		let loggur			= helpers.getMockedLoggur();
@@ -131,6 +197,21 @@ test({
 		let loggur	= helpers.getMockedLoggur();
 		loggur.addLogger( 'nullLogger', { logLevel: 0 } );
 		assert.equal( loggur.log( 'test' ) instanceof Promise, true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Loggur.log.if.no.loggers.and.default.logger.is.disabled',
+	test	: async( done ) => {
+		const loggur	= helpers.getMockedLoggur();
+
+		loggur.disableDefault();
+
+		const result	= await loggur.log( 'test' );
+
+		assert.deepStrictEqual( result, [] );
 
 		done();
 	}

@@ -21,6 +21,7 @@ class Loggur
 		this.enableDefaultLogger	= true;
 		let uniqueId				= cluster.isMaster
 									? 'Master'
+									/* istanbul ignore next */
 									: 'Worker/' + process.pid;
 
 		Object.defineProperty( this, 'uniqueId', {
@@ -128,12 +129,12 @@ class Loggur
 	 */
 	log()
 	{
-		let loggersPromises	= [];
+		const loggersPromises	= [];
 		if ( Object.keys( this.loggers ).length !== 0 )
 		{
-			for ( let loggerId in this.loggers )
+			for ( const loggerId in this.loggers )
 			{
-				let logger	= this.loggers[loggerId];
+				const logger	= this.loggers[loggerId];
 				loggersPromises.push( logger.log.apply( logger, arguments ) );
 			}
 		}
@@ -141,7 +142,7 @@ class Loggur
 		{
 			if ( this.enableDefaultLogger )
 			{
-				let logger	= this.getDefaultLogger();
+				const logger	= this.getDefaultLogger();
 				loggersPromises.push( logger.log.apply( logger, arguments ) );
 			}
 		}

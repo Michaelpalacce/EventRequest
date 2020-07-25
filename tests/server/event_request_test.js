@@ -178,6 +178,102 @@ test({
 });
 
 test({
+	message	: 'EventRequest.send.when.response.is.not.given',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		let send			= false;
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: () => { send = true; },
+			called			: 1
+		});
+
+		eventRequest.send();
+
+		send	? done() : done( 'Send did not get called' );
+	}
+});
+
+test({
+	message	: 'EventRequest._send.with.defaults',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		let send			= false;
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: () => { send = true; },
+			called			: 1
+		});
+
+		eventRequest._send();
+
+		send	? done() : done( 'Send did not get called' );
+	}
+});
+
+test({
+	message	: 'EventRequest._send.with.malformed.payload',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		let send			= false;
+		eventRequest.response._mock({
+			method			: 'end',
+			with			: [['Malformed payload']],
+			shouldReturn	: () => { send = true; },
+			called			: 1
+		});
+
+		const circular	= {};
+		circular.a		= { b: circular };
+
+		eventRequest._send( circular );
+
+		send	? done() : done( 'Send did not get called' );
+	}
+});
+
+test({
+	message	: 'EventRequest.getRequestHeaderIfItDoesNotExist',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+
+		eventRequest._mock({
+			method			: 'hasRequestHeader',
+			shouldReturn	: true
+		});
+
+		assert.deepStrictEqual( eventRequest.getRequestHeader( 'non-existing', 'default' ), 'default' );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.send.when._send.throws.calls.handleError.for.the.error.handler',
+	test	: ( done ) => {
+		const eventRequest			= helpers.getEventRequest();
+		eventRequest.errorHandler	= new MockedErrorHandler();
+
+		eventRequest.errorHandler._mock({
+			method			: 'handleError',
+			called			: 1,
+			shouldReturn	: () => {
+				done();
+			}
+		});
+
+		eventRequest._mock({
+			method			: '_send',
+			shouldReturn	: () => {
+				throw new Error();
+			}
+		});
+
+		eventRequest.send();
+	}
+});
+
+test({
 	message	: 'EventRequest send calls response.end when raw',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
@@ -593,6 +689,46 @@ test({
 });
 
 test({
+	message	: 'EventRequest.next.when.next.is.called.when.request.is.finished.and.is.async',
+	test	: ( done ) => {
+		const eventRequest			= helpers.getEventRequest();
+		eventRequest.errorHandler	= new MockedErrorHandler();
+		eventRequest.errorHandler._mock({
+			method			: 'handleError',
+			shouldReturn	: () => { done(); },
+			with			: [[eventRequest, undefined]],
+			called			: 1
+		});
+
+		eventRequest._setBlock( [async () => {
+			throw new Error();
+		}] );
+
+		eventRequest.next();
+	}
+});
+
+test({
+	message	: 'EventRequest.next.when.next.is.called.when.request.is.finished.and.is.async',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest();
+
+		eventRequest._setBlock( [async ( event ) => {
+			event.send( '' );
+
+			throw new Error();
+		}] );
+
+		eventRequest.next();
+
+		setTimeout(()=>{
+			// A bit of a weird test.. but basically nothing should happen in this test
+			done();
+		}, 50 );
+	}
+});
+
+test({
 	message	: 'EventRequest.next handles thrown errors',
 	test	: ( done ) => {
 		const eventRequest			= helpers.getEventRequest();
@@ -868,7 +1004,6 @@ test({
 		done();
 	}
 });
-
 
 test({
 	message	: 'EventRequest.next sends 404 if route does not exist',

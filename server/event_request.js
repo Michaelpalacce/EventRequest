@@ -32,7 +32,7 @@ class EventRequest extends EventEmitter
 		});
 
 		this.query			= parsedUrl.query;
-		this.clientIp		= request.connection === undefined ? false : request.connection.remoteAddress;
+		this.clientIp		= request.connection.remoteAddress;
 		this.path			= parsedUrl.pathname.trim();
 		this.method			= request.method.toUpperCase();
 		this.headers		= request.headers;
@@ -128,7 +128,7 @@ class EventRequest extends EventEmitter
 		for( const optionName in options )
 		{
 			if ( optionName.toLowerCase() === 'expires' || optionName.toLowerCase() === 'max-age' )
-				options[optionName]	= new Date( new Date().getTime() + options[optionName] * 1000 )
+				options[optionName]	= new Date( new Date().getTime() + options[optionName] * 1000 );
 
 			cookie	+= ` ${optionName}=${options[optionName]};`;
 		}
@@ -264,7 +264,7 @@ class EventRequest extends EventEmitter
 	 * @param	{String} key
 	 * @param	{String} [defaultValue=null]
 	 *
-	 * @return	mixed
+	 * @return	String
 	 */
 	getRequestHeader( key, defaultValue = null )
 	{
@@ -389,10 +389,8 @@ class EventRequest extends EventEmitter
 				{
 					response.catch(( error ) => {
 						setImmediate(() => {
-
 							if ( ! this.isFinished() )
 								this.next( error );
-
 						});
 					});
 				}

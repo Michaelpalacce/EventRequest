@@ -57,7 +57,7 @@ helpers.getTestFile	= () => {
  * @return	String
  */
 helpers.getTestFilePath	= () => {
-	return path.join( path.dirname( require.main.filename ), helpers.getTestFile() );
+	return helpers.getTestFile();
 };
 
 /**
@@ -176,6 +176,7 @@ helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '',
  * 			user's work easier
  */
 let tester		= new Tester();
+
 module.exports	= {
 	tester,
 	Mock,

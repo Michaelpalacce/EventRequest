@@ -1,7 +1,8 @@
 'use strict';
 
-const { assert, test }	= require( '../../../test_helper' );
-const Bucket			= require( '../../../../server/components/rate_limiter/bucket' );
+const { Mock, assert, test }	= require( '../../../test_helper' );
+const DataServer				= require( '../../../../server/components/caching/data_server' );
+const Bucket					= require( '../../../../server/components/rate_limiter/bucket' );
 
 test({
 	message	: 'Bucket.constructor on defaults',
@@ -13,6 +14,74 @@ test({
 			assert.equal( bucket.maxAmount, 1000 );
 			assert.equal( bucket.refillAmount, 100 );
 			done();
+		});
+	}
+});
+
+test({
+	message	: 'Bucket.handleError.on.error.throws',
+	test	: ( done ) => {
+		const MockDataServer	= Mock( DataServer );
+		const dataServer		= new MockDataServer();
+		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
+
+		process.once( 'uncaughtException', ( reason, p ) => {
+			done();
+		});
+
+		bucket.init().then( async () => {
+			dataServer._mock({
+				method			: 'set',
+				shouldReturn	: async () => {
+					throw new Error( 'error' );
+				}
+			});
+
+			await bucket._setValue( 'test' );
+		});
+	}
+});
+
+test({
+	message	: 'Bucket._doLock.if.max.counter.is.reached',
+	test	: ( done ) => {
+		const MockDataServer	= Mock( DataServer );
+		const dataServer		= new MockDataServer();
+		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
+
+		bucket.init().then( async () => {
+			dataServer._mock({
+				method			: 'lock',
+				shouldReturn	: async () => {
+					return false;
+				}
+			});
+
+			const promise	= new Promise( ( resolve, reject ) => {
+				bucket._doLock( resolve, reject, 0 ).catch( done );
+			});
+
+			promise.then(( status ) => { status === false ? done() : done( `Status should have been false but is ${status}` ); }).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Bucket.reduce.when.cannot.obtain.lock',
+	test	: ( done ) => {
+		const MockDataServer	= Mock( DataServer );
+		const dataServer		= new MockDataServer();
+		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
+
+		bucket.init().then( async () => {
+			dataServer._mock({
+				method			: 'lock',
+				shouldReturn	: async () => {
+					return false;
+				}
+			});
+
+			await bucket.reduce().catch( done ) === false ? done() : done( 'Should not have reduced' );
 		});
 	}
 });

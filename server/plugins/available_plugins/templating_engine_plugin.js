@@ -37,7 +37,7 @@ class TemplatingEnginePlugin extends PluginInterface
 								? templateName + '.html'
 								: 'index.html';
 
-				readFile( path.join( this.templateDir, templateName ), 'utf8' ).then( html => {
+				readFile( path.join( this.templateDir, templateName ), 'utf8' ).then( ( html ) => {
 					if ( html && html.length > 0  && ! this.isFinished() )
 					{
 						try
