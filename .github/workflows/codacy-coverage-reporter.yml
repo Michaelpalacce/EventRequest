@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@main
+        uses: codacy/codacy-coverage-reporter-action@master
         with:
           project-token: f0fdcfc826ef4a0aaff49120a624fcae
-          coverage-reports: ./coverage/coverage.json,./coverage/lcov.info
+          coverage-reports: ./coverage/lcov.info
