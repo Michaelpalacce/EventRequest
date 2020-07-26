@@ -1,38 +1,32 @@
 'use strict';
 
 // Dependencies
-const path			= require( 'path' );
-const fs			= require( 'fs' );
+const path					= require( 'path' );
+const fs					= require( 'fs' );
+const AbstractFileStream	= require( './abstract_file_stream' );
 
 /**
  * @brief	The type of file this stream supports
  *
  * @var		String
  */
-const STREAM_TYPE	= 'video';
+const STREAM_TYPE		= 'video';
+
+/**
+ * @brief	The supported file extensions
+ *
+ * @var		Array
+ */
+const SUPPORTED_TYPES	= ['.mp4', '.webm'];
 
 /**
  * @brief	Used to stream mp4 and webm files
  */
-class VideoFileStream
+class VideoFileStream extends AbstractFileStream
 {
 	constructor()
 	{
-		this.SUPPORTED_FORMATS	= ['.mp4', '.webm'];
-		this._streamType		= STREAM_TYPE;
-	}
-
-	/**
-	 * @brief	Check whether the given file is supported by the file stream
-	 *
-	 * @param	{String} file
-	 *
-	 * @return	Boolean
-	 */
-	supports( file )
-	{
-		const parsedPath	= path.parse( file );
-		return this.SUPPORTED_FORMATS.indexOf( parsedPath.ext.toLowerCase() ) !== -1;
+		super( SUPPORTED_TYPES, STREAM_TYPE );
 	}
 
 	/**
@@ -76,16 +70,6 @@ class VideoFileStream
 		event.emit( 'stream_start', { stream } );
 
 		return stream;
-	}
-
-	/**
-	 * @brief	Gets the type of file this stream supports
-	 *
-	 * @return	String
-	 */
-	getType()
-	{
-		return this._streamType;
 	}
 }
 

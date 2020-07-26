@@ -15,7 +15,7 @@ testSuites.securitySuite		= () => {
 	require( './server/components/security/content_security_policy_test' );
 	require( './server/components/security/content_type_options_test' );
 	require( './server/components/security/expect_ct_test' );
-	require( './server/components/security/http_strict_transport_security' );
+	require( './server/components/security/http_strict_transport_security_test' );
 };
 
 testSuites.routingSuite		= () => {

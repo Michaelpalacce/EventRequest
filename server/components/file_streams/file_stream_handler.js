@@ -17,8 +17,7 @@ module.exports			= {
 	 *
 	 * @return	VideoFileStream|AudioFileStream|ImageFileStream|TextFileStream|null
 	 */
-	getFileStreamerForType	: function( file )
-	{
+	getFileStreamerForType	: ( file ) => {
 		const fileStreams	= [
 			new VideoFileStream(),
 			new AudioFileStream(),
@@ -26,11 +25,14 @@ module.exports			= {
 			new TextFileStream()
 		];
 
-		if ( ! fs.existsSync( file ) )
+		if ( typeof file !== 'string' || ! fs.existsSync( file ) )
 			return null;
 
 		for ( const index in fileStreams )
 		{
+			if ( ! {}.hasOwnProperty.call( fileStreams, index ) )
+				continue;
+
 			const fileStream	= fileStreams[index];
 			if ( fileStream.supports( file ) )
 			{

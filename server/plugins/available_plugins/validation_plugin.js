@@ -61,7 +61,7 @@ class ValidationPlugin extends PluginInterface
 			}
 
 			event.next();
-		}
+		};
 	}
 }
 

@@ -1,3 +1,8 @@
+26.0.5
+- Added more tests
+- Codacy code improvements
+- The file streams now have an abstract class behind them to remove code duplication
+
 26.0.4
 - Added more tests
 - Codacy code improvements

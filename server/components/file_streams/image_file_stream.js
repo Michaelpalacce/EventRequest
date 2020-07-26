@@ -1,41 +1,33 @@
 'use strict';
 
 // Dependencies
-const path			= require( 'path' );
-const fs			= require( 'fs' );
-
+const fs					= require( 'fs' );
+const AbstractFileStream	= require( './abstract_file_stream' );
 
 /**
  * @brief	The type of file this stream supports
  *
  * @var		String
  */
-const STREAM_TYPE	= 'image';
+const STREAM_TYPE		= 'image';
+
+/**
+ * @brief	The supported file extensions
+ *
+ * @var		Array
+ */
+const SUPPORTED_TYPES	= [
+	'.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
+];
 
 /**
  * @brief	Used to stream text files
  */
-class ImageFileStream
+class ImageFileStream extends AbstractFileStream
 {
 	constructor()
 	{
-		this.SUPPORTED_FORMATS	= [
-			'.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
-		];
-		this._streamType		= STREAM_TYPE;
-	}
-
-	/**
-	 * @brief	Check whether the given file is supported by the file stream
-	 *
-	 * @param	{String} file
-	 *
-	 * @return	Boolean
-	 */
-	supports( file )
-	{
-		const parsedPath	= path.parse( file );
-		return this.SUPPORTED_FORMATS.indexOf( parsedPath.ext.toLowerCase() ) !== -1;
+		super( SUPPORTED_TYPES, STREAM_TYPE );
 	}
 
 	/**
@@ -54,16 +46,6 @@ class ImageFileStream
 		event.emit( 'stream_start', { stream } );
 
 		return stream;
-	}
-
-	/**
-	 * @brief	Gets the type of file this stream supports
-	 *
-	 * @return	String
-	 */
-	getType()
-	{
-		return this._streamType;
 	}
 }
 
