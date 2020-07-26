@@ -232,8 +232,13 @@ class Router extends PluginInterface
 
 				this.middleware			= this.middleware.concat( secondMiddleware );
 				const routerMiddlewares	= second.globalMiddlewares;
+
 				for ( const [key, value] of Object.entries( routerMiddlewares ) )
 					this.define( key, value );
+			}
+			else
+			{
+				throw new Error( 'Invalid middleware added!' );
 			}
 		}
 		else
@@ -274,6 +279,7 @@ class Router extends PluginInterface
 
 		for ( let index in this.middleware )
 		{
+			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this.middleware, index ) )
 				continue;
 
@@ -420,6 +426,7 @@ class Router extends PluginInterface
 		{
 			for ( const key in this.cache )
 			{
+				/* istanbul ignore next */
 				if ( ! {}.hasOwnProperty.call( this.cache, key ) )
 					continue;
 

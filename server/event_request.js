@@ -127,6 +127,7 @@ class EventRequest extends EventEmitter
 
 		for( const optionName in options )
 		{
+			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( options, optionName ) )
 				continue;
 

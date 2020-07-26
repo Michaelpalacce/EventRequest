@@ -40,6 +40,157 @@ test({
 });
 
 test({
+	message			: 'ValidationRules.getLength.when.value.is.not.passed',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.getLength(), -1 );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.getLength.when.value.is.object',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.getLength( { test: 'hey' } ), 1 );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.getLength.when.value.matches.nothing',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.getLength( true ), -1 );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertIsDate.when.is.date',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertIsDate( '2020/07/26 00:00:00' ), true );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertIsDate.when.not.date',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertIsDate(), false );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertNotDate.when.is.date',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertNotDate( '2020/07/26 00:00:00' ), false );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertNotDate.when.not.date',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertNotDate(), true );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertNotDateObject.when.is.date',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertNotDateObject( new Date() ), false );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertNotDateObject.when.not.date',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertNotDateObject(), true );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertNotValidEmail.when.valid',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertNotValidEmail( 'test@example.com' ), false );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertNotValidEmail.when.invalid',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertNotValidEmail( 'test' ), true );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertBiggerThan',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertBiggerThan( 10, 5 ), true );
+		assert.deepStrictEqual( ValidationRules.assertBiggerThan( 10, 50 ), false );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertSmallerThan',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertSmallerThan( 10, 5 ), false );
+		assert.deepStrictEqual( ValidationRules.assertSmallerThan( 10, 50 ), true );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertFalse.when.not.false',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertFalse(), false );
+
+		done();
+	}
+});
+
+test({
+	message			: 'ValidationRules.assertIsBoolean',
+	test			: ( done ) => {
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( true ), true );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( 1 ), true );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( 'true' ), true );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( '1' ), true );
+
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( false ), true );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( 0 ), true );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( 'false' ), true );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( '0' ), true );
+
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( 11 ), false );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( '11' ), false );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( 'wrong' ), false );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( [] ), false );
+		assert.deepStrictEqual( ValidationRules.assertIsBoolean( {} ), false );
+
+		done();
+	}
+});
+
+test({
 	message			: 'ValidationRules assertNotEqual',
 	dataProvider	: [
 		[0, 0, false],

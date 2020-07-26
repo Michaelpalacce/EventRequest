@@ -148,28 +148,29 @@ class DataServer extends EventEmitter
 	 * @param	{String} key
 	 * @param	{Object} options
 	 *
-	 * @return	Promise|null
+	 * @return	Promise
 	 */
 	async get( key, options = {} )
 	{
 		if ( typeof key !== 'string' || typeof options !== 'object' )
 			return null;
 
-		this.emit( 'get', { key, options } );
-		return this._get( key, options ).catch( this._handleServerDown.bind( this ) ) || null;
+		return this._get( key, options ).catch( this._handleServerDown.bind( this, null ) );
 	}
 
 	/**
 	 * @brief	Any operations with the data server should reject if the data server is not responding
 	 *
-	 * @return	void
+	 * @return	*
 	 */
-	_handleServerDown()
+	_handleServerDown( returnValue = null )
 	{
 		const error	= 'The data server is not responding';
 
 		Loggur.log( error, Loggur.LOG_LEVELS.error );
 		this.emit( 'serverError', { error } );
+
+		return returnValue;
 	}
 
 	/**
@@ -216,8 +217,7 @@ class DataServer extends EventEmitter
 			return null;
 		}
 
-		this.emit( 'set', { key, value, ttl, options } );
-		return this._set( key, value, ttl, options ).catch( this._handleServerDown.bind( this ) );
+		return this._set( key, value, ttl, options ).catch( this._handleServerDown.bind( this, null ) );
 	}
 
 	/**
@@ -227,12 +227,12 @@ class DataServer extends EventEmitter
 	 *
 	 * @param	{String} key
 	 * @param	{*} value
-	 * @param	{Number} [ttl=0]
-	 * @param	{Object} [options={}]
+	 * @param	{Number} ttl
+	 * @param	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _set( key, value, ttl, options = {} )
+	async _set( key, value, ttl, options )
 	{
 		return new Promise(( resolve ) => {
 			const persist	= typeof options.persist !== 'boolean'
@@ -251,7 +251,7 @@ class DataServer extends EventEmitter
 	 * @param	{Number} [value=1]
 	 * @param	{Object} [options={}]
 	 *
-	 * @return	Promise|null
+	 * @return	Promise
 	 */
 	async increment( key, value = 1, options = {} )
 	{
@@ -263,9 +263,7 @@ class DataServer extends EventEmitter
 			return false;
 		}
 
-		this.emit( 'increment', { key, value, options } );
-
-		return this._increment( key, value, options ).catch( this._handleServerDown.bind( this ) );
+		return this._increment( key, value, options ).catch( this._handleServerDown.bind( this, false ) );
 	}
 
 	/**
@@ -274,21 +272,21 @@ class DataServer extends EventEmitter
 	 * @details	Does no async operations intentionally
 	 *
 	 * @param	{String} key
-	 * @param	{Number} [value=1]
-	 * @param	{Object} [options={}]
+	 * @param	{Number} value
+	 * @param	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _increment( key, value = 1, options = {} )
+	async _increment( key, value, options )
 	{
 		return new Promise( async ( resolve, reject ) => {
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
-				resolve( false );
+				return resolve( false );
 
 			if ( typeof dataSet.value !== 'number' )
-				resolve( false );
+				return resolve( false );
 
 			dataSet.value	+= value;
 			dataSet.ttl		= this._getExpirationDateFromTtl( dataSet.ttl );
@@ -306,7 +304,7 @@ class DataServer extends EventEmitter
 	 * @param	{Number} [value=1]
 	 * @param	{Object} [options={}]
 	 *
-	 * @return	Promise|null
+	 * @return	Promise
 	 */
 	async decrement( key, value = 1, options = {} )
 	{
@@ -318,9 +316,7 @@ class DataServer extends EventEmitter
 			return false;
 		}
 
-		this.emit( 'decrement', { key, value, options } );
-
-		return this._decrement( key, value, options ).catch( this._handleServerDown.bind( this ) );
+		return this._decrement( key, value, options ).catch( this._handleServerDown.bind( this, false ) );
 	}
 
 	/**
@@ -329,21 +325,21 @@ class DataServer extends EventEmitter
 	 * @details	Does no async operations intentionally
 	 *
 	 * @param	{String} key
-	 * @param	{Number} [value=1]
-	 * @param	{Object} [options={}]
+	 * @param	{Number} value
+	 * @param	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _decrement( key, value = 1, options = {} )
+	async _decrement( key, value, options )
 	{
 		return new Promise( async ( resolve, reject ) => {
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
-				resolve( false );
+				return resolve( false );
 
 			if ( typeof dataSet.value !== 'number' )
-				resolve( false );
+				return resolve( false );
 
 			dataSet.value	-= value;
 			dataSet.ttl		= this._getExpirationDateFromTtl( dataSet.ttl );
@@ -367,20 +363,18 @@ class DataServer extends EventEmitter
 		if ( typeof key !== 'string' || typeof options !== 'object' )
 			return false;
 
-		this.emit( 'lock', { key, options } );
-
-		return this._lock( key, options ).catch( this._handleServerDown.bind( this ) );
+		return this._lock( key, options ).catch( this._handleServerDown.bind( this, false ) );
 	}
 
 	/**
 	 * @brief	Locking mechanism. Will return a boolean if the lock was ok
 	 *
 	 * @param	{String} key
-	 * @param	{Object} [options={}]
+	 * @param	{Object} options
 	 *
 	 * @return	Boolean
 	 */
-	async _lock( key, options = {} )
+	async _lock( key, options )
 	{
 		return new Promise(( resolve ) => {
 			const ttl		= -1;
@@ -408,20 +402,18 @@ class DataServer extends EventEmitter
 		if ( typeof key !== 'string' || typeof options !== 'object' )
 			return false;
 
-		this.emit( 'unlock', { key, options } );
-
-		return this._unlock( key, options ).catch( this._handleServerDown.bind( this ) );
+		return this._unlock( key, options ).catch( this._handleServerDown.bind( this, false ) );
 	}
 
 	/**
 	 * @brief	Releases the key
 	 *
 	 * @param	{String} key
-	 * @param	{Object} [options={}]
+	 * @param	{Object} options
 	 *
 	 * @return	Boolean
 	 */
-	async _unlock( key, options = {} )
+	async _unlock( key, options )
 	{
 		return new Promise(( resolve ) => {
 			const exists	= typeof this.server[key] !== 'undefined';
@@ -464,25 +456,22 @@ class DataServer extends EventEmitter
 	{
 		if ( typeof key !== 'string' || typeof ttl !== 'number' || typeof options !== 'object' )
 		{
-			return new Promise(( resolve ) => {
-				resolve( false );
-			});
+			return false;
 		}
 
-		this.emit( 'touch', { key, ttl, options } );
-		return this._touch( key, ttl, options ).catch( this._handleServerDown.bind( this ) );
+		return this._touch( key, ttl, options ).catch( this._handleServerDown.bind( this, false ) );
 	}
 
 	/**
 	 * @brief	Touches the key
 	 *
 	 * @param	{String} key
-	 * @param	{Number} [ttl=0]
-	 * @param	{Object} [options={}]
+	 * @param	{Number} ttl
+	 * @param	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _touch( key, ttl = 0, options = {} )
+	async _touch( key, ttl, options )
 	{
 		return new Promise( async ( resolve ) => {
 			const dataSet	= await this._prune( key );
@@ -500,11 +489,11 @@ class DataServer extends EventEmitter
 	 * @brief	Removes a key if it is expired, otherwise, return it
 	 *
 	 * @param	{String} key
-	 * @param	{Object} [options={}]
+	 * @param	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _prune( key, options = {} )
+	async _prune( key, options )
 	{
 		return new Promise( async ( resolve ) => {
 			const now		= new Date().getTime() / 1000;
@@ -539,26 +528,20 @@ class DataServer extends EventEmitter
 	async delete( key, options = {} )
 	{
 		if ( typeof key === 'string' && typeof options === 'object' )
-		{
-			this.emit( 'delete', { key, options } );
+			return this._delete( key, options ).catch( this._handleServerDown.bind( this, false ) );
 
-			return this._delete( key, options ).catch( this._handleServerDown.bind( this ) );
-		}
-
-		return new Promise(( resolve ) => {
-			resolve( false );
-		});
+		return false;
 	}
 
 	/**
 	 * @brief	Deletes the key from the server
 	 *
 	 * @param	{String} key
-	 * @param	{Object} [options={}]
+	 * @param	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	_delete( key, options = {} )
+	_delete( key, options )
 	{
 		return new Promise(( resolve ) => {
 			if ( typeof this.server[key] === 'undefined' )
@@ -578,6 +561,7 @@ class DataServer extends EventEmitter
 	 *
 	 * @return	Number
 	 */
+	/* istanbul ignore next */
 	length()
 	{
 		return Object.keys( this.server ).length;
@@ -609,6 +593,7 @@ class DataServer extends EventEmitter
 		let serverData	= {};
 		for ( const key in this.server )
 		{
+			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this.server, key ) )
 				continue;
 
@@ -631,20 +616,21 @@ class DataServer extends EventEmitter
 			const writeStream		= fs.createWriteStream( this.persistPath );
 			readableStream.pipe( writeStream );
 
+			/* istanbul ignore next */
 			readableStream.on( 'error', ( error ) => {
-				Loggur.log( error, Loggur.LOG_LEVELS.error );
 				this.emit( '_saveDataError', { error } );
 			});
 
+			/* istanbul ignore next */
 			writeStream.on( 'error', ( error ) => {
-				Loggur.log( error, Loggur.LOG_LEVELS.error );
 				this.emit( '_saveDataError', { error } );
 			});
 
 			writeStream.on( 'close', () => {
 				this.emit( '_saveData' );
+
+				/* istanbul ignore next */
 				unlink( tmpFile ).catch( ( error ) => {
-					Loggur.log( error, Loggur.LOG_LEVELS.error );
 					this.emit( '_saveDataError', { error } );
 				});
 			});
@@ -666,7 +652,8 @@ class DataServer extends EventEmitter
 		}
 		catch ( error )
 		{
-			Loggur.log( error, Loggur.LOG_LEVELS.error );
+			/* istanbul ignore next */
+			serverData	= {};
 		}
 
 		const currentServerData	= this.server;

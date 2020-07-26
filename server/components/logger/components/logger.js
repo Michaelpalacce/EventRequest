@@ -115,6 +115,7 @@ class Logger
 	 *
 	 * @return	void
 	 */
+	/* istanbul ignore next */
 	attachUnhandledEventListener()
 	{
 		if ( this.capture )
@@ -126,13 +127,11 @@ class Logger
 				});
 
 				this.log( unhandledRejectionLog ).finally(() => {
-					/* istanbul ignore next */
 					if ( this.dieOnCapture )
 						process.exit( 1 );
 				});
 			});
 
-			/* istanbul ignore next */
 			process.on( 'uncaughtException', ( err ) => {
 				const uncaughtExceptionLog	= Log.getInstance({
 					level	: this.unhandledExceptionLevel,
@@ -156,6 +155,7 @@ class Logger
 	{
 		for ( let key in this.logLevels )
 		{
+			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this.logLevels, key ) )
 				continue;
 

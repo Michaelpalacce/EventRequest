@@ -66,11 +66,6 @@ class Route
 							: DEFAULT_ROUTE_HANDLER;
 
 		this.middlewares	= this.parseGlobalMiddlewares( routeConfig );
-
-		if ( this.handler === null )
-		{
-			throw new Error( 'Invalid middleware added!' );
-		}
 	}
 
 	/**

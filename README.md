@@ -2007,14 +2007,6 @@ integrated with other plugins.
 **stop()**
 - Emitted when the server is stopping
 
-**touch( { String key, Number ttl, Object options } )**
-**get( { String key, Object options } )**
-**lock( { String key, Object options } )**
-**unlock( { String key, Object options } )**
-**delete( { String key, Object options } )**
-**set( { String key, mixed value, Number ttl, Object options } )**
-**increment( { String key, mixed value, Object options } )**
-**decrement( { String key, mixed value, Object options } )**
 
 #### Functions:
 **stop(): void**
@@ -2032,11 +2024,10 @@ integrated with other plugins.
 - This method is the protected method that should be implemented in case extension of the DataServer should be done
 - It is called in the constructor to create the cache file we will be using if persistence is enabled
 
-**get( String key, Object options ): Promise: Object|null** 
+**get( String key, Object options = {} ): Promise: Object|null** 
 - Retrieves the value given a key. Returns null if the key does not exist.
 - This function is a 'public' method to be used by users.
 - In the case that you want to implement your own DataServer, you should override **_get( String key )**
-- Emits a get event
 
 **_get( String key, Object options ): Promise: mixed|null** 
 - This method is the protected method that should be implemented in case extension of the DataServer should be done
@@ -2045,7 +2036,7 @@ integrated with other plugins.
 - This method also sets the expiration of the DataSet to Infinity if it is null.
 - This will return the value set by set()
 
-**set( String key, mixed value, Number ttl = 0, Object options ): Promise: Object|null** 
+**set( String key, mixed value, Number ttl = 0, Object options = {} ): Promise: Object|null** 
 - Returns the data if it was set, otherwise returns null
 - Sets the given key with the given value. 
 - ttl is the time in **seconds** that the data will be kept.
@@ -2053,9 +2044,8 @@ integrated with other plugins.
 - If ttl is 0 then the Default TTL will be used.
 - If ttl is > 0 then the value will be used
 - Calls _set() after checking the arguments if they are valid
-- Emits a set event
 
-**_set( String key, mixed value, Number ttl = 0, Object options ): Promise: Object|null** 
+**_set( String key, mixed value, Number ttl, Object options ): Promise: Object|null** 
 - Implement for development. No need to do checks of the values of the parameter as that is done in the set() function
 - This function commits the key/value to memory with all it's attributes
 - If the dataSet existed, then a key 'isNew' must be set to true or false
@@ -2066,49 +2056,45 @@ However if the global persist is set to false, this will not work
 **_makeDataSet( String key, mixed value, Number ttl, Boolean persist ): Object**  
 - Forms the dataSet object and returns it in the following format: `{ key, value, ttl, expirationDate, persist };`
 
-**touch( String key, Number ttl = 0, Object options ): Promise: Boolean**
+**touch( String key, Number ttl = 0, Object options = {} ): Promise: Boolean**
 - Returns a Boolean whether the data was successfully touched
 - Returns a false if key is not String or ttl is not Number
 - Calls _touch after checking if arguments are valid
-- Emits a touch event
 
-**_touch( String key, Number ttl = 0, Object options ): Promise: Boolean**
+**_touch( String key, Number ttl, Object options ): Promise: Boolean**
 - Implement for development. No need to do checks of the values of the parameter as that is done in the touch() function
 - Returns a Boolean whether the data was successfully touched
 - If ttl = 0 then the dataSet will be updated with it's own ttl
 - This function actually touches the data
 
-**decrement( String key, Number value = 1, Object options ): Promise: Boolean**
+**decrement( String key, Number value = 1, Object options = {} ): Promise: Boolean**
 - If value is not a number, returns false
 - If the data was not set correctly returns false
 - If the data to decrement was not set correctly returns false
 - If the data to decrement was not numeric returns false
 - Calls _decrement() after checking for validity of data
-- Emits a decrement event
 - The ttl of the value will be extended by it's original ttl
 
-**_decrement( String key, Number value = 1, Object options ): Promise: Boolean**
+**_decrement( String key, Number value, Object options ): Promise: Boolean**
 - Implement for development. No need to do checks of the values of the parameter as that is done in the decrement() function
 - Retrieves, decrements and then saves the new dataset 
 - If the operation is successfully done, returns true
 
-**increment( String key, Number value = 1, Object options ): Promise: Boolean**
+**increment( String key, Number value = 1, Object options = {} ): Promise: Boolean**
 - If value is not a number, returns false
 - If the data was not set correctly returns false
 - If the data to increment was not set correctly returns false
 - If the data to increment was not numeric returns false
 - Calls _increment() after checking for validity of data
-- Emits an increment event
 - The ttl of the value will be extended by it's original ttl
 
-**_increment( String key, Number value = 1, Object options ): Promise: Boolean**
+**_increment( String key, Number value, Object options ): Promise: Boolean**
 - Implement for development. No need to do checks of the values of the parameter as that is done in the increment() function
 - Retrieves, increment and then saves the new dataset 
 - If the operation is successfully done, returns true
 
-**delete( String key, Object options ): Promise: Boolean**
+**delete( String key, Object options = {} ): Promise: Boolean**
 - Deletes the given data
-- Emits a delete event
 - WIll return false if arguments are invalid
 
 **_delete( String key, Object options ): Promise: Boolean**
@@ -2116,9 +2102,8 @@ However if the global persist is set to false, this will not work
 - This function deletes the actual data
 - Will return true always
 
-**lock( String key, Object options ): Promise: Boolean**
+**lock( String key, Object options = {} ): Promise: Boolean**
 - Acquires a lock given a key.
-- Emits a lock event
 - This calls _lock
 
 **_lock( String key, Object options ): Promise: Boolean**
@@ -2126,9 +2111,8 @@ However if the global persist is set to false, this will not work
 - Acquires a lock given a key.
 - This will return true only if there is no key like that in the DataServer, otherwise return false
 
-**unlock( String key, Object options ): Promise: Boolean**
+**unlock( String key, Object options = {} ): Promise: Boolean**
 - Releases a lock
-- Emits a unlock event
 - This calls _unlock
 
 **_unlock( String key, Object options ): Promise: Boolean**

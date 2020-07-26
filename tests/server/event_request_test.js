@@ -921,7 +921,6 @@ test({
 	message: 'EventRequest.setCookie.with.hasOwnProperty',
 	test: ( done ) => {
 		const eventRequest		= helpers.getEventRequest();
-		let setCookieArguments	= ['key', 'value', { __proto__: 'hey' }];
 
 		eventRequest._mock({
 			method			: 'setResponseHeader',
@@ -932,7 +931,7 @@ test({
 			}
 		});
 
-		eventRequest.setCookie.apply( eventRequest, setCookieArguments );
+		eventRequest.setCookie( 'key', 'value', { __proto__: 'hey' } );
 	}
 });
 

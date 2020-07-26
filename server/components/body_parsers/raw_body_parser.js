@@ -49,9 +49,6 @@ class RawBodyParser extends EventEmitter
 			let rawBody		= [];
 			let payloadLength	= 0;
 
-			if ( ! this.supports( event ) )
-				return reject( 'Body type not supported' );
-
 			event.request.on( 'data', ( data ) =>
 			{
 				if ( ! event.isFinished() )

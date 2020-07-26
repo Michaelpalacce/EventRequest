@@ -29,6 +29,81 @@ test({
 });
 
 test({
+	message	: 'Router.enableCaching.with.defaults',
+	test	: ( done ) => {
+		let router	= new Router();
+
+		assert.deepStrictEqual( router.cachingIsEnabled, true );
+
+		router.enableCaching( false );
+
+		assert.deepStrictEqual( router.cachingIsEnabled, false );
+
+		router.enableCaching();
+
+		assert.deepStrictEqual( router.cachingIsEnabled, true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.setKeyLimit.with.defaults',
+	test	: ( done ) => {
+		let router	= new Router();
+
+		assert.deepStrictEqual( router.keyLimit, 5000 );
+
+		router.setKeyLimit( 100 );
+
+		assert.deepStrictEqual( router.keyLimit, 100 );
+
+		router.setKeyLimit();
+
+		assert.deepStrictEqual( router.keyLimit, 5000 );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.get.post.etc.with.invalid.middleware',
+	test	: ( done ) => {
+		let router	= new Router();
+
+		assert.throws(() => {
+			router.get();
+		});
+
+		assert.throws(() => {
+			router.post();
+		});
+
+		assert.throws(() => {
+			router.put();
+		});
+
+		assert.throws(() => {
+			router.delete();
+		});
+
+		assert.throws(() => {
+			router.head();
+		});
+
+		assert.throws(() => {
+			router.patch();
+		});
+
+		assert.throws(() => {
+			router.copy();
+		});
+
+		done();
+	}
+});
+
+test({
 	message	: 'Router.add adds a valid middleware',
 	test	: ( done ) => {
 		let router			= new Router();
@@ -39,6 +114,87 @@ test({
 		});
 
 		assert.deepStrictEqual( [defaultRoute], router.middleware );
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add.with.2.invalid.arguments',
+	test	: ( done ) => {
+		const router	= new Router();
+
+		assert.throws( () => {
+			router.add( 'wrong', 'wrong' );
+		});
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add.another.router.with.middleware.with.regex.removes.^.if.present',
+	test	: ( done ) => {
+		const router	= new Router();
+
+		const routerTwo	= new Router();
+		routerTwo.get( /^\/test/, () => {} );
+
+		router.add( '/users', routerTwo );
+
+		assert.deepStrictEqual( router.middleware.length, 1 );
+		assert.deepStrictEqual( router.middleware[0].getRoute(), /\/users\/test/ );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add.another.router.adds.global.middlewares.as.well',
+	test	: ( done ) => {
+		const router		= new Router();
+		const routerTwo		= new Router();
+
+		const middleware	= () => {};
+		routerTwo.define( 'test', middleware );
+
+		router.add( routerTwo );
+
+		assert.deepStrictEqual( Object.keys( router.globalMiddlewares ).length, 1 );
+		assert.deepStrictEqual( router.globalMiddlewares.test, middleware );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add.another.router.adds.global.middlewares.as.well.if.adding.with.route',
+	test	: ( done ) => {
+		const router		= new Router();
+		const routerTwo		= new Router();
+
+		const middleware	= () => {};
+		routerTwo.define( 'test', middleware );
+
+		router.add( '/user', routerTwo );
+
+		assert.deepStrictEqual( Object.keys( router.globalMiddlewares ).length, 1 );
+		assert.deepStrictEqual( router.globalMiddlewares.test, middleware );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add.throws.if.middleware.does.not.exist',
+	test	: ( done ) => {
+		const router	= new Router();
+
+		router.get( '/', 'test', () => {} );
+
+		assert.throws(() => {
+			router.getExecutionBlockForCurrentEvent( helpers.getEventRequest( 'GET', '/' ) );
+		});
+
 		done();
 	}
 });
@@ -72,7 +228,7 @@ test({
 });
 
 test({
-	message	: 'Router.add adds another router\'s middleware if passed',
+	message	: 'Router.add.adds.another.router\'s middleware if passed',
 	test	: ( done ) => {
 		let routerOne		= new Router();
 		let routerTwo		= new Router();
@@ -160,6 +316,67 @@ test({
 	test	: ( done ) => {
 		assert.equal( Router.matchMethod( 'GET', 'GET' ), true );
 		assert.equal( Router.matchMethod( 'POST', 'GET' ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.matchMethod.on.error',
+	test	: ( done ) => {
+		assert.equal( Router.matchMethod( 'POST', {} ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.matchRoute.on.error',
+	test	: ( done ) => {
+		assert.equal( Router.matchRoute( 'POST', {} ), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router._clearCache.when.cache.is.full',
+	test	: ( done ) => {
+		const router	= new Router();
+
+		router.get( '/', () => {} );
+		router.post( '/', () => {} );
+
+		router.setKeyLimit( 1 );
+
+		router.getExecutionBlockForCurrentEvent( helpers.getEventRequest( 'GET', '/' ) );
+
+		setTimeout(() => {
+			router.getExecutionBlockForCurrentEvent( helpers.getEventRequest( 'POST', '/' ) );
+			assert.deepStrictEqual( Object.keys( router.cache ).length, 2 );
+
+			setTimeout(() => {
+				router._clearCache( 10, 0 );
+
+				assert.deepStrictEqual( Object.keys( router.cache ).length, 1 );
+				assert.deepStrictEqual( typeof router.cache['/POST'] !== 'undefined', true );
+
+				done();
+			}, 5 );
+		}, 5 );
+	}
+});
+
+test({
+	message	: 'Router._isCacheFull.if.key.limit.is.0',
+	test	: ( done ) => {
+		const router	= new Router();
+
+		router.setKeyLimit( 0 );
+
+		router.cache['testkey']	= {};
+
+		assert.deepStrictEqual( router._isCacheFull(), false );
 
 		done();
 	}

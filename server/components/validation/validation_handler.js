@@ -16,6 +16,9 @@ module.exports	= {
 		if ( typeof validationInput !== 'object' )
 			validationInput	= {};
 
+		if ( typeof skeleton !== 'object' )
+			skeleton	= {};
+
 		return new ValidationResult( validationInput, skeleton );
 	}
 };

@@ -62,6 +62,7 @@ class ValidationResult
 
 		for ( key in skeleton )
 		{
+			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( skeleton, key ) )
 				continue;
 

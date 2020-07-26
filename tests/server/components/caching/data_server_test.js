@@ -1,17 +1,18 @@
 'use strict';
 
-const DataServer			= require( '../../../../server/components/caching/data_server' );
-const { assert, test }		= require( '../../../test_helper' );
-const path					= require( 'path' );
-const fs					= require( 'fs' );
+const DataServer				= require( '../../../../server/components/caching/data_server' );
+const { assert, test, Mock }	= require( '../../../test_helper' );
+const path						= require( 'path' );
+const { Loggur }				= require( '../../../../server/components/logger/loggur' );
+const fs						= require( 'fs' );
 
-const PROJECT_ROOT			= path.parse( require.main.filename ).dir;
-const DEFAULT_PERSIST_FILE	= path.join( PROJECT_ROOT, 'cache' );
+const PROJECT_ROOT				= path.parse( require.main.filename ).dir;
+const DEFAULT_PERSIST_FILE		= path.join( PROJECT_ROOT, 'cache' );
 
 /**
  * @brief	For linux... wait a certain amount synchronously cause of fast file deletion, creation
  *
- * @param	Number ms
+ * @param	{Number} ms
  */
 function wait( ms )
 {
@@ -58,6 +59,24 @@ test({
 
 		removeCache( dataServer );
 		done();
+	}
+});
+
+test({
+	message	: 'DataServer._handleServerDown',
+	test	: ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+		Loggur.loggers		= {};
+		Loggur.disableDefault();
+
+		dataServer.on( 'serverError', ( error ) => {
+			assert.deepStrictEqual( { error: 'The data server is not responding' }, error );
+			removeCache( dataServer );
+			done();
+		});
+
+		dataServer._handleServerDown();
 	}
 });
 
@@ -135,14 +154,9 @@ test({
 			const ttl			= 100;
 			const persist		= true;
 			const expected		= { key: { key, value, ttl, persist } };
-			let called			= 0;
 
 			assert.equal( dataServer.intervals.length, 2 );
 			assert.deepStrictEqual( dataServer.server, {} );
-
-			dataServer.on( 'set', () => {
-				called ++;
-			});
 
 			dataServer.set( key, value, ttl, { persist } );
 
@@ -155,7 +169,6 @@ test({
 			assert.equal( dataSet.key, key );
 			assert.equal( dataSet.value, value );
 			assert.equal( typeof dataSet.expirationDate === 'number', true );
-			assert.equal( called, 1 );
 
 			removeCache( dataServer );
 			done();
@@ -268,11 +281,6 @@ test({
 			const ttl			= 100;
 			const persist		= true;
 			const expected		= { key: { key, value, ttl, persist } };
-			let called			= 0;
-
-			dataServer.on( 'get', () => {
-				called ++;
-			});
 
 			assert.equal( dataServer.intervals.length, 1 );
 			assert.deepStrictEqual( dataServer.server, {} );
@@ -288,7 +296,6 @@ test({
 			assert.equal( dataServer.server[key].persist, expected[key].persist );
 			assert.equal( dataServer.server[key].key, key );
 			assert.equal( typeof dataServer.server[key].expirationDate === 'number', true );
-			assert.equal( called, 1 );
 
 			removeCache( dataServer );
 			done();
@@ -361,11 +368,6 @@ test({
 			const value			= 'value';
 			const ttl			= 1;
 			const persist		= true;
-			let called			= 0;
-
-			dataServer.on( 'touch', () => {
-				called ++;
-			});
 
 			assert.equal( dataServer.intervals.length, 1 );
 			assert.deepStrictEqual( dataServer.server, {} );
@@ -383,7 +385,39 @@ test({
 				const currentExpirationDate	= dataSet.expirationDate;
 				assert.notEqual( currentExpirationDate, expirationDate );
 
-				assert.equal( called, 1 );
+				removeCache( dataServer );
+				done();
+			}, 100 );
+		}, 10 );
+	}
+});
+
+test({
+	message	: 'DataServer.touch.with.specific.ttl.updates.ttl',
+	test	: ( done ) => {
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async () => {
+			const dataServer	= new DataServer( { persist: false } );
+			const key			= 'key';
+			const value			= 'value';
+			const ttl			= 1;
+			const persist		= true;
+
+			assert.equal( dataServer.intervals.length, 1 );
+			assert.deepStrictEqual( dataServer.server, {} );
+
+			await dataServer.set( key, value, ttl, { persist } );
+
+			assert.equal( typeof dataServer.server[key] === 'object', true );
+			const { expirationDate }	= dataServer.server[key];
+
+			setTimeout( async () => {
+				await dataServer.touch( key, 500 );
+				const dataSet	= await dataServer.get( key );
+
+				assert.equal( dataSet, value );
+				const currentExpirationDate	= dataSet.expirationDate;
+				assert.notEqual( currentExpirationDate, expirationDate );
 
 				removeCache( dataServer );
 				done();
@@ -465,7 +499,7 @@ test({
 });
 
 test({
-	message	: 'DataServer persistsData',
+	message	: 'DataServer.persistsData',
 	test	: ( done ) => {
 		removeCache();
 
@@ -474,6 +508,7 @@ test({
 			const key			= 'key';
 			const keyTwo		= 'keyTwo';
 			const keyThree		= 'keyThree';
+			const keyFour		= 'keyFour';
 			const dataServer	= new DataServer( { persistInterval: 2, persistPath: DEFAULT_PERSIST_FILE + '1' } );
 			let saveCalled		= false;
 
@@ -482,8 +517,9 @@ test({
 			});
 
 			dataServer.set( key, 'value' );
-			dataServer.set( keyTwo, 'value2', 1, true );
-			dataServer.set( keyThree, 'value3', 10000, false );
+			dataServer.set( keyTwo, 'value2', 1000, { persist: true } );
+			dataServer.set( keyThree, 'value3', 1, { persist: true } );
+			dataServer.set( keyFour, 'value4', 10000, { persist: false } );
 
 			assert.notEqual( dataServer.get( key ), null );
 			assert.notEqual( dataServer.get( keyTwo ), null );
@@ -493,7 +529,7 @@ test({
 				const content	= fs.readFileSync( DEFAULT_PERSIST_FILE + '1' );
 				const data		= JSON.parse( content.toString( 'utf8' ) );
 
-				assert.deepStrictEqual( Object.keys( data ), [key] );
+				assert.deepStrictEqual( Object.keys( data ), [key, keyTwo] );
 
 				removeCache( dataServer );
 
@@ -548,19 +584,12 @@ test({
 			const dataServer	= new DataServer({ persist: false });
 			const key			= 'key';
 			const value			= { test: 'value' };
-			let called			= 0;
-
-			dataServer.on( 'delete', () => {
-				called ++;
-			});
 
 			await dataServer.set( key, value );
 
 			assert.equal( await dataServer.delete( 123 ), false );
 			assert.equal( await dataServer.delete( key ), true );
 			assert.equal( await dataServer.delete( key ), true );
-			// 2 because one is with invalid arguments
-			assert.equal( called, 2 );
 
 			dataServer.stop();
 
@@ -589,11 +618,6 @@ test({
 
 		const dataServer	= new DataServer({ persist: false });
 		const key			= 'key';
-		let called			= 0;
-
-		dataServer.on( 'increment', () => {
-			called ++;
-		});
 
 		await dataServer.set( key, value ).catch( done );
 
@@ -612,7 +636,6 @@ test({
 		}
 
 		assert.equal( result, expectedValue );
-		assert.equal( called, 1 );
 
 		dataServer.stop();
 
@@ -640,11 +663,6 @@ test({
 
 		const dataServer	= new DataServer({ persist: false });
 		const key			= 'key';
-		let called			= 0;
-
-		dataServer.on( 'decrement', () => {
-			called ++;
-		});
 
 		await dataServer.set( key, value ).catch( done );
 
@@ -663,7 +681,6 @@ test({
 		}
 
 		assert.equal( result, expectedValue );
-		assert.equal( called, 1 );
 
 		dataServer.stop();
 
@@ -728,11 +745,6 @@ test({
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
-			let called			= 0;
-
-			dataServer.on( 'lock', () => {
-				called ++;
-			});
 
 			assert.equal( await dataServer.lock( 'key' ), true );
 			assert.equal( await dataServer.lock( 'key' ), false );
@@ -740,7 +752,37 @@ test({
 			assert.equal( await dataServer.lock( 'key' ), true );
 			assert.equal( await dataServer.lock( 'key' ), false );
 
-			assert.equal( called, 4 );
+			removeCache( dataServer );
+			done();
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.lock.returns.false.on.invalid.arguments',
+	test			: ( done ) => {
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async () => {
+			const dataServer	= new DataServer( { persist: false } );
+
+			assert.equal( await dataServer.lock( 123 ), false );
+			assert.equal( await dataServer.lock( 'test', 123 ), false );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServer.unlock.returns.false.on.invalid.arguments',
+	test			: ( done ) => {
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async () => {
+			const dataServer	= new DataServer( { persist: false } );
+
+			assert.equal( await dataServer.unlock( 123 ), false );
+			assert.equal( await dataServer.unlock( 'test', 123 ), false );
 
 			removeCache( dataServer );
 			done();
@@ -774,17 +816,11 @@ test({
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( async () => {
 			const dataServer	= new DataServer( { persist: false } );
-			let called			= 0;
-
-			dataServer.on( 'unlock', () => {
-				called ++;
-			});
 
 			assert.equal( await dataServer.unlock( 'key' ), true );
 			assert.equal( await dataServer.unlock( 'key' ), true );
 			assert.equal( await dataServer.lock( 'key' ), true );
 			assert.equal( await dataServer.unlock( 'key' ), true );
-			assert.equal( called, 3 );
 
 			removeCache( dataServer );
 			done();
@@ -847,5 +883,206 @@ test({
 				done();
 			}).catch( done );
 		}, 10 );
+	}
+});
+
+test({
+	message	: 'DataServer.get.on.error',
+	test	: async ( done ) => {
+		removeCache();
+		const MockDataServer	= Mock( DataServer );
+		const dataServer		= new MockDataServer();
+
+		Loggur.loggers		= {};
+		Loggur.disableDefault();
+
+		dataServer._mock({
+			method			: '_get',
+			shouldReturn	: async () => {
+				throw new Error();
+			}
+		});
+
+		await dataServer.set( 'test', 'value' )
+
+		assert.deepStrictEqual( await dataServer.get( 'test', {} ), null );
+		removeCache();
+
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer.increment.with.defaults',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+
+		await dataServer.set( 'test', 1 )
+
+		assert.deepStrictEqual( await dataServer.increment( 'test' ), 2 );
+
+		assert.deepStrictEqual( await dataServer.get( 'test' ), 2 );
+		removeCache();
+
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer.decrement.with.defaults',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+
+		await dataServer.set( 'test', 1 )
+
+		assert.deepStrictEqual( await dataServer.decrement( 'test' ), 0 );
+
+		assert.deepStrictEqual( await dataServer.get( 'test' ), 0 );
+		removeCache();
+
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer.increment.if.data.does.not.exist.returns.false',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+
+		assert.deepStrictEqual( await dataServer.increment( 'test' ), false );
+
+		removeCache();
+
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer.touch.if.data.does.not.exist.returns.false',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+
+		assert.deepStrictEqual( await dataServer.touch( 'test' ), false );
+
+		removeCache();
+
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer._prune.data.that.has.exiration.date.null.is.set.to.infinity.when.data.is.loaded.from.file',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer		= new DataServer();
+		const entry				= {
+			key				: 'test',
+			value			: 'value',
+			ttl				: 300,
+			expirationDate	: null,
+			persist			: true,
+		};
+
+		const expectedEntry		= {
+			key				: 'test',
+			value			: 'value',
+			ttl				: 300,
+			expirationDate	: Infinity,
+			persist			: true,
+		};
+
+		dataServer.server.test	= entry;
+
+		assert.deepStrictEqual( await dataServer._prune( 'test' ), expectedEntry );
+
+		removeCache();
+
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer._garbageCollect.when.has.own.property',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+		const entry			= {
+			key				: 'test',
+			value			: 'value',
+			ttl				: 300,
+			expirationDate	: null,
+			persist			: true,
+		};
+
+		dataServer.server.__proto__	= entry;
+
+		dataServer._garbageCollect();
+
+		setTimeout(()=>{
+			assert.deepStrictEqual( dataServer.server.__proto__, entry )
+
+			removeCache();
+			done();
+		}, 20 );
+	}
+});
+
+test({
+	message	: 'DataServer.decrement.if.data.does.not.exist.returns.false',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+
+		assert.deepStrictEqual( await dataServer.decrement( 'test' ), false );
+
+		removeCache();
+
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer._getTtl.with.defaults',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+
+		assert.deepStrictEqual( dataServer._getTtl(), Infinity );
+
+		removeCache();
+
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer._getExpirationDateFromTtl.with.defaults',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+
+		assert.deepStrictEqual( dataServer._getExpirationDateFromTtl(), Infinity );
+
+		removeCache();
+
+		done();
+	}
+});
+
+test({
+	message	: 'DataServer._loadData.on.error',
+	test	: async ( done ) => {
+		removeCache();
+		const dataServer	= new DataServer();
+
+		assert.deepStrictEqual( dataServer._getExpirationDateFromTtl(), Infinity );
+
+		removeCache();
+
+		done();
 	}
 });

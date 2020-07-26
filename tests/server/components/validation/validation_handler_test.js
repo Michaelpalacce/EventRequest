@@ -150,3 +150,16 @@ test({
 		done();
 	}
 });
+
+
+test({
+	message	: 'ValidationHandler.validation.when.validationInput.is.empty',
+	test	: ( done ) => {
+		const result	= validationHandler.validate();
+
+		assert.deepStrictEqual( result.hasValidationFailed(), false );
+		assert.deepStrictEqual( result.getValidationResult(), {} );
+
+		done();
+	}
+});

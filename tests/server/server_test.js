@@ -3780,9 +3780,42 @@ test({
 });
 
 test({
+	message	: 'Server.add.route.without.a.handler',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		Loggur.loggers	= {};
+		Loggur.disableDefault();
+
+		app.add( {} );
+
+		app.get( '/testAddRouteWithoutAHandler', ( event ) => {
+			event.send( '' );
+		});
+
+		helpers.sendServerRequest(
+			'/testAddRouteWithoutAHandler',
+			'GET',
+			200,
+			'',
+			{},
+			4220
+		).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), '' );
+			done();
+		}).catch( done );
+
+		app.listen( 4220 );
+	}
+});
+
+test({
 	message	: 'Server.eventRequest.on.error.without.a.logger',
 	test	: ( done ) => {
 		const app	= new Server();
+
+		Loggur.disableDefault();
+		Loggur.loggers	= {};
 
 		app.get( '/eventRequestOnErrorWithoutALogger', ( event ) => {
 			// This will call the Loggur.log ( cannot be mocked ) But it is called since there is no throw

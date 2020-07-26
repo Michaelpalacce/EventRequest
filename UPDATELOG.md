@@ -4,6 +4,14 @@
 - The file streams now have an abstract class behind them to remove code duplication
 - Removed code duplication in the transports
 - Added hasOwnProperty wherever was needed
+- Removed DataServer emitting events for every operation
+- Removed defaults from the DataServer private functions
+- Fixed the DataServer to actually return null on get in case of an error
+- Fixed documentation for DataServer
+- Fixed DataServer was not stopping execution and was resulting in an unhandled promise error
+- Fixed Router not throwing in case of invalid 2 arguments
+- Fixed Route by removing an if that was unreachable 
+- Removed an unreachable if statement in the raw body parser
 
 26.0.4
 - Added more tests

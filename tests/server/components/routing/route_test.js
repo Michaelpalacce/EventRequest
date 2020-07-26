@@ -34,6 +34,15 @@ test({
 });
 
 test({
+	message	: 'Route.getMatchObject',
+	test	: ( done ) => {
+		assert.deepStrictEqual( Route.getMatchObject(), { matched: false, params : {} } );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Route.constructor throws with invalid arguments',
 	test	: ( done ) => {
 		assert.throws( () => {
@@ -119,7 +128,7 @@ test({
 });
 
 test({
-	message			: 'Route.matchRoute matches String',
+	message			: 'Route.matchPath matches String',
 	dataProvider	: [
 		['', false, {}],
 		['/', true, {}],
@@ -139,7 +148,18 @@ test({
 });
 
 test({
-	message			: 'Route.matchRoute matches Regex',
+	message			: 'Route.matchPath.on.default.params',
+	test			: ( done ) => {
+		const route	= getRoute( undefined, '/' );
+
+		assert.deepEqual( route.matchPath( '/' ), true );
+
+		done();
+	}
+});
+
+test({
+	message			: 'Route.matchPath matches Regex',
 	dataProvider	: [
 		['', false],
 		['/', false],
