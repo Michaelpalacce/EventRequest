@@ -6,27 +6,13 @@ const fs					= require( 'fs' );
 const AbstractFileStream	= require( './abstract_file_stream' );
 
 /**
- * @brief	The type of file this stream supports
- *
- * @var		String
- */
-const STREAM_TYPE		= 'audio';
-
-/**
- * @brief	The supported file extensions
- *
- * @var		Array
- */
-const SUPPORTED_TYPES	= ['.mp3', '.flac', '.wav', '.aiff', '.aac'];
-
-/**
  * @brief	Used to stream audio files
  */
 class AudioFileStream extends AbstractFileStream
 {
 	constructor()
 	{
-		super( SUPPORTED_TYPES, STREAM_TYPE );
+		super( ['.mp3', '.flac', '.wav', '.aiff', '.aac'], 'audio' );
 	}
 
 	/**

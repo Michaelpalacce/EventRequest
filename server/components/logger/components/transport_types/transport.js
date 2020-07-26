@@ -81,6 +81,32 @@ class Transport
 	}
 
 	/**
+	 * @brief	Gets the timestamp from the Log
+	 *
+	 * @param	{Log} log
+	 *
+	 * @return	{String}
+	 */
+	_getTimestamp( log )
+	{
+		let timestamp	= Date.now();
+
+		if ( ! ( log instanceof Log ) )
+			timestamp	= log.getTimestamp();
+
+		timestamp		= new Date( timestamp * 1000 );
+		return Intl.DateTimeFormat( 'en-GB', {
+			hour12	: false,
+			year	: '2-digit',
+			month	: '2-digit',
+			day		: '2-digit',
+			hour	: '2-digit',
+			minute	: '2-digit',
+			second	: '2-digit'
+		}).format( timestamp );
+	}
+
+	/**
 	 * @brief	The method that actually logs the data
 	 *
 	 * @param	{Log} log

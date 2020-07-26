@@ -2,6 +2,7 @@
 - Added more tests
 - Codacy code improvements
 - The file streams now have an abstract class behind them to remove code duplication
+- Removed code duplication in the transports
 
 26.0.4
 - Added more tests

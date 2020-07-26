@@ -107,19 +107,8 @@ class File extends Transport
 	{
 		const message	= log.getMessage();
 		const uniqueId	= log.getUniqueId();
-		let timestamp	= log.getTimestamp();
-		timestamp		= new Date( timestamp * 1000 );
-		timestamp		= Intl.DateTimeFormat( 'en-GB', {
-			hour12	: false,
-			year	: '2-digit',
-			month	: '2-digit',
-			day		: '2-digit',
-			hour	: '2-digit',
-			minute	: '2-digit',
-			second	: '2-digit'
-		}).format( timestamp );
 
-		return uniqueId + ' - ' + timestamp + ': ' + message;
+		return uniqueId + ' - ' + this._getTimestamp( log ) + ': ' + message;
 	}
 
 	/**

@@ -6,27 +6,13 @@ const fs					= require( 'fs' );
 const AbstractFileStream	= require( './abstract_file_stream' );
 
 /**
- * @brief	The type of file this stream supports
- *
- * @var		String
- */
-const STREAM_TYPE		= 'video';
-
-/**
- * @brief	The supported file extensions
- *
- * @var		Array
- */
-const SUPPORTED_TYPES	= ['.mp4', '.webm'];
-
-/**
  * @brief	Used to stream mp4 and webm files
  */
 class VideoFileStream extends AbstractFileStream
 {
 	constructor()
 	{
-		super( SUPPORTED_TYPES, STREAM_TYPE );
+		super( ['.mp4', '.webm'], 'video' );
 	}
 
 	/**
