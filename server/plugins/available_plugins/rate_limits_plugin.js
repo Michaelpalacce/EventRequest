@@ -183,10 +183,8 @@ class RateLimitsPlugin extends PluginInterface
 			if ( typeof options.stopPropagation !== 'boolean' )
 				options.stopPropagation	= false;
 
-
-			if ( typeof typeof options.ipLimit !== 'boolean' )
+			if ( typeof options.ipLimit !== 'boolean' )
 				options.ipLimit	= false;
-
 		}
 		else
 		{

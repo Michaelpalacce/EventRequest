@@ -232,7 +232,7 @@ class Tester
 			this.stop	= true;
 			this.finished();
 		}
-	};
+	}
 
 	/**
 	 * @brief	Called when all the tests have finished
