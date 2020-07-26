@@ -255,7 +255,7 @@ class Tester
 		Promise.all( logPromises ).then(() => {
 			this.callback( this.errors.length > 0 ? 'Errors while testing' : false );
 		});
-	};
+	}
 
 	/**
 	 * @brief	Called by the done function of the tests

@@ -568,7 +568,7 @@ class DataServer extends EventEmitter
 			delete this.server[key];
 
 			resolve( true );
-		})
+		});
 	}
 
 	/**
