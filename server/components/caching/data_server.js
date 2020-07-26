@@ -647,7 +647,7 @@ class DataServer extends EventEmitter
 					Loggur.log( error, Loggur.LOG_LEVELS.error );
 					this.emit( '_saveDataError', { error } );
 				});
-			})
+			});
 		});
 	}
 
