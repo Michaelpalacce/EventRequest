@@ -68,7 +68,12 @@ class ContentSecurityPolicy
 							: {};
 
 		for ( const directiveName in this.directives )
+		{
+			if ( ! {}.hasOwnProperty.call( this.directives, directiveName ) )
+				continue;
+
 			this.directives[directiveName]	= this.directives[directiveName].map( ( attribute ) => { return this._decorateFetchDirectiveSource( attribute ); } );
+		}
 
 		const reportUri		= typeof options[OPTIONS_REPORT_URI] === 'string'
 							? options[OPTIONS_REPORT_URI]

@@ -29,7 +29,7 @@ class EnvPlugin extends PluginInterface
 	{
 		this.envVariableKeys.forEach(( envKey ) => {
 			delete process.env[envKey];
-		})
+		});
 	}
 
 	/**

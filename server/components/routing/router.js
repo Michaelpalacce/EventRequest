@@ -157,7 +157,7 @@ class Router extends PluginInterface
 				});
 
 				return object;
-			}
+			};
 		});
 	}
 
@@ -274,6 +274,9 @@ class Router extends PluginInterface
 
 		for ( let index in this.middleware )
 		{
+			if ( ! {}.hasOwnProperty.call( this.middleware, index ) )
+				continue;
+
 			let route	= this.middleware[index];
 			let params	= {};
 
@@ -387,9 +390,7 @@ class Router extends PluginInterface
 	{
 		if ( typeof route === 'string' || route instanceof RegExp )
 		{
-			route	= new Route({
-				route	: route
-			});
+			route	= new Route( { route } );
 		}
 
 		if ( ! ( route instanceof Route ) )
@@ -419,6 +420,9 @@ class Router extends PluginInterface
 		{
 			for ( const key in this.cache )
 			{
+				if ( ! {}.hasOwnProperty.call( this.cache, key ) )
+					continue;
+
 				const data	= this.cache[key];
 
 				if ( ( data.date + ttl ) <= Date.now() )

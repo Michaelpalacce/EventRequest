@@ -53,7 +53,7 @@ class BodyParserPlugin extends PluginInterface
 		}
 
 		this.server.pluginBag.parsers.push({
-			parserClass:		this.parserClass,
+			ParserClass:		this.parserClass,
 			parserOptions:		this.parserOptions
 		});
 	}
@@ -71,7 +71,7 @@ class BodyParserPlugin extends PluginInterface
 		const pluginMiddleware	= {
 			handler	: ( event ) =>
 			{
-				if ( event.body == null )
+				if ( event.body === null || event.body === undefined )
 				{
 					event.body	= {};
 
@@ -84,13 +84,16 @@ class BodyParserPlugin extends PluginInterface
 
 				for ( const index in this.server.pluginBag.parsers )
 				{
-					const parser							= this.server.pluginBag.parsers[index];
-					const { parserOptions, parserClass }	= parser;
+					if ( ! {}.hasOwnProperty.call( this.server.pluginBag.parsers, index ) )
+						continue;
 
-					bodyParserHandler.addParser( new parserClass( parserOptions ) );
+					const parser							= this.server.pluginBag.parsers[index];
+					const { parserOptions, ParserClass }	= parser;
+
+					bodyParserHandler.addParser( new ParserClass( parserOptions ) );
 				}
 
-				bodyParserHandler.parseBody( event ).then( parsedData => {
+				bodyParserHandler.parseBody( event ).then( ( parsedData ) => {
 					event.body		= typeof parsedData.body === 'undefined' ? {} : parsedData.body;
 					event.rawBody	= typeof parsedData.rawBody === 'undefined' ? {} : parsedData.rawBody;
 

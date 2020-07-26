@@ -127,6 +127,9 @@ class EventRequest extends EventEmitter
 
 		for( const optionName in options )
 		{
+			if ( ! {}.hasOwnProperty.call( options, optionName ) )
+				continue;
+
 			if ( optionName.toLowerCase() === 'expires' || optionName.toLowerCase() === 'max-age' )
 				options[optionName]	= new Date( new Date().getTime() + options[optionName] * 1000 );
 
@@ -182,8 +185,8 @@ class EventRequest extends EventEmitter
 			this.setStatusCode( code );
 
 		if (
-			response != null
-			&& typeof response != 'undefined'
+			response !== null
+			&& typeof response !== 'undefined'
 			&& typeof response.pipe === 'function'
 			&& response instanceof Streams.Readable
 		) {

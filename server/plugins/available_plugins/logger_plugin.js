@@ -44,11 +44,11 @@ class LoggerPlugin extends PluginInterface
 	 */
 	getLogger()
 	{
-		if ( this.logger == null )
+		if ( this.logger === null || this.logger === undefined )
 		{
 			this.logger	= this.options.logger instanceof Logger
 						? this.options.logger
-						: Loggur.getDefaultLogger()
+						: Loggur.getDefaultLogger();
 		}
 
 		return this.logger;

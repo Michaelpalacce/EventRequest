@@ -208,7 +208,8 @@ class DataServer extends EventEmitter
 	{
 		if (
 			typeof key !== 'string'
-			|| value == null
+			|| value === null
+			|| value === undefined
 			|| typeof ttl !== 'number'
 			|| typeof options !== 'object'
 		) {
@@ -234,11 +235,13 @@ class DataServer extends EventEmitter
 	async _set( key, value, ttl, options = {} )
 	{
 		return new Promise(( resolve ) => {
-			const persist	= typeof options.persist !== 'boolean' || options.persist == null ? this.persist : options.persist;
+			const persist	= typeof options.persist !== 'boolean'
+							? this.persist
+							: options.persist;
 
 			const dataSet	= this._makeDataSet( key, value, ttl, persist );
 			resolve( this.server[key] = dataSet );
-		})
+		});
 	}
 
 	/**
@@ -588,7 +591,12 @@ class DataServer extends EventEmitter
 	_garbageCollect()
 	{
 		for ( const key in this.server )
+		{
+			if ( ! {}.hasOwnProperty.call( this.server, key ) )
+				continue;
+
 			this._get( key ).catch( this._handleServerDown.bind( this ) );
+		}
 	}
 
 	/**

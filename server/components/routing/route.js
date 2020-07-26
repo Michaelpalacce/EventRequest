@@ -9,7 +9,7 @@ const { Loggur, LOG_LEVELS }	= require( '../logger/loggur' );
 const DEFAULT_ROUTE_HANDLER	= ( event ) => {
 	Loggur.log( 'Possible mishandling. This route does not have a handler specified.', LOG_LEVELS.info );
 
-	event.next()
+	event.next();
 };
 
 /**
@@ -36,7 +36,7 @@ class Route
 		return {
 			matched	: false,
 			params	: {}
-		}
+		};
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Route
 		this.method			= typeof routeConfig.method === 'string'
 							? routeConfig.method.toUpperCase()
 							: routeConfig.method instanceof Array
-							? routeConfig.method.map( ( x ) => { return x.toUpperCase() } )
+							? routeConfig.method.map( ( x ) => { return x.toUpperCase(); } )
 							: '';
 
 		this.handler		= routeConfig.handler instanceof Function

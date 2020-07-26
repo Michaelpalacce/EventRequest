@@ -126,7 +126,7 @@ class Server extends EventEmitter
 			throw new Error( 'A PluginInterface or an existing PluginManager pluginId (string) must be added' );
 		}
 
-		if ( options != null )
+		if ( options !== null && options !== undefined )
 			plugin.setOptions( options );
 
 		this._attachPlugin( plugin );
@@ -209,7 +209,7 @@ class Server extends EventEmitter
 			let eventRequest	= new EventRequest( request, response );
 
 			request.on( 'close', () => {
-				if ( eventRequest != null )
+				if ( eventRequest !== null && eventRequest !== undefined )
 				{
 					eventRequest._cleanUp();
 					eventRequest	= null;
@@ -217,7 +217,7 @@ class Server extends EventEmitter
 			});
 
 			response.on( 'error', ( error ) => {
-				if ( eventRequest != null )
+				if ( eventRequest !== null && eventRequest !== undefined )
 				{
 					eventRequest.next( error );
 					eventRequest	= null;
@@ -231,7 +231,7 @@ class Server extends EventEmitter
 				eventRequest._setBlock( block );
 
 				const onErrorCallback	= ( error ) => {
-					if ( eventRequest.logger == null )
+					if ( eventRequest.logger === null || eventRequest.logger === undefined )
 						Loggur.log( error, LOG_LEVELS.error );
 				};
 
@@ -245,7 +245,7 @@ class Server extends EventEmitter
 				if ( ! eventRequest.isFinished() )
 					eventRequest.next( error );
 			}
-		}
+		};
 	}
 
 	/**

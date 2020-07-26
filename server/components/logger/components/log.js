@@ -109,7 +109,7 @@ class Log
 				this.message	= message;
 				break;
 
-			case message == null:
+			case message === null:
 				this.message	= '';
 				break;
 

@@ -81,7 +81,7 @@ class Logger
 										? options.transports
 										: [];
 
-		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport ) } );
+		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport ); } );
 
 		if ( this.transports.length === 0 )
 		{
@@ -156,6 +156,9 @@ class Logger
 	{
 		for ( let key in this.logLevels )
 		{
+			if ( ! {}.hasOwnProperty.call( this.logLevels, key ) )
+				continue;
+
 			let logLevel			= this.logLevels[key];
 			let objectProperties	= Object.getOwnPropertyNames( this.constructor.prototype );
 
@@ -212,7 +215,7 @@ class Logger
 	{
 		return typeof this.serverName === 'string'
 				? `${this.serverName}/${this.uniqueId}`
-				: this.uniqueId
+				: this.uniqueId;
 	}
 
 	/**

@@ -62,6 +62,9 @@ class ValidationResult
 
 		for ( key in skeleton )
 		{
+			if ( ! {}.hasOwnProperty.call( skeleton, key ) )
+				continue;
+
 			let value	= validationInput[key];
 			const rules	= skeleton[key];
 

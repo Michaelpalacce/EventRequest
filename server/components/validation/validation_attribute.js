@@ -258,7 +258,7 @@ class ValidationAttribute
 		return{
 			rule	: ruleParams.shift(),
 			params	: ruleParams
-		}
+		};
 	}
 }
 

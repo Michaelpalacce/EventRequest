@@ -71,7 +71,7 @@ class TimeoutPlugin extends PluginInterface
 			}
 
 			event.internalTimeout	= undefined;
-		}
+		};
 	}
 
 	/**

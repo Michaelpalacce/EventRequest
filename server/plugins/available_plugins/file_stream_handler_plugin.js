@@ -58,7 +58,7 @@ class FileStreamHandlerPlugin extends PluginInterface
 			else
 			{
 				if ( typeof errCallback !== 'function' )
-					this.next( 'Could not find a FileStream that supports that format', 400 )
+					this.next( 'Could not find a FileStream that supports that format', 400 );
 				else
 					errCallback();
 			}

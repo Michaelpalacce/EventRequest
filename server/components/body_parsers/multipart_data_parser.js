@@ -163,6 +163,9 @@ class MultipartDataParser extends EventEmitter
 
 		for ( const index in this.parts )
 		{
+			if ( ! {}.hasOwnProperty.call( this.parts, index ) )
+				continue;
+
 			const part	= this.parts[index];
 			part.buffer	= null;
 			part.state	= null;
@@ -288,6 +291,7 @@ class MultipartDataParser extends EventEmitter
 			{
 				case STATE_START:
 					part.state	= STATE_START_BOUNDARY;
+					break;
 
 				case STATE_START_BOUNDARY:
 					// Receive chunks until we find the first boundary if the end has been finished, throw an error
@@ -333,7 +337,7 @@ class MultipartDataParser extends EventEmitter
 						}
 						else if ( lineCount === CONTENT_TYPE_INDEX )
 						{
-							contentTypeLine	= line
+							contentTypeLine	= line;
 						}
 						else
 						{
@@ -419,6 +423,7 @@ class MultipartDataParser extends EventEmitter
 					}
 
 					part.state	= STATE_PART_DATA_START;
+					break;
 
 				case STATE_PART_DATA_START:
 					if ( part.type === DATA_TYPE_FILE )
@@ -435,6 +440,7 @@ class MultipartDataParser extends EventEmitter
 					}
 
 					part.state	= STATE_PART_DATA;
+					break;
 
 				case STATE_PART_DATA:
 					boundaryOffset	= part.buffer.indexOf( this.boundary );
@@ -528,7 +534,7 @@ class MultipartDataParser extends EventEmitter
 	supports( event )
 	{
 		const contentType	= event.getRequestHeader( CONTENT_TYPE_HEADER );
-		return typeof contentType === 'string' && contentType.match( MULTIPART_PARSER_SUPPORTED_TYPE ) !== null
+		return typeof contentType === 'string' && contentType.match( MULTIPART_PARSER_SUPPORTED_TYPE ) !== null;
 	}
 
 	/**
@@ -558,14 +564,12 @@ class MultipartDataParser extends EventEmitter
 		const boundary	= contentType.match( BOUNDARY_REGEX );
 
 		if ( boundary === null )
-		{
 			return false;
-		}
 
 		return {
-			contentLength	: contentLength,
-			boundary		: boundary[1]
-		}
+			contentLength,
+			boundary	: boundary[1]
+		};
 	}
 
 	/**

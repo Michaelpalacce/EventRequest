@@ -237,7 +237,7 @@ class Bucket
 	 */
 	async _unlock()
 	{
-		await this.dataStore.unlock( `${this.key}//lock` ).catch( this.handleError )
+		await this.dataStore.unlock( `${this.key}//lock` ).catch( this.handleError );
 	}
 
 	/**

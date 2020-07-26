@@ -65,7 +65,7 @@ class TemplatingEnginePlugin extends PluginInterface
 			renderPromise.catch( errorCallback === null ? eventRequest.next : errorCallback );
 
 			return renderPromise;
-		}
+		};
 	}
 
 	/**

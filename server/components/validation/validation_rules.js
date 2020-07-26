@@ -12,7 +12,7 @@ let assert	= {};
  */
 function getType( value )
 {
-	return typeof value
+	return typeof value;
 }
 
 /**
@@ -173,7 +173,8 @@ assert.assertNotArray		= ( actual ) => {
  * @return	Boolean
  */
 assert.assertIsEmpty		= ( actual ) => {
-	return actual == null
+	return actual === null
+		|| actual === undefined
 		|| actual === ''
 		|| ( getType( actual ) === 'object' && Object.keys( actual ).length === 0 )
 		|| ( Array.isArray( actual ) && actual.length === 0 );

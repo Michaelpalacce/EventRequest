@@ -73,7 +73,7 @@ class CorsPlugin extends PluginInterface
 	 */
 	getPluginMiddleware()
 	{
-		return [{ handler : this.applyCors.bind( this ) }]
+		return [{ handler : this.applyCors.bind( this ) }];
 	}
 }
 
