@@ -51,7 +51,7 @@ class SessionPlugin extends PluginInterface
 		const setUpPluginMiddleware	= {
 			handler	: ( event ) =>
 			{
-				if ( event.session == null )
+				if ( event.session === null || event.session === undefined )
 				{
 					event.session	= new Session( event, this.options );
 

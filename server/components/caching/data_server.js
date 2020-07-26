@@ -523,7 +523,7 @@ class DataServer extends EventEmitter
 			}
 
 			resolve( dataSet );
-		})
+		});
 	}
 
 	/**
@@ -609,6 +609,9 @@ class DataServer extends EventEmitter
 		let serverData	= {};
 		for ( const key in this.server )
 		{
+			if ( ! {}.hasOwnProperty.call( this.server, key ) )
+				continue;
+
 			const dataSet	= this.server[key];
 
 			if ( dataSet.persist === true )

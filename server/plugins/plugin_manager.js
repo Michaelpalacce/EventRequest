@@ -36,7 +36,7 @@ class PluginManager
 	 */
 	hasPlugin( id )
 	{
-		return this.plugins[id] != null;
+		return typeof this.plugins[id] !== 'undefined';
 	}
 
 	/**

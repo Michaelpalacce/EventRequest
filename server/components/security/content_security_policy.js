@@ -377,6 +377,9 @@ class ContentSecurityPolicy
 
 		for ( const directive in this.directives )
 		{
+			if ( ! {}.hasOwnProperty.call( this.directives, directive ) )
+				continue;
+
 			// Remove duplicates
 			let attributes	= [...new Set( this.directives[directive] )];
 			attributes		= attributes.join( ' ' );
