@@ -918,6 +918,25 @@ test({
 });
 
 test({
+	message: 'EventRequest.setCookie.with.hasOwnProperty',
+	test: ( done ) => {
+		const eventRequest		= helpers.getEventRequest();
+		let setCookieArguments	= ['key', 'value', { __proto__: 'hey' }];
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			shouldReturn	: ( headerName, cookie ) => {
+				assert.deepStrictEqual( headerName, 'set-cookie' );
+				assert.deepStrictEqual( cookie, ['key=value;'] );
+				done();
+			}
+		});
+
+		eventRequest.setCookie.apply( eventRequest, setCookieArguments );
+	}
+});
+
+test({
 	message	: 'EventRequest.getRequestHeader should return header',
 	test	: ( done ) => {
 		const headerName	= 'test';

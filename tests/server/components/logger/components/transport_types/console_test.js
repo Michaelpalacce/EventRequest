@@ -33,6 +33,17 @@ test({
 });
 
 test({
+	message	: 'Console._getTimestamp.when.log.is.not.an.instance.of.log',
+	test	: ( done ) => {
+		let consoleTransport	= new Console();
+
+		assert.deepStrictEqual( consoleTransport._getTimestamp( new Log() ), consoleTransport._getTimestamp() );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Console.constructor on invalid configuration',
 	test	: ( done ) => {
 		let consoleTransport	= new Console({

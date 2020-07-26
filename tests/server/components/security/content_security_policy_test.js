@@ -38,6 +38,33 @@ test({
 });
 
 test({
+	message	: 'CSP.parseOptions.on.own.property',
+	test	: ( done ) => {
+		const csp					= new CSP( { directives: { __proto__ : 'test' } } );
+
+		// Is same as default
+		assert.deepStrictEqual( csp.directives, XSS_EXPECTED_DIRECTIVES );
+		assert.equal( csp.reportOnly, false );
+		assert.equal( csp.enabled, true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'CSP.build.on.directives.own.property',
+	test	: ( done ) => {
+		const csp					= new CSP();
+		csp.directives				= { __proto__ : 'test' };
+
+		// Proto is not added
+		assert.deepStrictEqual( csp.directives, {} );
+
+		done();
+	}
+});
+
+test({
 	message			: 'CSP.constructorOnDifferentOptions',
 	dataProvider	: [
 		[

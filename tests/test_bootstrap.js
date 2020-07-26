@@ -1,10 +1,27 @@
 'use strict';
 
 const path			= require( 'path' );
+const fs			= require( 'fs' );
 const app			= require( '../index' )();
 const DataServer	= require( '../server/components/caching/data_server' );
 
 const TEST_ROOT		= path.parse( __dirname ).dir;
+
+function clearUpDirectory( dir, whiteList )
+{
+	if ( fs.existsSync( dir ) )
+	{
+		fs.readdirSync( dir ).forEach( ( file ) =>
+		{
+			const curPath	= path.join( dir, file );
+			if ( ! whiteList.includes( file ) )
+				fs.unlinkSync( curPath );
+		});
+	}
+}
+
+clearUpDirectory( path.join( __dirname, './server/components/body_parsers/fixture/testUploads' ), ['.gitignore'] );
+clearUpDirectory( path.join( __dirname, './server/fixture/body_parser/multipart' ), ['.gitignore', 'multipart_data_CR', 'multipart_data_CRLF', 'multipart_data_LF'] );
 
 app.add({
 	route	: '/ping',

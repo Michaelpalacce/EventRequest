@@ -89,9 +89,9 @@ class Transport
 	 */
 	_getTimestamp( log )
 	{
-		let timestamp	= Date.now();
+		let timestamp	= Date.now() / 1000;
 
-		if ( ! ( log instanceof Log ) )
+		if ( log instanceof Log )
 			timestamp	= log.getTimestamp();
 
 		timestamp		= new Date( timestamp * 1000 );

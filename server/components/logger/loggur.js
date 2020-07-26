@@ -130,13 +130,11 @@ class Loggur
 	log()
 	{
 		const loggersPromises	= [];
+
 		if ( Object.keys( this.loggers ).length !== 0 )
 		{
 			for ( const loggerId in this.loggers )
 			{
-				if ( ! {}.hasOwnProperty.call( this.loggers, loggerId ) )
-					continue;
-
 				const logger	= this.loggers[loggerId];
 				loggersPromises.push( logger.log.apply( logger, arguments ) );
 			}
@@ -165,12 +163,7 @@ class Loggur
 		if ( Object.keys( this.loggers ).length !== 0 )
 		{
 			for ( let loggerId in this.loggers )
-			{
-				if ( ! {}.hasOwnProperty.call( this.loggers, loggerId ) )
-					continue;
-
 				this.loggers[loggerId].setLogLevel( logLevel );
-			}
 		}
 		else
 		{
