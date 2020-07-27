@@ -350,6 +350,7 @@ class MultipartDataParser extends EventEmitter
 					// Receive chunks until we read the two rows of metadata if end is reached, throw an error
 					if ( contentDispositionLine === null || contentTypeLine === null || lineCount < 2 )
 					{
+						/* istanbul ignore next */
 						if ( this.hasFinished() )
 							this.handleError( ERROR_INVALID_METADATA );
 						return;

@@ -21,6 +21,32 @@ test({
 });
 
 test({
+	message	: 'MultipartDataParser.setUpTempDirIfDirDoesNotExist',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/unexisting${Math.random()}` );
+		const parser	= new MultipartDataParser( { tempDir } );
+
+		assert.deepStrictEqual( fs.existsSync( parser.tempDir ), true );
+
+		fs.rmdirSync( tempDir );
+
+		done();
+	}
+});
+
+test({
+	message	: 'MultipartDataParser.setUpTempDirIfDirExists',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
+		const parser	= new MultipartDataParser( { tempDir } );
+
+		assert.deepStrictEqual( fs.existsSync( parser.tempDir ), true );
+
+		done();
+	}
+});
+
+test({
 	message	: 'MultipartDataParser.determineEOL.with.different.lines',
 	test	: ( done ) => {
 		const multipartDataParser		= new MultipartDataParser();
@@ -276,6 +302,126 @@ test({
 });
 
 test({
+	message		: 'MultipartDataParser.parse.parses.multipart.data.with.invalid.filename',
+	test		: ( done ) => {
+		let tempDir			= path.join( __dirname, './fixture/testUploads' );
+		let multipartParser	= new MockMultipartDataParser( { tempDir } );
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'multipart/form-data; boundary=---------------------------9051914041544843365972754266',
+				'content-length'	: '10000',
+			}
+		);
+
+		const multipartData	= 'Content-Type: multipart/form-data; boundary=---------------------------9051914041544843365972754266\r\n' +
+			'Content-Length: 554\r\n' +
+			'\r\n' +
+			'-----------------------------9051914041544843365972754266\r\n' +
+			'Content-Disposition: form-data; name="test"\r\n' +
+			'\r\n' +
+			'text default\r\n' +
+			'-----------------------------9051914041544843365972754266\r\n' +
+			'Content-Disposition: form-data; name="file1"; filename=\r\n' +
+			'Content-Type: text/plain\r\n' +
+			'\r\n' +
+			'Content of a.txt.\r\n' +
+			'-----------------------------9051914041544843365972754266\r\n' +
+			'Content-Disposition: form-data; name="file2"; filename="a.html"\r\n' +
+			'Content-Type: text/html\r\n' +
+			'\r\n' +
+			'<!DOCTYPE html><title>Content of a.html.</title>\r\n' +
+			'-----------------------------9051914041544843365972754266--';
+
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					let data			= multipartData;
+					let placeToSplit	= data.length / 2;
+					let firstPart		= data.substr( 0, placeToSplit );
+					let secondPart		= data.substr( placeToSplit );
+					callback( Buffer.from( firstPart ) );
+					callback( Buffer.from( secondPart ) );
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+
+		multipartParser.parse( eventRequest ).then( ( parsedData ) => {
+			assert.deepStrictEqual( parsedData.rawBody, {} );
+			assert.deepStrictEqual( parsedData.body.$files.length, 1 );
+			assert.deepStrictEqual( parsedData.body.$files[0].name, 'a.html' );
+			assert.deepStrictEqual( parsedData.body.test, 'text default' );
+
+			assert.deepStrictEqual( parsedData.body.file1, 'Content of a.txt.' );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message		: 'MultipartDataParser.parse.parses.multipart.data.with.invalid.name.amount.of.lines',
+	test		: ( done ) => {
+		let tempDir			= path.join( __dirname, './fixture/testUploads' );
+		let multipartParser	= new MockMultipartDataParser( { tempDir } );
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'multipart/form-data; boundary=---------------------------9051914041544843365972754266',
+				'content-length'	: '10000',
+			}
+		);
+
+		const multipartData	= 'Content-Type: multipart/form-data; boundary=---------------------------9051914041544843365972754266\r\n' +
+			'Content-Length: 554\r\n' +
+			'\r\n' +
+			'-----------------------------9051914041544843365972754266\r\n' +
+			'\r\n' +
+			'Content of a.txt.\r\n' +
+			'-----------------------------9051914041544843365972754266\r\n' +
+			'Content-Disposition: form-data; name="file2"; filename="a.html"\r\n' +
+			'Content-Type: text/html\r\n' +
+			'\r\n' +
+			'<!DOCTYPE html><title>Content of a.html.</title>\r\n' +
+			'-----------------------------9051914041544843365972754266--';
+
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					let data			= multipartData;
+					let placeToSplit	= data.length / 2;
+					let firstPart		= data.substr( 0, placeToSplit );
+					let secondPart		= data.substr( placeToSplit );
+					callback( Buffer.from( firstPart ) );
+					callback( Buffer.from( secondPart ) );
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+
+		multipartParser.parse( eventRequest ).then( () => {
+			done( 'Should not have parsed' );
+		}).catch( ( error ) => {
+			assert.deepStrictEqual( error, '104' );
+			done();
+		});
+	}
+});
+
+test({
 	message		: 'MultipartDataParser.parse.parses.multipart.data.with.invalid.filename.skips.the.file',
 	test		: ( done ) => {
 		let tempDir			= path.join( __dirname, './fixture/testUploads' );
@@ -293,7 +439,7 @@ test({
 			'Content-Length: 554\r\n' +
 			'\r\n' +
 			'-----------------------------9051914041544843365972754266\r\n' +
-			'Content-Disposition: form-data; name="text"\r\n' +
+			'Content-Disposition: form-data; name="test"\r\n' +
 			'\r\n' +
 			'text default\r\n' +
 			'-----------------------------9051914041544843365972754266\r\n' +
@@ -332,7 +478,7 @@ test({
 				assert.deepStrictEqual( parsedData.rawBody, {} );
 				assert.deepStrictEqual( parsedData.body.$files.length, 1 );
 				assert.deepStrictEqual( parsedData.body.$files[0].name, 'a.html' );
-				assert.deepStrictEqual( parsedData.body.text, 'text default' );
+				assert.deepStrictEqual( parsedData.body.test, 'text default' );
 				assert.deepStrictEqual( parsedData.body.file1, 'Content of a.txt.' );
 
 				done();
