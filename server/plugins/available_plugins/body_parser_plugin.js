@@ -71,19 +71,23 @@ class BodyParserPlugin extends PluginInterface
 		const pluginMiddleware	= {
 			handler	: ( event ) =>
 			{
-				if ( event.body === null || event.body === undefined )
+				if ( event.body !== null && event.body !== undefined )
 				{
-					event.body	= {};
-
-					event.on( 'cleanUp', () => {
-						event.body	= undefined;
-					} );
+					event.next();
+					return;
 				}
+
+				event.body	= {};
+
+				event.on( 'cleanUp', () => {
+					event.body	= undefined;
+				});
 
 				const bodyParserHandler	= new BodyParserHandler();
 
 				for ( const index in this.server.pluginBag.parsers )
 				{
+					/* istanbul ignore next */
 					if ( ! {}.hasOwnProperty.call( this.server.pluginBag.parsers, index ) )
 						continue;
 

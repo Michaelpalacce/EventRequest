@@ -45,6 +45,15 @@ testSuites.rateLimiterSuite		= () => {
 	require( './server/components/rate_limiter/bucket_test' );
 };
 
+testSuites.fileStreamSuite		= () => {
+	require( './server/components/file_streams/abstract_file_stream_test' );
+	require( './server/components/file_streams/file_stream_handler_test' );
+	require( './server/components/file_streams/audio_file_stream_test' );
+	require( './server/components/file_streams/text_file_stream_test' );
+	require( './server/components/file_streams/video_file_stream_test' );
+	require( './server/components/file_streams/image_file_stream_test' );
+};
+
 testSuites.errorSuite		= () => {
 	require( './server/components/error/error_handler_test' );
 };

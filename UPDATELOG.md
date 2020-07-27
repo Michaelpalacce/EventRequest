@@ -6,6 +6,9 @@
 - Fixed a bug with validation attribute that would return a validation that was NOT in an array
 - Fixed an issue with the BodyParsers and the way payloadLength was calculated
 - Removed unnecessary code form the body parsers
+- Body Parser Plugin will not attempt to parse if a body key already exists
+- er_env plugin has a new variable watcher ( the watcher that is attached to the file ). For testing only
+- Server resets the options of the static resources plugin
 
 26.0.5
 - Added more tests

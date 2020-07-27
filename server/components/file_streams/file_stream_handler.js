@@ -30,6 +30,7 @@ module.exports			= {
 
 		for ( const index in fileStreams )
 		{
+			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( fileStreams, index ) )
 				continue;
 

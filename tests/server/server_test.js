@@ -1,20 +1,22 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers, Mock }	= require( '../test_helper' );
-const path								= require( 'path' );
-const http								= require( 'http' );
-const fs								= require( 'fs' );
-const { Loggur, File, Logger }			= require( './../../server/components/logger/loggur' );
-const Router							= require( './../../server/components/routing/router' );
-const DataServer						= require( './../../server/components/caching/data_server' );
-const PluginManager						= require( './../../server/plugins/plugin_manager' );
-const Session							= require( './../../server/components/session/session' );
-const querystring						= require( 'querystring' );
-const RateLimitsPlugin					= require( './../../server/plugins/available_plugins/rate_limits_plugin' );
+const { assert, test, helpers, Mock, Mocker }	= require( '../test_helper' );
+const path										= require( 'path' );
+const http										= require( 'http' );
+const fs										= require( 'fs' );
+const { Loggur, File, Logger }					= require( './../../server/components/logger/loggur' );
+const Router									= require( './../../server/components/routing/router' );
+const DataServer								= require( './../../server/components/caching/data_server' );
+const PluginManager								= require( './../../server/plugins/plugin_manager' );
+const Session									= require( './../../server/components/session/session' );
+const querystring								= require( 'querystring' );
+const RateLimitsPlugin							= require( './../../server/plugins/available_plugins/rate_limits_plugin' );
+const JsonBodyParser							= require( './../../server/components/body_parsers/json_body_parser' );
+const BodyParserPlugin							= require( './../../server/plugins/available_plugins/body_parser_plugin' );
 
-const { App, Server }					= require( './../../index' );
-const app								= App();
+const { App, Server }							= require( './../../index' );
+const app										= App();
 
 test({
 	message	: 'Server.constructor starts without crashing with defaults',
@@ -1807,6 +1809,143 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_body_parser_json.does.not.parse.anything.but.application/json.setting.options',
+	test	: ( done ) => {
+		const name			= 'testErJsonBodyParserParsesApplicationJson';
+		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
+		const formDataValue	= 'value';
+
+		const app			= new Server();
+
+		app.er_body_parser_json.setOptions({
+			maxPayloadLength: 60
+		});
+		app.apply( app.er_body_parser_json );
+
+		app.get( `/${name}`, ( event ) => {
+			if (
+				typeof event.body === 'undefined'
+				|| typeof event.body[formDataKey] === 'undefined'
+				|| ! event.body[formDataKey].includes( formDataValue )
+			) {
+				event.sendError( 'Body was not parsed', 400 );
+			}
+
+			event.send( 'ok' );
+		} );
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': 'application/json' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ ['content-type'.toUpperCase()]: 'application/json' },
+				3337
+			)
+		);
+
+		// Above the limit of 60 bytes
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
+				{ 'content-type': 'application/json' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': 'application/*' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': '*/*' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': 'json' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{ 'content-type': '*' },
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				JSON.stringify( { [formDataKey]: formDataValue } ),
+				{},
+				3337
+			)
+		);
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				400,
+				'{wrongJson',
+				{},
+				3337
+			)
+		);
+
+		const server	= app.listen( 3337, () => {
+			Promise.all( responses ).then(() => {
+				server.close();
+				done();
+			}).catch( done );
+		} );
+	}
+});
+
+test({
 	message	: 'Server.test er_body_parser_json does not parse above the maxPayload if strict',
 	test	: ( done ) => {
 		const name			= 'testErJsonBodyParserParsesApplicationJson';
@@ -2175,6 +2314,134 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_body_parser.setOptions.without.anything',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.apply( app.er_body_parser_json, { maxPayloadLength: 1 } );
+		assert.deepStrictEqual( app.er_body_parser_json.options, { maxPayloadLength: 1 } );
+
+		app.er_body_parser_json.setOptions();
+		app.apply( app.er_body_parser_json );
+		assert.deepStrictEqual( app.er_body_parser_json.options, {} );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.test.er_body_parser.when.event.body.already.exists.does.not.parse',
+	test	: ( done ) => {
+		const name	= 'testErBodyParserDoesNotParseIfBodyExists';
+		const app	= new Server();
+
+		app.get( `/${name}`, ( event ) => {
+			event.body		= 'TEST';
+			event.rawBody	= 'TEST';
+			event.next();
+		});
+
+		app.apply( app.er_body_parser_json );
+
+		app.get( `/${name}`, ( event ) => {
+			event.send( { body: event.body, rawBody: event.rawBody } );
+		});
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				JSON.stringify( { key: 123 } ),
+				{ 'content-type': 'application/json' },
+				4300,
+				JSON.stringify( { body: 'TEST', rawBody: 'TEST' } )
+			)
+		);
+
+		const server = app.listen( 4300, () => {
+			Promise.all( responses ).then(() => {
+				server.close();
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_body_parser.when.parsed.data.is.invalid',
+	test	: ( done ) => {
+		const name				= 'testErBodyParserIfInvalidParserData';
+		const app				= new Server();
+		const MockBodyParser	= Mock( JsonBodyParser );
+
+		Mocker( MockBodyParser, {
+			method			: 'parse',
+			shouldReturn	: () => {
+				return new Promise(( resolve ) => {
+					resolve( 'wrongData' );
+				});
+			}
+		});
+
+		Mocker( MockBodyParser, {
+			method			: 'supports',
+			shouldReturn	: () => {
+				return true;
+			}
+		});
+
+		app.apply( new BodyParserPlugin( MockBodyParser, 'er_test' ) );
+
+		app.get( `/${name}`, ( event ) => {
+			event.send( { body: event.body, rawBody: event.rawBody } );
+		});
+
+		const responses	= [];
+
+		responses.push(
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				200,
+				'',
+				{ 'content-type': '*/*' },
+				4301,
+				JSON.stringify( { body: {}, rawBody: {} } )
+			)
+		);
+
+		const server = app.listen( 4301, () => {
+			Promise.all( responses ).then(() => {
+				server.close();
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_body_parser.setServerOnRuntime.without.pluginbag.creates.one',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		assert.deepStrictEqual( typeof app.pluginBag.parsers, 'undefined' );
+
+		app.apply( app.er_body_parser_json );
+		assert.deepStrictEqual( typeof app.pluginBag.parsers, 'object' );
+		assert.deepStrictEqual( Object.keys( app.pluginBag.parsers ).length, 1 );
+
+		app.apply( app.er_body_parser_form );
+		assert.deepStrictEqual( typeof app.pluginBag.parsers, 'object' );
+		assert.deepStrictEqual( Object.keys( app.pluginBag.parsers ).length, 2 );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Server.test er_body_parser_raw handles anything',
 	test	: ( done ) => {
 		const name	= 'testErBodyParserRaw';
@@ -2490,6 +2757,15 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_env.getEnvFileAbsPath',
+	test	: ( done ) => {
+		assert.deepStrictEqual( app.er_env.getEnvFileAbsPath(), path.join( path.parse( require.main.filename ).dir, '.env' ) );
+
+		done();
+	}
+});
+
+test({
 	message	: 'Server.test er_env attaches environment variables to process',
 	test	: ( done ) => {
 		const name			= 'testErEnvAttachesVariablesToProcess';
@@ -2507,6 +2783,51 @@ test({
 			assert.equal( response.body.toString(), name );
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.er_env.attaches.environment.variables.to.process.when.changed',
+	test	: ( done ) => {
+		const fileLocation	= path.join( __dirname, './fixture/.env' );
+		app.apply( app.er_env, { fileLocation } );
+
+		assert.equal( process.env.TESTKEY, 'TESTVALUE' );
+
+		fs.writeFileSync( fileLocation, 'TESTKEY=TESTVALUE2' )
+
+		setTimeout(()=>{
+			assert.equal( process.env.TESTKEY, 'TESTVALUE2' );
+			fs.writeFileSync( fileLocation, 'TESTKEY=TESTVALUE' )
+			setTimeout(()=>{
+				done();
+			}, 100 );
+		}, 200 );
+	}
+});
+
+test({
+	message	: 'Server.test.er_env.if.file.not.exists',
+	test	: ( done ) => {
+		const fileLocation	= path.join( __dirname, './fixture/.envNotExisting' );
+
+		assert.throws(() => {
+			app.apply( app.er_env, { fileLocation } );
+		});
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.test.er_env.defaults',
+	test	: ( done ) => {
+
+		assert.throws(() => {
+			app.apply( app.er_env );
+		});
+
+		done();
 	}
 });
 
@@ -3420,13 +3741,65 @@ test({
 });
 
 test({
-	message	: 'Server.test er_file_stream works as expected',
+	message	: 'Server.test.er_static_resources.works.as.expected.with.string',
+	test	: ( done ) => {
+		const app	= new Server();
+		app.apply( app.er_static_resources, { paths: 'tests/server/fixture/static' } );
+
+
+		app.listen( 4310, ()=>{
+			helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js`, 'GET', 200, '', {}, 4310 ).then(( response ) => {
+				assert.equal( response.headers['content-type'], 'application/javascript' );
+				assert.equal( response.body.toString(), 'const test=\'123\';' );
+
+				return helpers.sendServerRequest( '/tests/server/fixture/static/test.css', 'GET', 200, '', {}, 4310 );
+			}).then(( response ) => {
+				assert.equal( response.headers['content-type'], 'text/css' );
+				assert.equal( response.body.toString(), 'body{background:black;}' );
+
+				return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404, '', {}, 4310 );
+			}).then(( response ) => {
+				assert.equal( response.body.toString().includes( 'File not found' ), true );
+
+				done();
+			}).catch( done )
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_static_resources.works.as.expected.with.default',
+	test	: ( done ) => {
+		const app	= new Server();
+		app.apply( app.er_static_resources );
+
+		app.listen( 4311, ()=>{
+			helpers.sendServerRequest( `/public/test/index.css`, 'GET', 200, '', {}, 4311 ).then(( response ) => {
+				assert.equal( response.body.toString().includes( 'body' ), true );
+
+				return helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4311 );
+			}).then(( response ) => {
+				assert.equal( response.body.toString().includes( 'Hello World!' ), true );
+
+				return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404, '', {}, 4311 );
+			}).then(( response ) => {
+				assert.equal( response.body.toString().includes( 'Cannot GET' ), true );
+
+				done();
+			}).catch( done )
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_file_stream.works.as.expected',
 	test	: ( done ) => {
 		app.apply( app.er_file_stream );
 
 		app.get( '/testErFileStreamVideoWithRange', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
+				|| event.getFileStream( path.join( __dirname, './fixture/file_streams/test.unsupported' ) ) !== null
 				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
 				|| event.response.getHeader( 'Content-Range' ) == null
 				|| event.response.getHeader( 'Content-Length' ) == null
@@ -3443,6 +3816,7 @@ test({
 		app.get( '/testErFileStreamVideoWithOutRange', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
+				|| event.getFileStream( path.join( __dirname, './fixture/file_streams/test.unsupported' ) ) !== null
 				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
 				|| event.response.getHeader( 'Content-Length' ) == null
 				|| event.response.getHeader( 'Content-Range' ) != null
@@ -3514,6 +3888,20 @@ test({
 			event.send( 'ok' ) ;
 		});
 
+		app.get( '/testErFileStreamWhenFileNotSupported', ( event ) => {
+			event.streamFile( path.join( __dirname, './fixture/file_streams/test.unsupported' ) );
+		});
+
+		app.get( '/testErFileStreamWhenFileNotSupportedWithErrorCallback', ( event ) => {
+			event.streamFile( path.join( __dirname, './fixture/file_streams/test.unsupported' ), undefined, () => {
+				event.send( 'OK!' );
+			});
+		});
+
+		app.get( '/testErFileStreamWhenFileSupported', ( event ) => {
+			event.streamFile( path.join( __dirname, './fixture/file_streams/text.txt' ) );
+		});
+
 		const responses	= [];
 
 		responses.push( helpers.sendServerRequest( `/testErFileStreamVideoWithRange`, 'GET', 206, '', { range: 'bytes=1-50'} ) );
@@ -3522,6 +3910,39 @@ test({
 		responses.push( helpers.sendServerRequest( `/testErFileStreamAudioWithOutRange` ) );
 		responses.push( helpers.sendServerRequest( `/testErFileStreamImage` ) );
 		responses.push( helpers.sendServerRequest( `/testErFileStreamText` ) );
+		responses.push(
+			helpers.sendServerRequest(
+				`/testErFileStreamWhenFileNotSupported`,
+				'GET',
+				400,
+				'',
+				{},
+				3333,
+				'{"error":"Could not find a FileStream that supports that format"}'
+			)
+		);
+		responses.push(
+			helpers.sendServerRequest(
+				`/testErFileStreamWhenFileNotSupportedWithErrorCallback`,
+				'GET',
+				200,
+				'',
+				{},
+				3333,
+				'OK!'
+			)
+		);
+		responses.push(
+			helpers.sendServerRequest(
+				`/testErFileStreamWhenFileSupported`,
+				'GET',
+				200,
+				'',
+				{},
+				3333,
+				'test'
+			)
+		);
 
 		Promise.all( responses ).then( () => {
 			done();

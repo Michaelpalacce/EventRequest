@@ -6,10 +6,12 @@ require( './tests/test_bootstrap' );
 
 const startTests	= () => {
 	testSuites.eventSuite();
+	testSuites.eventSuite();
 	testSuites.securitySuite();
 	testSuites.templatingEngine();
 	testSuites.helpersSuite();
 	testSuites.errorSuite();
+	testSuites.fileStreamSuite();
 	testSuites.routingSuite();
 	testSuites.loggingSuite();
 	testSuites.validationSuite();

@@ -18,6 +18,7 @@ class EnvPlugin extends PluginInterface
 		super( id, options );
 
 		this.envVariableKeys	= [];
+		this.watcher			= null;
 	}
 
 	/**
@@ -92,9 +93,10 @@ class EnvPlugin extends PluginInterface
 	 */
 	attachFileWatcherToEnvFile()
 	{
-		fs.watch( this.getEnvFileAbsPath(), ( eventType ) => {
-			if ( eventType === CHANGE_EVENT )
-				this.loadFileInEnv();
+		this.watcher	= fs.watch( this.getEnvFileAbsPath() );
+
+		this.watcher.on( 'change', () => {
+			this.loadFileInEnv();
 		});
 	}
 }

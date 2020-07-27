@@ -110,14 +110,8 @@ class Server extends EventEmitter
 		this.pluginManager.addPlugin( this.er_validation );
 
 		this.apply( this.router );
-
-		const pluginsToApply	= [
-			{ plugin : 'er_static_resources', options: { paths: ['favicon.ico'] } },
-		];
-
-		pluginsToApply.forEach(( pluginConfig ) => {
-			this.apply( pluginConfig.plugin, pluginConfig.options );
-		});
+		this.apply( this.er_static_resources, { paths: ['favicon.ico'] } );
+		this.er_static_resources.setOptions( {} );
 	}
 
 	/**

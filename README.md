@@ -2947,6 +2947,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 - form body parser supports: application/x-www-form-urlencoded
 - multipart body parser supports: multipart/form-data
 - er_body_parser_raw is a fallback body parser that will return the data as a raw string if no other parser supports the request. The default body parser has a limit of 10MB. It can optionally be added as a final parser manually to have it's maxPayloadLength changed
+- THE BODY PARSER PLUGINS WILL NOT PARSE DATE IF event.body exists when hitting the middleware
 
 
 ***
