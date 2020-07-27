@@ -61,6 +61,32 @@ test({
 });
 
 test({
+	message	: 'ValidationPlugin.validate.when.property.is.not.an.object',
+	test	: ( done ) => {
+		const plugin				= new ValidationPlugin();
+		const eventRequest			= helpers.getEventRequest( 'GET', '/?testKey=123&testKeyTwo=123', { headerTest: '123', headerTestTwo: 123 } );
+		const validationCallback	= plugin.validate( { clientIp: { testKey: 'string' } }, () => { done( 'Validation Failed' ); } );
+
+		eventRequest._mock({
+			method			: 'next',
+			shouldReturn	: ( error ) => {
+				assert.deepStrictEqual( error,  'Could not validate clientIp as it is not a property of the EventRequest' );
+				done();
+			}
+		});
+
+		eventRequest._mock({
+			method			: 'send',
+			shouldReturn	: () => {
+				done( 'Should not be called' );
+			}
+		});
+
+		validationCallback( eventRequest );
+	}
+});
+
+test({
 	message	: 'ValidationPlugin.validate.calls.provided.error.function.on.error',
 	test	: ( done ) => {
 		const plugin				= new ValidationPlugin();

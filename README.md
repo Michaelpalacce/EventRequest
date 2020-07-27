@@ -751,7 +751,7 @@ The event request is an object that is created by the server and passed through 
      
   -  **response: mixed** 
      - The response that was returned
-     - Will not be sent if isRaw is true and the response was not a string 
+     - Will not be sent if isRaw is true and the response was not either a string or a number
      
   -  **headers: Object**
      - The headers that were sent

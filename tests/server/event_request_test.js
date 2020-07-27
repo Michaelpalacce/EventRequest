@@ -311,7 +311,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest send emits send event with response even if isRaw is true of the response is a string',
+	message	: 'EventRequest send emits send event with response even if isRaw is true and the response is a string',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
@@ -321,6 +321,7 @@ test({
 		});
 
 		eventRequest.on( 'send', ( payload ) => {
+			console.log( payload );
 			if ( typeof payload.response !== 'undefined' )
 				send	= true;
 		});

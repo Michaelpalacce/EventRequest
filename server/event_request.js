@@ -213,7 +213,7 @@ class EventRequest extends EventEmitter
 
 		const payload	= { code, raw, headers: this.response.getHeaders() };
 
-		if ( ! isRaw || typeof response === 'string' )
+		if ( ! isRaw || ( isRaw && ( typeof response === 'string' || typeof response === 'number' ) ) )
 			payload.response	= response;
 
 		this.emit( 'send', payload );

@@ -57,13 +57,10 @@ class ResponseCachePlugin extends PluginInterface
 
 			const { response, code, headers }	= responseData;
 
-			if ( typeof response === 'string' )
-			{
-				const ttl			= this.getTimeToLive( event );
-				const recordName	= this.getCacheId( event );
+			const ttl			= this.getTimeToLive( event );
+			const recordName	= this.getCacheId( event );
 
-				await this.dataServer.set( recordName, { response, code, headers }, ttl, { persist: false } );
-			}
+			await this.dataServer.set( recordName, { response, code, headers }, ttl, { persist: false } );
 		} );
 	}
 
@@ -134,11 +131,7 @@ class ResponseCachePlugin extends PluginInterface
 					}
 					else
 					{
-						const ttl		= this.getTimeToLive( event );
-						const status	= await this.dataServer.touch( cacheId, ttl );
-
-						if ( ! status )
-							await this.dataServer.set( cacheId, cachedDataSet, ttl, { persist: false } );
+						await this.dataServer.touch( cacheId, this.getTimeToLive( event ) );
 
 						const { response, code, headers }	= cachedDataSet;
 						const headersKeys					= Object.keys( headers );

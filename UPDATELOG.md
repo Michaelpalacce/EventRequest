@@ -1,6 +1,9 @@
 26.0.8
-- Added Logger plugin tests
+- Added more tests
 - Fixed the process.log, now it should not throw an error
+- Fixed the Response cache plugin to cache correctly depending on type of response
+- Fixed when EXACTLY is the response emitted with the send event of the event request
+- Removed unnecessary statements in the response cache plugin
 
 26.0.7
 - Added more tests
