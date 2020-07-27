@@ -47,6 +47,152 @@ test({
 });
 
 test({
+	message	: 'MultipartDataParser.clearUpLastPart',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
+		const parser	= new MultipartDataParser( { tempDir } );
+
+		parser.parts	= [parser.getPartData()]
+
+		assert.deepStrictEqual( parser.parts, [{
+			buffer		: Buffer.from( '' ),
+			contentType	: '',
+			name		: '',
+			size		: 0,
+			state		: 0
+		}]);
+
+		parser.clearUpLastPart();
+		assert.deepStrictEqual( parser.parts, [] );
+
+		done();
+	}
+});
+
+test({
+	message	: 'MultipartDataParser.cleanUpItems.when.part.path.not.exists',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
+		const parser	= new MultipartDataParser( { tempDir } );
+
+		const part		= parser.formPart();
+		part.type		= 'file';
+
+		parser.parts.$files	= [part]
+
+		parser.cleanUpItems();
+
+		setTimeout(()=>{
+			done();
+		}, 200 );
+	}
+});
+
+test({
+	message	: 'MultipartDataParser.cleanUpItems.when.file.does.not.exist',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
+		const parser	= new MultipartDataParser( { tempDir } );
+
+		const part		= parser.formPart();
+		part.type		= 'file';
+		part.path		= 'wrong';
+
+		parser.parts.$files	= [part]
+		parser.cleanUpItems();
+
+		setTimeout(()=>{
+			done();
+		}, 200 );
+	}
+});
+
+test({
+	message	: 'MultipartDataParser.cleanUpItems.when.parts.are.not.$files.yet.and.file.does.not.exist',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
+		const parser	= new MultipartDataParser( { tempDir } );
+
+		const part		= parser.formPart();
+		part.type		= 'file';
+		part.path		= 'wrong';
+
+		parser.parts	= [part]
+		parser.cleanUpItems();
+
+		setTimeout(()=>{
+			done();
+		}, 200 );
+	}
+});
+
+test({
+	message	: 'MultipartDataParser.cleanUpItems.when.parts.are.not.$files.yet.and.path.not.defined',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
+		const parser	= new MultipartDataParser( { tempDir } );
+
+		const part		= parser.formPart();
+		part.type		= 'file';
+
+		parser.parts	= [part]
+		parser.cleanUpItems();
+
+		setTimeout(()=>{
+			done();
+		}, 200 );
+	}
+});
+
+test({
+	message	: 'MultipartDataParser.cleanUpItems.when.parts.are.not.$files.yet.and.type.is.not.file',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
+		const parser	= new MultipartDataParser( { tempDir } );
+
+		const part		= parser.formPart();
+		part.type		= 'parameter';
+
+		parser.parts	= [part]
+		parser.cleanUpItems();
+
+		setTimeout(()=>{
+			done();
+		}, 200 );
+	}
+});
+
+test({
+	message	: 'MultipartDataParser.separateParts.does.not.work.with.unknown.types',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
+		const parser	= new MultipartDataParser( { tempDir } );
+
+		const part		= parser.formPart();
+		part.type		= 'unknown';
+
+		parser.parts	= [part]
+
+		assert.deepStrictEqual( parser.parts, [
+			{
+				buffer		: Buffer.from( '' ),
+				contentType	: '',
+				size		: 0,
+				type		: 'unknown',
+				name		: '',
+				state		: 0
+			}
+		]);
+
+		parser.separateParts();
+
+		assert.deepStrictEqual( parser.parts, [] );
+
+		done();
+	}
+});
+
+test({
 	message	: 'MultipartDataParser.determineEOL.with.different.lines',
 	test	: ( done ) => {
 		const multipartDataParser		= new MultipartDataParser();
@@ -241,6 +387,59 @@ test({
 });
 
 test({
+	message		: 'MultipartDataParser.parse.parses.multipart.data.when.cut.abruptly',
+	test		: ( done ) => {
+		let tempDir			= path.join( __dirname, './fixture/testUploads' );
+		let multipartParser	= new MockMultipartDataParser( { tempDir } );
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'multipart/form-data; boundary=---------------------------9051914041544843365972754266',
+				'content-length'	: '10000',
+			}
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					let data			= multipartData.toString();
+					let placeToSplit	= 700;
+					let firstPart		= data.substr( 0, placeToSplit );
+					callback( Buffer.from( firstPart ) );
+
+					setTimeout(()=>{
+						eventRequest.emit( 'cleanUp' );
+					}, 10 );
+				}
+			}
+		});
+
+		multipartParser.parse( eventRequest ).then( ()=>{
+			done( 'Should have never happened!' );
+		}).catch( done );
+
+		const files	= [];
+
+		for ( const part of multipartParser.parts )
+		{
+			if ( part.type === 'file' )
+				files.push( part );
+		}
+
+		setTimeout(() => {
+			assert.deepStrictEqual( multipartParser.parts, null );
+
+			for ( const file of files )
+				assert.deepStrictEqual( fs.existsSync( file.path ), false );
+
+			done();
+		}, 210 );
+	}
+});
+
+test({
 	message		: 'MultipartDataParser.parse.parses.multipart.data.with.invalid.name',
 	test		: ( done ) => {
 		let tempDir			= path.join( __dirname, './fixture/testUploads' );
@@ -367,7 +566,7 @@ test({
 });
 
 test({
-	message		: 'MultipartDataParser.parse.parses.multipart.data.with.invalid.name.amount.of.lines',
+	message		: 'MultipartDataParser.parse.parses.multipart.data.with.invalid.amount.of.lines',
 	test		: ( done ) => {
 		let tempDir			= path.join( __dirname, './fixture/testUploads' );
 		let multipartParser	= new MockMultipartDataParser( { tempDir } );
@@ -487,68 +686,6 @@ test({
 	}
 });
 
-const placesToSplitProvider	= [];
-const dataLength			= multipartData.toString().length;
-
-for ( let i = 0; i < dataLength; i ++ )
-{
-	placesToSplitProvider.push( [i] );
-}
-
-test({
-	message			: 'MultipartDataParser.parse.parses.multipart.data.with.different.cuts',
-	dataProvider	: placesToSplitProvider,
-	test			: ( done, placeToSplit ) => {
-		let tempDir			= path.join( __dirname, './fixture/testUploads' );
-		let multipartParser	= new MockMultipartDataParser( { tempDir } );
-		let eventRequest	= helpers.getEventRequest(
-			undefined,
-			undefined,
-			{
-				'content-type'		: 'multipart/form-data; boundary=---------------------------9051914041544843365972754266',
-				'content-length'	: '10000',
-			}
-		);
-		eventRequest.request._mock({
-			method			: 'on',
-			shouldReturn	: ( event, callback ) => {
-				if ( event === 'data' )
-				{
-					let data			= multipartData.toString();
-					let firstPart		= data.substr( 0, placeToSplit );
-					let secondPart		= data.substr( placeToSplit );
-					callback( Buffer.from( firstPart ) );
-					callback( Buffer.from( secondPart ) );
-				}
-				else if ( event === 'end' )
-				{
-					callback();
-				}
-			}
-		});
-
-		multipartParser.parse( eventRequest ).then(( parsedData ) => {
-			const body	= parsedData.body;
-
-			// Sync delay
-			setTimeout(() => {
-				assert.deepStrictEqual( parsedData.rawBody, {} );
-				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
-				assert.equal( body.text, 'text default' );
-				assert.equal( body.$files[0].name, 'a.txt' );
-				assert.equal( body.$files[0].contentType, 'text/plain' );
-				assert.equal( fs.readFileSync( body.$files[1].path ).toString().includes( '<!DOCTYPE html><title>Content of a.html.</title>' ), true );
-				assert.equal( body.$files[1].name, 'a.html' );
-				assert.equal( body.$files[1].contentType, 'text/html' );
-
-				multipartParser.terminate();
-				done();
-			}, 75 );
-		}).catch( done );
-	}
-});
-
-
 test({
 	message			: 'MultipartDataParser.parse.parses.multipart.data.with.2.bytes.at.a.time',
 	test			: ( done ) => {
@@ -608,6 +745,67 @@ test({
 				done();
 			}, 50 );
 
+		}).catch( done );
+	}
+});
+
+const placesToSplitProvider	= [];
+const dataLength			= multipartData.toString().length;
+
+for ( let i = 0; i < dataLength; i ++ )
+{
+	placesToSplitProvider.push( [i] );
+}
+
+test({
+	message			: 'MultipartDataParser.parse.parses.multipart.data.with.different.cuts',
+	dataProvider	: placesToSplitProvider,
+	test			: ( done, placeToSplit ) => {
+		let tempDir			= path.join( __dirname, './fixture/testUploads' );
+		let multipartParser	= new MockMultipartDataParser( { tempDir } );
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{
+				'content-type'		: 'multipart/form-data; boundary=---------------------------9051914041544843365972754266',
+				'content-length'	: '10000',
+			}
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					let data			= multipartData.toString();
+					let firstPart		= data.substr( 0, placeToSplit );
+					let secondPart		= data.substr( placeToSplit );
+					callback( Buffer.from( firstPart ) );
+					callback( Buffer.from( secondPart ) );
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+
+		multipartParser.parse( eventRequest ).then(( parsedData ) => {
+			const body	= parsedData.body;
+
+			// Sync delay
+			setTimeout(() => {
+				assert.deepStrictEqual( parsedData.rawBody, {} );
+				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
+				assert.equal( body.text, 'text default' );
+				assert.equal( body.$files[0].name, 'a.txt' );
+				assert.equal( body.$files[0].contentType, 'text/plain' );
+				assert.equal( fs.readFileSync( body.$files[1].path ).toString().includes( '<!DOCTYPE html><title>Content of a.html.</title>' ), true );
+				assert.equal( body.$files[1].name, 'a.html' );
+				assert.equal( body.$files[1].contentType, 'text/html' );
+
+				multipartParser.terminate();
+				done();
+			}, 75 );
 		}).catch( done );
 	}
 });

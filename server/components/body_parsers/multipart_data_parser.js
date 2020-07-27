@@ -33,14 +33,11 @@ const STATE_START_BOUNDARY						= 1;
 const STATE_HEADER_FIELD_START					= 2;
 const STATE_PART_DATA_START						= 4;
 const STATE_PART_DATA							= 5;
-const STATE_CLOSE_BOUNDARY						= 6;
 const STATE_END									= 7;
 
 const ERROR_INVALID_STATE						= 101;
-const ERROR_INCORRECT_END_OF_STREAM				= 102;
 const ERROR_COULD_NOT_FLUSH_BUFFER				= 103;
 const ERROR_INVALID_METADATA					= 104;
-const ERROR_RESOURCE_TAKEN						= 106;
 
 /**
  * @brief	FormParser used to parse multipart data
@@ -86,6 +83,7 @@ class MultipartDataParser extends EventEmitter
 	{
 		this.cleanUpItems();
 		this.removeAllListeners();
+
 		this.parsingError	= false;
 		this.ended			= false;
 
@@ -296,12 +294,7 @@ class MultipartDataParser extends EventEmitter
 					// Receive chunks until we find the first boundary if the end has been finished, throw an error
 					boundaryOffset	= part.buffer.indexOf( this.boundary );
 					if ( boundaryOffset === -1 || part.buffer.length < boundaryOffset + this.boundary.length + 10 )
-					{
-						if ( this.hasFinished() )
-							this.handleError( ERROR_INCORRECT_END_OF_STREAM );
-
 						return;
-					}
 
 					if ( this.EOL === null )
 						this.determineEOL( part.buffer );
@@ -397,28 +390,13 @@ class MultipartDataParser extends EventEmitter
 						this.upgradeToParameterTypePart( part );
 						part.name	= nameCheck;
 					}
-					else
-					{
-						this.handleError( ERROR_INVALID_METADATA );
-						return;
-					}
 
 					part.state	= STATE_PART_DATA_START;
 					break;
 
 				case STATE_PART_DATA_START:
-					if ( part.type === DATA_TYPE_FILE )
-					{
-						if ( part.file === null )
-						{
-							part.file	= fs.createWriteStream( part.path, { flag : 'a' } );
-						}
-						else
-						{
-							this.handleError( ERROR_RESOURCE_TAKEN );
-							return;
-						}
-					}
+					if ( part.type === DATA_TYPE_FILE && part.file === null )
+						part.file	= fs.createWriteStream( part.path, { flag : 'a', autoClose : true } );
 
 					part.state	= STATE_PART_DATA;
 					break;
@@ -427,11 +405,6 @@ class MultipartDataParser extends EventEmitter
 					boundaryOffset	= part.buffer.indexOf( this.boundary );
 					if ( boundaryOffset === -1 )
 					{
-						if ( this.hasFinished() )
-						{
-							this.handleError( ERROR_INCORRECT_END_OF_STREAM );
-						}
-
 						// Flush out the buffer and set it to an empty buffer so next time we set the data correctly
 						// leave buffer is used as a redundancy check
 						let leaveBuffer		= this.boundary.length + 10;
@@ -446,28 +419,11 @@ class MultipartDataParser extends EventEmitter
 					{
 						this.flushBuffer( part, part.buffer.slice( 0, Math.max( boundaryOffset - this.EOL_LENGTH, 0 ) ) );
 						if ( part.type === DATA_TYPE_FILE )
-						{
 							part.file.end();
-						}
 
 						part.buffer	= part.buffer.slice( boundaryOffset );
-						part.state	= STATE_CLOSE_BOUNDARY;
+						part.state	= STATE_END;
 					}
-					break;
-				case STATE_CLOSE_BOUNDARY:
-					boundaryOffset	= part.buffer.indexOf( this.boundary );
-					if ( boundaryOffset === -1 )
-					{
-						if ( this.hasFinished() )
-						{
-							this.handleError( ERROR_INCORRECT_END_OF_STREAM );
-						}
-
-						return;
-					}
-
-					part.state	= STATE_END;
-					part.buffer	= part.buffer.slice( boundaryOffset );
 					break;
 				case STATE_END:
 					let nextPart	= this.formPart();
@@ -477,6 +433,7 @@ class MultipartDataParser extends EventEmitter
 					this.parts.push( nextPart );
 					break;
 
+					/* istanbul ignore next */
 				default:
 					this.handleError( ERROR_INVALID_STATE );
 			}
@@ -638,11 +595,7 @@ class MultipartDataParser extends EventEmitter
 			{
 				this.parts.$files.forEach( ( part ) => {
 					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
-					{
-						unlink( part.path ).catch(( e ) => {
-							Loggur.log( e, Loggur.LOG_LEVELS.error );
-						});
-					}
+						this._removeFile( part.path );
 				});
 			}
 			else
@@ -653,17 +606,28 @@ class MultipartDataParser extends EventEmitter
 						if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
 							part.file.end();
 
-						part.file.on( 'close',() => {
-							unlink( part.path ).catch(( e ) => {
-								Loggur.log( e, Loggur.LOG_LEVELS.error );
-							});
-						});
+						this._removeFile( part.path );
 					}
 				});
 			}
 
 			this.parts	= null;
 		}, this.cleanUpItemsTimeoutMS );
+	}
+
+	/**
+	 * @brief	Extracted for testing purposes
+	 *
+	 * @details	I can't simulate an error when unlinking so this test is ignored for now
+	 *
+	 * @param	{String} absFilePath
+	 */
+	_removeFile( absFilePath )
+	{
+		/* istanbul ignore next */
+		unlink( absFilePath ).catch(( e ) => {
+			Loggur.log( e, Loggur.LOG_LEVELS.info );
+		});
 	}
 
 	/**
@@ -681,19 +645,17 @@ class MultipartDataParser extends EventEmitter
 			if ( part.type === DATA_TYPE_FILE )
 				parts.$files.push( part );
 
-			if ( part.type === DATA_TYPE_PARAMETER )
-			{
-				if ( typeof parts[part.name] === 'undefined' )
-					parts[part.name]	= part.data.toString();
-			}
+			if ( part.type === DATA_TYPE_PARAMETER && typeof parts[part.name] === 'undefined' )
+				parts[part.name]	= part.data.toString();
 		});
 
-		if ( parts.$files.count === 0 )
-		{
+		if ( parts.$files.length === 0 )
 			delete parts.$files;
-		}
 
 		this.parts	= parts;
+
+		if ( Object.keys( this.parts ).length === 0 )
+			this.parts	= [];
 	}
 
 	/**
@@ -711,9 +673,10 @@ class MultipartDataParser extends EventEmitter
 		});
 
 		this.event.request.on( 'end', () => {
-
 			if ( ! this.hasFinished() )
+			{
 				this.emit( 'end' );
+			}
 
 		});
 	}

@@ -167,7 +167,7 @@ class DataServer extends EventEmitter
 	{
 		const error	= 'The data server is not responding';
 
-		Loggur.log( error, Loggur.LOG_LEVELS.error );
+		Loggur.log( error, Loggur.LOG_LEVELS.info );
 		this.emit( 'serverError', { error } );
 
 		return returnValue;

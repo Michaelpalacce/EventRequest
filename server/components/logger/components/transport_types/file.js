@@ -58,9 +58,7 @@ class File extends Transport
 		const file	= path.parse( this.filePath );
 
 		if ( ! fs.existsSync( file.dir ) )
-		{
 			fs.mkdirSync( file.dir );
-		}
 
 		if ( this.fileStream === null || ! fs.existsSync( this.getFileName() ) )
 		{

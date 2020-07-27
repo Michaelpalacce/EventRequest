@@ -1,3 +1,12 @@
+26.0.7
+- Added more tests
+- Removed code that was unreachable in the multipart data parser
+- Removed an unnecessary state in the multipart data parser
+- Fixed removing of $files in case of empty array in the multipart data parser
+- Fixed files that were not being deleted by the multipart data parser
+- Fixed MANY small issues with the Multipart Data Parser
+- Changed the Log levels of logs in the data server in case of failure and the file in case of file not being able to be opened
+
 26.0.6
 - Added more tests
 - Fixed examples. Now all examples have been verified and should be working without an issue.

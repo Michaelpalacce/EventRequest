@@ -345,7 +345,7 @@ class EventRequest extends EventEmitter
 	 */
 	isFinished()
 	{
-		return this.response.finished || this.finished === true;
+		return this.finished === true || this.response.finished;
 	}
 
 	/**
