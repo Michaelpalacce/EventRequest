@@ -2618,7 +2618,7 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.two.dynamic.middlewares',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithDynamicGlobalMiddleware';
+		const name			= 'testErRateLimitsWithTwoDynamicGlobalMiddleware';
 
 		const app			= new Server();
 		const server		= http.createServer( app.attach() );
