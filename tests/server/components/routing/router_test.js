@@ -200,6 +200,28 @@ test({
 });
 
 test({
+	message	: 'Router.add.throws.if.middleware.is.REALLY.REALLY.invalid',
+	test	: ( done ) => {
+		const router	= new Router();
+		const badRoute	= new Route({
+			handler	: () => {},
+			method	: 'GET',
+			route	: '/'
+		});
+
+		badRoute.middlewares	= [123];
+
+		router.middleware.push( badRoute );
+
+		assert.throws(() => {
+			router.getExecutionBlockForCurrentEvent( helpers.getEventRequest( 'GET', '/' ) );
+		});
+
+		done();
+	}
+});
+
+test({
 	message	: 'Router.add returns self',
 	test	: ( done ) => {
 		const router		= new Router();

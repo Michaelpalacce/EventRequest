@@ -69,6 +69,7 @@ class ContentSecurityPolicy
 
 		for ( const directiveName in this.directives )
 		{
+			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this.directives, directiveName ) )
 				continue;
 
@@ -377,6 +378,7 @@ class ContentSecurityPolicy
 
 		for ( const directive in this.directives )
 		{
+			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this.directives, directive ) )
 				continue;
 

@@ -67,7 +67,7 @@ test({
 });
 
 test({
-	message	: 'FormBodyParser.parse parses event request body',
+	message	: 'FormBodyParser.parse.parses.event.request.body',
 	test	: ( done ) => {
 		let expectedBody	= { body: { key: 'value' }, rawBody: 'key=value' };
 		let bodyToStream	= 'key=value';
@@ -95,6 +95,169 @@ test({
 			assert.deepStrictEqual( body, expectedBody );
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'FormBodyParser.parse.parses.event.request.body.with.no.data',
+	test	: ( done ) => {
+		let expectedBody	= { body: {}, rawBody: {} };
+		let bodyToStream	= '';
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{ 'content-type' : 'application/x-www-form-urlencoded' }
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let formBodyParser	= new FormBodyParser( { strict: false } );
+
+		formBodyParser.parse( eventRequest ).then(( body ) => {
+			assert.deepStrictEqual( body, expectedBody );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'FormBodyParser.parse.does.not.parse.if.event.headers.do.not.exist.and.is.strict',
+	test	: ( done ) => {
+		let expectedBody	= { body: {}, rawBody: {} };
+		let bodyToStream	= 'key=value';
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{ 'content-type' : 'application/x-www-form-urlencoded' }
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let formBodyParser	= new FormBodyParser( { strict: true } );
+
+		formBodyParser.parse( eventRequest ).then(( body ) => {
+			assert.deepStrictEqual( body, expectedBody );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'FormBodyParser.parse.parses.if.event.headers.content.length.matches.payload.length.and.is.strict',
+	test	: ( done ) => {
+		let expectedBody	= { body: { key: 'value' }, rawBody: 'key=value' };
+		let bodyToStream	= 'key=value';
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{ 'content-type' : 'application/x-www-form-urlencoded', 'content-length' : 9 }
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let formBodyParser	= new FormBodyParser( { strict: true } );
+
+		formBodyParser.parse( eventRequest ).then(( body ) => {
+			assert.deepStrictEqual( body, expectedBody );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'FormBodyParser.parse.does.not.parse.values.that.are.not.in.the.expected.format.and.contain.an.unencoded.equals',
+	test	: ( done ) => {
+		let expectedBody	= { body: { key: 'value' }, rawBody: 'key=value&keyTwo=value=Two' };
+		let bodyToStream	= 'key=value&keyTwo=value=Two';
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{ 'content-type' : 'application/x-www-form-urlencoded', 'content-length' : 26 }
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let formBodyParser	= new FormBodyParser( { strict: true } );
+
+		formBodyParser.parse( eventRequest ).then(( body ) => {
+			assert.deepStrictEqual( body, expectedBody );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'FormBodyParser.parse.when.event.is.finished',
+	test	: ( done ) => {
+		let bodyToStream	= 'key=value&keyTwo=value=Two';
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{ 'content-type' : 'application/x-www-form-urlencoded', 'content-length' : 26 }
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					eventRequest.finished	= true;
+
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let formBodyParser	= new FormBodyParser( { strict: true } );
+
+		formBodyParser.parse( eventRequest ).then(() => { done( 'Should not have been called' ); }).catch( done );
+
+		setTimeout(() => {
+			// The form body parser was never done, since the event finished prematurely
+			done();
+		}, 100 );
 	}
 });
 

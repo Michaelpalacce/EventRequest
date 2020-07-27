@@ -8,7 +8,7 @@ const Mocker	= require( './mocker' );
  *
  * @param	{*} objectToMock
  *
- * @return	MockedClass
+ * @return	Function
  */
 let Mock	= function ( objectToMock )
 {

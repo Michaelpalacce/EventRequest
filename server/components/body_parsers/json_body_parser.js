@@ -69,11 +69,10 @@ class JsonBodyParser extends EventEmitter
 			{
 				if ( ! event.isFinished() )
 				{
+					payloadLength	+= data.length;
+
 					if ( payloadLength <= this.maxPayloadLength )
-					{
 						rawBody.push( data );
-						payloadLength	+= data.length;
-					}
 				}
 			});
 

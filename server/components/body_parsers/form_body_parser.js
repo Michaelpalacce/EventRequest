@@ -55,7 +55,7 @@ class FormBodyParser extends EventEmitter
 	parse( event )
 	{
 		return new Promise(( resolve, reject ) => {
-			let rawBody		= [];
+			let rawBody			= [];
 			let payloadLength	= 0;
 
 			if ( ! this.supports( event ) )
@@ -65,11 +65,10 @@ class FormBodyParser extends EventEmitter
 			{
 				if ( ! event.isFinished() )
 				{
+					payloadLength += data.length;
+
 					if ( payloadLength <= this.maxPayloadLength )
-					{
 						rawBody.push( data );
-						payloadLength	+= data.length;
-					}
 				}
 			});
 
@@ -81,12 +80,13 @@ class FormBodyParser extends EventEmitter
 					if ( payloadLength > this.maxPayloadLength || payloadLength === 0 )
 						return resolve( { body: {}, rawBody: {} } );
 
+					const contentLengthHeader	= event.getRequestHeader( CONTENT_LENGTH_HEADER );
+
 					if (
 						this.strict &&
 						(
-							typeof event.headers !== 'object'
-							|| typeof event.headers[CONTENT_LENGTH_HEADER] === 'undefined'
-							|| payloadLength !== Number( event.headers[CONTENT_LENGTH_HEADER] )
+							contentLengthHeader === null
+							|| payloadLength !== Number( contentLengthHeader )
 						)
 					) {
 						return resolve( { body: {}, rawBody: {} } );

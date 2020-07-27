@@ -1819,6 +1819,7 @@ test({
 
 		app.get( `/${name}`, ( event ) => {
 			assert.deepStrictEqual( event.body, {} );
+			assert.deepStrictEqual( event.rawBody, {} );
 
 			event.send( 'ok' );
 		} );

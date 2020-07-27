@@ -115,6 +115,7 @@ test({
 		['testKey', 0, 'weakIsFalse', ['weakIsFalse']],
 		['testKey', null, 'weakIsFalse', ['weakIsFalse']],
 		['testKey', [], 'weakIsFalse', ['weakIsFalse']],
+		['testKey', [], 12345, ['rules']],
 	],
 	test			: ( done, key, value, rules, anythingInvalid ) => {
 		let dataToValidate		= {

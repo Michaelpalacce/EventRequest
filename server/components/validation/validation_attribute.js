@@ -63,7 +63,7 @@ class ValidationAttribute
 		}
 
 		if ( this.rules === undefined || typeof this.rules !== 'string' )
-			return VALIDATION_ERRORS.rules;
+			return [VALIDATION_ERRORS.rules];
 
 		let allRules	= this.rules.split( '||' );
 		let index, rule, result, params, validationErrors	= [];

@@ -66,9 +66,8 @@ test({
 	}
 });
 
-
 test({
-	message	: 'JsonBodyParser.parse parses event request body',
+	message	: 'JsonBodyParser.parse.parses.event.request.body',
 	test	: ( done ) => {
 		let expectedBody	= { body: { key: 'value' }, rawBody: '{"key":"value"}' };
 		let bodyToStream	= JSON.stringify( { key: 'value' } );
@@ -96,6 +95,74 @@ test({
 			assert.deepStrictEqual( body, expectedBody );
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'JsonBodyParser.parse.parses.event.request.body.is.invalid',
+	test	: ( done ) => {
+		let bodyToStream	= '{"foo": 1,}';
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{ 'content-type' : 'application/json' }
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let jsonBodyParser	= new JsonBodyParser( { strict: false } );
+
+		jsonBodyParser.parse( eventRequest ).then(( body ) => {
+			done( 'Should not have been called!' );
+		}).catch( ( error )=>{
+			assert.deepStrictEqual( error, 'Could not parse the body' );
+			done();
+		} );
+	}
+});
+
+test({
+	message	: 'JsonBodyParser.parse.when.event.is.finished',
+	test	: ( done ) => {
+		let bodyToStream	= JSON.stringify( { key: 'value' } );
+		let eventRequest	= helpers.getEventRequest(
+			undefined,
+			undefined,
+			{ 'content-type' : 'application/json' }
+		);
+		eventRequest.request._mock({
+			method			: 'on',
+			shouldReturn	: ( event, callback ) => {
+				if ( event === 'data' )
+				{
+					eventRequest.finished	= true;
+
+					callback( Buffer.from( bodyToStream ) )
+				}
+				else if ( event === 'end' )
+				{
+					callback();
+				}
+			}
+		});
+		let jsonBodyParser	= new JsonBodyParser( { strict: false } );
+
+		jsonBodyParser.parse( eventRequest ).then(() => { done( 'Should not have been called' ); }).catch( done );
+
+		setTimeout(() => {
+			// The json body parser was never done, since the event finished prematurely
+			done();
+		}, 100 );
 	}
 });
 

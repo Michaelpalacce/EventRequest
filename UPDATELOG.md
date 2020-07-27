@@ -1,7 +1,11 @@
 26.0.6
+- Added more tests
 - Fixed examples. Now all examples have been verified and should be working without an issue.
 - Small fix with the dynamic middleware of the rate limits plugin
 - Changed the way that the Plugin Manager is created. Now each Server instance will have it's own instance of each of the preloaded plugins as well as it's own instance of PluginManager. This way any possible issues that could arrise with one plugin being used in two servers will be removed.
+- Fixed a bug with validation attribute that would return a validation that was NOT in an array
+- Fixed an issue with the BodyParsers and the way payloadLength was calculated
+- Removed unnecessary code form the body parsers
 
 26.0.5
 - Added more tests

@@ -53,11 +53,10 @@ class RawBodyParser extends EventEmitter
 			{
 				if ( ! event.isFinished() )
 				{
+					payloadLength	+= data.length;
+
 					if ( payloadLength <= this.maxPayloadLength )
-					{
 						rawBody.push( data );
-						payloadLength	+= data.length;
-					}
 				}
 			});
 
@@ -71,14 +70,7 @@ class RawBodyParser extends EventEmitter
 
 					rawBody	= rawBody.toString();
 
-					try
-					{
-						resolve( { body: rawBody, rawBody } );
-					}
-					catch ( e )
-					{
-						reject( 'Could not parse the body' );
-					}
+					resolve( { body: rawBody, rawBody } );
 				}
 			});
 		});

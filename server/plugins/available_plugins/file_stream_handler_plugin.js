@@ -41,13 +41,13 @@ class FileStreamHandlerPlugin extends PluginInterface
 		 *
 		 * @details	The file must be the absolute path to the file to be streamed
 		 *
-		 * @param	{String }file
+		 * @param	{String} file
 		 * @param	{Object} [options={}]
-		 * @param	{Function }errCallback
+		 * @param	{Function} [errCallback=null]
 		 *
 		 * @return	void
 		 */
-		event.streamFile	= function( file, options = {}, errCallback )
+		event.streamFile	= function( file, options = {}, errCallback = null )
 		{
 			const fileStream	= event.getFileStream( file, options );
 

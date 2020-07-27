@@ -18,10 +18,8 @@ const CONTENT_TYPE_INDEX						= 1;
 const CONTENT_LENGTH_HEADER						= 'content-length';
 const CONTENT_TYPE_HEADER						= 'content-type';
 const BOUNDARY_REGEX							= /boundary=(\S+[^\s])/;
-const CONTENT_DISPOSITION_NAME_CHECK_REGEX		= /\bname="[^"]+"/;
-const CONTENT_DISPOSITION_FILENAME_CHECK_REGEX	= /\bfilename="[^"]+"/;
-const CONTENT_DISPOSITION_NAME_REGEX			= /\bname="([^"]+)"/;
-const CONTENT_DISPOSITION_FILENAME_REGEX		= /\bfilename="([^"]+)"/;
+const CONTENT_DISPOSITION_NAME_CHECK_REGEX		= /\bname="([^"]+)"/;
+const CONTENT_DISPOSITION_FILENAME_CHECK_REGEX	= /\bfilename="([^"]+)"/;
 const CONTENT_TYPE_GET_TYPE_REGEX				= /Content-Type:\s+(.+)$/;
 const DEFAULT_BUFFER_ENCODING					= 'utf8';
 const DEFAULT_BOUNDARY_PREFIX					= '--';
@@ -163,6 +161,7 @@ class MultipartDataParser extends EventEmitter
 
 		for ( const index in this.parts )
 		{
+			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this.parts, index ) )
 				continue;
 
@@ -356,36 +355,17 @@ class MultipartDataParser extends EventEmitter
 						return;
 					}
 
-					// Should be in the beginning of the payload, so set state
-
 					// Extract data
 					let filenameCheck	= contentDispositionLine.match( CONTENT_DISPOSITION_FILENAME_CHECK_REGEX );
 					let nameCheck		= contentDispositionLine.match( CONTENT_DISPOSITION_NAME_CHECK_REGEX );
-					let filename		= null;
-					let name			= null;
+
 					if ( filenameCheck !== null )
-					{
-						filename	= contentDispositionLine.match( CONTENT_DISPOSITION_FILENAME_REGEX );
-
-						if ( filename === null )
-							this.handleError( ERROR_INVALID_METADATA );
-
-						filename	= filename[1];
-					}
+						filenameCheck	= filenameCheck[1];
 
 					if ( nameCheck !== null )
-					{
-						name	= contentDispositionLine.match( CONTENT_DISPOSITION_NAME_REGEX );
-
-						if ( name === null )
-							this.handleError( ERROR_INVALID_METADATA );
-						else
-							name	= name[1];
-					}
+						nameCheck	= nameCheck[1];
 					else
-					{
 						this.handleError( ERROR_INVALID_METADATA );
-					}
 
 					// Cut until after the two lines
 					part.buffer	= part.buffer.slice( idxStart );
@@ -403,18 +383,18 @@ class MultipartDataParser extends EventEmitter
 						part.contentType	= contentType[1];
 					}
 
-					if ( filename !== null && name !== null )
+					if ( filenameCheck !== null && nameCheck !== null )
 					{
 						// File input being parsed
 						this.upgradeToFileTypePart( part );
-						part.path		= path.join( this.tempDir, makeId( RANDOM_NAME_LENGTH ) );
-						part.name		= filename;
+						part.path	= path.join( this.tempDir, makeId( RANDOM_NAME_LENGTH ) );
+						part.name	= filenameCheck;
 					}
-					else if ( name !== null )
+					else if ( nameCheck !== null )
 					{
 						// Multipart form param being parsed
 						this.upgradeToParameterTypePart( part );
-						part.name	= name;
+						part.name	= nameCheck;
 					}
 					else
 					{
@@ -672,7 +652,7 @@ class MultipartDataParser extends EventEmitter
 						if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
 							part.file.end();
 
-						part.file.on( 'end',() => {
+						part.file.on( 'close',() => {
 							unlink( part.path ).catch(( e ) => {
 								Loggur.log( e, Loggur.LOG_LEVELS.error );
 							});

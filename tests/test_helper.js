@@ -84,18 +84,18 @@ helpers.getEmptyMiddleware	= () => {
 /**
  * @brief	Returns a mocked instance of the eventRequest
  *
- * @param	requestMethod
- * @param	requestUrl
+ * @param	{String} [requestMethod='']
+ * @param	{String} [requestUrl='/']
+ * @param	{Object} [headers={}]
  *
  * @return	EventRequest
  */
 helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} ) => {
 	let request			= new IncomingMessage();
-	let connectionMock	= {
+
+	request.connection	= {
 		remoteAddress	: '127.0.0.1'
 	};
-
-	request.connection	= connectionMock;
 	request._mock( { method : 'method', shouldReturn : requestMethod } );
 	request._mock( { method : 'url', shouldReturn : requestUrl, } );
 	request._mock( { method : 'headers', shouldReturn : headers, } );
@@ -112,12 +112,13 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
 /**
  * @brief	Sends a request to the server and returns a Promise
  *
- * @param	String path
- * @param	String method
- * @param	Number statusCode
- * @param	mixed data
- * @param	Number port
- * @param	String expectedBody
+ * @param	{String} path
+ * @param	{String} [method='GET']
+ * @param	{Number} [statusCode=200]
+ * @param	{*} [data='']
+ * @param	{Object} [headers={}]
+ * @param	{Number} [port=3333]
+ * @param	{String} [expectedBody=null]
  *
  * @return	Promise
  */
