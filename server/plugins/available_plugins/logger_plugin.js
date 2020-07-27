@@ -31,7 +31,7 @@ class LoggerPlugin extends PluginInterface
 				return Loggur.log( Log.getStackTrace() );
 			};
 
-			process.log			= Loggur.log;
+			process.log			= Loggur.log.bind( Loggur );
 		}
 	}
 

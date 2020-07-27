@@ -1,3 +1,7 @@
+26.0.8
+- Added Logger plugin tests
+- Fixed the process.log, now it should not throw an error
+
 26.0.7
 - Added more tests
 - Removed code that was unreachable in the multipart data parser
