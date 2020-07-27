@@ -1462,6 +1462,38 @@ test({
 });
 
 test({
+	message	: 'Server.er_security.with.constructor.with.options',
+	test	: ( done ) => {
+		const port	= 3379;
+		const name	= 'testErSecurityWithConstructorWithOptionsRemovesBuild';
+		const app	= new Server();
+
+		const SecurityConstructor	= app.er_security.constructor;
+		const securityPlugin		= new SecurityConstructor( 'id', { build : false } );
+		assert.deepStrictEqual( securityPlugin.options, { build: false } );
+
+		app.apply( securityPlugin );
+
+		app.get( `/${name}`, ( event ) => {
+			event.send( name );
+		});
+
+		app.listen( port, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
+				assert.equal( response.body.toString(), name );
+
+				assert.equal( typeof response.headers['content-security-policy'], 'undefined' );
+				assert.equal( typeof response.headers['strict-transport-security'], 'undefined' );
+				assert.equal( typeof response.headers['expect-ct'], 'undefined' );
+				assert.equal( typeof response.headers['x-content-type-options'], 'undefined' );
+
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
 	message	: 'Server.er_securityWithChangesFromTheOptions',
 	test	: ( done ) => {
 		const port	= 3371;
@@ -2784,7 +2816,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_timeout without reaching timeout',
+	message	: 'Server.test.er_timeout.without.reaching.timeout',
 	test	: ( done ) => {
 		const body			= 'testTimeoutWithoutReachingTimeout';
 		const timeout		= 100;
@@ -2815,7 +2847,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_timeout with reaching timeout',
+	message	: 'Server.test.er_timeout.with.reaching.timeout',
 	test	: ( done ) => {
 		const timeout	= 100;
 		let timeoutCalled	= 0;
@@ -2848,6 +2880,43 @@ test({
 
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.er_timeout.with.reaching.timeout.but.request.is.finished',
+	test	: ( done ) => {
+		const app			= new Server();
+		const timeout		= 100;
+		let timeoutCalled	= 0;
+
+		if ( ! app.hasPlugin( app.er_timeout ) )
+			app.apply( app.er_timeout, { timeout } );
+
+		app.add({
+			handler	: ( event ) => {
+				event.on( 'clearTimeout', () => {
+					timeoutCalled++;
+				});
+
+				event.finished	= true;
+
+				// Expired but the timeout checked that the request was finished and did nothing;
+				setTimeout(()=>{
+					event.finished	= false;
+					event.send( 'DONE' );
+				}, 200 );
+			}
+		});
+
+		app.get( '/testTimeoutWithReachingTimeout', ( event ) => {} );
+
+		app.listen( 4400, () => {
+			helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 200, '', {}, 4400, 'DONE' ).then(( response ) => {
+				assert.equal( timeoutCalled, 1 );
+				done();
+			}).catch( done );
+		});
 	}
 });
 
@@ -2987,6 +3056,110 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_rate_limits.when.using.file.and.file.does.not.exist',
+	test	: ( done ) => {
+		const name			= 'testErRateLimitsUsingFileCreatesFile';
+		const fileLocation	= path.join( __dirname, './fixture/er_rate_limits_when_file_does_not_exist.json' );
+
+		if ( fs.existsSync( fileLocation ) )
+			fs.unlinkSync( fileLocation );
+
+		const app			= new Server();
+
+		app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+
+		app.get( `/${name}`, ( event ) => {
+			event.send( name );
+		} );
+
+		app.listen( 4330, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4330 ).then(( response ) => {
+				assert.equal( response.body.toString(), name );
+				assert.equal( fs.existsSync( fileLocation ), true );
+
+				fs.unlinkSync( fileLocation );
+
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.when.using.file.and.json.is.invalid',
+	test	: ( done ) => {
+		const name			= 'testErRateLimitsUsingFileInvalidJson';
+		const fileLocation	= path.join( __dirname, './fixture/er_rate_limits_invalid_json.json' );
+		const app			= new Server();
+
+		app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+
+		app.get( `/${name}`, ( event ) => {
+			assert.deepStrictEqual( app.er_rate_limits.rules, [{
+				path: '',
+				methods: [],
+				maxAmount: 10000,
+				refillTime: 10,
+				refillAmount: 1000,
+				policy: 'connection_delay',
+				delayTime: 3,
+				delayRetries: 5,
+				stopPropagation: false,
+				ipLimit: false
+			}] );
+
+			event.send( name );
+		} );
+
+		app.listen( 4331, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4331 ).then(( response ) => {
+				assert.equal( response.body.toString(), name );
+				assert.equal( fs.existsSync( fileLocation ), true );
+
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.when.using.file.and.file.is.empty',
+	test	: ( done ) => {
+		const name			= 'testErRateLimitsUsingFileEmptyFile';
+		const fileLocation	= path.join( __dirname, './fixture/er_rate_limits_empty.json' );
+		const app			= new Server();
+
+		app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+
+		app.get( `/${name}`, ( event ) => {
+			assert.deepStrictEqual( app.er_rate_limits.rules, [{
+				path: '',
+				methods: [],
+				maxAmount: 10000,
+				refillTime: 10,
+				refillAmount: 1000,
+				policy: 'connection_delay',
+				delayTime: 3,
+				delayRetries: 5,
+				stopPropagation: false,
+				ipLimit: false
+			}] );
+
+			event.send( name );
+		} );
+
+		app.listen( 4332, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4332 ).then(( response ) => {
+				assert.equal( response.body.toString(), name );
+				assert.equal( fs.existsSync( fileLocation ), true );
+
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
 	message	: 'Server.test er_rate_limits with rules in an array instead of json',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithRulesInAnArray';
@@ -3028,6 +3201,69 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_rate_limits.sanitize.config.on.default',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.er_rate_limits.sanitizeConfig();
+
+		assert.deepStrictEqual( app.er_rate_limits.rules, [] );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.validate.rule.if.rule.is.invalid',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		assert.throws(() => {
+			app.er_rate_limits.validateRule( {} );
+		});
+
+		done();
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.validate.rule.if.connection_delay_rule.is.invalid',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		assert.throws(() => {
+			app.er_rate_limits.validateRule( {
+				path: '',
+				methods: [],
+				maxAmount: 10000,
+				refillTime: 10,
+				refillAmount: 1000,
+				policy: 'connection_delay',
+				delayTime: 3,
+				stopPropagation: false,
+				ipLimit: false
+			} );
+		});
+
+		assert.throws(() => {
+			app.er_rate_limits.validateRule( {
+				path: '',
+				methods: [],
+				maxAmount: 10000,
+				refillTime: 10,
+				refillAmount: 1000,
+				policy: 'connection_delay',
+				delayRetries: 3,
+				stopPropagation: false,
+				ipLimit: false
+			} );
+		});
+
+		done();
+	}
+});
+
+test({
 	message	: 'Server.test.er_rate_limits.with.dynamic.middleware',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithDynamicGlobalMiddleware';
@@ -3044,11 +3280,9 @@ test({
 			"delayRetries": 5
 		};
 
-		app.apply( app.er_rate_limits );
-
-		app.get( `/${name}`, app.getPlugin( app.er_rate_limits ).rateLimit( rule ), ( event ) => {
+		app.get( `/${name}`, app.er_rate_limits.rateLimit( rule ), ( event ) => {
 			event.send( name );
-		} );
+		});
 
 		server.listen( 4001, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
@@ -3061,6 +3295,39 @@ test({
 				}, 200 );
 			}).catch( done );
 		} );
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.with.dynamic.middleware.when.request.is.finished',
+	test	: ( done ) => {
+		const name			= 'testErRateLimitsWithDynamicGlobalMiddleware';
+		const app			= new Server();
+
+		const rule			= {
+			"maxAmount":0,
+			"refillTime":100,
+			"refillAmount":1,
+			"policy": 'strict'
+		};
+
+		app.get( `/${name}`, async ( event ) => {
+			event.finished	= true;
+
+			// This never gets rate limited
+			await app.er_rate_limits.rateLimit( rule )( event );
+
+			setTimeout(() => {
+				event.finished	= false;
+				event.send( name );
+			}, 100 );
+		});
+
+		app.listen( 4340, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4340, name ).then(() => {
+				done();
+			}).catch( done );
+		});
 	}
 });
 
@@ -3288,6 +3555,59 @@ test({
 
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.with.two.connection.delay.policy.limiting',
+	test	: ( done ) => {
+		const name			= 'testErRateLimitsWithTwoConnectionDelayPolicy';
+		const now			= Math.floor( new Date().getTime() / 1000 );
+		const app			= new Server();
+
+		app.apply( app.er_rate_limits, { rules: [
+					{
+						"path": "/testErRateLimitsWithTwoConnectionDelayPolicy",
+						"methods": [],
+						"maxAmount": 1,
+						"refillTime": 1,
+						"refillAmount": 1,
+						"policy": "connection_delay",
+						"delayTime": 1,
+						"delayRetries": 10,
+						"stopPropagation": false,
+						"ipLimit": false
+					},
+					{
+						path: /\/[\S]+/,
+						"methods": [],
+						"maxAmount": 1,
+						"refillTime": 3,
+						"refillAmount": 1,
+						"policy": "connection_delay",
+						"delayTime": 1,
+						"delayRetries": 10,
+						"stopPropagation": false,
+						"ipLimit": false
+					}
+				]
+			}
+		);
+
+		app.get( `/${name}`, ( event ) => {
+			event.send( name );
+		} );
+
+		app.listen( 4350, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4350 ).then(( response ) => {
+				return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4350 );
+			}).then(( response ) => {
+				assert.equal( response.body.toString(), name );
+				assert.equal( ( Math.floor( new Date().getTime() / 1000 ) - now ) >= 3, true );
+
+				done();
+			}).catch( done );
+		});
 	}
 });
 
@@ -3572,7 +3892,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_templating_engine attaches a render function that fetches files',
+	message	: 'Server.test.er_templating_engine.attaches.a.render.function.that.fetches.files',
 	test	: ( done ) => {
 		const name			= 'testTemplatingEngine';
 		const deepName		= 'testTemplatingEngineDeep';
@@ -3615,7 +3935,7 @@ test({
 });
 
 test({
-	message	: 'Server.tester_templating_engine attaches a render function that calls next on error',
+	message	: 'Server.test.er_templating_engine.attaches.a.render.function.that.calls.next.on.error',
 	test	: ( done ) => {
 		const name			= 'testTemplatingEngineFail';
 		const templateDir 	= path.join( __dirname, './fixture/templates' );
@@ -3629,6 +3949,104 @@ test({
 		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
 			done();
 		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.er_templating_engine.with.no.template.name.passed.gets.the.index.html',
+	test	: ( done ) => {
+		const name			= 'testTemplatingEngineFail';
+		const app			= new Server();
+		const templateDir 	= path.join( __dirname, './fixture/templates' );
+
+		app.apply( app.er_templating_engine, { templateDir } );
+
+		app.get( `/${name}`, ( event ) => {
+			event.render();
+		});
+
+		app.listen( 4321, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4321 ).then(( response ) => {
+				assert.deepStrictEqual( response.body.toString(), fs.readFileSync( path.join( templateDir, 'index.html' ) ).toString() );
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_templating_engine.with.no.templateDir.uses.root.public.by.default',
+	test	: ( done ) => {
+		const name			= 'testTemplatingEngineFail';
+		const app			= new Server();
+		const templateDir 	= path.join( __dirname, '../../public/test' );
+
+		app.apply( app.er_templating_engine );
+
+		app.get( `/${name}`, ( event ) => {
+			event.render( '/test/index' );
+		});
+
+		app.listen( 4325, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4325 ).then(( response ) => {
+				assert.deepStrictEqual( response.body.toString(), fs.readFileSync( path.join( templateDir, 'index.html' ) ).toString() );
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_templating_engine.render.when.is.finished',
+	test	: ( done ) => {
+		const name			= 'testTemplatingEngineFail';
+		const app			= new Server();
+		const templateDir 	= path.join( __dirname, './fixture/templates' );
+
+		app.apply( app.er_templating_engine, { templateDir } );
+
+		app.get( `/${name}`, ( event ) => {
+			event.finished	= true;
+			event.render( null, {}, ( error )=>{
+				event.finished	= false;
+				event.send( error );
+			});
+		});
+
+		app.listen( 4322, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4322, 'Error rendering' ).then(( response ) => {
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_templating_engine.render.when.templating.engine.rejects',
+	test	: ( done ) => {
+		const name			= 'testTemplatingEngineFail';
+		const app			= new Server();
+		const templateDir 	= path.join( __dirname, './fixture/templates' );
+
+		app.apply( app.er_templating_engine, { templateDir } );
+
+		app.get( `/${name}`, ( event ) => {
+			event.templatingEngine	= {
+				render	: () => {
+					throw new Error( 'Could not render' )
+				}
+			}
+
+			event.render( null, {}, ( error )=>{
+				event.send( error.message );
+			});
+		});
+
+		app.listen( 4323, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4323, 'Could not render' ).then(( response ) => {
+				done();
+			}).catch( done );
+		});
 	}
 });
 

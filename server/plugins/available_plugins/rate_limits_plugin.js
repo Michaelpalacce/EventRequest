@@ -131,7 +131,7 @@ class RateLimitsPlugin extends PluginInterface
 
 			try
 			{
-				config	= JSON.parse( buffer.toString( 'utf-8' ) || '[]' );
+				config	= JSON.parse( buffer.toString( 'utf-8' ) || JSON.stringify( config ) );
 			} catch ( e ) {}
 		}
 
@@ -167,15 +167,14 @@ class RateLimitsPlugin extends PluginInterface
 			&& typeof options.refillAmount === 'number'
 			&& typeof options.methods !== 'undefined'
 			&& Array.isArray( options.methods )
-			&& typeof options.path === 'string'
+			&& ( typeof options.path === 'string' || options.path instanceof RegExp )
 			&& typeof options.policy === 'string'
 		) {
 			const policy	= options.policy;
 
 			if (
 				policy === CONNECTION_DELAY_POLICY
-				&& typeof options.delayTime !== 'number'
-				&& typeof options.delayRetries !== 'number'
+				&& ( typeof options.delayTime !== 'number' || typeof options.delayRetries !== 'number' )
 			) {
 				throw new Error( `Rate limit with ${CONNECTION_DELAY_POLICY} must have delayTime set` );
 			}
@@ -301,9 +300,7 @@ class RateLimitsPlugin extends PluginInterface
 	async _rateLimit( eventRequest, rules )
 	{
 		if ( eventRequest.isFinished() )
-		{
 			return;
-		}
 
 		if ( typeof eventRequest.rateLimited !== 'boolean' )
 			eventRequest.rateLimited		= false;
@@ -316,7 +313,7 @@ class RateLimitsPlugin extends PluginInterface
 		eventRequest.on( 'cleanUp', () => {
 			eventRequest.rateLimited		= undefined;
 			eventRequest.erRateLimitRules	= undefined;
-		} );
+		});
 
 		const path							= eventRequest.path;
 		const method						= eventRequest.method;
@@ -341,9 +338,7 @@ class RateLimitsPlugin extends PluginInterface
 				bucketKey	+= `${rulePath}${policy}`;
 
 				if ( ipLimit === true )
-				{
 					bucketKey	+= clientIp;
-				}
 
 				const bucket	= await this.getNewBucketFromOptions( bucketKey, rule );
 				const hasToken	= await bucket.reduce();

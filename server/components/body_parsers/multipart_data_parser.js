@@ -377,6 +377,8 @@ class MultipartDataParser extends EventEmitter
 						part.contentType	= contentType[1];
 					}
 
+					// The else is impossible to go to, but is added in case something is changed
+					/* istanbul ignore else */
 					if ( filenameCheck !== null && nameCheck !== null )
 					{
 						// File input being parsed
@@ -389,6 +391,11 @@ class MultipartDataParser extends EventEmitter
 						// Multipart form param being parsed
 						this.upgradeToParameterTypePart( part );
 						part.name	= nameCheck;
+					}
+					else
+					{
+						this.handleError( ERROR_INVALID_METADATA );
+						return;
 					}
 
 					part.state	= STATE_PART_DATA_START;
@@ -601,7 +608,7 @@ class MultipartDataParser extends EventEmitter
 			else
 			{
 				this.parts.forEach( ( part ) => {
-					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
+					if ( part.type === DATA_TYPE_FILE && typeof part.path !== 'undefined' && fs.existsSync( part.path ) )
 					{
 						if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
 							part.file.end();

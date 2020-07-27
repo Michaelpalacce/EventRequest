@@ -59,7 +59,7 @@
     "test": "nyc --reporter=lcov --reporter=text-summary node test.js",
     "deploy": "npm run test && npm publish"
   },
-  "version": "26.0.8",
+  "version": "26.0.9",
   "devDependencies": {
     "nyc": "^15.1.0"
   }

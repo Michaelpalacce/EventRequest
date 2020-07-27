@@ -1,3 +1,12 @@
+26.0.9
+- !!! 100% Test Coverage !!!
+- Added more tests
+- Rate limits plugin now accepts RegExp as path variable when passing rules as an array
+- Rate Limits plugin will use the default rule if there is an error parsing the json
+- The connection delay rules are now validated correctly
+- Added an else that should never be hit in the multipart data parser in case anything gets changed in the future.
+- Multipart data parser fix for when files are not converted to $files, the file was not being deleted, now is
+
 26.0.8
 - Added more tests
 - Fixed the process.log, now it should not throw an error

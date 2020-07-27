@@ -52,18 +52,27 @@ test({
 		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
 		const parser	= new MultipartDataParser( { tempDir } );
 
-		parser.parts	= [parser.getPartData()]
+		const part		= parser.getPartData();
+		part.state		= 7;
+
+		parser.parts	= [part]
 
 		assert.deepStrictEqual( parser.parts, [{
 			buffer		: Buffer.from( '' ),
 			contentType	: '',
 			name		: '',
 			size		: 0,
-			state		: 0
+			state		: 7
 		}]);
 
 		parser.clearUpLastPart();
-		assert.deepStrictEqual( parser.parts, [] );
+		assert.deepStrictEqual( parser.parts, [{
+			buffer		: Buffer.from( '' ),
+			contentType	: '',
+			name		: '',
+			size		: 0,
+			state		: 7
+		}] );
 
 		done();
 	}
@@ -150,15 +159,21 @@ test({
 		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
 		const parser	= new MultipartDataParser( { tempDir } );
 
+		const fileToDelete	= path.join( tempDir, 'fileToDelete' );
+
+		fs.writeFileSync( fileToDelete, 'test' );
+
 		const part		= parser.formPart();
-		part.type		= 'parameter';
+		part.type		= 'file';
+		part.path		= fileToDelete;
 
 		parser.parts	= [part]
 		parser.cleanUpItems();
 
 		setTimeout(()=>{
+			assert.deepStrictEqual( fs.existsSync( fileToDelete ), false );
 			done();
-		}, 200 );
+		}, 250 );
 	}
 });
 
