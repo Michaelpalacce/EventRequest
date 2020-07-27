@@ -74,7 +74,6 @@ testSuites.pluginsSuite		= () => {
 	require( './server/plugins/plugin_manager_test' );
 	require( './server/plugins/available_plugins/static_resources_plugin_test' );
 	require( './server/plugins/available_plugins/session_plugin_test' );
-	require( './server/plugins/preloaded_plugins_test' );
 	require( './server/plugins/available_plugins/templating_engine_plugin_test' );
 	require( './server/plugins/available_plugins/logger_plugin_test' );
 	require( './server/plugins/available_plugins/response_cache_plugin_test' );

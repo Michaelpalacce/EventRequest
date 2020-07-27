@@ -8,9 +8,9 @@ const fs								= require( 'fs' );
 const { Loggur, File, Logger }			= require( './../../server/components/logger/loggur' );
 const Router							= require( './../../server/components/routing/router' );
 const DataServer						= require( './../../server/components/caching/data_server' );
+const PluginManager						= require( './../../server/plugins/plugin_manager' );
 const Session							= require( './../../server/components/session/session' );
 const querystring						= require( 'querystring' );
-const PreloadedPluginManager			= require( './../../server/plugins/preloaded_plugins' );
 const RateLimitsPlugin					= require( './../../server/plugins/available_plugins/rate_limits_plugin' );
 
 const { App, Server }					= require( './../../index' );
@@ -44,7 +44,7 @@ test({
 		assert.equal( 1, server.router.middleware.length );
 		assert.equal( 2, Object.keys( server.plugins ).length );
 		assert.equal( typeof server.pluginBag === 'object', true );
-		assert.deepStrictEqual( server.pluginManager, PreloadedPluginManager );
+		assert.deepStrictEqual( server.pluginManager instanceof PluginManager, true );
 
 		assert.equal( typeof server.er_timeout === 'object', true );
 		assert.equal( typeof server.er_env === 'object', true );
@@ -81,7 +81,7 @@ test({
 		const server		= new Server();
 		const pluginManager	= server.getPluginManager();
 
-		assert.equal( true, pluginManager instanceof PreloadedPluginManager.constructor );
+		assert.equal( true, pluginManager instanceof PluginManager );
 		done();
 	}
 });

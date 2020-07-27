@@ -1510,63 +1510,63 @@ console.log( result.getValidationResult() );
 ~~~javascript
 const validationHandler = require( 'event_request/server/components/validation/validation_handler' )
 
-const dataToValidate	= {
-	testOne	: 123,
-	testTwo	: '123',
-	123			: [1,2,3,4,5],
-	testThree	: {
-		'deepOne'	: 123,
-		deepTwo	: {
-			deeperOne	: 123,
-			deeperTwo	: '123',
-			deeperFour	: '4'
-		}
-	},
-	testFour	: true,
-	testFive	: 'true',
-	testSix		: '1',
-	testNine	: {
-		weakString	: 'weakString',
-		weakBoolean	: true,
-		weakNumeric	: 123,
-		weakIsTrue	: true,
-		weakIsFalse	: false,
-	}
+const dataToValidate    = {
+    testOne    : 123,
+    testTwo    : '123',
+    123            : [1,2,3,4,5],
+    testThree    : {
+        'deepOne'    : 123,
+        deepTwo    : {
+            deeperOne    : 123,
+            deeperTwo    : '123',
+            deeperFour    : '4'
+        }
+    },
+    testFour    : true,
+    testFive    : 'true',
+    testSix        : '1',
+    testNine    : {
+        weakString    : 'weakString',
+        weakBoolean    : true,
+        weakNumeric    : 123,
+        weakIsTrue    : true,
+        weakIsFalse    : false,
+    }
 };
 
-const result	= validationHandler.validate(
-	dataToValidate,
-	{
-		testOne		: 'string||range:2-4',
-		testTwo		: 'numeric||range:123-124',
-		123			: 'array||range:4-6',
-		testThree	: {
-			deepOne	: 'numeric||range:122-124',
-			deepTwo	: {
-				deeperOne	: 'string||range:2-4',
-				deeperTwo	: 'numeric||range:123-124',
-				deeperThree	: { $rules: 'optional||min:2||max:5', $default: 4 },
-				deeperFour	: { $rules: 'optional||numeric||min:2||max:5', $default: 4 }
-			}
-		},
-		testFour	: 'boolean',
-		testFive	: 'boolean',
-		testSix		: 'boolean',
-		testSeven	: { $rules: 'optional||min:2||max:5', $default: 4 },
-		testEight	: 'numeric',
-		testNine	: {
-			weakString	: 'weakString',
-			weakBoolean	: 'weakBoolean',
-			weakNumeric	: 'weakNumeric',
-			weakIsTrue	: 'weakIsTrue',
-			weakIsFalse	: 'weakIsFalse',
-			deep	: {
-				deeper	: {
-					deepest: 'string'
-				}
-			}
-		}
-	}
+const result    = validationHandler.validate(
+    dataToValidate,
+    {
+        testOne        : 'string||range:2-4',
+        testTwo        : 'numeric||range:123-124',
+        123            : 'array||range:4-6',
+        testThree    : {
+            deepOne    : 'numeric||range:122-124',
+            deepTwo    : {
+                deeperOne    : 'string||range:2-4',
+                deeperTwo    : 'numeric||range:123-124',
+                deeperThree    : { $rules: 'optional||min:2||max:5', $default: 4 },
+                deeperFour    : { $rules: 'optional||numeric||min:2||max:5', $default: 4 }
+            }
+        },
+        testFour    : 'boolean',
+        testFive    : 'boolean',
+        testSix        : 'boolean',
+        testSeven    : { $rules: 'optional||min:2||max:5', $default: 4 },
+        testEight    : 'numeric',
+        testNine    : {
+            weakString    : 'weakString',
+            weakBoolean    : 'weakBoolean',
+            weakNumeric    : 'weakNumeric',
+            weakIsTrue    : 'weakIsTrue',
+            weakIsFalse    : 'weakIsFalse',
+            deep    : {
+                deeper    : {
+                    deepest: 'string'
+                }
+            }
+        }
+    }
 );
 console.log( result.hasValidationFailed() );
 console.log( result.getValidationResult() );
@@ -1903,11 +1903,11 @@ const App = require( 'event_request' );
 
 const app = App();
 app.add(( event ) => {
-	event.sendError( 'Error', 500 ); // This will call the error Handler
+    event.sendError( 'Error', 500 ); // This will call the error Handler
 
-	// event.next( 'Error', 500 ); // This will call the error Handler
+    // event.next( 'Error', 500 ); // This will call the error Handler
 
-	// event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
+    // event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
 });
 app.listen( 80 );
 ~~~
@@ -2208,7 +2208,7 @@ app.apply( timeoutPlugin );
 app.get('/',() => {});
 
 app.listen( 80, () => {
-	app.Loggur.log( 'Try opening http://localhost and wait for 5 seconds' )
+    app.Loggur.log( 'Try opening http://localhost and wait for 5 seconds' )
 } );
 ~~~
 
@@ -2286,7 +2286,7 @@ The plugin Manager exports the following functions:
 ~~~javascript
 function callback( event )
 {
-	event.next( `Request timed out in: ${this.timeout/1000} seconds`, 503 );
+    event.next( `Request timed out in: ${this.timeout/1000} seconds`, 503 );
 }
 ~~~
 
@@ -2489,16 +2489,16 @@ app.apply( app.er_data_server );
 app.apply( app.er_data_server, { dataServerOptions: { persist: false, ttl: 200, persistPath: '/root' } } );
 
 app.get( '/', async ( event ) => {
-	const value	= await event.dataServer.get( 'testKey' );
+    const value    = await event.dataServer.get( 'testKey' );
 
-	if ( value !== 'testValue' )
-		await event.dataServer.set( 'testKey', 'testValue' );
+    if ( value !== 'testValue' )
+        await event.dataServer.set( 'testKey', 'testValue' );
 
-	event.send( value )
+    event.send( value )
 });
 
 app.listen( 80 , () => {
-	app.Loggur.log( 'Server started, try going to http://localhost twice!' );
+    app.Loggur.log( 'Server started, try going to http://localhost twice!' );
 });
 ~~~
 
@@ -2607,56 +2607,56 @@ app.apply( app.er_session );
 
 // Initialize the session
 app.add( async ( event ) => {
-	event.initSession( event.next ).catch( event.next );
+    event.initSession( event.next ).catch( event.next );
 });
 
 // Redirect to login if authenticated is not true
 app.add(( event ) => {
-	if (
-		event.path !== '/login'
-		&& ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
-	) {
-		event.redirect( '/login' );
-		return;
-	}
+    if (
+        event.path !== '/login'
+        && ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
+    ) {
+        event.redirect( '/login' );
+        return;
+    }
 
-	event.next();
+    event.next();
 });
 
 app.post( '/login', async ( event ) => {
-	const result = event.validate( event.body, { username : 'filled||string', password : 'filled||string' } );
+    const result = event.validate( event.body, { username : 'filled||string', password : 'filled||string' } );
 
-	if ( result.hasValidationFailed() )
-	{
-		event.redirect( '/login' );
-		return;
-	}
+    if ( result.hasValidationFailed() )
+    {
+        event.redirect( '/login' );
+        return;
+    }
 
-	const { username, password } = result.getValidationResult();
+    const { username, password } = result.getValidationResult();
 
-	if ( username === 'username' && password === 'password' )
-	{
-		event.session.add( 'username', username );
-		event.session.add( 'authenticated', true );
+    if ( username === 'username' && password === 'password' )
+    {
+        event.session.add( 'username', username );
+        event.session.add( 'authenticated', true );
 
-		event.redirect( '/' );
-	}
-	else
-	{
-		event.redirect( '/login' );
-	}
+        event.redirect( '/' );
+    }
+    else
+    {
+        event.redirect( '/login' );
+    }
 });
 
 app.get( '/login', ( event ) => {
-	event.send( 'Try to post to /login with { username: "username", password: "password" } in the body. Make sure to send the cookie you get back!' );
+    event.send( 'Try to post to /login with { username: "username", password: "password" } in the body. Make sure to send the cookie you get back!' );
 })
 
 app.get( '/',( event ) => {
-	event.send( 'LOGGED IN!' );
+    event.send( 'LOGGED IN!' );
 });
 
 app.listen( 80, () => {
-	Loggur.log( 'Server started' );
+    Loggur.log( 'Server started' );
 });
 ~~~
 
@@ -2833,39 +2833,39 @@ const app = require( 'event_request' )();
 app.apply( app.er_file_stream );
 
 app.get( '/data', ( event ) => {
-		const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
-		const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
+        const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
+        const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
 
-		if ( ! file || ! fs.existsSync( file ) )
-		{
-			event.next( 'File does not exist' );
-		}
-		else
-		{
-			// You can use this if you want to maybe pipe the file stream to a transformation stream or in general
-			// do something else than piping it to the event.response
-			event.getFileStream( file ).pipe( event.response );
-		}
-	}
+        if ( ! file || ! fs.existsSync( file ) )
+        {
+            event.next( 'File does not exist' );
+        }
+        else
+        {
+            // You can use this if you want to maybe pipe the file stream to a transformation stream or in general
+            // do something else than piping it to the event.response
+            event.getFileStream( file ).pipe( event.response );
+        }
+    }
 );
 
 app.get( '/dataTwo', ( event ) => {
-		const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
-		const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
+        const result    = event.validation.validate( event.query, { file: 'filled||string||min:1' } );
+        const file        = ! result.hasValidationFailed() ? result.getValidationResult().file : false;
 
-		if ( ! file || ! fs.existsSync( file ) )
-		{
-			event.next( 'File does not exist' );
-		}
-		else
-		{
-			event.streamFile( file );
-		}
-	}
+        if ( ! file || ! fs.existsSync( file ) )
+        {
+            event.next( 'File does not exist' );
+        }
+        else
+        {
+            event.streamFile( file );
+        }
+    }
 );
 
 app.listen( '80', () => {
-	app.Loggur.log( 'Try hitting http://localhost/data?file={someFileInTheCurrentProjectRoot}' );
+    app.Loggur.log( 'Try hitting http://localhost/data?file={someFileInTheCurrentProjectRoot}' );
 });
 ~~~
 
@@ -3107,68 +3107,68 @@ app.apply( app.er_response_cache );
 
 // call event.cacheCurrentRequest() where you want to cache.
 app.add({
-	route : '/',
-	method : 'GET',
-	handler : ( event ) => {
-		event.cacheCurrentRequest().catch( event.next );
-		// Nothing else should be done after calling cache current request in the same middleware, a new one needs to be added
-		// cacheCurrentRequest calls next inside it if it is not cached and caches it, if it is cached, then it will return the cached result
-	}
+    route : '/',
+    method : 'GET',
+    handler : ( event ) => {
+        event.cacheCurrentRequest().catch( event.next );
+        // Nothing else should be done after calling cache current request in the same middleware, a new one needs to be added
+        // cacheCurrentRequest calls next inside it if it is not cached and caches it, if it is cached, then it will return the cached result
+    }
 });
 
 // OR
 // When setting a request to be cached, ttl and useIp may be passed that will overwrite the default options
 // app.add( ( event ) => {
-// 	//**useIp** -> whether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
-// 	//**ttl** -> time to live for the record. Defaults to 60 * 5000 ms
+//     //**useIp** -> whether the user Ip should be included when caching. This allows PER USER cache. -> Defaults to false
+//     //**ttl** -> time to live for the record. Defaults to 60 * 5000 ms
 //
-// 	event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } ).catch( event.next );
+//     event.cacheCurrentRequest( { ttl: 20 * 1000, useIp: true } ).catch( event.next );
 // });
 
 
-let counter	= 0;
+let counter    = 0;
 
 // call event.cacheCurrentRequest() where you want to cache.
 app.add({
-	route : '/',
-	method : 'GET',
-	handler : ( event ) => {
-		counter ++;
+    route : '/',
+    method : 'GET',
+    handler : ( event ) => {
+        counter ++;
 
-		if ( counter > 1 )
-			event.send( 'NOT CACHED', 500 );
+        if ( counter > 1 )
+            event.send( 'NOT CACHED', 500 );
 
-		event.send( 'ok' );
-	}
+        event.send( 'ok' );
+    }
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // OR  You can create your own middleware that will be added to all requests
 // you want to cache, no need to do it separately
-let counterTwo		= 0;
-let counterThree	= 0;
+let counterTwo        = 0;
+let counterThree    = 0;
 
 app.get( /\/test/, ( event ) => {
-	event.cacheCurrentRequest().catch( event.next );
+    event.cacheCurrentRequest().catch( event.next );
 });
 
 app.get( '/testTwo', async ( event ) => {
-	counterTwo ++;
+    counterTwo ++;
 
-	if ( counterTwo > 1 )
-		event.send( 'NOT CACHED', 500 );
+    if ( counterTwo > 1 )
+        event.send( 'NOT CACHED', 500 );
 
-	event.send( 'ok' );
+    event.send( 'ok' );
 });
 
 app.get( '/testThree', async ( event ) => {
-	counterThree ++;
+    counterThree ++;
 
-	if ( counterThree > 1 )
-		event.send( 'NOT CACHED', 500 );
+    if ( counterThree > 1 )
+        event.send( 'NOT CACHED', 500 );
 
-	event.send( 'ok' );
+    event.send( 'ok' );
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3178,18 +3178,18 @@ let counterFour = 0;
 
 // You can add it via a middleware to a specific route
 app.get( '/testFour', 'cache.request', ( event )=>
-	{
-		counterFour ++;
+    {
+        counterFour ++;
 
-		if ( counterFour > 1 )
-			event.send( 'NOT CACHED', 500 );
+        if ( counterFour > 1 )
+            event.send( 'NOT CACHED', 500 );
 
-		event.send( 'ok' );
-	}
+        event.send( 'ok' );
+    }
 );
 
 app.listen( 80, () => {
-	app.Loggur.log( 'Try going to http://localhost, http://localhost/testTwo, http://localhost/testThree, http://localhost/testFour' );
+    app.Loggur.log( 'Try going to http://localhost, http://localhost/testTwo, http://localhost/testThree, http://localhost/testFour' );
 });
 ~~~
 
@@ -3304,118 +3304,140 @@ const app = require( 'event_request' )();
 
 app.apply( app.er_body_parser_multipart );
 
-// This will validate the query parameters and the body
-app.post( '/',
-    app.er_validation.validate( { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255'} } ),
+// This will validate the query parameters
+app.get( '/',
+    app.er_validation.validate( { query : { testKey: 'numeric||min:1||max:255' } } ),
     ( event ) => {
-        event.send( { query: event.query, body: event.body } );
+        event.send( { query: event.query } );
     }
 );
 
-app.listen( 80, () => { console.log( 'Server started on port 80' ); } );
+app.listen( 80, () => {
+		app.Loggur.log(
+			'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to get a different response.'
+		);
+	}
+);
 ~~~
 
 - Passing a custom failure callback
 ~~~javascript
 const app = require( 'event_request' )();
 
-app.apply( app.er_body_parser_multipart );
+// This will validate the query parameters and will call the error callback
+app.get( '/',
+	app.er_validation.validate(
+		{ query : { testKey: 'numeric||min:1||max:255' } },
+		( event, validationParameter, validationResult ) => {
+			app.Loggur.log( validationParameter, null, true );
+			app.Loggur.log( validationResult, null, true );
 
-// This will validate the query parameters and the body and will call the error callback 
-app.post( '/',
-    app.er_validation.validate(
-        { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } },
-        ( event, validationParameter, validationResult ) => {
-            console.log( validationParameter );
-            console.log( validationResult );
-
-            event.send( 'ok' );
-        }   
-    ),
-    ( event ) => {
-        event.send( { query: event.query, body: event.body } );
-    }
+			event.send( 'ok' );
+		}
+	),
+	( event ) => {
+		event.send( { query: event.query } );
+	}
 );
 
-app.listen( 80, () => { console.log( 'Server started on port 80' ); } );
+app.listen( 80, () => {
+		app.Loggur.log(
+			'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to get a different response.'
+		);
+	}
+);
 ~~~
 
 - When passing a default one and a custom one, the custom one will be used
 ~~~javascript
 const app = require( 'event_request' )();
 
-// You have to apply the validation plugin
-app.apply(
-    app.er_validation,
-    {
-         failureCallback: ( event, validationParameter, validationResult ) => {
-            console.log( validationParameter );
-            console.log( validationResult );
-
-            event.send( 'ok' );
-         }
-    }
-);
-
 // Alternatively you can do:
 app.er_validation.setOptions({
-     failureCallback: ( event, validationParameter, validationResult ) => {
-        console.log( validationParameter );
-        console.log( validationResult );
+	failureCallback: ( event, validationParameter, validationResult ) => {
+		app.Loggur.log( validationParameter, null, true );
+		app.Loggur.log( validationResult, null, true );
 
-        event.send( 'ok' );
-     }
+		event.send( 'DEFAULT' );
+	}
 });
 
 app.apply( app.er_body_parser_multipart );
+app.apply( app.er_body_parser_json );
+app.apply( app.er_body_parser_form );
 
-// This will validate the query parameters and the body and will call the error callback 
-app.post( '/',
-    app.er_validation.validate(
-        { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } },
-        ( event, validationParameter, validationResult ) => {
-            console.log( validationParameter );
-            console.log( validationResult );
+// This will validate the query parameters and will call the error callback
+app.get( '/',
+	app.er_validation.validate(
+		{ query : { testKey: 'numeric||min:1||max:255' } },
+		( event, validationParameter, validationResult ) => {
+			app.Loggur.log( validationParameter, null, true );
+			app.Loggur.log( validationResult, null, true );
 
-            event.send( 'ok' );
-        }   
-    ),
-    ( event ) => {
-        event.send( { query: event.query, body: event.body } );
-    }
+			event.send( 'CUSTOM' );
+		}
+	),
+	( event ) => {
+		event.send( { query: event.query } );
+	}
 );
 
-app.listen( 80, () => { console.log( 'Server started on port 80' ); } );
+app.listen( 80, () => {
+		app.Loggur.log(
+			'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to get a different response.'
+		);
+	}
+);
 ~~~
 
 - When passing a default one if no failure callback is provided then the default one will be used
 ~~~javascript
-const app    = require( 'event_request' )();
+const app = require( 'event_request' )();
+
 app.apply(
-    app.er_validation,
-    {
-        failureCallback: ( event, validationParameter, validationResult ) => {
-         console.log( validationParameter );
-         console.log( validationResult );
-        
-         event.send( 'ok' );
-        }
-    }
+	app.er_validation,
+	{
+		failureCallback: ( event, validationParameter, validationResult ) => {
+			app.Loggur.log( validationParameter, null, true );
+			app.Loggur.log( validationResult, null, true );
+
+			event.send( 'ok' );
+		}
+	}
 );
 
 app.apply( app.er_body_parser_multipart );
+app.apply( app.er_body_parser_json );
+app.apply( app.er_body_parser_form );
 
-// This will validate the query parameters and the body and will call the error callback 
+// This will validate the query parameters and the body and will call the error callback
 app.post( '/',
-    app.er_validation.validate(
-        { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } }
-    ),
-    ( event ) => {
-        event.send( { query: event.query, body: event.body } );
-    }
+	app.er_validation.validate(
+		{ query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } }
+	),
+	( event ) => {
+		event.send( { query: event.query, body: event.body } );
+	}
 );
 
-app.listen( 80, () => { console.log( 'Server started on port 80' ); } );
+// This will validate the query parameters and will call the error callback
+app.get( '/',
+	app.er_validation.validate(
+		{ query : { testKey: 'numeric||min:1||max:255' } }
+	),
+	( event ) => {
+		event.send( { query: event.query } );
+	}
+);
+
+app.listen( 80, () => {
+		app.Loggur.log(
+			'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to'
+			+ ' get a different response. Try posting to http://localhost?testKey=5 with a body: test=5. Change the'
+			+ ' value for test in the body to get a different response'
+		);
+	}
+);
 ~~~
 
 ***
@@ -3525,7 +3547,9 @@ app.add(( event ) => {
     event.send( event.response.getHeaders() );
 });
 
-app.listen( 80 );
+app.listen( 80, () => {
+    app.Loggur.log( 'Server started, try going to http://localhost and check the body. It will have the returned headers!' )
+});
 ~~~
 
 ***
@@ -3689,24 +3713,66 @@ the request will be immediately canceled
 ]
 ~~~
 
+- Simple implementation
 ~~~javascript
 const app = require( 'event_request' )();
 
-app.apply( app.er_rate_limits );
+const rule = {
+    path : '/rate',
+    methods : ['GET'],
+    maxAmount :3,
+    refillTime :10,
+    refillAmount :2,
+    policy : 'strict'
+};
 
-// If you implement a custom distributed DataServer you can sync between servers
-// Two servers
+app.apply( app.er_rate_limits, { rules: [rule] } );
 
-const { App } = require( 'event_request' );
-const RateLimitsPlugin = require( 'event_request/server/plugins/available_plugins/rate_limits_plugin' );
+app.get( '/rate', ( event ) => {
+    event.send( 'ok' );
+});
+
+app.listen( 80, () => {
+    app.Loggur.log( 'Server started at port 80, try visiting http://localhost:80/rate a 4 times' );
+});
+~~~
+
+- If you implement a custom distributed DataServer you can sync between servers
+~~~javascript
+const { Server } = require( 'event_request' );
 const DataServer = require( 'event_request/server/components/caching/data_server' );
 const dataStore = new DataServer( { persist: false, ttl: 90000 } );
 
-const appOne = new App();
-const appTwo = new App();
+const appOne = new Server();
+const appTwo = new Server();
 
-appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
-appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
+const rule = {
+    path : '/rate',
+    methods : ['GET'],
+    maxAmount :3,
+    refillTime :10,
+    refillAmount :2,
+    policy : 'strict'
+};
+
+appOne.apply( appOne.er_rate_limits, { dataStore, rules: [rule] } );
+appTwo.apply( appTwo.er_rate_limits, { dataStore, rules: [rule] } );
+
+appOne.get( '/rate', ( event ) => {
+    event.send( 'ok' );
+});
+
+appTwo.get( '/rate', ( event ) => {
+    event.send( 'ok' );
+});
+
+appOne.listen( 80, () => {
+    appOne.Loggur.log( 'Server One started at port 80, try visiting http://localhost:80/rate 2 times' )
+});
+
+appTwo.listen( 81, () => {
+    appTwo.Loggur.log( 'Server Two started at port 81, try visiting http://localhost:81/rate 2 times' )
+});
 ~~~
 
 - Using the global middleware
@@ -3714,36 +3780,36 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 const app = require( 'event_request' )();
 
 const rule = {
-	"maxAmount":3,
-	"refillTime":100,
-	"refillAmount":2,
-	"policy": 'strict'
+    "maxAmount":3,
+    "refillTime":100,
+    "refillAmount":2,
+    "policy": 'strict'
 };
 
 // No need to apply this
 app.apply( app.er_rate_limits );
 
 app.get( '/testRoute', app.er_rate_limits.rateLimit( rule ), ( event ) => {
-	event.send( 'ok' );
+    event.send( 'ok' );
 });
 
 const ruleTwo  = {
-	"maxAmount":1,
-	"refillTime":100,
-	"refillAmount":1,
-	"policy": 'permissive'
+    "maxAmount":1,
+    "refillTime":100,
+    "refillAmount":1,
+    "policy": 'permissive'
 };
 
 app.get( '/testRouteTwo', [
-	app.er_rate_limits.rateLimit( ruleTwo ),
-	app.er_rate_limits.rateLimit( rule )
+    app.er_rate_limits.rateLimit( ruleTwo ),
+    app.er_rate_limits.rateLimit( rule )
 ], ( event ) => {
-	app.Loggur.log( event.erRateLimitRules, undefined, true );
-	event.send( `You have been rate limited by permissive: ${event.rateLimited}` );
+    app.Loggur.log( event.erRateLimitRules, undefined, true );
+    event.send( `You have been rate limited by permissive: ${event.rateLimited}` );
 });
 
 app.listen( 80, () => {
-	app.Loggur.log( 'Try going to http://localhost/testRoute and then to http://localhost/testRouteTwo and refreshing a few times' );
+    app.Loggur.log( 'Try going to http://localhost/testRoute and then to http://localhost/testRouteTwo and refreshing a few times' );
 });
 ~~~
 
@@ -3752,54 +3818,54 @@ app.listen( 80, () => {
 const app = require( 'event_request' )();
 
 const rules = [
-	{
-		"path": "/",
-		"methods": [],
-		"maxAmount": 2,
-		"refillTime": 5,
-		"refillAmount": 1,
-		"policy": "strict"
-	},
-	{
-		"path": "/connection",
-		"methods": [],
-		"maxAmount": 2,
-		"refillTime": 5,
-		"refillAmount": 1,
-		"policy": "connection_delay",
-		"delayTime": 3,
-		"delayRetries": 5,
-		"ipLimit": true
-	},
-	{
-		"path": "/permissive",
-		"methods": [],
-		"maxAmount": 2,
-		"refillTime": 5,
-		"refillAmount": 1,
-		"policy": "permissive",
-		"ipLimit": true
-	},
+    {
+        "path": "/",
+        "methods": [],
+        "maxAmount": 2,
+        "refillTime": 5,
+        "refillAmount": 1,
+        "policy": "strict"
+    },
+    {
+        "path": "/connection",
+        "methods": [],
+        "maxAmount": 2,
+        "refillTime": 5,
+        "refillAmount": 1,
+        "policy": "connection_delay",
+        "delayTime": 3,
+        "delayRetries": 5,
+        "ipLimit": true
+    },
+    {
+        "path": "/permissive",
+        "methods": [],
+        "maxAmount": 2,
+        "refillTime": 5,
+        "refillAmount": 1,
+        "policy": "permissive",
+        "ipLimit": true
+    },
 ];
 
 app.apply( app.er_rate_limits, { rules } );
 
 app.get( '/', ( event ) => {
-	event.send( 'You have been allowed in!' );
+    event.send( 'You have been allowed in!' );
 });
 
 app.get( '/connection', ( event ) => {
-	event.send( 'You have been allowed in!' );
+    event.send( 'You have been allowed in!' );
 });
 
 app.get( '/permissive', ( event ) => {
-	event.send( `You have been limited: ${event.rateLimited}` );
+    event.send( `You have been limited: ${event.rateLimited}` );
 });
 
 app.listen( 80, () => {
-	app.Loggur.log( 'Try going to http://localhost and hit refresh a few times. You will get an error but after a while you will be let back in.' );
-	app.Loggur.log( 'Try going to http://localhost/connection and hit refresh a few times. The site will be stuck loading for a while but will eventually connect.' );
-	app.Loggur.log( 'Try going to http://localhost/permissive and hit refresh a few times. You will not get an error but you will see a flag is set' );
+    app.Loggur.log( 'Try going to http://localhost and hit refresh a few times. You will get an error but after a while you will be let back in.' );
+    app.Loggur.log( 'Try going to http://localhost/connection and hit refresh a few times. The site will be stuck loading for a while but will eventually connect.' );
+    app.Loggur.log( 'Try going to http://localhost/permissive and hit refresh a few times. You will not get an error but you will see a flag is set' );
 });
 ~~~
 
@@ -4207,19 +4273,19 @@ const app = require( 'event_request' )();
 app.apply( app.er_security );
 
 app.add(( event ) => {
-	event.$security.csp.enableSandbox();
-	event.$security.hsts.setEnabled( false );
-	event.$security.cto.setEnabled( false );
-	event.$security.ect.setMaxAge( 300 );
-	event.$security.ect.setReportUri( '/report/uri' );
+    event.$security.csp.enableSandbox();
+    event.$security.hsts.setEnabled( false );
+    event.$security.cto.setEnabled( false );
+    event.$security.ect.setMaxAge( 300 );
+    event.$security.ect.setReportUri( '/report/uri' );
 
-	event.$security.build();
+    event.$security.build();
 
-	event.send();
+    event.send();
 });
 
 app.listen( 80, () => {
-	app.Loggur.log( 'Try opening http://localhost and checking the headers sent from the server!' );
+    app.Loggur.log( 'Try opening http://localhost and checking the headers sent from the server!' );
 });
 ~~~
 
@@ -4228,33 +4294,33 @@ app.listen( 80, () => {
 const app = require( 'event_request' )();
 
 app.apply( app.er_security, {
-	csp    : {
-		directives    : {
-			'font-src'    : ['https://fonts.gstatic.com'],
-			'script-src': ['https://example.com'],
-			'style-src': ['https://example.com', 'unsafe-eval'],
-		},
-		xss: true
-	},
-	ect : {
-		maxAge: '300'
-	},
-	hsts    : {
-		maxAge: '300',
-		preload: false
-	},
-	cto : {
-		enabled: false
-	},
-	build: true
+    csp    : {
+        directives    : {
+            'font-src'    : ['https://fonts.gstatic.com'],
+            'script-src': ['https://example.com'],
+            'style-src': ['https://example.com', 'unsafe-eval'],
+        },
+        xss: true
+    },
+    ect : {
+        maxAge: '300'
+    },
+    hsts    : {
+        maxAge: '300',
+        preload: false
+    },
+    cto : {
+        enabled: false
+    },
+    build: true
 });
 
 app.add(( event ) => {
-	event.send( '' );
+    event.send( '' );
 });
 
 app.listen( 80, () => {
-	app.Loggur.log( 'Try opening http://localhost and checking the headers sent from the server!' );
+    app.Loggur.log( 'Try opening http://localhost and checking the headers sent from the server!' );
 });
 ~~~
 
@@ -4265,38 +4331,38 @@ app.apply( app.er_security, { csp : { xss: false } } );
 
 app.add(( event ) => {
 
-	// self is repeated twice but will be shown only once and with single quotes
-	event.$security.csp.addFontSrc( 'self' );
-	event.$security.csp.addFontSrc( "'self'" );
-	event.$security.csp.addFontSrc( 'test' );
-	event.$security.csp.upgradeInsecureRequests();
-	event.$security.csp.enableSelf();
-	event.$security.csp.enableSandbox();
+    // self is repeated twice but will be shown only once and with single quotes
+    event.$security.csp.addFontSrc( 'self' );
+    event.$security.csp.addFontSrc( "'self'" );
+    event.$security.csp.addFontSrc( 'test' );
+    event.$security.csp.upgradeInsecureRequests();
+    event.$security.csp.enableSelf();
+    event.$security.csp.enableSandbox();
 
-	event.$security.ect.setEnabled( false );
-	event.$security.ect.setMaxAge( 30000 );
+    event.$security.ect.setEnabled( false );
+    event.$security.ect.setMaxAge( 30000 );
 
-	event.$security.hsts.setMaxAge( 300 );
-	// null and 'string' are invalid for max age so 300 will be left
-	event.$security.hsts.setMaxAge( null );
-	event.$security.hsts.setMaxAge( 'string' );
-	event.$security.hsts.preload();
-	event.$security.hsts.includeSubDomains( false );
+    event.$security.hsts.setMaxAge( 300 );
+    // null and 'string' are invalid for max age so 300 will be left
+    event.$security.hsts.setMaxAge( null );
+    event.$security.hsts.setMaxAge( 'string' );
+    event.$security.hsts.preload();
+    event.$security.hsts.includeSubDomains( false );
 
-	event.$security.build();
+    event.$security.build();
 
-	// This will actually add a new script-src to the csp and will disable the cto component
-	event.$security.csp.addScriptSrc( 'test' );
-	event.$security.ect.setEnabled( true );
+    // This will actually add a new script-src to the csp and will disable the cto component
+    event.$security.csp.addScriptSrc( 'test' );
+    event.$security.ect.setEnabled( true );
 
-	// This will overwrite the previous build and set the new modified headers
-	event.$security.build();
+    // This will overwrite the previous build and set the new modified headers
+    event.$security.build();
 
-	event.send( '' );
+    event.send( '' );
 });
 
 app.listen( 80, () => {
-	app.Loggur.log( 'Try opening http://localhost and checking the headers sent from the server!' );
+    app.Loggur.log( 'Try opening http://localhost and checking the headers sent from the server!' );
 });
 ~~~
 

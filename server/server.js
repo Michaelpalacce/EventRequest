@@ -6,9 +6,29 @@ const EventRequest				= require( './event_request' );
 const { EventEmitter }			= require( 'events' );
 const RouterClass				= require( './components/routing/router' );
 const PluginInterface			= require( './plugins/plugin_interface' );
-const PluginManager				= require( './plugins/preloaded_plugins' );
+const PluginManager				= require( './plugins/plugin_manager' );
 const Logging					= require( './components/logger/loggur' );
 const { Loggur, LOG_LEVELS }	= Logging;
+
+const TimeoutPlugin				= require( './plugins/available_plugins/timeout_plugin' );
+const EnvPlugin					= require( './plugins/available_plugins/env_plugin' );
+const RateLimitsPlugin			= require( './plugins/available_plugins/rate_limits_plugin' );
+const StaticResourcesPlugin		= require( './plugins/available_plugins/static_resources_plugin' );
+const DataServerPlugin			= require( './plugins/available_plugins/data_server_plugin' );
+const TemplatingEnginePlugin	= require( './plugins/available_plugins/templating_engine_plugin' );
+const FileStreamHandlerPlugin	= require( './plugins/available_plugins/file_stream_handler_plugin' );
+const LoggerPlugin				= require( './plugins/available_plugins/logger_plugin' );
+const BodyParserPlugin			= require( './plugins/available_plugins/body_parser_plugin' );
+const ResponseCachePlugin		= require( './plugins/available_plugins/response_cache_plugin' );
+const SessionPlugin				= require( './plugins/available_plugins/session_plugin' );
+const SecurityPlugin			= require( './plugins/available_plugins/security_plugin' );
+const CorsPlugin				= require( './plugins/available_plugins/cors_plugin' );
+const ValidationPlugin			= require( './plugins/available_plugins/validation_plugin' );
+
+const JsonBodyParser			= require( './components/body_parsers/json_body_parser' );
+const MultipartDataParser		= require( './components/body_parsers/multipart_data_parser' );
+const FormBodyParser			= require( './components/body_parsers/form_body_parser' );
+const RawBodyParser				= require( './components/body_parsers/raw_body_parser' );
 
 /**
  * @brief	Server class responsible for receiving requests and sending responses
@@ -23,11 +43,12 @@ class Server extends EventEmitter
 		super();
 		this.setMaxListeners( 0 );
 
-		this.plugins		= [];
-		this.pluginManager	= PluginManager;
-		this.pluginBag		= {};
+		this.pluginManager	= new PluginManager();
 		this.router			= this.Router();
 		this.Loggur			= Loggur;
+
+		this.plugins		= [];
+		this.pluginBag		= {};
 
 		this.setUpDefaultPlugins();
 	}
@@ -51,6 +72,43 @@ class Server extends EventEmitter
 	 */
 	setUpDefaultPlugins()
 	{
+		// attached like this to enable smart autocomplete in IDE's
+		this.er_timeout					= new TimeoutPlugin( 'er_timeout' );
+		this.er_env						= new EnvPlugin( 'er_env' );
+		this.er_rate_limits				= new RateLimitsPlugin( 'er_rate_limits' );
+		this.er_static_resources		= new StaticResourcesPlugin( 'er_static_resources' );
+		this.er_data_server				= new DataServerPlugin( 'er_data_server' );
+		this.er_templating_engine		= new TemplatingEnginePlugin( 'er_templating_engine' );
+		this.er_file_stream				= new FileStreamHandlerPlugin( 'er_file_stream' );
+		this.er_logger					= new LoggerPlugin( 'er_logger' );
+		this.er_session					= new SessionPlugin( 'er_session' );
+		this.er_security				= new SecurityPlugin( 'er_security' );
+		this.er_cors					= new CorsPlugin( 'er_cors' );
+		this.er_response_cache			= new ResponseCachePlugin( 'er_response_cache' );
+		this.er_body_parser_json		= new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' );
+		this.er_body_parser_form		= new BodyParserPlugin( FormBodyParser, 'er_body_parser_form' );
+		this.er_body_parser_multipart	= new BodyParserPlugin( MultipartDataParser, 'er_body_parser_multipart' );
+		this.er_body_parser_raw			= new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' );
+		this.er_validation				= new ValidationPlugin( 'er_validation' );
+
+		this.pluginManager.addPlugin( this.er_timeout );
+		this.pluginManager.addPlugin( this.er_env );
+		this.pluginManager.addPlugin( this.er_rate_limits );
+		this.pluginManager.addPlugin( this.er_static_resources );
+		this.pluginManager.addPlugin( this.er_data_server );
+		this.pluginManager.addPlugin( this.er_templating_engine );
+		this.pluginManager.addPlugin( this.er_file_stream );
+		this.pluginManager.addPlugin( this.er_logger );
+		this.pluginManager.addPlugin( this.er_session );
+		this.pluginManager.addPlugin( this.er_security );
+		this.pluginManager.addPlugin( this.er_cors );
+		this.pluginManager.addPlugin( this.er_response_cache );
+		this.pluginManager.addPlugin( this.er_body_parser_json );
+		this.pluginManager.addPlugin( this.er_body_parser_form );
+		this.pluginManager.addPlugin( this.er_body_parser_multipart );
+		this.pluginManager.addPlugin( this.er_body_parser_raw );
+		this.pluginManager.addPlugin( this.er_validation );
+
 		this.apply( this.router );
 
 		const pluginsToApply	= [
@@ -60,25 +118,6 @@ class Server extends EventEmitter
 		pluginsToApply.forEach(( pluginConfig ) => {
 			this.apply( pluginConfig.plugin, pluginConfig.options );
 		});
-
-		// attached like this to enable smart autocomplete in IDE's
-		this.er_timeout					= this.pluginManager.getPlugin( 'er_timeout' );
-		this.er_env						= this.pluginManager.getPlugin( 'er_env' );
-		this.er_rate_limits				= this.pluginManager.getPlugin( 'er_rate_limits' );
-		this.er_static_resources		= this.pluginManager.getPlugin( 'er_static_resources' );
-		this.er_data_server				= this.pluginManager.getPlugin( 'er_data_server' );
-		this.er_templating_engine		= this.pluginManager.getPlugin( 'er_templating_engine' );
-		this.er_file_stream				= this.pluginManager.getPlugin( 'er_file_stream' );
-		this.er_logger					= this.pluginManager.getPlugin( 'er_logger' );
-		this.er_session					= this.pluginManager.getPlugin( 'er_session' );
-		this.er_security				= this.pluginManager.getPlugin( 'er_security' );
-		this.er_cors					= this.pluginManager.getPlugin( 'er_cors' );
-		this.er_response_cache			= this.pluginManager.getPlugin( 'er_response_cache' );
-		this.er_body_parser_json		= this.pluginManager.getPlugin( 'er_body_parser_json' );
-		this.er_body_parser_form		= this.pluginManager.getPlugin( 'er_body_parser_form' );
-		this.er_body_parser_multipart	= this.pluginManager.getPlugin( 'er_body_parser_multipart' );
-		this.er_body_parser_raw			= this.pluginManager.getPlugin( 'er_body_parser_raw' );
-		this.er_validation				= this.pluginManager.getPlugin( 'er_validation' );
 	}
 
 	/**
