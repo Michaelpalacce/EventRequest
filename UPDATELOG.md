@@ -1,3 +1,7 @@
+26.0.6
+- Fixed examples
+- Small fix with the dynamic middleware of the rate limits plugin
+
 26.0.5
 - Added more tests
 - Codacy code improvements

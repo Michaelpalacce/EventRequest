@@ -305,8 +305,13 @@ class RateLimitsPlugin extends PluginInterface
 			return;
 		}
 
-		eventRequest.rateLimited		= false;
-		eventRequest.erRateLimitRules	= rules;
+		if ( typeof eventRequest.rateLimited !== 'boolean' )
+			eventRequest.rateLimited		= false;
+
+		if ( typeof eventRequest.erRateLimitRules !== 'object' )
+			eventRequest.erRateLimitRules	= rules;
+		else
+			eventRequest.erRateLimitRules	= Object.assign( eventRequest.erRateLimitRules, rules );
 
 		eventRequest.on( 'cleanUp', () => {
 			eventRequest.rateLimited		= undefined;

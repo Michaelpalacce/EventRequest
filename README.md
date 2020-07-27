@@ -3711,80 +3711,96 @@ appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { dataStore } );
 
 - Using the global middleware
 ~~~javascript
-const app                = require( 'event_request' )();
+const app = require( 'event_request' )();
 
-const rule            = {
-    "maxAmount":1,
-    "refillTime":100,
-    "refillAmount":1,
-    "policy": 'strict',
-    "delayTime": 3,
-    "delayRetries": 5,
-    "stopPropagation": false,
-    "ipLimit": false
+const rule = {
+	"maxAmount":3,
+	"refillTime":100,
+	"refillAmount":2,
+	"policy": 'strict'
 };
 
 // No need to apply this
 app.apply( app.er_rate_limits );
 
 app.get( '/testRoute', app.er_rate_limits.rateLimit( rule ), ( event ) => {
-    event.send( name );
+	event.send( 'ok' );
 });
 
-const ruleTwo            = {
-    "maxAmount":1,
-    "refillTime":100,
-    "refillAmount":1,
-    "policy": 'permissive',
-    "delayTime": 3,
-    "delayRetries": 5,
-    "stopPropagation": false,
-    "ipLimit": false
+const ruleTwo  = {
+	"maxAmount":1,
+	"refillTime":100,
+	"refillAmount":1,
+	"policy": 'permissive'
 };
 
 app.get( '/testRouteTwo', [
-   app.er_rate_limits.rateLimit( ruleTwo ),
-   app.er_rate_limits.rateLimit( rule )
+	app.er_rate_limits.rateLimit( ruleTwo ),
+	app.er_rate_limits.rateLimit( rule )
 ], ( event ) => {
-    event.send( name );
+	app.Loggur.log( event.erRateLimitRules, undefined, true );
+	event.send( `You have been rate limited by permissive: ${event.rateLimited}` );
+});
+
+app.listen( 80, () => {
+	app.Loggur.log( 'Try going to http://localhost/testRoute and then to http://localhost/testRouteTwo and refreshing a few times' );
 });
 ~~~
 
 - Adding with rules directly:
 ~~~javascript
-/**
- * @brief    Instantiate the server
- */
 const app = require( 'event_request' )();
 
 const rules = [
-  {
-    "path": "",
-    "methods": [],
-    "maxAmount": 10000,
-    "refillTime": 10,
-    "refillAmount": 1000,
-    "policy": "connection_delay",
-    "delayTime": 3,
-    "delayRetries": 5,
-    "stopPropagation": false,
-    "ipLimit": false
-  },
-  {
-    "path": "/test",
-    "methods": [],
-    "maxAmount": 10000,
-    "refillTime": 10,
-    "refillAmount": 1000,
-    "policy": "connection_delay",
-    "delayTime": 3,
-    "delayRetries": 5,
-    "stopPropagation": false,
-    "ipLimit": false
-  },
+	{
+		"path": "/",
+		"methods": [],
+		"maxAmount": 2,
+		"refillTime": 5,
+		"refillAmount": 1,
+		"policy": "strict"
+	},
+	{
+		"path": "/connection",
+		"methods": [],
+		"maxAmount": 2,
+		"refillTime": 5,
+		"refillAmount": 1,
+		"policy": "connection_delay",
+		"delayTime": 3,
+		"delayRetries": 5,
+		"ipLimit": true
+	},
+	{
+		"path": "/permissive",
+		"methods": [],
+		"maxAmount": 2,
+		"refillTime": 5,
+		"refillAmount": 1,
+		"policy": "permissive",
+		"ipLimit": true
+	},
 ];
 
 app.apply( app.er_rate_limits, { rules } );
+
+app.get( '/', ( event ) => {
+	event.send( 'You have been allowed in!' );
+});
+
+app.get( '/connection', ( event ) => {
+	event.send( 'You have been allowed in!' );
+});
+
+app.get( '/permissive', ( event ) => {
+	event.send( `You have been limited: ${event.rateLimited}` );
+});
+
+app.listen( 80, () => {
+	app.Loggur.log( 'Try going to http://localhost and hit refresh a few times. You will get an error but after a while you will be let back in.' );
+	app.Loggur.log( 'Try going to http://localhost/connection and hit refresh a few times. The site will be stuck loading for a while but will eventually connect.' );
+	app.Loggur.log( 'Try going to http://localhost/permissive and hit refresh a few times. You will not get an error but you will see a flag is set' );
+});
 ~~~
 
 ***
@@ -4186,18 +4202,24 @@ app.apply( app.er_security );
 
 - Apply the plugin and use the builder methods
 ~~~javascript
+const app = require( 'event_request' )();
+
 app.apply( app.er_security );
 
 app.add(( event ) => {
-    event.$security.csp.enableSandbox();
-    event.$security.hsts.setEnabled( false );
-    event.$security.cto.setEnabled( false );
-    event.$security.ect.setMaxAge( 300 );
-    event.$security.ect.setReportUri( '/report/uri' );
-    
-    event.$security.build();
+	event.$security.csp.enableSandbox();
+	event.$security.hsts.setEnabled( false );
+	event.$security.cto.setEnabled( false );
+	event.$security.ect.setMaxAge( 300 );
+	event.$security.ect.setReportUri( '/report/uri' );
 
-    event.next();
+	event.$security.build();
+
+	event.send();
+});
+
+app.listen( 80, () => {
+	app.Loggur.log( 'Try opening http://localhost and checking the headers sent from the server!' );
 });
 ~~~
 
@@ -4206,25 +4228,33 @@ app.add(( event ) => {
 const app = require( 'event_request' )();
 
 app.apply( app.er_security, {
-    csp    : {
-        directives    : {
-            'font-src'    : ['https://fonts.gstatic.com'],
-            'script-src': ['https://example.com'],
-            'style-src': ['https://example.com', 'unsafe-eval'],
-        },
-        xss: true
-    },
-    ect : {
-        maxAge: '300'
-    },
-    hsts    : {
-        maxAge: '300',
-        preload: false
-    },
-    cto : {
-        enabled: false
-    },
-    build: true
+	csp    : {
+		directives    : {
+			'font-src'    : ['https://fonts.gstatic.com'],
+			'script-src': ['https://example.com'],
+			'style-src': ['https://example.com', 'unsafe-eval'],
+		},
+		xss: true
+	},
+	ect : {
+		maxAge: '300'
+	},
+	hsts    : {
+		maxAge: '300',
+		preload: false
+	},
+	cto : {
+		enabled: false
+	},
+	build: true
+});
+
+app.add(( event ) => {
+	event.send( '' );
+});
+
+app.listen( 80, () => {
+	app.Loggur.log( 'Try opening http://localhost and checking the headers sent from the server!' );
 });
 ~~~
 
@@ -4235,34 +4265,38 @@ app.apply( app.er_security, { csp : { xss: false } } );
 
 app.add(( event ) => {
 
-    // self is repeated twice but will be shown only once and with single quotes
-    event.$security.csp.addFontSrc( 'self' );
-    event.$security.csp.addFontSrc( "'self'" );
-    event.$security.csp.addFontSrc( 'test' );
-    event.$security.csp.upgradeInsecureRequests();
-    event.$security.csp.enableSelf();
-    event.$security.csp.enableSandbox();
+	// self is repeated twice but will be shown only once and with single quotes
+	event.$security.csp.addFontSrc( 'self' );
+	event.$security.csp.addFontSrc( "'self'" );
+	event.$security.csp.addFontSrc( 'test' );
+	event.$security.csp.upgradeInsecureRequests();
+	event.$security.csp.enableSelf();
+	event.$security.csp.enableSandbox();
 
-    event.$security.ect.setEnabled( false );
-    event.$security.ect.setMaxAge( 30000 );
+	event.$security.ect.setEnabled( false );
+	event.$security.ect.setMaxAge( 30000 );
 
-    event.$security.hsts.setMaxAge( 300 );
-    // null and 'string' are invalid for max age so 300 will be left
-    event.$security.hsts.setMaxAge( null );
-    event.$security.hsts.setMaxAge( 'string' );
-    event.$security.hsts.preload();
-    event.$security.hsts.includeSubDomains( false );
+	event.$security.hsts.setMaxAge( 300 );
+	// null and 'string' are invalid for max age so 300 will be left
+	event.$security.hsts.setMaxAge( null );
+	event.$security.hsts.setMaxAge( 'string' );
+	event.$security.hsts.preload();
+	event.$security.hsts.includeSubDomains( false );
 
-    event.$security.build();
+	event.$security.build();
 
-    // This will actually add a new script-src to the csp and will disable the cto component
-    event.$security.csp.addScriptSrc( 'test' );
-    event.$security.cto.setEnabled( false );
+	// This will actually add a new script-src to the csp and will disable the cto component
+	event.$security.csp.addScriptSrc( 'test' );
+	event.$security.ect.setEnabled( true );
 
-    // This will overwrite the previous build and set the new modified headers
-    event.$security.build();
+	// This will overwrite the previous build and set the new modified headers
+	event.$security.build();
 
-    event.next();
+	event.send( '' );
+});
+
+app.listen( 80, () => {
+	app.Loggur.log( 'Try opening http://localhost and checking the headers sent from the server!' );
 });
 ~~~
 

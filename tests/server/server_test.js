@@ -2616,6 +2616,53 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_rate_limits.with.two.dynamic.middlewares',
+	test	: ( done ) => {
+		const name			= 'testErRateLimitsWithDynamicGlobalMiddleware';
+
+		const app			= new Server();
+		const server		= http.createServer( app.attach() );
+
+		const rule			= {
+			"maxAmount":1,
+			"refillTime":100,
+			"refillAmount":1,
+			"policy": 'strict'
+		};
+
+		const ruleTwo		= {
+			"maxAmount":0,
+			"refillTime":100,
+			"refillAmount":1,
+			"policy": 'permissive'
+		};
+
+		app.apply( app.er_rate_limits );
+
+		app.get( `/${name}`, [
+			app.getPlugin( app.er_rate_limits ).rateLimit( ruleTwo ),
+			app.getPlugin( app.er_rate_limits ).rateLimit( rule ),
+		], ( event ) => {
+			assert.deepStrictEqual( event.rateLimited, true );
+			assert.deepStrictEqual( event.erRateLimitRules.length, 2 );
+			event.send( name );
+		} );
+
+		server.listen( 4001, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
+				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
+			}).then(( response ) => {
+				setTimeout(() => {
+					server.close();
+					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+					done();
+				}, 200 );
+			}).catch( done );
+		} );
+	}
+});
+
+test({
 	message	: 'Server.test.er_rate_limits.with.dynamic.middleware.ignores.path.and.methods',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithDynamicGlobalMiddlewareIgnoresPathAndMethods';
