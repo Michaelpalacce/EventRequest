@@ -2035,6 +2035,7 @@ integrated with other plugins.
 - No need to check if key is a String, that has been done in the _get method already.
 - This method also sets the expiration of the DataSet to Infinity if it is null.
 - This will return the value set by set()
+- NOTE: Always check the data. Just because for example a number is set it is not a rule to return a number. Different Data Store handle this differently
 
 **set( String key, mixed value, Number ttl = 0, Object options = {} ): Promise: Object|null** 
 - Returns the data if it was set, otherwise returns null

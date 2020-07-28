@@ -184,8 +184,8 @@ class Bucket
 	 */
 	async _fetchData()
 	{
-		const lastUpdate	= await this._getLastUpdate().catch( this.handleError );
-		const value			= await this._getValue().catch( this.handleError );
+		const lastUpdate	= parseInt( await this._getLastUpdate().catch( this.handleError ) );
+		const value			= parseInt( await this._getValue().catch( this.handleError ) );
 
 		return { value, lastUpdate };
 	}

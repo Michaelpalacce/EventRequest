@@ -1,5 +1,7 @@
 26.0.10
 - Changed the default time for the default data store of the bucket to -1
+- When fetching from the dataStore the values will now go through parseInt
+- Updated the documentation a bit
 
 26.0.9
 - !!! 100% Test Coverage !!!
