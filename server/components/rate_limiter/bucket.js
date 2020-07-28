@@ -44,7 +44,7 @@ class Bucket
 		if ( dataStore === null || ! ( dataStore instanceof DataServer ) )
 		{
 			this.dataStore	= new DataServer({
-				ttl		: this.maxAmount / this.refillAmount * refillTime * 2,
+				ttl		: -1,
 				persist	: false
 			});
 		}
