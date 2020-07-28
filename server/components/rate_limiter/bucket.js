@@ -39,7 +39,7 @@ class Bucket
 		this.maxAmount					= maxAmount;
 		this.prefix						= prefix;
 		this.dataStoreRefetchInterval	= dataStoreRefetchInterval;
-		this.maxCounter					= Math.max( Math.floor( 100 / dataStoreRefetchInterval ), 1 );
+		this.maxCounter					= Math.max( Math.floor( 10000 / dataStoreRefetchInterval ), 1 );
 
 		if ( dataStore === null || ! ( dataStore instanceof DataServer ) )
 		{

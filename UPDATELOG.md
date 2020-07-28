@@ -1,3 +1,6 @@
+26.0.11
+- Increased the maxCounter to 10000
+
 26.0.10
 - Changed the default time for the default data store of the bucket to -1
 - When fetching from the dataStore the values will now go through parseInt

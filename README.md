@@ -1613,7 +1613,7 @@ This class can be used to limit data in one way or another.
 
 **dataStoreRefetchInterval: Number**
 - Milliseconds after which a retry should be sent to the dataStore ( usually should be set to 1 or 2, set to more if the dataStore cannot handle a lot of traffic )
-- Used to set the maxCounter using the following formula: Math.max( Math.floor( 1000 / dataStoreRefetchInterval ), 1 )
+- Used to set the maxCounter using the following formula: Math.max( Math.floor( 10000 / dataStoreRefetchInterval ), 1 )
 - Defaults to 1
 
 ***
