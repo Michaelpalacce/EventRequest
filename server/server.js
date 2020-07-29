@@ -140,14 +140,14 @@ class Server extends EventEmitter
 	 * @details	The plugin manager can be used to extract and set up plugins and then add them to the server just by
 	 * 			giving their plugin ids
 	 *
-	 * @param	{PluginInterface|String} plugin
+	 * @param	{PluginInterface|Object|String} plugin
 	 * @param	{Object} options
 	 *
 	 * @return	Server
 	 */
 	apply( plugin, options = null )
 	{
-		if ( plugin instanceof PluginInterface )
+		if ( this.pluginManager.isValidPlugin( plugin ))
 		{
 		}
 		else if ( typeof plugin === 'string' )

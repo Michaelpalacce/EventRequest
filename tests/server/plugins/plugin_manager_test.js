@@ -51,6 +51,56 @@ test({
 });
 
 test({
+	message	: 'PluginManager.isValidPlugin',
+	test	: ( done ) => {
+		let pluginManager		= new PluginManager();
+		let timeoutPlugin		= new TimeoutPlugin( 'id', {} );
+		const validPlugin		= {
+			getPluginId				: ()=>{ return 'id'; },
+			getPluginDependencies	: ()=>{ return []; },
+			getPluginMiddleware		: ()=>{ return []; },
+			setOptions				: ()=>{},
+			setServerOnRuntime		: ()=>{},
+		};
+
+		assert.deepStrictEqual( pluginManager.isValidPlugin( timeoutPlugin ), true );
+		assert.deepStrictEqual( pluginManager.isValidPlugin( validPlugin ), true );
+		assert.deepStrictEqual( pluginManager.isValidPlugin( {
+			getPluginDependencies	: ()=>{ return []; },
+			getPluginMiddleware		: ()=>{ return []; },
+			setOptions				: ()=>{},
+			setServerOnRuntime		: ()=>{},
+		} ), false );
+		assert.deepStrictEqual( pluginManager.isValidPlugin( {
+			getPluginId				: ()=>{ return 'id'; },
+			getPluginMiddleware		: ()=>{ return []; },
+			setOptions				: ()=>{},
+			setServerOnRuntime		: ()=>{},
+		} ), false );
+		assert.deepStrictEqual( pluginManager.isValidPlugin( {
+			getPluginId				: ()=>{ return 'id'; },
+			getPluginDependencies	: ()=>{ return []; },
+			setOptions				: ()=>{},
+			setServerOnRuntime		: ()=>{},
+		} ), false );
+		assert.deepStrictEqual( pluginManager.isValidPlugin( {
+			getPluginId				: ()=>{ return 'id'; },
+			getPluginDependencies	: ()=>{ return []; },
+			getPluginMiddleware		: ()=>{ return []; },
+			setServerOnRuntime		: ()=>{},
+		} ), false );
+		assert.deepStrictEqual( pluginManager.isValidPlugin( {
+			getPluginId				: ()=>{ return 'id'; },
+			getPluginDependencies	: ()=>{ return []; },
+			getPluginMiddleware		: ()=>{ return []; },
+			setOptions				: ()=>{},
+		} ), false );
+
+		done();
+	}
+});
+
+test({
 	message	: 'PluginManager removePlugin',
 	test	: ( done ) => {
 		let pluginManager		= new PluginManager();

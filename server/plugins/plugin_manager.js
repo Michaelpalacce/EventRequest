@@ -21,7 +21,7 @@ class PluginManager
 	 */
 	addPlugin( plugin )
 	{
-		if ( plugin instanceof PluginInterface )
+		if ( this.isValidPlugin( plugin ) )
 			this.plugins[plugin.getPluginId()]	= plugin;
 		else
 			throw new Error( 'Cannot add plugin' );
@@ -59,6 +59,22 @@ class PluginManager
 	getAllPluginIds()
 	{
 		return Object.keys( this.plugins );
+	}
+
+	/**
+	 * @brief	Returns if the given plugin is a valid plugin interface
+	 *
+	 * @param	{PluginInterface|Object} plugin
+	 *
+	 * @return	Boolean
+	 */
+	isValidPlugin( plugin )
+	{
+		return typeof plugin.getPluginId === 'function'
+			&& typeof plugin.getPluginDependencies === 'function'
+			&& typeof plugin.getPluginMiddleware === 'function'
+			&& typeof plugin.setServerOnRuntime === 'function'
+			&& typeof plugin.setOptions === 'function';
 	}
 
 	/**

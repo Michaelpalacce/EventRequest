@@ -1,3 +1,7 @@
+26.1.2
+- Added Feedback welcome message
+- The server.apply method now uses duck-typing to determine if the plugin is a valid plugin interface
+
 26.1.1
 - The DataServer increment and decrement now return a value instead of true or false
 - Documentation update

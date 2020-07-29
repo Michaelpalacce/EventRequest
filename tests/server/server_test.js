@@ -279,15 +279,69 @@ test({
 });
 
 test({
-	message	: 'Server.apply applies only a PluginInterface and a valid string',
+	message	: 'Server.apply.applies.only.a.PluginInterface.and.a.valid.string',
 	test	: ( done ) => {
 		const server			= new Server();
 
 		const PluginManager		= server.getPluginManager();
 		const staticResources	= PluginManager.getPlugin( 'er_static_resources' );
 
+		const validPlugin		= {
+			getPluginId				: ()=>{ return 'id'; },
+			getPluginDependencies	: ()=>{ return []; },
+			getPluginMiddleware		: ()=>{ return []; },
+			setOptions				: ()=>{},
+			setServerOnRuntime		: ()=>{},
+		};
+
 		server.apply( staticResources );
 		server.apply( 'er_static_resources' );
+		server.apply( validPlugin );
+
+		assert.throws(() => {
+			server.apply({
+				getPluginDependencies	: ()=>{ return []; },
+				getPluginMiddleware		: ()=>{ return []; },
+				setOptions				: ()=>{},
+				setServerOnRuntime		: ()=>{},
+			});
+		});
+
+		assert.throws(() => {
+			server.apply({
+				getPluginId				: ()=>{ return 'id'; },
+				getPluginMiddleware		: ()=>{ return []; },
+				setOptions				: ()=>{},
+				setServerOnRuntime		: ()=>{},
+			});
+		});
+
+		assert.throws(() => {
+			server.apply({
+				getPluginId				: ()=>{ return 'id'; },
+				getPluginDependencies	: ()=>{ return []; },
+				setOptions				: ()=>{},
+				setServerOnRuntime		: ()=>{},
+			});
+		});
+
+		assert.throws(() => {
+			server.apply({
+				getPluginId				: ()=>{ return 'id'; },
+				getPluginDependencies	: ()=>{ return []; },
+				getPluginMiddleware		: ()=>{ return []; },
+				setServerOnRuntime		: ()=>{},
+			});
+		});
+
+		assert.throws(() => {
+			server.apply({
+				getPluginId				: ()=>{ return 'id'; },
+				getPluginDependencies	: ()=>{ return []; },
+				getPluginMiddleware		: ()=>{ return []; },
+				setOptions				: ()=>{},
+			});
+		});
 
 		assert.throws(() => {
 			server.apply( 'wrong' );
