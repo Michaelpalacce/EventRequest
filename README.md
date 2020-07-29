@@ -2149,6 +2149,124 @@ However if the global persist is set to false, this will not work
 ***
 
 
+# DataServerMap
+- Is an EventEmitter
+- Can be extended
+- Same as the default data server but uses a Map instead of an object
+- Extends the DataServer
+
+~~~javascript
+const DataServerMap   = require( 'event_request/server/components/caching/data_server_map' );
+
+console.log( DataServerMap );
+console.log( new DataServerMap( options ) );
+~~~
+
+***
+#### Accepted options
+
+**ttl: Number** 
+- The time in seconds to be used as a default 'Time To Live' if none is specified. 
+- If ttl is set to -1 then the data will never expire
+- Defaults to 300 
+
+**persistPath: String** 
+- The absolute path of the file that will persist data. 
+- Defaults to <PROJECT_ROOT>/cache 
+
+**persistInterval: Number** 
+- The time in seconds after which data will be persisted. 
+- Defaults to 100
+
+**gcInterval: Number** 
+- The time in seconds after which data will be garbageCollected. 
+- Defaults to 60 
+
+**persist: Boolean** 
+- Flag that specifies whether the data should be persisted to disk. 
+- Defaults to true 
+
+#### Events:
+
+**_saveDataError( Error error )**
+- Emitted in case of an error while saving data
+
+**_saveData()**
+- Emitted when the data has finished saving
+
+**stop()**
+- Emitted when the server is stopping
+
+
+#### Functions:
+
+**_stop(): void**
+- Removes the cache file
+
+**_setUpPersistence(): void**
+- It is called in the constructor to create the cache file we will be using if persistence is enabled
+
+**_get( String key, Object options ): Promise: mixed|null** 
+- Removes the DataSet if it is expired, otherwise returns it. Returns null if the data is removed.
+- No need to check if key is a String, that has been done in the _get method already.
+- This method also sets the expiration of the DataSet to Infinity if it is null.
+- This will return the value set by set()
+
+**_set( String key, mixed value, Number ttl, Object options ): Promise: Object|null** 
+- This function commits the key/value to memory with all it's attributes
+- If the dataSet existed, then a key 'isNew' must be set to true or false
+- The options accept a Boolean flag persist that will override the global persist value. You can set a key to not be persisted. 
+However if the global persist is set to false, this will not work
+- Returns the data if it was set, otherwise returns null
+
+**_touch( String key, Number ttl, Object options ): Promise: Boolean**
+- Returns a Boolean whether the data was successfully touched
+- If ttl = 0 then the dataSet will be updated with it's own ttl
+- This function actually touches the data
+
+**_decrement( String key, Number value, Object options ): Promise: Number|null**
+- Retrieves, decrements and then saves the new dataset 
+- If the operation is successfully done, returns the decremented value
+
+**_increment( String key, Number value, Object options ): Promise: Number|null**
+- Retrieves, increment and then saves the new dataset 
+- If the operation is successfully done, returns the incremented value
+
+**_delete( String key, Object options ): Promise: Boolean**
+- This function deletes the actual data
+- Will return true always
+
+**_lock( String key, Object options ): Promise: Boolean**
+- Acquires a lock given a key.
+- This will return true only if there is no key like that in the DataServer, otherwise return false
+
+**_unlock( String key, Object options ): Promise: Boolean**
+- Releases a lock
+- This returns true always
+
+**_garbageCollect(): void**
+- Prunes all the data from the server if needed
+- Implement this if your Data Server needs it, otherwise leave it blank
+
+**_saveData(): void**
+- Persists all the data set to be persisted to disk
+- Extra measures have been taken so this operation will not break if it is running fast, however if the persist interval is too low it still may cause an issue while saving
+- This respects any data set with persist = false
+
+**_loadData(): void**
+- Loads all the data from disk
+
+**Used for development purposes:**
+
+**length(): Number**
+- Returns how many keys there are
+
+
+***
+***
+***
+
+
 ***
 # Plugins
 - Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**

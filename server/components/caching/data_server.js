@@ -34,7 +34,7 @@ class DataServer extends EventEmitter
 		this.setMaxListeners( 0 );
 
 		this.intervals	= [];
-		this.server		= null;
+		this.server		= {};
 
 		this._configure( options );
 	}
@@ -50,8 +50,6 @@ class DataServer extends EventEmitter
 	 */
 	_configure( options )
 	{
-		this.server				= {};
-
 		this.defaultTtl			= typeof options.ttl === 'number'
 								? options.ttl
 								: DEFAULT_TTL;
@@ -455,9 +453,7 @@ class DataServer extends EventEmitter
 	async touch( key, ttl = 0, options = {} )
 	{
 		if ( typeof key !== 'string' || typeof ttl !== 'number' || typeof options !== 'object' )
-		{
 			return false;
-		}
 
 		return this._touch( key, ttl, options ).catch( this._handleServerDown.bind( this, false ) );
 	}

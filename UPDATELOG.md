@@ -1,3 +1,8 @@
+26.2.0
+- Added new DataServerMap that is identical to the old data server but uses a Map instead of an object
+- This DataServer should be used if you wanna store A LOT of data
+- In the future this will be improved to support BigMaps, essentially being able to hold infinite amounts of data
+
 26.1.2
 - Added Feedback welcome message
 - The server.apply method now uses duck-typing to determine if the plugin is a valid plugin interface
