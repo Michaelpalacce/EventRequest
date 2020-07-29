@@ -81,7 +81,7 @@ server.listen( '80',() => {
 ~~~
 
 # Plugins:
-- https://www.npmjs.com/package/er_memcached_data_server - memcached data server
+- https://www.npmjs.com/package/er_memcached_data_server - memcached data server [![Build Status](https://travis-ci.com/Michaelpalacce/er_memcached_data_server.svg?branch=master)](https://travis-ci.com/Michaelpalacce/er_memcached_data_server)
 - https://www.npmjs.com/package/er_redis_data_server - redis data server [![Build Status](https://travis-ci.com/Michaelpalacce/er_redis_data_server.svg?branch=master)](https://travis-ci.com/Michaelpalacce/er_redis_data_server)
 
 # Example Projects:
