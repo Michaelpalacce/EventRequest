@@ -82,6 +82,7 @@ server.listen( '80',() => {
 
 # Plugins:
 - https://www.npmjs.com/package/er_memcached_data_server - memcached data server
+- https://www.npmjs.com/package/er_redis_data_server - redis data server [![Build Status](https://travis-ci.com/Michaelpalacce/er_redis_data_server.svg?branch=master)](https://travis-ci.com/Michaelpalacce/er_redis_data_server)
 
 # Example Projects:
 - https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
@@ -2068,31 +2069,31 @@ However if the global persist is set to false, this will not work
 - If ttl = 0 then the dataSet will be updated with it's own ttl
 - This function actually touches the data
 
-**decrement( String key, Number value = 1, Object options = {} ): Promise: Boolean**
-- If value is not a number, returns false
-- If the data was not set correctly returns false
-- If the data to decrement was not set correctly returns false
-- If the data to decrement was not numeric returns false
+**decrement( String key, Number value = 1, Object options = {} ): Promise: Number|null**
+- If value is not a number, returns null
+- If the data was not set correctly returns null
+- If the data to decrement was not set correctly returns null
+- If the data to decrement was not numeric returns null
 - Calls _decrement() after checking for validity of data
 - The ttl of the value will be extended by it's original ttl
 
-**_decrement( String key, Number value, Object options ): Promise: Boolean**
+**_decrement( String key, Number value, Object options ): Promise: Number|null**
 - Implement for development. No need to do checks of the values of the parameter as that is done in the decrement() function
 - Retrieves, decrements and then saves the new dataset 
-- If the operation is successfully done, returns true
+- If the operation is successfully done, returns the decremented value
 
-**increment( String key, Number value = 1, Object options = {} ): Promise: Boolean**
-- If value is not a number, returns false
-- If the data was not set correctly returns false
-- If the data to increment was not set correctly returns false
-- If the data to increment was not numeric returns false
+**increment( String key, Number value = 1, Object options = {} ): Promise: Number|null**
+- If value is not a number, returns null
+- If the data was not set correctly returns null
+- If the data to increment was not set correctly returns null
+- If the data to increment was not numeric returns null
 - Calls _increment() after checking for validity of data
 - The ttl of the value will be extended by it's original ttl
 
-**_increment( String key, Number value, Object options ): Promise: Boolean**
+**_increment( String key, Number value, Object options ): Promise: Number|null**
 - Implement for development. No need to do checks of the values of the parameter as that is done in the increment() function
 - Retrieves, increment and then saves the new dataset 
-- If the operation is successfully done, returns true
+- If the operation is successfully done, returns the incremented value
 
 **delete( String key, Object options = {} ): Promise: Boolean**
 - Deletes the given data

@@ -627,7 +627,7 @@ test({
 		{
 			dataServer.stop();
 			removeCache( dataServer );
-			return done( ! ( false === result ) );
+			return done( ! ( null === result ) );
 		}
 
 		if ( result === null )
@@ -672,7 +672,7 @@ test({
 		{
 			dataServer.stop();
 			removeCache( dataServer );
-			return done( ! ( false === result ) );
+			return done( ! ( null === result ) );
 		}
 
 		if ( result === null )
@@ -947,12 +947,12 @@ test({
 });
 
 test({
-	message	: 'DataServer.increment.if.data.does.not.exist.returns.false',
+	message	: 'DataServer.increment.if.data.does.not.exist.returns.null',
 	test	: async ( done ) => {
 		removeCache();
 		const dataServer	= new DataServer();
 
-		assert.deepStrictEqual( await dataServer.increment( 'test' ), false );
+		assert.deepStrictEqual( await dataServer.increment( 'test' ), null );
 
 		removeCache();
 
@@ -1037,7 +1037,7 @@ test({
 		removeCache();
 		const dataServer	= new DataServer();
 
-		assert.deepStrictEqual( await dataServer.decrement( 'test' ), false );
+		assert.deepStrictEqual( await dataServer.decrement( 'test' ), null );
 
 		removeCache();
 

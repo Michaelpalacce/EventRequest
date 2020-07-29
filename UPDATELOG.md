@@ -1,3 +1,7 @@
+26.1.0
+- The DataServer increment and decrement now return a value instead of true or false
+- Documentation update
+
 26.0.11
 - Increased the maxCounter to 10000
 

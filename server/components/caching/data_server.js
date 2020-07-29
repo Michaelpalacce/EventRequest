@@ -260,10 +260,10 @@ class DataServer extends EventEmitter
 			|| typeof value !== 'number'
 			|| typeof options !== 'object'
 		) {
-			return false;
+			return null;
 		}
 
-		return this._increment( key, value, options ).catch( this._handleServerDown.bind( this, false ) );
+		return this._increment( key, value, options ).catch( this._handleServerDown.bind( this, null ) );
 	}
 
 	/**
@@ -283,10 +283,10 @@ class DataServer extends EventEmitter
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
-				return resolve( false );
+				return resolve( null );
 
 			if ( typeof dataSet.value !== 'number' )
-				return resolve( false );
+				return resolve( null );
 
 			dataSet.value	+= value;
 			dataSet.ttl		= this._getExpirationDateFromTtl( dataSet.ttl );
@@ -313,10 +313,10 @@ class DataServer extends EventEmitter
 			|| typeof value !== 'number'
 			|| typeof options !== 'object'
 		) {
-			return false;
+			return null;
 		}
 
-		return this._decrement( key, value, options ).catch( this._handleServerDown.bind( this, false ) );
+		return this._decrement( key, value, options ).catch( this._handleServerDown.bind( this, null ) );
 	}
 
 	/**
@@ -336,10 +336,10 @@ class DataServer extends EventEmitter
 			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
-				return resolve( false );
+				return resolve( null );
 
 			if ( typeof dataSet.value !== 'number' )
-				return resolve( false );
+				return resolve( null );
 
 			dataSet.value	-= value;
 			dataSet.ttl		= this._getExpirationDateFromTtl( dataSet.ttl );
