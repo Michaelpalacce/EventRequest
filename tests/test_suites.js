@@ -76,6 +76,10 @@ testSuites.helpersSuite		= () => {
 	require( './server/components/helpers/unique_id_test' );
 };
 
+testSuites.bigMapSuite		= () => {
+	require( './server/components/big_map/big_map_test' );
+};
+
 testSuites.bodyParserSuite	= () => {
 	require( './server/components/body_parsers/body_parser_handler_test' );
 	require( './server/components/body_parsers/form_body_parser_test' );

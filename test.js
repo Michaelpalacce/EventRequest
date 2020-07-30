@@ -6,7 +6,7 @@ require( './tests/test_bootstrap' );
 
 const startTests	= () => {
 	testSuites.eventSuite();
-	testSuites.eventSuite();
+	testSuites.bigMapSuite();
 	testSuites.securitySuite();
 	testSuites.templatingEngine();
 	testSuites.helpersSuite();
