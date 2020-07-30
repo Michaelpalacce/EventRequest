@@ -22,7 +22,7 @@ test({
 	message	: 'Bucket.handleError.on.error.throws',
 	test	: ( done ) => {
 		const MockDataServer	= Mock( DataServer );
-		const dataServer		= new MockDataServer();
+		const dataServer		= new MockDataServer({persist: false });
 		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 
 		process.once( 'uncaughtException', ( reason, p ) => {
@@ -46,7 +46,7 @@ test({
 	message	: 'Bucket._doLock.if.max.counter.is.reached',
 	test	: ( done ) => {
 		const MockDataServer	= Mock( DataServer );
-		const dataServer		= new MockDataServer();
+		const dataServer		= new MockDataServer({persist: false });
 		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {
@@ -70,7 +70,7 @@ test({
 	message	: 'Bucket.reduce.when.cannot.obtain.lock',
 	test	: ( done ) => {
 		const MockDataServer	= Mock( DataServer );
-		const dataServer		= new MockDataServer();
+		const dataServer		= new MockDataServer({persist: false });
 		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {

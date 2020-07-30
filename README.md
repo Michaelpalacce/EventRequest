@@ -2285,6 +2285,15 @@ However if the global persist is set to false, this will not work
 ***
 ***
 ***
+#BigMap
+- An implementation of the normal Map API
+- This one can store a near infinite amounts of data
+- It has the exact same usage as the normal Map and can be pretty much used as a replacement
+
+
+***
+***
+***
 
 
 ***

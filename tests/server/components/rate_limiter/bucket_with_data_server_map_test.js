@@ -47,7 +47,7 @@ test({
 	message	: 'Bucket.with.map._doLock.if.max.counter.is.reached',
 	test	: ( done ) => {
 		const MockDataServer	= Mock( DataServerMap );
-		const dataServer		= new MockDataServer();
+		const dataServer		= new MockDataServer({ persist: false });
 		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {
@@ -71,7 +71,7 @@ test({
 	message	: 'Bucket.with.map.reduce.when.cannot.obtain.lock',
 	test	: ( done ) => {
 		const MockDataServer	= Mock( DataServerMap );
-		const dataServer		= new MockDataServer();
+		const dataServer		= new MockDataServer({ persist: false });
 		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {

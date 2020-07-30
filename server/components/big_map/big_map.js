@@ -117,12 +117,12 @@ class BigMap
 	 */
 	get size()
 	{
-		let size = 0
+		let size = 0;
 
 		for ( let map of this.maps )
-			size	+= map.size
+			size	+= map.size;
 
-		return size
+		return size;
 	}
 
 	/**
@@ -206,7 +206,7 @@ class BigMap
 			*[Symbol.iterator](){
 				for ( const map of that.maps )
 					for ( const element of map[elementToGet]() )
-						yield element;7
+						yield element;
 			}
 		}
 	}
