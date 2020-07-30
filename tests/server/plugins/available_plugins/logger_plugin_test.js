@@ -7,7 +7,7 @@ const LoggerPlugin								= require( '../../../../server/plugins/available_plugi
 const Router									= require( '../../../../server/components/routing/router' );
 
 test({
-	message	: 'LoggerPlugin attaches correctly',
+	message	: 'LoggerPlugin.attaches.correctly',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let router			= new Router();
@@ -74,7 +74,7 @@ test({
 });
 
 test({
-	message	: 'LoggerPlugin setServerOnRuntime attaches process',
+	message	: 'LoggerPlugin.setServerOnRuntime.attaches.process',
 	test	: ( done ) => {
 		let MockServer		= Mock( helpers.getServer().constructor );
 		let server			= new MockServer();
@@ -90,6 +90,16 @@ test({
 
 		assert.equal( 'function', typeof process.dumpStack );
 		assert.equal( 'function', typeof process.log );
+
+		done();
+	}
+});
+
+test({
+	message	: 'LoggerPlugin.getLogger.returns.default.logger.if.none.specified',
+	test	: ( done ) => {
+		const loggerPlugin	= new LoggerPlugin( 'id' );
+		assert.deepStrictEqual( loggerPlugin.getLogger(), Loggur.getDefaultLogger() );
 
 		done();
 	}

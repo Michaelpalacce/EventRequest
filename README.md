@@ -2022,9 +2022,15 @@ integrated with other plugins.
 - This method is the protected method that should be implemented in case extension of the DataServer should be done
 - Removes the cache file
 
+**_configure: void**
+- This method is a protected method that should be implemented in case extension of the DataServer should be done
+- This method sets up any options that will be used in the data server
+- This method sets up persistence, garbage collection, etc
+- This is called as a last step in the constructor.
+
 **_setUpPersistence(): void**
 - This method is the protected method that should be implemented in case extension of the DataServer should be done
-- It is called in the constructor to create the cache file we will be using if persistence is enabled
+- It is called in _configure to create the cache file we will be using if persistence is enabled
 
 **get( String key, Object options = {} ): Promise: Object|null** 
 - Retrieves the value given a key. Returns null if the key does not exist.
@@ -2152,8 +2158,9 @@ However if the global persist is set to false, this will not work
 # DataServerMap
 - Is an EventEmitter
 - Can be extended
-- Same as the default data server but uses a Map instead of an object
 - Extends the DataServer
+- Same as the default data server but uses a Map instead of an object
+- It is recommended you use this one ( even tho it is not the default data server )
 
 ~~~javascript
 const DataServerMap   = require( 'event_request/server/components/caching/data_server_map' );
@@ -2202,9 +2209,15 @@ console.log( new DataServerMap( options ) );
 
 **_stop(): void**
 - Removes the cache file
+- Flushes the Map
+
+**_configure: void**
+- This method sets up any options that will be used in the data server
+- This method sets up persistence, garbage collection, etc
+- This is called as a last step in the constructor.
 
 **_setUpPersistence(): void**
-- It is called in the constructor to create the cache file we will be using if persistence is enabled
+- It is called in configure to create the cache file we will be using if persistence is enabled
 
 **_get( String key, Object options ): Promise: mixed|null** 
 - Removes the DataSet if it is expired, otherwise returns it. Returns null if the data is removed.
@@ -2570,7 +2583,8 @@ app.listen( 80 );
 - The options to be passed to the DataServer if the default one should be used
 
 **dataServer: Object**
- - An already instantiated child of DataServer to be used insted of the default one
+ - An already instantiated child of DataServer to be used instead of the default one
+ - Uses Duck-Typing to determine if the dataServer is valid
 
 ***
 ####Events:

@@ -4,25 +4,15 @@
 const { assert, test, helpers, Mock }	= require( '../../../test_helper' );
 const SessionPlugin						= require( './../../../../server/plugins/available_plugins/session_plugin' );
 const DataServerPlugin					= require( '../../../../server/plugins/available_plugins/data_server_plugin' );
+const DataServerMap						= require( '../../../../server/components/caching/data_server_map' );
 const Session							= require( './../../../../server/components/session/session' );
 const Router							= require( '../../../../server/components/routing/router' );
 
 test({
-	message	: 'SessionPlugin.getPluginDependencies.returns.er_data_server',
-	test	: ( done ) => {
-		let plugin	= new SessionPlugin( 'id' );
-
-		assert.deepStrictEqual( ['er_data_server'], plugin.getPluginDependencies() );
-
-		done();
-	}
-});
-
-test({
-	message	: 'SessionPlugin.attaches.functions.to.the.eventRequest',
+	message	: 'SessionPlugin.with.map.attaches.functions.to.the.eventRequest',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
-		eventRequest.dataServer	= helpers.getDataServer();
+		eventRequest.dataServer	= new DataServerMap( { persist: false } );
 		let sessionPlugin		= new SessionPlugin( 'id' );
 		let router				= new Router();
 		let called				= 0;
@@ -59,10 +49,10 @@ test({
 });
 
 test({
-	message	: 'SessionPlugin.does.not.save.session.on.send.if.not.inited',
+	message	: 'SessionPlugin.with.map.does.not.save.session.on.send.if.not.inited',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
-		eventRequest.dataServer	= helpers.getDataServer();
+		eventRequest.dataServer	= new DataServerMap( { persist: false } );
 		let sessionPlugin		= new SessionPlugin( 'id' );
 		let MockSession			= Mock( Session );
 		let session				= new MockSession( eventRequest );
@@ -97,10 +87,10 @@ test({
 });
 
 test({
-	message	: 'SessionPlugin.saves.session.on.send',
+	message	: 'SessionPlugin.with.map.saves.session.on.send',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
-		eventRequest.dataServer	= helpers.getDataServer();
+		eventRequest.dataServer	= new DataServerMap( { persist: false } );
 		let sessionPlugin		= new SessionPlugin( 'id' );
 		let MockSession			= Mock( Session );
 		let session				= new MockSession( eventRequest );
@@ -136,11 +126,11 @@ test({
 });
 
 test({
-	message	: 'SessionPlugin.serServerOnRuntime.and.initSession.initializes.a.session.if.it.doesn\'t.exist',
+	message	: 'SessionPlugin.with.map.serServerOnRuntime.and.initSession.initializes.a.session.if.it.doesn\'t.exist',
 	test	: ( done ) => {
 		let MockServer				= Mock( helpers.getServer().constructor );
 		let MockDataServerPlugin	= Mock( DataServerPlugin );
-		let MockDataServer			= Mock( helpers.getDataServer().constructor );
+		let MockDataServer			= Mock( new DataServerMap( { persist: false } ).constructor );
 		let dataServer				= new MockDataServer();
 		let dataServerPlugin		= new MockDataServerPlugin();
 		let server					= new MockServer();
@@ -188,10 +178,10 @@ test({
 });
 
 test({
-	message	: 'SessionPlugin.initSession.fetches.a.session.if.it.exists',
+	message	: 'SessionPlugin.with.map.initSession.fetches.a.session.if.it.exists',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
-		eventRequest.dataServer	= helpers.getDataServer();
+		eventRequest.dataServer	= new DataServerMap( { persist: false } );
 		let sessionPlugin		= new SessionPlugin( 'id' );
 		let router				= new Router();
 

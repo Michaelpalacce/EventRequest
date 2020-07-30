@@ -1,25 +1,21 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers, Mock, Mocker }	= require( '../test_helper' );
-const path										= require( 'path' );
-const http										= require( 'http' );
-const fs										= require( 'fs' );
-const { Loggur, File, Logger }					= require( './../../server/components/logger/loggur' );
-const Router									= require( './../../server/components/routing/router' );
-const DataServer								= require( './../../server/components/caching/data_server' );
-const PluginManager								= require( './../../server/plugins/plugin_manager' );
-const Session									= require( './../../server/components/session/session' );
-const querystring								= require( 'querystring' );
-const RateLimitsPlugin							= require( './../../server/plugins/available_plugins/rate_limits_plugin' );
-const JsonBodyParser							= require( './../../server/components/body_parsers/json_body_parser' );
-const BodyParserPlugin							= require( './../../server/plugins/available_plugins/body_parser_plugin' );
+const { assert, test, helpers, Mock }	= require( '../test_helper' );
+const path								= require( 'path' );
+const http								= require( 'http' );
+const fs								= require( 'fs' );
+const { Loggur, Logger }				= require( './../../server/components/logger/loggur' );
+const Router							= require( './../../server/components/routing/router' );
+const DataServer						= require( './../../server/components/caching/data_server' );
+const DataServerMap						= require( './../../server/components/caching/data_server_map' );
+const PluginManager						= require( './../../server/plugins/plugin_manager' );
 
-const { App, Server }							= require( './../../index' );
-const app										= App();
+const { App, Server }					= require( './../../index' );
+const app								= App();
 
 test({
-	message	: 'Server.constructor starts without crashing with defaults',
+	message	: 'Server.constructor.starts.without.crashing.with.defaults',
 	test	: ( done ) => {
 		assert.doesNotThrow( () => {
 			const server	= new Server();
@@ -31,7 +27,7 @@ test({
 });
 
 test({
-	message	: 'Server.App Returns the same as App()',
+	message	: 'Server.App.Returns.the.same.as.App()',
 	test	: ( done ) => {
 		assert.deepStrictEqual( app, App.App() );
 		done();
@@ -39,7 +35,7 @@ test({
 });
 
 test({
-	message	: 'Server.constructor defaults',
+	message	: 'Server.constructor.defaults',
 	test	: ( done ) => {
 		let server	= new Server();
 		assert.equal( true, server.router instanceof Router );
@@ -62,6 +58,8 @@ test({
 		assert.equal( typeof server.er_body_parser_form === 'object', true );
 		assert.equal( typeof server.er_body_parser_multipart === 'object', true );
 		assert.equal( typeof server.er_body_parser_raw === 'object', true );
+		assert.equal( typeof server.er_cors === 'object', true );
+		assert.equal( typeof server.er_security === 'object', true );
 		assert.equal( typeof server.er_validation === 'object', true );
 
 		done();
@@ -69,7 +67,7 @@ test({
 });
 
 test({
-	message	: 'Server is started',
+	message	: 'Server.is.started',
 	test	: ( done ) => {
 		helpers.sendServerRequest( '/ping' ).then(() => {
 			done();
@@ -78,7 +76,7 @@ test({
 });
 
 test({
-	message	: 'Server.getPluginManager returns a pluginManager',
+	message	: 'Server.getPluginManager.returns.a.pluginManager',
 	test	: ( done ) => {
 		const server		= new Server();
 		const pluginManager	= server.getPluginManager();
@@ -122,7 +120,7 @@ test({
 });
 
 test({
-	message	: 'Server.add adds a handler with different permutations',
+	message	: 'Server.add.adds.a.handler.with.different.permutations',
 	test	: ( done ) => {
 		const server	= new Server();
 
@@ -359,7 +357,7 @@ test({
 });
 
 test({
-	message	: 'Server.get works as intended',
+	message	: 'Server.get.works.as.intended',
 	test	: ( done ) => {
 		const server		= new Server();
 		const eventRequest	= helpers.getEventRequest( 'GET', '/' );
@@ -386,7 +384,7 @@ test({
 });
 
 test({
-	message	: 'Server.post works as intended',
+	message	: 'Server.post.works.as.intended',
 	test	: ( done ) => {
 		const server		= new Server();
 		const eventRequest	= helpers.getEventRequest( 'POST', '/' );
@@ -413,7 +411,7 @@ test({
 });
 
 test({
-	message	: 'Server.delete works as intended',
+	message	: 'Server.delete.works.as.intended',
 	test	: ( done ) => {
 		const server		= new Server();
 		const eventRequest	= helpers.getEventRequest( 'DELETE', '/' );
@@ -440,7 +438,7 @@ test({
 });
 
 test({
-	message	: 'Server.put works as intended',
+	message	: 'Server.put.works.as.intended',
 	test	: ( done ) => {
 		const server		= new Server();
 		const eventRequest	= helpers.getEventRequest( 'PUT', '/' );
@@ -467,7 +465,7 @@ test({
 });
 
 test({
-	message	: 'Server.define calls router.define',
+	message	: 'Server.define.calls.router.define',
 	test	: ( done ) => {
 		const RouterMock		= Mock( Router );
 		const middlewareName	= 'test';
@@ -491,7 +489,7 @@ test({
 });
 
 test({
-	message	: 'Server.Router returns a new router',
+	message	: 'Server.Router.returns.a.new.router',
 	test	: ( done ) => {
 		const router	= app.Router();
 		assert( router instanceof Router, true );
@@ -501,7 +499,7 @@ test({
 });
 
 test({
-	message	: 'Server.Router can be attached back',
+	message	: 'Server.Router.can.be.attached.back',
 	test	: ( done ) => {
 		const server	= App();
 		const name		= '/testRouterCanBeAttachedBack';
@@ -523,7 +521,7 @@ test({
 });
 
 test({
-	message	: 'Server.Router does not affect the original router if not applied back',
+	message	: 'Server.Router.does.not.affect.the.original.router.if.not.applied.back',
 	test	: ( done ) => {
 		const server	= App();
 		const name		= '/testRouterReturnsANewRouter';
@@ -549,7 +547,7 @@ test({
 });
 
 test({
-	message	: 'Server() returns the same instance',
+	message	: 'Server().returns.the.same.instance',
 	test	: ( done ) => {
 		const server	= App();
 		const serverTwo	= App();
@@ -567,7 +565,7 @@ test({
 });
 
 test({
-	message	: 'Server.cleanUp() cleans up',
+	message	: 'Server.cleanUp().cleans.up',
 	test	: ( done ) => {
 		const server	= App();
 
@@ -586,7 +584,7 @@ test({
 });
 
 test({
-	message	: 'App().attach() returns a function',
+	message	: 'App().attach().returns.a.function',
 	test	: ( done ) => {
 		assert.equal( typeof App().attach() === 'function', true );
 
@@ -595,7 +593,7 @@ test({
 });
 
 test({
-	message	: 'App().attach() using a httpServer works as expected',
+	message	: 'App().attach().using.a.httpServer.works.as.expected',
 	test	: ( done ) => {
 		const httpServer	= require( 'http' );
 		const body			= '<h1>Hello World!</h1>';
@@ -620,7 +618,7 @@ test({
 });
 
 test({
-	message	: 'Server testGETWithoutRoute ( skipped cause it will fail all the others )',
+	message	: 'Server.testGETWithoutRoute.(.skipped.cause.it.will.fail.all.the.others.)',
 	test	: ( done ) => {
 		const body	= 'testGET';
 		const app	= new Server();
@@ -654,7 +652,7 @@ test({
 });
 
 test({
-	message	: 'Server testGET',
+	message	: 'Server.testGET',
 	test	: ( done ) => {
 		const body	= 'testGET';
 		app.get( '/testGET', ( event ) => {
@@ -682,7 +680,7 @@ test({
 });
 
 test({
-	message	: 'Server testPOST',
+	message	: 'Server.testPOST',
 	test	: ( done ) => {
 		const body	= 'testPOST';
 		app.post( '/testPOST', ( event ) => {
@@ -710,7 +708,7 @@ test({
 });
 
 test({
-	message	: 'Server testDELETE',
+	message	: 'Server.testDELETE',
 	test	: ( done ) => {
 		const body	= 'testDELETE';
 		app.delete( '/testDELETE', ( event ) => {
@@ -738,7 +736,7 @@ test({
 });
 
 test({
-	message	: 'Server testPUT',
+	message	: 'Server.testPUT',
 	test	: ( done ) => {
 		const body	= 'testPUT';
 		app.put( '/testPUT', ( event ) => {
@@ -766,7 +764,7 @@ test({
 });
 
 test({
-	message	: 'Server testHEAD also head does not return body even if sent',
+	message	: 'Server.testHEAD.also.head.does.not.return.body.even.if.sent',
 	test	: ( done ) => {
 		const body	= 'testHEAD';
 		app.head( '/testHEAD', ( event ) => {
@@ -794,7 +792,7 @@ test({
 });
 
 test({
-	message	: 'Server testPATCH',
+	message	: 'Server.testPATCH',
 	test	: ( done ) => {
 		const body	= 'testPATCH';
 		app.patch( '/testPATCH', ( event ) => {
@@ -822,7 +820,7 @@ test({
 });
 
 test({
-	message	: 'Server testGET with add',
+	message	: 'Server.testGET.with.add',
 	test	: ( done ) => {
 		const body	= 'testGETWithAdd';
 		app.add({
@@ -854,7 +852,7 @@ test({
 });
 
 test({
-	message	: 'Server testPOST with add',
+	message	: 'Server.testPOST.with.add',
 	test	: ( done ) => {
 		const body	= 'testPOSTWithAddWithAdd';
 		app.add({
@@ -886,7 +884,7 @@ test({
 });
 
 test({
-	message	: 'Server testDELETE with add',
+	message	: 'Server.testDELETE.with.add',
 	test	: ( done ) => {
 		const body	= 'testDELETEWithAdd';
 		app.add({
@@ -918,7 +916,7 @@ test({
 });
 
 test({
-	message	: 'Server testPUT with add',
+	message	: 'Server.testPUT.with.add',
 	test	: ( done ) => {
 		const body	= 'testPUTWithAdd';
 		app.add({
@@ -950,7 +948,7 @@ test({
 });
 
 test({
-	message	: 'Server testHEAD with add also head does not return body even if sent',
+	message	: 'Server.testHEAD.with.add.also.head.does.not.return.body.even.if.sent',
 	test	: ( done ) => {
 		const body	= 'testHEADWithAdd';
 		app.add({
@@ -982,7 +980,7 @@ test({
 });
 
 test({
-	message	: 'Server testPATCH with add',
+	message	: 'Server.testPATCH.with.add',
 	test	: ( done ) => {
 		const body	= 'testPATCHWithAdd';
 		app.add({
@@ -1014,7 +1012,7 @@ test({
 });
 
 test({
-	message	: 'Server.test add is case insensitive',
+	message	: 'Server.test.add.is.case.insensitive',
 	test	: ( done ) => {
 		const body			= 'testGETCaseInsensitive';
 		const headerName	= 'testGETCaseInsensitive';
@@ -1069,7 +1067,7 @@ test({
 });
 
 test({
-	message	: 'Server.test multiple middlewares',
+	message	: 'Server.test.multiple.middlewares',
 	test	: ( done ) => {
 		const body				= 'testGETWithMultipleMiddlewares';
 
@@ -1103,7 +1101,7 @@ test({
 });
 
 test({
-	message	: 'Server.test empty middleware',
+	message	: 'Server.test.empty.middleware',
 	test	: ( done ) => {
 		const body			= 'testEmptyMiddleware';
 		const headerName	= 'testEmptyMiddleware';
@@ -1127,7 +1125,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest header functions',
+	message	: 'Server.test.eventRequest.header.functions',
 	test	: ( done ) => {
 		const name			= 'testEventRequestHeaderFunctions';
 		const headerName	= 'testEventRequestHeaderFunctions';
@@ -1162,7 +1160,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest setStatusCode',
+	message	: 'Server.test.eventRequest.setStatusCode',
 	test	: ( done ) => {
 		const name					= 'testSetStatusCode';
 		const expectedStatusCode	= 201;
@@ -1198,7 +1196,7 @@ test({
 
 
 test({
-	message	: 'Server.test eventRequest redirect',
+	message	: 'Server.test.eventRequest.redirect',
 	test	: ( done ) => {
 		const name					= 'testRedirect';
 		const expectedStatusCode	= 303;
@@ -1218,7 +1216,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest redirect',
+	message	: 'Server.test.eventRequest.redirect',
 	test	: ( done ) => {
 		const name					= 'testRedirectTwo';
 		const expectedRedirectRoute	= '/testRedirectedRouteTwo';
@@ -1237,7 +1235,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest isFinished',
+	message	: 'Server.test.eventRequest.isFinished',
 	test	: ( done ) => {
 		const name					= 'testIsFinished';
 
@@ -1272,7 +1270,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest send string',
+	message	: 'Server.test.eventRequest.send.string',
 	test	: ( done ) => {
 		const name	= 'testSendString';
 
@@ -1288,7 +1286,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest send object',
+	message	: 'Server.test.eventRequest.send.object',
 	test	: ( done ) => {
 		const name	= 'testSendObject';
 
@@ -1304,7 +1302,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest sendError',
+	message	: 'Server.test.eventRequest.sendError',
 	test	: ( done ) => {
 		const name	= 'testEventSendError';
 
@@ -1320,7 +1318,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest sendError send Error',
+	message	: 'Server.test.eventRequest.sendError.send.Error',
 	test	: ( done ) => {
 		const name	= 'testEventSendErrorWithError';
 		const error	= new Error( 'test' );
@@ -1337,7 +1335,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest sendError with different status',
+	message	: 'Server.test.eventRequest.sendError.with.different.status',
 	test	: ( done ) => {
 		const name	= 'testEventSendErrorWithDifferentStatus';
 
@@ -1353,7 +1351,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest send Error',
+	message	: 'Server.test.eventRequest.send.Error',
 	test	: ( done ) => {
 		const error	= new Error( 'Error' );
 		const name	= 'testSendError';
@@ -1370,7 +1368,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest send raw',
+	message	: 'Server.test.eventRequest.send.raw',
 	test	: ( done ) => {
 		const name	= 'testSendErrorRaw';
 
@@ -1386,7 +1384,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest send stream',
+	message	: 'Server.test.eventRequest.send.stream',
 	test	: ( done ) => {
 		const name	= 'testSendErrorStream';
 
@@ -1402,7 +1400,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest isFinished',
+	message	: 'Server.test.eventRequest.isFinished',
 	test	: ( done ) => {
 		const name					= 'testIsFinished';
 
@@ -1437,7 +1435,7 @@ test({
 });
 
 test({
-	message	: 'Server.test eventRequest setCookie',
+	message	: 'Server.test.eventRequest.setCookie',
 	test	: ( done ) => {
 		const name			= 'testSetCookie';
 		const cookiesValue	= 'ok';
@@ -1483,2628 +1481,6 @@ test({
 });
 
 test({
-	message	: 'Server.er_securityOnDefaults',
-	test	: ( done ) => {
-		const port	= 3370;
-		const name	= 'testErSecurityOnDefaults';
-		const app	= new Server();
-
-		app.apply( app.er_security );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
-				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
-				assert.equal( typeof response.headers['expect-ct'] === 'string', true );
-				assert.equal( typeof response.headers['x-content-type-options'] === 'string', true );
-
-				assert.equal( response.headers['content-security-policy'], "default-src 'none'; script-src 'self'; img-src 'self'; font-src 'self'; style-src 'self'; connect-src 'self'; child-src 'self'; media-src 'self'; manifest-src 'self'; object-src 'self'; frame-ancestors 'self'; base-uri 'self'; upgrade-insecure-requests;" );
-
-				assert.equal( response.headers['strict-transport-security'], "max-age=31536000;" );
-				assert.equal( response.headers['expect-ct'], "max-age=86400, enforce" );
-				assert.equal( response.headers['x-content-type-options'], "nosniff" );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.er_security.with.constructor.with.options',
-	test	: ( done ) => {
-		const port	= 3379;
-		const name	= 'testErSecurityWithConstructorWithOptionsRemovesBuild';
-		const app	= new Server();
-
-		const SecurityConstructor	= app.er_security.constructor;
-		const securityPlugin		= new SecurityConstructor( 'id', { build : false } );
-		assert.deepStrictEqual( securityPlugin.options, { build: false } );
-
-		app.apply( securityPlugin );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		});
-
-		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
-				assert.equal( response.body.toString(), name );
-
-				assert.equal( typeof response.headers['content-security-policy'], 'undefined' );
-				assert.equal( typeof response.headers['strict-transport-security'], 'undefined' );
-				assert.equal( typeof response.headers['expect-ct'], 'undefined' );
-				assert.equal( typeof response.headers['x-content-type-options'], 'undefined' );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.er_securityWithChangesFromTheOptions',
-	test	: ( done ) => {
-		const port	= 3371;
-		const name	= 'testErSecurityWithChangesFromTheOptions';
-		const app	= new Server();
-
-		app.apply( app.er_security, {
-			csp		: { xss: false,  directives: { 'font-src': ["self", 'test'], 'upgrade-insecure-requests': [] }, self: true, sandbox: true },
-			ect		: { enabled: false, maxAge: 30000 },
-			hsts	: { maxAge: 300, preload: true, includeSubDomains: false },
-			cto		: { enabled: true }
-		});
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		});
-
-		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
-				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
-				assert.equal( typeof response.headers['expect-ct'] === 'string', false );
-				assert.equal( typeof response.headers['x-content-type-options'] === 'string', true );
-
-				assert.equal( response.headers['content-security-policy'], "font-src 'self' test; upgrade-insecure-requests; default-src 'self'; sandbox;" );
-
-				assert.equal( response.headers['strict-transport-security'], "max-age=300; preload;" );
-				assert.equal( response.headers['expect-ct'], undefined );
-				assert.equal( response.headers['x-content-type-options'], "nosniff" );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.er_securityWithChangesInline',
-	test	: ( done ) => {
-		const port	= 3372;
-		const name	= 'testErSecurityWithChangesInline';
-		const app	= new Server();
-
-		app.apply( app.er_security, { csp : { xss: false } } );
-
-		app.add(( event ) => {
-
-			event.$security.csp.addFontSrc( 'self' );
-			event.$security.csp.addFontSrc( "'self'" );
-			event.$security.csp.addFontSrc( 'test' );
-			event.$security.csp.upgradeInsecureRequests();
-			event.$security.csp.enableSelf();
-			event.$security.csp.enableSandbox();
-
-			event.$security.ect.setEnabled( false );
-			event.$security.ect.setMaxAge( 30000 );
-
-			event.$security.hsts.setMaxAge( 300 );
-			event.$security.hsts.setMaxAge( null );
-			event.$security.hsts.setMaxAge( 'string' );
-			event.$security.hsts.preload();
-			event.$security.hsts.includeSubDomains( false );
-
-			event.$security.build();
-
-			event.next();
-		});
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		});
-
-		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
-				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
-				assert.equal( typeof response.headers['expect-ct'] === 'string', false );
-				assert.equal( typeof response.headers['x-content-type-options'] === 'string', true );
-
-				assert.equal( response.headers['content-security-policy'], "font-src 'self' test; upgrade-insecure-requests; default-src 'self'; sandbox;" );
-
-				assert.equal( response.headers['strict-transport-security'], "max-age=300; preload;" );
-				assert.equal( response.headers['expect-ct'], undefined );
-				assert.equal( response.headers['x-content-type-options'], "nosniff" );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.er_securityCallingBuildMultipleTimes',
-	test	: ( done ) => {
-		const port	= 3373;
-		const name	= 'testErSecurityWithChangesInline';
-		const app	= new Server();
-
-		app.apply( app.er_security, { csp : { xss: false } } );
-
-		app.add(( event ) => {
-
-			event.$security.csp.addFontSrc( 'self' );
-			event.$security.csp.addFontSrc( "'self'" );
-			event.$security.csp.addFontSrc( 'test' );
-			event.$security.csp.upgradeInsecureRequests();
-			event.$security.csp.enableSelf();
-			event.$security.csp.enableSandbox();
-
-			event.$security.ect.setEnabled( false );
-			event.$security.ect.setMaxAge( 30000 );
-
-			event.$security.hsts.setMaxAge( 300 );
-			event.$security.hsts.setMaxAge( null );
-			event.$security.hsts.setMaxAge( 'string' );
-			event.$security.hsts.preload();
-			event.$security.hsts.includeSubDomains( false );
-
-			event.$security.build();
-			event.$security.build();
-			event.$security.build();
-
-			event.next();
-		});
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		});
-
-		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
-				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
-				assert.equal( typeof response.headers['expect-ct'] === 'string', false );
-				assert.equal( typeof response.headers['x-content-type-options'] === 'string', true );
-
-				assert.equal( response.headers['content-security-policy'], "font-src 'self' test; upgrade-insecure-requests; default-src 'self'; sandbox;" );
-
-				assert.equal( response.headers['strict-transport-security'], "max-age=300; preload;" );
-				assert.equal( response.headers['expect-ct'], undefined );
-				assert.equal( response.headers['x-content-type-options'], "nosniff" );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.er_securityCallingBuildMultipleTimesAppliesChangesIfAny',
-	test	: ( done ) => {
-		const port	= 3374;
-		const name	= 'testErSecurityWithChangesInline';
-		const app	= new Server();
-
-		app.apply( app.er_security, { csp : { xss: false } } );
-
-		app.add(( event ) => {
-
-			event.$security.csp.addFontSrc( 'self' );
-			event.$security.csp.addFontSrc( "'self'" );
-			event.$security.csp.addFontSrc( 'test' );
-			event.$security.csp.upgradeInsecureRequests();
-			event.$security.csp.enableSelf();
-			event.$security.csp.enableSandbox();
-
-			event.$security.ect.setEnabled( false );
-			event.$security.ect.setMaxAge( 30000 );
-
-			event.$security.hsts.setMaxAge( 300 );
-			event.$security.hsts.setMaxAge( null );
-			event.$security.hsts.setMaxAge( 'string' );
-			event.$security.hsts.preload();
-			event.$security.hsts.includeSubDomains( false );
-
-			event.$security.build();
-
-			event.$security.csp.addScriptSrc( 'test' );
-			event.$security.cto.setEnabled( false );
-
-			event.$security.build();
-
-			event.next();
-		});
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		});
-
-		app.listen( port, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, port ).then( ( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( typeof response.headers['content-security-policy'] === 'string', true );
-				assert.equal( typeof response.headers['strict-transport-security'] === 'string', true );
-				assert.equal( typeof response.headers['expect-ct'] === 'string', false );
-				assert.equal( typeof response.headers['x-content-type-options'] === 'string', false );
-
-				assert.equal( response.headers['content-security-policy'], "font-src 'self' test; upgrade-insecure-requests; default-src 'self'; sandbox; script-src test;" );
-
-				assert.equal( response.headers['strict-transport-security'], "max-age=300; preload;" );
-				assert.equal( response.headers['expect-ct'], undefined );
-				assert.equal( response.headers['x-content-type-options'], undefined );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test er_body_parser_json does not parse anything but application/json',
-	test	: ( done ) => {
-		const name			= 'testErJsonBodyParserParsesApplicationJson';
-		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
-		const formDataValue	= 'value';
-
-		const app			= new Server();
-
-		app.apply( app.er_body_parser_json, { maxPayloadLength: 60 } );
-
-		app.get( `/${name}`, ( event ) => {
-			if (
-				typeof event.body === 'undefined'
-				|| typeof event.body[formDataKey] === 'undefined'
-				|| ! event.body[formDataKey].includes( formDataValue )
-			) {
-				event.sendError( 'Body was not parsed', 400 );
-			}
-
-			event.send( 'ok' );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': 'application/json' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ ['content-type'.toUpperCase()]: 'application/json' },
-				3337
-			)
-		);
-
-		// Above the limit of 60 bytes
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
-				{ 'content-type': 'application/json' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': 'application/*' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': '*/*' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': 'json' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': '*' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{},
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				'{wrongJson',
-				{},
-				3337
-			)
-		);
-
-		const server	= app.listen( 3337, () => {
-			Promise.all( responses ).then(() => {
-				server.close();
-				done();
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_body_parser_json.does.not.parse.anything.but.application/json.setting.options',
-	test	: ( done ) => {
-		const name			= 'testErJsonBodyParserParsesApplicationJson';
-		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
-		const formDataValue	= 'value';
-
-		const app			= new Server();
-
-		app.er_body_parser_json.setOptions({
-			maxPayloadLength: 60
-		});
-		app.apply( app.er_body_parser_json );
-
-		app.get( `/${name}`, ( event ) => {
-			if (
-				typeof event.body === 'undefined'
-				|| typeof event.body[formDataKey] === 'undefined'
-				|| ! event.body[formDataKey].includes( formDataValue )
-			) {
-				event.sendError( 'Body was not parsed', 400 );
-			}
-
-			event.send( 'ok' );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': 'application/json' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ ['content-type'.toUpperCase()]: 'application/json' },
-				3337
-			)
-		);
-
-		// Above the limit of 60 bytes
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
-				{ 'content-type': 'application/json' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': 'application/*' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': '*/*' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': 'json' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': '*' },
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				JSON.stringify( { [formDataKey]: formDataValue } ),
-				{},
-				3337
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				'{wrongJson',
-				{},
-				3337
-			)
-		);
-
-		const server	= app.listen( 3337, () => {
-			Promise.all( responses ).then(() => {
-				server.close();
-				done();
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test er_body_parser_json does not parse above the maxPayload if strict',
-	test	: ( done ) => {
-		const name			= 'testErJsonBodyParserParsesApplicationJson';
-		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
-		const formDataValue	= 'value';
-
-		const app			= new Server();
-
-		app.apply( app.er_body_parser_json, { maxPayloadLength: 60, strict: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			assert.deepStrictEqual( event.body, {} );
-			assert.deepStrictEqual( event.rawBody, {} );
-
-			event.send( 'ok' );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				JSON.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
-				{ 'content-type': 'application/json' },
-				3338
-			)
-		);
-
-		const server	= app.listen( 3338, () => {
-			Promise.all( responses ).then(() => {
-				server.close();
-				done();
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test er_body_parser_form parser above the maxPayload if not strict',
-	test	: ( done ) => {
-		const name			= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
-		const formDataKey	= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
-		const formDataValue	= 'value';
-
-		const app			= new Server();
-
-		app.apply( app.er_body_parser_form, { maxPayloadLength: 60, strict: false } );
-
-		app.get( `/${name}`, ( event ) => {
-			if (
-				typeof event.body === 'undefined'
-				|| typeof event.body[formDataKey] === 'undefined'
-				|| ! event.body[formDataKey].includes( formDataValue )
-			) {
-				event.sendError( 'Body was not parsed', 400 );
-			}
-
-			event.send( 'ok' );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				querystring.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': 'application/x-www-form-urlencoded' },
-				3339
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				querystring.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
-				{ 'content-type': 'application/x-www-form-urlencoded' },
-				3339
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				querystring.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type' : '' },
-				3339
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				querystring.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': 'application/*' },
-				3339
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				querystring.stringify( { [formDataKey]: formDataValue } ),
-				{ 'content-type': '*' },
-				3339
-			)
-		);
-
-		const server	= app.listen( 3339, () => {
-			Promise.all( responses ).then(() => {
-				server.close();
-				done();
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test er_body_parser_form does parse not above the maxPayload if strict',
-	test	: ( done ) => {
-		const name			= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
-		const formDataKey	= 'testErBodyParserFormParsesApplicationXWwwFormUrlencoded';
-		const formDataValue	= 'value';
-
-		const app			= new Server();
-
-		app.apply( app.er_body_parser_form, { maxPayloadLength: 60, strict: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			assert.deepStrictEqual( event.body, {} );
-
-			event.send( 'ok' );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				querystring.stringify( { [formDataKey]: formDataValue + formDataValue + formDataValue } ),
-				{ 'content-type': 'application/x-www-form-urlencoded' },
-				3340
-			)
-		);
-
-		const server	= app.listen( 3340, () => {
-			Promise.all( responses ).then(() => {
-				server.close();
-				done();
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_body_parser_multipart.parses.only.multipart/form-data',
-	test	: ( done ) => {
-		const name				= 'testErBodyParserMultipartParsesMultipartFormData';
-		const multipartDataCR	= fs.readFileSync( path.join( __dirname, './fixture/body_parser/multipart/multipart_data_CR' ) );
-		const multipartDataCRLF	= fs.readFileSync( path.join( __dirname, './fixture/body_parser/multipart/multipart_data_CRLF' ) );
-		const multipartDataLF	= fs.readFileSync( path.join( __dirname, './fixture/body_parser/multipart/multipart_data_LF' ) );
-		const tempDir			= path.join( __dirname, `./fixture/body_parser/multipart` );
-		const app				= new Server();
-
-		app.apply( app.er_body_parser_multipart, { tempDir } );
-
-		app.get( `/${name}`, ( event ) => {
-			if (
-				typeof event.body === 'undefined'
-				|| typeof event.body.$files === 'undefined'
-				|| event.body.text !== 'text default'
-				|| event.body.$files.length !== 2
-				|| event.body.$files[0].type !== 'file'
-				|| event.body.$files[0].size !== 17
-				|| event.body.$files[0].contentType !== 'text/plain'
-				|| event.body.$files[0].name !== 'a.txt'
-				|| ! event.body.$files[0].path.includes( tempDir )
-				|| event.body.$files[1].type !== 'file'
-				|| event.body.$files[1].size !== 48
-				|| event.body.$files[1].contentType !== 'text/html'
-				|| event.body.$files[1].name !== 'a.html'
-				|| ! event.body.$files[1].path.includes( tempDir )
-			) {
-				event.sendError( 'Body was not parsed', 400 );
-			}
-
-			event.send( 'ok' );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				multipartDataCRLF,
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				multipartDataCR,
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				multipartDataLF,
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				multipartDataCRLF,
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9041544843365972754266' },
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				500,
-				multipartDataCRLF,
-				{ 'content-type': 'multipart/form-data' },
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				multipartDataCRLF,
-				{},
-				3341
-			)
-		);
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				400,
-				'',
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-				3341
-			)
-		);
-
-		const server	= app.listen( 3341, () => {
-			Promise.all( responses ).then(() => {
-				setTimeout(() => {
-					server.close();
-					done();
-				}, 500 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test er_body_parser_multipart will not parse if limit is reached',
-	test	: ( done ) => {
-		const name			= 'testErBodyParserMultipartParsesMultipartFormData';
-		const multipartData	= fs.readFileSync( path.join( __dirname, `./fixture/body_parser/multipart/multipart_data_CRLF` ) );
-		const tempDir		= path.join( __dirname, './fixture/body_parser/multipart' );
-		const app			= new Server();
-
-		app.apply( app.er_body_parser_multipart, { tempDir, maxPayload: 10 } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( 'ok' );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				500,
-				multipartData,
-				{ 'content-type': 'multipart/form-data; boundary=---------------------------9051914041544843365972754266' },
-				3342
-			)
-		);
-
-		const server	= app.listen( 3342, () => {
-			Promise.all( responses ).then(() => {
-				setTimeout(() => {
-					server.close();
-					done();
-				}, 500 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test body_parser_handler fallback parser',
-	test	: ( done ) => {
-		const name	= 'testBodyParserHandlerFallbackParser';
-		const app	= new Server();
-
-		app.apply( app.er_body_parser_json );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( { body: event.body, rawBody: event.rawBody } );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				'SomeRandomData',
-				{ 'content-type': 'somethingDoesntMatter' },
-				3901,
-				JSON.stringify( { body: 'SomeRandomData', rawBody: 'SomeRandomData' } )
-			)
-		);
-
-		const server	= app.listen( 3901, () => {
-			Promise.all( responses ).then(() => {
-				setTimeout(() => {
-					server.close();
-					done();
-				}, 500 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_body_parser.setOptions.without.anything',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		app.apply( app.er_body_parser_json, { maxPayloadLength: 1 } );
-		assert.deepStrictEqual( app.er_body_parser_json.options, { maxPayloadLength: 1 } );
-
-		app.er_body_parser_json.setOptions();
-		app.apply( app.er_body_parser_json );
-		assert.deepStrictEqual( app.er_body_parser_json.options, {} );
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.test.er_body_parser.when.event.body.already.exists.does.not.parse',
-	test	: ( done ) => {
-		const name	= 'testErBodyParserDoesNotParseIfBodyExists';
-		const app	= new Server();
-
-		app.get( `/${name}`, ( event ) => {
-			event.body		= 'TEST';
-			event.rawBody	= 'TEST';
-			event.next();
-		});
-
-		app.apply( app.er_body_parser_json );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( { body: event.body, rawBody: event.rawBody } );
-		});
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				JSON.stringify( { key: 123 } ),
-				{ 'content-type': 'application/json' },
-				4300,
-				JSON.stringify( { body: 'TEST', rawBody: 'TEST' } )
-			)
-		);
-
-		const server = app.listen( 4300, () => {
-			Promise.all( responses ).then(() => {
-				server.close();
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_body_parser.when.parsed.data.is.invalid',
-	test	: ( done ) => {
-		const name				= 'testErBodyParserIfInvalidParserData';
-		const app				= new Server();
-		const MockBodyParser	= Mock( JsonBodyParser );
-
-		Mocker( MockBodyParser, {
-			method			: 'parse',
-			shouldReturn	: () => {
-				return new Promise(( resolve ) => {
-					resolve( 'wrongData' );
-				});
-			}
-		});
-
-		Mocker( MockBodyParser, {
-			method			: 'supports',
-			shouldReturn	: () => {
-				return true;
-			}
-		});
-
-		app.apply( new BodyParserPlugin( MockBodyParser, 'er_test' ) );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( { body: event.body, rawBody: event.rawBody } );
-		});
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				'',
-				{ 'content-type': '*/*' },
-				4301,
-				JSON.stringify( { body: {}, rawBody: {} } )
-			)
-		);
-
-		const server = app.listen( 4301, () => {
-			Promise.all( responses ).then(() => {
-				server.close();
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_body_parser.setServerOnRuntime.without.pluginbag.creates.one',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		assert.deepStrictEqual( typeof app.pluginBag.parsers, 'undefined' );
-
-		app.apply( app.er_body_parser_json );
-		assert.deepStrictEqual( typeof app.pluginBag.parsers, 'object' );
-		assert.deepStrictEqual( Object.keys( app.pluginBag.parsers ).length, 1 );
-
-		app.apply( app.er_body_parser_form );
-		assert.deepStrictEqual( typeof app.pluginBag.parsers, 'object' );
-		assert.deepStrictEqual( Object.keys( app.pluginBag.parsers ).length, 2 );
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.test er_body_parser_raw handles anything',
-	test	: ( done ) => {
-		const name	= 'testErBodyParserRaw';
-		const app	= new Server();
-
-		app.apply( app.er_body_parser_raw, { maxPayloadLength: 15 } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( { body: event.body, rawBody: event.rawBody } );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				'SomeRandomData',
-				{ 'content-type': 'somethingDoesntMatter' },
-				3902,
-				JSON.stringify( { body: 'SomeRandomData', rawBody: 'SomeRandomData' } )
-			)
-		);
-
-		// Returns 200 and an empty body due to limit reached
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				'SomeRandomDataSomeRandomData',
-				{ 'content-type': 'somethingDoesntMatter' },
-				3902,
-				JSON.stringify( { body: {}, rawBody: {} } )
-			)
-		);
-
-		const server	= app.listen( 3902, () => {
-			Promise.all( responses ).then(() => {
-				setTimeout(() => {
-					server.close();
-					done();
-				}, 500 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_logger',
-	test	: ( done ) => {
-		const name					= 'testErLogger';
-		const relativeLogLocation	= './tests/server/fixture/logger/testLog.log';
-		const fileTransport			= new File({
-			logLevel	: Loggur.LOG_LEVELS.debug,
-			filePath	: relativeLogLocation
-		});
-
-		const logger				= Loggur.createLogger({
-			serverName	: 'Server.test_er_logger',
-			logLevel	: Loggur.LOG_LEVELS.debug,
-			capture		: false,
-			transports	: [fileTransport]
-		});
-
-		const app		= new Server();
-
-		assert.deepStrictEqual( app.Loggur, Loggur );
-
-		app.apply( app.er_logger, { logger, attachToProcess: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			if (
-				typeof process.dumpStack !== 'function'
-				|| typeof process.log !== 'function'
-			) {
-				event.sendError( 'Logger is not attached correctly', 500 );
-			}
-
-			process.dumpStack();
-			process.log( 'TESTLOG' );
-
-			event.emit( 'redirect', { redirectUrl: 'REDIRECT-LINK' } );
-			event.emit( 'cachedResponse' );
-			event.emit( 'stop' );
-			event.emit( 'clearTimeout' );
-			event.emit( 'on_error', new Error( 'error' ) );
-			event.emit( 'error', new Error( 'normal error' ) );
-			event.emit( 'error', 'NORMAL SIMPLE ERROR MESSAGE' );
-			event.emit( 'on_error', 'SIMPLE ERROR MESSAGE' );
-
-			event.setResponseHeader( 'key', 'value' );
-
-			event.send( name );
-		} );
-
-		const server	= app.listen( 3336, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { headerName: 'value' }, 3336 ).then(( response ) => {
-				fileTransport.getWriteStream().end();
-				setTimeout(() => {
-					process.dumpStack	= undefined;
-					process.log			= undefined;
-
-					assert.equal( fs.existsSync( fileTransport.getFileName() ), true );
-					assert.equal( fs.statSync( fileTransport.getFileName() ).size > 0, true );
-					assert.equal( response.body.toString(), name );
-
-					const logData	= fs.readFileSync( fileTransport.getFileName() );
-
-					assert.equal( logData.includes( `GET /${name} 200` ), true );
-					assert.equal( logData.includes( 'Event is cleaning up' ), true );
-					assert.equal( logData.includes( 'Event finished' ), true );
-					assert.equal( logData.includes( 'Server.test_er_logger/Master' ), true );
-					assert.equal( logData.includes( 'Redirect to: REDIRECT-LINK' ), true );
-					assert.equal( logData.includes( 'Response to' ), true );
-					assert.equal( logData.includes( 'send from cache' ), true );
-					assert.equal( logData.includes( 'Event stopped' ), true );
-					assert.equal( logData.includes( 'Timeout cleared' ), true );
-					assert.equal( logData.includes( 'Header set: key with value: value' ), true );
-					assert.equal( logData.includes( 'Headers: ' ), true );
-					assert.equal( logData.includes( 'Cookies: ' ), true );
-					assert.equal( logData.includes( 'Error : SIMPLE ERROR MESSAGE' ), true );
-					assert.equal( logData.includes( 'Error : NORMAL SIMPLE ERROR MESSAGE' ), true );
-					assert.equal( logData.includes( 'Error : Error: error' ), true );
-					assert.equal( logData.includes( 'Error : Error: normal error' ), true );
-					assert.equal( logData.includes( 'at EventRequest._next' ), true );
-
-					if ( fs.existsSync( fileTransport.getFileName() ) )
-						fs.unlinkSync( fileTransport.getFileName() );
-
-					server.close();
-					done();
-				}, 250 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_logger.when.user.agent.is.set',
-	test	: ( done ) => {
-		const name					= 'testErLogger';
-		const relativeLogLocation	= './tests/server/fixture/logger/testLog.log';
-		const fileTransport			= new File({
-			logLevel	: Loggur.LOG_LEVELS.debug,
-			filePath	: relativeLogLocation
-		});
-
-		const logger				= Loggur.createLogger({
-			serverName	: 'Server.test_er_logger',
-			logLevel	: Loggur.LOG_LEVELS.debug,
-			capture		: false,
-			transports	: [fileTransport]
-		});
-
-		const app		= new Server();
-
-		assert.deepStrictEqual( app.Loggur, Loggur );
-
-		app.apply( app.er_logger, { logger, attachToProcess: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			if (
-				typeof process.dumpStack !== 'function'
-				|| typeof process.log !== 'function'
-			) {
-				event.sendError( 'Logger is not attached correctly', 500 );
-			}
-
-			process.dumpStack();
-			process.log( 'TESTLOG' );
-
-			event.emit( 'redirect', { redirectUrl: 'REDIRECT-LINK' } );
-			event.emit( 'cachedResponse' );
-			event.emit( 'stop' );
-			event.emit( 'clearTimeout' );
-			event.emit( 'on_error', new Error( 'error' ) );
-			event.emit( 'error', new Error( 'normal error' ) );
-			event.emit( 'error', 'NORMAL SIMPLE ERROR MESSAGE' );
-			event.emit( 'on_error', 'SIMPLE ERROR MESSAGE' );
-
-			event.setResponseHeader( 'key', 'value' );
-
-			event.send( name );
-		} );
-
-		const server	= app.listen( 4310, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { headerName: 'value', 'user-agent': 'someUserAgent' }, 4310 ).then(( response ) => {
-				fileTransport.getWriteStream().end();
-				setTimeout(() => {
-					process.dumpStack	= undefined;
-					process.log			= undefined;
-
-					assert.equal( fs.existsSync( fileTransport.getFileName() ), true );
-					assert.equal( fs.statSync( fileTransport.getFileName() ).size > 0, true );
-					assert.equal( response.body.toString(), name );
-
-					const logData	= fs.readFileSync( fileTransport.getFileName() );
-
-					assert.equal( logData.includes( `GET /${name} 200` ), true );
-					assert.equal( logData.includes( 'someUserAgent' ), true );
-					assert.equal( logData.includes( 'Event is cleaning up' ), true );
-					assert.equal( logData.includes( 'Event finished' ), true );
-					assert.equal( logData.includes( 'Server.test_er_logger/Master' ), true );
-					assert.equal( logData.includes( 'Redirect to: REDIRECT-LINK' ), true );
-					assert.equal( logData.includes( 'Response to' ), true );
-					assert.equal( logData.includes( 'send from cache' ), true );
-					assert.equal( logData.includes( 'Event stopped' ), true );
-					assert.equal( logData.includes( 'Timeout cleared' ), true );
-					assert.equal( logData.includes( 'Header set: key with value: value' ), true );
-					assert.equal( logData.includes( 'Headers: ' ), true );
-					assert.equal( logData.includes( 'Cookies: ' ), true );
-					assert.equal( logData.includes( 'Error : SIMPLE ERROR MESSAGE' ), true );
-					assert.equal( logData.includes( 'Error : NORMAL SIMPLE ERROR MESSAGE' ), true );
-					assert.equal( logData.includes( 'Error : Error: error' ), true );
-					assert.equal( logData.includes( 'Error : Error: normal error' ), true );
-					assert.equal( logData.includes( 'at EventRequest._next' ), true );
-
-					if ( fs.existsSync( fileTransport.getFileName() ) )
-						fs.unlinkSync( fileTransport.getFileName() );
-
-					server.close();
-					done();
-				}, 250 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_logger.getLogger.returns.default.logger.if.none.specified',
-	test	: ( done ) => {
-		assert.deepStrictEqual( app.er_logger.getLogger(), Loggur.getDefaultLogger() );
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.test er_response_cache caches',
-	test	: ( done ) => {
-		const name	= 'testErResponseCacheCaches';
-		let i		= 0;
-
-		if ( ! app.hasPlugin( app.er_response_cache ) )
-		{
-			app.apply( app.er_data_server, { dataServer: helpers.getDataServer() } );
-			app.apply( app.er_response_cache );
-		}
-
-		app.get( `/${name}`, 'cache.request', ( event ) => {
-			if ( i === 0 )
-			{
-				i ++;
-				return event.send( name );
-			}
-
-			event.sendError( 'ERROR', 501 );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-
-			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_response_cache does not cache if not needed',
-	test	: ( done ) => {
-		const name	= 'testErResponseCacheDoesNotCacheEverything';
-		let i		= 0;
-
-		if ( ! app.hasPlugin( app.er_response_cache ) )
-		{
-			app.apply( app.er_data_server, { dataServer: helpers.getDataServer() } );
-			app.apply( app.er_response_cache );
-		}
-
-		app.get( `/${name}`, ( event ) => {
-			if ( i === 0 )
-			{
-				i ++;
-				return event.send( name );
-			}
-
-			event.sendError( 'ERROR', 501 );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-
-			return helpers.sendServerRequest( `/${name}`, 'GET', 501 );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'ERROR' } ) );
-
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_response_cache does not cache raw',
-	test	: ( done ) => {
-		const name	= 'testErResponseCacheDoesNotCacheRaw';
-		let i		= 0;
-
-		if ( ! app.hasPlugin( app.er_response_cache ) )
-		{
-			app.apply( app.er_data_server, { dataServer: helpers.getDataServer() } );
-			app.apply( app.er_response_cache );
-		}
-
-		app.get( `/${name}`, ( event ) => {
-			if ( i === 0 )
-			{
-				i ++;
-				return event.send( name, 200, true );
-			}
-
-			event.sendError( 'ERROR', 501 );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-
-			return helpers.sendServerRequest( `/${name}`, 'GET', 501 );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'ERROR' } ) );
-
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_timeout.without.reaching.timeout',
-	test	: ( done ) => {
-		const body			= 'testTimeoutWithoutReachingTimeout';
-		const timeout		= 100;
-		let timeoutCalled	= 0;
-
-		if ( ! app.hasPlugin( app.er_timeout ) )
-			app.apply( app.er_timeout, { timeout } );
-
-		app.add( ( event ) => {
-				event.on( 'clearTimeout', () => {
-					timeoutCalled++;
-				});
-
-				event.next();
-			}
-		);
-
-		app.get( '/testTimeoutWithoutReachingTimeout', ( event ) => {
-			event.send( body );
-		} );
-
-		helpers.sendServerRequest( '/testTimeoutWithoutReachingTimeout' ).then(( response ) => {
-			assert.equal( response.body.toString(), body );
-			assert.equal( timeoutCalled, 1 );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_timeout.with.reaching.timeout',
-	test	: ( done ) => {
-		const timeout	= 100;
-		let timeoutCalled	= 0;
-
-		if ( ! app.hasPlugin( app.er_timeout ) )
-			app.apply( app.er_timeout, { timeout } );
-
-		app.add({
-			handler	: ( event ) => {
-				event.on( 'clearTimeout', () => {
-					timeoutCalled++;
-				});
-
-				event.next();
-			}
-		});
-
-		app.get( '/testTimeoutWithReachingTimeout', ( event ) => {} );
-
-		helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 503 ).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: `Request timed out in: ${timeout/1000} seconds`} ) );
-			assert.equal( timeoutCalled, 1 );
-
-			app.add({
-				handler	: ( event ) => {
-					event.clearTimeout();
-					event.next();
-				}
-			});
-
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_timeout.with.reaching.timeout.but.request.is.finished',
-	test	: ( done ) => {
-		const app			= new Server();
-		const timeout		= 100;
-		let timeoutCalled	= 0;
-
-		if ( ! app.hasPlugin( app.er_timeout ) )
-			app.apply( app.er_timeout, { timeout } );
-
-		app.add({
-			handler	: ( event ) => {
-				event.on( 'clearTimeout', () => {
-					timeoutCalled++;
-				});
-
-				event.finished	= true;
-
-				// Expired but the timeout checked that the request was finished and did nothing;
-				setTimeout(()=>{
-					event.finished	= false;
-					event.send( 'DONE' );
-				}, 200 );
-			}
-		});
-
-		app.get( '/testTimeoutWithReachingTimeout', ( event ) => {} );
-
-		app.listen( 4400, () => {
-			helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 200, '', {}, 4400, 'DONE' ).then(( response ) => {
-				assert.equal( timeoutCalled, 1 );
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_timeout.with.reaching.timeout.and.custom.callback',
-	test	: ( done ) => {
-		const timeout	= 100;
-		let timeoutCalled	= 0;
-
-		const app	= new Server();
-
-		app.apply( app.er_timeout, { timeout, callback: ( event ) => { event.send( 'It is all good', 200 ) } } );
-
-		app.add(
-			( event ) => {
-				event.on( 'clearTimeout', () => {
-					timeoutCalled++;
-				});
-
-				event.next();
-			}
-		);
-
-		app.get( '/testTimeoutWithReachingTimeoutAndCustomCallback', ( event ) => {} );
-
-		app.listen( 4120, () => {
-			helpers.sendServerRequest( '/testTimeoutWithReachingTimeoutAndCustomCallback', 'GET', 200, '', {}, 4120, 'It is all good'  ).then(( response ) => {
-				assert.equal( timeoutCalled, 1 );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_env.getEnvFileAbsPath',
-	test	: ( done ) => {
-		assert.deepStrictEqual( app.er_env.getEnvFileAbsPath(), path.join( path.parse( require.main.filename ).dir, '.env' ) );
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.test er_env attaches environment variables to process',
-	test	: ( done ) => {
-		const name			= 'testErEnvAttachesVariablesToProcess';
-		const fileLocation	= path.join( __dirname, './fixture/.env' );
-		app.apply( app.er_env, { fileLocation } );
-
-		assert.equal( process.env.TESTKEY, 'TESTVALUE' );
-
-		app.get( `/${name}`, ( event ) => {
-			assert.equal( process.env.TESTKEY, 'TESTVALUE' );
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_env.attaches.environment.variables.to.process.when.changed',
-	test	: ( done ) => {
-		const fileLocation	= path.join( __dirname, './fixture/.env' );
-		app.apply( app.er_env, { fileLocation } );
-
-		assert.equal( process.env.TESTKEY, 'TESTVALUE' );
-
-		fs.writeFileSync( fileLocation, 'TESTKEY=TESTVALUE2' )
-
-		setTimeout(()=>{
-			assert.equal( process.env.TESTKEY, 'TESTVALUE2' );
-			fs.writeFileSync( fileLocation, 'TESTKEY=TESTVALUE' )
-			setTimeout(()=>{
-				done();
-			}, 100 );
-		}, 200 );
-	}
-});
-
-test({
-	message	: 'Server.test.er_env.if.file.not.exists',
-	test	: ( done ) => {
-		const fileLocation	= path.join( __dirname, './fixture/.envNotExisting' );
-
-		assert.throws(() => {
-			app.apply( app.er_env, { fileLocation } );
-		});
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.test.er_env.defaults',
-	test	: ( done ) => {
-
-		assert.throws(() => {
-			app.apply( app.er_env );
-		});
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits does not die without any parameters',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsDoesNotDie';
-		const fileLocation	= path.join( __dirname, './../../rate_limits.json' );
-
-		const app			= new Server();
-		const server		= http.createServer( app.attach() );
-
-		app.apply( app.er_rate_limits );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		server.listen( 3334, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3334 ).then(( response ) => {
-				setTimeout(() => {
-					server.close();
-					assert.equal( response.body.toString(), name );
-					assert.equal( fs.existsSync( fileLocation ), false );
-					done();
-				}, 200 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.when.using.file.and.file.does.not.exist',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsUsingFileCreatesFile';
-		const fileLocation	= path.join( __dirname, './fixture/er_rate_limits_when_file_does_not_exist.json' );
-
-		if ( fs.existsSync( fileLocation ) )
-			fs.unlinkSync( fileLocation );
-
-		const app			= new Server();
-
-		app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		app.listen( 4330, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4330 ).then(( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( fs.existsSync( fileLocation ), true );
-
-				fs.unlinkSync( fileLocation );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.when.using.file.and.json.is.invalid',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsUsingFileInvalidJson';
-		const fileLocation	= path.join( __dirname, './fixture/er_rate_limits_invalid_json.json' );
-		const app			= new Server();
-
-		app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			assert.deepStrictEqual( app.er_rate_limits.rules, [{
-				path: '',
-				methods: [],
-				maxAmount: 10000,
-				refillTime: 10,
-				refillAmount: 1000,
-				policy: 'connection_delay',
-				delayTime: 3,
-				delayRetries: 5,
-				stopPropagation: false,
-				ipLimit: false
-			}] );
-
-			event.send( name );
-		} );
-
-		app.listen( 4331, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4331 ).then(( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( fs.existsSync( fileLocation ), true );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.when.using.file.and.file.is.empty',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsUsingFileEmptyFile';
-		const fileLocation	= path.join( __dirname, './fixture/er_rate_limits_empty.json' );
-		const app			= new Server();
-
-		app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			assert.deepStrictEqual( app.er_rate_limits.rules, [{
-				path: '',
-				methods: [],
-				maxAmount: 10000,
-				refillTime: 10,
-				refillAmount: 1000,
-				policy: 'connection_delay',
-				delayTime: 3,
-				delayRetries: 5,
-				stopPropagation: false,
-				ipLimit: false
-			}] );
-
-			event.send( name );
-		} );
-
-		app.listen( 4332, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4332 ).then(( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( fs.existsSync( fileLocation ), true );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits with rules in an array instead of json',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithRulesInAnArray';
-
-		const app			= new Server();
-		const server		= http.createServer( app.attach() );
-
-		const rule			= {
-			"path":`/${name}`,
-			"methods":['GET'],
-			"maxAmount":1,
-			"refillTime":100,
-			"refillAmount":1,
-			"policy": 'strict',
-			"delayTime": 3,
-			"delayRetries": 5,
-			"stopPropagation": false,
-			"ipLimit": false
-		};
-
-		app.apply( app.er_rate_limits, { rules: [rule] } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		server.listen( 4001, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
-			}).then(( response ) => {
-				setTimeout(() => {
-					server.close();
-					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
-					done();
-				}, 200 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.sanitize.config.on.default',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		app.er_rate_limits.sanitizeConfig();
-
-		assert.deepStrictEqual( app.er_rate_limits.rules, [] );
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.validate.rule.if.rule.is.invalid',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		assert.throws(() => {
-			app.er_rate_limits.validateRule( {} );
-		});
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.validate.rule.if.connection_delay_rule.is.invalid',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		assert.throws(() => {
-			app.er_rate_limits.validateRule( {
-				path: '',
-				methods: [],
-				maxAmount: 10000,
-				refillTime: 10,
-				refillAmount: 1000,
-				policy: 'connection_delay',
-				delayTime: 3,
-				stopPropagation: false,
-				ipLimit: false
-			} );
-		});
-
-		assert.throws(() => {
-			app.er_rate_limits.validateRule( {
-				path: '',
-				methods: [],
-				maxAmount: 10000,
-				refillTime: 10,
-				refillAmount: 1000,
-				policy: 'connection_delay',
-				delayRetries: 3,
-				stopPropagation: false,
-				ipLimit: false
-			} );
-		});
-
-		done();
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.with.dynamic.middleware',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithDynamicGlobalMiddleware';
-
-		const app			= new Server();
-		const server		= http.createServer( app.attach() );
-
-		const rule			= {
-			"maxAmount":1,
-			"refillTime":100,
-			"refillAmount":1,
-			"policy": 'strict',
-			"delayTime": 3,
-			"delayRetries": 5
-		};
-
-		app.get( `/${name}`, app.er_rate_limits.rateLimit( rule ), ( event ) => {
-			event.send( name );
-		});
-
-		server.listen( 4001, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
-			}).then(( response ) => {
-				setTimeout(() => {
-					server.close();
-					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
-					done();
-				}, 200 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.with.dynamic.middleware.when.request.is.finished',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithDynamicGlobalMiddleware';
-		const app			= new Server();
-
-		const rule			= {
-			"maxAmount":0,
-			"refillTime":100,
-			"refillAmount":1,
-			"policy": 'strict'
-		};
-
-		app.get( `/${name}`, async ( event ) => {
-			event.finished	= true;
-
-			// This never gets rate limited
-			await app.er_rate_limits.rateLimit( rule )( event );
-
-			setTimeout(() => {
-				event.finished	= false;
-				event.send( name );
-			}, 100 );
-		});
-
-		app.listen( 4340, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4340, name ).then(() => {
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.with.two.dynamic.middlewares',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithTwoDynamicGlobalMiddleware';
-
-		const app			= new Server();
-		const server		= http.createServer( app.attach() );
-
-		const rule			= {
-			"maxAmount":1,
-			"refillTime":100,
-			"refillAmount":1,
-			"policy": 'strict'
-		};
-
-		const ruleTwo		= {
-			"maxAmount":0,
-			"refillTime":100,
-			"refillAmount":1,
-			"policy": 'permissive'
-		};
-
-		app.apply( app.er_rate_limits );
-
-		app.get( `/${name}`, [
-			app.getPlugin( app.er_rate_limits ).rateLimit( ruleTwo ),
-			app.getPlugin( app.er_rate_limits ).rateLimit( rule ),
-		], ( event ) => {
-			assert.deepStrictEqual( event.rateLimited, true );
-			assert.deepStrictEqual( event.erRateLimitRules.length, 2 );
-			event.send( name );
-		} );
-
-		server.listen( 4001, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
-			}).then(( response ) => {
-				setTimeout(() => {
-					server.close();
-					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
-					done();
-				}, 200 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.with.dynamic.middleware.ignores.path.and.methods',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithDynamicGlobalMiddlewareIgnoresPathAndMethods';
-
-		const app			= new Server();
-		const server		= http.createServer( app.attach() );
-
-		const rule			= {
-			"path": ['wrong', 123],
-			"methods": 123,
-			"maxAmount":1,
-			"refillTime":100,
-			"refillAmount":1,
-			"policy": 'strict',
-			"delayTime": 3,
-			"delayRetries": 5,
-			"stopPropagation": false,
-			"ipLimit": false
-		};
-
-		app.apply( app.er_rate_limits );
-
-		app.get( `/${name}`, app.getPlugin( app.er_rate_limits ).rateLimit( rule ), ( event ) => {
-			event.send( name );
-		} );
-
-		server.listen( 4001, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
-			}).then(( response ) => {
-				setTimeout(() => {
-					server.close();
-					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
-					done();
-				}, 200 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.bucket.works.cross.apps',
-	test	: ( done ) => {
-		const dataStore	= new DataServer( { persist: false, ttl: 90000 } );
-
-		const appOne	= new Server();
-		const appTwo	= new Server();
-
-		const name			= 'testErRateLimitsBucketWorksCrossApps';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
-		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
-
-		appOne.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		appTwo.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		appOne.listen( 3360 );
-		appTwo.listen( 3361 );
-
-		setTimeout(() => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3360 ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 3361 );
-			}).then(( response ) => {
-				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
-				done();
-			}).catch( done );
-		}, 100 );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits.with.params',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithParams';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}/:test:`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}/testTwo`, 'GET', 200, '', {} ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}/testTwo`, 'GET', 429, '', {} );
-		}).then( () => { done(); } ).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.with.permissive.limiting',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithPermissiveLimiting';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-		let called			= 0;
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			called ++;
-
-			if ( called > 1 )
-			{
-				assert.equal( event.rateLimited, true );
-			}
-			else
-			{
-				assert.equal( event.rateLimited, false );
-			}
-
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.with.permissive.limiting.refills',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithPermissiveLimitingRefills';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			assert.equal( event.rateLimited, false );
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			setTimeout(() => {
-				helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-					assert.equal( response.body.toString(), name );
-					done();
-				}).catch( done )
-			}, 1000 );
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits with connection delay policy limiting',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithConnectionDelayPolicy';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-		const now			= Math.floor( new Date().getTime() / 1000 );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			assert.equal( ( Math.floor( new Date().getTime() / 1000 ) - now ) >= 2, true );
-
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.with.two.connection.delay.policy.limiting',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithTwoConnectionDelayPolicy';
-		const now			= Math.floor( new Date().getTime() / 1000 );
-		const app			= new Server();
-
-		app.apply( app.er_rate_limits, { rules: [
-					{
-						"path": "/testErRateLimitsWithTwoConnectionDelayPolicy",
-						"methods": [],
-						"maxAmount": 1,
-						"refillTime": 1,
-						"refillAmount": 1,
-						"policy": "connection_delay",
-						"delayTime": 1,
-						"delayRetries": 10,
-						"stopPropagation": false,
-						"ipLimit": false
-					},
-					{
-						path: /\/[\S]+/,
-						"methods": [],
-						"maxAmount": 1,
-						"refillTime": 3,
-						"refillAmount": 1,
-						"policy": "connection_delay",
-						"delayTime": 1,
-						"delayRetries": 10,
-						"stopPropagation": false,
-						"ipLimit": false
-					}
-				]
-			}
-		);
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		app.listen( 4350, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4350 ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4350 );
-			}).then(( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( ( Math.floor( new Date().getTime() / 1000 ) - now ) >= 3, true );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits with strict policy',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicy';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limitsSTRESS with strict policy STRESS',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyStress';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		const promises	= [];
-
-		for ( let i = 0; i < 100; i ++ )
-		{
-			promises.push( helpers.sendServerRequest( `/${name}` ) );
-		}
-
-		setTimeout(() => {
-			for ( let i = 0; i < 50; i ++ )
-			{
-				promises.push( helpers.sendServerRequest( `/${name}` ) );
-			}
-
-			Promise.all( promises).then(() => {
-				done();
-			}).catch( done );
-		}, 2100 );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits with specified methods matches',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethods';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits with multiple specified methods matches',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyWithMultipleSpecifiedMethods';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits with specified methods does not match if method is not the same',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethodsThatDoNotMatch';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits with stopPropagation',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithPropagation';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-		let called			= 0;
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			called ++;
-
-			if ( called > 1 )
-			{
-				assert.equal( event.rateLimited, true );
-			}
-			else
-			{
-				assert.equal( event.rateLimited, false );
-			}
-
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}`, 'GET', 200 );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits with multiple rules',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithMultipleRules';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits strict overrides connection delay',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsStrictOverridesConnectionDelayPolicy';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits connection delay overrides permissive',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsConnectionDelayOverridesPermissivePolicy';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}` );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_rate_limits connection delay returns 429 if no more retries',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsConnectionDelayReturns429IfNoMoreRetries';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.tester_rate_limits.with.strict.policy.with.ip.limit',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyWithIpLimit';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-
-		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			try
-			{
-				assert.notEqual(
-					app.getPlugin( app.er_rate_limits ).dataStore.server['$LB:/testErRateLimitsWithStrictPolicyWithIpLimitstrict::ffff:127.0.0.1//value'],
-					`/${name}` )
-				;
-			}
-			catch ( e )
-			{
-				return done( 'er_rate_limits with ip limit did not return as expected' );
-			}
-
-			event.send( name );
-		} );
-
-		setTimeout(() => {
-			helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
-			}).then(( response ) => {
-				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
-				done();
-			}).catch( done );
-		}, 50 );
-	}
-});
-
-test({
-	message	: 'Server.test.er_templating_engine.attaches.a.render.function.that.fetches.files',
-	test	: ( done ) => {
-		const name			= 'testTemplatingEngine';
-		const deepName		= 'testTemplatingEngineDeep';
-		const templateDir 	= path.join( __dirname, './fixture/templates' );
-		let renderCalled	= 0;
-
-		app.apply( app.er_templating_engine, { templateDir } );
-
-		app.add({
-			handler	: ( event ) => {
-				event.on( 'render', () => {
-					renderCalled++;
-				} );
-
-				event.next();
-			}
-		});
-
-		app.get( `/${name}`, ( event ) => {
-			event.render( 'index' );
-		} );
-
-		app.get( `/${deepName}`, ( event ) => {
-			event.render( 'deep/directory/structure/file' );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString().includes( 'THIS_IS_THE_INDEX_HTML_FILE' ), true );
-			assert.equal( response.headers['content-type'], 'text/html' );
-
-			return helpers.sendServerRequest( `/${deepName}` );
-		}).then(( response ) => {
-			assert.equal( response.body.toString().includes( 'THIS_IS_THE_DEEP_HTML_FILE' ), true );
-			assert.equal( response.headers['content-type'], 'text/html' );
-
-			assert.equal( renderCalled, 2 );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_templating_engine.attaches.a.render.function.that.calls.next.on.error',
-	test	: ( done ) => {
-		const name			= 'testTemplatingEngineFail';
-		const templateDir 	= path.join( __dirname, './fixture/templates' );
-
-		app.apply( app.er_templating_engine, { templateDir } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.render( 'fail' );
-		} );
-
-		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_templating_engine.with.no.template.name.passed.gets.the.index.html',
-	test	: ( done ) => {
-		const name			= 'testTemplatingEngineFail';
-		const app			= new Server();
-		const templateDir 	= path.join( __dirname, './fixture/templates' );
-
-		app.apply( app.er_templating_engine, { templateDir } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.render();
-		});
-
-		app.listen( 4321, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4321 ).then(( response ) => {
-				assert.deepStrictEqual( response.body.toString(), fs.readFileSync( path.join( templateDir, 'index.html' ) ).toString() );
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_templating_engine.with.no.templateDir.uses.root.public.by.default',
-	test	: ( done ) => {
-		const name			= 'testTemplatingEngineFail';
-		const app			= new Server();
-		const templateDir 	= path.join( __dirname, '../../public/test' );
-
-		app.apply( app.er_templating_engine );
-
-		app.get( `/${name}`, ( event ) => {
-			event.render( '/test/index' );
-		});
-
-		app.listen( 4325, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4325 ).then(( response ) => {
-				assert.deepStrictEqual( response.body.toString(), fs.readFileSync( path.join( templateDir, 'index.html' ) ).toString() );
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_templating_engine.render.when.is.finished',
-	test	: ( done ) => {
-		const name			= 'testTemplatingEngineFail';
-		const app			= new Server();
-		const templateDir 	= path.join( __dirname, './fixture/templates' );
-
-		app.apply( app.er_templating_engine, { templateDir } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.finished	= true;
-			event.render( null, {}, ( error )=>{
-				event.finished	= false;
-				event.send( error );
-			});
-		});
-
-		app.listen( 4322, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4322, 'Error rendering' ).then(( response ) => {
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_templating_engine.render.when.templating.engine.rejects',
-	test	: ( done ) => {
-		const name			= 'testTemplatingEngineFail';
-		const app			= new Server();
-		const templateDir 	= path.join( __dirname, './fixture/templates' );
-
-		app.apply( app.er_templating_engine, { templateDir } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.templatingEngine	= {
-				render	: () => {
-					throw new Error( 'Could not render' )
-				}
-			}
-
-			event.render( null, {}, ( error )=>{
-				event.send( error.message );
-			});
-		});
-
-		app.listen( 4323, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4323, 'Could not render' ).then(( response ) => {
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
 	message	: 'Server.test.er_router.caches.correctly',
 	test	: ( done ) => {
 		const name	= 'testErRouterCaches';
@@ -4129,143 +1505,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_session works as expected',
-	test	: ( done ) => {
-		const name	= 'testErSession';
-
-		assert.throws(() => {
-			const appOne	= new Server();
-			appOne.apply( appOne.er_session );
-		});
-
-		app.apply( app.er_data_server );
-		app.apply( app.er_session );
-
-		app.get( `/${name}`, ( event ) => {
-			event.initSession( event.next ).catch( event.next );
-		} );
-
-		app.get( `/${name}`, async ( event ) => {
-			assert.equal( event.session instanceof Session, true );
-			const session	= event.session;
-
-			if ( session.has( 'authenticated' ) === false )
-			{
-				assert.throws(() => {
-					session.get( 'authenticated' );
-				});
-
-				session.add( 'authenticated', true );
-			}
-			else
-			{
-				assert.equal( session.get( 'authenticated' ), true );
-				event.setResponseHeader( 'authenticated', 1 );
-			}
-
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			assert.equal( typeof response.headers['set-cookie'] !== 'undefined', true );
-
-			const cookies	= {},
-				rc		= response.headers['set-cookie'][0];
-
-			rc && rc.split( ';' ).forEach( function( cookie ) {
-				const parts						= cookie.split( '=' );
-				cookies[parts.shift().trim()]	= decodeURI( parts.join( '=' ) );
-			});
-
-			assert.equal( typeof cookies.sid === 'string', true );
-
-			const headers	= { cookie: `sid=${cookies.sid}`};
-
-			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			assert.equal( typeof response.headers.authenticated !== 'undefined', true );
-			assert.equal( response.headers.authenticated, 1 );
-
-			const headers	= { cookie: `sid=wrong`};
-
-			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			assert.equal( typeof response.headers.authenticated === 'undefined', true );
-
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.er_session.works.as.expected.with.headers',
-	test	: ( done ) => {
-		const name	= 'testErSessionWithHeaders';
-
-		assert.throws(() => {
-			const appOne	= new Server();
-			appOne.apply( appOne.er_session );
-		});
-
-		app.apply( app.er_data_server );
-		app.apply( app.er_session, { isCookieSession: false } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.initSession( event.next ).catch( event.next );
-		} );
-
-		app.get( `/${name}`, async ( event ) => {
-			assert.equal( event.session instanceof Session, true );
-			const session	= event.session;
-
-			if ( session.has( 'authenticated' ) === false )
-			{
-				assert.throws(() => {
-					session.get( 'authenticated' );
-				});
-
-				session.add( 'authenticated', true );
-			}
-			else
-			{
-				assert.equal( session.get( 'authenticated' ), true );
-				event.setResponseHeader( 'authenticated', 1 );
-			}
-
-			event.send( name );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			assert.equal( typeof response.headers.sid !== 'undefined', true );
-
-			const sid		= response.headers.sid;
-			const headers	= { sid };
-
-			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-
-			assert.equal( typeof response.headers.authenticated !== 'undefined', true );
-			assert.equal( response.headers.authenticated, 1 );
-
-			const headers	= { sid: 'wrong' };
-
-			return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', headers );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			assert.equal( typeof response.headers.authenticated === 'undefined', true );
-
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test er_data_server works as expected',
+	message	: 'Server.test.er_data_server.works.as.expected',
 	test	: ( done ) => {
 		const name			= 'testCacheServer';
 		const secondName	= `/${name}Second`;
@@ -4307,7 +1547,49 @@ test({
 });
 
 test({
-	message	: 'Server.test server does not export /public by default',
+	message	: 'Server.test.er_data_server.works.as.expected.with.map',
+	test	: ( done ) => {
+		const name			= 'testCacheServer';
+		const secondName	= `/${name}Second`;
+		const key			= `${name}_KEY`;
+		const value			= `${name}_VALUE`;
+
+		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false } ) } );
+
+		app.get( `/${name}`, async ( event ) => {
+			assert.equal( event.dataServer instanceof DataServerMap, true );
+
+			await event.dataServer.set( key, value ).catch( done );
+			await event.dataServer.set( `${key}_delete`, value ).catch( done );
+
+			await event.dataServer.delete( `${key}_delete` ).catch( done );
+
+			event.send( name );
+		});
+
+		app.get( secondName, async ( event ) => {
+			assert.equal( event.dataServer instanceof DataServerMap, true );
+
+			const cacheValue	= await event.dataServer.get( key ).catch( done );
+
+			assert.equal( cacheValue, value );
+			assert.equal( await event.dataServer.get( `${key}_delete` ).catch( done ), null );
+
+			event.send( secondName );
+		});
+
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
+			assert.equal( response.body.toString(), name );
+			return helpers.sendServerRequest( secondName );
+		}).then(( response ) => {
+			assert.equal( response.body.toString(), secondName );
+			done();
+		}).catch( done )
+	}
+});
+
+test({
+	message	: 'Server.test.server.does.not.export./public.by.default',
 	test	: ( done ) => {
 		helpers.sendServerRequest( `/public/test/index.html`, 'GET', 404 ).then(( response ) => {
 			assert.equal( response.body.toString(), '{"error":"Cannot GET /public/test/index.html"}' );
@@ -4317,7 +1599,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_static_resources works as expected',
+	message	: 'Server.test.er_static_resources.works.as.expected',
 	test	: ( done ) => {
 		app.apply( app.er_static_resources, { paths: ['tests/server/fixture/static'] } );
 
@@ -4345,22 +1627,22 @@ test({
 		const app	= new Server();
 		app.apply( app.er_static_resources, { paths: 'tests/server/fixture/static' } );
 
-
-		app.listen( 4310, ()=>{
-			helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js`, 'GET', 200, '', {}, 4310 ).then(( response ) => {
+		app.listen( 4500, ()=>{
+			helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js`, 'GET', 200, '', {}, 4500 ).then(( response ) => {
 				assert.equal( response.headers['content-type'], 'application/javascript' );
 				assert.equal( response.body.toString(), 'const test=\'123\';' );
 
-				return helpers.sendServerRequest( '/tests/server/fixture/static/test.css', 'GET', 200, '', {}, 4310 );
+				return helpers.sendServerRequest( '/tests/server/fixture/static/test.css', 'GET', 200, '', {}, 4500 );
 			}).then(( response ) => {
 				assert.equal( response.headers['content-type'], 'text/css' );
 				assert.equal( response.body.toString(), 'body{background:black;}' );
 
-				return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404, '', {}, 4310 );
+				return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404, '', {}, 4500 );
 			}).then(( response ) => {
 				assert.equal( response.body.toString().includes( 'File not found' ), true );
-
-				done();
+				setTimeout(()=>{
+					done();
+				}, 100 )
 			}).catch( done )
 		});
 	}
@@ -4550,7 +1832,7 @@ test({
 });
 
 test({
-	message	: 'Server.test calling next twice does not die critically',
+	message	: 'Server.test.calling.next.twice.does.not.die.critically',
 	test	: ( done ) => {
 		const error	= 'An Error Has Occurred!';
 
@@ -4577,237 +1859,6 @@ test({
 
 			done();
 		} ).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.testValidation',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		app.apply( app.er_body_parser_json );
-
-		app.get( '/testValidation',
-			app.er_validation.validate( { query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } } ),
-			( event ) => {
-			event.send( { query: event.query, body: event.body } );
-		} );
-
-		helpers.sendServerRequest(
-			'/testValidation?testKey=50',
-			'GET',
-			200,
-			JSON.stringify( { email: 'test@example.com' } ),
-			{ 'content-type': 'application/json' },
-			4110
-		).then(( response ) => {
-			assert.deepStrictEqual(
-				JSON.parse( response.body.toString() ),
-				{ query: { testKey: 50 }, body: { email: 'test@example.com' } }
-			);
-			done();
-		}).catch( done );
-
-		app.listen( 4110 );
-	}
-});
-
-test({
-	message	: 'Server.testValidation.when.validation.fails',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		app.apply( app.er_body_parser_json );
-
-		app.get( '/testValidation',
-			app.er_validation.validate( { query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } } ),
-			( event ) => {
-			event.send( { query: event.query, body: event.body } );
-		} );
-
-		helpers.sendServerRequest(
-			'/testValidation?testKey=50',
-			'GET',
-			200,
-			JSON.stringify( { email: 'test' } ),
-			{ 'content-type': 'application/json' },
-			4111
-		).then(( response ) => {
-			assert.deepStrictEqual(
-				JSON.parse( response.body.toString() ),
-				{ body: { email: ['email'] } }
-			);
-			done();
-		}).catch( done );
-
-		app.listen( 4111 );
-	}
-});
-
-test({
-	message	: 'Server.testValidation.when.validation.fails.returns.first.only',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		app.apply( app.er_body_parser_json );
-
-		app.get( '/testValidation',
-			app.er_validation.validate( { query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } } ),
-			( event ) => {
-			event.send( { query: event.query, body: event.body } );
-		} );
-
-		helpers.sendServerRequest(
-			'/testValidation?testKey=test',
-			'GET',
-			200,
-			JSON.stringify( { email: 'test' } ),
-			{ 'content-type': 'application/json' },
-			4112
-		).then(( response ) => {
-			assert.deepStrictEqual(
-				JSON.parse( response.body.toString() ),
-				{ query: { testKey: ['numeric'] } }
-			);
-			done();
-		}).catch( done );
-
-		app.listen( 4112 );
-	}
-});
-
-test({
-	message	: 'Server.testValidation.when.custom.error.callback',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		app.apply( app.er_body_parser_json );
-
-		app.get( '/testValidation',
-			app.er_validation.validate(
-				{ query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } },
-				( event, validationParameter, validationResult ) => {
-
-					assert.deepStrictEqual( validationParameter, 'query' );
-					assert.deepStrictEqual( validationResult.getValidationResult(), { testKey: ['numeric'] } );
-
-					event.send( 'ok' );
-				}
-			),
-			( event ) => {
-				event.next( 'Error!' );
-			} );
-
-		helpers.sendServerRequest(
-			'/testValidation?testKey=test',
-			'GET',
-			200,
-			JSON.stringify( { email: 'test' } ),
-			{ 'content-type': 'application/json' },
-			4113
-		).then(( response ) => {
-			assert.deepStrictEqual(
-				response.body.toString(),
-				'ok'
-			);
-			done();
-		}).catch( done );
-
-		app.listen( 4113 );
-	}
-});
-
-test({
-	message	: 'Server.testValidation.when.default.error.callback',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		app.apply(
-			app.er_validation,
-			{
-				failureCallback: ( event, validationParameter, validationResult ) => {
-					assert.deepStrictEqual( validationParameter, 'query' );
-					assert.deepStrictEqual( validationResult.getValidationResult(), { testKey: ['numeric'] } );
-
-					event.send( 'ok' );
-				}
-			}
-		);
-		app.apply( app.er_body_parser_json );
-
-		app.get( '/testValidation',
-			app.er_validation.validate(
-				{ query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } }
-			),
-			( event ) => {
-				event.next( 'Error!' );
-			} );
-
-		helpers.sendServerRequest(
-			'/testValidation?testKey=test',
-			'GET',
-			200,
-			JSON.stringify( { email: 'test' } ),
-			{ 'content-type': 'application/json' },
-			4114
-		).then(( response ) => {
-			assert.deepStrictEqual(
-				response.body.toString(),
-				'ok'
-			);
-			done();
-		}).catch( done );
-
-		app.listen( 4114 );
-	}
-});
-
-test({
-	message	: 'Server.testValidation.when.custom.error.callback.and.default.error.callback',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		app.apply(
-			app.er_validation,
-			{
-				failureCallback: ( event ) => {
-					event.next( 'Error!' );
-				}
-			}
-		);
-		app.apply( app.er_body_parser_json );
-
-		app.get( '/testValidation',
-			app.er_validation.validate(
-				{ query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } },
-				( event, validationParameter, validationResult ) => {
-
-					assert.deepStrictEqual( validationParameter, 'query' );
-					assert.deepStrictEqual( validationResult.getValidationResult(), { testKey: ['numeric'] } );
-
-					event.send( 'ok' );
-				}
-			),
-			( event ) => {
-				event.next( 'Error!' );
-			} );
-
-		helpers.sendServerRequest(
-			'/testValidation?testKey=test',
-			'GET',
-			200,
-			JSON.stringify( { email: 'test' } ),
-			{ 'content-type': 'application/json' },
-			4115
-		).then(( response ) => {
-			assert.deepStrictEqual(
-				response.body.toString(),
-				'ok'
-			);
-			done();
-		}).catch( done );
-
-		app.listen( 4115 );
 	}
 });
 

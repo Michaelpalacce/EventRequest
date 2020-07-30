@@ -5,7 +5,6 @@ const { Tester, Mock, Mocker }						= require( './../server/tester/tester' );
 const EventRequest									= require( './../server/event_request' );
 const assert										= require( 'assert' );
 const fs											= require( 'fs' );
-const path											= require( 'path' );
 const { Loggur }									= require( './../server/components/logger/loggur' );
 const MockLoggur									= Mock( Loggur.constructor );
 const { server, dataServer }						= require( './test_bootstrap' );
@@ -28,7 +27,7 @@ helpers.getServer	= () => {
 /**
  * @brief	Returns the caching server set up by the test bootstrap
  *
- * @return	Server
+ * @return	DataServer
  */
 helpers.getDataServer	= () => {
 	return dataServer;

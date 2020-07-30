@@ -7,7 +7,7 @@ const uniqueId	= require( './../helpers/unique_id' );
  *
  * @var		Number TTL
  */
-const TTL		= 7776000;
+const TTL	= 7776000;
 
 /**
  * @brief	Session container
@@ -71,7 +71,7 @@ class Session
 		if ( this.sessionId === null )
 			return false;
 
-		return await this.server.get( this.sessionId ) !== null;
+		return await this.server.get( Session.SESSION_PREFIX + this.sessionId ) !== null;
 	}
 
 	/**
@@ -81,7 +81,7 @@ class Session
 	 */
 	async removeSession()
 	{
-		await this.server.delete( this.sessionId );
+		await this.server.delete( Session.SESSION_PREFIX + this.sessionId );
 
 		this.session	= {};
 
@@ -184,7 +184,7 @@ class Session
 		if ( sessionId === null )
 			return false;
 
-		return await this.server.set( sessionId, this.session, this.ttl ) !== null;
+		return await this.server.set( Session.SESSION_PREFIX + sessionId, this.session, this.ttl ) !== null;
 	}
 
 	/**
@@ -196,10 +196,10 @@ class Session
 	 */
 	async fetchSession()
 	{
-		if ( ! await this.server.touch( this.sessionId ) )
+		if ( ! await this.server.touch( Session.SESSION_PREFIX + this.sessionId ) )
 			return false;
 
-		this.session	= await this.server.get( this.sessionId );
+		this.session	= await this.server.get( Session.SESSION_PREFIX + this.sessionId );
 
 		return true;
 	}
@@ -214,5 +214,12 @@ class Session
 		return this.sessionId;
 	}
 }
+
+/**
+ * @brief	Default prefix set before every key that is set in the store
+ *
+ * @var		String SESSION_PREFIX
+ */
+Session.SESSION_PREFIX	= '$S:';
 
 module.exports	= Session;

@@ -1,6 +1,6 @@
 'use strict';
 
-let testSuites	= {};
+let testSuites				= {};
 
 testSuites.eventSuite		= () => {
 	require( './server/event_request_test' );
@@ -8,10 +8,21 @@ testSuites.eventSuite		= () => {
 
 testSuites.serverSuite		= () => {
 	require( './server/server_test' );
+	require( './server/server_er_rate_limits_test' );
+	require( './server/server_er_body_parsers_test' );
+	require( './server/server_er_security_test' );
+	require( './server/server_er_logger_test' );
+	require( './server/server_er_response_cache_test' );
+	require( './server/server_er_timeout_test' );
+	require( './server/server_er_env_test' );
+	require( './server/server_er_templating_engine' );
+	require( './server/server_er_session' );
+	require( './server/server_er_validation_test' );
 };
 
 testSuites.securitySuite		= () => {
 	require( './server/components/session/session_test' );
+	require( './server/components/session/session_with_data_server_map_test' );
 	require( './server/components/security/content_security_policy_test' );
 	require( './server/components/security/content_type_options_test' );
 	require( './server/components/security/expect_ct_test' );
@@ -44,6 +55,7 @@ testSuites.templatingEngine		= () => {
 
 testSuites.rateLimiterSuite		= () => {
 	require( './server/components/rate_limiter/bucket_test' );
+	require( './server/components/rate_limiter/bucket_with_data_server_map_test' );
 };
 
 testSuites.fileStreamSuite		= () => {
@@ -80,14 +92,17 @@ testSuites.validationSuite	= () => {
 
 testSuites.pluginsSuite		= () => {
 	require( './server/plugins/available_plugins/data_server_plugin_test' );
+	require( './server/plugins/available_plugins/data_server_plugin_with_map_test' );
 	require( './server/plugins/available_plugins/timeout_plugin_test' );
 	require( './server/plugins/available_plugins/env_plugin_test' );
 	require( './server/plugins/plugin_manager_test' );
 	require( './server/plugins/available_plugins/static_resources_plugin_test' );
 	require( './server/plugins/available_plugins/session_plugin_test' );
+	require( './server/plugins/available_plugins/session_plugin_with_map_test' );
 	require( './server/plugins/available_plugins/templating_engine_plugin_test' );
 	require( './server/plugins/available_plugins/logger_plugin_test' );
 	require( './server/plugins/available_plugins/response_cache_plugin_test' );
+	require( './server/plugins/available_plugins/response_cache_plugin_with_map_test' );
 	require( './server/plugins/available_plugins/cors_plugin_test' );
 	require( './server/plugins/available_plugins/validation_plugin_test' );
 };

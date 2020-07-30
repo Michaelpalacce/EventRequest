@@ -27,10 +27,37 @@ class DataServerPlugin extends PluginInterface
 								? this.options.dataServerOptions
 								: {};
 
-		return this.server		= this.options.dataServer instanceof DataServer
+		return this.server		= this.isValidDataServer( this.options.dataServer )
 								? this.options.dataServer
 								: new DataServer( this.dataServerOptions );
 	}
+
+	/**
+	 * @brief	Uses Duck-Typing to check if the Data Server is a valid data server
+	 *
+	 * @param	{Object} dataServer
+	 *
+	 * @return {boolean}
+	 */
+	isValidDataServer( dataServer )
+	{
+		if ( typeof dataServer !== 'object' )
+			return false;
+
+		if ( dataServer instanceof DataServer )
+			return true;
+
+		let isValid					= true;
+		const mandatoryFunctions	= ['get', 'set', 'delete', 'lock', 'unlock', 'increment', 'decrement', 'stop', 'touch', '_configure'];
+
+		mandatoryFunctions.forEach( ( value ) => {
+			if ( typeof dataServer[value] !== 'function' )
+				isValid	= false;
+		});
+
+		return isValid;
+	}
+
 
 	/**
 	 * @brief	Attaches the middleware to the eventRequest
@@ -47,7 +74,7 @@ class DataServerPlugin extends PluginInterface
 
 				event.on( 'cleanUp', () => {
 					event.dataServer	= null;
-				} );
+				});
 
 				event.next();
 			}

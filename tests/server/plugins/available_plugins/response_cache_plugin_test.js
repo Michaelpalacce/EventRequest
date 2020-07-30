@@ -6,7 +6,7 @@ const ResponseCachePlugin		= require( '../../../../server/plugins/available_plug
 const Router					= require( '../../../../server/components/routing/router' );
 
 test({
-	message		: 'ResponseCachePlugin adds a cacheCurrentRequest method',
+	message		: 'ResponseCachePlugin.adds.a.cacheCurrentRequest.method',
 	test		: ( done ) => {
 		let eventRequest		= helpers.getEventRequest( 'GET', '/tests' );
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
@@ -168,7 +168,7 @@ test({
 });
 
 test({
-	message		: 'ResponseCachePlugin getCacheId doesn\'t use ip by default',
+	message		: 'ResponseCachePlugin.getCacheId.doesn\'t.use.ip.by.default',
 	test		: ( done ) => {
 		let path				= '/path';
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
@@ -182,7 +182,7 @@ test({
 });
 
 test({
-	message		: 'ResponseCachePlugin getCacheId uses ip if set in config',
+	message		: 'ResponseCachePlugin.getCacheId.uses.ip.if.set.in.config',
 	test		: ( done ) => {
 		let path				= '/path';
 		let ipAddress			= '127.0.0.1';
@@ -209,7 +209,7 @@ test({
 });
 
 test({
-	message		: 'ResponseCachePlugin getCacheId uses given options instead of config if any',
+	message		: 'ResponseCachePlugin.getCacheId.uses.given.options.instead.of.config.if.any',
 	test		: ( done ) => {
 		let path				= '/path';
 		let ipAddress			= '127.0.0.1';
@@ -240,7 +240,7 @@ test({
 });
 
 test({
-	message		: 'ResponseCachePlugin getTimeToLive on default',
+	message		: 'ResponseCachePlugin.getTimeToLive.on.default',
 	test		: ( done ) => {
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 		let eventRequest		= helpers.getEventRequest( 'GET', '/test' );
@@ -254,7 +254,7 @@ test({
 });
 
 test({
-	message		: 'ResponseCachePlugin getTimeToLive if set on config',
+	message		: 'ResponseCachePlugin.getTimeToLive.if.set.on.config',
 	test		: ( done ) => {
 		let configTtl			= 10;
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
@@ -271,7 +271,7 @@ test({
 });
 
 test({
-	message		: 'ResponseCachePlugin getTimeToLive set on config is overwritten if passed',
+	message		: 'ResponseCachePlugin.getTimeToLive.set.on.config.is.overwritten.if.passed',
 	test		: ( done ) => {
 		let configTtl			= 10;
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
@@ -293,7 +293,7 @@ test({
 });
 
 test({
-	message		: 'ResponseCachePlugin getPluginDependencies depends on cache server',
+	message		: 'ResponseCachePlugin.getPluginDependencies.depends.on.cache.server',
 	test		: ( done ) => {
 		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
 

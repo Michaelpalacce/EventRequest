@@ -2,6 +2,7 @@
 
 const DataServerPlugin			= require( '../../../../server/plugins/available_plugins/data_server_plugin' );
 const DataServer				= require( '../../../../server/components/caching/data_server' );
+const DataServerMap				= require( '../../../../server/components/caching/data_server_map' );
 const Router					= require( '../../../../server/components/routing/router' );
 const { assert, test, helpers }	= require( '../../../test_helper' );
 const path						= require( 'path' );
@@ -90,8 +91,155 @@ test({
 		} );
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		setTimeout(() => {
-			eventRequest.next();
-		}, 250 );
+		eventRequest.next();
+	}
+});
+
+test({
+	message	: 'DataServerPlugin.isValidDataServer',
+	test	: ( done ) => {
+		const options	= { dataServerOptions: { persist: false } };
+		const plugin	= new DataServerPlugin( 'id', options );
+
+		assert.deepStrictEqual( plugin.isValidDataServer( {} ), false );
+		assert.deepStrictEqual( plugin.isValidDataServer( '' ), false );
+		assert.deepStrictEqual( plugin.isValidDataServer( 1 ), false );
+		assert.deepStrictEqual( plugin.isValidDataServer( new DataServerMap( { persist: false } ) ), true );
+		assert.deepStrictEqual( plugin.isValidDataServer( new DataServer( { persist: false } ) ), true );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			set : ()=>{},
+			delete : ()=>{},
+			lock : ()=>{},
+			unlock : ()=>{},
+			increment : ()=>{},
+			decrement : ()=>{},
+			stop : ()=>{},
+			touch : ()=>{},
+			_configure : ()=>{}
+		} ), true );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			set : ()=>{},
+			delete : ()=>{},
+			lock : ()=>{},
+			unlock : ()=>{},
+			increment : ()=>{},
+			decrement : ()=>{},
+			stop : ()=>{},
+			touch : ()=>{},
+			_configure : ()=>{}
+		} ), false );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			delete : ()=>{},
+			lock : ()=>{},
+			unlock : ()=>{},
+			increment : ()=>{},
+			decrement : ()=>{},
+			stop : ()=>{},
+			touch : ()=>{},
+			_configure : ()=>{}
+		} ), false );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			set : ()=>{},
+			lock : ()=>{},
+			unlock : ()=>{},
+			increment : ()=>{},
+			decrement : ()=>{},
+			stop : ()=>{},
+			touch : ()=>{},
+			_configure : ()=>{}
+		} ), false );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			set : ()=>{},
+			delete : ()=>{},
+			unlock : ()=>{},
+			increment : ()=>{},
+			decrement : ()=>{},
+			stop : ()=>{},
+			touch : ()=>{},
+			_configure : ()=>{}
+		} ), false );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			set : ()=>{},
+			delete : ()=>{},
+			lock : ()=>{},
+			increment : ()=>{},
+			decrement : ()=>{},
+			stop : ()=>{},
+			touch : ()=>{},
+			_configure : ()=>{}
+		} ), false );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			set : ()=>{},
+			delete : ()=>{},
+			lock : ()=>{},
+			unlock : ()=>{},
+			decrement : ()=>{},
+			stop : ()=>{},
+			touch : ()=>{},
+			_configure : ()=>{}
+		} ), false );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			set : ()=>{},
+			delete : ()=>{},
+			lock : ()=>{},
+			unlock : ()=>{},
+			increment : ()=>{},
+			stop : ()=>{},
+			touch : ()=>{},
+			_configure : ()=>{}
+		} ), false );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			set : ()=>{},
+			delete : ()=>{},
+			lock : ()=>{},
+			unlock : ()=>{},
+			increment : ()=>{},
+			decrement : ()=>{},
+			touch : ()=>{},
+			_configure : ()=>{}
+		} ), false );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			set : ()=>{},
+			delete : ()=>{},
+			lock : ()=>{},
+			unlock : ()=>{},
+			increment : ()=>{},
+			decrement : ()=>{},
+			stop : ()=>{},
+			_configure : ()=>{}
+		} ), false );
+
+		assert.deepStrictEqual( plugin.isValidDataServer({
+			get : ()=>{},
+			set : ()=>{},
+			delete : ()=>{},
+			lock : ()=>{},
+			unlock : ()=>{},
+			increment : ()=>{},
+			decrement : ()=>{},
+			stop : ()=>{},
+			touch : ()=>{},
+		} ), false );
+
+		done();
 	}
 });
