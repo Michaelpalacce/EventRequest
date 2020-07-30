@@ -76,7 +76,7 @@ class BigMap
 
 		const result	= map.delete( key );
 
-		if ( map.size === 0 )
+		if ( map.size === 0 && this.maps.length !== 1 )
 			this.maps.splice( this.maps.indexOf( map ), 1 );
 
 		return result;
@@ -132,11 +132,21 @@ class BigMap
 	forEach ( callbackFn, thisArg )
 	{
 		if ( thisArg )
-			for ( const value of this )
-				callbackFn.call( thisArg, value );
+			for ( const result of this )
+			{
+				const key	= result[0];
+				const value	= result[1];
+
+				callbackFn.call( this, value, key, this );
+			}
 		else
-			for ( const value of this )
-				callbackFn( value );
+			for ( const result of this )
+			{
+				const key	= result[0];
+				const value	= result[1];
+
+				callbackFn( value, key, this );
+			}
 	}
 
 	/**
@@ -214,7 +224,7 @@ class BigMap
 	{
 		for ( let index = this.maps.length - 1; index >= 0; index-- )
 		{
-			const map = this.maps[index]
+			const map = this.maps[index];
 
 			if ( map.has( key ) )
 				return map;

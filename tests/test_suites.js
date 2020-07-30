@@ -47,6 +47,7 @@ testSuites.loggingSuite		= () => {
 testSuites.cachingSuite		= () => {
 	require( './server/components/caching/data_server_test' );
 	require( './server/components/caching/data_server_map_test' );
+	require( './server/components/caching/data_server_map_big_map_test' );
 };
 
 testSuites.templatingEngine		= () => {

@@ -48,7 +48,7 @@ test({
 	test	: ( done ) => {
 		removeCache();
 
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		assert.deepEqual( dataServer.server, new Map() );
 		assert.equal( dataServer.defaultTtl, 300 );
@@ -66,7 +66,7 @@ test({
 	message	: 'DataServerMap._handleServerDown',
 	test	: ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 		Loggur.loggers		= {};
 		Loggur.disableDefault();
 
@@ -102,7 +102,7 @@ test({
 
 		fs.writeFileSync( DEFAULT_PERSIST_FILE, JSON.stringify( map, DataServerMap.replacer ) );
 
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		assert.deepStrictEqual( await dataServer.get( key ), value );
 
@@ -114,23 +114,24 @@ test({
 test({
 	message	: 'DataServerMap.constructor does not load data or set an interval for saving data if persist is false',
 	test	: ( done ) => {
+		const key	= 'key';
 		const ttl	= 50;
 		const value	= { route: '/get' };
 		const now	= ( new Date().getTime() / 1000 );
 
-		const data	= {
-			test: {
-				key: 'test',
+		const map	= new Map();
+		map.set( key, {
+				key,
 				value,
 				ttl,
 				expirationDate: now + ttl,
 				persist: true
 			}
-		};
+		);
 
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
-			fs.writeFileSync( DEFAULT_PERSIST_FILE, JSON.stringify( data ) );
+			fs.writeFileSync( DEFAULT_PERSIST_FILE, JSON.stringify( map, DataServerMap.replacer ) );
 
 			const dataServer	= new DataServerMap( { persist: false } );
 
@@ -148,7 +149,7 @@ test({
 	test	: ( done ) => {
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
-			const dataServer	= new DataServerMap();
+			const dataServer	= new DataServerMap( {} );
 			const key			= 'key';
 			const value			= 'value';
 			const ttl			= 100;
@@ -181,7 +182,7 @@ test({
 	test	: ( done ) => {
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
-			const dataServer	= new DataServerMap();
+			const dataServer	= new DataServerMap( {} );
 			const key			= 'key';
 			const value			= 'value';
 			const persist		= true;
@@ -549,7 +550,7 @@ test({
 
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
-			const dataServer	= new DataServerMap();
+			const dataServer	= new DataServerMap( {} );
 			const key			= 'key';
 			const value			= { test: 'value' };
 
@@ -919,7 +920,7 @@ test({
 	message	: 'DataServerMap.increment.with.defaults',
 	test	: async ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		await dataServer.set( 'test', 1 )
 
@@ -936,7 +937,7 @@ test({
 	message	: 'DataServerMap.decrement.with.defaults',
 	test	: async ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		await dataServer.set( 'test', 1 )
 
@@ -953,7 +954,7 @@ test({
 	message	: 'DataServerMap.increment.if.data.does.not.exist.returns.null',
 	test	: async ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		assert.deepStrictEqual( await dataServer.increment( 'test' ), null );
 
@@ -967,7 +968,7 @@ test({
 	message	: 'DataServerMap.touch.if.data.does.not.exist.returns.false',
 	test	: async ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		assert.deepStrictEqual( await dataServer.touch( 'test' ), false );
 
@@ -981,7 +982,7 @@ test({
 	message	: 'DataServerMap._prune.data.that.has.exiration.date.null.is.set.to.infinity.when.data.is.loaded.from.file',
 	test	: async ( done ) => {
 		removeCache();
-		const dataServer		= new DataServerMap();
+		const dataServer		= new DataServerMap( {} );
 		const entry				= {
 			key				: 'test',
 			value			: 'value',
@@ -1012,7 +1013,7 @@ test({
 	message	: 'DataServerMap.decrement.if.data.does.not.exist.returns.false',
 	test	: async ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		assert.deepStrictEqual( await dataServer.decrement( 'test' ), null );
 
@@ -1026,7 +1027,7 @@ test({
 	message	: 'DataServerMap._getTtl.with.defaults',
 	test	: async ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		assert.deepStrictEqual( dataServer._getTtl(), Infinity );
 
@@ -1040,7 +1041,7 @@ test({
 	message	: 'DataServerMap._getExpirationDateFromTtl.with.defaults',
 	test	: async ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		assert.deepStrictEqual( dataServer._getExpirationDateFromTtl(), Infinity );
 
@@ -1054,7 +1055,7 @@ test({
 	message	: 'DataServerMap._loadData.on.error',
 	test	: async ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap();
+		const dataServer	= new DataServerMap( {} );
 
 		assert.deepStrictEqual( dataServer._getExpirationDateFromTtl(), Infinity );
 

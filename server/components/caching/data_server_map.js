@@ -47,7 +47,7 @@ class DataServerMap extends DataServer
 		}
 		else
 		{
-			fs.writeFileSync( this.persistPath, '{"dataType":"Map","value":[]}' );
+			fs.writeFileSync( this.persistPath, JSON.stringify( this.useBigMap ? new BigMap() : new Map() ) );
 		}
 	}
 
@@ -188,11 +188,10 @@ class DataServerMap extends DataServer
 		return new Promise(( resolve ) => {
 			const ttl		= -1;
 			const persist	= false;
-
 			const isNew		= ! this.server.has( key );
 
 			if ( isNew )
-				this.server.set( key, this._makeDataSet( key, DataServer.LOCK_VALUE, ttl, persist ) );
+				this.server.set( key, this._makeDataSet( key, DataServer.LOCK_VALUE, ttl, persist ) )
 
 			resolve( isNew );
 		});
@@ -326,7 +325,7 @@ class DataServerMap extends DataServer
 	 */
 	_saveData()
 	{
-		let serverData	= new Map();
+		let serverData	= this.useBigMap ? new BigMap() : new Map();
 
 		this.server.forEach(( value, key ) => {
 			if ( value.persist === true )
@@ -334,7 +333,6 @@ class DataServerMap extends DataServer
 		});
 
 		const tmpFile		= `${this.persistPath}.tmp`;
-
 		const writeStream	= fs.createWriteStream( tmpFile );
 		writeStream.setDefaultEncoding( 'utf-8' );
 
@@ -384,7 +382,7 @@ class DataServerMap extends DataServer
 		catch ( error )
 		{
 			/* istanbul ignore next */
-			serverData	= new Map();
+			serverData	= this.useBigMap ? new BigMap() : new Map();
 		}
 
 		const currentServerData	= this.server;
