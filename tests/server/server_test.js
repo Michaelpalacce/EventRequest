@@ -1549,42 +1549,90 @@ test({
 test({
 	message	: 'Server.test.er_data_server.works.as.expected.with.map',
 	test	: ( done ) => {
-		const name			= 'testCacheServer';
+		const app			= new Server();
+		const name			= 'testCacheServerMap';
 		const secondName	= `/${name}Second`;
 		const key			= `${name}_KEY`;
 		const value			= `${name}_VALUE`;
 
 		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false } ) } );
 
-		app.get( `/${name}`, async ( event ) => {
-			assert.equal( event.dataServer instanceof DataServerMap, true );
+		app.listen( 4380, () => {
+			app.get( `/${name}`, async ( event ) => {
+				assert.equal( event.dataServer instanceof DataServerMap, true );
 
-			await event.dataServer.set( key, value ).catch( done );
-			await event.dataServer.set( `${key}_delete`, value ).catch( done );
+				await event.dataServer.set( key, value ).catch( done );
+				await event.dataServer.set( `${key}_delete`, value ).catch( done );
 
-			await event.dataServer.delete( `${key}_delete` ).catch( done );
+				await event.dataServer.delete( `${key}_delete` ).catch( done );
 
-			event.send( name );
+				event.send( name );
+			});
+
+			app.get( secondName, async ( event ) => {
+				assert.equal( event.dataServer instanceof DataServerMap, true );
+
+				const cacheValue	= await event.dataServer.get( key ).catch( done );
+
+				assert.equal( cacheValue, value );
+				assert.equal( await event.dataServer.get( `${key}_delete` ).catch( done ), null );
+
+				event.send( secondName );
+			});
+
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4380 ).then(( response ) => {
+				assert.equal( response.body.toString(), name );
+				return helpers.sendServerRequest( secondName, 'GET', 200, '', {}, 4380 );
+			}).then(( response ) => {
+				assert.equal( response.body.toString(), secondName );
+				done();
+			}).catch( done )
 		});
+	}
+});
 
-		app.get( secondName, async ( event ) => {
-			assert.equal( event.dataServer instanceof DataServerMap, true );
+test({
+	message	: 'Server.test.er_data_server.works.as.expected.with.big.map',
+	test	: ( done ) => {
+		const app			= new Server();
+		const name			= 'testCacheServerMap';
+		const secondName	= `/${name}Second`;
+		const key			= `${name}_KEY`;
+		const value			= `${name}_VALUE`;
 
-			const cacheValue	= await event.dataServer.get( key ).catch( done );
+		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false, useBigMap: true } ) } );
 
-			assert.equal( cacheValue, value );
-			assert.equal( await event.dataServer.get( `${key}_delete` ).catch( done ), null );
+		app.listen( 4381, () => {
+			app.get( `/${name}`, async ( event ) => {
+				assert.equal( event.dataServer instanceof DataServerMap, true );
 
-			event.send( secondName );
+				await event.dataServer.set( key, value ).catch( done );
+				await event.dataServer.set( `${key}_delete`, value ).catch( done );
+
+				await event.dataServer.delete( `${key}_delete` ).catch( done );
+
+				event.send( name );
+			});
+
+			app.get( secondName, async ( event ) => {
+				assert.equal( event.dataServer instanceof DataServerMap, true );
+
+				const cacheValue	= await event.dataServer.get( key ).catch( done );
+
+				assert.equal( cacheValue, value );
+				assert.equal( await event.dataServer.get( `${key}_delete` ).catch( done ), null );
+
+				event.send( secondName );
+			});
+
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4381 ).then(( response ) => {
+				assert.equal( response.body.toString(), name );
+				return helpers.sendServerRequest( secondName, 'GET', 200, '', {}, 4381 );
+			}).then(( response ) => {
+				assert.equal( response.body.toString(), secondName );
+				done();
+			}).catch( done )
 		});
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString(), name );
-			return helpers.sendServerRequest( secondName );
-		}).then(( response ) => {
-			assert.equal( response.body.toString(), secondName );
-			done();
-		}).catch( done )
 	}
 });
 

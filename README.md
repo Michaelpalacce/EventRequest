@@ -1963,6 +1963,7 @@ const plugin    = new BodyParserPlugin( CustomBodyParser, 'custom_body_parser', 
 # DataServer
 - Is an EventEmitter
 - Can be extended
+- This Data Server can store around 8million keys
 
 ~~~javascript
 const DataServer   = require( 'event_request/server/components/caching/data_server' );
@@ -2161,6 +2162,8 @@ However if the global persist is set to false, this will not work
 - Extends the DataServer
 - Same as the default data server but uses a Map instead of an object
 - It is recommended you use this one ( even tho it is not the default data server )
+- This DataServer can store up to 16.7 million keys
+- It can be extended to use a near infinite amount of keys if you set useBigMap to true
 
 ~~~javascript
 const DataServerMap   = require( 'event_request/server/components/caching/data_server_map' );
@@ -2192,6 +2195,10 @@ console.log( new DataServerMap( options ) );
 **persist: Boolean** 
 - Flag that specifies whether the data should be persisted to disk. 
 - Defaults to true 
+
+**useBigMap: Boolean** 
+- Flag that specifies whether the data should be stored in a Map or a BigMap. 
+- Defaults to false 
 
 #### Events:
 

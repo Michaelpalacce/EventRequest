@@ -820,7 +820,7 @@ test({
 
 				multipartParser.terminate();
 				done();
-			}, 75 );
+			}, 100 );
 		}).catch( done );
 	}
 });

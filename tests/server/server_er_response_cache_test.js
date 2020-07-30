@@ -68,6 +68,36 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_response_cache.with.big.map.caches',
+	test	: ( done ) => {
+		const app	= new Server();
+		const name	= 'testErResponseCacheCaches';
+		let i		= 0;
+
+		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false } ) } );
+		app.apply( app.er_response_cache );
+
+		app.get( `/${name}`, 'cache.request', ( event ) => {
+			if ( i === 0 )
+			{
+				i ++;
+				return event.send( name );
+			}
+
+			event.sendError( 'ERROR', 501 );
+		} );
+
+		app.listen( 4382, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4382, name ).then(( response ) => {
+				return helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4382, name );
+			}).then(( response ) => {
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
 	message	: 'Server.test.er_response_cache.does.not.cache.if.not.needed',
 	test	: ( done ) => {
 		const name	= 'testErResponseCacheDoesNotCacheEverything';
@@ -132,6 +162,36 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_response_cache.does.not.cache.if.not.needed.with.big.map',
+	test	: ( done ) => {
+		const app	= new Server();
+		const name	= 'testErResponseCacheDoesNotCacheEverything';
+		let i		= 0;
+
+		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false, useBigMap: true } ) } );
+		app.apply( app.er_response_cache );
+
+		app.get( `/${name}`, ( event ) => {
+			if ( i === 0 )
+			{
+				i ++;
+				return event.send( name );
+			}
+
+			event.sendError( 'ERROR', 501 );
+		} );
+
+		app.listen( 4364, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4364, name ).then(( response ) => {
+				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4364, JSON.stringify( { error: 'ERROR' } ) );
+			}).then(( response ) => {
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
 	message	: 'Server.test.er_response_cache.does.not.cache.raw',
 	test	: ( done ) => {
 		const name	= 'testErResponseCacheDoesNotCacheRaw';
@@ -188,6 +248,36 @@ test({
 		app.listen( 4362, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4362, name ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4362, JSON.stringify( { error: 'ERROR' } ) );
+			}).then(( response ) => {
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_response_cache.does.not.cache.raw.with.big.map',
+	test	: ( done ) => {
+		const app	= new Server();
+		const name	= 'testErResponseCacheDoesNotCacheRaw';
+		let i		= 0;
+
+		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false, useBigMap: true } ) } );
+		app.apply( app.er_response_cache );
+
+		app.get( `/${name}`, ( event ) => {
+			if ( i === 0 )
+			{
+				i ++;
+				return event.send( name, 200, true );
+			}
+
+			event.sendError( 'ERROR', 501 );
+		} );
+
+		app.listen( 4363, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4363, name ).then(( response ) => {
+				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4363, JSON.stringify( { error: 'ERROR' } ) );
 			}).then(( response ) => {
 				done();
 			}).catch( done );

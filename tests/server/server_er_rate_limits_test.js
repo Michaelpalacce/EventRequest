@@ -459,6 +459,40 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_rate_limits.with.dynamic.middleware.with.data.server.big.map',
+	test	: ( done ) => {
+		const name	= 'testErRateLimitsWithDynamicGlobalMiddleware';
+
+		const app	= new Server();
+
+		const rule	= {
+			"maxAmount":1,
+			"refillTime":100,
+			"refillAmount":1,
+			"policy": 'strict',
+			"delayTime": 3,
+			"delayRetries": 5
+		};
+
+		app.er_rate_limits.dataStore	= new DataServerMap( { persist: false, useBigMap: true } );
+
+		app.get( `/${name}`, app.er_rate_limits.rateLimit( rule ), ( event ) => {
+			event.send( name );
+		});
+
+		const server	= app.listen( 4001, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4001 ).then(( response ) => {
+				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
+			}).then(( response ) => {
+				server.close();
+				assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+				done();
+			}).catch( done );
+		} );
+	}
+});
+
+test({
 	message	: 'Server.test.er_rate_limits.bucket.works.cross.apps.with.data.server.map',
 	test	: ( done ) => {
 		const dataStore	= new DataServerMap( { persist: false, ttl : 90000 } );
@@ -486,6 +520,42 @@ test({
 		setTimeout(() => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3360 ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 3361 );
+			}).then(( response ) => {
+				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+				done();
+			}).catch( done );
+		}, 100 );
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.bucket.works.cross.apps.with.data.server.big.map',
+	test	: ( done ) => {
+		const dataStore	= new DataServerMap( { persist: false, ttl : 90000, useBigMap: true } );
+
+		const appOne	= new Server();
+		const appTwo	= new Server();
+
+		const name			= 'testErRateLimitsBucketWorksCrossApps';
+		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+
+		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
+		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
+
+		appOne.get( `/${name}`, ( event ) => {
+			event.send( name );
+		} );
+
+		appTwo.get( `/${name}`, ( event ) => {
+			event.send( name );
+		} );
+
+		appOne.listen( 4800 );
+		appTwo.listen( 4801 );
+
+		setTimeout(() => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4800 ).then(( response ) => {
+				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4801 );
 			}).then(( response ) => {
 				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
 				done();

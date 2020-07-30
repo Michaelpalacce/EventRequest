@@ -1,3 +1,8 @@
+26.3.0
+- Added a BigMap implementation
+- Added ability to switch between using a BigMap and Map in the DataServerMap
+- BigMap will always be a bit slower, but if you are expecting to store more than 16.7 million keys, then BigMap is better to use
+
 26.2.0
 - Added new DataServerMap that is identical to the old data server but uses a Map instead of an object
 - This DataServer should be used if you wanna store A LOT of data. In the future this will be improved to support BigMaps, essentially being able to hold infinite amounts of data

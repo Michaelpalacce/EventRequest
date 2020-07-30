@@ -3,6 +3,7 @@
 const path					= require( 'path' );
 const fs					= require( 'fs' );
 const DataServer			= require( './data_server' );
+const BigMap				= require( '../big_map/big_map' );
 const { promisify }			= require( 'util' );
 
 const unlink				= promisify( fs.unlink );
@@ -26,7 +27,8 @@ class DataServerMap extends DataServer
 							? options.persistPath
 							: DEFAULT_PERSIST_FILE;
 
-		this.server			= new Map();
+		this.useBigMap		= options.useBigMap || false;
+		this.server			= this.useBigMap ? new BigMap() : new Map();
 
 		super._configure( options );
 	}
@@ -387,7 +389,9 @@ class DataServerMap extends DataServer
 
 		const currentServerData	= this.server;
 
-		this.server	= new Map( [...currentServerData, ...serverData] );
+		this.server	= this.useBigMap
+					? new BigMap( [...currentServerData, ...serverData] )
+					: new Map( [...currentServerData, ...serverData] );
 	}
 
 	/**
@@ -402,6 +406,17 @@ class DataServerMap extends DataServer
 
 		if( originalObject instanceof Map )
 			return { dataType : 'Map', value : Array.from( originalObject.entries() ) };
+
+		if( originalObject instanceof BigMap )
+		{
+			const value	= [];
+
+			for ( const map of originalObject.maps )
+				value.push( { dataType : 'Map', value : Array.from( map.entries() ) } );
+
+			return { dataType : 'BigMap', value };
+		}
+
 		else
 			return value;
 	}
@@ -416,6 +431,14 @@ class DataServerMap extends DataServer
 	{
 		if( typeof value === 'object' && value !== null && value.dataType === 'Map' )
 			return new Map( value.value );
+
+		if( typeof value === 'object' && value !== null && value.dataType === 'BigMap' )
+		{
+			const bigMap	= new BigMap();
+			bigMap.maps		= value.value;
+
+			return bigMap;
+		}
 
 		return value;
 	}
