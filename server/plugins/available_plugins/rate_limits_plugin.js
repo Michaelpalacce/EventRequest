@@ -233,10 +233,7 @@ class RateLimitsPlugin extends PluginInterface
 				return;
 			}
 
-			this.dataStore	= new DataServer({
-				ttl		: -1,
-				persist	: false
-			});
+			this.dataStore	= new DataServer( { ttl : -1 } );
 		}
 	}
 

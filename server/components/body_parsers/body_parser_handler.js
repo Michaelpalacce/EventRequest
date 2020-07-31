@@ -24,9 +24,7 @@ class BodyParserHandler
 	addParser( parser )
 	{
 		if ( typeof parser.supports !== 'function' || typeof parser.parse !== 'function' )
-		{
 			throw new Error( 'Parser must have a supports and parse functions' );
-		}
 
 		this.parsers.push( parser );
 	}
@@ -41,13 +39,8 @@ class BodyParserHandler
 	parseBody( event )
 	{
 		for ( const parser of this.parsers )
-		{
 			if ( parser.supports( event ) )
-			{
-				event.emit( 'stream_start' );
 				return parser.parse( event );
-			}
-		}
 
 		return this.fallbackParser.parse( event );
 	}

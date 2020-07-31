@@ -151,13 +151,9 @@ class Server extends EventEmitter
 		{
 		}
 		else if ( typeof plugin === 'string' )
-		{
 			plugin	= this.pluginManager.getPlugin( plugin );
-		}
 		else
-		{
 			throw new Error( 'A PluginInterface or an existing PluginManager pluginId (string) must be added' );
-		}
 
 		if ( options !== null && options !== undefined )
 			plugin.setOptions( options );

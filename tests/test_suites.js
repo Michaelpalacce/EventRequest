@@ -15,8 +15,8 @@ testSuites.serverSuite		= () => {
 	require( './server/server_er_response_cache_test' );
 	require( './server/server_er_timeout_test' );
 	require( './server/server_er_env_test' );
-	require( './server/server_er_templating_engine' );
-	require( './server/server_er_session' );
+	require( './server/server_er_templating_engine_test' );
+	require( './server/server_er_session_test' );
 	require( './server/server_er_validation_test' );
 };
 

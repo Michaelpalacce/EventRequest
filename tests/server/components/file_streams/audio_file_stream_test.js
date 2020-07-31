@@ -1,9 +1,9 @@
 'use strict';
 
-const AudioFileStream					= require( '../../../../server/components/file_streams/audio_file_stream' );
-const { assert, test, Mock, helpers }	= require( '../../../test_helper' );
-const path								= require( 'path' );
-const fs								= require( 'fs' );
+const AudioFileStream			= require( '../../../../server/components/file_streams/audio_file_stream' );
+const { assert, test, helpers }	= require( '../../../test_helper' );
+const path						= require( 'path' );
+const fs						= require( 'fs' );
 
 const DEFAULT_TEST_FILE			= path.join( __dirname, './fixtures/testFile.mp3' );
 

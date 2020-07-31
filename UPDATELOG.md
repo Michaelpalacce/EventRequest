@@ -1,3 +1,12 @@
+27.0.0
+- Main focus of this release is fixing a few small bugs and reworking the ErrorHandler. In general APIs do not return messages but rather return error codes. Messages are still optional so, the ErrorHandler supports that entirely. Check the Readme For more information about this change at the ErrorHandling section.
+- Fixed a small bug with the set of BigMap. Added test for it
+- Fixed the reviver and the replacer to include the BigMap _limit as well
+- Updated the BigMap limit to default to 14,000,000 and not 8,000,000 
+- Session.get no longer throws, but returns null. We want to avoid throwing inside the web framework
+- persist is no longer defaulted to true when creating a dataServer. This is a cache. Caches are ephemeral!
+- Removed undocumented and wrong `stream_start` event on body_parser_handler
+
 26.3.0
 - Added a BigMap implementation
 - Added ability to switch between using a BigMap and Map in the DataServerMap

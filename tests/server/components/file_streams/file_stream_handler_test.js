@@ -1,9 +1,9 @@
 'use strict';
 
-const FileStreamHandler					= require( '../../../../server/components/file_streams/file_stream_handler' );
-const TextFileStream					= require( '../../../../server/components/file_streams/text_file_stream' );
-const { assert, test, Mock, helpers }	= require( '../../../test_helper' );
-const path								= require( 'path' );
+const FileStreamHandler	= require( '../../../../server/components/file_streams/file_stream_handler' );
+const TextFileStream	= require( '../../../../server/components/file_streams/text_file_stream' );
+const { assert, test }	= require( '../../../test_helper' );
+const path				= require( 'path' );
 
 const DEFAULT_TEST_FILE			= path.join( __dirname, './fixtures/testFile.txt' );
 const UNSUPPORTED_TEST_FILE		= path.join( __dirname, './fixtures/testFile.unsupported' );

@@ -27,10 +27,7 @@ test({
 
 			if ( session.has( 'authenticated' ) === false )
 			{
-				assert.throws(() => {
-					session.get( 'authenticated' );
-				});
-
+				assert.deepStrictEqual( session.get( 'authenticated' ), null );
 				session.add( 'authenticated', true );
 			}
 			else
@@ -100,10 +97,7 @@ test({
 
 			if ( session.has( 'authenticated' ) === false )
 			{
-				assert.throws(() => {
-					session.get( 'authenticated' );
-				});
-
+				assert.deepStrictEqual( session.get( 'authenticated' ), null );
 				session.add( 'authenticated', true );
 			}
 			else
@@ -175,10 +169,7 @@ test({
 
 			if ( session.has( 'authenticated' ) === false )
 			{
-				assert.throws(() => {
-					session.get( 'authenticated' );
-				});
-
+				assert.deepStrictEqual( session.get( 'authenticated' ), null );
 				session.add( 'authenticated', true );
 			}
 			else
@@ -249,10 +240,7 @@ test({
 
 			if ( session.has( 'authenticated' ) === false )
 			{
-				assert.throws(() => {
-					session.get( 'authenticated' );
-				});
-
+				assert.deepStrictEqual( session.get( 'authenticated' ), null );
 				session.add( 'authenticated', true );
 			}
 			else
@@ -314,10 +302,7 @@ test({
 
 			if ( session.has( 'authenticated' ) === false )
 			{
-				assert.throws(() => {
-					session.get( 'authenticated' );
-				});
-
+				assert.deepStrictEqual( session.get( 'authenticated' ), null );
 				session.add( 'authenticated', true );
 			}
 			else
@@ -381,10 +366,7 @@ test({
 
 			if ( session.has( 'authenticated' ) === false )
 			{
-				assert.throws(() => {
-					session.get( 'authenticated' );
-				});
-
+				assert.deepStrictEqual( session.get( 'authenticated' ), null );
 				session.add( 'authenticated', true );
 			}
 			else

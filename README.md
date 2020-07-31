@@ -1994,7 +1994,7 @@ console.log( new DataServer( options ) );
 
 **persist: Boolean** 
 - Flag that specifies whether the data should be persisted to disk. 
-- Defaults to true 
+- Defaults to false 
 
 The DataServer provides a set of methods that have to be implemented if you want to create your own Caching server to be 
 integrated with other plugins. 
@@ -2164,6 +2164,7 @@ However if the global persist is set to false, this will not work
 - It is recommended you use this one ( even tho it is not the default data server )
 - This DataServer can store up to 16.7 million keys
 - It can be extended to use a near infinite amount of keys if you set useBigMap to true
+- Keep in mind when persisting millions of keys... is not fast
 
 ~~~javascript
 const DataServerMap   = require( 'event_request/server/components/caching/data_server_map' );
@@ -2194,7 +2195,7 @@ console.log( new DataServerMap( options ) );
 
 **persist: Boolean** 
 - Flag that specifies whether the data should be persisted to disk. 
-- Defaults to true 
+- Defaults to false 
 
 **useBigMap: Boolean** 
 - Flag that specifies whether the data should be stored in a Map or a BigMap. 
@@ -2289,6 +2290,8 @@ However if the global persist is set to false, this will not work
 - An implementation of the normal Map API
 - This one can store a near infinite amounts of data
 - It has the exact same usage as the normal Map and can be pretty much used as a replacement
+- It will create a new Map every 14,000,000 keys.
+- The internal limit can be changed by doing `map._limit = {LIMIT};`
 
 
 ***
@@ -2727,6 +2730,7 @@ app.listen( 80 , () => {
 
 **get( String key ): mixed**
 - Gets a value from the session
+- Returns null if the value does not exist
 
 **delete( String key ): void**
 - Deletes a key from the session
@@ -2767,7 +2771,7 @@ app.add( async ( event ) => {
 app.add(( event ) => {
     if (
         event.path !== '/login'
-        && ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
+        && ( event.session.get( 'authenticated' ) === null )
     ) {
         event.redirect( '/login' );
         return;
