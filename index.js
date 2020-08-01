@@ -33,25 +33,3 @@ App.Logging		= Logging;
 App.App			= App;
 
 module.exports	= App;
-
-//
-//
-// const path			= require( 'path' );
-// const PROJECT_ROOT	= path.parse( require.main.filename ).dir;
-// const app			= App();
-//
-// app.apply( app.er_body_parser_form );
-//
-// app.apply( app.er_body_parser_json );
-// app.apply( app.er_body_parser_multipart, { tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
-// app.apply( app.er_body_parser_raw );
-//
-// app.get( '/', ( event ) => {
-// 	event.send( 'ok' );
-// });
-//
-// app.post( '/', ( event ) => {
-// 	event.next( { code: 'app.test.test', status: 502, error: new Error( 'HEYAA' ) } );
-// });
-//
-// app.listen( 80 );

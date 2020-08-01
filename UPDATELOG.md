@@ -10,6 +10,8 @@
 - Changed a lot of logger plugin log levels to verbose. 
 - Every ErrorMessage was changed to a code
 - getExecutionBlockForCurrentEvent no longer throws if invald EventRequest. Whoever is using it should know what they are doing
+- Added a new option to the File Transport splitToNewLines, that allows you to validate \n \r \r\n and split the log in multiple lines
+- ErrorHandling will not modify the error anymore
 
 26.3.0
 - Added a BigMap implementation

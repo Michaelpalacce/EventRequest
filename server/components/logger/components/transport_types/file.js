@@ -27,6 +27,7 @@ class File extends Transport
 	 *
 	 * @details	Accepted options:
 	 * 			- filePath - String - the location of the file to log to -> if it is not provided the transport will not log
+	 * 			- splitToNewLines - Boolean - Whether the new lines in the message should be evaluated as new lines and split or do we want to log the entire message on one line
 	 *
 	 * @param	{Object} options
 	 *
@@ -36,9 +37,13 @@ class File extends Transport
 	{
 		super.sanitizeConfig( options );
 
-		this.filePath	= typeof options.filePath === "string"
-						? options.filePath
-						: null;
+		this.filePath			= typeof options.filePath === "string"
+								? options.filePath
+								: null;
+
+		this.splitToNewLines	= typeof options.splitToNewLines === "boolean"
+								? options.splitToNewLines
+								: true;
 
 		this.fileStream	= null;
 
@@ -125,7 +130,33 @@ class File extends Transport
 		if ( ! this.filePath )
 			reject( 'File Path not provided' );
 
-		this.getWriteStream().write( message + SYSTEM_EOL, 'utf8', ( err ) => {
+		const writeStream	= this.getWriteStream();
+
+		if ( this.splitToNewLines )
+		{
+			while ( true )
+			{
+				let hit			= false;
+				const lineEnds	= ['\r\n', '\\r\\n', '\n', '\\n', '\r', '\\r'];
+
+				for ( const lineEnd of lineEnds )
+				{
+					const lineEndPosition	= message.indexOf( `${lineEnd}` );
+
+					if ( lineEndPosition !== -1 )
+					{
+						writeStream.write( message.slice( 0, lineEndPosition ) + SYSTEM_EOL, 'utf8' );
+						message	= message.slice( lineEndPosition + lineEnd.length );
+						hit		= true;
+					}
+				}
+
+				if ( ! hit )
+					break;
+			}
+		}
+
+		writeStream.write( message + SYSTEM_EOL, 'utf8', ( err ) => {
 			if ( err )
 				reject( err );
 			else

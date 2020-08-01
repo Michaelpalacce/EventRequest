@@ -1134,6 +1134,10 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - Accepts Absolute and relative paths
 - If it is not provided the transport will not log
 
+**splitToNewLines: Boolean**
+- Flag telling the transport if the new line characters should be evaluated as new lines or not
+- Defaults to false
+
 ~~~javascript
 const { Loggur, LOG_LEVELS, Console, File } = require( 'event_request' ).Logging;
 

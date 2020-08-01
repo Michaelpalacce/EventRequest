@@ -69,13 +69,21 @@ class LoggerPlugin extends PluginInterface
 		const requestURL	= event.request.url;
 
 		const errCallback	= ( error ) => {
+			let message;
+
 			if ( error.error instanceof Error )
-				error.error	= error.error.stack;
+			{
+				message			= Object.assign( {}, error );
+				message.error	= message.error.stack;
+			}
+			else if ( error instanceof Error )
+				message	= error.stack;
+			else if ( typeof error === 'object' )
+				message	= Object.assign( {}, error );
+			else
+				message	= error;
 
-			if ( error instanceof Error )
-				error	= error.stack;
-
-			logger.error( error, true );
+			logger.error( message, true );
 		};
 
 		event.on( 'error', errCallback );

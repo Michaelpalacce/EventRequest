@@ -43,6 +43,7 @@ test({
 			event.emit( 'clearTimeout' );
 			event.emit( 'on_error', new Error( 'error' ) );
 			event.emit( 'error', new Error( 'normal error' ) );
+			event.emit( 'error', { error: new Error( 'normal error' ), code: 'app.test' } );
 			event.emit( 'error', 'NORMAL SIMPLE ERROR MESSAGE' );
 			event.emit( 'on_error', 'SIMPLE ERROR MESSAGE' );
 
@@ -81,6 +82,66 @@ test({
 
 					if ( fs.existsSync( fileTransport.getFileName() ) )
 						fs.unlinkSync( fileTransport.getFileName() );
+
+					server.close();
+					done();
+				}, 250 );
+			}).catch( done );
+		} );
+	}
+});
+
+test({
+	message	: 'Server.test.er_logger.logs.errors.if.thrown',
+	test	: ( done ) => {
+		const name					= 'testErLoggerWithErrorThrown';
+		const relativeLogLocation	= './tests/server/fixture/logger/testLog.log';
+		const fileTransport			= new File({
+			logLevel	: Loggur.LOG_LEVELS.debug,
+			filePath	: relativeLogLocation
+		});
+
+		const logger				= Loggur.createLogger({
+			serverName	: 'Server.test_er_logger',
+			logLevel	: Loggur.LOG_LEVELS.debug,
+			capture		: false,
+			transports	: [fileTransport]
+		});
+
+		const app		= new Server();
+
+		assert.deepStrictEqual( app.Loggur, Loggur );
+
+		app.apply( app.er_logger, { logger, attachToProcess: true } );
+
+		app.get( `/${name}`, ( event ) => {
+			event.logger.log( 'multiline\\ncomment' );
+			event.emit( 'on_error', { test: 123 } );
+			event.emit( 'on_error', 'someError' );
+
+			throw new Error( 'Some error occurred' );
+		});
+
+		const server	= app.listen( 3336, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 500, '', { headerName: 'value' }, 3336, '{"error":{"code":"app.general","message":"Some error occurred"}}' ).then(( response ) => {
+				fileTransport.getWriteStream().end();
+				setTimeout(() => {
+					process.dumpStack	= undefined;
+					process.log			= undefined;
+
+					assert.equal( fs.existsSync( fileTransport.getFileName() ), true );
+					assert.equal( fs.statSync( fileTransport.getFileName() ).size > 0, true );
+
+					const logData	= fs.readFileSync( fileTransport.getFileName() );
+
+					if ( fs.existsSync( fileTransport.getFileName() ) )
+						fs.unlinkSync( fileTransport.getFileName() );
+
+					assert.equal( logData.includes( '"code":"app.general","status":500,"message":"Some error occurred","error":"Error: Some error occurred' ), true );
+					assert.equal( logData.includes( 'GET /testErLoggerWithErrorThrown 500' ), true );
+					assert.equal( logData.includes( '{"test":123}' ), true );
+					assert.equal( logData.includes( 'someError' ), true );
+					assert.equal( logData.toString().match( /multiline(\r\n|\r|\n)^comment$/gm ) !== null, true );
 
 					server.close();
 					done();

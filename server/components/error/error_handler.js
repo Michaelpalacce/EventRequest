@@ -7,7 +7,15 @@ class ErrorHandler
 {
 	constructor()
 	{
-		this.defaultCase	= { callback: this._defaultCase.bind( this ), status: 500, code: ErrorHandler.GENERAL_ERROR_CODE };
+		this.defaultCase	= {
+			callback: this._defaultCase.bind( this ),
+			status: 500,
+			code: ErrorHandler.GENERAL_ERROR_CODE,
+			emit: true,
+			message: undefined,
+			headers: undefined
+		};
+
 		this.cases			= new Map();
 	}
 
@@ -21,7 +29,7 @@ class ErrorHandler
 	 *
 	 * @return	void
 	 */
-	handleError( event, errorToHandle = null, errStatusCode = 500, emitError = true )
+	handleError( event, errorToHandle = null, errStatusCode = null, emitError = null )
 	{
 		let errorCase	= null;
 		let code;
@@ -31,21 +39,21 @@ class ErrorHandler
 		let headers;
 		let emit;
 
-		if ( typeof errorToHandle === 'object' && typeof errorToHandle.code === 'string' )
+		if ( errorToHandle !== null && typeof errorToHandle === 'object' && typeof errorToHandle.code === 'string' )
 		{
 			code	= errorToHandle.code;
 			error	= errorToHandle.error || null;
 			message	= errorToHandle.message || errorToHandle.error || null;
 			status	= errorToHandle.status || errStatusCode;
-			headers	= errorToHandle.headers || {};
-			emit	= errorToHandle.emit || emitError;
+			headers	= errorToHandle.headers || null;
+			emit	= typeof errorToHandle.emit === 'boolean' ? errorToHandle.emit : emitError;
 		}
 		else
 		{
 			code	= ErrorHandler.GENERAL_ERROR_CODE;
 			error	= errorToHandle;
 			status	= errStatusCode;
-			headers	= {};
+			headers	= null;
 			emit	= emitError;
 
 			if ( errorToHandle instanceof Error )
@@ -77,21 +85,12 @@ class ErrorHandler
 
 		const callback	= errorCase.callback;
 
-		message			= this._formatError( message || errorCase.error )
+		message			= this._formatError( message || errorCase.message )
 		status			= status || errorCase.status;
+		emit			= typeof emit === 'boolean' ? emit : errorCase.emit;
+		headers			= headers || errorCase.headers || {};
 
-		const toEmit	= { code, status };
-
-		if ( message !== null && message !== undefined )
-			toEmit.message	= message;
-
-		if ( error !== null && error !== undefined )
-			toEmit.error	= error;
-
-		if ( emit )
-			event.emit( 'on_error', toEmit );
-
-		callback( { event, code, status, message, error, headers } );
+		callback( { event, code, status, message, error, headers, emit } );
 	}
 
 	/**
@@ -100,25 +99,31 @@ class ErrorHandler
 	 * @details	In case the errorCode is thrown somewhere then the
 	 *
 	 * @param	{String} errorCode
-	 * @param	{*} error
+	 * @param	{*} message
 	 * @param	{Function} callback
 	 * @param	{Number} status
+	 * @param	{Boolean} emit
+	 * @param	{Object} headers
 	 *
 	 * @return	void
 	 */
-	addCase( errorCode, { error, callback, status } )
+	addCase( errorCode, { message, callback, status, emit, headers } = {} )
 	{
 		if ( ! this.validateErrorCode( errorCode ) )
 			return;
 
 		if ( typeof callback !== 'function' )
 			callback	= this.defaultCase.callback;
-		if ( typeof error !== 'string' )
-			error	= this.defaultCase.error;
+		if ( typeof message !== 'string' )
+			message	= this.defaultCase.message;
 		if ( typeof status !== 'number' )
 			status	= this.defaultCase.status;
+		if ( typeof emit !== 'boolean' )
+			emit	= this.defaultCase.emit;
+		if ( typeof headers !== 'object' )
+			headers	= this.defaultCase.headers;
 
-		this.cases.set( errorCode, { error, callback, status, code: errorCode } );
+		this.cases.set( errorCode, { message, callback, status, emit, code: errorCode, headers } );
 	}
 
 	/**
@@ -173,20 +178,31 @@ class ErrorHandler
 	 * @param	{*} error
 	 * @param	{*} message
 	 * @param	{Object} headers
+	 * @param	{Boolean} emit
 	 *
 	 * @private
 	 *
 	 * @return	void
 	 */
-	_defaultCase( { event, code, status, error, message, headers } )
+	_defaultCase( { event, code, status, error, message, headers, emit } )
 	{
 		if ( event.isFinished() )
 			return;
 
-		const response		= { error: { code } };
+		const response	= { error: { code } };
+		const toEmit	= { code, status };
 
 		if ( message !== null && message !== undefined )
+		{
 			response.error.message	= message;
+			toEmit.message	= message;
+		}
+
+		if ( error !== null && error !== undefined )
+			toEmit.error	= error;
+
+		if ( emit )
+			event.emit( 'on_error', toEmit );
 
 		for ( const key in headers )
 		{

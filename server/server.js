@@ -260,14 +260,24 @@ class Server extends EventEmitter
 				eventRequest._setBlock( block );
 
 				const onErrorCallback	= ( error ) => {
+					if ( eventRequest.logger !== null && eventRequest.logger !== undefined )
+						return;
+
+					let message;
+
 					if ( error.error instanceof Error )
-						error.error	= error.error.stack;
+					{
+						message			= Object.assign( {}, error );
+						message.error	= message.error.stack;
+					}
+					else if ( error instanceof Error )
+						message	= error.stack;
+					else if ( typeof error === 'object' )
+						message	= Object.assign( {}, error );
+					else
+						message	= error;
 
-					if ( error instanceof Error )
-						error	= error.stack;
-
-					if ( eventRequest.logger === null || eventRequest.logger === undefined )
-						Loggur.log( error, LOG_LEVELS.error, true );
+					Loggur.log( message, LOG_LEVELS.error, true );
 				};
 
 				eventRequest.on( 'error', onErrorCallback );

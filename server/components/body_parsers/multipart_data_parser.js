@@ -205,21 +205,19 @@ class MultipartDataParser extends EventEmitter
 	determineEOL( chunk )
 	{
 		const data		= chunk.toString( DEFAULT_BUFFER_ENCODING );
-		const lineEnds	= ['\r\n', '\n', '\r'];
 		const boundry	= this.boundary.substr( 2 );
+		const match		= data.match( new RegExp( `${boundry}(\r\n|\r|\n)` ) );
 
-		for ( const lineEnd of lineEnds )
+		if ( match !== null )
 		{
-			if ( data.indexOf( `${boundry}${lineEnd}` ) !== -1 )
-			{
-				this.EOL		= lineEnd;
-				this.EOL_LENGTH	= lineEnd.length;
-				return;
-			}
+			this.EOL		= match[1];
+			this.EOL_LENGTH	= match[1].length;
 		}
-
-		this.EOL		= '\r\n';
-		this.EOL_LENGTH	= this.EOL.length;
+		else
+		{
+			this.EOL		= '\r\n';
+			this.EOL_LENGTH	= this.EOL.length;
+		}
 	}
 
 	/**

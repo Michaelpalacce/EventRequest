@@ -39,7 +39,7 @@ test({
 
 		eventRequest._mock({
 			method			: 'on',
-			shouldReturn	: () => {
+			shouldReturn	: ( error ) => {
 				called	++;
 			},
 			with			: [
@@ -51,7 +51,7 @@ test({
 				['cachedResponse', undefined],
 				['setResponseHeader', undefined],
 			],
-			called			: 10
+			called			: 7
 		});
 
 		router.add( middleware[0] );

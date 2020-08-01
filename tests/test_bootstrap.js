@@ -22,6 +22,7 @@ function clearUpDirectory( dir, whiteList )
 
 clearUpDirectory( path.join( __dirname, './server/components/body_parsers/fixture/testUploads' ), ['.gitignore'] );
 clearUpDirectory( path.join( __dirname, './server/fixture/body_parser/multipart' ), ['.gitignore', 'multipart_data_CR', 'multipart_data_CRLF', 'multipart_data_LF'] );
+clearUpDirectory( path.join( __dirname, './server/fixture/logger' ), ['.gitignore'] );
 
 app.add({
 	route	: '/ping',
