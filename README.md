@@ -106,7 +106,7 @@ server.listen( '80',() => {
 - https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
 - https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
 
-# (Properties exported by the Module:)[#module-properties]
+# [Properties exported by the Module:](#module-properties)
     App, // The Singleton Instance of the Framework that can be used to retrieve the Web Server at any point
 
     Server, // The Server of the framework. This is just the class and not the actual isntance. Use this only if you want to create multiple servers
