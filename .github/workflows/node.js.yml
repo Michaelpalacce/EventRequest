@@ -38,8 +38,11 @@ jobs:
     runs-on: ubuntu-latest
     name: codacy-coverage-reporter
     steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: lcov.info
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@master
         with:
           project-token: f0fdcfc826ef4a0aaff49120a624fcae
-          coverage-reports: coverage/lcov.info
+          coverage-reports: lcov.info
