@@ -50,16 +50,16 @@ class TemplatingEnginePlugin extends PluginInterface
 							this.send( result, 200 );
 							resolve();
 						}
-						catch ( e )
+						catch ( error )
 						{
-							reject( e );
+							reject( { code: 'app.err.templatingEngine.errorRendering' } );
 						}
 					}
 					else
 					{
-						reject( 'Error rendering' );
+						reject( { code: 'app.err.templatingEngine.errorRendering' } );
 					}
-				}).catch( reject );
+				}).catch( ( error ) => { reject( { code: 'app.err.templatingEngine.errorRendering' } ); } );
 			});
 
 			renderPromise.catch( errorCallback === null ? eventRequest.next : errorCallback );

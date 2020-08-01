@@ -17,13 +17,13 @@ class Logger
 {
 	/**
 	 * @param	{Object} [options={}]
-	 * @param	{Boolean} [uniqueId=false]
+	 * @param	{Boolean} [uniqueId=null]
 	 */
-	constructor( options = {}, uniqueId = false )
+	constructor( options = {}, uniqueId = null )
 	{
 		Object.defineProperty( this, 'uniqueId', {
 			writable	: false,
-			value		: typeof uniqueId === 'string' ? uniqueId : false
+			value		: typeof uniqueId === 'string' ? uniqueId : null
 		});
 
 		if ( typeof this.uniqueId !== 'string' )

@@ -48,9 +48,7 @@ class File extends Transport
 		this.fileStream	= null;
 
 		if ( this.filePath )
-		{
 			this.getWriteStream();
-		}
 	}
 
 	/**
@@ -128,7 +126,7 @@ class File extends Transport
 		let message	= this.format( log );
 
 		if ( ! this.filePath )
-			reject( 'File Path not provided' );
+			reject( { code: 'app.er.logging.transport.file.fileLogPathNotProvided' } );
 
 		const writeStream	= this.getWriteStream();
 

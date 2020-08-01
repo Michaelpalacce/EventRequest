@@ -724,9 +724,9 @@ The event request is an object that is created by the server and passed through 
 **sendError( mixed error = '', Number code = 500, emit = true ): void** 
 - Like send but used to send errors. 
 - Code will be the status code sent
-- Emit is a flag whether the error should be emitted to 'on_error'
+- Emit is a flag whether the error should be emitted on 'on_error'
 - It will call the errorHandler directly with all the arguments specified ( in case of a custom error handler, you can send extra parameters with the first one being the EventRequest )
-- NOTE: Check the ErrorHandling Section for more info
+- NOTE: Check the Error Handling Section for more info
 
 **validate( ...args ): ValidationResult**
 - Shorthand for event.validation.validate 
@@ -1040,6 +1040,10 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 
 ####Functions:
 
+**constructor( Object options = {}, String uniqueId = null )**
+- Available options can be checked in the section above.
+- If uniqueId is not a string or is not passed, then an error will be thrown
+
 **log( Log||String||mixed log, Number level, Boolean isRaw ): Promise**
 - log determines what should be logged
 - The level is the log level that we should log at. This is optional. Defaults to the default logLevel of the logger
@@ -1140,6 +1144,7 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 
 **splitToNewLines: Boolean**
 - Flag telling the transport if the new line characters should be evaluated as new lines or not
+- New lines in files may make it a bit easier to read, but if you have some software for automatic shipping of logs, you may want them on one row
 - Defaults to false
 
 ~~~javascript
@@ -1949,6 +1954,18 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
 **app.er.routing.cannotDefineMiddleware**
   - Thrown by the routing when an invalid global middleware was attempted to be defined
 
+**app.er.bodyParser.form.notSupported**
+  - Thrown by the form body parser when the body to be parsed is not supported
+
+**app.er.bodyParser.multipart.wrongHeaderData**
+  - Thrown by the multipart body parser when there is wrong or missing header data. Either `content-type` or `content-length`. `content-type` may not have the boundry defined
+
+**app.er.bodyParser.multipart.maxPayloadReached**
+  - Thrown by the multipart body parser when the maxPayload is not infinite ( not 0 ) and the maxPayload and `content-length` do not match
+
+**app.er.bodyParser.json.notSupported**
+  - Thrown by the json body parser when the body to be parsed is not supported
+
 **app.er.routing.missingMiddleware**
   - Thrown by the routing when a middleware was missing when adding two routers together
   - throw { code: 'app.er.routing.missingMiddleware', message: middleware };
@@ -1964,6 +1981,12 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
 
 **app.er.session.missingDataServer**
   - Thrown by the session when the event request is missing a dataServer
+
+**app.err.templatingEngine.errorRendering**
+  - Thrown by when there was an error during rendering in the templating engine plugin
+
+**app.er.logging.transport.file.fileLogPathNotProvided**
+  - Thrown by the file transport if there is no filePath provided while logging
 
 **app.er.validation.error**
   - Thrown by the validation plugin when there is an error with validation. Could be that the EventRequest has a missing property or validation of input failed

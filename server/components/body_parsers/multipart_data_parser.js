@@ -563,13 +563,13 @@ class MultipartDataParser extends EventEmitter
 		let headerData	= MultipartDataParser.getHeaderData( this.event.headers );
 		if ( ! headerData )
 		{
-			callback( 'Could not retrieve the header data' );
+			callback( { code: 'app.er.bodyParser.multipart.wrongHeaderData' } );
 			return;
 		}
 
 		if ( this.maxPayload !== 0 && this.maxPayload < headerData.contentLength )
 		{
-			callback( 'Max Payload data reached' );
+			callback( { code: 'app.er.bodyParser.multipart.maxPayloadReached' } );
 			return;
 		}
 

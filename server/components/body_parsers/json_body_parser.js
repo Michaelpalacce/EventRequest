@@ -63,7 +63,7 @@ class JsonBodyParser extends EventEmitter
 			let payloadLength	= 0;
 
 			if ( ! this.supports( event ) )
-				return reject( 'Body type not supported' );
+				return reject( { code: 'app.er.bodyParser.json.notSupported' } );
 
 			event.request.on( 'data', ( data ) =>
 			{
@@ -104,9 +104,9 @@ class JsonBodyParser extends EventEmitter
 
 						resolve( { body, rawBody } );
 					}
-					catch ( e )
+					catch ( error )
 					{
-						reject( 'Could not parse the body' );
+						reject( { code: 'app.er.bodyParser.json.errorParsing' } );
 					}
 				}
 			});

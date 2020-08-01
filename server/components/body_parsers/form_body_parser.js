@@ -59,7 +59,7 @@ class FormBodyParser extends EventEmitter
 			let payloadLength	= 0;
 
 			if ( ! this.supports( event ) )
-				return reject( 'Body type not supported' );
+				return reject( { code: 'app.er.bodyParser.form.notSupported' } );
 
 			event.request.on( 'data', ( data ) =>
 			{
