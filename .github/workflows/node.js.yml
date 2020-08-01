@@ -46,3 +46,16 @@ jobs:
         with:
           project-token: f0fdcfc826ef4a0aaff49120a624fcae
           coverage-reports: lcov.info
+          
+  codecov-reporter:
+    needs: build
+    runs-on: ubuntu-latest
+    name: codecov-reporter
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: lcov.info
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./lcov.infol
