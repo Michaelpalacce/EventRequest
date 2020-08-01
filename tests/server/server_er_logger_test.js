@@ -137,7 +137,7 @@ test({
 					if ( fs.existsSync( fileTransport.getFileName() ) )
 						fs.unlinkSync( fileTransport.getFileName() );
 
-					assert.equal( logData.includes( '"code":"app.general","status":500,"message":"Some error occurred","error":"Error: Some error occurred' ), true );
+					assert.equal( logData.includes( '"code":"app.general","status":500,"headers":{},"message":"Some error occurred","error":"Error: Some error occurred' ), true );
 					assert.equal( logData.includes( 'GET /testErLoggerWithErrorThrown 500' ), true );
 					assert.equal( logData.includes( '{"test":123}' ), true );
 					assert.equal( logData.includes( 'someError' ), true );

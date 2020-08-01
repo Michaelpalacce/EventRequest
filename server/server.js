@@ -178,7 +178,7 @@ class Server extends EventEmitter
 		pluginDependencies.forEach(( dependency ) => {
 
 			if ( ! this.hasPlugin( dependency ) )
-				throw new Error( `app.er.server.${pluginId}.missingDependency.${dependency}` );
+				throw new Error( `app.er.server.missingPluginDependency.${pluginId}` );
 
 		});
 

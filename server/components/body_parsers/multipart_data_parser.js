@@ -209,15 +209,11 @@ class MultipartDataParser extends EventEmitter
 		const match		= data.match( new RegExp( `${boundry}(\r\n|\r|\n)` ) );
 
 		if ( match !== null )
-		{
-			this.EOL		= match[1];
-			this.EOL_LENGTH	= match[1].length;
-		}
+			this.EOL	= match[1];
 		else
-		{
-			this.EOL		= '\r\n';
-			this.EOL_LENGTH	= this.EOL.length;
-		}
+			this.EOL	= '\r\n';
+
+		this.EOL_LENGTH	= this.EOL.length;
 	}
 
 	/**

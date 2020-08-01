@@ -47,7 +47,7 @@ test({
 				assert.equal( event, 'on_error' );
 			},
 			with			: [
-				['on_error', { code: 'app.general', error: error, status: 501, message: error.message }],
+				['on_error', { code: 'app.general', error: error, status: 501, message: error.message, headers: {} }],
 			],
 			called			: 1
 		});
@@ -100,21 +100,21 @@ test({
 });
 
 test({
-	message			: 'ErrorHandler.addCase.with.different.cases',
+	message			: 'ErrorHandler.addNamespace.with.different.namespaces',
 	test			: ( done ) => {
 		const errorHandler	= new ErrorHandler();
 
-		errorHandler.addCase( 'WRONG NAMESAPCE' );
+		errorHandler.addNamespace( 'WRONG NAMESAPCE' );
 
-		assert.deepStrictEqual( errorHandler.cases.size, 0 );
+		assert.deepStrictEqual( errorHandler.namespaces.size, 0 );
 
-		errorHandler.addCase( 'correct.namespace' );
+		errorHandler.addNamespace( 'correct.namespace' );
 
-		const expectedCase	= errorHandler.defaultCase;
+		const expectedCase	= errorHandler.defaultNamespace;
 		expectedCase.code	= 'correct.namespace';
-		assert.deepStrictEqual( errorHandler.cases.get( 'correct.namespace' ), errorHandler.defaultCase );
+		assert.deepStrictEqual( errorHandler.namespaces.get( 'correct.namespace' ), errorHandler.defaultNamespace );
 
-		assert.deepStrictEqual( errorHandler.cases.size, 1 );
+		assert.deepStrictEqual( errorHandler.namespaces.size, 1 );
 
 		done();
 	}
@@ -127,7 +127,7 @@ test({
 			undefined,
 			undefined,
 			undefined,
-			{ code: 'app.general', status: 500 },
+			{ code: 'app.general', status: 500, headers: {} },
 			{ error: { code: 'app.general' } },
 			500,
 			{}
@@ -145,7 +145,7 @@ test({
 			null,
 			152,
 			undefined,
-			{ code: 'app.general', status: 152 },
+			{ code: 'app.general', status: 152, headers: {} },
 			{ error: { code: 'app.general' } },
 			152,
 			{}
@@ -154,7 +154,7 @@ test({
 			'namespace.does.not.exist',
 			undefined,
 			undefined,
-			{ code: 'namespace.does.not.exist', status: 500, error: 'namespace.does.not.exist' },
+			{ code: 'namespace.does.not.exist', status: 500, error: 'namespace.does.not.exist', headers: {} },
 			{ error: { code: 'namespace.does.not.exist' } },
 			500,
 			{}
@@ -163,7 +163,7 @@ test({
 			new Error( 'namespace.does.not.exist' ),
 			undefined,
 			undefined,
-			{ code: 'namespace.does.not.exist', status: 500, error: new Error( 'namespace.does.not.exist' ) },
+			{ code: 'namespace.does.not.exist', status: 500, error: new Error( 'namespace.does.not.exist' ), headers: {} },
 			{ error: { code: 'namespace.does.not.exist' } },
 			500,
 			{}
@@ -172,7 +172,7 @@ test({
 			new Error( 'Just your everyday Error!' ),
 			undefined,
 			undefined,
-			{ code: 'app.general', status: 500, message: 'Just your everyday Error!', error: new Error( 'Just your everyday Error!' ) },
+			{ code: 'app.general', status: 500, message: 'Just your everyday Error!', error: new Error( 'Just your everyday Error!' ), headers: {} },
 			{ error: { code: 'app.general', message: 'Just your everyday Error!' } },
 			500,
 			{}
@@ -181,7 +181,7 @@ test({
 			'Just your everyday Error!',
 			undefined,
 			undefined,
-			{ code: 'app.general', status: 500, message: 'Just your everyday Error!', error: 'Just your everyday Error!' },
+			{ code: 'app.general', status: 500, message: 'Just your everyday Error!', error: 'Just your everyday Error!', headers: {} },
 			{ error: { code: 'app.general', message: 'Just your everyday Error!' } },
 			500,
 			{}
@@ -190,7 +190,7 @@ test({
 			{ code: 'namespace.does.not.exist' },
 			undefined,
 			undefined,
-			{ code: 'namespace.does.not.exist', status: 500 },
+			{ code: 'namespace.does.not.exist', status: 500, headers: {} },
 			{ error: { code: 'namespace.does.not.exist' } },
 			500,
 			{}
@@ -199,7 +199,7 @@ test({
 			{ code: 'Incorrect Namespace BABY' },
 			undefined,
 			undefined,
-			{ code: 'Incorrect Namespace BABY', status: 500 },
+			{ code: 'Incorrect Namespace BABY', status: 500, headers: {} },
 			{ error: { code: 'Incorrect Namespace BABY' } },
 			500,
 			{}
@@ -208,7 +208,7 @@ test({
 			{ code: 'namespace.does.not.exist', headers: { keyOne: 1, keyTwo: 2 } },
 			undefined,
 			undefined,
-			{ code: 'namespace.does.not.exist', status: 500 },
+			{ code: 'namespace.does.not.exist', status: 500, headers: { keyOne: 1, keyTwo: 2 } },
 			{ error: { code: 'namespace.does.not.exist' } },
 			500,
 			{ keyOne: 1, keyTwo: 2 }
@@ -235,7 +235,7 @@ test({
 			'namespace.does.not.exist',
 			200,
 			undefined,
-			{ code: 'namespace.does.not.exist', status: 200, error: 'namespace.does.not.exist' },
+			{ code: 'namespace.does.not.exist', status: 200, error: 'namespace.does.not.exist', headers: {} },
 			{ error: { code: 'namespace.does.not.exist' } },
 			200,
 			{}
@@ -244,7 +244,7 @@ test({
 			{ code: 'namespace.does.not.exist', status: 200 },
 			undefined,
 			undefined,
-			{ code: 'namespace.does.not.exist', status: 200 },
+			{ code: 'namespace.does.not.exist', status: 200, headers: {} },
 			{ error: { code: 'namespace.does.not.exist' } },
 			200,
 			{}
@@ -253,7 +253,7 @@ test({
 			{ code: 'namespace.does.not.exist', status: 200, error: 'Some Error' },
 			undefined,
 			undefined,
-			{ code: 'namespace.does.not.exist', status: 200, error: 'Some Error', message: 'Some Error' },
+			{ code: 'namespace.does.not.exist', status: 200, error: 'Some Error', message: 'Some Error', headers: {} },
 			{ error: { code: 'namespace.does.not.exist', message: 'Some Error' } },
 			200,
 			{}
@@ -262,7 +262,7 @@ test({
 			{ code: 'namespace.does.not.exist', status: 200, error: 'Some Error', message: 'Some Message' },
 			undefined,
 			undefined,
-			{ code: 'namespace.does.not.exist', status: 200, error: 'Some Error', message: 'Some Message' },
+			{ code: 'namespace.does.not.exist', status: 200, error: 'Some Error', message: 'Some Message', headers: {} },
 			{ error: { code: 'namespace.does.not.exist', message: 'Some Message' } },
 			200,
 			{}
@@ -325,7 +325,7 @@ test({
 			{ code: 'test.exists.with.just.message', message: 'Overwritten Default Message', headers: { keyOne: 1, keyTwo: 2 } },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.just.message', status: 500, message: 'Overwritten Default Message' },
+			{ code: 'test.exists.with.just.message', status: 500, message: 'Overwritten Default Message', headers: { keyOne: 1, keyTwo: 2 } },
 			{ error: { code: 'test.exists.with.just.message', message: 'Overwritten Default Message' } },
 			500,
 			{ keyOne: 1, keyTwo: 2 }
@@ -334,7 +334,7 @@ test({
 			{ code: 'test.exists.with.just.message' },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.just.message', status: 500, message: 'Default Message' },
+			{ code: 'test.exists.with.just.message', status: 500, message: 'Default Message', headers: {} },
 			{ error: { code: 'test.exists.with.just.message', message: 'Default Message' } },
 			500,
 			{}
@@ -343,7 +343,7 @@ test({
 			{ code: 'test.exists.with.just.message', status: 501 },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.just.message', status: 501, message: 'Default Message' },
+			{ code: 'test.exists.with.just.message', status: 501, message: 'Default Message', headers: {} },
 			{ error: { code: 'test.exists.with.just.message', message: 'Default Message' } },
 			501,
 			{}
@@ -352,7 +352,7 @@ test({
 			{ code: 'test.exists.with.just.message', error: 'Some Error!!' },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.just.message', status: 500, message: 'Some Error!!', error: 'Some Error!!' },
+			{ code: 'test.exists.with.just.message', status: 500, message: 'Some Error!!', error: 'Some Error!!', headers: {} },
 			{ error: { code: 'test.exists.with.just.message', message: 'Some Error!!' } },
 			500,
 			{}
@@ -361,7 +361,7 @@ test({
 			{ code: 'test.exists.with.just.message', status: 501 },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.just.message', status: 501, message: 'Default Message' },
+			{ code: 'test.exists.with.just.message', status: 501, message: 'Default Message', headers: {} },
 			{ error: { code: 'test.exists.with.just.message', message: 'Default Message' } },
 			501,
 			{}
@@ -370,7 +370,7 @@ test({
 			{ code: 'test.exists.with.just.message', error: 'Some Error!!', message: 'Overwritten Message' },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.just.message', status: 500, message: 'Overwritten Message', error: 'Some Error!!' },
+			{ code: 'test.exists.with.just.message', status: 500, message: 'Overwritten Message', error: 'Some Error!!', headers: {} },
 			{ error: { code: 'test.exists.with.just.message', message: 'Overwritten Message' } },
 			500,
 			{}
@@ -388,7 +388,7 @@ test({
 			'test.exists.with.just.message',
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.just.message', status: 500, message: 'Default Message', error: 'test.exists.with.just.message' },
+			{ code: 'test.exists.with.just.message', status: 500, message: 'Default Message', error: 'test.exists.with.just.message', headers: {} },
 			{ error: { code: 'test.exists.with.just.message', message: 'Default Message' } },
 			500,
 			{}
@@ -397,7 +397,7 @@ test({
 			new Error( 'test.exists.with.just.message' ),
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.just.message', status: 500, message: 'Default Message', error: new Error( 'test.exists.with.just.message' ) },
+			{ code: 'test.exists.with.just.message', status: 500, message: 'Default Message', error: new Error( 'test.exists.with.just.message' ), headers: {} },
 			{ error: { code: 'test.exists.with.just.message', message: 'Default Message' } },
 			500,
 			{}
@@ -406,7 +406,7 @@ test({
 			'test.exists.with.just.message',
 			123,
 			undefined,
-			{ code: 'test.exists.with.just.message', status: 123, message: 'Default Message', error: 'test.exists.with.just.message' },
+			{ code: 'test.exists.with.just.message', status: 123, message: 'Default Message', error: 'test.exists.with.just.message', headers: {} },
 			{ error: { code: 'test.exists.with.just.message', message: 'Default Message' } },
 			123,
 			{}
@@ -433,7 +433,7 @@ test({
 			{ code: 'test.exists.with.message.and.status', status: 200 },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.message.and.status', status: 200, message: 'Message with Status' },
+			{ code: 'test.exists.with.message.and.status', status: 200, message: 'Message with Status', headers: {} },
 			{ error: { code: 'test.exists.with.message.and.status', message: 'Message with Status' } },
 			200,
 			{}
@@ -442,7 +442,7 @@ test({
 			{ code: 'test.exists.with.message.and.status' },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.message.and.status', status: 532, message: 'Message with Status' },
+			{ code: 'test.exists.with.message.and.status', status: 532, message: 'Message with Status', headers: {} },
 			{ error: { code: 'test.exists.with.message.and.status', message: 'Message with Status' } },
 			532,
 			{}
@@ -451,7 +451,7 @@ test({
 			{ code: 'test.exists.with.message.and.status', message: 'SOMETHING!' },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.message.and.status', status: 532, message: 'SOMETHING!' },
+			{ code: 'test.exists.with.message.and.status', status: 532, message: 'SOMETHING!', headers: {} },
 			{ error: { code: 'test.exists.with.message.and.status', message: 'SOMETHING!' } },
 			532,
 			{}
@@ -460,7 +460,7 @@ test({
 			{ code: 'test.exists.with.message.and.status', message: 'SOMETHING!', status: 521 },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.message.and.status', status: 521, message: 'SOMETHING!' },
+			{ code: 'test.exists.with.message.and.status', status: 521, message: 'SOMETHING!', headers: {} },
 			{ error: { code: 'test.exists.with.message.and.status', message: 'SOMETHING!' } },
 			521,
 			{}
@@ -469,7 +469,7 @@ test({
 			{ code: 'test.exists.with.message.and.status', message: 'SOMETHING!', status: 521, headers: { keyOne: 2 } },
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.message.and.status', status: 521, message: 'SOMETHING!' },
+			{ code: 'test.exists.with.message.and.status', status: 521, message: 'SOMETHING!', headers: { keyOne: 2 } },
 			{ error: { code: 'test.exists.with.message.and.status', message: 'SOMETHING!' } },
 			521,
 			{ keyOne: 2 }
@@ -478,7 +478,7 @@ test({
 			'test.exists.with.message.and.status',
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.message.and.status', status: 532, message: 'Message with Status', error: 'test.exists.with.message.and.status' },
+			{ code: 'test.exists.with.message.and.status', status: 532, message: 'Message with Status', error: 'test.exists.with.message.and.status', headers: {} },
 			{ error: { code: 'test.exists.with.message.and.status', message: 'Message with Status' } },
 			532,
 			{}
@@ -487,7 +487,7 @@ test({
 			new Error( 'test.exists.with.message.and.status' ),
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.message.and.status', status: 532, message: 'Message with Status', error: new Error( 'test.exists.with.message.and.status' ) },
+			{ code: 'test.exists.with.message.and.status', status: 532, message: 'Message with Status', error: new Error( 'test.exists.with.message.and.status' ), headers: {} },
 			{ error: { code: 'test.exists.with.message.and.status', message: 'Message with Status' } },
 			532,
 			{}
@@ -496,7 +496,7 @@ test({
 			'test.exists.with.message.and.status',
 			123,
 			undefined,
-			{ code: 'test.exists.with.message.and.status', status: 123, message: 'Message with Status', error: 'test.exists.with.message.and.status' },
+			{ code: 'test.exists.with.message.and.status', status: 123, message: 'Message with Status', error: 'test.exists.with.message.and.status', headers: {} },
 			{ error: { code: 'test.exists.with.message.and.status', message: 'Message with Status' } },
 			123,
 			{}
@@ -532,7 +532,7 @@ test({
 			'test.exists.with.status',
 			undefined,
 			undefined,
-			{ code: 'test.exists.with.status', error: 'test.exists.with.status', status: 462 },
+			{ code: 'test.exists.with.status', error: 'test.exists.with.status', status: 462, headers: {} },
 			{ error: { code: 'test.exists.with.status' } },
 			462,
 			{}
@@ -541,7 +541,7 @@ test({
 			'test.exists.with.status',
 			472,
 			undefined,
-			{ code: 'test.exists.with.status', error: 'test.exists.with.status', status: 472 },
+			{ code: 'test.exists.with.status', error: 'test.exists.with.status', status: 472, headers: {} },
 			{ error: { code: 'test.exists.with.status' } },
 			472,
 			{}
@@ -550,7 +550,7 @@ test({
 			'test.exists.with.status',
 			472,
 			true,
-			{ code: 'test.exists.with.status', error: 'test.exists.with.status', status: 472 },
+			{ code: 'test.exists.with.status', error: 'test.exists.with.status', status: 472, headers: {} },
 			{ error: { code: 'test.exists.with.status' } },
 			472,
 			{}
@@ -586,7 +586,7 @@ test({
 			'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep',
 			123,
 			true,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 123, message: 'DEEP message', error: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 123, message: 'DEEP message', error: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'DEEP message' } },
 			123,
 			{ headerOne: 1, headerTwo: 2 }
@@ -595,7 +595,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep' },
 			123,
 			true,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 123, message: 'DEEP message' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 123, message: 'DEEP message', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'DEEP message' } },
 			123,
 			{ headerOne: 1, headerTwo: 2 }
@@ -604,7 +604,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true },
 			undefined,
 			undefined,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 532, message: 'DEEP message' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 532, message: 'DEEP message', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'DEEP message' } },
 			532,
 			{ headerOne: 1, headerTwo: 2 }
@@ -613,7 +613,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true, status: 1235 },
 			undefined,
 			undefined,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'DEEP message' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'DEEP message', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'DEEP message' } },
 			1235,
 			{ headerOne: 1, headerTwo: 2 }
@@ -622,7 +622,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true, status: 1235, error: 'test' },
 			undefined,
 			undefined,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'test' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'test', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'test' } },
 			1235,
 			{ headerOne: 1, headerTwo: 2 }
@@ -631,7 +631,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true, status: 1235, message: 'test' },
 			undefined,
 			undefined,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'test' } },
 			1235,
 			{ headerOne: 1, headerTwo: 2 }
@@ -640,7 +640,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true, status: 1235, error: 'error', message: 'test' },
 			undefined,
 			undefined,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'error' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'error', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'test' } },
 			1235,
 			{ headerOne: 1, headerTwo: 2 }
@@ -649,7 +649,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true, status: 1235, error: 'error', message: 'test', headers: { test: 1 } },
 			undefined,
 			undefined,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'error' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'error', headers: { test: 1 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'test' } },
 			1235,
 			{ test: 1 }
@@ -658,7 +658,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true, status: 1235, error: 'error', message: 'test' },
 			undefined,
 			false,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'error' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'error', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'test' } },
 			1235,
 			{ headerOne: 1, headerTwo: 2 }
@@ -667,7 +667,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true, status: 1235, error: 'error', message: 'test' },
 			111,
 			undefined,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'error' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 1235, message: 'test', error: 'error', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'test' } },
 			1235,
 			{ headerOne: 1, headerTwo: 2 }
@@ -685,7 +685,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true },
 			undefined,
 			false,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 532, message: 'DEEP message' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 532, message: 'DEEP message', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'DEEP message' } },
 			532,
 			{ headerOne: 1, headerTwo: 2 }
@@ -694,7 +694,7 @@ test({
 			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', emit: true },
 			undefined,
 			false,
-			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 532, message: 'DEEP message' },
+			{ code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', status: 532, message: 'DEEP message', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.deep.this.is.further.down.but.will.take.the.properties.of.test.deep', message: 'DEEP message' } },
 			532,
 			{ headerOne: 1, headerTwo: 2 }
@@ -748,7 +748,7 @@ test({
 			'test.callback',
 			undefined,
 			undefined,
-			{ code: 'test.callback'},
+			{ code: 'test.callback', headers: { headerOne: 1, headerTwo: 2 } },
 			{ error: { code: 'test.callback' } },
 			532,
 			{ headerOne: 1, headerTwo: 2 }
@@ -761,12 +761,12 @@ test({
 		let called			= false;
 		let emitCalled		= 0;
 
-		errorHandler.addCase( 'test.exists.with.just.message', { message: 'Default Message' } );
-		errorHandler.addCase( 'test.exists.with.message.and.status', { status: 532, message: 'Message with Status' } );
-		errorHandler.addCase( 'test.exists.with.status', { status: 462 } );
-		errorHandler.addCase( 'test.deep', { status: 532, message: 'DEEP message', emit: false, headers: { headerOne: 1, headerTwo: 2 } } );
+		errorHandler.addNamespace( 'test.exists.with.just.message', { message: 'Default Message' } );
+		errorHandler.addNamespace( 'test.exists.with.message.and.status', { status: 532, message: 'Message with Status' } );
+		errorHandler.addNamespace( 'test.exists.with.status', { status: 462 } );
+		errorHandler.addNamespace( 'test.deep', { status: 532, message: 'DEEP message', emit: false, headers: { headerOne: 1, headerTwo: 2 } } );
 
-		errorHandler.addCase(
+		errorHandler.addNamespace(
 			'test.callback',
 			{
 				callback: ( { event, code, status, message, error, headers, emit } ) => {

@@ -26,7 +26,7 @@ class Logger
 			value		: typeof uniqueId === 'string' ? uniqueId : false
 		});
 
-		if ( this.uniqueId === false )
+		if ( typeof this.uniqueId !== 'string' )
 			throw new Error( 'app.er.logger.invalidUniqueId' );
 
 		this.sanitizeConfig( options );

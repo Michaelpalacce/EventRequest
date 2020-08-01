@@ -39,7 +39,6 @@ test({
 		const app	= new Server();
 
 		app.apply( app.er_body_parser_json );
-
 		app.get( '/testValidation',
 			app.er_validation.validate( { query: { testKey: 'numeric||min:1||max:255'}, body: { email: 'string||email' } } ),
 			( event ) => {
@@ -49,14 +48,14 @@ test({
 		helpers.sendServerRequest(
 			'/testValidation?testKey=50',
 			'GET',
-			200,
+			400,
 			JSON.stringify( { email: 'test' } ),
 			{ 'content-type': 'application/json' },
 			4111
 		).then(( response ) => {
 			assert.deepStrictEqual(
 				JSON.parse( response.body.toString() ),
-				{ body: { email: ['email'] } }
+				{ error: { code: 'app.er.validation.error', message: { body: { email: ['email'] } } } }
 			);
 			done();
 		}).catch( done );
@@ -81,14 +80,14 @@ test({
 		helpers.sendServerRequest(
 			'/testValidation?testKey=test',
 			'GET',
-			200,
+			400,
 			JSON.stringify( { email: 'test' } ),
 			{ 'content-type': 'application/json' },
 			4112
 		).then(( response ) => {
 			assert.deepStrictEqual(
 				JSON.parse( response.body.toString() ),
-				{ query: { testKey: ['numeric'] } }
+				{ error: { code: 'app.er.validation.error', message: { query: { testKey: ['numeric'] } } } }
 			);
 			done();
 		}).catch( done );

@@ -295,7 +295,7 @@ class Router extends PluginInterface
 						{
 							case typeof middleware === 'string':
 								if ( typeof this.globalMiddlewares[middleware] !== 'function' )
-									throw new Error( `app.er.routing.missingMiddleware.${middleware}` );
+									throw { code: 'app.er.routing.missingMiddleware', message: middleware };
 
 								block.push( this.globalMiddlewares[middleware] );
 								break;
@@ -305,7 +305,7 @@ class Router extends PluginInterface
 								break;
 
 							default:
-								throw new Error( `app.er.routing.missingMiddleware.${middleware}` );
+								throw { code: 'app.er.routing.missingMiddleware', message: middleware };
 						}
 					}
 

@@ -33,6 +33,7 @@
     "static-resources",
     "caching",
     "error-handling",
+    "error-namespaces",
     "env-loader",
     "response-cache",
     "request-timeout",

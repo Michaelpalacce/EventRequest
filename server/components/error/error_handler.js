@@ -7,7 +7,8 @@ class ErrorHandler
 {
 	constructor()
 	{
-		this.defaultCase	= {
+		this.namespaces			= new Map();
+		this.defaultNamespace	= {
 			callback: this._defaultCase.bind( this ),
 			status: 500,
 			code: ErrorHandler.GENERAL_ERROR_CODE,
@@ -15,23 +16,21 @@ class ErrorHandler
 			message: undefined,
 			headers: undefined
 		};
-
-		this.cases			= new Map();
 	}
 
 	/**
 	 * @brief	Handles an error
 	 *
 	 * @param	{EventRequest} event
-	 * @param	{*} errorToHandle
-	 * @param	{Number} errStatusCode
-	 * @param	{Boolean} emitError
+	 * @param	{*} [errorToHandle=null]
+	 * @param	{Number} [errStatusCode=null]
+	 * @param	{Boolean} [emitError=null]
 	 *
 	 * @return	void
 	 */
 	handleError( event, errorToHandle = null, errStatusCode = null, emitError = null )
 	{
-		let errorCase	= null;
+		let errorNamespace	= null;
 		let code;
 		let error;
 		let message;
@@ -58,18 +57,18 @@ class ErrorHandler
 
 			if ( errorToHandle instanceof Error )
 			{
-				errorCase	= this.getCase( errorToHandle.message );
+				errorNamespace	= this.getNamespace( errorToHandle.message );
 
-				if ( errorCase !== null )
+				if ( errorNamespace !== null )
 					code	= errorToHandle.message;
 				else
 					message	= errorToHandle.message;
 			}
 			else if ( typeof errorToHandle === 'string' )
 			{
-				errorCase	= this.getCase( errorToHandle );
+				errorNamespace	= this.getNamespace( errorToHandle );
 
-				if ( errorCase !== null )
+				if ( errorNamespace !== null )
 					code	= errorToHandle;
 				else
 					message	= errorToHandle;
@@ -80,25 +79,23 @@ class ErrorHandler
 			}
 		}
 
-		if ( errorCase === null )
-			errorCase	= this.getCase( code ) || this.defaultCase;
+		if ( errorNamespace === null )
+			errorNamespace	= this.getNamespace( code ) || this.defaultNamespace;
 
-		const callback	= errorCase.callback;
+		const callback	= errorNamespace.callback;
 
-		message			= this._formatError( message || errorCase.message )
-		status			= status || errorCase.status;
-		emit			= typeof emit === 'boolean' ? emit : errorCase.emit;
-		headers			= headers || errorCase.headers || {};
+		message			= this._formatError( message || errorNamespace.message )
+		status			= status || errorNamespace.status;
+		emit			= typeof emit === 'boolean' ? emit : errorNamespace.emit;
+		headers			= headers || errorNamespace.headers || {};
 
 		callback( { event, code, status, message, error, headers, emit } );
 	}
 
 	/**
-	 * @brief	Adds a new expectation for a specific errorCode
+	 * @brief	Adds a new namespace
 	 *
-	 * @details	In case the errorCode is thrown somewhere then the
-	 *
-	 * @param	{String} errorCode
+	 * @param	{String} code
 	 * @param	{*} message
 	 * @param	{Function} callback
 	 * @param	{Number} status
@@ -107,23 +104,23 @@ class ErrorHandler
 	 *
 	 * @return	void
 	 */
-	addCase( errorCode, { message, callback, status, emit, headers } = {} )
+	addNamespace( code, { message, callback, status, emit, headers } = {} )
 	{
-		if ( ! this.validateErrorCode( errorCode ) )
+		if ( ! this.validateNamespaceCode( code ) )
 			return;
 
 		if ( typeof callback !== 'function' )
-			callback	= this.defaultCase.callback;
+			callback	= this.defaultNamespace.callback;
 		if ( typeof message !== 'string' )
-			message	= this.defaultCase.message;
+			message	= this.defaultNamespace.message;
 		if ( typeof status !== 'number' )
-			status	= this.defaultCase.status;
+			status	= this.defaultNamespace.status;
 		if ( typeof emit !== 'boolean' )
-			emit	= this.defaultCase.emit;
+			emit	= this.defaultNamespace.emit;
 		if ( typeof headers !== 'object' )
-			headers	= this.defaultCase.headers;
+			headers	= this.defaultNamespace.headers;
 
-		this.cases.set( errorCode, { message, callback, status, emit, code: errorCode, headers } );
+		this.namespaces.set( code, { message, callback, status, emit, code, headers } );
 	}
 
 	/**
@@ -133,7 +130,7 @@ class ErrorHandler
 	 *
 	 * @return	{Boolean}
 	 */
-	validateErrorCode( errorCode )
+	validateNamespaceCode( errorCode )
 	{
 		return typeof errorCode === 'string' && errorCode.match( /\s/g ) === null;
 	}
@@ -145,32 +142,33 @@ class ErrorHandler
 	 *
 	 * @return	{Object|null}
 	 */
-	getCase( errorCode )
+	getNamespace( errorCode )
 	{
-		if ( ! this.validateErrorCode( errorCode ) )
+		if ( ! this.validateNamespaceCode( errorCode ) )
 			return null;
 
 		while ( true )
 		{
-			if ( this.cases.has( errorCode ) )
-				return this.cases.get( errorCode );
+			if ( this.namespaces.has( errorCode ) )
+				return this.namespaces.get( errorCode );
 
 			const parts	= errorCode.split( '.' );
 			parts.pop();
 
 			if ( parts.length === 0 )
-				return this.defaultCase;
+				return this.defaultNamespace;
 
 			errorCode	= parts.join( '.' );
 		}
 	}
 
 	/**
-	 * @brief	Fallback case that will be called whenever there is no case for the given error code OR the case match does not have a callback
+	 * @brief	Fallback namespace that will be called whenever there is no namespace for the given error code OR the namespace match does not have a callback
 	 *
 	 * @details	This callback will set any headers provided
 	 * 			This callback will set the status code given
 	 * 			This callback will format an appropriate message in case of an error
+	 * 			This callback emit an error IF needed
 	 *
 	 * @param	{EventRequest} event
 	 * @param	{String} errorCode
@@ -190,7 +188,7 @@ class ErrorHandler
 			return;
 
 		const response	= { error: { code } };
-		const toEmit	= { code, status };
+		const toEmit	= { code, status, headers };
 
 		if ( message !== null && message !== undefined )
 		{
@@ -221,12 +219,12 @@ class ErrorHandler
 	 *
 	 * @param	{*} error
 	 *
-	 * @return	Object
+	 * @return	*
 	 */
 	_formatError( error )
 	{
 		if ( error instanceof Error )
-			error	= error.message;
+			return error.message;
 
 		return error;
 	}

@@ -1662,7 +1662,7 @@ test({
 
 			return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString().includes( 'File not found' ), true );
+			assert.equal( response.body.toString().includes( '{"error":{"code":"app.er.staticResources.fileNotFound","message":"File not found' ), true );
 
 			done();
 		}).catch( done )
@@ -1687,7 +1687,7 @@ test({
 
 				return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404, '', {}, 4500 );
 			}).then(( response ) => {
-				assert.equal( response.body.toString().includes( 'File not found' ), true );
+				assert.equal( response.body.toString().includes( '{"error":{"code":"app.er.staticResources.fileNotFound","message":"File not found' ), true );
 				setTimeout(()=>{
 					done();
 				}, 100 )

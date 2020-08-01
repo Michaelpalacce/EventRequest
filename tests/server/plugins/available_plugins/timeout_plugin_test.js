@@ -22,7 +22,7 @@ test({
 
 		eventRequest.on( 'on_error', ( err ) => {
 			assert.deepStrictEqual( typeof err === 'object', true );
-			assert.deepStrictEqual( err, { code: 'app.er.timeout.timedOut', status: 408 } );
+			assert.deepStrictEqual( err, { code: 'app.er.timeout.timedOut', status: 408, headers: {} } );
 			error	= true;
 		});
 
