@@ -31,11 +31,13 @@ test({
 
 		assert.deepStrictEqual( fs.existsSync( dir ), true );
 
-		fs.unlinkSync( fileTransport.getFileName() );
+		setTimeout(() => {
+			fs.unlinkSync( fileTransport.getFileName() );
 
-		fs.unlink( dir, () => {
-			done();
-		});
+			fs.unlink( dir, () => {
+				done();
+			});
+		}, 250 );
 	}
 });
 
