@@ -105,7 +105,7 @@ server.listen( '80',() => {
 - https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
 - https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
 
-#Properties exported by the Module:
+# Properties exported by the Module:
     App, // The Singleton Instance of the Framework that can be used to retrieve the Web Server at any point
 
     Server, // The Server of the framework. This is just the class and not the actual isntance. Use this only if you want to create multiple servers
@@ -117,7 +117,7 @@ server.listen( '80',() => {
     Loggur, // Easier access to the Logging.Loggur instance
 
 
-#Getting started:
+# Getting started:
 
 #### Setup
 The Framework uses the "Singleton" design pattern to create a web server that can be retrieved from anywhere. 
@@ -144,7 +144,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 ***
 ***
 
-#Components:
+# Components:
 - Components are parts of the server that can be used standalone or extended and replaced ( mostly )
 - Any component can be retrieved from : event_request/server/components
 - Extendable components are :
@@ -154,7 +154,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
    - file_streams => require( 'event_request/server/components/file_streams/file_stream' )
    - rate_limiter => require( 'event_request/server/components/rate_limiter/bucket' )
 
-#Plugins:
+# Plugins:
 - Plugins are parts of the server that attach functionality to the EventRequest
 - They can be retrieved from App() ( look at the plugins section for more info )
 
@@ -163,7 +163,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 ***
 
 ***
-#Router and Routing
+# Router and Routing
 - The router is used to route request to the appropriate middleware
 
 #### Router Caching:
@@ -175,7 +175,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 - The router will attempt to clear the cache of stagnated entries on every request but it will get triggered at most every minute
 
 ***
-####Functions exported by the Router:
+#### Functions exported by the Router:
 
 **static matchRoute( String requestedRoute, String|RegExp route, Object matchedParams ={} ): Boolean** 
 - Match the given route and returns any route parameters passed in the matchedParams argument. 
@@ -207,7 +207,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 - One key is a combination of the event.path and the event.method
 
 ***
-####Adding routes
+#### Adding routes
 
 - The server has 2 ways of adding routes/middleware
 
@@ -283,7 +283,7 @@ app.listen( 80, () => {
 - When adding a Route the **server.add( Object route )** or **router.add( Object route )** can be used. 
 - The following parameters can be used when using .add():
 
-####OBJECT CONTAINING:
+#### OBJECT CONTAINING:
 
 **handler: Function** 
 - The callback function 
@@ -305,7 +305,7 @@ app.listen( 80, () => {
 - ( { method: '', route: '', handler:() => {}, middlewares: [] } )
 
 ***
-####Adding Routers:
+#### Adding Routers:
 - A router can be added by calling .add on another router: ( Router router )
 - All the new router's routes will be added to the old one
 - All the global middleware will be merged as well
@@ -328,7 +328,7 @@ App().listen( 80 );
 ~~~
 
 ***
-####Adding Routers with path:
+#### Adding Routers with path:
 - A router can be added by calling .add on another router with a string route: ( String route, Router router )
 - All the new router's routes will be pefixed with the given route
 - All the global middleware will be merged as well
@@ -391,7 +391,7 @@ app.listen( 80, () => {
 });
 ~~~
 
-####FUNCTION:
+#### FUNCTION:
 - server.add can also accept a function that will be transformed into a route without method or route ( Function route )
 ~~~javascript
 const App = require( 'event_request' );
@@ -487,7 +487,7 @@ app.listen( 80, () => {
 ~~~
 
 ***
-####Router Wildcards
+#### Router Wildcards
 - The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
 ~~~javascript
 const { App, Loggur } = require( 'event_request' );
@@ -515,7 +515,7 @@ app.listen( 80, () => {
 ~~~
 
 ***
-####Router Global and Dynamic middlewares:
+#### Router Global and Dynamic middlewares:
 
 - You can `define` middlewares in any router or the server. Middlewares will be merged if you add a router to another router.
 - These global middlewares can be used to call a function before another step in the chain.You can add multiple middlewares per route.
@@ -625,7 +625,7 @@ app.listen( 80, () => {
 The event request is an object that is created by the server and passed through every single middleware.
 
 ***
-####Properties of eventRequest:
+#### Properties of eventRequest:
 
 **query: Object** 
 - The query parameters
@@ -677,7 +677,7 @@ The event request is an object that is created by the server and passed through 
 - Default or Custom error handler that will be called in case of an error
 
 ***
-####Functions exported by the event request:
+#### Functions exported by the event request:
 
 **setCookie( String name, String value, Object options = {} ): Boolean**
 - Sets a new cookie with the given name and value
@@ -751,7 +751,7 @@ The event request is an object that is created by the server and passed through 
 - This function will pass any arguments passed to the event.validation.validate function
 
 ***
-####Events emitted by the EventRequest
+#### Events emitted by the EventRequest
 
 **cleanUp()** 
 - Emitted when the event request is about to begin the cleanUp phase.
@@ -871,7 +871,7 @@ server.listen( '80',() => {
 
 
 ***
-####Functions exported by the server:
+#### Functions exported by the server:
 
 **getPluginManager(): PluginManager** 
 - Returns an instance of the plugin manager attached to the server
@@ -906,7 +906,7 @@ server.listen( '80',() => {
 - Any arguments given will be applied to httpServer.listen
 
 ***
-####Events emitted by the server
+#### Events emitted by the server
 
 **NONE**  
 
@@ -1015,14 +1015,14 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 ***
 ***
 
-##Logger:
+## Logger:
 - Logger class that can be configured for specific logging purposes like access logs or error logs
 - First parameter of the constructor is the options which can be used to configure the logger and the second is the logger Id which must be a string, otherwise an error `app.er.logger.invalidUniqueId` will be thrown
 - Each Logger can have it's own transport layers.
 - Every transport layer will be called when calling logger.log
 - Logger.log returns a promise which will be resolved when the logging is complete
 
-####Accepted options
+#### Accepted options
 **serverName: String** 
 - The name of the server to be concatenated with the uniqueId 
 - Defaults to empty
@@ -1056,7 +1056,7 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - What level should the unhandled exceptions be logged at 
 - Defaults to error
 
-####Functions:
+#### Functions:
 
 **constructor( Object options = {}, String uniqueId = null )**
 - Available options can be checked in the section above.
@@ -1101,12 +1101,12 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 ***
 ***
 
-##Console
+### Console
 - Logs data in the console
 - It can log raw logs
 
 ***
-####Accepted options:
+#### Accepted options:
 
 **logLevel: Number**
 - The log level lower than which everything will be logged
@@ -1135,12 +1135,12 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
     - [LOG_LEVELS.verbose] : 'cyan',
     - [LOG_LEVELS.debug]   : 'white'
 
-###File
+### File
 - Logs data to a file
 - It can't log raw logs
 
 ***
-####Accepted options:
+#### Accepted options:
 
 **logLevel: Number**
 - The log level lower than which everything will be logged
@@ -1376,7 +1376,7 @@ console.log( result.getValidationResult() );
 **equals** 
 - checks if the input equals another given string: equals:makeSureToEqualToThis
 
-####Note: in case of an error the exact rule/s that failed will be returned, furthermore if the rules passed were malformed a special "rules" error will be returned for the field/s
+#### Note: in case of an error the exact rule/s that failed will be returned, furthermore if the rules passed were malformed a special "rules" error will be returned for the field/s
 
 When validation is done a ValidationResult is returned. It has 2 methods:
     getValidationResult that in case of a validation error will return an object with the fields tested mapped to the errors found. 
@@ -1443,7 +1443,7 @@ The address will be asserted to be an object and the keys in it will be validate
 The extra if not passed will default to 'def'
 
 ***
-####Validation defaults
+#### Validation defaults
 
 - Validation results can also have defaults set. 
 - This is done by instead of passing a string of rules to the skeleton keys, an object is passed with two values: $rules and $default
@@ -1618,7 +1618,7 @@ console.log( result.getValidationResult() );
 This class can be used to limit data in one way or another.
 
 ***
-####Accepted constructor arguments:
+#### Accepted constructor arguments:
 
 **refillAmount: Number**
 - How many tokens to refill after the refillTime
@@ -1652,7 +1652,7 @@ This class can be used to limit data in one way or another.
 - Defaults to 1
 
 ***
-####The class has the following functions:
+#### The class has the following functions:
 
 **async init(): void**
 - This has to be called before using the class
@@ -1670,7 +1670,7 @@ This class can be used to limit data in one way or another.
 **async isFull(): Boolean** 
 - This function returns Boolean whether the bucket is full
 
-####Example:
+#### Example:
 
 ~~~javascript
      const LeakyBucket = require( 'event_request/server/components/rate_limiter/bucket' );
@@ -1812,7 +1812,7 @@ The 'runAllTests' function accepts an object that accepts the following options:
 - If there is an err or an Error is thrown then the process with exit with code 1 otherwise it will exit with code 0
 
 ***
-###The 'test' function accepts an object with the following options:
+### The 'test' function accepts an object with the following options:
 
 **message: String** 
 - the name of the test
@@ -1861,7 +1861,7 @@ The 'runAllTests' function accepts an object that accepts the following options:
 
 - The tester has the same functions: 'test', 'runAllTests'
 
-###Mocker
+### Mocker
 You can also use the Mocker class by:
 ~~~javascript
        Mocker( classToMock, methodToMockOptions )
@@ -1885,7 +1885,7 @@ The TestingTools export:
 ***
 ***
 
-#Error Handling | ErrorHandler
+# Error Handling | ErrorHandler
 - The EventRequest has a default ErrorHandler set in it
 - It is a good idea to insantiate a new ErrorHandler OUTSIDE the eventRequest for speed. You can attach a preconfigured ErrorHandler rather than configuring the one created every request.
 - The Error Handler supports error namespaces. An error namespace is a string error code, that is separated by dots: `app.module.someError`. Every Dot represents a new Error namespace. They may take a second to get the hang on but are a powerful tool when you understand them better!
@@ -1896,18 +1896,18 @@ The TestingTools export:
 - You can write your own ErrorHandler, but since there are errors generated by the framework, they will always look for an ErrorHandler with a handleError function and if one is not present, will create a new one. 
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **NONE**
 
 ***
-####Events:
+#### Events:
 
 **on_error: ( mixed error )**
 - This is called in cases
 
 ***
-####Functions:
+#### Functions:
 
 **handleError( EventRequest event, * errorToHandle = null, Number errStatusCode = null, emitError = null ): void**
 - This function will call a callback of either the default Namespace or of a custom one, with parameters: { event, code, status, message, error, headers, emit }
@@ -1923,7 +1923,7 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
 - Any parameters that are not provided will be taken from the defaultNamespace ( check Namespaces section for more info )
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **event.errorHandler: ErrorHandler**
 - Attached by default to the EventRequest but can be overwritten at any point
@@ -2117,7 +2117,7 @@ throw { code: 'app.test.namespace', status: 500 };
 - The logic of what will be emitted and what will be sent to the user is really complex. Below there is an example. Play around, comment out some lines, write new cases to see what happens
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const ErrorHandler = require( 'event_request/server/components/error/error_handler' );
@@ -2200,7 +2200,7 @@ app.listen( 80 );
 ***
 ***
 
-#BodyParser
+# BodyParser
 - If you want to create a new BodyParser the new BodyParser must implement the functions described below
 
 #### Accepted options
@@ -2568,7 +2568,7 @@ However if the global persist is set to false, this will not work
 ***
 ***
 ***
-#BigMap
+# BigMap
 - An implementation of the normal Map API
 - This one can store a near infinite amounts of data
 - It has the exact same usage as the normal Map and can be pretty much used as a replacement
@@ -2701,16 +2701,16 @@ The plugin Manager exports the following functions:
 # Available plugins:
 
 
-#er_timeout
+# er_timeout
 - Adds a timeout to the request
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **timeout: Number**
 - the amount of milliseconds after which the request should timeout - Defaults to 60 seconds or 60000 milliseconds
@@ -2731,31 +2731,31 @@ function callback( event )
 
 
 ***
-####Events:
+#### Events:
 
 **clearTimeout()**
 - Emitted when the event.clearTimeout() function is called if there was a timeout to be cleared
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **event.clearTimeout(): void**
 - Clears the Request Timeout
 - Will do nothing if there is no timeout
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **event.internalTimeout: Timeout**
 - The request timeout set in the EventRequest
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const App = require( 'event_request' );
@@ -2795,18 +2795,18 @@ app.listen( 80, () => {
 ***
 ***
 
-#er_static_resources
+# er_static_resources
 - Adds a static resources path to the request.
 - By default the server has this plugin attached to allow favicon.ico to be sent
 - The Content-Type header will be set with a mime type if the file is css or js
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **paths: Array[String] | String**
 - The path/s to the static resources to be served. Defaults to 'public'
@@ -2814,27 +2814,27 @@ app.listen( 80, () => {
 - The path starts from the root of the project ( where the node command is being executed )
 
 ***
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **NONE**
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **NONE**
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const App = require( 'event_request' );
@@ -2870,17 +2870,17 @@ app.listen( 80 );
 ***
 ***
 
-#er_data_server
+# er_data_server
 - Adds a Caching Server using the DataServer provided in the constructor if any.
 - This plugin will add a DataServer to: `event.dataServer` 
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **dataServerOptions: Object** 
 - The options to be passed to the DataServer if the default one should be used
@@ -2890,30 +2890,30 @@ app.listen( 80 );
  - Uses Duck-Typing to determine if the dataServer is valid
 
 ***
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **NONE**
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **event.dataServer: DataServer**
 - The data server will be available to be used within the EventRequest after it has been applied in the middleware block
 - You can retrieve the DataServer from any other plugin after this one has been applied by doing: server.getPlugin( 'er_data_server' ).getServer()
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **getServer(): DataServer**
 - Returns the instance of the DataServer, following a singleton pattern
 
 ***
-####Example:
+#### Example:
 
 - You can add the plugin like:
 ~~~javascript
@@ -2946,18 +2946,18 @@ app.listen( 80 , () => {
 ***
 ***
 
-#er_session 
+# er_session 
 - Adds a Session class.
 - The session works with a cookie or a header.
 - The cookie/header will be sent back to the client who must then return the cookie/header back.
 
 ***
-####Dependencies:
+#### Dependencies:
 
  **er_data_server**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **ttl: Number**
 - Time in seconds the session should be kept. 
@@ -2976,12 +2976,12 @@ app.listen( 80 , () => {
 - Defaults to true ( session cookie )
 
 ***
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **event.initSession( Function callback ): Promise** 
 - Initializes the session. This should be called in the beginning when you want to start the user sesion
@@ -2989,14 +2989,14 @@ app.listen( 80 , () => {
 - The callback will return false if there was no error
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **event.session: Session**
 - This is the main class that should be used to manipulate the user session.
 - There is no need to save the changes done to the session, that will be done automatically at the end of the request
 
 ***
-####The Session exports the following functions:
+#### The Session exports the following functions:
 
 **hasSession(): Promise: Boolean**
 - Returns true if the user has a session started. 
@@ -3028,12 +3028,12 @@ app.listen( 80 , () => {
 - You probably should never pass a sessionId 
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 - You can use the session like this:
 ~~~javascript
@@ -3105,18 +3105,18 @@ app.listen( 80, () => {
 ***
 ***
 
-#er_templating_engine
+# er_templating_engine
 - Adds a templating engine to the event request ( the default templating engine is used just to render static HTML )
 - If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
 - Use this ONLY if you want to serve static data or when testing
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **engine: Object**
 - Instance of a templating engine that has a function render
@@ -3128,14 +3128,14 @@ app.listen( 80, () => {
 - Defaults to PROJECT_ROOT/public
 
 ***
-####Events:
+#### Events:
 
 **render ( String templateName, Object variables )**
 - Emitted in the beginning of the rendering process if everything has been started successfully 
 
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **event.render( String templateName, Object variables = {}, Function errorCallback = null ): Promise**
 - templateName will be the name of the file without the '.html' extension starting from the tempateDir given as a base ( folders are ok )
@@ -3146,7 +3146,7 @@ app.listen( 80, () => {
 - 'render' event will be emitted by the EventRequest in the beginning with details on what is being rendered
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **event.templatingEngine: TemplatingEngine**
 - The templating engine to be used with the render function
@@ -3157,12 +3157,12 @@ app.listen( 80, () => {
 - Defaults to path.join( PROJECT_ROOT, './public' )
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const app = require( 'event_request' )();
@@ -3198,7 +3198,7 @@ router.get( '/preview', ( event ) => {
 ***
 ***
 
-#er_file_stream 
+# er_file_stream 
 - Adds a file streaming plugin to the site allowing different MIME types to be streamed
 - Currently supported are :
   - Images: '.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
@@ -3212,23 +3212,23 @@ router.get( '/preview', ( event ) => {
 - Files with no extension will be treated as text files
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **NONE**
 
 ***
-####Events:
+#### Events:
 
 **stream_start ( FileStream stream )**
 - Emitted when the stream is started successfully
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **event.streamFile( String file, Object options = {}, errCallback ): void** 
 - This function accepts the absolute file name ( file ) and any options that should be given to the file stream ( options )
@@ -3239,18 +3239,18 @@ router.get( '/preview', ( event ) => {
 - This function will return null if no file streams were found or in case of another error
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **event.fileStreamHandler: Object**
 - Object containing one function: **getFileStreamerForType( String file ): FileStream**
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const app = require( 'event_request' )();
@@ -3314,18 +3314,18 @@ app.listen( '80', () => {
 ***
 ***
 
-#er_logger 
+# er_logger 
 - Adds a logger to the eventRequest
 - Attaches a dumpStack() function as well as log( data, level ) function to the process for easier access
 - This can be controlled and turned off. The process.log( data, level ) calls the given logger
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **logger: Logger**
 - Instance of Logger, if incorrect object provided, defaults to the default logger from the Loggur
@@ -3334,12 +3334,12 @@ app.listen( '80', () => {
 - Boolean whether the plugin should attach dumpStack and log to the process
 
 ***
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Events Attached To
+#### EventRequest Events Attached To
 
 **Event: 'error'**
 - Logs with a log level of 100 ( error ) any error that is passed here 
@@ -3372,12 +3372,12 @@ app.listen( '80', () => {
 - The logger that was passed to the logger plugin
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **NONE**
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **process.dumpStack(): Promise**
 - Logs the current stack
@@ -3386,12 +3386,12 @@ app.listen( '80', () => {
 - You can use the attached logger anywhere
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const app = require( 'event_request' )();
@@ -3411,7 +3411,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 ***
 ***
 
-#er_body_parser_json, er_body_parser_form, er_body_parser_multipart, er_body_parser_raw
+# er_body_parser_json, er_body_parser_form, er_body_parser_multipart, er_body_parser_raw
 - Adds a JsonBodyParser, FormBodyParser or MultipartBodyParser bodyParsers respectively that can be set up
 - They all implement the design principle behind the BodyParser 
 - These plugins are basically one and the same and even tho many may be added they will use a single body parser handler.
@@ -3426,17 +3426,17 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 
 ***
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
 ***
 
-####Accepted Options:
+#### Accepted Options:
 
 ***
-#####MultipartFormParser:
+##### MultipartFormParser:
 
 **maxPayload: Number**
 - Maximum payload in bytes to parse if set to 0 means infinite 
@@ -3447,7 +3447,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 - Defaults to the tmp dir of the os
 
 ***
-#####JsonBodyParser:
+##### JsonBodyParser:
 **maxPayloadLength: Number** 
 - The max size of the body to be parsed 
 - Defaults to 104857600/ 100MB
@@ -3457,13 +3457,13 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 - Defaults to false
 
 ***
-#####RawBodyParser:
+##### RawBodyParser:
 **maxPayloadLength: Number** 
 - The max size of the body to be parsed 
 - Defaults to 10485760/ 10MB
 
 ***
-#####FormBodyParser:
+##### FormBodyParser:
 **maxPayloadLength: Number**
 - The max size of the body to be parsed 
 - Defaults to 10485760
@@ -3479,10 +3479,10 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 ***
 ***
 
-####Errors:
+#### Errors:
 
 ***
-#####MultipartFormParser:
+##### MultipartFormParser:
 
 **app.er.bodyParser.multipart.invalidState**
 
@@ -3491,36 +3491,36 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 **app.er.bodyParser.multipart.invalidMetadata**
 
 ***
-#####JsonBodyParser:
+##### JsonBodyParser:
 
 **NONE** 
 
 ***
-#####RawBodyParser:
-
-**NONE** 
-
-
-***
-#####FormBodyParser:
+##### RawBodyParser:
 
 **NONE** 
 
 
 ***
+##### FormBodyParser:
+
+**NONE** 
+
+
+***
 ***
 
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **NONE**
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **event.body: Object**
 - Will hold different data according to which parser was fired
@@ -3533,12 +3533,12 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 - The multipart body parser will also have the rawBody set but will always be {}
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const app = require( 'event_request' )();
@@ -3569,44 +3569,44 @@ app.post( '/submit', ( event ) => {
 ***
 ***
 
-#er_response_cache 
+# er_response_cache 
 Adds a response caching mechanism.
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **er_data_server**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **NONE**
 
 ***
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **acheCurrentRequest(): Promise**
 - Caches the current request.
 - Will not cache the response if the response was not a String
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 Middleware: **cache.request**
 - Can be added to any request as a global middleware and that request will be cached if possible
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const app = require( 'event_request' )();
@@ -3708,44 +3708,44 @@ app.listen( 80, () => {
 ***
 ***
 
-#er_env 
+# er_env 
 - Adds environment variables from a .env file to the process.env Object. In case the .env file changes
 - This plugin will automatically update the process.env and will delete the old environment variables.
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **fileLocation: String**
 - The absolute path to the .env file you want to use
 - Defaults to PROJECT_ROOT
 
 ***
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **NONE**
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **NONE**
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 - Create a new .env file with the following content: `KEY=TEST`
 ~~~javascript
@@ -3762,38 +3762,38 @@ console.log( process.env.KEY );
 ***
 ***
 
-#er_validation 
+# er_validation 
 - Does not attach any functionality
 - Provides a Dynamic Middleware that can validate any EventRequest properties
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **failureCallback: Function**
 - The plugin can be attached or setup to have a default failureCallback which will be taken if one is not provided
 
 ***
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **NONE**
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **NONE**
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **validate( Object validationRules, Function failureCallback): Function**
 - This function generates a Dynamic Middleware
@@ -3808,7 +3808,7 @@ console.log( process.env.KEY );
 - This plugin uses the built in validation suite
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const app = require( 'event_request' )();
@@ -3955,7 +3955,7 @@ app.listen( 80, () => {
 ***
 ***
 
-#er_cors 
+# er_cors 
 - Adds commonly used CORS headers
 - In case of an options request returns 204 status code
 - Defaults to:
@@ -3969,12 +3969,12 @@ const defaults = {
 ~~~
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **origin: String**
 - The allowed origins 
@@ -4019,27 +4019,27 @@ const defaults = {
 - Omitted by default
 
 ***
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **NONE**
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **NONE**
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Example:
+#### Example:
 
 ~~~javascript
 const app = require( 'event_request' )();
@@ -4077,12 +4077,12 @@ app.listen( 80, () => {
 - If you don't provide a dataStore, then the er_data_server data store will be used. If that plugin is not set, then the default bucket one will be used
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **fileLocation**
 - The absolute path to the rate limits json file.
@@ -4105,7 +4105,7 @@ app.listen( 80, () => {
 - Defaults to false
 
 ***
-####Events:
+#### Events:
 
 **rateLimited( String policy, Object rule )**
 - The policy will be which policy applied the rate limiting 
@@ -4114,12 +4114,12 @@ app.listen( 80, () => {
 - This is emitted before any actions are taken
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **NONE**
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **event.rateLimited: Boolean**
 - Flag depicting whether the request was rate limited or not
@@ -4128,7 +4128,7 @@ app.listen( 80, () => {
 - Will hold all the rules that the plugin has along with the buckets
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **rateLimit( Object rule ): Function**
 - This function generates a Dynamic Middleware
@@ -4140,7 +4140,7 @@ app.listen( 80, () => {
 - !!!WARNING!!!: Due to the way that middlewares work, this will be fired very very late. If you want to limit things like file transfers or authorization ( operations that cost resources ), then this approach may not be the best. Alternatively you can add a new middleware with the same route/method as the one you want to rate limit just before these costly operations and rate limit that.
 
 ***
-####Notes:
+#### Notes:
 If you want to create custom rate limiting you can get er_rate_limits plugin and use getNewBucketFromOptions to get a new bucket, given options for it
 options['maxAmount']
 options['refillTime']
@@ -4184,7 +4184,7 @@ Rate limit rule options:
 - Optional
 
 *** 
-####POLICIES:
+#### POLICIES:
 
 **PERMISSIVE_POLICY**    = 'permissive';
 
@@ -4206,7 +4206,7 @@ This will also include a Retry-After header. If this policy is triggered, stopPr
 the request will be immediately canceled
 
 ***
-####Example:
+#### Example:
 ~~~json
 [
   {
@@ -4384,17 +4384,17 @@ app.listen( 80, () => {
 ***
 ***
 
-#er_security 
+# er_security 
 - Adds common security http headers
 - Options for all the headers can be passed directly in the options and later changed as all components used by the security plugin implement a builder pattern
 
 ***
-####Dependencies:
+#### Dependencies:
 
 **NONE**
 
 ***
-####Accepted Options:
+#### Accepted Options:
 
 **build: Boolean**
 - Whether the headers should be build and set immediately ( taking the default settings )
@@ -4425,12 +4425,12 @@ app.listen( 80, () => {
 - Defaults to an empty object
 
 ***
-####Events:
+#### Events:
 
 **NONE**
 
 ***
-####EventRequest Attached Functions
+#### EventRequest Attached Functions
 
 **event.$security.build(): void**
 - This function accepts no arguments. 
@@ -4438,7 +4438,7 @@ app.listen( 80, () => {
 - This function is called if the build flag is set
 
 ***
-####Attached Functionality:
+#### Attached Functionality:
 
 **event.$security: Object**
 - Holds the build function that builds and sets the security headers
@@ -4462,14 +4462,14 @@ app.listen( 80, () => {
 - Look down for more info
 
 ***
-####Exported Plugin Functions:
+#### Exported Plugin Functions:
 
 **NONE**
 
 ***
-####Objects:
+#### Objects:
 
-#####HTTP Strict Transport Security
+##### HTTP Strict Transport Security
 - Used to build a Strict-Transport-Security header
 - It can either be enabled or not
 - The HTTP Strict-Transport-Security response header (often abbreviated as HSTS) lets a web site tell browsers that it should only be accessed using HTTPS, instead of using HTTP.
@@ -4527,7 +4527,7 @@ app.listen( 80, () => {
 ***
 ***
 
-#####Content Type Options
+##### Content Type Options
 - Used to build a X-Content-Type-Options header
 - It can either be enabled or not
 - The value of the header is nosniff always
@@ -4555,7 +4555,7 @@ app.listen( 80, () => {
 ***
 ***
 
-#####Expect-CT
+##### Expect-CT
 - Used to build a Expect-CT header
 - It can either be enabled or not
 - The Expect-CT header allows sites to opt in to reporting and/or enforcement of Certificate Transparency requirements, which prevents the use of misissued certificates for that site from going unnoticed.
@@ -4613,7 +4613,7 @@ app.listen( 80, () => {
 ***
 ***
 
-#####Content Security Policy
+##### Content Security Policy
 - Used to build a CSP header
 - Many the directives may have many arguments, when the header is build only one directive will be set.
 
@@ -4767,7 +4767,7 @@ app.listen( 80, () => {
 
 
 ***
-####Example:
+#### Example:
 
 - Apply the plugin with defaults
 ~~~javascript
