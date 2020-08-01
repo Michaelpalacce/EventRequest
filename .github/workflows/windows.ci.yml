@@ -1,7 +1,7 @@
 # This workflow will do a clean install of NodeJS 12.x on windows for every push or pull request on master and develop branches
 # It will then run the tests of the app
 
-name: windows
+name: windows-12.x
 
 on:
   push:
@@ -12,16 +12,12 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        node-version: [12.x]
-
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 12.x
     - run: npm i
     - run: npm run build --if-present
     - run: npm test
