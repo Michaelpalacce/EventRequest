@@ -134,9 +134,11 @@ class File extends Transport
 
 		if ( this.splitToNewLines )
 		{
-			while ( true )
+			let hit	= true;
+
+			while ( hit )
 			{
-				let hit			= false;
+				hit	= false;
 				const lineEnds	= ['\r\n', '\\r\\n', '\n', '\\n', '\r', '\\r'];
 
 				for ( const lineEnd of lineEnds )
@@ -150,9 +152,6 @@ class File extends Transport
 						hit		= true;
 					}
 				}
-
-				if ( ! hit )
-					break;
 			}
 		}
 

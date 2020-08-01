@@ -84,7 +84,7 @@ class ErrorHandler
 
 		const callback	= errorNamespace.callback;
 
-		message			= this._formatError( message || errorNamespace.message )
+		message			= this._formatError( message || errorNamespace.message );
 		status			= status || errorNamespace.status;
 		emit			= typeof emit === 'boolean' ? emit : errorNamespace.emit;
 		headers			= headers || errorNamespace.headers || {};
