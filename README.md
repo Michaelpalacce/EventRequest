@@ -1152,15 +1152,15 @@ const { Loggur, LOG_LEVELS, Console, File } = require( 'event_request' ).Logging
 
 // Create a custom Logger
 const logger = Loggur.createLogger({
-    serverName    : 'Test', // The name of the logger
-    logLevel    : LOG_LEVELS.debug, // The logLevel for which the logger should be fired
-    capture        : false, // Do not capture thrown errors
-    transports    : [
+    serverName : 'Test', // The name of the logger
+    logLevel : LOG_LEVELS.debug, // The logLevel for which the logger should be fired
+    capture : false, // Do not capture thrown errors
+    transports : [
         new Console( { logLevel : LOG_LEVELS.notice } ), // Console logger that logs everything below notice
         new File({ // File logger
-            logLevel    : LOG_LEVELS.notice, // Logs everything below notice
-            filePath    : '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
-            logLevels    : { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level, combining this with the er_logging plugin that logs all request paths to a notice level, you have a nice access log. Alternatively you can log to notice yourself )
+            logLevel : LOG_LEVELS.notice, // Logs everything below notice
+            filePath : '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
+            logLevels : { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level, combining this with the er_logging plugin that logs all request paths to a notice level, you have a nice access log. Alternatively you can log to notice yourself )
         }),
         new File({
             logLevel : LOG_LEVELS.error,
@@ -1169,7 +1169,7 @@ const logger = Loggur.createLogger({
         }),
         new File({
             logLevel : LOG_LEVELS.debug,
-            filePath : '/logs/debug_log.log'
+            filePath : '/logs/debug_log.log',
             splitToNewLines : true
         })
     ]
