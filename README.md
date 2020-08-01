@@ -1,7 +1,24 @@
 # EventRequest
 A highly customizable backend server in NodeJs. Any feedback is most welcome!
 
-[![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest) ![windows-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-12.x/badge.svg) ![linux-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-12.x/badge.svg) [![Dependencies](https://david-dm.org/Michaelpalacce/EventRequest.svg)](https://david-dm.org/Michaelpalacce/EventRequest.svg) [![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json) [![npm version](https://badge.fury.io/js/event_request.svg)](https://badge.fury.io/js/event_request)  [![codecov](https://codecov.io/gh/Michaelpalacce/EventRequest/branch/master/graph/badge.svg)](https://codecov.io/gh/Michaelpalacce/EventRequest) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3c843dd2bc454f06b10eb60820dc6d1b)](https://www.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Michaelpalacce/EventRequest&amp;utm_campaign=Badge_Grade) ![npm](https://img.shields.io/npm/dw/event_request?style=plastic) ![npm](https://img.shields.io/npm/dt/event_request?style=plastic) ![GitHub top language](https://img.shields.io/github/languages/top/Michaelpalacce/EventRequest) ![GitHub issues](https://img.shields.io/github/issues-raw/Michaelpalacce/EventRequest) ![npm bundle size](https://img.shields.io/bundlephobia/min/event_request) ![GitHub contributors](https://img.shields.io/github/contributors/Michaelpalacce/EventRequest) ![Maintenance](https://img.shields.io/maintenance/yes/2020) ![GitHub last commit](https://img.shields.io/github/last-commit/Michaelpalacce/EventRequest)
+[![linux-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-12.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Alinux-12.x)
+[![linux-14.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-14.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Alinux-14.x)
+[![windows-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-12.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Awindows-12.x)
+[![windows-14.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-14.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Awindows-14.x)
+
+[![codecov](https://codecov.io/gh/Michaelpalacce/EventRequest/branch/master/graph/badge.svg)](https://codecov.io/gh/Michaelpalacce/EventRequest)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/3c843dd2bc454f06b10eb60820dc6d1b)](https://www.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Michaelpalacce/EventRequest&amp;utm_campaign=Badge_Grade) 
+[![Dependencies](https://david-dm.org/Michaelpalacce/EventRequest.svg)](https://david-dm.org/Michaelpalacce/EventRequest.svg)
+[![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json)
+[![npm version](https://badge.fury.io/js/event_request.svg)](https://badge.fury.io/js/event_request)
+![npm](https://img.shields.io/npm/dw/event_request?style=plastic)
+![npm](https://img.shields.io/npm/dt/event_request?style=plastic)
+![GitHub top language](https://img.shields.io/github/languages/top/Michaelpalacce/EventRequest)
+![GitHub issues](https://img.shields.io/github/issues-raw/Michaelpalacce/EventRequest)
+![npm bundle size](https://img.shields.io/bundlephobia/min/event_request)
+![GitHub contributors](https://img.shields.io/github/contributors/Michaelpalacce/EventRequest)
+![Maintenance](https://img.shields.io/maintenance/yes/2020)
+![GitHub last commit](https://img.shields.io/github/last-commit/Michaelpalacce/EventRequest)
 
 [**CHANGELOG**](https://github.com/Michaelpalacce/EventRequest/blob/master/UPDATELOG.md) || [**BENCHMARKS**](https://github.com/Michaelpalacce/EventRequest-Benchmarks) || [**BOARD**](https://trello.com/b/LzErnccL/eventrequest) 
 
