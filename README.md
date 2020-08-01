@@ -76,7 +76,7 @@ appTwo.listen( 3335, () => {
 });
 ~~~
 
-# Custom http Server setup:
+# [Custom http Server setup:](#custom-http-server-setup)
 ~~~javascript
 const http = require( 'http' );
 const App = require( 'event_request' );
@@ -98,15 +98,15 @@ server.listen( '80',() => {
 });
 ~~~
 
-# Plugins:
+# [Plugins](#plugins):
 - https://www.npmjs.com/package/er_memcached_data_server - memcached data server [![Build Status](https://travis-ci.com/Michaelpalacce/er_memcached_data_server.svg?branch=master)](https://travis-ci.com/Michaelpalacce/er_memcached_data_server)
 - https://www.npmjs.com/package/er_redis_data_server - redis data server [![Build Status](https://travis-ci.com/Michaelpalacce/er_redis_data_server.svg?branch=master)](https://travis-ci.com/Michaelpalacce/er_redis_data_server)
 
-# Example Projects:
+# [Example Projects:](#example-projects)
 - https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
 - https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
 
-# Properties exported by the Module:
+# (Properties exported by the Module:)[#module-properties]
     App, // The Singleton Instance of the Framework that can be used to retrieve the Web Server at any point
 
     Server, // The Server of the framework. This is just the class and not the actual isntance. Use this only if you want to create multiple servers
@@ -118,7 +118,7 @@ server.listen( '80',() => {
     Loggur, // Easier access to the Logging.Loggur instance
 
 
-# Getting started:
+# [Getting started:](#getting-started)
 
 #### Setup
 The Framework uses the "Singleton" design pattern to create a web server that can be retrieved from anywhere. 
@@ -145,7 +145,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 ***
 ***
 
-# Components:
+# [Components:](#components)
 - Components are parts of the server that can be used standalone or extended and replaced ( mostly )
 - Any component can be retrieved from : event_request/server/components
 - Extendable components are :
@@ -155,7 +155,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
    - file_streams => require( 'event_request/server/components/file_streams/file_stream' )
    - rate_limiter => require( 'event_request/server/components/rate_limiter/bucket' )
 
-# Plugins:
+# [Plugins:](#plugins-info)
 - Plugins are parts of the server that attach functionality to the EventRequest
 - They can be retrieved from App() ( look at the plugins section for more info )
 
@@ -164,7 +164,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 ***
 
 ***
-# Router and Routing
+# [Router|Routing](#router-and-routing)
 - The router is used to route request to the appropriate middleware
 
 #### Router Caching:
@@ -208,7 +208,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 - One key is a combination of the event.path and the event.method
 
 ***
-#### Adding routes
+#### [Adding routes](#adding-routes)
 
 - The server has 2 ways of adding routes/middleware
 
@@ -284,7 +284,7 @@ app.listen( 80, () => {
 - When adding a Route the **server.add( Object route )** or **router.add( Object route )** can be used. 
 - The following parameters can be used when using .add():
 
-#### OBJECT CONTAINING:
+#### [Adding an object:](#adding-an-object)
 
 **handler: Function** 
 - The callback function 
@@ -306,7 +306,7 @@ app.listen( 80, () => {
 - ( { method: '', route: '', handler:() => {}, middlewares: [] } )
 
 ***
-#### Adding Routers:
+#### [Adding Routers:](#adding-routers)
 - A router can be added by calling .add on another router: ( Router router )
 - All the new router's routes will be added to the old one
 - All the global middleware will be merged as well
@@ -329,7 +329,7 @@ App().listen( 80 );
 ~~~
 
 ***
-#### Adding Routers with path:
+#### [Adding Routers with path:](#adding-routers-with-path)
 - A router can be added by calling .add on another router with a string route: ( String route, Router router )
 - All the new router's routes will be pefixed with the given route
 - All the global middleware will be merged as well
@@ -392,7 +392,7 @@ app.listen( 80, () => {
 });
 ~~~
 
-#### FUNCTION:
+#### [Adding a function:](#adding-a-function)
 - server.add can also accept a function that will be transformed into a route without method or route ( Function route )
 ~~~javascript
 const App = require( 'event_request' );
@@ -488,7 +488,7 @@ app.listen( 80, () => {
 ~~~
 
 ***
-#### Router Wildcards
+#### [Router Wildcards](#router-wildcards)
 - The route url can have a part separated by ":" on both sides that will be extracted and set to event.params
 ~~~javascript
 const { App, Loggur } = require( 'event_request' );
@@ -516,7 +516,7 @@ app.listen( 80, () => {
 ~~~
 
 ***
-#### Router Global and Dynamic middlewares:
+#### [Router Global and Dynamic middlewares:](#router-global-dynamic-middlewares)
 
 - You can `define` middlewares in any router or the server. Middlewares will be merged if you add a router to another router.
 - These global middlewares can be used to call a function before another step in the chain.You can add multiple middlewares per route.
@@ -622,7 +622,7 @@ app.listen( 80, () => {
 });
 ~~~
 
-# EventRequest
+# [EventRequest](#event-request)
 The event request is an object that is created by the server and passed through every single middleware.
 
 ***
@@ -808,7 +808,7 @@ The event request is an object that is created by the server and passed through 
 ***
 ***
 
-# Server
+# [Server](#server-class)
 The main object of the framework.
 
 - To retrieve the Server class do:
@@ -915,7 +915,7 @@ server.listen( '80',() => {
 ***
 ***
 
-# Logging
+# [Logging](#logging)
 
 - Logging is done by using the Loggur class mainly. 
 - The Loggur can create different loggers who can have different transports
@@ -952,7 +952,7 @@ app.Loggur.log( 'TEST' );
 ***
 ***
 
-## Loggur:
+## [Loggur:](#loggur)
 - Loggur used to create, store and use different loggers
 - Every logger added to the Loggur will be called when doing Loggur.log
 - Loggur.log returns a promise which will be resolved when the logging is complete
@@ -1016,7 +1016,7 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 ***
 ***
 
-## Logger:
+## [Logger:](#logger)
 - Logger class that can be configured for specific logging purposes like access logs or error logs
 - First parameter of the constructor is the options which can be used to configure the logger and the second is the logger Id which must be a string, otherwise an error `app.er.logger.invalidUniqueId` will be thrown
 - Each Logger can have it's own transport layers.
@@ -1102,7 +1102,7 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 ***
 ***
 
-### Console
+### [Console](#console)
 - Logs data in the console
 - It can log raw logs
 
@@ -1136,7 +1136,7 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
     - [LOG_LEVELS.verbose] : 'cyan',
     - [LOG_LEVELS.debug]   : 'white'
 
-### File
+### [File](#file)
 - Logs data to a file
 - It can't log raw logs
 
@@ -1211,7 +1211,7 @@ console.log( typeof Loggur.loggers['serverLogger'] !== 'undefined' );
 ***
 ***
 
-# Validation
+# [Validation](#validation-suite)
 The validation is done by using:
 
 ~~~javascript
@@ -1615,7 +1615,7 @@ console.log( result.getValidationResult() );
 ***
 ***
 
-# LeakyBucket
+# [LeakyBucket](#leaky-bucket)
 This class can be used to limit data in one way or another.
 
 ***
@@ -1677,7 +1677,7 @@ This class can be used to limit data in one way or another.
      const LeakyBucket = require( 'event_request/server/components/rate_limiter/bucket' );
 ~~~
 
-# Testing
+# [Testing](#testing)
 If you need to test your project, then you can use the Testing tools included in the project.
 
 ~~~javascript
@@ -1862,7 +1862,7 @@ The 'runAllTests' function accepts an object that accepts the following options:
 
 - The tester has the same functions: 'test', 'runAllTests'
 
-### Mocker
+### [Mocker](#mocker)
 You can also use the Mocker class by:
 ~~~javascript
        Mocker( classToMock, methodToMockOptions )
@@ -1886,7 +1886,7 @@ The TestingTools export:
 ***
 ***
 
-# Error Handling | ErrorHandler
+# [Error Handling | ErrorHandler](#error-handling-errorHandler)
 - The EventRequest has a default ErrorHandler set in it
 - It is a good idea to insantiate a new ErrorHandler OUTSIDE the eventRequest for speed. You can attach a preconfigured ErrorHandler rather than configuring the one created every request.
 - The Error Handler supports error namespaces. An error namespace is a string error code, that is separated by dots: `app.module.someError`. Every Dot represents a new Error namespace. They may take a second to get the hang on but are a powerful tool when you understand them better!
@@ -2014,7 +2014,7 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
 
 ***
 ***
-#### Namespaces:
+#### [Namespaces:](#error-handling-namespaces)
 - Error Namespaces are ways for you to attach common error handling to the same section of your application. If you have the following namespaces: `app.security.invalid.password`, `app.security.invalid.username`, `app.security.unauthorized`, `app.security.invalid.token` and lets say that everything besides `app.security.invalid.token` has been handled, what do we do with that one specifically? Well, if you attach a namespace that is `app.security` with a message of 'General Security Error' and a status of 401 or 403, then you don't have to worry that you have not handled this scenario.
 
 ~~~javscript
@@ -2201,7 +2201,7 @@ app.listen( 80 );
 ***
 ***
 
-# BodyParser
+# [BodyParser](#body-parser)
 - If you want to create a new BodyParser the new BodyParser must implement the functions described below
 
 #### Accepted options
@@ -2243,7 +2243,7 @@ const plugin    = new BodyParserPlugin( CustomBodyParser, 'custom_body_parser', 
 ***
 ***
 
-# DataServer
+# [DataServer](#data-server)
 - Is an EventEmitter
 - Can be extended
 - This Data Server can store around 8million keys
@@ -2439,7 +2439,7 @@ However if the global persist is set to false, this will not work
 ***
 
 
-# DataServerMap
+# [DataServerMap](#data-server-map)
 - Is an EventEmitter
 - Can be extended
 - Extends the DataServer
@@ -2569,7 +2569,7 @@ However if the global persist is set to false, this will not work
 ***
 ***
 ***
-# BigMap
+# [BigMap](#big-map)
 - An implementation of the normal Map API
 - This one can store a near infinite amounts of data
 - It has the exact same usage as the normal Map and can be pretty much used as a replacement
@@ -2583,7 +2583,7 @@ However if the global persist is set to false, this will not work
 
 
 ***
-# Plugins
+# [Plugins](#plugins-section)
 - Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**
 - Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
     plugin all you have to do is do: server.apply( 'pluginId' )
@@ -2598,7 +2598,6 @@ However if the global persist is set to false, this will not work
 
 ~~~
 Server {
-  ...
   er_timeout,
   er_env,
   er_rate_limits,
@@ -2652,7 +2651,7 @@ app.listen( 80, () => {
 ***
 ***
 
-# PluginInterface
+# [PluginInterface](#plugin-interface)
 The PluginInterface has a getPluginMiddleware method that must return an array of middleware objects implementing handler,
 route, method keys or instances of Route. 
 
@@ -2678,7 +2677,7 @@ This is how the flow of adding a plugin goes:
 4. getPluginMiddleware 
 
 
-# Plugin Manager
+# [Plugin Manager](#plugin-manager)
 The manager can be extracted from the created Server by:
 ~~~javascript
 const pluginManager   = server.getPluginManager();
@@ -2702,7 +2701,7 @@ The plugin Manager exports the following functions:
 # Available plugins:
 
 
-# er_timeout
+# [er_timeout](#er_timeout)
 - Adds a timeout to the request
 
 ***
@@ -2796,7 +2795,7 @@ app.listen( 80, () => {
 ***
 ***
 
-# er_static_resources
+# [er_static_resources](#er_static_resources)
 - Adds a static resources path to the request.
 - By default the server has this plugin attached to allow favicon.ico to be sent
 - The Content-Type header will be set with a mime type if the file is css or js
@@ -2871,7 +2870,7 @@ app.listen( 80 );
 ***
 ***
 
-# er_data_server
+# [er_data_server](#er_data_server)
 - Adds a Caching Server using the DataServer provided in the constructor if any.
 - This plugin will add a DataServer to: `event.dataServer` 
 
@@ -2947,7 +2946,7 @@ app.listen( 80 , () => {
 ***
 ***
 
-# er_session 
+# [er_session](#er_session) 
 - Adds a Session class.
 - The session works with a cookie or a header.
 - The cookie/header will be sent back to the client who must then return the cookie/header back.
@@ -3106,7 +3105,7 @@ app.listen( 80, () => {
 ***
 ***
 
-# er_templating_engine
+# [er_templating_engine](#er_templating_engine)
 - Adds a templating engine to the event request ( the default templating engine is used just to render static HTML )
 - If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
 - Use this ONLY if you want to serve static data or when testing
@@ -3199,7 +3198,7 @@ router.get( '/preview', ( event ) => {
 ***
 ***
 
-# er_file_stream 
+# [er_file_stream](#er_file_stream) 
 - Adds a file streaming plugin to the site allowing different MIME types to be streamed
 - Currently supported are :
   - Images: '.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
@@ -3315,7 +3314,7 @@ app.listen( '80', () => {
 ***
 ***
 
-# er_logger 
+# [er_logger](#er_logger) 
 - Adds a logger to the eventRequest
 - Attaches a dumpStack() function as well as log( data, level ) function to the process for easier access
 - This can be controlled and turned off. The process.log( data, level ) calls the given logger
@@ -3412,7 +3411,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 ***
 ***
 
-# er_body_parser_json, er_body_parser_form, er_body_parser_multipart, er_body_parser_raw
+# [er_body_parser_json, er_body_parser_form, er_body_parser_multipart, er_body_parser_raw](#er_body_parsers)
 - Adds a JsonBodyParser, FormBodyParser or MultipartBodyParser bodyParsers respectively that can be set up
 - They all implement the design principle behind the BodyParser 
 - These plugins are basically one and the same and even tho many may be added they will use a single body parser handler.
@@ -3570,7 +3569,7 @@ app.post( '/submit', ( event ) => {
 ***
 ***
 
-# er_response_cache 
+# [er_response_cache](#er_response_cache) 
 Adds a response caching mechanism.
 
 ***
@@ -3709,7 +3708,7 @@ app.listen( 80, () => {
 ***
 ***
 
-# er_env 
+# [er_env](#er_env) 
 - Adds environment variables from a .env file to the process.env Object. In case the .env file changes
 - This plugin will automatically update the process.env and will delete the old environment variables.
 
@@ -3763,7 +3762,7 @@ console.log( process.env.KEY );
 ***
 ***
 
-# er_validation 
+# [er_validation](#er_validation) 
 - Does not attach any functionality
 - Provides a Dynamic Middleware that can validate any EventRequest properties
 
@@ -3956,7 +3955,7 @@ app.listen( 80, () => {
 ***
 ***
 
-# er_cors 
+# [er_cors](#er_cors) 
 - Adds commonly used CORS headers
 - In case of an options request returns 204 status code
 - Defaults to:
@@ -4068,7 +4067,7 @@ app.listen( 80, () => {
 ***
 ***
 
-# er_rate_limits
+# [er_rate_limits](#er_rate_limits)
 - Adds a Rate limits plugin to the server. 
 - The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
 - The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist and useFile is set to true
@@ -4385,7 +4384,7 @@ app.listen( 80, () => {
 ***
 ***
 
-# er_security 
+# [er_security](#er_security) 
 - Adds common security http headers
 - Options for all the headers can be passed directly in the options and later changed as all components used by the security plugin implement a builder pattern
 
