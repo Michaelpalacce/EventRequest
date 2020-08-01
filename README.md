@@ -22,7 +22,8 @@ A highly customizable backend server in NodeJs. Any feedback is most welcome!
 
 [**CHANGELOG**](https://github.com/Michaelpalacce/EventRequest/blob/master/UPDATELOG.md) || [**BENCHMARKS**](https://github.com/Michaelpalacce/EventRequest-Benchmarks) || [**BOARD**](https://trello.com/b/LzErnccL/eventrequest) 
 
-# Setup
+# [Setup](#setup)
+
 ~~~javascript
 // Framework Singleton instance
 const app = require( 'event_request' )();
@@ -48,7 +49,7 @@ const { App } = require( 'event_request' );
 const app = App();
 ~~~
 
-# Multiple Servers Setup:
+# [Multiple Servers Setup:](#multiple-servers-setup)
 ~~~javascript
 const { Server, Loggur } = require( 'event_request' );
 
