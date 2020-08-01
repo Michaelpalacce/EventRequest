@@ -65,21 +65,18 @@ test({
 					const logData	= fs.readFileSync( fileTransport.getFileName() );
 
 					assert.equal( logData.includes( `GET /${name} 200` ), true );
-					assert.equal( logData.includes( 'Event is cleaning up' ), true );
 					assert.equal( logData.includes( 'Event finished' ), true );
 					assert.equal( logData.includes( 'Server.test_er_logger/Master' ), true );
 					assert.equal( logData.includes( 'Redirect to: REDIRECT-LINK' ), true );
 					assert.equal( logData.includes( 'Response to' ), true );
 					assert.equal( logData.includes( 'send from cache' ), true );
-					assert.equal( logData.includes( 'Event stopped' ), true );
-					assert.equal( logData.includes( 'Timeout cleared' ), true );
 					assert.equal( logData.includes( 'Header set: key with value: value' ), true );
 					assert.equal( logData.includes( 'Headers: ' ), true );
 					assert.equal( logData.includes( 'Cookies: ' ), true );
-					assert.equal( logData.includes( 'Error : SIMPLE ERROR MESSAGE' ), true );
-					assert.equal( logData.includes( 'Error : NORMAL SIMPLE ERROR MESSAGE' ), true );
-					assert.equal( logData.includes( 'Error : Error: error' ), true );
-					assert.equal( logData.includes( 'Error : Error: normal error' ), true );
+					assert.equal( logData.includes( 'SIMPLE ERROR MESSAGE' ), true );
+					assert.equal( logData.includes( 'NORMAL SIMPLE ERROR MESSAGE' ), true );
+					assert.equal( logData.includes( 'Error: error' ), true );
+					assert.equal( logData.includes( 'Error: normal error' ), true );
 					assert.equal( logData.includes( 'at EventRequest._next' ), true );
 
 					if ( fs.existsSync( fileTransport.getFileName() ) )
@@ -156,21 +153,18 @@ test({
 
 					assert.equal( logData.includes( `GET /${name} 200` ), true );
 					assert.equal( logData.includes( 'someUserAgent' ), true );
-					assert.equal( logData.includes( 'Event is cleaning up' ), true );
 					assert.equal( logData.includes( 'Event finished' ), true );
 					assert.equal( logData.includes( 'Server.test_er_logger/Master' ), true );
 					assert.equal( logData.includes( 'Redirect to: REDIRECT-LINK' ), true );
 					assert.equal( logData.includes( 'Response to' ), true );
 					assert.equal( logData.includes( 'send from cache' ), true );
-					assert.equal( logData.includes( 'Event stopped' ), true );
-					assert.equal( logData.includes( 'Timeout cleared' ), true );
 					assert.equal( logData.includes( 'Header set: key with value: value' ), true );
 					assert.equal( logData.includes( 'Headers: ' ), true );
 					assert.equal( logData.includes( 'Cookies: ' ), true );
-					assert.equal( logData.includes( 'Error : SIMPLE ERROR MESSAGE' ), true );
-					assert.equal( logData.includes( 'Error : NORMAL SIMPLE ERROR MESSAGE' ), true );
-					assert.equal( logData.includes( 'Error : Error: error' ), true );
-					assert.equal( logData.includes( 'Error : Error: normal error' ), true );
+					assert.equal( logData.includes( 'SIMPLE ERROR MESSAGE' ), true );
+					assert.equal( logData.includes( 'NORMAL SIMPLE ERROR MESSAGE' ), true );
+					assert.equal( logData.includes( 'Error: error' ), true );
+					assert.equal( logData.includes( 'Error: normal error' ), true );
 					assert.equal( logData.includes( 'at EventRequest._next' ), true );
 
 					if ( fs.existsSync( fileTransport.getFileName() ) )

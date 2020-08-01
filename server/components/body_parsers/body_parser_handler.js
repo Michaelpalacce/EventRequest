@@ -24,7 +24,7 @@ class BodyParserHandler
 	addParser( parser )
 	{
 		if ( typeof parser.supports !== 'function' || typeof parser.parse !== 'function' )
-			throw new Error( 'Parser must have a supports and parse functions' );
+			throw new Error( 'app.er.bodyParser.invalidParser' );
 
 		this.parsers.push( parser );
 	}

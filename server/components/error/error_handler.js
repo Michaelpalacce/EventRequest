@@ -7,10 +7,8 @@ class ErrorHandler
 {
 	constructor()
 	{
-		this.defaultCase	= { callback: this._defaultCase.bind( this ), status: 500 };
+		this.defaultCase	= { callback: this._defaultCase.bind( this ), status: 500, code: ErrorHandler.GENERAL_ERROR_CODE };
 		this.cases			= new Map();
-
-		this.cases.set( ErrorHandler.GENERAL_ERROR_CODE, this.defaultCase );
 	}
 
 	/**
@@ -19,11 +17,13 @@ class ErrorHandler
 	 * @param	{EventRequest} event
 	 * @param	{*} errorToHandle
 	 * @param	{Number} errStatusCode
+	 * @param	{Boolean} emitError
 	 *
 	 * @return	void
 	 */
-	handleError( event, errorToHandle = null, errStatusCode = 500 )
+	handleError( event, errorToHandle = null, errStatusCode = 500, emitError = true )
 	{
+		let errorCase	= null;
 		let code;
 		let error;
 		let message;
@@ -38,7 +38,7 @@ class ErrorHandler
 			message	= errorToHandle.message || errorToHandle.error || null;
 			status	= errorToHandle.status || errStatusCode;
 			headers	= errorToHandle.headers || {};
-			emit	= errorToHandle.emit || false;
+			emit	= errorToHandle.emit || emitError;
 		}
 		else
 		{
@@ -46,18 +46,22 @@ class ErrorHandler
 			error	= errorToHandle;
 			status	= errStatusCode;
 			headers	= {};
-			emit	= true;
+			emit	= emitError;
 
 			if ( errorToHandle instanceof Error )
 			{
-				if ( this.cases.has( errorToHandle.message ) )
+				errorCase	= this.getCase( errorToHandle.message );
+
+				if ( errorCase !== null )
 					code	= errorToHandle.message;
 				else
 					message	= errorToHandle.message;
 			}
 			else if ( typeof errorToHandle === 'string' )
 			{
-				if ( this.cases.has( errorToHandle ) )
+				errorCase	= this.getCase( errorToHandle );
+
+				if ( errorCase !== null )
 					code	= errorToHandle;
 				else
 					message	= errorToHandle;
@@ -68,14 +72,24 @@ class ErrorHandler
 			}
 		}
 
-		const errorCase	= this.getCase( code );
+		if ( errorCase === null )
+			errorCase	= this.getCase( code ) || this.defaultCase;
+
 		const callback	= errorCase.callback;
 
 		message			= this._formatError( message || errorCase.error )
 		status			= status || errorCase.status;
 
+		const toEmit	= { code, status };
+
+		if ( message !== null && message !== undefined )
+			toEmit.message	= message;
+
+		if ( error !== null && error !== undefined )
+			toEmit.error	= error;
+
 		if ( emit )
-			event.emit( 'on_error', { code, error, status, message } );
+			event.emit( 'on_error', toEmit );
 
 		callback( { event, code, status, message, error, headers } );
 	}
@@ -94,6 +108,9 @@ class ErrorHandler
 	 */
 	addCase( errorCode, { error, callback, status } )
 	{
+		if ( ! this.validateErrorCode( errorCode ) )
+			return;
+
 		if ( typeof callback !== 'function' )
 			callback	= this.defaultCase.callback;
 		if ( typeof error !== 'string' )
@@ -101,7 +118,19 @@ class ErrorHandler
 		if ( typeof status !== 'number' )
 			status	= this.defaultCase.status;
 
-		this.cases.set( errorCode, { error, callback, status } );
+		this.cases.set( errorCode, { error, callback, status, code: errorCode } );
+	}
+
+	/**
+	 * @brief	Validates that the provided errorCode is a string and does not have any white space characters
+	 *
+	 * @param	{String} errorCode
+	 *
+	 * @return	{Boolean}
+	 */
+	validateErrorCode( errorCode )
+	{
+		return typeof errorCode === 'string' && errorCode.match( /\s/g ) === null;
 	}
 
 	/**
@@ -109,13 +138,26 @@ class ErrorHandler
 	 *
 	 * @param	{String} errorCode
 	 *
-	 * @return	{Object}
+	 * @return	{Object|null}
 	 */
 	getCase( errorCode )
 	{
-		return this.cases.has( errorCode )
-			? this.cases.get( errorCode )
-			: this.defaultCase;
+		if ( ! this.validateErrorCode( errorCode ) )
+			return null;
+
+		while ( true )
+		{
+			if ( this.cases.has( errorCode ) )
+				return this.cases.get( errorCode );
+
+			const parts	= errorCode.split( '.' );
+			parts.pop();
+
+			if ( parts.length === 0 )
+				return this.defaultCase;
+
+			errorCode	= parts.join( '.' );
+		}
 	}
 
 	/**
@@ -174,6 +216,6 @@ class ErrorHandler
 	}
 }
 
-ErrorHandler.GENERAL_ERROR_CODE		= 'app.general';
+ErrorHandler.GENERAL_ERROR_CODE	= 'app.general';
 
-module.exports	= ErrorHandler;
+module.exports					= ErrorHandler;

@@ -49,10 +49,7 @@ test({
 				['finished', undefined],
 				['redirect', undefined],
 				['cachedResponse', undefined],
-				['stop', undefined],
 				['setResponseHeader', undefined],
-				['cleanUp', undefined],
-				['clearTimeout', undefined],
 			],
 			called			: 10
 		});
@@ -65,7 +62,7 @@ test({
 
 		// DO this to wait for the log to complete
 		setImmediate(() => {
-			assert.equal( called, 10 );
+			assert.equal( called, 7 );
 			assert.equal( true, eventRequest.logger instanceof Logger );
 
 			done();

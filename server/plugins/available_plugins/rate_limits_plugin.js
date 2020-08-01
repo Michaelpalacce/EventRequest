@@ -176,7 +176,7 @@ class RateLimitsPlugin extends PluginInterface
 				policy === CONNECTION_DELAY_POLICY
 				&& ( typeof options.delayTime !== 'number' || typeof options.delayRetries !== 'number' )
 			) {
-				throw new Error( `Rate limit with ${CONNECTION_DELAY_POLICY} must have delayTime set` );
+				throw new Error( `app.er.rateLimits.${CONNECTION_DELAY_POLICY}.missingDelayTimeOrDelayRetries` );
 			}
 
 			if ( typeof options.stopPropagation !== 'boolean' )
@@ -187,7 +187,7 @@ class RateLimitsPlugin extends PluginInterface
 		}
 		else
 		{
-			throw new Error( 'Invalid rate limit options set: ' + JSON.stringify( options ) );
+			throw new Error( 'app.er.rateLimits.invalidOptions' );
 		}
 	}
 
@@ -420,8 +420,13 @@ class RateLimitsPlugin extends PluginInterface
 	 */
 	sendRetryAfterRequest( eventRequest, retryAfterTime )
 	{
-		eventRequest.setResponseHeader( 'Retry-After', retryAfterTime );
-		eventRequest.sendError( 'Too many requests', TOO_MANY_REQUESTS_STATUS_CODE );
+		eventRequest.sendError(
+			{
+				code: 'app.er.rateLimits.tooManyRequests',
+				status: TOO_MANY_REQUESTS_STATUS_CODE,
+				headers: { 'Retry-After': retryAfterTime }
+			}
+		);
 	}
 }
 

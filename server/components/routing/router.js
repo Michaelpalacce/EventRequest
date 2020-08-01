@@ -66,7 +66,7 @@ class Router extends PluginInterface
 			|| typeof middleware !== 'function'
 			|| typeof this.globalMiddlewares[middlewareName] !== 'undefined'
 		) {
-			throw new Error( 'Invalid middleware definition or middleware already exists' );
+			throw new Error( 'app.er.routing.cannotDefineMiddleware' );
 		}
 
 		this.globalMiddlewares[middlewareName]	= middleware;
@@ -146,7 +146,7 @@ class Router extends PluginInterface
 						break;
 
 					default:
-						throw new Error( 'Trying to add an invalid middleware' );
+						throw new Error( 'app.er.routing.invalidMiddlewareAdded' );
 				}
 
 				this.add({
@@ -238,12 +238,12 @@ class Router extends PluginInterface
 			}
 			else
 			{
-				throw new Error( 'Invalid middleware added!' );
+				throw new Error( 'app.er.routing.invalidMiddlewareAdded' );
 			}
 		}
 		else
 		{
-			throw new Error( 'Invalid middleware added!' );
+			throw new Error( 'app.er.routing.invalidMiddlewareAdded' );
 		}
 
 		return this;
@@ -258,9 +258,6 @@ class Router extends PluginInterface
 	 */
 	getExecutionBlockForCurrentEvent( event )
 	{
-		if ( ! ( event instanceof EventRequest ) )
-			throw new Error( 'Invalid EventRequest provided' );
-
 		const blockKey	= `${event.path}${event.method}`;
 		const block		= [];
 
@@ -298,7 +295,7 @@ class Router extends PluginInterface
 						{
 							case typeof middleware === 'string':
 								if ( typeof this.globalMiddlewares[middleware] !== 'function' )
-									throw new Error( `Could not find middleware ${middleware}` );
+									throw new Error( `app.er.routing.missingMiddleware.${middleware}` );
 
 								block.push( this.globalMiddlewares[middleware] );
 								break;
@@ -308,7 +305,7 @@ class Router extends PluginInterface
 								break;
 
 							default:
-								throw new Error( `Could not find middleware ${middleware}` );
+								throw new Error( `app.er.routing.missingMiddleware.${middleware}` );
 						}
 					}
 

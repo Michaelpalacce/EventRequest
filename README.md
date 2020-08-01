@@ -2436,12 +2436,14 @@ The plugin Manager exports the following functions:
 **callback: Function**
 - The callback that should be called in case the timeout is reached.
 - The callback must accept the event request as the first parameter
+- Will send back an error code: `app.er.timeout.timedOut`
+- Will set status code : `408`
 - Defaults to:
 
 ~~~javascript
 function callback( event )
 {
-    event.next( `Request timed out in: ${this.timeout/1000} seconds`, 503 );
+    event.next( { code: 'app.er.timeout.timedOut', status: 408 } );
 }
 ~~~
 
@@ -3057,7 +3059,35 @@ app.listen( '80', () => {
 ***
 ####EventRequest Attached Functions
 
-**NONE**
+**Event: 'error'**
+- Logs with a log level of 100 ( error ) any error that is passed here 
+
+**Event: 'on_error'**
+- Logs with a log level of 100 ( error ) any error that is passed here 
+
+**Event: 'redirect'**
+- Logs with a log level of 400 ( info ) where the redirect was to
+
+**Event: 'cachedResponse'**
+- Logs with a log level of 400 ( info ) which url was send from the cache
+
+**Event: 'finished'**
+- Logs with a log level of 500 ( verbose ) that the event is finished
+
+**Event: 'setResponseHeader'**
+- Logs with a log level of 500 ( verbose ) which header was set with what value
+
+**Event: 'cleanUp'**
+- Logs with a log level of 300 ( notice ) the method, path, responseStatusCode, clientIp and userAgent
+
+**Event: 'verbose'**
+- Logs with a log level of 300 ( notice ) the method, path, responseStatusCode, clientIp and userAgent
+
+**Middleware**
+- Logs with a log level of 500 ( verbose ) the headers and the cookies
+
+**event.logger: Logger**
+- The logger that was passed to the logger plugin
 
 ***
 ####Attached Functionality:
@@ -3189,6 +3219,8 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 
 ~~~javascript
 const app = require( 'event_request' )();
+const path = require( 'path' );
+const PROJECT_ROOT = path.parse( require.main.filename ).dir;
 
 // Add Body Parsers
 app.apply( app.er_body_parser_json );

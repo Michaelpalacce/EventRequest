@@ -1311,7 +1311,7 @@ test({
 		} );
 
 		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: name } ) );
+			assert.deepStrictEqual( response.body.toString(), JSON.stringify( { error: { code: name } } ) );
 			done();
 		}).catch( done );
 	}
@@ -1328,7 +1328,7 @@ test({
 		} );
 
 		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'test' } ) );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: 'test' } } ) );
 			done();
 		}).catch( done );
 	}
@@ -1344,7 +1344,7 @@ test({
 		} );
 
 		helpers.sendServerRequest( `/${name}`, 'GET', 501 ).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: name } ) );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: name } } ) );
 			done();
 		}).catch( done );
 	}
@@ -1640,7 +1640,7 @@ test({
 	message	: 'Server.test.server.does.not.export./public.by.default',
 	test	: ( done ) => {
 		helpers.sendServerRequest( `/public/test/index.html`, 'GET', 404 ).then(( response ) => {
-			assert.equal( response.body.toString(), '{"error":"Cannot GET /public/test/index.html"}' );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: 'app.general', message: 'Cannot GET /public/test/index.html' } } ) );
 			done();
 		}).catch( done )
 	}
@@ -1847,7 +1847,7 @@ test({
 				'',
 				{},
 				3333,
-				'{"error":"Could not find a FileStream that supports that format"}'
+				'{"error":{"code":"app.general","message":"Could not find a FileStream that supports that format"}}'
 			)
 		);
 		responses.push(
@@ -1890,7 +1890,7 @@ test({
 		});
 
 		helpers.sendServerRequest( `/testCallingNextTwiceDoesNotDieCritically`, 'GET', 500 ).then( ( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error } ) );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: 'app.general', message: error } } ) );
 			done();
 		} ).catch( done );
 	}
@@ -2064,7 +2064,7 @@ test({
 			{},
 			4215
 		).then(( response ) => {
-			assert.deepStrictEqual( response.body.toString(), '{"error":"Error has occured!"}' );
+			assert.deepStrictEqual( response.body.toString(), '{"error":{"code":"app.general","message":"Error has occured!"}}' );
 			done();
 		}).catch( done );
 

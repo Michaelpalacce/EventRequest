@@ -168,7 +168,8 @@ test({
 			}).then(( response ) => {
 				setTimeout(() => {
 					server.close();
-					assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+					assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+					assert.equal( response.body.toString(), '{"error":{"code":"app.er.rateLimits.tooManyRequests"}}' );
 					done();
 				}, 200 );
 			}).catch( done );
@@ -264,7 +265,8 @@ test({
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
 			}).then(( response ) => {
 				server.close();
-				assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+				assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+				assert.equal( response.body.toString(), '{"error":{"code":"app.er.rateLimits.tooManyRequests"}}' );
 				done();
 			}).catch( done );
 		} );
@@ -341,7 +343,8 @@ test({
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
 			}).then(( response ) => {
 				server.close();
-				assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+				assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+				assert.equal( response.body.toString(), '{"error":{"code":"app.er.rateLimits.tooManyRequests"}}' );
 				done();
 			}).catch( done );
 		} );
@@ -379,7 +382,8 @@ test({
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
 			}).then(( response ) => {
 				server.close();
-				assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+				assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+				assert.equal( response.body.toString(), '{"error":{"code":"app.er.rateLimits.tooManyRequests"}}' );
 				done();
 			}).catch( done );
 		} );
@@ -417,7 +421,8 @@ test({
 			}).then(( response ) => {
 				serverOne.close();
 				serverTwo.close();
-				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+				assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+				assert.equal( response.body.toString(), JSON.stringify( { error: { code: 'app.er.rateLimits.tooManyRequests' } } ) );
 				done();
 			}).catch( done );
 		}, 100 );
@@ -451,7 +456,8 @@ test({
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
 			}).then(( response ) => {
 				server.close();
-				assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+				assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+				assert.equal( response.body.toString(), '{"error":{"code":"app.er.rateLimits.tooManyRequests"}}' );
 				done();
 			}).catch( done );
 		} );
@@ -485,7 +491,8 @@ test({
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4001 );
 			}).then(( response ) => {
 				server.close();
-				assert.equal( response.body.toString(), '{"error":"Too many requests"}' );
+				assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+				assert.equal( response.body.toString(), '{"error":{"code":"app.er.rateLimits.tooManyRequests"}}' );
 				done();
 			}).catch( done );
 		} );
@@ -521,7 +528,8 @@ test({
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 3360 ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 3361 );
 			}).then(( response ) => {
-				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+				assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+				assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
 				done();
 			}).catch( done );
 		}, 100 );
@@ -557,7 +565,8 @@ test({
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4800 ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429, '', {}, 4801 );
 			}).then(( response ) => {
-				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+				assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+				assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
 				done();
 			}).catch( done );
 		}, 100 );
@@ -736,7 +745,8 @@ test({
 		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
 			done();
 		}).catch( done );
 	}
@@ -791,7 +801,8 @@ test({
 		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
 			done();
 		}).catch( done );
 	}
@@ -813,7 +824,8 @@ test({
 		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
 			done();
 		}).catch( done );
 	}
@@ -891,7 +903,8 @@ test({
 		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
 			done();
 		}).catch( done );
 	}
@@ -913,7 +926,8 @@ test({
 		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
 			done();
 		}).catch( done );
 	}
@@ -958,7 +972,7 @@ test({
 		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
 			done();
 		}).catch( done );
 	}
@@ -993,7 +1007,8 @@ test({
 			helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 				return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
 			}).then(( response ) => {
-				assert.equal( response.body.toString(), JSON.stringify( { error: 'Too many requests' } ) );
+				assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+				assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
 				done();
 			}).catch( done );
 		}, 50 );

@@ -384,7 +384,7 @@ test({
 				assert.deepStrictEqual( typeof router.cache['/POST'] !== 'undefined', true );
 
 				done();
-			}, 5 );
+			}, 3 );
 		}, 5 );
 	}
 });
@@ -530,13 +530,11 @@ test({
 });
 
 test({
-	message	: 'Router.getExecutionBlockForCurrentEvent throws on invalid EventRequest',
+	message	: 'Router.getExecutionBlockForCurrentEvent.does.not.throw.on.invalid.EventRequest.anymore',
 	test	: ( done ) => {
 		const router	= new Router();
 
-		assert.throws( () => {
-			router.getExecutionBlockForCurrentEvent( {} );
-		});
+		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( {} ), [] );
 
 		done();
 	}

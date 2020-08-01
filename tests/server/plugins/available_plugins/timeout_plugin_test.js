@@ -15,21 +15,22 @@ test({
 
 		let pluginMiddlewares	= timeoutPlugin.getPluginMiddleware();
 
-		assert.equal( 1, pluginMiddlewares.length );
+		assert.deepStrictEqual( 1, pluginMiddlewares.length );
 
 		router.add( pluginMiddlewares[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
 		eventRequest.on( 'on_error', ( err ) => {
-			assert.equal( typeof err === 'string', true );
+			assert.deepStrictEqual( typeof err === 'object', true );
+			assert.deepStrictEqual( err, { code: 'app.er.timeout.timedOut', status: 408 } );
 			error	= true;
 		});
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
-		assert.equal( true, typeof eventRequest.clearTimeout !== 'undefined' );
-		assert.equal( true, typeof eventRequest.internalTimeout !== 'undefined' );
+		assert.deepStrictEqual( true, typeof eventRequest.clearTimeout !== 'undefined' );
+		assert.deepStrictEqual( true, typeof eventRequest.internalTimeout !== 'undefined' );
 
 		// Since the timeout is in the event loop, add the done callback at the end of the event loop
 		setTimeout(() => {

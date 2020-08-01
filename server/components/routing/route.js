@@ -49,7 +49,7 @@ class Route
 	sanitize( routeConfig )
 	{
 		if ( typeof routeConfig !== 'object' || routeConfig === null )
-			throw new Error( 'Invalid middleware added!' );
+			throw new Error( 'app.er.routing.invalidMiddlewareAdded' );
 
 		this.route			= typeof routeConfig.route === 'string' || routeConfig.route instanceof RegExp
 							? routeConfig.route

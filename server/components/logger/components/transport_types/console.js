@@ -79,18 +79,14 @@ class Console extends Transport
 						: TRANSPORT_DEFAULT_COLOR;
 
 			if ( ! isRaw )
-			{
 				message	= colorize[color]( message );
-			}
 
 			uniqueId	= colorize.reset( uniqueId );
 			timestamp	= colorize.blue( timestamp );
 		}
 
 		if ( isRaw )
-		{
 			return [`${uniqueId} - ${timestamp}: ${colorize.reset( '' )}`, message];
-		}
 
 		return [`${uniqueId} - ${timestamp}: ${message} ${colorize.reset( '' )}`];
 	}

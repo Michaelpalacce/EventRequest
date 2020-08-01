@@ -153,7 +153,7 @@ class Server extends EventEmitter
 		else if ( typeof plugin === 'string' )
 			plugin	= this.pluginManager.getPlugin( plugin );
 		else
-			throw new Error( 'A PluginInterface or an existing PluginManager pluginId (string) must be added' );
+			throw new Error( 'app.er.server.invalidPlugin' );
 
 		if ( options !== null && options !== undefined )
 			plugin.setOptions( options );
@@ -178,7 +178,7 @@ class Server extends EventEmitter
 		pluginDependencies.forEach(( dependency ) => {
 
 			if ( ! this.hasPlugin( dependency ) )
-				throw new Error( 'The plugin ' + pluginId + ' requires ' + dependency + ' which is missing.' );
+				throw new Error( `app.er.server.${pluginId}.missingDependency.${dependency}` );
 
 		});
 
@@ -210,7 +210,7 @@ class Server extends EventEmitter
 			return this.plugins[id];
 
 		else
-			throw new Error( `The plugin ${id} is not attached to the server` );
+			throw new Error( `app.er.server.missingPlugin.${id}` );
 	}
 
 	/**
@@ -260,8 +260,14 @@ class Server extends EventEmitter
 				eventRequest._setBlock( block );
 
 				const onErrorCallback	= ( error ) => {
+					if ( error.error instanceof Error )
+						error.error	= error.error.stack;
+
+					if ( error instanceof Error )
+						error	= error.stack;
+
 					if ( eventRequest.logger === null || eventRequest.logger === undefined )
-						Loggur.log( error, LOG_LEVELS.error );
+						Loggur.log( error, LOG_LEVELS.error, true );
 				};
 
 				eventRequest.on( 'error', onErrorCallback );

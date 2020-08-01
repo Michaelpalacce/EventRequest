@@ -46,7 +46,7 @@ class Session
 		this.session			= {};
 
 		if ( typeof event.dataServer === 'undefined' )
-			throw new Error( 'Could not create session. No data server is set in the event' );
+			throw new Error( 'app.er.session.missingDataServer' );
 
 		this.server				= event.dataServer;
 	}

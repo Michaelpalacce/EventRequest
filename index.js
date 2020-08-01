@@ -34,62 +34,24 @@ App.App			= App;
 
 module.exports	= App;
 
-const ErrorHandler	= require( './server/components/error/error_handler' );
-
-const errorHandler	= new ErrorHandler();
-const mocker		= {
-	isFinished	: ()=>{ return false },
-	send		: function(){ console.log( arguments );},
-	emit		: function(){ console.log( arguments );},
-};
-
-errorHandler.addCase( 'app.test', { error : 'MESSSSSSSSSSSSSSSSSSSSSSSS', status: 403 } )
-
-errorHandler.handleError( mocker, 'An error has occurred!' );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, 'An error has occurred!', 400 );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, 'app.test' );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, 'app.DOES.NOT.EXIST' );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, new Error( 'app.DOES.NOT.EXIST' ) );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, new Error( 'app.test' ) );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, new Error( 'app.test' ), 501 );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, 'app.test' );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, 'app.test', 402 );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, 'app.TESTTTTTT', 402 );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, { code: 'app.test' } );
-console.log(  );
-console.log(  );
-console.log(  );
-errorHandler.handleError( mocker, { code: 'app.test', emit: true, status : 231, error: 'Cannot Do something', message: 'CANNOT DO IT' } );
-console.log(  );
-console.log(  );
-console.log(  );
+//
+//
+// const path			= require( 'path' );
+// const PROJECT_ROOT	= path.parse( require.main.filename ).dir;
+// const app			= App();
+//
+// app.apply( app.er_body_parser_form );
+//
+// app.apply( app.er_body_parser_json );
+// app.apply( app.er_body_parser_multipart, { tempDir: path.join( PROJECT_ROOT, '/Uploads' ) } );
+// app.apply( app.er_body_parser_raw );
+//
+// app.get( '/', ( event ) => {
+// 	event.send( 'ok' );
+// });
+//
+// app.post( '/', ( event ) => {
+// 	event.next( { code: 'app.test.test', status: 502, error: new Error( 'HEYAA' ) } );
+// });
+//
+// app.listen( 80 );

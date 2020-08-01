@@ -27,7 +27,7 @@ class Logger
 		});
 
 		if ( this.uniqueId === false )
-			throw new Error( 'Logger created without an uniqueId' );
+			throw new Error( 'app.er.logger.invalidUniqueId' );
 
 		this.sanitizeConfig( options );
 	}

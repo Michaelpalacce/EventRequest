@@ -6,6 +6,10 @@
 - Session.get no longer throws, but returns null. We want to avoid throwing inside the web framework
 - persist is no longer defaulted to true when creating a dataServer. This is a cache. Caches are ephemeral!
 - Removed undocumented and wrong `stream_start` event on body_parser_handler
+- Fixed yet another bug with the multipart body parser.
+- Changed a lot of logger plugin log levels to verbose. 
+- Every ErrorMessage was changed to a code
+- getExecutionBlockForCurrentEvent no longer throws if invald EventRequest. Whoever is using it should know what they are doing
 
 26.3.0
 - Added a BigMap implementation

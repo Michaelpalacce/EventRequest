@@ -178,7 +178,25 @@ test({
 });
 
 test({
-	message	: 'MultipartDataParser.separateParts.does.not.work.with.unknown.types',
+	message	: 'MultipartDataParser.cleanUpItems.when.everything.was.successful.with.no.files',
+	test	: ( done ) => {
+		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
+		const parser	= new MultipartDataParser( { tempDir } );
+		const part		= parser.formPart();
+
+		parser.parts	= [part]
+		parser.cleanUpItems();
+
+		setTimeout(()=>{
+			assert.deepStrictEqual( parser.parts, null );
+
+			done();
+		}, 250 );
+	}
+});
+
+test({
+	message	: 'MultipartDataParser.formatParts.does.not.work.with.unknown.types',
 	test	: ( done ) => {
 		const tempDir	= path.join( __dirname, `./fixture/testUploads` );
 		const parser	= new MultipartDataParser( { tempDir } );
@@ -199,9 +217,18 @@ test({
 			}
 		]);
 
-		parser.separateParts();
+		assert.deepStrictEqual( parser.formatParts(), {} );
 
-		assert.deepStrictEqual( parser.parts, [] );
+		assert.deepStrictEqual( parser.parts, [
+			{
+				buffer		: Buffer.from( '' ),
+				contentType	: '',
+				size		: 0,
+				type		: 'unknown',
+				name		: '',
+				state		: 0
+			}
+		]);
 
 		done();
 	}
@@ -509,7 +536,7 @@ test({
 		multipartParser.parse( eventRequest ).then( () => {
 			done( 'Should not have parsed' );
 		}).catch( ( error ) => {
-			assert.deepStrictEqual( error, '104' );
+			assert.deepStrictEqual( error, 'app.er.bodyParser.multipart.invalidMetadata' );
 			done();
 		});
 	}
@@ -629,7 +656,7 @@ test({
 		multipartParser.parse( eventRequest ).then( () => {
 			done( 'Should not have parsed' );
 		}).catch( ( error ) => {
-			assert.deepStrictEqual( error, '104' );
+			assert.deepStrictEqual( error, 'app.er.bodyParser.multipart.invalidMetadata' );
 			done();
 		});
 	}

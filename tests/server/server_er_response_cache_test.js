@@ -124,7 +124,7 @@ test({
 
 			return helpers.sendServerRequest( `/${name}`, 'GET', 501 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'ERROR' } ) );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: 'ERROR' } } ) );
 
 			done();
 		}).catch( done );
@@ -153,7 +153,7 @@ test({
 
 		app.listen( 4361, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4361, name ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4361, JSON.stringify( { error: 'ERROR' } ) );
+				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4361, JSON.stringify( { error: { code: 'ERROR' } } ) );
 			}).then(( response ) => {
 				done();
 			}).catch( done );
@@ -183,7 +183,7 @@ test({
 
 		app.listen( 4364, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4364, name ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4364, JSON.stringify( { error: 'ERROR' } ) );
+				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4364, JSON.stringify( { error: { code: 'ERROR' } } ) );
 			}).then(( response ) => {
 				done();
 			}).catch( done );
@@ -218,7 +218,7 @@ test({
 
 			return helpers.sendServerRequest( `/${name}`, 'GET', 501 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'ERROR' } ) );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: 'ERROR' } } ) );
 
 			done();
 		}).catch( done );
@@ -247,7 +247,7 @@ test({
 
 		app.listen( 4362, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4362, name ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4362, JSON.stringify( { error: 'ERROR' } ) );
+				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4362, JSON.stringify( { error: { code: 'ERROR' } } ) );
 			}).then(( response ) => {
 				done();
 			}).catch( done );
@@ -277,7 +277,7 @@ test({
 
 		app.listen( 4363, () => {
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4363, name ).then(( response ) => {
-				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4363, JSON.stringify( { error: 'ERROR' } ) );
+				return helpers.sendServerRequest( `/${name}`, 'GET', 501, '', {}, 4363, JSON.stringify( { error: { code: 'ERROR' } } ) );
 			}).then(( response ) => {
 				done();
 			}).catch( done );

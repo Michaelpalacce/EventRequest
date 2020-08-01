@@ -24,7 +24,7 @@ class PluginManager
 		if ( this.isValidPlugin( plugin ) )
 			this.plugins[plugin.getPluginId()]	= plugin;
 		else
-			throw new Error( 'Cannot add plugin' );
+			throw new Error( 'app.er.pluginManager.invalidPlugin' );
 	}
 
 	/**
@@ -87,7 +87,7 @@ class PluginManager
 	getPlugin( id )
 	{
 		if ( ! this.hasPlugin( id ) )
-			throw new Error( 'Plugin cannot be found' );
+			throw new Error( 'app.er.pluginManager.pluginDoesNotExist' );
 
 		return this.plugins[id];
 	}
