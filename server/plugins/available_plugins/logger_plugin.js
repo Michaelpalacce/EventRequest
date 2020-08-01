@@ -68,22 +68,29 @@ class LoggerPlugin extends PluginInterface
 		const logger		= this.getLogger();
 		const requestURL	= event.request.url;
 
-		event.on( 'error', ( error ) => {
-			if ( error instanceof Error )
-				error	= error.stack;
+		const errCallback	= ( error ) => {
+			let message;
 
-			logger.error( `Error : ${error}` );
-		});
+			if ( error.error instanceof Error )
+			{
+				message			= Object.assign( {}, error );
+				message.error	= message.error.stack;
+			}
+			else if ( error instanceof Error )
+				message	= error.stack;
+			else if ( typeof error === 'object' )
+				message	= Object.assign( {}, error );
+			else
+				message	= error;
 
-		event.on( 'on_error', ( error ) => {
-			if ( error instanceof Error )
-				error	= error.stack;
+			logger.error( message, true );
+		};
 
-			logger.error( `Error : ${error}` );
-		});
+		event.on( 'error', errCallback );
+		event.on( 'on_error', errCallback );
 
 		event.on( 'finished', () => {
-			logger.info( 'Event finished' );
+			logger.verbose( 'Event finished' );
 		});
 
 		event.on( 'redirect', ( redirect ) => {
@@ -94,20 +101,8 @@ class LoggerPlugin extends PluginInterface
 			logger.info( `Response to ${requestURL} send from cache` );
 		});
 
-		event.on( 'stop', () => {
-			logger.verbose( 'Event stopped' );
-		});
-
 		event.on( 'setResponseHeader', ( header ) => {
 			logger.verbose( `Header set: ${header.key} with value: ${header.value}` );
-		});
-
-		event.on( 'cleanUp', () => {
-			logger.verbose( 'Event is cleaning up' );
-		});
-
-		event.on( 'clearTimeout', () => {
-			logger.verbose( 'Timeout cleared' );
 		});
 	}
 
@@ -122,11 +117,10 @@ class LoggerPlugin extends PluginInterface
 
 		const pluginMiddleware	= {
 			handler	: ( event ) => {
-				const requestURL	= event.request.url;
 
 				event.on( 'cleanUp', () => {
 					const userAgent	= typeof event.headers['user-agent'] === 'undefined' ? 'UNKNOWN' : event.headers['user-agent'];
-					logger.notice( `${event.method} ${requestURL} ${event.response.statusCode} ||| ${event.clientIp} ||| ${userAgent}` );
+					logger.notice( `${event.method} ${event.request.url} ${event.response.statusCode} ||| ${event.clientIp} ||| ${userAgent}` );
 				});
 
 				logger.verbose( 'Headers: ' + JSON.stringify( event.headers ) );

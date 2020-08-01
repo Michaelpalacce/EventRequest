@@ -62,7 +62,7 @@ class StaticResourcesPlugin extends PluginInterface
 					}
 					else
 					{
-						event.next( `File not found: ${item}`, 404 );
+						event.next( { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${item}`, status: 404 } );
 					}
 				}
 			} );

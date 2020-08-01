@@ -54,9 +54,9 @@ test({
 		assert.deepEqual( dataServer.server, new BigMap() );
 		assert.equal( dataServer.defaultTtl, 300 );
 		assert.equal( dataServer.persistPath, DEFAULT_PERSIST_FILE );
-		assert.equal( fs.existsSync( dataServer.persistPath ), true );
+		assert.equal( fs.existsSync( dataServer.persistPath ), false );
 		assert.equal( dataServer.persistInterval, 10000 );
-		assert.equal( dataServer.intervals.length, 2 );
+		assert.equal( dataServer.intervals.length, 1 );
 
 		removeCache( dataServer );
 		done();
@@ -103,7 +103,7 @@ test({
 
 		fs.writeFileSync( DEFAULT_PERSIST_FILE, JSON.stringify( map, DataServerMap.replacer ) );
 
-		const dataServer	= new DataServerMap( { useBigMap: true } );
+		const dataServer	= new DataServerMap( { persist: true, useBigMap: true } );
 
 		assert.deepStrictEqual( await dataServer.get( key ), value );
 
@@ -157,7 +157,7 @@ test({
 			const persist		= true;
 			const expected		= { key: { key, value, ttl, persist } };
 
-			assert.equal( dataServer.intervals.length, 2 );
+			assert.equal( dataServer.intervals.length, 1 );
 			assert.deepStrictEqual( dataServer.server, new BigMap() );
 
 			dataServer.set( key, value, ttl, { persist } );
@@ -186,11 +186,11 @@ test({
 			const dataServer	= new DataServerMap( { useBigMap: true } );
 			const key			= 'key';
 			const value			= 'value';
-			const persist		= true;
+			const persist		= false;
 			const ttl			= 100;
 			const expected		= { key: { key, value, ttl, persist } };
 
-			assert.equal( dataServer.intervals.length, 2 );
+			assert.equal( dataServer.intervals.length, 1 );
 			assert.deepStrictEqual( dataServer.server, new BigMap() );
 
 			dataServer.set( key, value, ttl );
@@ -506,6 +506,8 @@ test({
 	message	: 'DataServerMap.big.map.persistsData',
 	test	: ( done ) => {
 		removeCache();
+		if ( fs.existsSync( DEFAULT_PERSIST_FILE + '1' ) )
+			fs.unlinkSync( DEFAULT_PERSIST_FILE + '1' );
 
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
@@ -513,7 +515,7 @@ test({
 			const keyTwo		= 'keyTwo';
 			const keyThree		= 'keyThree';
 			const keyFour		= 'keyFour';
-			const dataServer	= new DataServerMap( { useBigMap: true, persistInterval: 2, persistPath: DEFAULT_PERSIST_FILE + '1' } );
+			const dataServer	= new DataServerMap( { persist: true, useBigMap: true, persistInterval: 2, persistPath: DEFAULT_PERSIST_FILE + '1' } );
 			let saveCalled		= false;
 
 			dataServer.on( '_saveData', () => {
@@ -542,7 +544,7 @@ test({
 
 				done( ! saveCalled );
 			}, 2100 );
-		}, 10 );
+		}, 100 );
 	}
 });
 
@@ -553,7 +555,7 @@ test({
 
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
-			const dataServer	= new DataServerMap( { useBigMap: true } );
+			const dataServer	= new DataServerMap( { persist: true, useBigMap: true } );
 			const key			= 'key';
 			const value			= { test: 'value' };
 

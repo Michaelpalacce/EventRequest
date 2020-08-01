@@ -127,7 +127,7 @@ test({
 		});
 
 		app.listen( 4322, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4322, 'Error rendering' ).then(( response ) => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4322, '{"code":"app.err.templatingEngine.errorRendering"}' ).then(( response ) => {
 				done();
 			}).catch( done );
 		});
@@ -151,12 +151,12 @@ test({
 			}
 
 			event.render( null, {}, ( error )=>{
-				event.send( error.message );
+				event.send( error );
 			});
 		});
 
 		app.listen( 4323, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4323, 'Could not render' ).then(( response ) => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4323, '{"code":"app.err.templatingEngine.errorRendering"}' ).then(( response ) => {
 				done();
 			}).catch( done );
 		});

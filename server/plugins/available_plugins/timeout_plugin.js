@@ -31,7 +31,7 @@ class TimeoutPlugin extends PluginInterface
 		this.callback	= typeof this.options.callback === 'function'
 						? this.options.callback :
 						( event ) => {
-							event.next( `Request timed out in: ${this.timeout/1000} seconds`, 503 );
+							event.next( { code: 'app.er.timeout.timedOut', status: 408 } );
 						};
 	}
 

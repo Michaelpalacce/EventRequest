@@ -14,3 +14,8 @@ after_success:
 
 env:
   - CODECOV_TOKEN=2ad21418-8e84-42c8-8e73-62c031c5ddc4
+
+branches:
+  only:
+    - master
+    - develop

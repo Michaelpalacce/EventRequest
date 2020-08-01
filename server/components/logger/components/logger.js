@@ -17,17 +17,17 @@ class Logger
 {
 	/**
 	 * @param	{Object} [options={}]
-	 * @param	{Boolean} [uniqueId=false]
+	 * @param	{Boolean} [uniqueId=null]
 	 */
-	constructor( options = {}, uniqueId = false )
+	constructor( options = {}, uniqueId = null )
 	{
 		Object.defineProperty( this, 'uniqueId', {
 			writable	: false,
-			value		: typeof uniqueId === 'string' ? uniqueId : false
+			value		: typeof uniqueId === 'string' ? uniqueId : null
 		});
 
-		if ( this.uniqueId === false )
-			throw new Error( 'Logger created without an uniqueId' );
+		if ( typeof this.uniqueId !== 'string' )
+			throw new Error( 'app.er.logger.invalidUniqueId' );
 
 		this.sanitizeConfig( options );
 	}

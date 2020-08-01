@@ -35,9 +35,9 @@ const STATE_PART_DATA_START						= 4;
 const STATE_PART_DATA							= 5;
 const STATE_END									= 7;
 
-const ERROR_INVALID_STATE						= 101;
-const ERROR_COULD_NOT_FLUSH_BUFFER				= 103;
-const ERROR_INVALID_METADATA					= 104;
+const ERROR_INVALID_STATE						= 'app.er.bodyParser.multipart.invalidState';
+const ERROR_COULD_NOT_FLUSH_BUFFER				= 'app.er.bodyParser.multipart.couldNotFlushBuffer';
+const ERROR_INVALID_METADATA					= 'app.er.bodyParser.multipart.invalidMetadata';
 
 /**
  * @brief	FormParser used to parse multipart data
@@ -168,9 +168,7 @@ class MultipartDataParser extends EventEmitter
 			part.state	= null;
 
 			if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
-			{
 				part.file.end();
-			}
 
 			delete part.buffer;
 			delete part.file;
@@ -206,21 +204,14 @@ class MultipartDataParser extends EventEmitter
 	 */
 	determineEOL( chunk )
 	{
-		const data		= chunk.toString( DEFAULT_BUFFER_ENCODING );
-		const lineEnds	= ['\r\n', '\n', '\r'];
-		const boundry	= this.boundary.substr( 2 );
+		const data	= chunk.toString( DEFAULT_BUFFER_ENCODING );
+		const match	= data.match( new RegExp( `(\r\n|\r|\n)` ) );
 
-		for ( const lineEnd of lineEnds )
-		{
-			if ( data.indexOf( `${boundry}${lineEnd}` ) !== -1 )
-			{
-				this.EOL		= lineEnd;
-				this.EOL_LENGTH	= lineEnd.length;
-				return;
-			}
-		}
+		if ( match !== null )
+			this.EOL	= match[1];
+		else
+			this.EOL	= '\r\n';
 
-		this.EOL		= '\r\n';
 		this.EOL_LENGTH	= this.EOL.length;
 	}
 
@@ -254,17 +245,11 @@ class MultipartDataParser extends EventEmitter
 	flushBuffer( part, buffer )
 	{
 		if ( part.type === DATA_TYPE_PARAMETER )
-		{
 			part.data	= Buffer.concat( [part.data, buffer] );
-		}
 		else if ( part.type === DATA_TYPE_FILE && part.file !== null )
-		{
 			part.file.write( buffer );
-		}
 		else
-		{
 			this.handleError( ERROR_COULD_NOT_FLUSH_BUFFER );
-		}
 
 		part.size	+= buffer.length;
 	}
@@ -543,9 +528,9 @@ class MultipartDataParser extends EventEmitter
 					this.on( 'end', () => {
 						this.ended	= true;
 						this.stripDataFromParts();
-						this.separateParts();
+						const parts	= this.formatParts();
 
-						resolve( { body: this.parts, rawBody: {} } );
+						resolve( { body: parts, rawBody: {} } );
 					});
 
 					this.event.on( 'cleanUp', () => {
@@ -577,13 +562,13 @@ class MultipartDataParser extends EventEmitter
 		let headerData	= MultipartDataParser.getHeaderData( this.event.headers );
 		if ( ! headerData )
 		{
-			callback( 'Could not retrieve the header data' );
+			callback( { code: 'app.er.bodyParser.multipart.wrongHeaderData' } );
 			return;
 		}
 
 		if ( this.maxPayload !== 0 && this.maxPayload < headerData.contentLength )
 		{
-			callback( 'Max Payload data reached' );
+			callback( { code: 'app.er.bodyParser.multipart.maxPayloadReached' } );
 			return;
 		}
 
@@ -598,24 +583,15 @@ class MultipartDataParser extends EventEmitter
 	cleanUpItems()
 	{
 		setTimeout(() => {
-			if ( typeof this.parts.$files !== 'undefined' )
+			for ( const part of this.parts )
 			{
-				this.parts.$files.forEach( ( part ) => {
-					if ( part.type === DATA_TYPE_FILE && part.path !== 'undefined' && fs.existsSync( part.path ) )
-						this._removeFile( part.path );
-				});
-			}
-			else
-			{
-				this.parts.forEach( ( part ) => {
-					if ( part.type === DATA_TYPE_FILE && typeof part.path !== 'undefined' && fs.existsSync( part.path ) )
-					{
-						if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
-							part.file.end();
+				if ( part.type === DATA_TYPE_FILE && typeof part.path !== 'undefined' && fs.existsSync( part.path ) )
+				{
+					if ( typeof part.file !== 'undefined' && typeof part.file.end === 'function' )
+						part.file.end();
 
-						this._removeFile( part.path );
-					}
-				});
+					this._removeFile( part.path );
+				}
 			}
 
 			this.parts	= null;
@@ -638,11 +614,11 @@ class MultipartDataParser extends EventEmitter
 	}
 
 	/**
-	 * @brief	Separates and organizes the parts into files and properties
+	 * @brief	Separates and organizes the parts into files and properties, then returns them
 	 *
-	 * @return	void
+	 * @return	Object
 	 */
-	separateParts()
+	formatParts()
 	{
 		const parts	= {
 			$files	: []
@@ -659,10 +635,7 @@ class MultipartDataParser extends EventEmitter
 		if ( parts.$files.length === 0 )
 			delete parts.$files;
 
-		this.parts	= parts;
-
-		if ( Object.keys( this.parts ).length === 0 )
-			this.parts	= [];
+		return parts;
 	}
 
 	/**

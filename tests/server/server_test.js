@@ -1,18 +1,18 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers, Mock }	= require( '../test_helper' );
-const path								= require( 'path' );
-const http								= require( 'http' );
-const fs								= require( 'fs' );
-const { Loggur, Logger }				= require( './../../server/components/logger/loggur' );
-const Router							= require( './../../server/components/routing/router' );
-const DataServer						= require( './../../server/components/caching/data_server' );
-const DataServerMap						= require( './../../server/components/caching/data_server_map' );
-const PluginManager						= require( './../../server/plugins/plugin_manager' );
+const { assert, test, helpers, Mock }		= require( '../test_helper' );
+const path									= require( 'path' );
+const http									= require( 'http' );
+const fs									= require( 'fs' );
+const { Loggur, Logger, File, LOG_LEVELS }	= require( './../../server/components/logger/loggur' );
+const Router								= require( './../../server/components/routing/router' );
+const DataServer							= require( './../../server/components/caching/data_server' );
+const DataServerMap							= require( './../../server/components/caching/data_server_map' );
+const PluginManager							= require( './../../server/plugins/plugin_manager' );
 
-const { App, Server }					= require( './../../index' );
-const app								= App();
+const { App, Server }						= require( './../../index' );
+const app									= App();
 
 test({
 	message	: 'Server.constructor.starts.without.crashing.with.defaults',
@@ -1311,7 +1311,7 @@ test({
 		} );
 
 		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: name } ) );
+			assert.deepStrictEqual( response.body.toString(), JSON.stringify( { error: { code: name } } ) );
 			done();
 		}).catch( done );
 	}
@@ -1328,7 +1328,7 @@ test({
 		} );
 
 		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: 'test' } ) );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: 'test' } } ) );
 			done();
 		}).catch( done );
 	}
@@ -1344,7 +1344,7 @@ test({
 		} );
 
 		helpers.sendServerRequest( `/${name}`, 'GET', 501 ).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: name } ) );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: name } } ) );
 			done();
 		}).catch( done );
 	}
@@ -1640,7 +1640,7 @@ test({
 	message	: 'Server.test.server.does.not.export./public.by.default',
 	test	: ( done ) => {
 		helpers.sendServerRequest( `/public/test/index.html`, 'GET', 404 ).then(( response ) => {
-			assert.equal( response.body.toString(), '{"error":"Cannot GET /public/test/index.html"}' );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: 'app.general', message: 'Cannot GET /public/test/index.html' } } ) );
 			done();
 		}).catch( done )
 	}
@@ -1662,7 +1662,7 @@ test({
 
 			return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString().includes( 'File not found' ), true );
+			assert.equal( response.body.toString().includes( '{"error":{"code":"app.er.staticResources.fileNotFound","message":"File not found' ), true );
 
 			done();
 		}).catch( done )
@@ -1687,7 +1687,7 @@ test({
 
 				return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404, '', {}, 4500 );
 			}).then(( response ) => {
-				assert.equal( response.body.toString().includes( 'File not found' ), true );
+				assert.equal( response.body.toString().includes( '{"error":{"code":"app.er.staticResources.fileNotFound","message":"File not found' ), true );
 				setTimeout(()=>{
 					done();
 				}, 100 )
@@ -1847,7 +1847,7 @@ test({
 				'',
 				{},
 				3333,
-				'{"error":"Could not find a FileStream that supports that format"}'
+				'{"error":{"code":"app.general","message":"Could not find a FileStream that supports that format"}}'
 			)
 		);
 		responses.push(
@@ -1890,7 +1890,7 @@ test({
 		});
 
 		helpers.sendServerRequest( `/testCallingNextTwiceDoesNotDieCritically`, 'GET', 500 ).then( ( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error } ) );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code: 'app.general', message: error } } ) );
 			done();
 		} ).catch( done );
 	}
@@ -1979,14 +1979,30 @@ test({
 test({
 	message	: 'Server.eventRequest.on.error.without.a.logger',
 	test	: ( done ) => {
+		const relativeLogLocation	= './tests/server/fixture/logger/testWithoutLoggerLog.log';
+		const fileTransport			= new File({
+			logLevel	: Loggur.LOG_LEVELS.debug,
+			filePath	: relativeLogLocation
+		});
+
+		const logger				= Loggur.createLogger({
+			serverName	: 'Server.test_er_logger',
+			logLevel	: Loggur.LOG_LEVELS.debug,
+			capture		: false,
+			transports	: [fileTransport]
+		});
+
 		const app	= new Server();
 
 		Loggur.disableDefault();
-		Loggur.loggers	= {};
+
+		Loggur.addLogger( 'test', logger );
 
 		app.get( '/eventRequestOnErrorWithoutALogger', ( event ) => {
-			// This will call the Loggur.log ( cannot be mocked ) But it is called since there is no throw
 			event.emit( 'on_error', 'ERROR!' );
+			event.emit( 'on_error', new Error( 'ERROR ! ERROR' ) );
+			event.emit( 'on_error', { test: 123 } );
+			event.emit( 'on_error', { error: new Error( 'test' ), code: 51251 } );
 
 			setImmediate(()=>{
 				event.send( 'ERROR!' );
@@ -2001,8 +2017,30 @@ test({
 			{},
 			4212
 		).then(( response ) => {
-			assert.deepStrictEqual( response.body.toString(), 'ERROR!' );
-			done();
+			fileTransport.getWriteStream().end();
+			setTimeout(() => {
+				assert.deepStrictEqual( response.body.toString(), 'ERROR!' );
+
+				process.dumpStack	= undefined;
+				process.log			= undefined;
+
+				assert.deepStrictEqual( fs.existsSync( fileTransport.getFileName() ), true );
+				assert.deepStrictEqual( fs.statSync( fileTransport.getFileName() ).size > 0, true );
+
+				const logData	= fs.readFileSync( fileTransport.getFileName() );
+
+				if ( fs.existsSync( fileTransport.getFileName() ) )
+					fs.unlinkSync( fileTransport.getFileName() );
+
+				assert.deepStrictEqual( logData.includes( 'ERROR!' ), true );
+				assert.deepStrictEqual( logData.includes( 'ERROR ! ERROR' ), true );
+				assert.deepStrictEqual( logData.includes( '{"test":123}' ), true );
+				assert.deepStrictEqual( logData.includes( '{"error":"Error: test' ), true );
+				assert.deepStrictEqual( logData.includes( ',"code":51251' ), true );
+
+				Loggur.loggers	= {};
+				done();
+			}, 250 );
 		}).catch( done );
 
 		app.listen( 4212 );
@@ -2012,33 +2050,67 @@ test({
 test({
 	message	: 'Server.eventRequest.on.error.with.a.logger',
 	test	: ( done ) => {
-		const app			= new Server();
-		const MockLogger	= new Mock( Logger );
+		const relativeLogLocation	= './tests/server/fixture/logger/testWithoutLoggerLog.log';
+		const fileTransport			= new File({
+			logLevel	: Loggur.LOG_LEVELS.debug,
+			filePath	: relativeLogLocation
+		});
 
-		app.get( '/eventRequestOnErrorWithALogger', ( event ) => {
-			event.logger	= new MockLogger( {}, 'uniqueId' );
+		const logger				= Loggur.createLogger({
+			serverName	: 'Server.test_er_logger',
+			logLevel	: Loggur.LOG_LEVELS.debug,
+			capture		: false,
+			transports	: [fileTransport]
+		});
 
-			// This will also do nothing as the on( 'error' ) is meant to be called ONLY in case the logging plugin is not attached
-			event.emit( 'on_error', '' );
+		const app	= new Server();
+
+		Loggur.disableDefault();
+		Loggur.addLogger( 'test', logger );
+
+		app.get( '/eventRequestOnErrorWithoutALogger', ( event ) => {
+			event.logger	= {};
+			event.emit( 'on_error', 'ERROR!' );
+			event.emit( 'on_error', new Error( 'ERROR ! ERROR' ) );
+			event.emit( 'on_error', { test: 123 } );
+			event.emit( 'on_error', { error: new Error( 'test' ), code: 51251 } );
 
 			setImmediate(()=>{
-				event.send( 'ERRORx2!' );
+				event.send( 'ERROR!' );
 			});
 		});
 
 		helpers.sendServerRequest(
-			'/eventRequestOnErrorWithALogger',
+			'/eventRequestOnErrorWithoutALogger',
 			'GET',
 			200,
 			'',
 			{},
-			4213
+			4217
 		).then(( response ) => {
-			assert.deepStrictEqual( response.body.toString(), 'ERRORx2!' );
-			done();
+			fileTransport.getWriteStream().end();
+			setTimeout(() => {
+				assert.deepStrictEqual( response.body.toString(), 'ERROR!' );
+
+				process.dumpStack	= undefined;
+				process.log			= undefined;
+
+				assert.deepStrictEqual( fs.existsSync( fileTransport.getFileName() ), true );
+				assert.deepStrictEqual( fs.statSync( fileTransport.getFileName() ).size > 0, false );
+
+				const logData	= fs.readFileSync( fileTransport.getFileName() );
+
+				if ( fs.existsSync( fileTransport.getFileName() ) )
+					fs.unlinkSync( fileTransport.getFileName() );
+
+				assert.deepStrictEqual( logData.toString(), '' );
+				Loggur.loggers	= {};
+
+				done();
+			}, 250 );
 		}).catch( done );
 
-		app.listen( 4213 );
+		app.listen( 4217 );
 	}
 });
 
@@ -2064,7 +2136,7 @@ test({
 			{},
 			4215
 		).then(( response ) => {
-			assert.deepStrictEqual( response.body.toString(), '{"error":"Error has occured!"}' );
+			assert.deepStrictEqual( response.body.toString(), '{"error":{"code":"app.general","message":"Error has occured!"}}' );
 			done();
 		}).catch( done );
 

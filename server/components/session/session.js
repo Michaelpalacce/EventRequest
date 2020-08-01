@@ -46,7 +46,7 @@ class Session
 		this.session			= {};
 
 		if ( typeof event.dataServer === 'undefined' )
-			throw new Error( 'Could not create session. No data server is set in the event' );
+			throw new Error( 'app.er.session.missingDataServer' );
 
 		this.server				= event.dataServer;
 	}
@@ -156,16 +156,18 @@ class Session
 	}
 
 	/**
-	 * @brief	Gets a session variable, will throw if that variable does not exist
+	 * @brief	Gets a session variable
+	 *
+	 * @details	Returns null if the value does not exist
 	 *
 	 * @param	{String} name
 	 *
-	 * @return	Mixed
+	 * @return	 *
 	 */
 	get( name )
 	{
 		if ( ! this.has( name ) )
-			throw new Error( `The session does not have a value set for: ${name}` );
+			return null;
 
 		return this.session[name];
 	}

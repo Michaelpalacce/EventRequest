@@ -721,9 +721,12 @@ The event request is an object that is created by the server and passed through 
 - If the event is stopped and the response has not been set then send a server error with a status of 500
 - If err !== undefined send an error
 
-**sendError( mixed error = '', Number code = 500 ): void** 
+**sendError( mixed error = '', Number code = 500, emit = true ): void** 
 - Like send but used to send errors. 
+- Code will be the status code sent
+- Emit is a flag whether the error should be emitted on 'on_error'
 - It will call the errorHandler directly with all the arguments specified ( in case of a custom error handler, you can send extra parameters with the first one being the EventRequest )
+- NOTE: Check the Error Handling Section for more info
 
 **validate( ...args ): ValidationResult**
 - Shorthand for event.validation.validate 
@@ -996,6 +999,7 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 
 ##Logger:
 - Logger class that can be configured for specific logging purposes like access logs or error logs
+- First parameter of the constructor is the options which can be used to configure the logger and the second is the logger Id which must be a string, otherwise an error `app.er.logger.invalidUniqueId` will be thrown
 - Each Logger can have it's own transport layers.
 - Every transport layer will be called when calling logger.log
 - Logger.log returns a promise which will be resolved when the logging is complete
@@ -1035,6 +1039,10 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - Defaults to error
 
 ####Functions:
+
+**constructor( Object options = {}, String uniqueId = null )**
+- Available options can be checked in the section above.
+- If uniqueId is not a string or is not passed, then an error will be thrown
 
 **log( Log||String||mixed log, Number level, Boolean isRaw ): Promise**
 - log determines what should be logged
@@ -1134,28 +1142,35 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - Accepts Absolute and relative paths
 - If it is not provided the transport will not log
 
+**splitToNewLines: Boolean**
+- Flag telling the transport if the new line characters should be evaluated as new lines or not
+- New lines in files may make it a bit easier to read, but if you have some software for automatic shipping of logs, you may want them on one row
+- Defaults to false
+
 ~~~javascript
 const { Loggur, LOG_LEVELS, Console, File } = require( 'event_request' ).Logging;
 
 // Create a custom Logger
 const logger = Loggur.createLogger({
-    serverName    : 'Test', // The name of the logger
-    logLevel    : LOG_LEVELS.debug, // The logLevel for which the logger should be fired
-    capture        : false, // Do not capture thrown errors
-    transports    : [
+    serverName : 'Test', // The name of the logger
+    logLevel : LOG_LEVELS.debug, // The logLevel for which the logger should be fired
+    capture : false, // Do not capture thrown errors
+    transports : [
         new Console( { logLevel : LOG_LEVELS.notice } ), // Console logger that logs everything below notice
         new File({ // File logger
-            logLevel    : LOG_LEVELS.notice, // Logs everything below notice
-            filePath    : '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
-            logLevels    : { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level, combining this with the er_logging plugin that logs all request paths to a notice level, you have a nice access log. Alternatively you can log to notice yourself )
+            logLevel : LOG_LEVELS.notice, // Logs everything below notice
+            filePath : '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
+            logLevels : { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level, combining this with the er_logging plugin that logs all request paths to a notice level, you have a nice access log. Alternatively you can log to notice yourself )
         }),
         new File({
-            logLevel    : LOG_LEVELS.error,
-            filePath    : '/logs/error_log.log',
+            logLevel : LOG_LEVELS.error,
+            filePath : '/logs/error_log.log',
+            splitToNewLines : true
         }),
         new File({
-            logLevel    : LOG_LEVELS.debug,
-            filePath    : '/logs/debug_log.log'
+            logLevel : LOG_LEVELS.debug,
+            filePath : '/logs/debug_log.log',
+            splitToNewLines : true
         })
     ]
 });
@@ -1852,10 +1867,15 @@ The TestingTools export:
 ***
 ***
 
-#ErrorHandler 
-- There is a default error handler in the event request
+#Error Handling | ErrorHandler
+- The EventRequest has a default ErrorHandler set in it
+- It is a good idea to insantiate a new ErrorHandler OUTSIDE the eventRequest for speed. You can attach a preconfigured ErrorHandler rather than configuring the one created every request.
+- The Error Handler supports error namespaces. An error namespace is a string error code, that is separated by dots: `app.module.someError`. Every Dot represents a new Error namespace. They may take a second to get the hang on but are a powerful tool when you understand them better!
+- Error Handling in the framework is done entirely using error codes.
+- Every Error Code thrown in the app will be in the following namespace: `app.er`
 - This class can be extended and custom functionality may be written
 - Alternatively instead of extending you can write your own class as long as it has a handleError function.
+- You can write your own ErrorHandler, but since there are errors generated by the framework, they will always look for an ErrorHandler with a handleError function and if one is not present, will create a new one. 
 
 ***
 ####Accepted Options:
@@ -1866,50 +1886,294 @@ The TestingTools export:
 ####Events:
 
 **on_error: ( mixed error )**
-- The error returned will be the one returned from ::_getErrorToEmit()
+- This is called in cases
 
 ***
 ####Functions:
 
-**handleError( EventRequest event, Error error, Number code = 500 ): void**
-- Emits an on_error event 
-- Calls _sendError
-- In case of extension of the ErrorHandler, this may not need to be touched
+**handleError( EventRequest event, * errorToHandle = null, Number errStatusCode = null, emitError = null ): void**
+- This function will call a callback of either the default Namespace or of a custom one, with parameters: { event, code, status, message, error, headers, emit }
+- Note The callback uses destructing: `callback( { event, code, status, message, error, headers, emit } )` so if you write your own custom callback for a  namespace make sure it takes this into account. For example: `_defaultCase( { event, code, status, error, message, headers, emit } )`. You can get as many parameters as you need and ignore the rest( or not even define them )
+- Check Namespaces section for more information how these parameters will be generated!
 
-**_getErrorToEmit( Error error ): mixed**
-- Returns error to be emitted
-- By default if error instanceof Error only the error.stack will be returned
-- In case of extension of the ErrorHandler this function can be overwritten
-
-**_formatError( Error error ): mixed**
-- Returns error to be sent
-- By default if error instanceof Error only the error.message will be returned
-- In case of extension of the ErrorHandler this function can be overwritten
-
-**_sendError( Error error ): mixed**
-- Sends the error to the user
-- Will not send if the response is finished
-- In case of extension of the ErrorHandler this function can be overwritten
+**addNamespace( errorCode, { message, callback, status, emit, headers } = {} ): void**
+- Adds a new namespace, given an errorCode and an object containing one or more parameters 
+- Note that the namespaceOptions use Object destructing, so if you want to call it it must be in the following format:
+~~~javascript
+errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', emit: false, headers: { headerOne: 2 }, callback: () => {} } );
+~~~
+- Any parameters that are not provided will be taken from the defaultNamespace ( check Namespaces section for more info )
 
 ***
 ####Attached Functionality:
 
 **event.errorHandler: ErrorHandler**
-- By default it is attached to the EventRequest but can be overwritten at any point
+- Attached by default to the EventRequest but can be overwritten at any point
+
+
+#### Errors thrown in the framework:
+- They all start with `app.er`
+- In general they do not have any messages attached to them with some few exceptions
+
+**app.er.timeout.timedOut**
+  - Thrown by the Timeout Plugin with a status of 408
+  - { code: 'app.er.timeout.timedOut', status: 408 }
+
+**app.er.staticResources.fileNotFound**
+  - { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${item}`, status: 404 }
+  - Thrown by the Timeout Plugin with a status of 408
+
+**app.er.bodyParser.invalidParser**
+  - Thrown by the body parser handler when an invalid parser was attempted to be added
+
+**app.er.logger.invalidUniqueId**
+  - Thrown by loggers if invalid uniqueId was passed ( not string )
+
+**app.er.bodyParser.multipart.invalidState**, **app.er.bodyParser.multipart.invalidMetadata**, **app.er.bodyParser.multipart.couldNotFlushBuffer**
+  - Thrown by lhe multipart data parser if a critical error was detected when parsing the multipart body
+
+**app.er.pluginManager.invalidPlugin**
+  - Thrown by the plugin manager when an invalid plugin was attempted to be added
+
+**app.er.pluginManager.pluginDoesNotExist**
+  - Thrown by the plugin manager if a plugin that does not exist was attempted to be retrieved
+
+**app.er.rateLimits.connection_delay.missingDelayTimeOrDelayRetries**
+  - Thrown by the rate limits plugin if an invalid connection delay policy rule was added
+
+**app.er.rateLimits.invalidOptions**
+  - Thrown by the rate limits plugin if an invalid rule was added
+
+**app.er.rateLimits.tooManyRequests**
+  - Thrown by the rate limits plugin if rate limiting ocurred
+  - { code: 'app.er.rateLimits.tooManyRequests', status: TOO_MANY_REQUESTS_STATUS_CODE, headers: { 'Retry-After': retryAfterTime } 
+
+**app.er.routing.invalidMiddlewareAdded**
+  - Thrown by the routing when an invalid middleware was added
+
+**app.er.routing.cannotDefineMiddleware**
+  - Thrown by the routing when an invalid global middleware was attempted to be defined
+
+**app.er.bodyParser.form.notSupported**
+  - Thrown by the form body parser when the body to be parsed is not supported
+
+**app.er.bodyParser.multipart.wrongHeaderData**
+  - Thrown by the multipart body parser when there is wrong or missing header data. Either `content-type` or `content-length`. `content-type` may not have the boundry defined
+
+**app.er.bodyParser.multipart.maxPayloadReached**
+  - Thrown by the multipart body parser when the maxPayload is not infinite ( not 0 ) and the maxPayload and `content-length` do not match
+
+**app.er.bodyParser.json.notSupported**
+  - Thrown by the json body parser when the body to be parsed is not supported
+
+**app.er.routing.missingMiddleware**
+  - Thrown by the routing when a middleware was missing when adding two routers together
+  - throw { code: 'app.er.routing.missingMiddleware', message: middleware };
+
+**app.er.server.missingPluginDependency.${pluginId}**
+  - Thrown by the server when a plugin has a missing dependency. The pluginId will be attached at the end
+
+**app.er.server.missingPlugin.${id}**
+  - Thrown by the server when a plugin is missing. The pluginId will be attached at the end
+
+**app.er.session.missingDataServer**
+  - Thrown by the session when the event request is missing a dataServer
+
+**app.er.session.missingDataServer**
+  - Thrown by the session when the event request is missing a dataServer
+
+**app.err.templatingEngine.errorRendering**
+  - Thrown by when there was an error during rendering in the templating engine plugin
+
+**app.er.logging.transport.file.fileLogPathNotProvided**
+  - Thrown by the file transport if there is no filePath provided while logging
+
+**app.er.validation.error**
+  - Thrown by the validation plugin when there is an error with validation. Could be that the EventRequest has a missing property or validation of input failed
+  - { status: 400, code: 'app.er.validation.error', message: { [validationParameter]: validationResult.getValidationResult() } }
+  - { status: 400, code: 'app.er.validation.error', message: `Could not validate ${toValidate} as it is not a property of the EventRequest` }
+
+***
+***
+#### Namespaces:
+- Error Namespaces are ways for you to attach common error handling to the same section of your application. If you have the following namespaces: `app.security.invalid.password`, `app.security.invalid.username`, `app.security.unauthorized`, `app.security.invalid.token` and lets say that everything besides `app.security.invalid.token` has been handled, what do we do with that one specifically? Well, if you attach a namespace that is `app.security` with a message of 'General Security Error' and a status of 401 or 403, then you don't have to worry that you have not handled this scenario.
+
+~~~javscript
+const ErrorHandler    = require( 'event_request/server/components/error/error_handler' );
+const handler    = new ErrorHandler();
+
+handler.defaultNamespace.callback    = function()
+{
+    console.log( arguments );
+}
+
+handler.addNamespace( 'app.security', { message: 'General Security Error', status: 403 } );
+handler.addNamespace( 'app.security.invalid.password', { message: 'Your password is not valid', status: 403 } );
+handler.addNamespace( 'app.security.invalid.username', { message: 'Your username is not valid', status: 403 } );
+handler.addNamespace( 'app.security.unauthorized', { message: 'You are not authorized for this request', status: 401 } );
+
+// This will set the error code to `app.security.invalid.token` 
+// so you know EXACTLY what the error is but the message and status will be taken from app.security namespace
+handler.handleError( {}, 'app.security.invalid.token' );
+~~~
+
+
+- Error Namespaces allow for a LOT of customization ( and anything not customized, will be taken from the defaultNamespace ). You can specify:
+  - message - what message the user will see
+  - status - This will be the status code that will be sent to the user
+  - callback - Function that will be called with `{ event, code, status, message, error, headers, emit }`. You can use any of these parameters. You don't need to define them all if they are unused.
+  - emit - Flag whether an on_error event should be emitted. Note: this is actually done in the callback, so its entirely in your own control if you want to stop it
+  - headers - A JS Object that will be put through a for...in loop. Every key will be set as a header and every value as the respective header value.
+
+This is the default Namespace callback:
+~~~javascript
+/**
+     * @brief    Fallback namespace that will be called whenever there is no namespace for the given error code OR the namespace match does not have a callback
+     *
+     * @details    This callback will set any headers provided
+     *             This callback will set the status code given
+     *             This callback will format an appropriate message in case of an error
+     *             This callback emit an error IF needed
+     *
+     * @param    {EventRequest} event
+     * @param    {String} errorCode
+     * @param    {Number} status
+     * @param    {*} error
+     * @param    {*} message
+     * @param    {Object} headers
+     * @param    {Boolean} emit
+     *
+     * @private
+     *
+     * @return    void
+     */
+    _defaultCase( { event, code, status, error, message, headers, emit } )
+    {
+        if ( event.isFinished() )
+            return;
+
+        const response = { error: { code } };
+        const toEmit = { code, status };
+
+        if ( message !== null && message !== undefined )
+        {
+            response.error.message = message;
+            toEmit.message = message;
+        }
+
+        if ( error !== null && error !== undefined )
+            toEmit.error    = error;
+
+        if ( emit )
+            event.emit( 'on_error', toEmit );
+
+        for ( const key in headers )
+        {
+            if ( ! {}.hasOwnProperty.call( headers, key ) )
+                continue;
+
+            event.setResponseHeader( key, headers[key] );
+        }
+
+        event.send( response, status );
+    }
+~~~
+
+- If you ever want to send an error you can do this by simply throwing an Error with the namespace as the only message
+- If you want to include more information you can also just throw an object or a string!
+- As long as they are thrown in a middleware somewhere or a promise is rejected with them, they will be picked up by the ErrorHandling and handled appropriately.
+
+~~~javscript
+throw new Error( 'app.test.namespace' );
+
+throw 'app.test.namespace';
+
+throw { code: 'app.test.namespace', status: 500 };
+~~~
+
+- handleError will handle a wide variety of information.
+- **It is preffered that you pass your own object with the parameters like this: `{ code: 'app.test', status: 500, message: 'User Message', error: new Error( 'Error To Log' ), headers: { headerOne: 'value' }, emit: false };`. Note that if status code is omitted, the status code passed to handleError will be taken, if not the status code form the namespace defined by the code will be used. Same logic applies for emit. If message or headers are not passed, they will be taken from the namespace.**
+- The errorToHandle can by anything from a simple string, Error, object and others.
+- If the errorToHandle is a string and it matches the pattern of a namespace, then it will be treated as a namespace
+- If the errorToHandle is an Error and Error.message matches the pattern of a namespace, then Error.message will be treated as a namespace
+- The logic of what will be emitted and what will be sent to the user is really complex. Below there is an example. Play around, comment out some lines, write new cases to see what happens
 
 ***
 ####Example:
 
 ~~~javascript
-const App = require( 'event_request' );
+const ErrorHandler = require( 'event_request/server/components/error/error_handler' );
+const app = require( 'event_request' )();
 
-const app = App();
+const errorHandler  = new ErrorHandler();
+errorHandler.addNamespace( 'test.exists.with.just.message', { message: 'Default Message' } );
+errorHandler.addNamespace( 'test.exists.with.message.and.status', { status: 532, message: 'Message with Status' } );
+errorHandler.addNamespace( 'test.exists.with.status', { status: 462 } );
+errorHandler.addNamespace( 'test.deep', { status: 532, message: 'DEEP message', emit: false, headers: { headerOne: 1, headerTwo: 2 } } );
+
+errorHandler.addNamespace(
+    'test.callback',
+    {
+        callback: ( { event, code, status, message, error, headers, emit } ) => {
+            if ( emit )
+                event.emit( 'on_error', { event, code, status, message, error, headers, emit } );
+
+            event.send( message, status );
+        },
+        status: 532,
+        message: 'CALLBACK MESSAGE',
+        emit: false,
+        headers: { headerOne: 1, headerTwo: 2 }
+    }
+);
+
+app.add( ( event ) => {
+    event.errorHandler    = errorHandler;
+    event.next();
+});
+
 app.add(( event ) => {
-    event.sendError( 'Error', 500 ); // This will call the error Handler
+    event.on( 'on_error', function()
+        {
+            console.log( arguments );
+        }
+    );
+    throw new Error( 'Some random error!' ); // No problem if the error is not a namespace! It will go to the default namespace
+    throw 'Some Error!'; // No problem if the error is not a namespace! It will go to the default namespace
+    throw { code: 'test.exists.with.just.message', status: 200, headers: { headerOne: 'value' }, emit: true }; // If you need that fine control!
 
-    // event.next( 'Error', 500 ); // This will call the error Handler
+    event.sendError( 'test.callback', 500 ); // This will call the error Handler 'test.callback'
+    event.sendError( 'test.exists.with.just.message', 500 ); // This will call the error Handler 'test.exists.with.just.message'
+    event.sendError( 'test.exists.with.message.and.status' ); // This will call the error Handler 'test.exists.with.message.and.status'
+    event.sendError( 'test.exists.with.status' ); // This will call the error Handler 'test.exists.with.status'
+    event.sendError( 'test.deep.we.go.on.deeper' ); // This will call the error Handler 'test.deep'
 
-    // event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
+    event.next( 'test.callback', 500 ); // This will call the error Handler 'test.callback'
+    event.next( 'test.exists.with.just.message', 500 ); // This will call the error Handler 'test.exists.with.just.message'
+    event.next( 'test.exists.with.message.and.status' ); // This will call the error Handler 'test.exists.with.message.and.status'
+    event.next( 'test.exists.with.status' ); // This will call the error Handler 'test.exists.with.status'
+    event.next( 'test.deep.we.go.on.deeper' ); // This will call the error Handler 'test.deep'
+
+    event.next( new Error( 'test.callback' ), 500 ); // This will call the error Handler 'test.callback'
+    event.next( new Error( 'test.exists.with.just.message' ), 500 ); // This will call the error Handler 'test.exists.with.just.message'
+    event.next( new Error( 'test.exists.with.message.and.status' ) ); // This will call the error Handler 'test.exists.with.message.and.status'
+    event.next( new Error( 'test.exists.with.status' ) ); // This will call the error Handler 'test.exists.with.status'
+    event.next( new Error( 'test.deep.we.go.on.deeper' ) ); // This will call the error Handler 'test.deep'
+
+    event.next( { code: 'test.callback' }, 500 ); // This will call the error Handler 'test.callback'
+    event.next( { code: 'test.exists.with.just.message' }, 500 ); // This will call the error Handler 'test.exists.with.just.message'
+    event.next( { code: 'test.exists.with.message.and.status', status: 502 }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
+    event.next( { code: 'test.exists.with.message.and.status', error: new Error( 'test.error' ) }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
+    event.next( { code: 'test.exists.with.message.and.status', error: 'test.error' }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
+    event.next( { code: 'test.exists.with.message.and.status', error: 'test.error', message: 'test.MESSAGE' }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
+    event.next( { code: 'test.exists.with.status' } ); // This will call the error Handler 'test.exists.with.status'
+    event.next( { code: 'test.deep.we.go.on.deeper' } ); // This will call the error Handler 'test.deep'
+
+    event.next( 'Error', 500 ); // This will call the error Handler default namespace
+
+    event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
+
+    throw new Error( 'test.exists.with.message.and.status' );
 });
 app.listen( 80 );
 ~~~
@@ -1994,7 +2258,7 @@ console.log( new DataServer( options ) );
 
 **persist: Boolean** 
 - Flag that specifies whether the data should be persisted to disk. 
-- Defaults to true 
+- Defaults to false 
 
 The DataServer provides a set of methods that have to be implemented if you want to create your own Caching server to be 
 integrated with other plugins. 
@@ -2164,6 +2428,7 @@ However if the global persist is set to false, this will not work
 - It is recommended you use this one ( even tho it is not the default data server )
 - This DataServer can store up to 16.7 million keys
 - It can be extended to use a near infinite amount of keys if you set useBigMap to true
+- Keep in mind when persisting millions of keys... is not fast
 
 ~~~javascript
 const DataServerMap   = require( 'event_request/server/components/caching/data_server_map' );
@@ -2194,7 +2459,7 @@ console.log( new DataServerMap( options ) );
 
 **persist: Boolean** 
 - Flag that specifies whether the data should be persisted to disk. 
-- Defaults to true 
+- Defaults to false 
 
 **useBigMap: Boolean** 
 - Flag that specifies whether the data should be stored in a Map or a BigMap. 
@@ -2289,6 +2554,8 @@ However if the global persist is set to false, this will not work
 - An implementation of the normal Map API
 - This one can store a near infinite amounts of data
 - It has the exact same usage as the normal Map and can be pretty much used as a replacement
+- It will create a new Map every 14,000,000 keys.
+- The internal limit can be changed by doing `map._limit = {LIMIT};`
 
 
 ***
@@ -2433,12 +2700,14 @@ The plugin Manager exports the following functions:
 **callback: Function**
 - The callback that should be called in case the timeout is reached.
 - The callback must accept the event request as the first parameter
+- Will send back an error code: `app.er.timeout.timedOut`
+- Will set status code : `408`
 - Defaults to:
 
 ~~~javascript
 function callback( event )
 {
-    event.next( `Request timed out in: ${this.timeout/1000} seconds`, 503 );
+    event.next( { code: 'app.er.timeout.timedOut', status: 408 } );
 }
 ~~~
 
@@ -2639,7 +2908,7 @@ app.apply( 'er_data_server' );
 app.apply( app.er_data_server );
 
 // OR if you want to pass specific parameters to the default DataServer:
-app.apply( app.er_data_server, { dataServerOptions: { persist: false, ttl: 200, persistPath: '/root' } } );
+app.apply( app.er_data_server, { dataServerOptions: { persist: true, ttl: 200, persistPath: '/root' } } );
 
 app.get( '/', async ( event ) => {
     const value    = await event.dataServer.get( 'testKey' );
@@ -2727,6 +2996,7 @@ app.listen( 80 , () => {
 
 **get( String key ): mixed**
 - Gets a value from the session
+- Returns null if the value does not exist
 
 **delete( String key ): void**
 - Deletes a key from the session
@@ -2767,7 +3037,7 @@ app.add( async ( event ) => {
 app.add(( event ) => {
     if (
         event.path !== '/login'
-        && ( ! event.session.has( 'authenticated' ) || event.session.get( 'authenticated' ) === false )
+        && ( event.session.get( 'authenticated' ) !== true )
     ) {
         event.redirect( '/login' );
         return;
@@ -3051,6 +3321,39 @@ app.listen( '80', () => {
 **NONE**
 
 ***
+####EventRequest Events Attached To
+
+**Event: 'error'**
+- Logs with a log level of 100 ( error ) any error that is passed here 
+
+**Event: 'on_error'**
+- Logs with a log level of 100 ( error ) any error that is passed here 
+
+**Event: 'redirect'**
+- Logs with a log level of 400 ( info ) where the redirect was to
+
+**Event: 'cachedResponse'**
+- Logs with a log level of 400 ( info ) which url was send from the cache
+
+**Event: 'finished'**
+- Logs with a log level of 500 ( verbose ) that the event is finished
+
+**Event: 'setResponseHeader'**
+- Logs with a log level of 500 ( verbose ) which header was set with what value
+
+**Event: 'cleanUp'**
+- Logs with a log level of 300 ( notice ) the method, path, responseStatusCode, clientIp and userAgent
+
+**Event: 'verbose'**
+- Logs with a log level of 300 ( notice ) the method, path, responseStatusCode, clientIp and userAgent
+
+**Middleware**
+- Logs with a log level of 500 ( verbose ) the headers and the cookies
+
+**event.logger: Logger**
+- The logger that was passed to the logger plugin
+
+***
 ####EventRequest Attached Functions
 
 **NONE**
@@ -3104,11 +3407,14 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 
 
 ***
+***
 ####Dependencies:
 
 **NONE**
 
 ***
+***
+
 ####Accepted Options:
 
 ***
@@ -3153,6 +3459,39 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 - Defaults to 100
 
 ***
+***
+
+####Errors:
+
+***
+#####MultipartFormParser:
+
+**app.er.bodyParser.multipart.invalidState**
+
+**app.er.bodyParser.multipart.couldNotFlushBuffer**
+
+**app.er.bodyParser.multipart.invalidMetadata**
+
+***
+#####JsonBodyParser:
+
+**NONE** 
+
+***
+#####RawBodyParser:
+
+**NONE** 
+
+
+***
+#####FormBodyParser:
+
+**NONE** 
+
+
+***
+***
+
 ####Events:
 
 **NONE**
@@ -3168,7 +3507,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 **event.body: Object**
 - Will hold different data according to which parser was fired
 - Json and Form Body parsers will have a JS object set as the body
-- The multipart body parser may have **$files** key set as well as whatever data was sent in a JS object format
+- The multipart body parser may have **$files** key set as well as whatever data was sent in a JS object format. The $files contain helpful data about the files saved ( as well as the absolute path they were saved in ). The files will automatically be cleared up if they were not moved before eventRequest.cleanUp event is called.
 
 **event.rawBody: Object**
 - Will hold the RAW request received
@@ -3185,6 +3524,8 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 
 ~~~javascript
 const app = require( 'event_request' )();
+const path = require( 'path' );
+const PROJECT_ROOT = path.parse( require.main.filename ).dir;
 
 // Add Body Parsers
 app.apply( app.er_body_parser_json );
@@ -3231,17 +3572,15 @@ Adds a response caching mechanism.
 ***
 ####EventRequest Attached Functions
 
-**NONE**
+**acheCurrentRequest(): Promise**
+- Caches the current request.
+- Will not cache the response if the response was not a String
 
 ***
 ####Attached Functionality:
 
 Middleware: **cache.request**
 - Can be added to any request as a global middleware and that request will be cached if possible
-
-**event.cacheCurrentRequest(): Promise**
-- Caches the current request.
-- Will not cache the response if the response was not a String
 
 ***
 ####Exported Plugin Functions:
@@ -3445,7 +3784,7 @@ console.log( process.env.KEY );
 - The validationRules must be an object with parametersToValidate pointing to validation skeletons
 - If no failureCallback is provided then a generic error will be sent with the validation error directly
 - if one is provided it must accept 3 parameters: ( EventRequest eventRequest, String validationParameter, ValidationResult validatrionResult )
-- If the parameter you are trying to validate does not exist in the EventRequest object, then an Error is thrown
+- If the parameter you are trying to validate does not exist in the EventRequest object, then by default sendError is called with a status code of 400, code: app.er.validation.error and the message containing the invalid input
 - After validation the validated params will be set in the EventRequest parameter that was validated: if you validated query for example the validated parameters will be set in the query object ( this way if any conversion was done by asserting a key is numeric or string for example, the correct type will be kept )
 - You don't have to validate all the keys, the objects will be merged
 - This plugin uses the built in validation suite
@@ -3467,10 +3806,10 @@ app.get( '/',
 );
 
 app.listen( 80, () => {
-		app.Loggur.log(
-			'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to get a different response.'
-		);
-	}
+        app.Loggur.log(
+            'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to get a different response.'
+        );
+    }
 );
 ~~~
 
@@ -3480,25 +3819,25 @@ const app = require( 'event_request' )();
 
 // This will validate the query parameters and will call the error callback
 app.get( '/',
-	app.er_validation.validate(
-		{ query : { testKey: 'numeric||min:1||max:255' } },
-		( event, validationParameter, validationResult ) => {
-			app.Loggur.log( validationParameter, null, true );
-			app.Loggur.log( validationResult, null, true );
+    app.er_validation.validate(
+        { query : { testKey: 'numeric||min:1||max:255' } },
+        ( event, validationParameter, validationResult ) => {
+            app.Loggur.log( validationParameter, null, true );
+            app.Loggur.log( validationResult, null, true );
 
-			event.send( 'ok' );
-		}
-	),
-	( event ) => {
-		event.send( { query: event.query } );
-	}
+            event.send( 'ok' );
+        }
+    ),
+    ( event ) => {
+        event.send( { query: event.query } );
+    }
 );
 
 app.listen( 80, () => {
-		app.Loggur.log(
-			'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to get a different response.'
-		);
-	}
+        app.Loggur.log(
+            'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to get a different response.'
+        );
+    }
 );
 ~~~
 
@@ -3508,12 +3847,12 @@ const app = require( 'event_request' )();
 
 // Alternatively you can do:
 app.er_validation.setOptions({
-	failureCallback: ( event, validationParameter, validationResult ) => {
-		app.Loggur.log( validationParameter, null, true );
-		app.Loggur.log( validationResult, null, true );
+    failureCallback: ( event, validationParameter, validationResult ) => {
+        app.Loggur.log( validationParameter, null, true );
+        app.Loggur.log( validationResult, null, true );
 
-		event.send( 'DEFAULT' );
-	}
+        event.send( 'DEFAULT' );
+    }
 });
 
 app.apply( app.er_body_parser_multipart );
@@ -3522,25 +3861,25 @@ app.apply( app.er_body_parser_form );
 
 // This will validate the query parameters and will call the error callback
 app.get( '/',
-	app.er_validation.validate(
-		{ query : { testKey: 'numeric||min:1||max:255' } },
-		( event, validationParameter, validationResult ) => {
-			app.Loggur.log( validationParameter, null, true );
-			app.Loggur.log( validationResult, null, true );
+    app.er_validation.validate(
+        { query : { testKey: 'numeric||min:1||max:255' } },
+        ( event, validationParameter, validationResult ) => {
+            app.Loggur.log( validationParameter, null, true );
+            app.Loggur.log( validationResult, null, true );
 
-			event.send( 'CUSTOM' );
-		}
-	),
-	( event ) => {
-		event.send( { query: event.query } );
-	}
+            event.send( 'CUSTOM' );
+        }
+    ),
+    ( event ) => {
+        event.send( { query: event.query } );
+    }
 );
 
 app.listen( 80, () => {
-		app.Loggur.log(
-			'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to get a different response.'
-		);
-	}
+        app.Loggur.log(
+            'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to get a different response.'
+        );
+    }
 );
 ~~~
 
@@ -3549,15 +3888,15 @@ app.listen( 80, () => {
 const app = require( 'event_request' )();
 
 app.apply(
-	app.er_validation,
-	{
-		failureCallback: ( event, validationParameter, validationResult ) => {
-			app.Loggur.log( validationParameter, null, true );
-			app.Loggur.log( validationResult, null, true );
+    app.er_validation,
+    {
+        failureCallback: ( event, validationParameter, validationResult ) => {
+            app.Loggur.log( validationParameter, null, true );
+            app.Loggur.log( validationResult, null, true );
 
-			event.send( 'ok' );
-		}
-	}
+            event.send( 'ok' );
+        }
+    }
 );
 
 app.apply( app.er_body_parser_multipart );
@@ -3566,31 +3905,31 @@ app.apply( app.er_body_parser_form );
 
 // This will validate the query parameters and the body and will call the error callback
 app.post( '/',
-	app.er_validation.validate(
-		{ query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } }
-	),
-	( event ) => {
-		event.send( { query: event.query, body: event.body } );
-	}
+    app.er_validation.validate(
+        { query : { testKey: 'numeric||min:1||max:255' }, body: { test: 'numeric||range:1-255' } }
+    ),
+    ( event ) => {
+        event.send( { query: event.query, body: event.body } );
+    }
 );
 
 // This will validate the query parameters and will call the error callback
 app.get( '/',
-	app.er_validation.validate(
-		{ query : { testKey: 'numeric||min:1||max:255' } }
-	),
-	( event ) => {
-		event.send( { query: event.query } );
-	}
+    app.er_validation.validate(
+        { query : { testKey: 'numeric||min:1||max:255' } }
+    ),
+    ( event ) => {
+        event.send( { query: event.query } );
+    }
 );
 
 app.listen( 80, () => {
-		app.Loggur.log(
-			'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to'
-			+ ' get a different response. Try posting to http://localhost?testKey=5 with a body: test=5. Change the'
-			+ ' value for test in the body to get a different response'
-		);
-	}
+        app.Loggur.log(
+            'Server started on port 80. Try going to http://localhost?testKey=5. Change the value for testKey to'
+            + ' get a different response. Try posting to http://localhost?testKey=5 with a body: test=5. Change the'
+            + ' value for test in the body to get a different response'
+        );
+    }
 );
 ~~~
 

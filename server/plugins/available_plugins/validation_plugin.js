@@ -28,7 +28,7 @@ class ValidationPlugin extends PluginInterface
 		this.failureCallback	= typeof options.failureCallback === 'function'
 								? options.failureCallback
 								: ( event, validationParameter, validationResult ) => {
-									event.send( { [validationParameter]: validationResult.getValidationResult() } );
+									event.sendError( { status: 400, code: 'app.er.validation.error', message: { [validationParameter]: validationResult.getValidationResult() } } );
 								};
 	}
 
@@ -50,7 +50,7 @@ class ValidationPlugin extends PluginInterface
 			for ( const toValidate in validationRules )
 			{
 				if ( typeof event[toValidate] !== 'object' )
-					return event.next( `Could not validate ${toValidate} as it is not a property of the EventRequest` );
+					return event.next( { status: 400, code: 'app.er.validation.error', message: `Could not validate ${toValidate} as it is not a property of the EventRequest` } );
 
 				const validationResult	= event.validate( event[toValidate], validationRules[toValidate] );
 

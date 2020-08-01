@@ -48,14 +48,14 @@ test({
 	test	: ( done ) => {
 		removeCache();
 
-		const dataServer	= new DataServerMap( {} );
+		const dataServer	= new DataServerMap();
 
 		assert.deepEqual( dataServer.server, new Map() );
 		assert.equal( dataServer.defaultTtl, 300 );
 		assert.equal( dataServer.persistPath, DEFAULT_PERSIST_FILE );
-		assert.equal( fs.existsSync( dataServer.persistPath ), true );
+		assert.equal( fs.existsSync( dataServer.persistPath ), false );
 		assert.equal( dataServer.persistInterval, 10000 );
-		assert.equal( dataServer.intervals.length, 2 );
+		assert.equal( dataServer.intervals.length, 1 );
 
 		removeCache( dataServer );
 		done();
@@ -66,7 +66,7 @@ test({
 	message	: 'DataServerMap._handleServerDown',
 	test	: ( done ) => {
 		removeCache();
-		const dataServer	= new DataServerMap( {} );
+		const dataServer	= new DataServerMap( { persist: false } );
 		Loggur.loggers		= {};
 		Loggur.disableDefault();
 
@@ -102,7 +102,7 @@ test({
 
 		fs.writeFileSync( DEFAULT_PERSIST_FILE, JSON.stringify( map, DataServerMap.replacer ) );
 
-		const dataServer	= new DataServerMap( {} );
+		const dataServer	= new DataServerMap({ persist: true });
 
 		assert.deepStrictEqual( await dataServer.get( key ), value );
 
@@ -149,14 +149,14 @@ test({
 	test	: ( done ) => {
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
-			const dataServer	= new DataServerMap( {} );
+			const dataServer	= new DataServerMap( { persist: false } );
 			const key			= 'key';
 			const value			= 'value';
 			const ttl			= 100;
 			const persist		= true;
 			const expected		= { key: { key, value, ttl, persist } };
 
-			assert.equal( dataServer.intervals.length, 2 );
+			assert.equal( dataServer.intervals.length, 1 );
 			assert.deepStrictEqual( dataServer.server, new Map() );
 
 			dataServer.set( key, value, ttl, { persist } );
@@ -182,7 +182,7 @@ test({
 	test	: ( done ) => {
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
-			const dataServer	= new DataServerMap( {} );
+			const dataServer	= new DataServerMap( { persist: true } );
 			const key			= 'key';
 			const value			= 'value';
 			const persist		= true;
@@ -486,7 +486,7 @@ test({
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( async () => {
 			const key	= 'key';
-			const dataServer	= new DataServerMap( { gcInterval: 1, ttl: 1 } );
+			const dataServer	= new DataServerMap( { persist: false, gcInterval: 1, ttl: 1 } );
 			await dataServer.set( key, 'value' );
 
 			assert.notEqual( await dataServer.get( key ), null );
@@ -505,6 +505,8 @@ test({
 	message	: 'DataServerMap.persistsData',
 	test	: ( done ) => {
 		removeCache();
+		if ( fs.existsSync( DEFAULT_PERSIST_FILE + '1' ) )
+			fs.unlinkSync( DEFAULT_PERSIST_FILE + '1' );
 
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
@@ -512,7 +514,7 @@ test({
 			const keyTwo		= 'keyTwo';
 			const keyThree		= 'keyThree';
 			const keyFour		= 'keyFour';
-			const dataServer	= new DataServerMap( { persistInterval: 2, persistPath: DEFAULT_PERSIST_FILE + '1' } );
+			const dataServer	= new DataServerMap( { persist: true, persistInterval: 2, persistPath: DEFAULT_PERSIST_FILE + '1' } );
 			let saveCalled		= false;
 
 			dataServer.on( '_saveData', () => {
@@ -550,7 +552,7 @@ test({
 
 		// Wait in case the file has not been deleted from the FS
 		setTimeout( () => {
-			const dataServer	= new DataServerMap( {} );
+			const dataServer	= new DataServerMap({ persist: true });
 			const key			= 'key';
 			const value			= { test: 'value' };
 

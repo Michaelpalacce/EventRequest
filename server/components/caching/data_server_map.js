@@ -191,7 +191,7 @@ class DataServerMap extends DataServer
 			const isNew		= ! this.server.has( key );
 
 			if ( isNew )
-				this.server.set( key, this._makeDataSet( key, DataServer.LOCK_VALUE, ttl, persist ) )
+				this.server.set( key, this._makeDataSet( key, DataServer.LOCK_VALUE, ttl, persist ) );
 
 			resolve( isNew );
 		});
@@ -412,7 +412,7 @@ class DataServerMap extends DataServer
 			for ( const map of originalObject.maps )
 				value.push( { dataType : 'Map', value : Array.from( map.entries() ) } );
 
-			return { dataType : 'BigMap', value };
+			return { dataType : 'BigMap', value: { maps: value, _limit : originalObject._limit } };
 		}
 
 		else
@@ -433,7 +433,8 @@ class DataServerMap extends DataServer
 		if( typeof value === 'object' && value !== null && value.dataType === 'BigMap' )
 		{
 			const bigMap	= new BigMap();
-			bigMap.maps		= value.value;
+			bigMap.maps		= value.value.maps;
+			bigMap._limit	= value.value._limit;
 
 			return bigMap;
 		}

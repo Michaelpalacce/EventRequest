@@ -54,8 +54,8 @@ test({
 
 		app.get( '/testTimeoutWithReachingTimeout', ( event ) => {} );
 
-		helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 503 ).then(( response ) => {
-			assert.equal( response.body.toString(), JSON.stringify( { error: `Request timed out in: ${timeout/1000} seconds`} ) );
+		helpers.sendServerRequest( '/testTimeoutWithReachingTimeout', 'GET', 408 ).then(( response ) => {
+			assert.equal( response.body.toString(), JSON.stringify( { error : { code: 'app.er.timeout.timedOut' } } ) );
 			assert.equal( timeoutCalled, 1 );
 
 			app.add({

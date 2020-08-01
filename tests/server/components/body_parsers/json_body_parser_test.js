@@ -125,7 +125,7 @@ test({
 		jsonBodyParser.parse( eventRequest ).then(( body ) => {
 			done( 'Should not have been called!' );
 		}).catch( ( error )=>{
-			assert.deepStrictEqual( error, 'Could not parse the body' );
+			assert.deepStrictEqual( error, { code: 'app.er.bodyParser.json.errorParsing' } );
 			done();
 		} );
 	}

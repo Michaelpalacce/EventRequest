@@ -88,7 +88,7 @@ class Mocker
 
 				assert.deepStrictEqual( value, args[index], `Failed asserting that ${this.method} was called `
 					+ ` with correct argument at position ${index}. `
-					+ `${value} was expected, but ${args[index]} received`
+					+ `${JSON.stringify( value )} was expected, but ${JSON.stringify( args[index] )} received`
 				);
 			}
 		}

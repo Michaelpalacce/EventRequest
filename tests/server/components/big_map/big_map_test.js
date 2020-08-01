@@ -1,5 +1,6 @@
 const { assert, test }	= require( '../../../test_helper' );
 const BigMap			= require( '../../../../server/components/big_map/big_map' );
+const DataServerMap		= require( '../../../../server/components/caching/data_server_map' );
 
 test({
 	message	: 'BigMap.constructor',
@@ -7,7 +8,7 @@ test({
 		const map	= new BigMap();
 
 		assert.deepStrictEqual( map.maps, [new Map()] );
-		assert.deepStrictEqual( map._limit, 8000000 );
+		assert.deepStrictEqual( map._limit, 14000000 );
 
 		done();
 	}
@@ -20,7 +21,7 @@ test({
 		const map	= new BigMap( init );
 
 		assert.deepStrictEqual( map.maps, [new Map( init )] );
-		assert.deepStrictEqual( map._limit, 8000000 );
+		assert.deepStrictEqual( map._limit, 14000000 );
 
 		done();
 	}
@@ -35,6 +36,25 @@ test({
 
 		assert.deepStrictEqual( map.get( 'key' ), 'value' );
 		assert.deepStrictEqual( map.maps, [new Map([['key', 'value']])] );
+
+		done();
+	}
+});
+
+test({
+	message	: 'BigMap.set.with.many.maps',
+	test	: ( done ) => {
+		const map		= new BigMap();
+		map._limit		= 1;
+
+		map.set( 'key', 'value' );
+		map.set( 'key2', 'value' );
+		map.set( 'key3', 'value' );
+		map.set( 'key', 'value' );
+		map.set( 'key3', 'value' );
+		map.set( 'key', 'value' );
+
+		assert.deepStrictEqual( map.maps, [new Map([['key', 'value']]), new Map([['key2', 'value']]), new Map([['key3', 'value']])] );
 
 		done();
 	}
@@ -511,6 +531,26 @@ test({
 			counter ++;
 			assert.deepStrictEqual( value, `${counter}value` );
 		}
+
+		done();
+	}
+});
+
+test({
+	message	: 'BigMap.with.JSON.and.DataServerMap.replacer.reviver',
+	test	: ( done ) => {
+		const map	= new BigMap();
+		map._limit	= 2;
+
+		map.set( 1, '1value' );
+		map.set( 2, '2value' );
+		map.set( 3, '3value' );
+		map.set( 1, '1value' );
+		map.set( 3, '3value' );
+
+		const restoredMap	= JSON.parse( JSON.stringify( map, DataServerMap.replacer ), DataServerMap.reviver );
+
+		assert.deepStrictEqual( map, restoredMap );
 
 		done();
 	}

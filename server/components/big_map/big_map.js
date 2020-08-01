@@ -3,10 +3,10 @@
  */
 class BigMap
 {
-	constructor (...parameters)
+	constructor ( ...parameters )
 	{
 		this.maps	= [new Map( ...parameters )];
-		this._limit	= 8000000;
+		this._limit	= 14000000;
 	}
 
 	/**
@@ -23,8 +23,8 @@ class BigMap
 	set( key, value )
 	{
 		let mapToSet	= null;
-		this.maps.forEach( map => {
-			if ( map.has( key ) && map.size < this._limit )
+		this.maps.forEach( ( map ) => {
+			if ( map.has( key ) )
 				mapToSet	= map;
 		});
 
@@ -203,12 +203,13 @@ class BigMap
 		const that	= this;
 
 		return {
-			*[Symbol.iterator](){
+			*[Symbol.iterator]()
+			{
 				for ( const map of that.maps )
 					for ( const element of map[elementToGet]() )
 						yield element;
 			}
-		}
+		};
 	}
 
 	/**

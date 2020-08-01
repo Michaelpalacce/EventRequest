@@ -33,6 +33,7 @@
     "static-resources",
     "caching",
     "error-handling",
+    "error-namespaces",
     "env-loader",
     "response-cache",
     "request-timeout",
@@ -42,6 +43,7 @@
     "testing",
     "tester",
     "testing-framework",
+    "big-map",
     "input-validation"
   ],
   "license": "GPL-3.0",
@@ -59,7 +61,7 @@
     "test": "nyc --reporter=lcov --reporter=text-summary node test.js --debug",
     "deploy": "npm run test && npm publish"
   },
-  "version": "26.3.0",
+  "version": "27.0.0",
   "devDependencies": {
     "nyc": "^15.1.0"
   }

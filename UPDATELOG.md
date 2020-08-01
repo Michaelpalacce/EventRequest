@@ -1,3 +1,20 @@
+27.0.0
+- A LOT OF CHANGES HAVE BEEN MADE, read carefully.
+- Main focus of this release is fixing a few small bugs and reworking the ErrorHandler. In general APIs do not return messages but rather return error codes. Messages are still optional so, the ErrorHandler supports that entirely. Check the Readme For more information about this change at the ErrorHandling section.
+- Fixed a small bug with the set of BigMap. Added test for it
+- Fixed the reviver and the replacer to include the BigMap _limit as well
+- Updated the BigMap limit to default to 14,000,000 and not 8,000,000 
+- Session.get no longer throws, but returns null. We want to avoid throwing inside the web framework
+- persist is no longer defaulted to true when creating a dataServer. This is a cache. Caches are ephemeral!
+- Removed undocumented and wrong `stream_start` event on body_parser_handler
+- Fixed yet another bug with the multipart body parser.
+- Changed a lot of logger plugin log levels to verbose. 
+- Every ErrorMessage was changed to a code
+- getExecutionBlockForCurrentEvent no longer throws if invalid EventRequest. Whoever is using it should know what they are doing
+- Added a new option to the File Transport splitToNewLines, that allows you to validate \n \r \r\n and split the log in multiple lines
+- ErrorHandling will not modify the error anymore
+- Loggers will check to make sure their `uniqueId`s are strings now instead of checking for false
+
 26.3.0
 - Added a BigMap implementation
 - Added ability to switch between using a BigMap and Map in the DataServerMap

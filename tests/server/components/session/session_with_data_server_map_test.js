@@ -293,9 +293,7 @@ test({
 		assert.equal( true, session.has( 'key') );
 		assert.equal( 'value', session.get( 'key' ) );
 		session.delete( 'key' );
-		assert.throws(() => {
-			session.get( 'key' );
-		});
+		assert.deepStrictEqual( session.get( 'key' ), null );
 
 		done();
 	}

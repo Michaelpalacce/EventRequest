@@ -14,7 +14,7 @@ const unlink			= promisify( fs.unlink );
 const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
 
 const DEFAULT_PERSIST_FILE				= path.join( PROJECT_ROOT, 'cache' );
-const DEFAULT_PERSIST_RULE				= true;
+const DEFAULT_PERSIST_RULE				= false;
 const DEFAULT_TTL						= 300;
 const DEFAULT_PERSIST_INTERVAL			= 10;
 const DEFAULT_GARBAGE_COLLECT_INTERVAL	= 60;

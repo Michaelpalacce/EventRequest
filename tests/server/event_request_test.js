@@ -1024,15 +1024,15 @@ test({
 });
 
 test({
-	message	: 'EventRequest.next sends 404 if route does not exist',
+	message	: 'EventRequest.next.sends.404.if.route.does.not.exist',
 	test	: ( done ) => {
-		const eventRequest	= helpers.getEventRequest( '/', 'GET' );
+		const eventRequest	= helpers.getEventRequest( 'GET', '/' );
 		let called			= false;
 
 		eventRequest._mock({
 			method: 'send',
 			shouldReturn: ( one, two ) => {
-				assert.deepStrictEqual( one, { error: 'Cannot / GET' } );
+				assert.deepStrictEqual( one, { error: { code: 'app.general', message: 'Cannot GET /' } } );
 				assert.equal( 404, two );
 				called	= true;
 			}

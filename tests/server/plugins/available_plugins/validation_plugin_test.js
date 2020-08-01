@@ -70,7 +70,7 @@ test({
 		eventRequest._mock({
 			method			: 'next',
 			shouldReturn	: ( error ) => {
-				assert.deepStrictEqual( error,  'Could not validate clientIp as it is not a property of the EventRequest' );
+				assert.deepStrictEqual( error, { code: 'app.er.validation.error', message: 'Could not validate clientIp as it is not a property of the EventRequest', status: 400 } );
 				done();
 			}
 		});
@@ -120,7 +120,7 @@ test({
 });
 
 test({
-	message	: 'ValidationPlugin.validate.calls.event.send.if.no.error.function.provided',
+	message	: 'ValidationPlugin.validate.calls.event.sendError.if.no.error.function.provided',
 	test	: ( done ) => {
 		const plugin				= new ValidationPlugin();
 		const eventRequest			= helpers.getEventRequest( 'GET', '/?testKey=wrong&testKeyTwo=123', { headerTest: '123', headerTestTwo: 123 } );
@@ -136,10 +136,10 @@ test({
 		});
 
 		eventRequest._mock({
-			method			: 'send',
+			method			: 'sendError',
 			called			: 1,
 			with			: [
-				[{ query: { testKey: ['numeric'] } }]
+				[{ status: 400, code : 'app.er.validation.error', message: { query: { testKey: ['numeric'] } } }]
 			],
 			shouldReturn	: () => {
 				done();
@@ -167,10 +167,10 @@ test({
 		});
 
 		eventRequest._mock({
-			method			: 'send',
+			method			: 'sendError',
 			called			: 1,
 			with			: [
-				[{ query: { testKey: ['numeric'] } }]
+				[{ status: 400, code : 'app.er.validation.error', message: { query: { testKey: ['numeric'] } } }]
 			],
 			shouldReturn	: () => {
 				done();
