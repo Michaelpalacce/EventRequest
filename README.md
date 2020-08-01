@@ -1,7 +1,24 @@
 # EventRequest
 A highly customizable backend server in NodeJs. Any feedback is most welcome!
 
-[![Build Status](https://travis-ci.com/Michaelpalacce/EventRequest.svg?branch=master)](https://travis-ci.com/Michaelpalacce/EventRequest) ![windows-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-12.x/badge.svg) ![linux-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-12.x/badge.svg) [![Dependencies](https://david-dm.org/Michaelpalacce/EventRequest.svg)](https://david-dm.org/Michaelpalacce/EventRequest.svg) [![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json) [![npm version](https://badge.fury.io/js/event_request.svg)](https://badge.fury.io/js/event_request)  [![codecov](https://codecov.io/gh/Michaelpalacce/EventRequest/branch/master/graph/badge.svg)](https://codecov.io/gh/Michaelpalacce/EventRequest) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3c843dd2bc454f06b10eb60820dc6d1b)](https://www.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Michaelpalacce/EventRequest&amp;utm_campaign=Badge_Grade) ![npm](https://img.shields.io/npm/dw/event_request?style=plastic) ![npm](https://img.shields.io/npm/dt/event_request?style=plastic) ![GitHub top language](https://img.shields.io/github/languages/top/Michaelpalacce/EventRequest) ![GitHub issues](https://img.shields.io/github/issues-raw/Michaelpalacce/EventRequest) ![npm bundle size](https://img.shields.io/bundlephobia/min/event_request) ![GitHub contributors](https://img.shields.io/github/contributors/Michaelpalacce/EventRequest) ![Maintenance](https://img.shields.io/maintenance/yes/2020) ![GitHub last commit](https://img.shields.io/github/last-commit/Michaelpalacce/EventRequest)
+[![linux-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-12.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Alinux-12.x)
+[![linux-14.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-14.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Alinux-14.x)
+[![windows-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-12.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Awindows-12.x)
+[![windows-14.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-14.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Awindows-14.x)
+
+[![codecov](https://codecov.io/gh/Michaelpalacce/EventRequest/branch/master/graph/badge.svg)](https://codecov.io/gh/Michaelpalacce/EventRequest)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/3c843dd2bc454f06b10eb60820dc6d1b)](https://www.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Michaelpalacce/EventRequest&amp;utm_campaign=Badge_Grade) 
+[![Dependencies](https://david-dm.org/Michaelpalacce/EventRequest.svg)](https://david-dm.org/Michaelpalacce/EventRequest.svg)
+[![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json)
+[![npm version](https://badge.fury.io/js/event_request.svg)](https://badge.fury.io/js/event_request)
+![npm](https://img.shields.io/npm/dw/event_request?style=plastic)
+![npm](https://img.shields.io/npm/dt/event_request?style=plastic)
+![GitHub top language](https://img.shields.io/github/languages/top/Michaelpalacce/EventRequest)
+![GitHub issues](https://img.shields.io/github/issues-raw/Michaelpalacce/EventRequest)
+![npm bundle size](https://img.shields.io/bundlephobia/min/event_request)
+![GitHub contributors](https://img.shields.io/github/contributors/Michaelpalacce/EventRequest)
+![Maintenance](https://img.shields.io/maintenance/yes/2020)
+![GitHub last commit](https://img.shields.io/github/last-commit/Michaelpalacce/EventRequest)
 
 [**CHANGELOG**](https://github.com/Michaelpalacce/EventRequest/blob/master/UPDATELOG.md) || [**BENCHMARKS**](https://github.com/Michaelpalacce/EventRequest-Benchmarks) || [**BOARD**](https://trello.com/b/LzErnccL/eventrequest) 
 
@@ -671,7 +688,7 @@ The event request is an object that is created by the server and passed through 
 - If you wish to expire a cookie set Expires / Max-Age to a negative number
 - { Path: 'test', expires: 100 } -> this will be set as 'cookieName=cookieValue; Path:test; expires:100'
 
-**setStatusCode( Number code ): void**
+**setStatusCode( Number code ): EventRequest**
 - Sets the status code of the response
 - If something other than a string is given, the status code will be assumed 500
 
@@ -684,16 +701,17 @@ The event request is an object that is created by the server and passed through 
 **send( mixed response = '', Number statusCode = 200, Boolean raw ): void** 
 - Sends the response to the user with the specified statusCode
 - If response is a stream then the stream will be piped to the response
+- If the response was NOT raw, then setResponseHeader will be called with the calculated Content-Length
 - if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. 
 - Emits a 'send' event and calls cleanUp
 - The event will be emitted with a response if the response was a string or the isRaw flag was set to false 
 
-**setResponseHeader( String key, mixed value ): void** 
+**setResponseHeader( String key, mixed value ): EventRequest** 
 - Sets a new header to the response.
 - Emits a 'setResponseHeader' event. 
 - If the response is finished then an error will be set to the next middleware
 
-**removeResponseHeader( String key ): void** 
+**removeResponseHeader( String key ): EventRequest** 
 - Removes an existing header from to the response.
 - Emits a 'removeResponseHeader' event. 
 - If the response is finished then an error will be set to the next middleware
@@ -713,7 +731,7 @@ The event request is an object that is created by the server and passed through 
 
 **isFinished(): Boolean** 
 - Checks if the response is finished
-- A response is finished if the response object returns true when calling isFinished or the cleanUp method has been called
+- A response is finished if eventRequest.finished === true || eventRequest.response.writableEnded || eventRequest.response.finished
 
 **next( mixed err = undefined, Number code = undefined ): void** 
 - Calls the next middleware in the execution block. 

@@ -9,7 +9,7 @@ const ErrorHandler						= require( '../../server/components/error/error_handler'
 const MockedErrorHandler				= Mock( ErrorHandler );
 
 test({
-	message	: 'EventRequest should throw an error with invalid constructor parameters',
+	message	: 'EventRequest.should.throw.an.error.with.invalid.constructor.parameters',
 	test	: function ( done )
 	{
 		assert.throws( () => {
@@ -21,7 +21,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest should not throw an error in case of valid constructor parameters',
+	message	: 'EventRequest.should.not.throw.an.error.in.case.of.valid.constructor.parameters',
 	test	: ( done ) => {
 		helpers.getEventRequest();
 		done();
@@ -29,7 +29,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest should parse url',
+	message	: 'EventRequest.should.parse.url',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest( '', '/test?testParam=testValue' );
 
@@ -41,7 +41,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest parses methods',
+	message	: 'EventRequest.parses.methods',
 	test	: ( done ) => {
 		let methods	= ['GET', 'DELETE', 'PUT', 'POST'];
 		methods.forEach( ( method ) => {
@@ -55,7 +55,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest parses headers',
+	message	: 'EventRequest.parses.headers',
 	test	: ( done ) => {
 		let headers			= { headerKey : 'headerValue' };
 		let eventRequest	= helpers.getEventRequest( undefined, undefined, headers );
@@ -67,7 +67,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest errorHandler does not need to be an instance of ErrorHandler',
+	message	: 'EventRequest.errorHandler.does.not.need.to.be.an.instance.of.ErrorHandler',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 
@@ -81,7 +81,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest sendError will create a default Error Handler if it is not correct',
+	message	: 'EventRequest.sendError.will.create.a.default.Error.Handler.if.it.is.not.correct',
 	test	: ( done ) => {
 		let eventRequest			= helpers.getEventRequest();
 		let errorToThrow			= 'Error to throw';
@@ -101,7 +101,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest _cleanUp emits event: cleanUp',
+	message	: 'EventRequest._cleanUp.emits.event:.cleanUp',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
@@ -115,7 +115,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest _cleanUp emits event: finished',
+	message	: 'EventRequest._cleanUp.emits.event:.finished',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let finished		= false;
@@ -128,7 +128,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest _cleanUp cleans up data',
+	message	: 'EventRequest._cleanUp.cleans.up.data',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		eventRequest.on( 'test', () => {} );
@@ -161,7 +161,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest send calls response.end when not raw',
+	message	: 'EventRequest.send.calls.response.end.when.not.raw',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
@@ -274,7 +274,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest send calls response.end when raw',
+	message	: 'EventRequest.send.calls.response.end.when.raw',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
@@ -291,7 +291,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest send emits send event',
+	message	: 'EventRequest.send.emits.send.event',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
@@ -332,7 +332,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest send emits send event without response if response is raw or stream',
+	message	: 'EventRequest.send.emits.send.event.without.response.if.response.is.raw.or.stream',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
@@ -359,7 +359,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest sets status code',
+	message	: 'EventRequest.sets.status.code',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		eventRequest.response._mock({
@@ -376,7 +376,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest send method calls cleanUp',
+	message	: 'EventRequest.send.method.calls.cleanUp',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
@@ -390,7 +390,7 @@ test({
 });
 
 test({
-	message		: 'EventRequest.send sends a stream',
+	message		: 'EventRequest.send.sends.a.stream',
 	test		: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
@@ -404,7 +404,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest setResponseHeader emits a setResponseHeader event',
+	message	: 'EventRequest.setResponseHeader.emits.a.setResponseHeader.event',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let setResponseHeader		= false;
@@ -418,7 +418,32 @@ test({
 });
 
 test({
-	message	: 'EventRequest removeResponseHeader emits a removeResponseHeader event',
+	message	: 'EventRequest.setResponseHeader.returns.EventRequest',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+
+		assert.deepStrictEqual( eventRequest.setResponseHeader( 'key', 'value' ), eventRequest );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.setResponseHeader.emits.a.setResponseHeader.event',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		let setResponseHeader		= false;
+
+		eventRequest.on( 'setResponseHeader', () => { setResponseHeader = true; });
+
+		eventRequest.setResponseHeader( 'key', 'value' );
+
+		setResponseHeader	? done() : done( 'EventRequest setResponseHeader event not emitted' );
+	}
+});
+
+test({
+	message	: 'EventRequest.removeResponseHeader.emits.a.removeResponseHeader.event',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let removeHeader	= false;
@@ -432,7 +457,18 @@ test({
 });
 
 test({
-	message	: 'EventRequest setStatusCode changes the status code',
+	message	: 'EventRequest.removeResponseHeader.returns.EventRequest',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+
+		assert.deepStrictEqual( eventRequest.removeResponseHeader( 'key' ), eventRequest );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.setStatusCode.changes.the.status.code',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		eventRequest.setStatusCode( 200 );
@@ -440,6 +476,16 @@ test({
 		assert.equal( 200, eventRequest.response.statusCode );
 		eventRequest.setStatusCode( 'wrong' );
 		assert.equal( 500, eventRequest.response.statusCode );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.setStatusCode.returns.eventRequest',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		assert.deepStrictEqual( eventRequest.setStatusCode( 200 ), eventRequest );
 
 		done();
 	}
@@ -574,7 +620,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.redirect sets header',
+	message	: 'EventRequest.redirect.sets.header',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let setResponseHeader		= false;
@@ -583,8 +629,11 @@ test({
 		eventRequest.response._mock({
 			method			: 'setHeader',
 			shouldReturn	: () => { setResponseHeader = true; },
-			with			: [['Location', redirectUrl]],
-			called			: 1
+			with			: [
+				['Location', redirectUrl],
+				['Content-Length', undefined]
+			],
+			called			: 2
 		});
 
 		eventRequest.redirect( redirectUrl, 302 );

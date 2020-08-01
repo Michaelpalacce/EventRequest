@@ -1,3 +1,10 @@
+27.1.0
+- Node v14.x support
+- EventRequest now no longer gets the clientIp from the connection, but uses the socket
+- The EventRequest.send() method now sets a response header with the Content-Length if the response is not raw
+- The response will be checked if it is finished with writableEnded and then finished ( as finished is getting deprecated )
+- The EventRequest setStatusCode, setResponseHeader and removeResponseHeader now return the instance of EventRequest so methods can be chained
+
 27.0.0
 - A LOT OF CHANGES HAVE BEEN MADE, read carefully.
 - Main focus of this release is fixing a few small bugs and reworking the ErrorHandler. In general APIs do not return messages but rather return error codes. Messages are still optional so, the ErrorHandler supports that entirely. Check the Readme For more information about this change at the ErrorHandling section.

@@ -92,7 +92,7 @@ helpers.getEmptyMiddleware	= () => {
 helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} ) => {
 	let request			= new IncomingMessage();
 
-	request.connection	= {
+	request.socket	= {
 		remoteAddress	: '127.0.0.1'
 	};
 	request._mock( { method : 'method', shouldReturn : requestMethod } );
@@ -142,7 +142,7 @@ helpers.sendServerRequest	= ( path, method = 'GET', statusCode = 200, data = '',
 			const bodyParts	= [];
 			res.on( 'data',( chunk ) => {
 				bodyParts.push( chunk );
-			} );
+			});
 
 			res.on( 'end',() => {
 				res.body	= Buffer.concat( bodyParts );
