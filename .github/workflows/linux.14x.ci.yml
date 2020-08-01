@@ -1,5 +1,5 @@
-# This workflow will do a clean install of NodeJS 12.x on linx for every push or pull request on master and develop branches
-# It will then run the tests of the app. After the tests have been run it will upload coverage reports for codacy and codecov
+# This workflow will do a clean install of NodeJS 14.x on linux for every push or pull request on master
+# It will then run the tests of the app.
 
 name: linux-14.x
 
@@ -21,10 +21,3 @@ jobs:
     - run: npm i
     - run: npm run build --if-present
     - run: npm test
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: lcov.info
-        path: coverage/lcov.info
-
