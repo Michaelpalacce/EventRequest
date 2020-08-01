@@ -671,7 +671,7 @@ The event request is an object that is created by the server and passed through 
 - If you wish to expire a cookie set Expires / Max-Age to a negative number
 - { Path: 'test', expires: 100 } -> this will be set as 'cookieName=cookieValue; Path:test; expires:100'
 
-**setStatusCode( Number code ): void**
+**setStatusCode( Number code ): EventRequest**
 - Sets the status code of the response
 - If something other than a string is given, the status code will be assumed 500
 
@@ -684,16 +684,17 @@ The event request is an object that is created by the server and passed through 
 **send( mixed response = '', Number statusCode = 200, Boolean raw ): void** 
 - Sends the response to the user with the specified statusCode
 - If response is a stream then the stream will be piped to the response
+- If the response was NOT raw, then setResponseHeader will be called with the calculated Content-Length
 - if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. 
 - Emits a 'send' event and calls cleanUp
 - The event will be emitted with a response if the response was a string or the isRaw flag was set to false 
 
-**setResponseHeader( String key, mixed value ): void** 
+**setResponseHeader( String key, mixed value ): EventRequest** 
 - Sets a new header to the response.
 - Emits a 'setResponseHeader' event. 
 - If the response is finished then an error will be set to the next middleware
 
-**removeResponseHeader( String key ): void** 
+**removeResponseHeader( String key ): EventRequest** 
 - Removes an existing header from to the response.
 - Emits a 'removeResponseHeader' event. 
 - If the response is finished then an error will be set to the next middleware
@@ -713,7 +714,7 @@ The event request is an object that is created by the server and passed through 
 
 **isFinished(): Boolean** 
 - Checks if the response is finished
-- A response is finished if the response object returns true when calling isFinished or the cleanUp method has been called
+- A response is finished if eventRequest.finished === true || eventRequest.response.writableEnded || eventRequest.response.finished
 
 **next( mixed err = undefined, Number code = undefined ): void** 
 - Calls the next middleware in the execution block. 

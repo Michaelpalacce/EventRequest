@@ -191,13 +191,13 @@ test({
 			useIp	: true
 		});
 		let eventRequest		= helpers.getEventRequest( 'GET', path );
-		let connection			= {
+		let socket			= {
 			remoteAddress	: ipAddress,
 		};
 
 		eventRequest.request._mock({
-			method			: 'connection',
-			shouldReturn	: connection
+			method			: 'socket',
+			shouldReturn	: socket
 		});
 
 		let cacheId	= responseCachePlugin.getCacheId( eventRequest );
@@ -218,13 +218,13 @@ test({
 			useIp	: true
 		});
 		let eventRequest		= helpers.getEventRequest( 'GET', path );
-		let connection			= {
+		let socket			= {
 			remoteAddress	: ipAddress,
 		};
 
 		eventRequest.request._mock({
-			method			: 'connection',
-			shouldReturn	: connection
+			method			: 'socket',
+			shouldReturn	: socket
 		});
 
 		eventRequest.currentResponseCacheConfig	= {

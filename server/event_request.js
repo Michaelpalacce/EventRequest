@@ -4,7 +4,7 @@
 const url									= require( 'url' );
 const { EventEmitter }						= require( 'events' );
 const ErrorHandler							= require( './components/error/error_handler' );
-const Streams								= require( 'stream' );
+const { Readable }							= require( 'stream' );
 const ValidationHandler						= require( './components/validation/validation_handler' );
 const { IncomingMessage, ServerResponse }	= require( 'http' );
 
@@ -32,7 +32,7 @@ class EventRequest extends EventEmitter
 		});
 
 		this.query			= parsedUrl.query;
-		this.clientIp		= request.connection.remoteAddress;
+		this.clientIp		= request.socket.remoteAddress;
 		this.path			= parsedUrl.pathname.trim();
 		this.method			= request.method.toUpperCase();
 		this.headers		= request.headers;
@@ -149,7 +149,7 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-1	 * @param	{*} [response='']
+	 * @param	{*} [response='']
 	 * @param	{Number} [code=200]
 	 * @param	{Boolean} [raw=false]
 	 */
@@ -189,7 +189,7 @@ class EventRequest extends EventEmitter
 			response !== null
 			&& typeof response !== 'undefined'
 			&& typeof response.pipe === 'function'
-			&& response instanceof Streams.Readable
+			&& response instanceof Readable
 		) {
 			isRaw	= true;
 			response.pipe( this.response );
@@ -206,6 +206,8 @@ class EventRequest extends EventEmitter
 				{
 					response	= 'Malformed payload';
 				}
+
+				this.setResponseHeader( 'Content-Length', response.length );
 			}
 
 			this.response.end( response );
@@ -229,7 +231,7 @@ class EventRequest extends EventEmitter
 	 * @param	{String} key
 	 * @param	{String} value
 	 *
-	 * @return	void
+	 * @return	EventRequest
 	 */
 	setResponseHeader( key, value )
 	{
@@ -240,6 +242,8 @@ class EventRequest extends EventEmitter
 
 		else
 			this.next( 'Trying to set header when response is already sent' );
+
+		return this;
 	}
 
 	/**
@@ -247,7 +251,7 @@ class EventRequest extends EventEmitter
 	 *
 	 * @param	{String} key
 	 *
-	 * @return	void
+	 * @return	EventRequest
 	 */
 	removeResponseHeader( key )
 	{
@@ -258,6 +262,8 @@ class EventRequest extends EventEmitter
 
 		else
 			this.next( 'Trying to remove header when response is already sent' );
+
+		return this;
 	}
 
 	/**
@@ -308,11 +314,13 @@ class EventRequest extends EventEmitter
 	 *
 	 * @param	{Number} code
 	 *
-	 * @return	void
+	 * @return	EventRequest
 	 */
 	setStatusCode( code )
 	{
 		this.response.statusCode	= typeof code === 'number' ? code : 500;
+
+		return this;
 	}
 
 	/**
@@ -345,7 +353,7 @@ class EventRequest extends EventEmitter
 	 */
 	isFinished()
 	{
-		return this.finished === true || this.response.finished;
+		return this.finished === true || this.response.writableEnded || this.response.finished;
 	}
 
 	/**
