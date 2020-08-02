@@ -180,34 +180,6 @@ test({
 });
 
 test({
-	message	: 'File.format.returns.a.string',
-	test	: ( done ) => {
-		let logLevel	= LOG_LEVELS.error;
-		let logLevels	= LOG_LEVELS;
-		let filePath	= helpers.getTestFile();
-		let MockedFile	= Mock( File );
-
-		Mocker( MockedFile, {
-			method			: 'getWriteStream',
-			shouldReturn	: () => {},
-			called			: 1
-		} );
-
-		let file	= new MockedFile({
-			logLevel,
-			logLevels,
-			filePath
-		});
-
-		assert.equal( typeof file.format( Log.getInstance( 'test' ) ), 'string' );
-
-		helpers.clearUpTestFile();
-
-		done();
-	}
-});
-
-test({
 	message	: 'File.getFileName adds timestamp',
 	test	: ( done ) => {
 		let logLevel		= LOG_LEVELS.error;
@@ -293,7 +265,7 @@ test({
 		});
 
 		let logData	= 'This is a test log';
-		let promise	= file.log( Log.getInstance( logData ) );
+		let promise	= file.log( [logData] );
 
 		assert.equal( promise instanceof Promise, true );
 

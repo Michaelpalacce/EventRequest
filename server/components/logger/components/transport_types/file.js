@@ -42,7 +42,7 @@ class File extends Transport
 
 		this.processors			= Array.isArray( options.processors )
 								? options.processors
-								: [Transport.processors.time(), Transport.processors.stack()];
+								: [Transport.processors.time(), Transport.processors.stack(), Transport.processors.line()];
 
 		this.formatter			= typeof options.formatter === 'function'
 								? options.formatter

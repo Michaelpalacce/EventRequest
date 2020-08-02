@@ -53,12 +53,9 @@ test({
 });
 
 test({
-	message	: 'Transport.getInstance returns an instance of Transport',
+	message	: 'Transport.getInstance.returns.an.instance.of.Transport',
 	test	: ( done ) => {
-		let transportBase	= new Transport();
-		let transportTest	= Transport.getInstance();
-
-		assert.deepStrictEqual( transportBase, transportTest );
+		assert.deepStrictEqual( Transport.getInstance() instanceof Transport, true );
 
 		done();
 	}
@@ -97,18 +94,6 @@ test({
 		assert.equal( transport.supports( Log.getInstance( '', LOG_LEVELS.info ) ), false );
 		assert.equal( transport.supports( Log.getInstance( '', LOG_LEVELS.verbose ) ), false );
 		assert.equal( transport.supports( Log.getInstance( '', LOG_LEVELS.debug ) ), false );
-
-		done();
-	}
-});
-
-test({
-	message	: 'Transport.format does nothing',
-	test	: ( done ) => {
-		let transport	= new Transport();
-		let log			= Log.getInstance( 'test' );
-
-		assert.equal( transport.format( log ), log );
 
 		done();
 	}

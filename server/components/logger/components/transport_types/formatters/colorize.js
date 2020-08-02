@@ -28,6 +28,6 @@ colorize.blue		= ( log ) => { return BLUE + log + RESET; };
 colorize.magenta	= ( log ) => { return MAGENTA + log + RESET; };
 colorize.cyan		= ( log ) => { return CYAN + log + RESET; };
 colorize.white		= ( log ) => { return WHITE + log + RESET; };
-colorize.reset		= ( log = '' ) => { return RESET + log; };
+colorize.reset		= ( log = '' ) => { return RESET + log + RESET; };
 
 module.exports	= colorize;

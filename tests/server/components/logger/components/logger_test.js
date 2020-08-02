@@ -21,7 +21,7 @@ test({
 });
 
 test({
-	message	: 'Logger.constructor on valid arguments',
+	message	: 'Logger.constructor.on.valid.arguments',
 	test	: ( done ) => {
 		let serverName				= 'Test';
 		let logLevel				= LOG_LEVELS.debug;
@@ -61,7 +61,7 @@ test({
 });
 
 test({
-	message	: 'Logger.constructor on invalid arguments',
+	message	: 'Logger.constructor.on.invalid.arguments',
 	test	: ( done ) => {
 		let serverName				= new Error();
 		let logLevel				= new Error();
@@ -88,9 +88,9 @@ test({
 		assert.deepStrictEqual( logger.capture, false );
 		assert.deepStrictEqual( logger.dieOnCapture, true );
 		assert.deepStrictEqual( logger.unhandledExceptionLevel, LOG_LEVELS.error );
-		assert.deepStrictEqual( logger.transports, [new Console()] );
-		assert.deepStrictEqual( logger.transports[0].logLevel, LOGGER_DEFAULT_LOG_LEVEL );
-		assert.deepStrictEqual( logger.uniqueId, 'id' );
+		assert.deepStrictEqual( logger.transports.length, 1 );
+		assert.deepEqual( logger.transports[0].logLevel, LOGGER_DEFAULT_LOG_LEVEL );
+		assert.deepEqual( logger.uniqueId, 'id' );
 		assert.deepStrictEqual( typeof logger.error, 'function' );
 		assert.deepStrictEqual( typeof logger.warning, 'function' );
 		assert.deepStrictEqual( typeof logger.notice, 'function' );
@@ -103,7 +103,7 @@ test({
 });
 
 test({
-	message	: 'Logger.constructor logLevels attaches only given properties',
+	message	: 'Logger.constructor.logLevels.attaches.only.given.properties',
 	test	: ( done ) => {
 		let logLevels	= { error : 100, warning : 200 };
 		let logger		= new Logger( { logLevels }, 'id' );
@@ -121,7 +121,7 @@ test({
 });
 
 test({
-	message	: 'Logger.constructor logLevels accepts custom levels',
+	message	: 'Logger.constructor.logLevels.accepts.custom.levels',
 	test	: ( done ) => {
 		let logLevels	= { testOne : 100, testTwo : 200 };
 		let logger		= new Logger( { logLevels }, 'id' );
@@ -135,7 +135,7 @@ test({
 });
 
 test({
-	message	: 'Logger.log logs only up to given log level and always returns a promise',
+	message	: 'Logger.log.logs.only.up.to.given.log.level.and.always.returns.a.promise',
 	test	: ( done ) => {
 		let TransportMock	= Mock( Transport );
 		let logged			= 0;
@@ -196,7 +196,7 @@ test({
 });
 
 test({
-	message	: 'Logger.addTransport adds only a transport that is an instance of Transport',
+	message	: 'Logger.addTransport.adds.only.a.transport.that.is.an.instance.of.Transport',
 	test	: ( done ) => {
 		let logger	= new Logger( {}, 'id' );
 		assert.equal( logger.addTransport( new Console( { logLevel : 0 } ) ), true );

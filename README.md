@@ -1125,20 +1125,6 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - If you have log levels: 100 and 200 and you try with a log level of 50 or a 300 it won't log
 - Defaults to LOG_LEVELS
 
-**color: Boolean**
-- Whether the log should be colored 
-- Defaults to true
-
-**logColors: Object** 
-- The colors to use 
-- Defaults to
-    - [LOG_LEVELS.error]   : 'red',
-    - [LOG_LEVELS.warning] : 'yellow',
-    - [LOG_LEVELS.notice]  : 'green',
-    - [LOG_LEVELS.info]    : 'blue',
-    - [LOG_LEVELS.verbose] : 'cyan',
-    - [LOG_LEVELS.debug]   : 'white'
-
 ### [File](#file)
 - Logs data to a file
 - It can't log raw logs
@@ -1164,11 +1150,6 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - Accepts Absolute and relative paths
 - If it is not provided the transport will not log
 
-**splitToNewLines: Boolean**
-- Flag telling the transport if the new line characters should be evaluated as new lines or not
-- New lines in files may make it a bit easier to read, but if you have some software for automatic shipping of logs, you may want them on one row
-- Defaults to false
-
 ~~~javascript
 const { Loggur, LOG_LEVELS, Console, File } = require( 'event_request' ).Logging;
 
@@ -1186,13 +1167,11 @@ const logger = Loggur.createLogger({
         }),
         new File({
             logLevel : LOG_LEVELS.error,
-            filePath : '/logs/error_log.log',
-            splitToNewLines : true
+            filePath : '/logs/error_log.log'
         }),
         new File({
             logLevel : LOG_LEVELS.debug,
-            filePath : '/logs/debug_log.log',
-            splitToNewLines : true
+            filePath : '/logs/debug_log.log'
         })
     ]
 });
@@ -1202,7 +1181,7 @@ Loggur.addLogger( 'serverLogger', logger );
 console.log( typeof Loggur.loggers['serverLogger'] !== 'undefined' );
 ~~~
 
-### Default log levels:
+# [Log Levels](#log-levles)
 - error   : 100,
 - warning : 200,
 - notice  : 300,

@@ -8,6 +8,7 @@ const jsonFormatter			= require( './formatters/json_formatter' );
 const timeProcessor			= require( './processors/timestamp_processor' );
 const colorProcessor		= require( './processors/color_processor' );
 const stackProcessor		= require( './processors/stack_processor' );
+const newLineProcessor		= require( './processors/new_line_processor' );
 
 /**
  * @brief	Constants
@@ -141,6 +142,7 @@ class Transport
 Transport.processors	= {
 	time	: timeProcessor,
 	color	: colorProcessor,
+	line	: newLineProcessor,
 	stack	: stackProcessor
 };
 
