@@ -3,7 +3,28 @@
 // Dependencies
 const { assert, test }		= require( '../../../../../../test_helper' );
 const timestampProcessor	= require( './../../../../../../../server/components/logger/components/transport_types/processors/timestamp_processor' );
-const os					= require( 'os' );
+
+/**
+ * @brief	Gets the timestamp from the Log
+ *
+ * @param	{Number} timestamp
+ *
+ * @return	{String}
+ */
+function getTimestamp( timestamp )
+{
+	return Intl.DateTimeFormat( 'en-GB',
+		{
+			hour12	: false,
+			year	: '2-digit',
+			month	: '2-digit',
+			day		: '2-digit',
+			hour	: '2-digit',
+			minute	: '2-digit',
+			second	: '2-digit'
+		}
+	).format( new Date( timestamp * 1000 ) );
+}
 
 test({
 	message	: 'timestampProcessor.returns.a.function',
@@ -56,7 +77,7 @@ test({
 
 		const expectedContext	= {
 			uniqueId	: 'uniqueId',
-			timestamp	: '01/01/70, 02:01:40',
+			timestamp	: getTimestamp( 100 ),
 			isRaw		: false,
 			message		: 'message',
 			rawMessage	: 'testRawMessage'

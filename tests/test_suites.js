@@ -48,7 +48,7 @@ testSuites.loggingSuite		= () => {
 	require( './server/components/logger/components/transport_types/processors/stack_processor_test' );
 	require( './server/components/logger/components/transport_types/processors/color_processor_test' );
 	require( './server/components/logger/components/transport_types/processors/new_line_processor_test' );
-	require( './server/components/logger/components/transport_types/processors/timestamp_processor' );
+	require( './server/components/logger/components/transport_types/processors/timestamp_processor_test' );
 };
 
 testSuites.cachingSuite		= () => {
