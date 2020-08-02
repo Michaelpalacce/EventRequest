@@ -45,10 +45,10 @@ class File extends Transport
 								? options.splitToNewLines
 								: true;
 
-		this.fileStream	= null;
+		this.fileStream			= null;
 
-		if ( this.filePath )
-			this.getWriteStream();
+		if ( ! this.filePath )
+			throw new Error( 'app.er.logging.transport.file.fileLogPathNotProvided' );
 	}
 
 	/**
@@ -123,11 +123,7 @@ class File extends Transport
 	 */
 	_log( log, resolve, reject )
 	{
-		let message	= this.format( log );
-
-		if ( ! this.filePath )
-			reject( { code: 'app.er.logging.transport.file.fileLogPathNotProvided' } );
-
+		let message			= this.format( log );
 		const writeStream	= this.getWriteStream();
 
 		if ( this.splitToNewLines )

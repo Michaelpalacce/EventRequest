@@ -2005,7 +2005,7 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
   - Thrown by when there was an error during rendering in the templating engine plugin
 
 **app.er.logging.transport.file.fileLogPathNotProvided**
-  - Thrown by the file transport if there is no filePath provided while logging
+  - Thrown by the file transport if there is no filePath provided
 
 **app.er.validation.error**
   - Thrown by the validation plugin when there is an error with validation. Could be that the EventRequest has a missing property or validation of input failed

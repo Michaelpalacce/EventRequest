@@ -1,6 +1,6 @@
 27.1.1
 - File test improved since builds were often failing there
-- Remove npm test from the publish workflow
+- Remove npm test from the publish workflow, releases have been tested already
 
 27.1.0
 - Node v14.x support

@@ -13,7 +13,18 @@ helpers.clearUpTestFile();
 test({
 	message	: 'File.constructor on defaults',
 	test	: ( done ) => {
-		new File();
+		assert.throws(() => {
+			new File();
+		});
+
+		try
+		{
+			new File();
+		}
+		catch ( e )
+		{
+			assert.deepStrictEqual( e.message, 'app.er.logging.transport.file.fileLogPathNotProvided' );
+		}
 
 		done();
 	}
@@ -29,9 +40,9 @@ test({
 
 		fileTransport.getWriteStream();
 
-		assert.deepStrictEqual( fs.existsSync( dir ), true );
-
 		setTimeout(() => {
+			assert.deepStrictEqual( fs.existsSync( dir ), true );
+
 			fs.unlinkSync( fileTransport.getFileName() );
 
 			fs.unlink( dir, () => {
@@ -119,14 +130,14 @@ test({
 		let file	= new File({
 			logLevel		: 'test',
 			logLevels		: 'test',
-			filePath		: true,
+			filePath		: './path',
 			splitToNewLines	: 123
 		});
 
 		assert.deepStrictEqual( file.logLevel, LOG_LEVELS.info );
 		assert.deepStrictEqual( file.logLevels, LOG_LEVELS );
 		assert.deepStrictEqual( file.supportedLevels, Object.values( LOG_LEVELS ) );
-		assert.deepStrictEqual( file.filePath, null );
+		assert.deepStrictEqual( file.filePath, './path' );
 		assert.deepStrictEqual( file.fileStream, null );
 		assert.deepStrictEqual( file.splitToNewLines, true );
 
@@ -135,7 +146,7 @@ test({
 });
 
 test({
-	message	: 'File.constructor on valid configuration',
+	message	: 'File.constructor.on.valid.configuration',
 	test	: ( done ) => {
 		let logLevel		= LOG_LEVELS.error;
 		let splitToNewLines	= false;
@@ -148,9 +159,8 @@ test({
 			method			: 'getWriteStream',
 			shouldReturn	: () => {
 				++ called;
-				return new Writable();
 			},
-			called			: 1
+			called			: 0
 		} );
 
 		let file	= new MockedFile({
@@ -166,7 +176,7 @@ test({
 		assert.deepStrictEqual( file.splitToNewLines, false );
 		assert.deepStrictEqual( file.filePath, expectedPath );
 		assert.deepStrictEqual( file.fileStream === null, true );
-		assert.deepStrictEqual( called, 1 );
+		assert.deepStrictEqual( called, 0 );
 
 		helpers.clearUpTestFile();
 
@@ -175,7 +185,7 @@ test({
 });
 
 test({
-	message	: 'File.format returns a string',
+	message	: 'File.format.returns.a.string',
 	test	: ( done ) => {
 		let logLevel	= LOG_LEVELS.error;
 		let logLevels	= LOG_LEVELS;
@@ -348,20 +358,5 @@ test({
 			},
 			done
 		);
-	}
-});
-
-test({
-	message	: 'File.log.rejects.if.filePath.not.provided',
-	test	: ( done ) => {
-		const MockedFile	= Mock( File );
-
-		const file	= new MockedFile( { filePath: false } );
-
-		file.log( Log.getInstance( 'test' ) ).then( () => {
-			done( 'Should not resolve' );
-		}).catch( () => {
-			done();
-		});
 	}
 });
