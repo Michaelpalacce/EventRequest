@@ -1021,6 +1021,8 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - Logger class that can be configured for specific logging purposes like access logs or error logs
 - First parameter of the constructor is the options which can be used to configure the logger and the second is the logger Id which must be a string, otherwise an error `app.er.logger.invalidUniqueId` will be thrown
 - Each Logger can have it's own transport layers.
+- Every transport layer has his set of processors that change the data to be logged ( timestamp is beautified, colors are added, data is sanitized )
+- Every transport layer has one formatter that changes the format of the data to be logged ( plain text, json )
 - Every transport layer will be called when calling logger.log
 - Logger.log returns a promise which will be resolved when the logging is complete
 
@@ -1041,7 +1043,7 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - Defaults to LOG_LEVELS.info
 
 **logLevels: Object** 
-- JSON object with all the log severity levels and their values All added log levels will be attached to the instance of the logger class 
+- JSON object with all the log severity levels and their values. All added log levels will be attached to the instance of the logger class
 - The logger will be able to log ONLY on these log levels
 - If you have log levels: 100 and 200 and you try with a log level of 50 or a 300 it won't log
 - Defaults to LOG_LEVELS
@@ -3317,7 +3319,7 @@ app.listen( '80', () => {
 
 # [er_logger](#er_logger) 
 - Adds a logger to the eventRequest
-- Attaches a dumpStack() function as well as log( data, level ) function to the process for easier access
+- Attaches a log( data, level ) function to the process for easier access
 - This can be controlled and turned off. The process.log( data, level ) calls the given logger
 
 ***
@@ -3332,7 +3334,7 @@ app.listen( '80', () => {
 - Instance of Logger, if incorrect object provided, defaults to the default logger from the Loggur
 
 **attachToProcess: Boolean**
-- Boolean whether the plugin should attach dumpStack and log to the process
+- Boolean whether the plugin should attach log to the process
 
 ***
 #### Events:
@@ -3379,9 +3381,6 @@ app.listen( '80', () => {
 
 ***
 #### Attached Functionality:
-
-**process.dumpStack(): Promise**
-- Logs the current stack
 
 **process.log( data, level ): Promise**
 - You can use the attached logger anywhere

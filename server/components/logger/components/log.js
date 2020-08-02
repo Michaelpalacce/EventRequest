@@ -1,7 +1,5 @@
 'use strict';
 
-const path	= require( 'path' );
-
 /**
  * @brief	Constants
  */
@@ -14,7 +12,6 @@ const LOG_LEVELS		= {
 	debug	: 600
 };
 const DEFAULT_LOG_LEVEL	= LOG_LEVELS.notice;
-const PROJECT_ROOT		= path.parse( require.main.filename ).dir + '\\';
 
 /**
  * @brief	Log object used to transport information inside the loggur
@@ -36,53 +33,6 @@ class Log
 		this.isRaw		= false;
 
 		this.processLog( log, level, isRaw );
-
-		if ( this.level	=== LOG_LEVELS.debug )
-			this.message	+= Log.getStackTrace();
-	}
-
-	/**
-	 * @brief	Gets the stack trace to be used in debugging
-	 *
-	 * @details	This sanitizes the stack trace a bit
-	 *
-	 * @return	String
-	 */
-	static getStackTrace()
-	{
-		let stack			= '';
-		let index			= 0;
-		let stackParts		= new Error().stack.replace( /at|Error/g, '' ).split( '\n' );
-		let removing		= true;
-
-		let forwardSlashes	= '\\'.repeat( 50 );
-		let NEW_LINE		= '\n';
-
-		stack				+= NEW_LINE;
-		stack				+= forwardSlashes;
-		stack				+= 'STACK TRACE';
-		stack				+= forwardSlashes;
-		stack				+= NEW_LINE;
-
-		// Remove the first empty log
-		stackParts.shift();
-
-		stackParts.forEach(( stackPart ) => {
-			if ( removing === true && stackPart.indexOf( __filename ) !== -1 )
-				return;
-
-			// Stop searching
-			removing	= false;
-
-			stackPart	= ++ index + '.' + stackPart;
-			stackPart	= stackPart.replace( PROJECT_ROOT, '' );
-			stackPart	= stackPart.trim();
-			stackPart	+= '\n';
-
-			stack		+=  stackPart;
-		});
-
-		return stack;
 	}
 
 	/**
@@ -96,13 +46,17 @@ class Log
 	 */
 	processLog( message = '', level = LOG_LEVELS.error, isRaw = false )
 	{
-		let logType	= typeof message;
-		this.level	= typeof level === 'number' ? level : DEFAULT_LOG_LEVEL;
+		let logType		= typeof message;
+
+		this.level		= typeof level === 'number' ? level : DEFAULT_LOG_LEVEL;
+		this.rawMessage	= message;
+		this.isRaw		= isRaw;
+		this.timestamp	= Log.getUNIXTime();
 
 		switch ( true )
 		{
 			case message instanceof Error:
-				this.message	= message.stack;
+				this.message	= message.message;
 				break;
 
 			case logType === 'string':
@@ -117,11 +71,6 @@ class Log
 				this.message	= JSON.stringify( message );
 				break;
 		}
-
-		this.rawMessage	= message;
-		this.isRaw		= isRaw;
-
-		this.timestamp	= Log.getUNIXTime();
 	}
 
 	/**

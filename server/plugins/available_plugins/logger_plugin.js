@@ -17,7 +17,7 @@ class LoggerPlugin extends PluginInterface
 	}
 
 	/**
-	 * @brief	Attaches a process.dumpStack and process.log function for easier use
+	 * @brief	Attaches a process.log function for easier use
 	 *
 	 * @param	{Server} server
 	 *
@@ -26,13 +26,7 @@ class LoggerPlugin extends PluginInterface
 	setServerOnRuntime( server )
 	{
 		if ( this.options.attachToProcess === true )
-		{
-			process.dumpStack	= () => {
-				return Loggur.log( Log.getStackTrace() );
-			};
-
-			process.log			= Loggur.log.bind( Loggur );
-		}
+			process.log	= Loggur.log.bind( Loggur );
 	}
 
 	/**

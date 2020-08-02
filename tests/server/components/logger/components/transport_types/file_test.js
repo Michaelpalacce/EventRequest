@@ -130,8 +130,7 @@ test({
 		let file	= new File({
 			logLevel		: 'test',
 			logLevels		: 'test',
-			filePath		: './path',
-			splitToNewLines	: 123
+			filePath		: './path'
 		});
 
 		assert.deepStrictEqual( file.logLevel, LOG_LEVELS.info );
@@ -139,7 +138,6 @@ test({
 		assert.deepStrictEqual( file.supportedLevels, Object.values( LOG_LEVELS ) );
 		assert.deepStrictEqual( file.filePath, './path' );
 		assert.deepStrictEqual( file.fileStream, null );
-		assert.deepStrictEqual( file.splitToNewLines, true );
 
 		done();
 	}
@@ -149,7 +147,6 @@ test({
 	message	: 'File.constructor.on.valid.configuration',
 	test	: ( done ) => {
 		let logLevel		= LOG_LEVELS.error;
-		let splitToNewLines	= false;
 		let logLevels		= LOG_LEVELS;
 		let called			= 0;
 		let filePath		= helpers.getTestFile();
@@ -166,14 +163,12 @@ test({
 		let file	= new MockedFile({
 			logLevel,
 			logLevels,
-			filePath,
-			splitToNewLines
+			filePath
 		});
 
 		assert.deepStrictEqual( file.logLevel, logLevel );
 		assert.deepStrictEqual( file.logLevels, logLevels );
 		assert.deepStrictEqual( file.supportedLevels, Object.values( logLevels ) );
-		assert.deepStrictEqual( file.splitToNewLines, false );
 		assert.deepStrictEqual( file.filePath, expectedPath );
 		assert.deepStrictEqual( file.fileStream === null, true );
 		assert.deepStrictEqual( called, 0 );
@@ -298,51 +293,6 @@ test({
 		});
 
 		let logData	= 'This is a test log';
-		let promise	= file.log( Log.getInstance( logData ) );
-
-		assert.equal( promise instanceof Promise, true );
-
-		promise.then(
-			() => {
-				let data	= fs.readFileSync( path.join( __dirname, './fixtures/testfile' ) );
-				assert.equal( data.toString().indexOf( logData ) !== -1, true );
-
-				helpers.clearUpTestFile();
-
-				done();
-			},
-			done
-		);
-	}
-});
-
-test({
-	message	: 'File.log.with.splitToNewLines.false',
-	test	: ( done ) => {
-		let logLevel	= LOG_LEVELS.error;
-		let logLevels	= LOG_LEVELS;
-		let filePath	= helpers.getTestFile();
-		let MockedFile	= Mock( File );
-
-		Mocker( MockedFile, {
-			method			: 'getWriteStream',
-			shouldReturn	: () => {
-				return fs.createWriteStream( path.join( __dirname, './fixtures/testfile' ), {
-					flags		: 'w',
-					autoClose	: true
-				});
-			},
-			called			: 2
-		} );
-
-		let file	= new MockedFile({
-			logLevel,
-			logLevels,
-			filePath,
-			splitToNewLines	: false
-		});
-
-		let logData	= 'This is a \\ntest log';
 		let promise	= file.log( Log.getInstance( logData ) );
 
 		assert.equal( promise instanceof Promise, true );

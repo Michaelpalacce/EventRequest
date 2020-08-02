@@ -27,14 +27,9 @@ test({
 		app.apply( app.er_logger, { logger, attachToProcess: true } );
 
 		app.get( `/${name}`, ( event ) => {
-			if (
-				typeof process.dumpStack !== 'function'
-				|| typeof process.log !== 'function'
-			) {
+			if ( typeof process.log !== 'function' )
 				event.sendError( 'Logger is not attached correctly', 500 );
-			}
 
-			process.dumpStack();
 			process.log( 'TESTLOG' );
 
 			event.emit( 'redirect', { redirectUrl: 'REDIRECT-LINK' } );
@@ -56,7 +51,6 @@ test({
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { headerName: 'value' }, 3336 ).then(( response ) => {
 				fileTransport.getWriteStream().end();
 				setTimeout(() => {
-					process.dumpStack	= undefined;
 					process.log			= undefined;
 
 					assert.equal( fs.existsSync( fileTransport.getFileName() ), true );
@@ -126,7 +120,6 @@ test({
 			helpers.sendServerRequest( `/${name}`, 'GET', 500, '', { headerName: 'value' }, 3336, '{"error":{"code":"app.general","message":"Some error occurred"}}' ).then(( response ) => {
 				fileTransport.getWriteStream().end();
 				setTimeout(() => {
-					process.dumpStack	= undefined;
 					process.log			= undefined;
 
 					assert.equal( fs.existsSync( fileTransport.getFileName() ), true );
@@ -175,14 +168,9 @@ test({
 		app.apply( app.er_logger, { logger, attachToProcess: true } );
 
 		app.get( `/${name}`, ( event ) => {
-			if (
-				typeof process.dumpStack !== 'function'
-				|| typeof process.log !== 'function'
-			) {
+			if (  typeof process.log !== 'function' )
 				event.sendError( 'Logger is not attached correctly', 500 );
-			}
 
-			process.dumpStack();
 			process.log( 'TESTLOG' );
 
 			event.emit( 'redirect', { redirectUrl: 'REDIRECT-LINK' } );
@@ -203,7 +191,6 @@ test({
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', { headerName: 'value', 'user-agent': 'someUserAgent' }, 4310 ).then(( response ) => {
 				fileTransport.getWriteStream().end();
 				setTimeout(() => {
-					process.dumpStack	= undefined;
 					process.log			= undefined;
 
 					assert.equal( fs.existsSync( fileTransport.getFileName() ), true );

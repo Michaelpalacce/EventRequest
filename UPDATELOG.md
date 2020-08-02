@@ -1,9 +1,12 @@
-27.1.1
+27.2.0
 - File test improved since builds were often failing there
 - Remove npm test from the publish workflow, releases have been tested already
 - Router reworked a bit, moved the cache to a different class.
 - Router now returns self when adding a router with a route
-- RouterCache will now consider the limit exactly the one set ( Object.keys( this._cache ).length >= this.keyLimit intead of Object.keys( this._cache ).length > this.keyLimit )
+- RouterCache will now consider the limit exactly the one set ( Object.keys( this._cache ).length >= this.keyLimit instead of Object.keys( this._cache ).length > this.keyLimit )
+- Refactored the logging. Even tho this changes the interface it won't break anything but may make some features not work correctly.
+- process.dumpStack has been removed from the Logger Plugin.
+- Added new Logging processors and formatters
 
 27.1.0
 - Node v14.x support

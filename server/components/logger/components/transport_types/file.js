@@ -27,7 +27,6 @@ class File extends Transport
 	 *
 	 * @details	Accepted options:
 	 * 			- filePath - String - the location of the file to log to -> if it is not provided the transport will not log
-	 * 			- splitToNewLines - Boolean - Whether the new lines in the message should be evaluated as new lines and split or do we want to log the entire message on one line
 	 *
 	 * @param	{Object} options
 	 *
@@ -41,9 +40,13 @@ class File extends Transport
 								? options.filePath
 								: null;
 
-		this.splitToNewLines	= typeof options.splitToNewLines === "boolean"
-								? options.splitToNewLines
-								: true;
+		this.processors			= Array.isArray( options.processors )
+								? options.processors
+								: [Transport.processors.time(), Transport.processors.stack()];
+
+		this.formatter			= typeof options.formatter === 'function'
+								? options.formatter
+								: Transport.formatters.plain( { noRaw: true } );
 
 		this.fileStream			= null;
 
@@ -93,63 +96,30 @@ class File extends Transport
 	}
 
 	/**
-	 * @brief	Format the given log
-	 *
-	 * @param	{Log} log
-	 *
-	 * @return	String
-	 */
-	format( log )
-	{
-		const message	= log.getMessage();
-		const uniqueId	= log.getUniqueId();
-
-		return uniqueId + ' - ' + this._getTimestamp( log ) + ': ' + message;
-	}
-
-	/**
 	 * @brief	Logs the log in a file
 	 *
-	 * @param	{Log} log
+	 * @param	{Array} data
 	 * @param	{Function} resolve
 	 * @param	{Function} reject
 	 *
 	 * @return	void
 	 */
-	_log( log, resolve, reject )
+	_log( data, resolve, reject )
 	{
-		let message			= this.format( log );
 		const writeStream	= this.getWriteStream();
+		let hasError		= false;
 
-		if ( this.splitToNewLines )
-		{
-			let hit	= true;
-
-			while ( hit )
-			{
-				hit				= false;
-				const lineEnds	= ['\r\n', '\\r\\n', '\n', '\\n', '\r', '\\r'];
-
-				for ( const lineEnd of lineEnds )
+		for ( const message of data )
+			writeStream.write( message + SYSTEM_EOL, 'utf8', ( err ) => {
+				if ( err )
 				{
-					const lineEndPosition	= message.indexOf( `${lineEnd}` );
-
-					if ( lineEndPosition !== -1 )
-					{
-						writeStream.write( message.slice( 0, lineEndPosition ) + SYSTEM_EOL, 'utf8' );
-						message	= message.slice( lineEndPosition + lineEnd.length );
-						hit		= true;
-					}
+					hasError	= true;
+					reject( err );
 				}
-			}
-		}
+			});
 
-		writeStream.write( message + SYSTEM_EOL, 'utf8', ( err ) => {
-			if ( err )
-				reject( err );
-			else
-				resolve();
-		});
+		if ( ! hasError )
+			resolve();
 	}
 }
 

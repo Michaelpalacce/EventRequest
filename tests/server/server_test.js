@@ -2021,7 +2021,6 @@ test({
 			setTimeout(() => {
 				assert.deepStrictEqual( response.body.toString(), 'ERROR!' );
 
-				process.dumpStack	= undefined;
 				process.log			= undefined;
 
 				assert.deepStrictEqual( fs.existsSync( fileTransport.getFileName() ), true );
@@ -2092,7 +2091,6 @@ test({
 			setTimeout(() => {
 				assert.deepStrictEqual( response.body.toString(), 'ERROR!' );
 
-				process.dumpStack	= undefined;
 				process.log			= undefined;
 
 				assert.deepStrictEqual( fs.existsSync( fileTransport.getFileName() ), true );

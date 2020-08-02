@@ -84,3 +84,12 @@ test({
 		done();
 	}
 });
+
+test({
+	message	: 'Colorize.reset.without.anything',
+	test	: ( done )=>{
+		assert.deepStrictEqual( colorize.reset(), '\u001b[0m' );
+
+		done();
+	}
+});
