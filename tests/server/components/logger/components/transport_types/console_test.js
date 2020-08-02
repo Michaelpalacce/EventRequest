@@ -1,8 +1,8 @@
 'use strict';
 
 // Dependencies
-const { assert, test, Mock }		= require( '../../../../../test_helper' );
-const { LOG_LEVELS, Console, Log }	= require( './../../../../../../server/components/logger/loggur' );
+const { assert, test, Mock }					= require( '../../../../../test_helper' );
+const { LOG_LEVELS, Console, Log, Transport }	= require( './../../../../../../server/components/logger/loggur' );
 
 test({
 	message	: 'Console.constructor.on.default',
@@ -80,7 +80,7 @@ test({
 
 		done();
 	}
-	});
+});
 
 test({
 	message	: 'Console.log.does.not.log.if.the.transport.does.not.support.it',
@@ -99,5 +99,23 @@ test({
 		assert.equal( consoleTransport.log( Log.getInstance( '', LOG_LEVELS.debug ) ) instanceof Promise, true );
 
 		called === 0 ? done() : done( 'Log should not have been called but it did' );
+	}
+});
+
+test({
+	message	: 'Console.formatters.is.same.as.Transport.formatters',
+	test	: ( done ) => {
+		assert.deepStrictEqual( Console.formatters, Transport.formatters );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Console.processors.is.same.as.Transport.processors',
+	test	: ( done ) => {
+		assert.deepStrictEqual( Console.processors, Transport.processors );
+
+		done();
 	}
 });

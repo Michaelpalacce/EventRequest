@@ -29,7 +29,8 @@ module.exports	= () => {
 	 *
 	 * @return	void
 	 */
-	return ( context ) => {
-		context.timestamp	= getTimestamp( context.timestamp );
+	return ( context = {} ) => {
+		if ( typeof context.timestamp === 'number' )
+			context.timestamp	= getTimestamp( context.timestamp );
 	}
 };

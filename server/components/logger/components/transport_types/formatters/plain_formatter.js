@@ -17,13 +17,23 @@ module.exports	= ( { noRaw = false } = {} ) =>{
 	 *
 	 * @return	Array
 	 */
-	return ( context ) => {
-		const uniqueId	= context.uniqueId;
-		const timestamp	= context.timestamp;
+	return ( context = {} ) => {
+		const propertiesToTest = ['uniqueId', 'timestamp', 'isRaw', 'rawMessage', 'message'];
 
-		if ( context.isRaw && noRaw === false )
-			return [`${uniqueId} - ${timestamp} :`, context.rawMessage];
+		if ( propertiesToTest.every( ( value ) => { return value in context; } ) )
+		{
+			const uniqueId	= context.uniqueId;
+			const timestamp	= context.timestamp;
 
-		return [`${uniqueId} - ${timestamp} : ${context.message}`];
+			if ( context.isRaw && noRaw === false )
+				return [`${uniqueId} - ${timestamp} :`, context.rawMessage];
+
+			return [`${uniqueId} - ${timestamp} : ${context.message}`];
+		}
+		else
+		{
+			return [];
+		}
+
 	}
 };

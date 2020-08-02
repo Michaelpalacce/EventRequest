@@ -10,11 +10,8 @@ module.exports	= () => {
 	 *
 	 * @return	void
 	 */
-	return ( context ) => {
-
-		const lineEnds	= ['\r\n', '\\r\\n', '\n', '\\n', '\r', '\\r'];
-
-		for ( const lineEnd of lineEnds )
-			context.message	= context.message.replace( /\\n/g, os.EOL );
+	return ( context = {} ) => {
+		if ( typeof context.message === 'string' )
+			context.message	= context.message.replace( /\r\n|\r|\n|\\r\\n|\\n|\\r/g, os.EOL );
 	}
 };

@@ -25,15 +25,20 @@ module.exports	= ( { logColors = DEFAULT_LOG_COLORS } = {} ) =>{
 	 *
 	 * @return	void
 	 */
-	return ( context ) => {
-		let color			= typeof logColors[context.level] === 'undefined' || typeof colorize[logColors[context.level]] !== 'function'
-							? FORMATTER_DEFAULT_COLOR
-							: logColors[context.level];
+	return ( context = {} ) => {
+		const propertiesToTest = ['level', 'uniqueId', 'timestamp', 'isRaw', 'message'];
 
-		context.uniqueId	= colorize.reset( context.uniqueId );
-		context.timestamp	= colorize.blue( context.timestamp );
+		if ( propertiesToTest.every( ( value ) => { return value in context; } ) )
+		{
+			let color			= typeof logColors[context.level] === 'undefined' || typeof colorize[logColors[context.level]] !== 'function'
+								? FORMATTER_DEFAULT_COLOR
+								: logColors[context.level];
 
-		if ( ! context.isRaw )
-			context.message	= `${colorize[color]( context.message )}${colorize.reset()}`;
+			context.uniqueId	= colorize.reset( context.uniqueId );
+			context.timestamp	= colorize.blue( context.timestamp );
+
+			if ( ! context.isRaw )
+				context.message	= `${colorize[color]( context.message )}${colorize.reset()}`;
+		}
 	}
 };

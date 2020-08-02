@@ -31,6 +31,15 @@ test({
 });
 
 test({
+	message	: 'jsonFormatter.returns.a.function.that.formats.context.with.nothing',
+	test	: ( done ) => {
+		assert.deepStrictEqual( jsonFormatter()(), ['{}']);
+
+		done();
+	}
+});
+
+test({
 	message	: 'jsonFormatter.returns.a.function.that.formats.context.when.raw',
 	test	: ( done ) => {
 		const context	= {
@@ -57,7 +66,7 @@ test({
 
 			return value
 		};
-		
+
 		const context	= {
 			uniqueId	: 'uniqueId',
 			timestamp	: 'timestamp',
@@ -74,6 +83,23 @@ test({
 		});
 
 		assert.deepStrictEqual( jsonFormatter( { replacer } )( context ), [expected]);
+
+		done();
+	}
+});
+
+test({
+	message	: 'jsonFormatter.returns.a.function.that.formats.context.with.nothing.and.replacer',
+	test	: ( done ) => {
+		const replacer	= function( key, value )
+		{
+			if ( key === 'message' )
+				return 'REPLACED MESSAGE';
+
+			return value
+		};
+
+		assert.deepStrictEqual( jsonFormatter( { replacer } )(), ['{}']);
 
 		done();
 	}

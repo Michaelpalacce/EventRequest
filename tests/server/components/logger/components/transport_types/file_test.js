@@ -3,7 +3,7 @@
 
 // Dependencies
 const { assert, test, Mock, Mocker, helpers, tester }	= require( '../../../../../test_helper' );
-const { LOG_LEVELS, File, Log }							= require( './../../../../../../server/components/logger/loggur' );
+const { LOG_LEVELS, File, Log, Transport }				= require( './../../../../../../server/components/logger/loggur' );
 const { Writable }										= require( 'stream' );
 const fs												= require( 'fs' );
 const path												= require( 'path' );
@@ -286,5 +286,24 @@ test({
 				}
 			).catch(() => { done( 'An error ocurred' ); });
 		}, 100 );
+	}
+});
+
+
+test({
+	message	: 'File.formatters.is.same.as.Transport.formatters',
+	test	: ( done ) => {
+		assert.deepStrictEqual( File.formatters, Transport.formatters );
+
+		done();
+	}
+});
+
+test({
+	message	: 'File.processors.is.same.as.Transport.processors',
+	test	: ( done ) => {
+		assert.deepStrictEqual( File.processors, Transport.processors );
+
+		done();
 	}
 });

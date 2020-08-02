@@ -13,7 +13,7 @@ module.exports	= ( { replacer = null } = {} ) =>{
 	 *
 	 * @return	Array
 	 */
-	return ( context ) => {
+	return ( context = {} ) => {
 		delete context.rawMessage;
 
 		return [JSON.stringify( context, replacer )];

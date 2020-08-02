@@ -31,6 +31,31 @@ test({
 });
 
 test({
+	message	: 'plainFormatter.returns.a.function.that.formats.context.with.missing.message',
+	test	: ( done ) => {
+		const context	= {
+			uniqueId	: 'uniqueId',
+			timestamp	: 'timestamp',
+			isRaw		: false,
+			rawMessage	: 'testRawMessage'
+		};
+
+		assert.deepStrictEqual( plainFormatter()( context ), []);
+
+		done();
+	}
+});
+
+test({
+	message	: 'plainFormatter.returns.a.function.that.formats.context.with.nothing',
+	test	: ( done ) => {
+		assert.deepStrictEqual( plainFormatter()(), []);
+
+		done();
+	}
+});
+
+test({
 	message	: 'plainFormatter.returns.a.function.that.formats.context.when.raw',
 	test	: ( done ) => {
 		const context	= {
@@ -59,6 +84,15 @@ test({
 		};
 
 		assert.deepStrictEqual( plainFormatter( { noRaw: true } )( context ), ['uniqueId - timestamp : testMessage']);
+
+		done();
+	}
+});
+
+test({
+	message	: 'plainFormatter.returns.a.function.that.formats.context.with.nothing.and.noRaw',
+	test	: ( done ) => {
+		assert.deepStrictEqual( plainFormatter( { noRaw: true } )(), []);
 
 		done();
 	}
