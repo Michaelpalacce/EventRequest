@@ -132,8 +132,9 @@ class Transport
 			const context	= this._createProcessorsObject( log );
 
 			for ( const processor of this.processors )
-				processor( context )
+				processor( context );
 
+			console.log( 'here' );
 			this._log( this.formatter( context ), resolve, reject );
 		});
 	}

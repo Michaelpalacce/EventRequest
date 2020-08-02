@@ -240,45 +240,31 @@ test({
 });
 
 test({
-	message	: 'File.log returns a Promise',
+	message	: 'File.log.returns.a.Promise',
 	test	: ( done ) => {
-		let logLevel	= LOG_LEVELS.error;
-		let logLevels	= LOG_LEVELS;
-		let filePath	= helpers.getTestFile();
-		let MockedFile	= Mock( File );
+		let filePath	= path.join( __dirname, './fixtures/testfile' );
 
-		Mocker( MockedFile, {
-			method			: 'getWriteStream',
-			shouldReturn	: () => {
-				return fs.createWriteStream( path.join( __dirname, './fixtures/testfile' ), {
-					flags		: 'w',
-					autoClose	: true
-				});
-			},
-			called			: 2
-		} );
-
-		let file	= new MockedFile({
-			logLevel,
-			logLevels,
-			filePath
-		});
+		let file		= new File( { filePath } );
 
 		let logData	= 'This is a test log';
+		console.log( 'START' );
 		let promise	= file.log( [logData] );
 
 		assert.equal( promise instanceof Promise, true );
 
-		promise.then(
-			() => {
-				let data	= fs.readFileSync( path.join( __dirname, './fixtures/testfile' ) );
-				assert.equal( data.toString().indexOf( logData ) !== -1, true );
-
-				helpers.clearUpTestFile();
-
-				done();
-			},
-			done
-		);
+		// setTimeout(() => {
+		// 	promise.then(
+		// 		() => {
+		// 			let data	= fs.readFileSync( file.getFileName() );
+		// 			console.log( data.toString() );
+		// 			assert.equal( data.toString().indexOf( logData ) !== -1, true );
+		//
+		// 			helpers.clearUpTestFile();
+		//
+		// 			done();
+		// 		},
+		// 		done
+		// 	);
+		// }, 200 );
 	}
 });

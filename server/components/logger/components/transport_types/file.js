@@ -80,7 +80,8 @@ class File extends Transport
 	getFileName()
 	{
 		const file	= path.parse( this.filePath );
-		return file.dir + '/' + file.name + this.getCurrentDayTimestamp() + file.ext;
+
+		return path.join( file.dir, file.name + this.getCurrentDayTimestamp() + file.ext );
 	}
 
 	/**
@@ -106,6 +107,7 @@ class File extends Transport
 	 */
 	_log( data, resolve, reject )
 	{
+		console.log( 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHh' );
 		const writeStream	= this.getWriteStream();
 		let hasError		= false;
 
