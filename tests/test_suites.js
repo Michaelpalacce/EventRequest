@@ -32,6 +32,7 @@ testSuites.securitySuite		= () => {
 testSuites.routingSuite		= () => {
 	require( './server/components/routing/route_test' );
 	require( './server/components/routing/router_test' );
+	require( './server/components/routing/router_cache_test' );
 };
 
 testSuites.loggingSuite		= () => {

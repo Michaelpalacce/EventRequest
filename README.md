@@ -173,7 +173,9 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
 - The keys to be saved can be configured
 - The caching can be turned on or off
 - The keys will be deleted if they have not been hit for more than one hour
-- The router will attempt to clear the cache of stagnated entries on every request but it will get triggered at most every minute
+- The router will attempt to clear the cache of stale entries on every request but it will get triggered at most every minute
+- The TTL of cached entries can be changed by: `app.router.cache.ttl = 60 * 60 * 1000;`. The value is in milliseconds
+- The cacheDebouncing can be changed by: `app.router.cache.cacheClearDebounce = 60 * 1000;`. The value is in milliseconds
 
 ***
 #### Functions exported by the Router:

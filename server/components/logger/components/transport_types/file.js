@@ -64,12 +64,7 @@ class File extends Transport
 			fs.mkdirSync( file.dir );
 
 		if ( this.fileStream === null || ! fs.existsSync( this.getFileName() ) )
-		{
-			this.fileStream	= fs.createWriteStream( this.getFileName(), {
-				flags		: 'a',
-				autoClose	: true
-			});
-		}
+			this.fileStream	= fs.createWriteStream( this.getFileName(), { flags : 'a', autoClose : true } );
 
 		return this.fileStream;
 	}
@@ -132,7 +127,7 @@ class File extends Transport
 
 			while ( hit )
 			{
-				hit	= false;
+				hit				= false;
 				const lineEnds	= ['\r\n', '\\r\\n', '\n', '\\n', '\r', '\\r'];
 
 				for ( const lineEnd of lineEnds )

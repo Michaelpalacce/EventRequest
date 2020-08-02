@@ -3,6 +3,7 @@
 // Dependencies
 const { assert, test, helpers, tester }	= require( '../../../test_helper' );
 const Router							= require( '../../../../server/components/routing/router' );
+const RouterCache						= require( '../../../../server/components/routing/router_cache' );
 const Route								= require( '../../../../server/components/routing/route' );
 const Server							= require( '../../../../server/server' );
 
@@ -52,15 +53,15 @@ test({
 	test	: ( done ) => {
 		let router	= new Router();
 
-		assert.deepStrictEqual( router.keyLimit, 5000 );
+		assert.deepStrictEqual( router.cache.keyLimit, 5000 );
 
 		router.setKeyLimit( 100 );
 
-		assert.deepStrictEqual( router.keyLimit, 100 );
+		assert.deepStrictEqual( router.cache.keyLimit, 100 );
 
 		router.setKeyLimit();
 
-		assert.deepStrictEqual( router.keyLimit, 5000 );
+		assert.deepStrictEqual( router.cache.keyLimit, 5000 );
 
 		done();
 	}
@@ -369,23 +370,23 @@ test({
 		router.get( '/', () => {} );
 		router.post( '/', () => {} );
 
-		router.setKeyLimit( 1 );
+		router.setKeyLimit( 2 );
 
 		router.getExecutionBlockForCurrentEvent( helpers.getEventRequest( 'GET', '/' ) );
 
 		setTimeout(() => {
 			router.getExecutionBlockForCurrentEvent( helpers.getEventRequest( 'POST', '/' ) );
-			assert.deepStrictEqual( Object.keys( router.cache ).length, 2 );
+			assert.deepStrictEqual( Object.keys( router.cache._cache ).length, 2 );
 
 			setTimeout(() => {
-				router._clearCache( 10, 0 );
+				router.cache.clear( 20, 0 );
 
-				assert.deepStrictEqual( Object.keys( router.cache ).length, 1 );
-				assert.deepStrictEqual( typeof router.cache['/POST'] !== 'undefined', true );
+				assert.deepStrictEqual( Object.keys( router.cache._cache ).length, 1 );
+				assert.deepStrictEqual( typeof router.cache._cache['/POST'] !== 'undefined', true );
 
 				done();
-			}, 3 );
-		}, 5 );
+			}, 5 );
+		}, 10 );
 	}
 });
 
@@ -396,9 +397,9 @@ test({
 
 		router.setKeyLimit( 0 );
 
-		router.cache['testkey']	= {};
+		router.cache._cache['testkey']	= {};
 
-		assert.deepStrictEqual( router._isCacheFull(), false );
+		assert.deepStrictEqual( router.cache.isFull(), false );
 
 		done();
 	}
@@ -541,7 +542,7 @@ test({
 });
 
 test({
-	message	: 'Router.getExecutionBlockForCurrentEvent returns correct execution block',
+	message	: 'Router.getExecutionBlockForCurrentEvent.returns.correct.execution.block',
 	test	: ( done ) => {
 		const router						= new Router();
 		const eventRequest					= helpers.getEventRequest( 'GET', '/test', {} );
@@ -574,7 +575,7 @@ test({
 });
 
 test({
-	message	: 'Router.define adds a new global middleware',
+	message	: 'Router.define.adds.a.new.global.middleware',
 	test	: ( done ) => {
 		const middlewareName	= 'test';
 		const router			= new Router();
@@ -592,7 +593,7 @@ test({
 });
 
 test({
-	message	: 'Router.define returns router',
+	message	: 'Router.define.returns.router',
 	test	: ( done ) => {
 		const router	= new Router();
 
@@ -603,7 +604,7 @@ test({
 });
 
 test({
-	message	: 'Router.define throws if trying to define a middleware with the same name',
+	message	: 'Router.define.throws.if.trying.to.define.a.middleware.with.the.same.name',
 	test	: ( done ) => {
 		const middlewareName	= 'test';
 		const router			= new Router();
@@ -621,7 +622,7 @@ test({
 });
 
 test({
-	message	: 'Router.define throws if middlewareName has invalid name',
+	message	: 'Router.define.throws.if.middlewareName.has.invalid.name',
 	test	: ( done ) => {
 		const router	= new Router();
 
@@ -634,7 +635,7 @@ test({
 });
 
 test({
-	message	: 'Router.define throws if middleware is not a function',
+	message	: 'Router.define.throws.if.middleware.is.not.a.function',
 	test	: ( done ) => {
 		const router	= new Router();
 
@@ -647,7 +648,7 @@ test({
 });
 
 test({
-	message	: 'Router.getExecutionBlockForCurrentEvent adds global middlewares',
+	message	: 'Router.getExecutionBlockForCurrentEvent.adds.global.middlewares',
 	test	: ( done ) => {
 		const eventRequest				= helpers.getEventRequest( 'GET', '/test', {} );
 		const expectedExecutionBlockCount	= 3;
@@ -689,13 +690,13 @@ test({
 
 		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
 		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
-		assert.equal( typeof router.cache[`${route.getRoute()}${route.getMethod()}`] === 'object', true );
-		assert.equal( typeof router.cache[`${route.getRoute()}${route.getMethod()}`].block !== 'undefined', true );
-		assert.equal( Array.isArray( router.cache[`${route.getRoute()}${route.getMethod()}`].block ), true );
-		assert.deepStrictEqual( router.cache[`${route.getRoute()}${route.getMethod()}`].block, [route.getHandler()] );
-		assert.equal( typeof router.cache[`${route.getRoute()}${route.getMethod()}`].date === 'number', true );
-		assert.equal( typeof router.cache[`${route.getRoute()}${route.getMethod()}`].params === 'object', true );
-		assert.deepStrictEqual( router.cache[`${route.getRoute()}${route.getMethod()}`].params, {} );
+		assert.equal( typeof router.cache._cache[`${route.getRoute()}${route.getMethod()}`] === 'object', true );
+		assert.equal( typeof router.cache._cache[`${route.getRoute()}${route.getMethod()}`].block !== 'undefined', true );
+		assert.equal( Array.isArray( router.cache._cache[`${route.getRoute()}${route.getMethod()}`].block ), true );
+		assert.deepStrictEqual( router.cache._cache[`${route.getRoute()}${route.getMethod()}`].block, [route.getHandler()] );
+		assert.equal( typeof router.cache._cache[`${route.getRoute()}${route.getMethod()}`].date === 'number', true );
+		assert.equal( typeof router.cache._cache[`${route.getRoute()}${route.getMethod()}`].params === 'object', true );
+		assert.deepStrictEqual( router.cache._cache[`${route.getRoute()}${route.getMethod()}`].params, {} );
 
 		done();
 	}
@@ -717,13 +718,13 @@ test({
 		router.getExecutionBlockForCurrentEvent( eventRequest );
 		router.getExecutionBlockForCurrentEvent( eventRequestTwo );
 
-		assert.equal( router.keyLimit, 5000 );
-		assert.equal( router._isCacheFull(), false );
+		assert.equal( router.cache.keyLimit, 5000 );
+		assert.equal( router.cache.isFull(), false );
 
 		router.setKeyLimit( 1 );
 
-		assert.equal( router.keyLimit, 1 );
-		assert.equal( router._isCacheFull(), true );
+		assert.equal( router.cache.keyLimit, 1 );
+		assert.equal( router.cache.isFull(), true );
 
 		done();
 	}
@@ -768,14 +769,14 @@ test({
 		router.enableCaching( false );
 
 		assert.deepStrictEqual( router.getExecutionBlockForCurrentEvent( eventRequest ).length, expectedExecutionBlockCount );
-		assert.deepStrictEqual( router.cache, {} );
+		assert.deepStrictEqual( router.cache, new RouterCache() );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Router.getExecutionBlockForCurrentEvent fails if route has a non existing global middleware',
+	message	: 'Router.getExecutionBlockForCurrentEvent.fails.if.route.has.a.non.existing.global.middleware',
 	test	: ( done ) => {
 		const router					= new Router();
 		const eventRequest				= helpers.getEventRequest( 'GET', '/test', {} );
@@ -800,7 +801,7 @@ test({
 });
 
 test({
-	message	: 'Router.add adds another router\'s GLOBAL middleware if passed',
+	message	: 'Router.add.adds.another.router\'s.GLOBAL.middleware.if.passed',
 	test	: ( done ) => {
 		const routerOne	= new Router();
 		const routerTwo	= new Router();
@@ -817,7 +818,7 @@ test({
 });
 
 test({
-	message	: 'Router.add doesn\'t add another router\'s GLOBAL middleware if it has duplicates',
+	message	: 'Router.add.doesn\'t.add.another.router\'s.GLOBAL.middleware.if.it.has.duplicates',
 	test	: ( done ) => {
 		const routerOne	= new Router();
 		const routerTwo	= new Router();
@@ -834,7 +835,7 @@ test({
 });
 
 test({
-	message	: 'Router.setServerOnRuntime adds methods to the Server and to itself that return instances of themselves',
+	message	: 'Router.setServerOnRuntime.adds.methods.to.the.Server.and.to.itself.that.return.instances.of.themselves',
 	test	: ( done ) => {
 		const server	= new Server();
 		const router	= server.router;

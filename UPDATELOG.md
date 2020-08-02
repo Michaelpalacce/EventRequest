@@ -1,6 +1,9 @@
 27.1.1
 - File test improved since builds were often failing there
 - Remove npm test from the publish workflow, releases have been tested already
+- Router reworked a bit, moved the cache to a different class.
+- Router now returns self when adding a router with a route
+- RouterCache will now consider the limit exactly the one set ( Object.keys( this._cache ).length >= this.keyLimit intead of Object.keys( this._cache ).length > this.keyLimit )
 
 27.1.0
 - Node v14.x support
