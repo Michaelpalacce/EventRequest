@@ -59,7 +59,7 @@ test({
 			uniqueId	: 'uniqueId',
 			timestamp	: 'timestamp',
 			isRaw		: false,
-			message		: error.stack.replace( /\r\n|\r|\n|\\r\\n|\\n|\\r/g, os.EOL ),
+			message		: error.stack.replace( /\r\n|\r|\n/g, os.EOL ),
 			rawMessage	: 'testRawMessage'
 		};
 

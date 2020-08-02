@@ -109,7 +109,6 @@ test({
 		app.apply( app.er_logger, { logger, attachToProcess: true } );
 
 		app.get( `/${name}`, ( event ) => {
-			event.logger.log( 'multiline\\ncomment' );
 			event.emit( 'on_error', { test: 123 } );
 			event.emit( 'on_error', 'someError' );
 
@@ -134,7 +133,6 @@ test({
 					assert.equal( logData.includes( 'GET /testErLoggerWithErrorThrown 500' ), true );
 					assert.equal( logData.includes( '{"test":123}' ), true );
 					assert.equal( logData.includes( 'someError' ), true );
-					assert.equal( logData.toString().match( /multiline(\r\n|\r|\n)^comment$/gm ) !== null, true );
 
 					server.close();
 					done();
