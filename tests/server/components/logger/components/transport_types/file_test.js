@@ -31,6 +31,31 @@ test({
 });
 
 test({
+	message	: 'File.constructor.with.valid.config',
+	test	: ( done ) => {
+		const file	= new File( { filePath: 'test' } );
+
+		assert.deepStrictEqual( file.filePath, 'test' );
+		assert.deepStrictEqual( file.formatter.toString(), File.formatters.plain( { noRaw : true } ).toString() );
+		assert.deepStrictEqual( file.processors.length, 3 );
+
+		done();
+	}
+});
+
+test({
+	message	: 'File.constructor.with.custom.config',
+	test	: ( done ) => {
+		const file	= new File( { filePath: 'test', processors: [File.processors.stack()], formatter: File.formatters.json() } );
+
+		assert.deepStrictEqual( file.formatter.toString(), File.formatters.json().toString() );
+		assert.deepStrictEqual( file.processors.length, 1 );
+
+		done();
+	}
+});
+
+test({
 	message	: 'File.getWriteStream.when.directory.does.not.exist',
 	test	: ( done ) => {
 		const dir			= `./tests/server/components/logger/components/transport_types/fixtures/unexisting_dir${Math.random()}/` ;
@@ -243,25 +268,23 @@ test({
 	message	: 'File.log.returns.a.Promise',
 	test	: ( done ) => {
 		let filePath	= path.join( __dirname, './fixtures/testfile' );
-		const File		= require( '../../../../../../server/components/logger/components/transport_types/file' )
-
-		let file		= new File( { filePath } );
+		let file		= new File( { logLevel: 600, filePath } );
 
 		let logData	= 'This is a test log';
 		let promise	= file.log( Log.getInstance( logData ) );
 
 		assert.equal( promise instanceof Promise, true );
 
-		promise.then(
-			() => {
-				let data	= fs.readFileSync( file.getFileName() );
-				assert.equal( data.toString().indexOf( logData ) !== -1, true );
+		setTimeout(() => {
+			promise.then(() => {
+					let data	= fs.readFileSync( file.getFileName() );
+					assert.equal( data.toString().indexOf( logData ) !== -1, true );
 
-				helpers.clearUpTestFile();
+					helpers.clearUpTestFile();
 
-				done();
-			},
-			done
-		);
+					done();
+				}
+			).catch(() => { done( 'An error ocurred' ); });
+		}, 100 );
 	}
 });

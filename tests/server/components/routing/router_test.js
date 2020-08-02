@@ -385,8 +385,8 @@ test({
 				assert.deepStrictEqual( typeof router.cache._cache['/POST'] !== 'undefined', true );
 
 				done();
-			}, 5 );
-		}, 10 );
+			}, 10 );
+		}, 15 );
 	}
 });
 

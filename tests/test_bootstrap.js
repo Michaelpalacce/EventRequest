@@ -14,6 +14,10 @@ function clearUpDirectory( dir, whiteList )
 		fs.readdirSync( dir ).forEach( ( file ) =>
 		{
 			const curPath	= path.join( dir, file );
+
+			if ( fs.lstatSync( curPath ).isDirectory() )
+				return;
+
 			if ( ! whiteList.includes( file ) )
 				fs.unlinkSync( curPath );
 		});
@@ -22,6 +26,7 @@ function clearUpDirectory( dir, whiteList )
 
 clearUpDirectory( path.join( __dirname, './server/components/body_parsers/fixture/testUploads' ), ['.gitignore'] );
 clearUpDirectory( path.join( __dirname, './server/fixture/body_parser/multipart' ), ['.gitignore', 'multipart_data_CR', 'multipart_data_CRLF', 'multipart_data_LF'] );
+clearUpDirectory( path.join( __dirname, './server/components/logger/components/transport_types/fixtures' ), ['.gitignore', 'testfile'] );
 clearUpDirectory( path.join( __dirname, './server/fixture/logger' ), ['.gitignore'] );
 
 app.add({

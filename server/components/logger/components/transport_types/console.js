@@ -8,11 +8,6 @@ const Transport	= require( './transport' );
  */
 class Console extends Transport
 {
-	constructor( options = {} )
-	{
-		super( options );
-	}
-
 	/**
 	 * @brief	Sanitize the config
 	 *
@@ -49,5 +44,8 @@ class Console extends Transport
 		resolve();
 	}
 }
+
+Console.formatters	= Transport.formatters;
+Console.processors	= Transport.processors;
 
 module.exports	= Console;

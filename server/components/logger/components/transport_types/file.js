@@ -119,4 +119,7 @@ class File extends Transport
 	}
 }
 
+File.processors	= Transport.processors;
+File.formatters	= Transport.formatters;
+
 module.exports	= File;

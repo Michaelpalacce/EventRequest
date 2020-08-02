@@ -4,19 +4,6 @@
 const { assert, test, Mock }		= require( '../../../../../test_helper' );
 const { LOG_LEVELS, Console, Log }	= require( './../../../../../../server/components/logger/loggur' );
 
-/**
- * @brief	Constants
- */
-const TRANSPORT_DEFAULT_SHOULD_COLOR	= true;
-const TRANSPORT_DEFAULT_COLORS			= {
-	[LOG_LEVELS.error]		: 'red',
-	[LOG_LEVELS.warning]	: 'yellow',
-	[LOG_LEVELS.notice]		: 'green',
-	[LOG_LEVELS.info]		: 'blue',
-	[LOG_LEVELS.verbose]	: 'cyan',
-	[LOG_LEVELS.debug]		: 'white'
-};
-
 test({
 	message	: 'Console.constructor.on.default',
 	test	: ( done ) => {
@@ -25,13 +12,15 @@ test({
 		assert.deepStrictEqual( consoleTransport.logLevel, LOG_LEVELS.info );
 		assert.deepStrictEqual( consoleTransport.logLevels, LOG_LEVELS );
 		assert.deepStrictEqual( consoleTransport.supportedLevels, Object.values( LOG_LEVELS ) );
+		assert.deepStrictEqual( consoleTransport.formatter.toString(), Console.formatters.plain().toString() );
+		assert.deepStrictEqual( consoleTransport.processors.length, 3 );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Console.constructor on invalid configuration',
+	message	: 'Console.constructor.on.invalid.configuration',
 	test	: ( done ) => {
 		let consoleTransport	= new Console({
 			logLevel	: 'test',
@@ -43,31 +32,40 @@ test({
 		assert.deepStrictEqual( consoleTransport.logLevel, LOG_LEVELS.info );
 		assert.deepStrictEqual( consoleTransport.logLevels, LOG_LEVELS );
 		assert.deepStrictEqual( consoleTransport.supportedLevels, Object.values( LOG_LEVELS ) );
+		assert.deepStrictEqual( consoleTransport.formatter.toString(), Console.formatters.plain().toString() );
+		assert.deepStrictEqual( consoleTransport.processors.length, 3 );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Console.constructor on valid configuration',
+	message	: 'Console.constructor.on.valid.configuration',
 	test	: ( done ) => {
 		let logLevel	= LOG_LEVELS.error;
 		let logLevels	= { error : 100, warning : 200 };
-		let color		= false;
-		let logColors	= { error : 'yellow', warning : 'red' };
 
-		let consoleTransport	= new Console( { logLevel, logLevels, color, logColors } );
+		let consoleTransport	= new Console(
+			{
+				logLevel,
+				logLevels,
+				formatter: Console.formatters.json(),
+				processors:[Console.processors.color()]
+			}
+		);
 
 		assert.deepStrictEqual( consoleTransport.logLevel, logLevel);
 		assert.deepStrictEqual( consoleTransport.logLevels, logLevels );
 		assert.deepStrictEqual( consoleTransport.supportedLevels, Object.values( logLevels ) );
+		assert.deepStrictEqual( consoleTransport.formatter.toString(), Console.formatters.json().toString() );
+		assert.deepStrictEqual( consoleTransport.processors.length, 1 );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Console.log returns a Promise',
+	message	: 'Console.log.returns.a.Promise',
 	test	: ( done ) => {
 		let ConsoleMock			= Mock( Console );
 		let consoleTransport	= new ConsoleMock();
@@ -82,7 +80,7 @@ test({
 
 		done();
 	}
-});
+	});
 
 test({
 	message	: 'Console.log.does.not.log.if.the.transport.does.not.support.it',
