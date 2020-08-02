@@ -134,7 +134,6 @@ class Transport
 			for ( const processor of this.processors )
 				processor( context );
 
-			console.log( 'here' );
 			this._log( this.formatter( context ), resolve, reject );
 		});
 	}

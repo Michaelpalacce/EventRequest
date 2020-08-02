@@ -243,28 +243,25 @@ test({
 	message	: 'File.log.returns.a.Promise',
 	test	: ( done ) => {
 		let filePath	= path.join( __dirname, './fixtures/testfile' );
+		const File		= require( '../../../../../../server/components/logger/components/transport_types/file' )
 
 		let file		= new File( { filePath } );
 
 		let logData	= 'This is a test log';
-		console.log( 'START' );
-		let promise	= file.log( [logData] );
+		let promise	= file.log( Log.getInstance( logData ) );
 
 		assert.equal( promise instanceof Promise, true );
 
-		// setTimeout(() => {
-		// 	promise.then(
-		// 		() => {
-		// 			let data	= fs.readFileSync( file.getFileName() );
-		// 			console.log( data.toString() );
-		// 			assert.equal( data.toString().indexOf( logData ) !== -1, true );
-		//
-		// 			helpers.clearUpTestFile();
-		//
-		// 			done();
-		// 		},
-		// 		done
-		// 	);
-		// }, 200 );
+		promise.then(
+			() => {
+				let data	= fs.readFileSync( file.getFileName() );
+				assert.equal( data.toString().indexOf( logData ) !== -1, true );
+
+				helpers.clearUpTestFile();
+
+				done();
+			},
+			done
+		);
 	}
 });

@@ -17,11 +17,6 @@ const SYSTEM_EOL	= os.EOL;
  */
 class File extends Transport
 {
-	constructor( options = {} )
-	{
-		super( options );
-	}
-
 	/**
 	 * @brief	Sanitizes the config
 	 *
@@ -107,7 +102,6 @@ class File extends Transport
 	 */
 	_log( data, resolve, reject )
 	{
-		console.log( 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHh' );
 		const writeStream	= this.getWriteStream();
 		let hasError		= false;
 
