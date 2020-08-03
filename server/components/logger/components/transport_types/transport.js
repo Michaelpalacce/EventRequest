@@ -119,7 +119,7 @@ class Transport
 	/**
 	 * @brief	Saves the log
 	 *
-	 * @param	{Log} log
+	 * @param	{Log} logg
 	 *
 	 * @return	Promise
 	 */
