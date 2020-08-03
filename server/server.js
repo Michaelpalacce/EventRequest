@@ -2,13 +2,12 @@
 
 // Dependencies
 const http						= require( 'http' );
-const EventRequest				= require( './event_request' );
 const { EventEmitter }			= require( 'events' );
+const EventRequest				= require( './event_request' );
 const RouterClass				= require( './components/routing/router' );
 const PluginInterface			= require( './plugins/plugin_interface' );
 const PluginManager				= require( './plugins/plugin_manager' );
-const Logging					= require( './components/logger/loggur' );
-const { Loggur, LOG_LEVELS }	= Logging;
+const { Loggur, LOG_LEVELS }	= require( './components/logger/loggur' );
 
 const TimeoutPlugin				= require( './plugins/available_plugins/timeout_plugin' );
 const EnvPlugin					= require( './plugins/available_plugins/env_plugin' );
@@ -147,12 +146,10 @@ class Server extends EventEmitter
 	 */
 	apply( plugin, options = null )
 	{
-		if ( this.pluginManager.isValidPlugin( plugin ))
-		{
-		}
-		else if ( typeof plugin === 'string' )
+		if ( typeof plugin === 'string' )
 			plugin	= this.pluginManager.getPlugin( plugin );
-		else
+
+		if ( ! this.pluginManager.isValidPlugin( plugin ) )
 			throw new Error( 'app.er.server.invalidPlugin' );
 
 		if ( options !== null && options !== undefined )
@@ -175,20 +172,14 @@ class Server extends EventEmitter
 		const pluginDependencies	= plugin.getPluginDependencies();
 		const pluginId				= plugin.getPluginId();
 
-		pluginDependencies.forEach(( dependency ) => {
-
+		for ( const dependency of pluginDependencies )
 			if ( ! this.hasPlugin( dependency ) )
 				throw new Error( `app.er.server.missingPluginDependency.${pluginId}` );
 
-		});
-
 		plugin.setServerOnRuntime( this );
 
-		const pluginMiddleware	= plugin.getPluginMiddleware();
-
-		pluginMiddleware.forEach( ( route ) => {
-			this.add( route );
-		});
+		for ( const middleware of plugin.getPluginMiddleware() )
+			this.add( middleware );
 
 		this.plugins[pluginId]	= plugin;
 	}
@@ -208,7 +199,6 @@ class Server extends EventEmitter
 
 		if ( this.hasPlugin( id ) )
 			return this.plugins[id];
-
 		else
 			throw new Error( `app.er.server.missingPlugin.${id}` );
 	}
@@ -255,7 +245,7 @@ class Server extends EventEmitter
 
 			try
 			{
-				let block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
+				const block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
 
 				eventRequest._setBlock( block );
 

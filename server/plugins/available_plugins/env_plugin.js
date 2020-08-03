@@ -6,7 +6,6 @@ const PluginInterface	= require( '../plugin_interface' );
 
 const ENV_FILENAME	= '.env';
 const ENV_SEPARATOR	= '=';
-const CHANGE_EVENT	= 'change';
 
 /**
  * @brief	Env Plugin responsible for parsing .env file and adding those variables to the process.env

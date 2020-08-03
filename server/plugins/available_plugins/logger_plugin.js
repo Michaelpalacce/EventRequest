@@ -1,8 +1,8 @@
 'use strict';
 
-const PluginInterface			= require( '../plugin_interface' );
-const Logging					= require( './../../components/logger/loggur' );
-const { Logger, Loggur, Log }	= Logging;
+const PluginInterface		= require( '../plugin_interface' );
+const Logging				= require( './../../components/logger/loggur' );
+const { Logger, Loggur }	= Logging;
 
 /**
  * @brief	Logger plugin used to attach logs at different levels in the app

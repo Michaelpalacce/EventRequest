@@ -1,3 +1,7 @@
+27.2.1
+- Server improvements, code cleanup
+- Added More Code analyzer badges. Some improvements to the code. Removed unused statements
+
 27.2.0
 - File test improved since builds were often failing there
 - Remove npm test from the publish workflow, releases have been tested already

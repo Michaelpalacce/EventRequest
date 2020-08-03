@@ -43,7 +43,7 @@ class EventRequest extends EventEmitter
 		this.finished		= false;
 		this.extra			= {};
 		this.params			= {};
-		this.block			= {};
+		this.block			= [];
 		this.errorHandler	= null;
 
 		// We do this so we can pass the event.next function by reference
@@ -389,7 +389,7 @@ class EventRequest extends EventEmitter
 
 		if ( ! isResponseFinished )
 		{
-			if ( ! this.block.length > 0  )
+			if ( this.block.length <= 0 )
 				return this.sendError( `Cannot ${this.method} ${this.path}`, 404 );
 
 			try
