@@ -32,5 +32,5 @@ module.exports	= () => {
 	return ( context = {} ) => {
 		if ( typeof context.timestamp === 'number' )
 			context.timestamp	= getTimestamp( context.timestamp );
-	}
+	};
 };

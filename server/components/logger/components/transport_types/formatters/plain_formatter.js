@@ -7,7 +7,7 @@
  *
  * @return	Function
  */
-module.exports	= ( { noRaw = false } = {} ) =>{
+module.exports	= ( { noRaw = false } = {} ) => {
 	/**
 	 * @brief	Formats the given log to a simple non standard format
 	 *
@@ -34,6 +34,5 @@ module.exports	= ( { noRaw = false } = {} ) =>{
 		{
 			return [];
 		}
-
-	}
+	};
 };

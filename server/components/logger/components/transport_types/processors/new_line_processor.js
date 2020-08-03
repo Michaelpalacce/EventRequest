@@ -13,5 +13,5 @@ module.exports	= () => {
 	return ( context = {} ) => {
 		if ( typeof context.message === 'string' )
 			context.message	= context.message.replace( /\r\n|\r|\n/g, os.EOL );
-	}
+	};
 };

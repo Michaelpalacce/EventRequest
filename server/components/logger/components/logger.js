@@ -232,7 +232,7 @@ class Logger
 			log.setUniqueId( this.getUniqueId() );
 
 			for ( const transport of this.transports )
-				promises.push( transport.log( log ) )
+				promises.push( transport.log( log ) );
 		}
 
 		// Do not reject the log if not supported

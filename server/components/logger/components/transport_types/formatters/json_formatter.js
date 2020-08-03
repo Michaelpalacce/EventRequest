@@ -5,7 +5,7 @@
  *
  * @return	Function
  */
-module.exports	= ( { replacer = null } = {} ) =>{
+module.exports	= ( { replacer = null } = {} ) => {
 	/**
 	 * @brief	Formats the given log to a JSON
 	 *
@@ -17,5 +17,5 @@ module.exports	= ( { replacer = null } = {} ) =>{
 		delete context.rawMessage;
 
 		return [JSON.stringify( context, replacer )];
-	}
+	};
 };

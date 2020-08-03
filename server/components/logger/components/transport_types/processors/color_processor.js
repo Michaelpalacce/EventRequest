@@ -19,7 +19,7 @@ const DEFAULT_LOG_COLORS		= {
  *
  * @return	Function
  */
-module.exports	= ( { logColors = DEFAULT_LOG_COLORS } = {} ) =>{
+module.exports	= ( { logColors = DEFAULT_LOG_COLORS } = {} ) => {
 	/**
 	 * @brief	Adds colors to the message, uniqueId and timestamp
 	 *
@@ -40,5 +40,5 @@ module.exports	= ( { logColors = DEFAULT_LOG_COLORS } = {} ) =>{
 			if ( ! context.isRaw )
 				context.message	= `${colorize[color]( context.message )}${colorize.reset()}`;
 		}
-	}
+	};
 };
