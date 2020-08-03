@@ -958,7 +958,6 @@ app.Loggur.log( 'TEST' );
 - Every logger added to the Loggur will be called when doing Loggur.log
 - Loggur.log returns a promise which will be resolved when the logging is complete
 
-
 #### Functions:
 **enableDefault(): void** 
 - Enables the default logger
@@ -998,6 +997,12 @@ app.Loggur.log( 'TEST' );
 logger.setLogLevel( 600 );
 ~~~
 
+***
+- If you want to change the log level of all the loggers attached to Loggur it can easily be done with .setLogLevel( logLevel )
+~~~javascript
+Loggur.setLogLevel( 600 ); // will change the logLevel of all loggers attached
+~~~
+
 Loggers can be added to the main instance of the Loggur who later can be used by: Loggur.log, which will call all the loggers added to it
 ~~~javascript
 const { Loggur, Console, LOG_LEVELS } = require( 'event_request' ).Logging;
@@ -1023,6 +1028,7 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - Each Logger can have it's own transport layers.
 - Every transport layer has his set of processors that change the data to be logged ( timestamp is beautified, colors are added, data is sanitized )
 - Every transport layer has one formatter that changes the format of the data to be logged ( plain text, json )
+- Every transport layer can choose if they support or do not support the log
 - Every transport layer will be called when calling logger.log
 - Logger.log returns a promise which will be resolved when the logging is complete
 
@@ -1105,6 +1111,15 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 ***
 ***
 
+## [Transports](#logging-transports)
+- Transports are object whose job is to transport the data to the given medium ( console, file, other )
+- They should check if the log is supported
+- They have multiple processors that modify the way the data is presented
+- They have one formatter that changes the format of the data to be logged: it could be a json format or plain text
+- There are 2 Transports currently.
+- Every Transport has all the available processors and formatters attached to it. Check the section on Processors and Formatters for more info
+
+
 ### [Console](#console)
 - Logs data in the console
 - It can log raw logs
@@ -1124,6 +1139,16 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - The logger will be able to log ONLY on these log levels
 - If you have log levels: 100 and 200 and you try with a log level of 50 or a 300 it won't log
 - Defaults to LOG_LEVELS
+
+**processors: Array**
+- Holds The processors that the log will be passed through before it is formatted and logged
+- It must be an Array, otherwise the defaults are taken
+- Defaults to [Console.processors.time(), Console.processors.stack(), Console.processors.color()]
+
+**formatter: Function**
+- Holds the formatter that is going to be called after the processors are done with the log context
+- Must be a function, otherwise the default is taken
+- Defaults to Console.formatters.plain()
 
 ### [File](#file)
 - Logs data to a file
@@ -1149,6 +1174,16 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 - The location of the file to log to. 
 - Accepts Absolute and relative paths
 - If it is not provided the transport will not log
+
+**processors: Array**
+- Holds The processors that the log will be passed through before it is formatted and logged
+- It must be an Array, otherwise the defaults are taken
+- Defaults to [File.processors.time(), File.processors.stack()]
+
+**formatter: Function**
+- Holds the formatter that is going to be called after the processors are done with the log context
+- Must be a function, otherwise the default is taken
+- Defaults to Console.formatters.plain()
 
 ~~~javascript
 const { Loggur, LOG_LEVELS, Console, File } = require( 'event_request' ).Logging;
@@ -1181,7 +1216,130 @@ Loggur.addLogger( 'serverLogger', logger );
 console.log( typeof Loggur.loggers['serverLogger'] !== 'undefined' );
 ~~~
 
-# [Log Levels](#log-levles)
+***
+## [Processors](#processors)
+- Processors are responsible for changing the log data
+- They are called in the beginning of the logging process, followed by the formatters and after that the data is shipped by the transporters
+- They are attached to the Transport, Console and File classes directly: `Console.processors`, `Transport.processors`, `File.processors`
+
+### [Available Processors](#available-processprs)
+
+#### [Color](#color-processor)
+- Processor responsible for coloring the log message 
+- It can be configured to log with different colors
+- Usage: `Transport.processor.color( { logColors } )`, `Console.processor.color( { logColors } )`, `File.processor.color( { logColors } )`
+
+#### Accepted Options:
+
+**logColors: Object**
+- An object containing logLevels mapped to colors
+- It is ideal if the logLevels are the same as the ones passed in the Transporter, or data may not be collored correctly
+- Defaults to:
+~~~
+{
+ [LOG_LEVELS.error] : 'red',
+ [LOG_LEVELS.warning] : 'yellow',
+ [LOG_LEVELS.notice] : 'green',
+ [LOG_LEVELS.info] : 'blue',
+ [LOG_LEVELS.verbose] : 'cyan',
+ [LOG_LEVELS.debug] : 'white'
+}
+~~~
+
+***
+#### [New Line](#new-line-processor)
+- Processor responsible for changing all the EOLs to the system EOL
+- Is this needed? No. Does it hurt? No. Did I implement it and wonder why I implemented it? Yes. Does that bother me? No.
+- Usage: `Transport.processor.line()`, `Console.processor.line()`, `File.processor.line()`
+
+#### Accepted Options:
+
+**NONE**
+
+***
+#### [Stack](#stack-processor)
+- Processor that will check if the message is an instance of Error and save the stack as the message
+- Usage: `Transport.processor.stack()`, `Console.processor.stack()`, `File.processor.stack()`
+
+#### Accepted Options:
+
+**NONE**
+
+***
+#### [Timestamp](#timestamp-processor)
+- Processor that will change the timestamp of the log to a human readable string: 08/03/20, 14:37:40 (mm/dd/yy h:m:s)
+- Usage: `Transport.processor.time()`, `Console.processor.time()`, `File.processor.time()`
+
+#### Accepted Options:
+
+**NONE**
+
+***
+## [Formatters](#formatters)
+- Formatters are responsible for changing how the data is represented
+- They are called after the processors have done processing the data
+- They are attached to the Transport, Console and File classes directly: `Console.formatters`, `Transport.formatters`, `File.formatters`
+
+### [Available Formatters](#available-formatters)
+
+#### [Plain](#plain-formatter)
+- Formatter that will format the data in a non standard way: `Default/Master - 08/03/20, 14:37:40 : Test message`
+- Usage: `Transport.processor.plain()`, `Console.processor.plain()`, `File.processor.plain()`
+
+#### Accepted Options:
+
+**noRaw**
+- This will signal the formatter to ignore the isRaw flag in the logs ( usefull when logging to file for example )
+- Defaults to false
+
+***
+#### [Json](#json-formatter)
+- Formatter that will format the data in a json format
+- Usage: `Transport.processor.json()`, `Console.processor.json()`, `File.processor.json()`
+
+#### Accepted Options:
+
+**NONE**
+
+***
+***
+***
+#### Examples:
+
+~~~javascript
+const { Loggur, LOG_LEVELS, Console, File } = require( 'event_request' ).Logging;
+
+const logColors = {
+    [LOG_LEVELS.error] : 'red',
+    [LOG_LEVELS.warning] : 'yellow',
+    [LOG_LEVELS.notice] : 'green',
+    [LOG_LEVELS.info] : 'blue',
+    [LOG_LEVELS.verbose] : 'cyan',
+    [LOG_LEVELS.debug]  : 'white'
+};
+
+// Create a custom Logger
+const logger = Loggur.createLogger({
+    transports : [
+        new Console({ 
+            logLevel : LOG_LEVELS.notice,
+            processors : [Console.processors.color( { logColors } ), File.processors.time()]
+        }),
+        new File({
+            logLevel : LOG_LEVELS.error,
+            filePath : '/logs/error_log.log',
+            processors : [File.processors.color( { logColors } ), File.processors.line(), File.processors.line()],
+            formatter : File.formatters.json()
+        }),
+    ]
+});
+
+Loggur.addLogger( 'serverLogger', logger );
+
+console.log( Loggur.loggers['serverLogger'] );
+~~~
+
+## [Log Levels](#log-levles)
 - error   : 100,
 - warning : 200,
 - notice  : 300,

@@ -7,6 +7,7 @@
 - Refactored the logging. Even tho this changes the interface it won't break anything but may make some features not work correctly.
 - process.dumpStack has been removed from the Logger Plugin.
 - Added new Logging processors and formatters
+- Logger small improvements, refactored a bit
 
 27.1.0
 - Node v14.x support

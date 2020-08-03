@@ -21,13 +21,13 @@ class Logger
 	 */
 	constructor( options = {}, uniqueId = null )
 	{
+		if ( typeof uniqueId !== 'string' )
+			throw new Error( 'app.er.logger.invalidUniqueId' );
+
 		Object.defineProperty( this, 'uniqueId', {
 			writable	: false,
-			value		: typeof uniqueId === 'string' ? uniqueId : null
+			value		: uniqueId
 		});
-
-		if ( typeof this.uniqueId !== 'string' )
-			throw new Error( 'app.er.logger.invalidUniqueId' );
 
 		this.sanitizeConfig( options );
 	}
@@ -81,15 +81,10 @@ class Logger
 										? options.transports
 										: [];
 
-		transports.forEach( ( currentTransport ) => { this.addTransport( currentTransport ); } );
+		transports.forEach( ( transport ) => { this.addTransport( transport ); } );
 
 		if ( this.transports.length === 0 )
-		{
-			this.transports.push( new Console({
-				logLevel	: this.logLevel,
-				logLevels	: this.logLevels
-			}) );
-		}
+			this.transports.push( new Console({ logLevel : this.logLevel, logLevels : this.logLevels }) );
 
 		this.attachLogLevelsToLogger();
 		this.attachUnhandledEventListener();
@@ -229,37 +224,22 @@ class Logger
 	 */
 	log( log, level = null, isRaw = false )
 	{
-		log						= Log.getInstance( log, level, isRaw );
-		let transportPromises	= [];
+		log				= Log.getInstance( log, level, isRaw );
+		const promises	= [];
 
 		if ( this.supports( log ) )
 		{
 			log.setUniqueId( this.getUniqueId() );
 
-			this.transports.forEach( ( transport ) => {
-				let logPromise	= new Promise( ( resolve, reject ) => {
-					setImmediate(() => {
-						const transportPromise	= transport.log( log );
-
-						transportPromise.then(() => {
-							resolve();
-						}).catch( reject );
-					});
-				});
-
-				transportPromises.push( logPromise );
-			});
+			for ( const transport of this.transports )
+				promises.push( transport.log( log ) )
 		}
 
-		if ( transportPromises.length === 0 )
-		{
-			// Do not reject the log if not supported
-			transportPromises.push( new Promise(( resolve ) => {
-				resolve();
-			}));
-		}
+		// Do not reject the log if not supported
+		if ( promises.length === 0 )
+			promises.push( Promise.resolve() );
 
-		return Promise.all( transportPromises );
+		return Promise.all( promises );
 	}
 }
 
