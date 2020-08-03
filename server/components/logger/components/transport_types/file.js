@@ -1,11 +1,10 @@
 'use strict';
 
 // Dependencies
-const Transport		= require( './transport' );
-const fs			= require( 'fs' );
-const WriteStream	= fs.WriteStream;
-const os			= require( 'os' );
-const path			= require( 'path' );
+const Transport	= require( './transport' );
+const fs		= require( 'fs' );
+const os		= require( 'os' );
+const path		= require( 'path' );
 
 /**
  * @brief	Constants

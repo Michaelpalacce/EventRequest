@@ -28,18 +28,9 @@ module.exports			= {
 		if ( typeof file !== 'string' || ! fs.existsSync( file ) )
 			return null;
 
-		for ( const index in fileStreams )
-		{
-			/* istanbul ignore next */
-			if ( ! {}.hasOwnProperty.call( fileStreams, index ) )
-				continue;
-
-			const fileStream	= fileStreams[index];
+		for ( const fileStream of fileStreams )
 			if ( fileStream.supports( file ) )
-			{
 				return fileStream;
-			}
-		}
 
 		return null;
 	}

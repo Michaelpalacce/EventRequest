@@ -146,12 +146,10 @@ class Server extends EventEmitter
 	 */
 	apply( plugin, options = null )
 	{
-		if ( this.pluginManager.isValidPlugin( plugin ))
-		{
-		}
-		else if ( typeof plugin === 'string' )
+		if ( typeof plugin === 'string' )
 			plugin	= this.pluginManager.getPlugin( plugin );
-		else
+
+		if ( ! this.pluginManager.isValidPlugin( plugin ) )
 			throw new Error( 'app.er.server.invalidPlugin' );
 
 		if ( options !== null && options !== undefined )

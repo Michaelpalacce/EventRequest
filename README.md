@@ -7,13 +7,17 @@ A highly customizable backend server in NodeJs. Any feedback is most welcome!
 [![windows-14.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-14.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Awindows-14.x)
 
 [![codecov](https://codecov.io/gh/Michaelpalacce/EventRequest/branch/master/graph/badge.svg)](https://codecov.io/gh/Michaelpalacce/EventRequest)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/3c843dd2bc454f06b10eb60820dc6d1b)](https://www.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Michaelpalacce/EventRequest&amp;utm_campaign=Badge_Coverage)
+
+[![CodeFactor](https://www.codefactor.io/repository/github/michaelpalacce/eventrequest/badge)](https://www.codefactor.io/repository/github/michaelpalacce/eventrequest)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3c843dd2bc454f06b10eb60820dc6d1b)](https://www.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Michaelpalacce/EventRequest&amp;utm_campaign=Badge_Grade) 
+[![DeepScan grade](https://deepscan.io/api/teams/10419/projects/13164/branches/218269/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=10419&pid=13164&bid=218269)
+
 [![GitHub last commit](https://img.shields.io/github/last-commit/Michaelpalacce/EventRequest)](https://github.com/Michaelpalacce/EventRequest)
 [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/MichaelPalacce/EventRequest/develop?label=last%20commit%20develop)](https://github.com/Michaelpalacce/EventRequest)
-[![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json)
-[![GitHub top language](https://img.shields.io/github/languages/top/Michaelpalacce/EventRequest)](https://github.com/Michaelpalacce/EventRequest)
 [![GitHub issues](https://img.shields.io/github/issues-raw/Michaelpalacce/EventRequest)](https://github.com/Michaelpalacce/EventRequest)
 [![Maintenance](https://img.shields.io/maintenance/yes/2020)](https://github.com/Michaelpalacce/EventRequest)
+[![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json)
 [![npm version](https://badge.fury.io/js/event_request.svg)](https://www.npmjs.com/package/event_request)
 [![npm](https://img.shields.io/npm/dt/event_request)](https://www.npmjs.com/package/event_request)
 [![npm](https://img.shields.io/npm/dw/event_request)](https://www.npmjs.com/package/event_request)
