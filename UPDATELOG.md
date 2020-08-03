@@ -1,3 +1,6 @@
+27.3.0
+- Server improvements, code cleanup
+
 27.2.0
 - File test improved since builds were often failing there
 - Remove npm test from the publish workflow, releases have been tested already
