@@ -3,6 +3,7 @@
 const EventRequest		= require( '../../event_request' );
 const Route				= require( './route' );
 const PluginInterface	= require( './../../plugins/plugin_interface' );
+const RouterCache		= require( './router_cache' );
 
 /**
  * @brief	Handler used to return all the needed middleware for the given event
@@ -16,13 +17,11 @@ class Router extends PluginInterface
 	{
 		super( 'er_router', {} );
 
-		this.middleware				= [];
-		this.globalMiddlewares		= {};
+		this.middleware			= [];
+		this.globalMiddlewares	= {};
 
-		this.cache					= {};
-		this.cachingIsEnabled		= true;
-		this.keyLimit				= 5000;
-		this.lastClearCacheAttempt	= 0;
+		this.cachingIsEnabled	= true;
+		this.cache				= new RouterCache();
 
 		this.setUpHttpMethodsToObject( this );
 	}
@@ -42,13 +41,11 @@ class Router extends PluginInterface
 	/**
 	 * @brief	Sets the caching key limit
 	 *
-	 * @param	{Number} [keyLimit=5000]
-	 *
 	 * @return	void
 	 */
-	setKeyLimit( keyLimit = 5000 )
+	setKeyLimit( ...args )
 	{
-		this.keyLimit	= keyLimit;
+		this.cache.setKeyLimit.apply( this.cache, args );
 	}
 
 	/**
@@ -179,74 +176,32 @@ class Router extends PluginInterface
 	 */
 	add( ...args )
 	{
-		if ( args.length === 1 )
+		let first	= args[0];
+		let second	= args[1];
+
+		switch ( args.length )
 		{
-			let first	= args[0];
+			case 1:
+				if ( first instanceof Router )
+					return this._concat( first );
 
-			if ( first instanceof Router )
-			{
-				this.middleware			= this.middleware.concat( first.middleware );
-				const routerMiddlewares	= first.globalMiddlewares;
+				if ( typeof first === 'function' )
+					first	= new Route( { handler: first } );
 
-				for ( const [key, value] of Object.entries( routerMiddlewares ) )
-					this.define( key, value );
+				if ( ! ( first instanceof Route ) )
+					first	= new Route( first );
+
+				this.middleware.push( first );
 
 				return this;
-			}
 
-			if ( typeof first === 'function' )
-				first	= new Route( { handler: first } );
+			case 2:
+				if ( typeof first === 'string' && second instanceof Router )
+					return this._concat( second, first );
 
-			if ( ! ( first instanceof Route ) )
-				first	= new Route( first );
-
-			this.middleware.push( first );
-		}
-		else if ( args.length === 2 )
-		{
-			let first	= args[0];
-			let second	= args[1];
-
-			if ( typeof first === 'string' && second instanceof Router )
-			{
-				const secondMiddleware	= second.middleware;
-
-				for ( const middleware of secondMiddleware )
-				{
-					if ( middleware.route === '/' )
-						middleware.route	= '';
-
-					if ( middleware.route instanceof RegExp )
-					{
-						let regex	= middleware.route.source;
-
-						if ( regex.startsWith( '^' ) )
-							regex	= regex.substring( 1 );
-
-						middleware.route	= new RegExp( `${first}${regex}`, middleware.route.flags );
-						continue;
-					}
-
-					middleware.route	= first + middleware.route;
-				}
-
-				this.middleware			= this.middleware.concat( secondMiddleware );
-				const routerMiddlewares	= second.globalMiddlewares;
-
-				for ( const [key, value] of Object.entries( routerMiddlewares ) )
-					this.define( key, value );
-			}
-			else
-			{
+			default:
 				throw new Error( 'app.er.routing.invalidMiddlewareAdded' );
-			}
 		}
-		else
-		{
-			throw new Error( 'app.er.routing.invalidMiddlewareAdded' );
-		}
-
-		return this;
 	}
 
 	/**
@@ -263,67 +218,118 @@ class Router extends PluginInterface
 
 		if ( this.cachingIsEnabled )
 		{
-			this._clearCache();
+			const blockData	= this.cache.getBlock( blockKey );
 
-			if ( typeof this.cache[blockKey] === 'object' )
+			if ( blockData !== null )
 			{
-				event.params				= Object.assign( event.params, this.cache[blockKey].params );
-				this.cache[blockKey].date	= Date.now();
+				event.params	= Object.assign( event.params, blockData.params );
 
-				return this.cache[blockKey].block.slice();
+				return blockData.block.slice();
 			}
 		}
 
-		for ( let index in this.middleware )
+		for ( const route of this.middleware )
 		{
-			/* istanbul ignore next */
-			if ( ! {}.hasOwnProperty.call( this.middleware, index ) )
-				continue;
-
-			let route	= this.middleware[index];
 			let params	= {};
 
-			if ( Router.matchMethod( event.method, route ) )
+			if ( Router.matchMethod( event.method, route ) && Router.matchRoute( event.path, route, params ) )
 			{
-				if ( Router.matchRoute( event.path, route, params ) )
-				{
-					event.params	= Object.assign( event.params, params );
+				event.params	= Object.assign( event.params, params );
 
-					for ( const middleware of route.getMiddlewares() )
-					{
-						switch ( true )
-						{
-							case typeof middleware === 'string':
-								if ( typeof this.globalMiddlewares[middleware] !== 'function' )
-									throw { code: 'app.er.routing.missingMiddleware', message: middleware };
-
-								block.push( this.globalMiddlewares[middleware] );
-								break;
-
-							case typeof middleware === 'function':
-								block.push( middleware );
-								break;
-
-							default:
-								throw { code: 'app.er.routing.missingMiddleware', message: middleware };
-						}
-					}
-
-					block.push( route.getHandler() );
-				}
+				// This will only push if there are any middlewares returned
+				block.push.apply( block, this._getGlobalMiddlewaresForRoute( route ) );
+				block.push( route.getHandler() );
 			}
 		}
 
-		if ( this.cachingIsEnabled && ! this._isCacheFull() )
+		if ( this.cachingIsEnabled && ! this.cache.isFull() )
 		{
-			let params				= {};
-			params					= Object.assign( params, event.params );
-			const date				= Date.now();
+			const params	= Object.assign( {}, event.params );
 
-			this.cache[blockKey]	= { block: block.slice(), params, date };
+			this.cache.setBlock( blockKey, { block: block.slice(), params } );
 		}
 
 		return block;
+	}
+
+	/**
+	 * @brief	Gets all the global middlewares for the given route
+	 *
+	 * @param	{Route} route
+	 *
+	 * @private
+	 *
+	 * @return	Array
+	 */
+	_getGlobalMiddlewaresForRoute( route )
+	{
+		const middlewares	= [];
+		for ( const middleware of route.getMiddlewares() )
+		{
+			switch ( true )
+			{
+				case typeof middleware === 'string':
+					if ( typeof this.globalMiddlewares[middleware] !== 'function' )
+						throw { code: 'app.er.routing.missingMiddleware', message: middleware };
+
+					middlewares.push( this.globalMiddlewares[middleware] );
+					break;
+
+				case typeof middleware === 'function':
+					middlewares.push( middleware );
+					break;
+
+				default:
+					throw { code: 'app.er.routing.missingMiddleware', message: middleware };
+			}
+		}
+
+		return middlewares;
+	}
+
+	/**
+	 *
+	 * @brief	Concatenates two routers together
+	 *
+	 * @details	If a path is passed, then that path will be used to prefix all the middlewares
+	 *
+	 * @param	{Router} router
+	 * @param	{String} path
+	 *
+	 * @private
+	 *
+	 * @return	Router
+	 */
+	_concat( router, path = null )
+	{
+		if ( path !== null )
+		{
+			for ( const middleware of router.middleware )
+			{
+				if ( middleware.route === '/' )
+					middleware.route	= '';
+
+				if ( middleware.route instanceof RegExp )
+				{
+					let regex	= middleware.route.source;
+
+					if ( regex.startsWith( '^' ) )
+						regex	= regex.substring( 1 );
+
+					middleware.route	= new RegExp( `${path}${regex}`, middleware.route.flags );
+					continue;
+				}
+
+				middleware.route	= path + middleware.route;
+			}
+		}
+
+		this.middleware	= this.middleware.concat( router.middleware );
+
+		for ( const [key, value] of Object.entries( router.globalMiddlewares ) )
+			this.define( key, value );
+
+		return this;
 	}
 
 	/**
@@ -400,56 +406,6 @@ class Router extends PluginInterface
 			return false;
 
 		return route.matchPath( requestedRoute, matchedParams );
-	}
-
-	/**
-	 * @brief	Attempts to keep the cache in check by clearing keys that are not in use
-	 *
-	 * @param	{Number} [ttl=3600000]
-	 * @param	{Number} [lastClearCacheAttemptTtl=60000]
-	 *
-	 * @private
-	 *
-	 * @return	void
-	 */
-	_clearCache( ttl = 60 * 60 * 1000, lastClearCacheAttemptTtl = 60 * 1000 )
-	{
-		if ( this.lastClearCacheAttempt + lastClearCacheAttemptTtl > Date.now() )
-			return;
-
-		this.lastClearCacheAttempt	= Date.now();
-
-		if ( this._isCacheFull() )
-		{
-			for ( const key in this.cache )
-			{
-				/* istanbul ignore next */
-				if ( ! {}.hasOwnProperty.call( this.cache, key ) )
-					continue;
-
-				const data	= this.cache[key];
-
-				if ( ( data.date + ttl ) <= Date.now() )
-					delete this.cache[key];
-			}
-		}
-	}
-
-	/**
-	 * @brief	Returns if the cache is full
-	 *
-	 * @details	If the keyLimit is set to 0 then the cache will have an unlimited size
-	 *
-	 * @private
-	 *
-	 * @return	Boolean
-	 */
-	_isCacheFull()
-	{
-		if ( this.keyLimit === 0 )
-			return false;
-
-		return Object.keys( this.cache ).length > this.keyLimit;
 	}
 }
 

@@ -80,12 +80,10 @@ test({
 
 		noAttachPlugin.setServerOnRuntime( server );
 
-		assert.equal( 'undefined', typeof process.dumpStack );
 		assert.equal( 'undefined', typeof process.log );
 
 		attachPlugin.setServerOnRuntime( server );
 
-		assert.equal( 'function', typeof process.dumpStack );
 		assert.equal( 'function', typeof process.log );
 
 		done();

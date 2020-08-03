@@ -25,7 +25,7 @@ test({
 		app.get( `/${name}`, ( event ) => {
 			assert.equal( process.env.TESTKEY, 'TESTVALUE' );
 			event.send( name );
-		} );
+		});
 
 		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), name );

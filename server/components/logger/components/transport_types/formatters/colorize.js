@@ -1,5 +1,6 @@
 'use strict';
 
+// THIS IS NOT A FORMATTER, JUST LAZY TO MOVE IT
 let colorize	= {};
 
 const BLACK		= '\u001b[30m';
@@ -19,14 +20,14 @@ const RESET		= '\u001b[0m';
  *
  * @return	String
  */
-colorize.red		= ( log ) => { return RED + log; };
-colorize.black		= ( log ) => { return BLACK + log; };
-colorize.green		= ( log ) => { return GREEN + log; };
-colorize.yellow		= ( log ) => { return YELLOW + log; };
-colorize.blue		= ( log ) => { return BLUE + log; };
-colorize.magenta	= ( log ) => { return MAGENTA + log; };
-colorize.cyan		= ( log ) => { return CYAN + log; };
-colorize.white		= ( log ) => { return WHITE + log; };
-colorize.reset		= ( log ) => { return RESET + log; };
+colorize.red		= ( log ) => { return RED + log + RESET; };
+colorize.black		= ( log ) => { return BLACK + log + RESET; };
+colorize.green		= ( log ) => { return GREEN + log + RESET; };
+colorize.yellow		= ( log ) => { return YELLOW + log + RESET; };
+colorize.blue		= ( log ) => { return BLUE + log + RESET; };
+colorize.magenta	= ( log ) => { return MAGENTA + log + RESET; };
+colorize.cyan		= ( log ) => { return CYAN + log + RESET; };
+colorize.white		= ( log ) => { return WHITE + log + RESET; };
+colorize.reset		= ( log = '' ) => { return RESET + log + RESET; };
 
 module.exports	= colorize;

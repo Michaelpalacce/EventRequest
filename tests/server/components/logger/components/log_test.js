@@ -123,15 +123,6 @@ test({
 });
 
 test({
-	message	: 'Log.getStackTrace returns string',
-	test	: ( done ) => {
-		assert.equal( 'string', typeof Log.getStackTrace() );
-
-		done();
-	}
-});
-
-test({
 	message	: 'Log.getMessage returns the message',
 	test	: ( done ) => {
 		let log	= new Log();
@@ -214,7 +205,7 @@ test({
 		const logMessage	= new Error( 'Test' );
 		const log			= new Log( logMessage );
 
-		assert.deepStrictEqual( log.getMessage(), logMessage.stack );
+		assert.deepStrictEqual( log.getMessage(), logMessage.message );
 
 		done();
 	}

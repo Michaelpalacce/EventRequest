@@ -59,15 +59,20 @@ class Tester
 			logLevels	: LOG_LEVELS,
 			transports	: [
 				new Console({
-					color		: true,
+					processors : [
+						Console.processors.time(),
+						Console.processors.stack(),
+						Console.processors.color({
+							logColors	: {
+								1000	: 'red',
+								2000	: 'green',
+								3000	: 'cyan',
+								4000	: 'magenta'
+							}
+						})
+					],
 					logLevels	: LOG_LEVELS,
 					logLevel	: DEFAULT_LOG_LEVEL,
-					logColors	: {
-						1000	: 'red',
-						2000	: 'green',
-						3000	: 'cyan',
-						4000	: 'magenta'
-					}
 				})
 			]
 		});

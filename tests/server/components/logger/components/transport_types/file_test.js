@@ -3,7 +3,7 @@
 
 // Dependencies
 const { assert, test, Mock, Mocker, helpers, tester }	= require( '../../../../../test_helper' );
-const { LOG_LEVELS, File, Log }							= require( './../../../../../../server/components/logger/loggur' );
+const { LOG_LEVELS, File, Log, Transport }				= require( './../../../../../../server/components/logger/loggur' );
 const { Writable }										= require( 'stream' );
 const fs												= require( 'fs' );
 const path												= require( 'path' );
@@ -13,7 +13,43 @@ helpers.clearUpTestFile();
 test({
 	message	: 'File.constructor on defaults',
 	test	: ( done ) => {
-		new File();
+		assert.throws(() => {
+			new File();
+		});
+
+		try
+		{
+			new File();
+		}
+		catch ( e )
+		{
+			assert.deepStrictEqual( e.message, 'app.er.logging.transport.file.fileLogPathNotProvided' );
+		}
+
+		done();
+	}
+});
+
+test({
+	message	: 'File.constructor.with.valid.config',
+	test	: ( done ) => {
+		const file	= new File( { filePath: 'test' } );
+
+		assert.deepStrictEqual( file.filePath, 'test' );
+		assert.deepStrictEqual( file.formatter.toString(), File.formatters.plain( { noRaw : true } ).toString() );
+		assert.deepStrictEqual( file.processors.length, 2 );
+
+		done();
+	}
+});
+
+test({
+	message	: 'File.constructor.with.custom.config',
+	test	: ( done ) => {
+		const file	= new File( { filePath: 'test', processors: [File.processors.stack()], formatter: File.formatters.json() } );
+
+		assert.deepStrictEqual( file.formatter.toString(), File.formatters.json().toString() );
+		assert.deepStrictEqual( file.processors.length, 1 );
 
 		done();
 	}
@@ -29,9 +65,9 @@ test({
 
 		fileTransport.getWriteStream();
 
-		assert.deepStrictEqual( fs.existsSync( dir ), true );
-
 		setTimeout(() => {
+			assert.deepStrictEqual( fs.existsSync( dir ), true );
+
 			fs.unlinkSync( fileTransport.getFileName() );
 
 			fs.unlink( dir, () => {
@@ -119,26 +155,23 @@ test({
 		let file	= new File({
 			logLevel		: 'test',
 			logLevels		: 'test',
-			filePath		: true,
-			splitToNewLines	: 123
+			filePath		: './path'
 		});
 
 		assert.deepStrictEqual( file.logLevel, LOG_LEVELS.info );
 		assert.deepStrictEqual( file.logLevels, LOG_LEVELS );
 		assert.deepStrictEqual( file.supportedLevels, Object.values( LOG_LEVELS ) );
-		assert.deepStrictEqual( file.filePath, null );
+		assert.deepStrictEqual( file.filePath, './path' );
 		assert.deepStrictEqual( file.fileStream, null );
-		assert.deepStrictEqual( file.splitToNewLines, true );
 
 		done();
 	}
 });
 
 test({
-	message	: 'File.constructor on valid configuration',
+	message	: 'File.constructor.on.valid.configuration',
 	test	: ( done ) => {
 		let logLevel		= LOG_LEVELS.error;
-		let splitToNewLines	= false;
 		let logLevels		= LOG_LEVELS;
 		let called			= 0;
 		let filePath		= helpers.getTestFile();
@@ -148,44 +181,8 @@ test({
 			method			: 'getWriteStream',
 			shouldReturn	: () => {
 				++ called;
-				return new Writable();
 			},
-			called			: 1
-		} );
-
-		let file	= new MockedFile({
-			logLevel,
-			logLevels,
-			filePath,
-			splitToNewLines
-		});
-
-		assert.deepStrictEqual( file.logLevel, logLevel );
-		assert.deepStrictEqual( file.logLevels, logLevels );
-		assert.deepStrictEqual( file.supportedLevels, Object.values( logLevels ) );
-		assert.deepStrictEqual( file.splitToNewLines, false );
-		assert.deepStrictEqual( file.filePath, expectedPath );
-		assert.deepStrictEqual( file.fileStream === null, true );
-		assert.deepStrictEqual( called, 1 );
-
-		helpers.clearUpTestFile();
-
-		done();
-	}
-});
-
-test({
-	message	: 'File.format returns a string',
-	test	: ( done ) => {
-		let logLevel	= LOG_LEVELS.error;
-		let logLevels	= LOG_LEVELS;
-		let filePath	= helpers.getTestFile();
-		let MockedFile	= Mock( File );
-
-		Mocker( MockedFile, {
-			method			: 'getWriteStream',
-			shouldReturn	: () => {},
-			called			: 1
+			called			: 0
 		} );
 
 		let file	= new MockedFile({
@@ -194,7 +191,12 @@ test({
 			filePath
 		});
 
-		assert.equal( typeof file.format( Log.getInstance( 'test' ) ), 'string' );
+		assert.deepStrictEqual( file.logLevel, logLevel );
+		assert.deepStrictEqual( file.logLevels, logLevels );
+		assert.deepStrictEqual( file.supportedLevels, Object.values( logLevels ) );
+		assert.deepStrictEqual( file.filePath, expectedPath );
+		assert.deepStrictEqual( file.fileStream === null, true );
+		assert.deepStrictEqual( called, 0 );
 
 		helpers.clearUpTestFile();
 
@@ -263,105 +265,45 @@ test({
 });
 
 test({
-	message	: 'File.log returns a Promise',
+	message	: 'File.log.returns.a.Promise',
 	test	: ( done ) => {
-		let logLevel	= LOG_LEVELS.error;
-		let logLevels	= LOG_LEVELS;
-		let filePath	= helpers.getTestFile();
-		let MockedFile	= Mock( File );
-
-		Mocker( MockedFile, {
-			method			: 'getWriteStream',
-			shouldReturn	: () => {
-				return fs.createWriteStream( path.join( __dirname, './fixtures/testfile' ), {
-					flags		: 'w',
-					autoClose	: true
-				});
-			},
-			called			: 2
-		} );
-
-		let file	= new MockedFile({
-			logLevel,
-			logLevels,
-			filePath
-		});
+		let filePath	= path.join( __dirname, './fixtures/testfile' );
+		let file		= new File( { logLevel: 600, filePath } );
 
 		let logData	= 'This is a test log';
 		let promise	= file.log( Log.getInstance( logData ) );
 
 		assert.equal( promise instanceof Promise, true );
 
-		promise.then(
-			() => {
-				let data	= fs.readFileSync( path.join( __dirname, './fixtures/testfile' ) );
-				assert.equal( data.toString().indexOf( logData ) !== -1, true );
+		setTimeout(() => {
+			promise.then(() => {
+					let data	= fs.readFileSync( file.getFileName() );
+					assert.equal( data.toString().indexOf( logData ) !== -1, true );
 
-				helpers.clearUpTestFile();
+					helpers.clearUpTestFile();
 
-				done();
-			},
-			done
-		);
+					done();
+				}
+			).catch(() => { done( 'An error ocurred' ); });
+		}, 100 );
+	}
+});
+
+
+test({
+	message	: 'File.formatters.is.same.as.Transport.formatters',
+	test	: ( done ) => {
+		assert.deepStrictEqual( File.formatters, Transport.formatters );
+
+		done();
 	}
 });
 
 test({
-	message	: 'File.log.with.splitToNewLines.false',
+	message	: 'File.processors.is.same.as.Transport.processors',
 	test	: ( done ) => {
-		let logLevel	= LOG_LEVELS.error;
-		let logLevels	= LOG_LEVELS;
-		let filePath	= helpers.getTestFile();
-		let MockedFile	= Mock( File );
+		assert.deepStrictEqual( File.processors, Transport.processors );
 
-		Mocker( MockedFile, {
-			method			: 'getWriteStream',
-			shouldReturn	: () => {
-				return fs.createWriteStream( path.join( __dirname, './fixtures/testfile' ), {
-					flags		: 'w',
-					autoClose	: true
-				});
-			},
-			called			: 2
-		} );
-
-		let file	= new MockedFile({
-			logLevel,
-			logLevels,
-			filePath,
-			splitToNewLines	: false
-		});
-
-		let logData	= 'This is a \\ntest log';
-		let promise	= file.log( Log.getInstance( logData ) );
-
-		assert.equal( promise instanceof Promise, true );
-
-		promise.then(
-			() => {
-				let data	= fs.readFileSync( path.join( __dirname, './fixtures/testfile' ) );
-				assert.equal( data.toString().indexOf( logData ) !== -1, true );
-
-				helpers.clearUpTestFile();
-
-				done();
-			},
-			done
-		);
-	}
-});
-
-test({
-	message	: 'File.log.rejects.if.filePath.not.provided',
-	test	: ( done ) => {
-		const MockedFile	= Mock( File );
-
-		const file	= new MockedFile( { filePath: false } );
-
-		file.log( Log.getInstance( 'test' ) ).then( () => {
-			done( 'Should not resolve' );
-		}).catch( () => {
-			done();
-		});
+		done();
 	}
 });

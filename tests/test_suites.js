@@ -32,6 +32,7 @@ testSuites.securitySuite		= () => {
 testSuites.routingSuite		= () => {
 	require( './server/components/routing/route_test' );
 	require( './server/components/routing/router_test' );
+	require( './server/components/routing/router_cache_test' );
 };
 
 testSuites.loggingSuite		= () => {
@@ -42,6 +43,12 @@ testSuites.loggingSuite		= () => {
 	require( './server/components/logger/components/transport_types/console_test' );
 	require( './server/components/logger/components/transport_types/file_test' );
 	require( './server/components/logger/components/transport_types/formatters/colorize_test' );
+	require( './server/components/logger/components/transport_types/formatters/plain_formatter_test' );
+	require( './server/components/logger/components/transport_types/formatters/json_formatter_test' );
+	require( './server/components/logger/components/transport_types/processors/stack_processor_test' );
+	require( './server/components/logger/components/transport_types/processors/color_processor_test' );
+	require( './server/components/logger/components/transport_types/processors/new_line_processor_test' );
+	require( './server/components/logger/components/transport_types/processors/timestamp_processor_test' );
 };
 
 testSuites.cachingSuite		= () => {
