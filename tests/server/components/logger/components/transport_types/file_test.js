@@ -37,7 +37,7 @@ test({
 
 		assert.deepStrictEqual( file.filePath, 'test' );
 		assert.deepStrictEqual( file.formatter.toString(), File.formatters.plain( { noRaw : true } ).toString() );
-		assert.deepStrictEqual( file.processors.length, 3 );
+		assert.deepStrictEqual( file.processors.length, 2 );
 
 		done();
 	}
