@@ -113,7 +113,7 @@ class Transport
 			uniqueId	: log.getUniqueId(),
 			rawMessage	: log.getRawMessage(),
 			extra		: {}
-		}
+		};
 	}
 
 	/**
