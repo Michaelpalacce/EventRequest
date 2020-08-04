@@ -1,3 +1,6 @@
+27.2.2
+- Lowered the package size significantly 
+
 27.2.1
 - Server improvements, code cleanup
 - Added More Code analyzer badges. Some improvements to the code. Removed unused statements
