@@ -76,7 +76,7 @@ class ValidationAttribute
 			if ( params.rule === VALIDATION_ERRORS.optional && assert.assertIsEmpty( this.value ) )
 				return false;
 
-			result	= this.validateRule( rule, index, params, allRules );
+			result	= this.validateRule( rule, index, params );
 
 			if ( result !== false )
 				validationErrors.push( result );
@@ -91,11 +91,10 @@ class ValidationAttribute
 	 * @param	{String} rule
 	 * @param	{Number} index
 	 * @param	{Object} params
-	 * @param	{Array} allRules
 	 *
 	 * @return	String|Boolean
 	 */
-	validateRule( rule, index, params, allRules )
+	validateRule( rule, index, params )
 	{
 		let valueLength, sameEntry, inputEntry;
 
