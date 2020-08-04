@@ -1,12 +1,11 @@
 'use strict';
 
 // Dependencies
-const url									= require( 'url' );
-const { EventEmitter }						= require( 'events' );
-const ErrorHandler							= require( './components/error/error_handler' );
-const { Readable }							= require( 'stream' );
-const ValidationHandler						= require( './components/validation/validation_handler' );
-const { IncomingMessage, ServerResponse }	= require( 'http' );
+const url				= require( 'url' );
+const { EventEmitter }	= require( 'events' );
+const ErrorHandler		= require( './components/error/error_handler' );
+const { Readable }		= require( 'stream' );
+const ValidationHandler	= require( './components/validation/validation_handler' );
 
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router

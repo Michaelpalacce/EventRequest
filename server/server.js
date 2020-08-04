@@ -5,7 +5,6 @@ const http						= require( 'http' );
 const { EventEmitter }			= require( 'events' );
 const EventRequest				= require( './event_request' );
 const RouterClass				= require( './components/routing/router' );
-const PluginInterface			= require( './plugins/plugin_interface' );
 const PluginManager				= require( './plugins/plugin_manager' );
 const { Loggur, LOG_LEVELS }	= require( './components/logger/loggur' );
 

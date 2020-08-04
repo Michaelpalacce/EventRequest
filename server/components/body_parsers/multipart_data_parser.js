@@ -272,10 +272,12 @@ class MultipartDataParser extends EventEmitter
 			switch ( part.state )
 			{
 				case STATE_START:
+				{
 					part.state	= STATE_START_BOUNDARY;
 					break;
-
+				}
 				case STATE_START_BOUNDARY:
+				{
 					// Receive chunks until we find the first boundary if the end has been finished, throw an error
 					boundaryOffset	= part.buffer.indexOf( this.boundary );
 					if ( boundaryOffset === -1 || part.buffer.length < boundaryOffset + this.boundary.length + 10 )
@@ -289,7 +291,9 @@ class MultipartDataParser extends EventEmitter
 					part.state	= STATE_HEADER_FIELD_START;
 
 					break;
+				}
 				case STATE_HEADER_FIELD_START:
+				{
 					let lineCount				= 0;
 					let contentTypeLine			= null;
 					let contentDispositionLine	= null;
@@ -385,15 +389,17 @@ class MultipartDataParser extends EventEmitter
 
 					part.state	= STATE_PART_DATA_START;
 					break;
-
+				}
 				case STATE_PART_DATA_START:
+				{
 					if ( part.type === DATA_TYPE_FILE && part.file === null )
 						part.file	= fs.createWriteStream( part.path, { flag : 'a', autoClose : true } );
 
 					part.state	= STATE_PART_DATA;
 					break;
-
+				}
 				case STATE_PART_DATA:
+				{
 					boundaryOffset	= part.buffer.indexOf( this.boundary );
 					if ( boundaryOffset === -1 )
 					{
@@ -417,15 +423,17 @@ class MultipartDataParser extends EventEmitter
 						part.state	= STATE_END;
 					}
 					break;
+				}
 				case STATE_END:
+				{
 					let nextPart	= this.formPart();
 					nextPart.buffer	= part.buffer;
 					part			= nextPart;
 
 					this.parts.push( nextPart );
 					break;
-
-					/* istanbul ignore next */
+				}
+				/* istanbul ignore next */
 				default:
 					this.handleError( ERROR_INVALID_STATE );
 			}

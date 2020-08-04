@@ -1,6 +1,5 @@
 'use strict';
 // Dependencies
-const EventRequest		= require( '../../event_request' );
 const Route				= require( './route' );
 const PluginInterface	= require( './../../plugins/plugin_interface' );
 const RouterCache		= require( './router_cache' );
