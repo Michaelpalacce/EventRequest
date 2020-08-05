@@ -59,7 +59,7 @@ class TemplatingEnginePlugin extends PluginInterface
 					{
 						reject( { code: 'app.err.templatingEngine.errorRendering' } );
 					}
-				}).catch( ( error ) => { reject( { code: 'app.err.templatingEngine.errorRendering' } ); } );
+				}).catch( () => { reject( { code: 'app.err.templatingEngine.errorRendering' } ); } );
 			});
 
 			renderPromise.catch( errorCallback === null ? eventRequest.next : errorCallback );

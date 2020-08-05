@@ -32,7 +32,7 @@ class StaticResourcesPlugin extends PluginInterface
 		const pluginMiddlewares	= [];
 
 		staticPaths.forEach( ( staticPath ) => {
-			const regExp	= new RegExp( '^(\/' + staticPath + ')' );
+			const regExp	= new RegExp( '^(/' + staticPath + ')' );
 
 			pluginMiddlewares.push( {
 				route	: regExp,
