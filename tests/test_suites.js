@@ -8,6 +8,7 @@ testSuites.eventSuite		= () => {
 
 testSuites.serverSuite		= () => {
 	require( './server/server_test' );
+	require( './server/server_er_static_test' );
 	require( './server/server_er_rate_limits_test' );
 	require( './server/server_er_body_parsers_test' );
 	require( './server/server_er_security_test' );

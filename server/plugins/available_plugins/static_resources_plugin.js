@@ -33,13 +33,14 @@ class StaticResourcesPlugin extends PluginInterface
 
 		staticPaths.forEach( ( staticPath ) => {
 			const regExp	= new RegExp( '^(/' + staticPath + ')' );
+			staticPath		= path.join( PROJECT_ROOT, staticPath )
 
 			pluginMiddlewares.push( {
 				route	: regExp,
 				handler	: ( event ) => {
 					const item	= path.join( PROJECT_ROOT, event.path );
 
-					if ( fs.existsSync( item ) )
+					if ( fs.existsSync( item ) && item.indexOf( staticPath ) !== -1 )
 					{
 						let mimeType	= '*/*';
 						switch ( path.extname( item ) )
@@ -62,7 +63,7 @@ class StaticResourcesPlugin extends PluginInterface
 					}
 					else
 					{
-						event.next( { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${item}`, status: 404 } );
+						event.next( { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${event.path}`, status: 404 } );
 					}
 				}
 			} );

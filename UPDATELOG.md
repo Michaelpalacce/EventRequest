@@ -7,6 +7,7 @@
 - Response Cache plugin now works a bit differently, but should not be a breaking change
 - Session plugin now sets the session on event cleanUp rather than event send as it is no longer emitted. This will also fix a long time bug where session was saved only on event.send...
 - Session plugin .initSession now no longer accepts a callback but returns the response
+- Fixed a bug with the static resources plugin, that was allowing files to be served outside the static folder. This WILL not happen again. Tests has been added for it
 
 27.2.2
 - Lowered the package size significantly 
