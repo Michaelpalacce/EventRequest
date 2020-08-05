@@ -3,8 +3,9 @@
 - removeResponseHeader no longer emits and no longer calls next with an error
 - Send no longer accepts Streams. If you want to send a stream, feel free to pipe it to the request.
 - Reworked send, no longer accepts isRaw.
+- send event is no longer emitted
 - Response Cache plugin now works a bit differently, but should not be a breaking change
-- Session plugin now sets the session on request close rather than send event as it is no longer emitted
+- Session plugin now sets the session on event cleanUp rather than event send as it is no longer emitted. This will also fix a long time bug where session was saved only on event.send...
 
 27.2.2
 - Lowered the package size significantly 

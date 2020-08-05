@@ -4,7 +4,6 @@
 const url				= require( 'url' );
 const { EventEmitter }	= require( 'events' );
 const ErrorHandler		= require( './components/error/error_handler' );
-const { Readable }		= require( 'stream' );
 const ValidationHandler	= require( './components/validation/validation_handler' );
 
 /**

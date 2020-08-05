@@ -109,13 +109,11 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( pluginMiddlewares[1] );
 		router.add({
-			handler	: ( event ) => {
+			handler	: async ( event ) => {
 				event.session	= session;
-				event.initSession( () => {
-					assert.equal( true, called );
+				assert.equal( await event.initSession(), called );
 
-					done();
-				} );
+				done();
 			}
 		});
 
@@ -157,10 +155,8 @@ test({
 				router.add( pluginMiddlewares[0] );
 				router.add( pluginMiddlewares[1] );
 				router.add({
-					handler	: ( event ) => {
-						event.initSession( ( error ) => {
-							error === false ? done() : done( 'Error while initializing the session' );
-						});
+					handler	: async ( event ) => {
+						await event.initSession() === false ? done() : done( 'Error while initializing the session' );
 					}
 				});
 
@@ -189,7 +185,7 @@ test({
 		router.add( pluginMiddlewares[0] );
 		router.add( pluginMiddlewares[1] );
 		router.add({
-			handler	: ( event ) => {
+			handler	: async ( event ) => {
 				event.session.sessionId	= 'testSessionId';
 				event.session.add( 'test', 'value' );
 				if ( ! event.session.saveSession() )
@@ -199,11 +195,11 @@ test({
 				}
 				else
 				{
-					event.initSession( () => {
-						assert.equal( true, event.session.has( 'test' ) );
-						assert.equal( 'value', event.session.get( 'test' ) );
-						done();
-					});
+					await event.initSession();
+
+					assert.equal( true, event.session.has( 'test' ) );
+					assert.equal( 'value', event.session.get( 'test' ) );
+					done();
 					return;
 				}
 			}

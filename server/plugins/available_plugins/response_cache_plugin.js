@@ -123,7 +123,7 @@ class ResponseCachePlugin extends PluginInterface
 							this.dataServer.set( recordName, { response, code, headers }, ttl, { persist: false } );
 
 							eventEnd.apply( event, args );
-						}
+						};
 
 						event.next();
 					}

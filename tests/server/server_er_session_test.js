@@ -17,11 +17,9 @@ test({
 		app.apply( app.er_data_server );
 		app.apply( app.er_session );
 
-		app.get( `/${name}`, ( event ) => {
-			event.initSession( event.next ).catch( event.next );
-		} );
-
 		app.get( `/${name}`, async ( event ) => {
+			await event.initSession();
+
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -87,11 +85,9 @@ test({
 		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false } ) } );
 		app.apply( app.er_session );
 
-		app.get( `/${name}`, ( event ) => {
-			event.initSession( event.next ).catch( event.next );
-		} );
-
 		app.get( `/${name}`, async ( event ) => {
+			await event.initSession();
+
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -159,11 +155,9 @@ test({
 		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false } ) } );
 		app.apply( app.er_session );
 
-		app.get( `/${name}`, ( event ) => {
-			event.initSession( event.next ).catch( event.next );
-		} );
-
 		app.get( `/${name}`, async ( event ) => {
+			await event.initSession();
+
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -230,11 +224,8 @@ test({
 		app.apply( app.er_data_server );
 		app.apply( app.er_session, { isCookieSession: false } );
 
-		app.get( `/${name}`, ( event ) => {
-			event.initSession( event.next ).catch( event.next );
-		} );
-
 		app.get( `/${name}`, async ( event ) => {
+			await event.initSession();
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -292,11 +283,9 @@ test({
 		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false } ) } );
 		app.apply( app.er_session, { isCookieSession: false } );
 
-		app.get( `/${name}`, ( event ) => {
-			event.initSession( event.next ).catch( event.next );
-		});
-
 		app.get( `/${name}`, async ( event ) => {
+			await event.initSession();
+
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -356,11 +345,9 @@ test({
 		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false, useBigMap: true } ) } );
 		app.apply( app.er_session, { isCookieSession: false } );
 
-		app.get( `/${name}`, ( event ) => {
-			event.initSession( event.next ).catch( event.next );
-		});
-
 		app.get( `/${name}`, async ( event ) => {
+			await event.initSession();
+
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
