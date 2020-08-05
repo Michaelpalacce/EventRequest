@@ -195,24 +195,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest._send.with.defaults',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let send			= false;
-		eventRequest.response._mock({
-			method			: 'end',
-			shouldReturn	: () => { send = true; },
-			called			: 1
-		});
-
-		eventRequest._send();
-
-		send	? done() : done( 'Send did not get called' );
-	}
-});
-
-test({
-	message	: 'EventRequest._send.with.malformed.payload',
+	message	: 'EventRequest.send.with.malformed.payload',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let send			= false;
@@ -226,9 +209,11 @@ test({
 		const circular	= {};
 		circular.a		= { b: circular };
 
-		eventRequest._send( circular );
+		assert.throws(() => {
+			eventRequest.send( circular );
+		});
 
-		send	? done() : done( 'Send did not get called' );
+		done();
 	}
 });
 
@@ -249,31 +234,6 @@ test({
 });
 
 test({
-	message	: 'EventRequest.send.when._send.throws.calls.handleError.for.the.error.handler',
-	test	: ( done ) => {
-		const eventRequest			= helpers.getEventRequest();
-		eventRequest.errorHandler	= new MockedErrorHandler();
-
-		eventRequest.errorHandler._mock({
-			method			: 'handleError',
-			called			: 1,
-			shouldReturn	: () => {
-				done();
-			}
-		});
-
-		eventRequest._mock({
-			method			: '_send',
-			shouldReturn	: () => {
-				throw new Error();
-			}
-		});
-
-		eventRequest.send();
-	}
-});
-
-test({
 	message	: 'EventRequest.send.calls.response.end.when.raw',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
@@ -290,73 +250,6 @@ test({
 	}
 });
 
-test({
-	message	: 'EventRequest.send.emits.send.event',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let send			= false;
-		eventRequest.response._mock({
-			method			: 'end',
-			shouldReturn	: () => {}
-		});
-
-		eventRequest.on( 'send', () => {
-			send	= true;
-		});
-
-		eventRequest.send( '' );
-
-		send	? done() : done( 'EventRequest send event not emitted' );
-	}
-});
-
-test({
-	message	: 'EventRequest.send.emits.send.event.with.response.even.if.isRaw.is.true.and.the.response.is.a.string',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let send			= false;
-		eventRequest.response._mock({
-			method			: 'end',
-			shouldReturn	: () => {}
-		});
-
-		eventRequest.on( 'send', ( payload ) => {
-			if ( typeof payload.response !== 'undefined' )
-				send	= true;
-		});
-
-		eventRequest.send( '', 200, true );
-
-		send	? done() : done( 'EventRequest send event not emitted but should have been' );
-	}
-});
-
-test({
-	message	: 'EventRequest.send.emits.send.event.without.response.if.response.is.raw.or.stream',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let send			= false;
-		eventRequest.response._mock({
-			method			: 'end',
-			shouldReturn	: () => {}
-		});
-
-		eventRequest.on( 'send', ( payload ) => {
-			if ( typeof payload.response !== 'undefined' )
-				send	= true;
-		});
-
-		eventRequest.send( {}, 200, true );
-
-		const stream	= fs.createReadStream( './tests/server/test_template.html' );
-
-		eventRequest.send( stream );
-
-		stream.close();
-
-		! send	? done() : done( 'EventRequest send event emitted but should not have been' );
-	}
-});
 
 test({
 	message	: 'EventRequest.sets.status.code',
@@ -404,20 +297,6 @@ test({
 });
 
 test({
-	message	: 'EventRequest.setResponseHeader.emits.a.setResponseHeader.event',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let setResponseHeader		= false;
-
-		eventRequest.on( 'setResponseHeader', () => { setResponseHeader = true; });
-
-		eventRequest.setResponseHeader( 'key', 'value' );
-
-		setResponseHeader	? done() : done( 'EventRequest setResponseHeader event not emitted' );
-	}
-});
-
-test({
 	message	: 'EventRequest.setResponseHeader.returns.EventRequest',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
@@ -425,34 +304,6 @@ test({
 		assert.deepStrictEqual( eventRequest.setResponseHeader( 'key', 'value' ), eventRequest );
 
 		done();
-	}
-});
-
-test({
-	message	: 'EventRequest.setResponseHeader.emits.a.setResponseHeader.event',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let setResponseHeader		= false;
-
-		eventRequest.on( 'setResponseHeader', () => { setResponseHeader = true; });
-
-		eventRequest.setResponseHeader( 'key', 'value' );
-
-		setResponseHeader	? done() : done( 'EventRequest setResponseHeader event not emitted' );
-	}
-});
-
-test({
-	message	: 'EventRequest.removeResponseHeader.emits.a.removeResponseHeader.event',
-	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let removeHeader	= false;
-
-		eventRequest.on( 'removeResponseHeader', () => { removeHeader = true; });
-
-		eventRequest.removeResponseHeader( 'key' );
-
-		removeHeader	? done() : done( 'EventRequest removeResponseHeader event not emitted' );
 	}
 });
 
@@ -492,7 +343,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest setResponseHeader sets the header in the response if response is not sent',
+	message	: 'EventRequest.setResponseHeader.sets.the.header.in.the.response.if.response.is.not.sent',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		assert.equal( eventRequest.isFinished(), false );
@@ -511,7 +362,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest removeResponseHeader removes the header in the response if response is not sent',
+	message	: 'EventRequest.removeResponseHeader.removes.the.header.in.the.response.if.response.is.not.sent',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		assert.equal( eventRequest.isFinished(), false );
@@ -533,8 +384,6 @@ test({
 	message	: 'EventRequest setResponseHeader does not set header when event is finished and throws error',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		let errorHandler	= new MockedErrorHandler();
-		let errorCalled		= false;
 
 		assert.equal( eventRequest.isFinished(), false );
 
@@ -550,17 +399,8 @@ test({
 			shouldReturn	: true
 		});
 
-		eventRequest.errorHandler	= errorHandler;
-
-		errorHandler._mock({
-			method			: 'handleError',
-			shouldReturn	: () => { errorCalled = true; },
-			with			: [[eventRequest, undefined]],
-			called			: 1
-		});
-
 		eventRequest.setResponseHeader( 'key', 'value' );
-		errorCalled	? done() : done( 'Error was not called' );
+		done();
 	}
 });
 
@@ -568,8 +408,6 @@ test({
 	message	: 'EventRequest removeResponseHeader does not remove header when event is finished and throws error',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		let errorHandler	= new MockedErrorHandler();
-		let errorCalled		= false;
 
 		assert.equal( eventRequest.isFinished(), false );
 
@@ -585,17 +423,8 @@ test({
 			shouldReturn	: true
 		});
 
-		eventRequest.errorHandler	= errorHandler;
-
-		errorHandler._mock({
-			method			: 'handleError',
-			shouldReturn	: () => { errorCalled = true; },
-			with			: [[eventRequest, undefined]],
-			called			: 1
-		});
-
 		eventRequest.removeResponseHeader( 'key' );
-		errorCalled	? done() : done( 'Error was not called' );
+		done();
 	}
 });
 
@@ -643,7 +472,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.redirect does not redirect if response is finished',
+	message	: 'EventRequest.redirect.does.not.redirect.if.response.is.finished',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		let MockedErrorHandler	= Mock( ErrorHandler );
@@ -679,7 +508,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.isFinished returns response.finished',
+	message	: 'EventRequest.isFinished.returns.response.finished',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		eventRequest.response._mock({
@@ -701,7 +530,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest._setBlock should set block',
+	message	: 'EventRequest._setBlock.should.set.block',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let block			= ['test'];
@@ -714,7 +543,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.next calls next middleware',
+	message	: 'EventRequest.next.calls.next.middleware',
 	test	: ( done ) => {
 		const eventRequest	= helpers.getEventRequest();
 		let firstCalled		= false;
@@ -778,7 +607,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.next handles thrown errors',
+	message	: 'EventRequest.next.handles.thrown.errors',
 	test	: ( done ) => {
 		const eventRequest			= helpers.getEventRequest();
 		let error					= false;
@@ -808,7 +637,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.next handles thrown errors if async',
+	message	: 'EventRequest.next.handles.thrown.errors.if.async',
 	test	: ( done ) => {
 		const eventRequest			= helpers.getEventRequest();
 		let error					= false;
@@ -840,7 +669,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.next sends error on error',
+	message	: 'EventRequest.next.sends.error.on.error',
 	test	: ( done ) => {
 		let eventRequest			= helpers.getEventRequest();
 		let error					= false;
@@ -867,7 +696,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.next calls errorHandler on no more middleware',
+	message	: 'EventRequest.next.calls.errorHandler.on.no.more.middleware',
 	test	: ( done ) => {
 		let eventRequest			= helpers.getEventRequest();
 		let error					= false;
@@ -890,7 +719,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.sendError emits an error event',
+	message	: 'EventRequest.sendError.emits.an.error.event',
 	test	: ( done ) => {
 		let eventRequest			= helpers.getEventRequest();
 		let errorToThrow			= 'Error to throw';
@@ -912,7 +741,7 @@ test({
 });
 
 test({
-	message: 'EventRequest should have a validation handler',
+	message: 'EventRequest.should.have.a.validation.handler',
 	test: ( done ) => {
 		const eventRequest		= helpers.getEventRequest();
 		const ValidationHandler	= require( '../../server/components/validation/validation_handler' );
@@ -925,7 +754,7 @@ test({
 });
 
 test({
-	message: 'EventRequest setCookie should add a header with the cookie',
+	message: 'EventRequest.setCookie.should.add.a.header.with.the.cookie',
 	dataProvider: [
 		['key', 'value', { Path: '/', Domain: 'localhost', HttpOnly: true, 'Max-Age': 100, Expires: 500 }, true],
 		['key', 123, { Path: '/', Domain: 'localhost', HttpOnly: true, 'Max-Age': 100, Expires: 500 }, true],
@@ -985,7 +814,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.getRequestHeader should return header',
+	message	: 'EventRequest.getRequestHeader.should.return.header',
 	test	: ( done ) => {
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
@@ -999,7 +828,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.getRequestHeader is case insensitive',
+	message	: 'EventRequest.getRequestHeader.is.case.insensitive',
 	test	: ( done ) => {
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
@@ -1014,7 +843,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.getRequestHeader should return default if header is not set',
+	message	: 'EventRequest.getRequestHeader.should.return.default.if.header.is.not.set',
 	test	: ( done ) => {
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
@@ -1029,7 +858,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.hasRequestHeader returns false if header does not exist',
+	message	: 'EventRequest.hasRequestHeader.returns.false.if.header.does.not.exist',
 	test	: ( done ) => {
 		const headerName	= 'test';
 
@@ -1042,7 +871,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.hasRequestHeader returns true if header exists',
+	message	: 'EventRequest.hasRequestHeader.returns.true.if.header.exists',
 	test	: ( done ) => {
 		const headerName	= 'test';
 		const headerValue	= 'TestHeader';
@@ -1056,7 +885,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.getRequestHeaders returns all request headers',
+	message	: 'EventRequest.getRequestHeaders.returns.all.request.headers',
 	test	: ( done ) => {
 		const headers	= {
 			headerOne: 'valueOne',

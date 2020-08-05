@@ -5,6 +5,7 @@ node_modules
 /tests/server/components/body_parsers/fixture/testUploads/*
 /rate_limits.json
 cache
+cacheMap1
 cacheMap
 .vagrant
 /coverage/

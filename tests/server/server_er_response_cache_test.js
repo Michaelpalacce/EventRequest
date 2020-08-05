@@ -98,6 +98,141 @@ test({
 });
 
 test({
+	message	: 'Server.test.er_response_cache.does.not.cache.with.object',
+	test	: ( done ) => {
+		const app	= new Server();
+		const name	= 'testErResponseCacheCachesWithObject';
+		let i		= 0;
+
+		app.apply( app.er_data_server, { dataServer: helpers.getDataServer() } );
+		app.apply( app.er_response_cache );
+
+		app.get( `/${name}`, 'cache.request', ( event ) => {
+			event.on( 'cachedResponse', () => {
+				event.send( 'Ok, but should not have been' );
+			});
+
+			return event.end( {} );
+		});
+
+		app.listen( 4365, () => {
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				500,
+				'',
+				{},
+				4365,
+				'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
+			).then(() => {
+
+				return helpers.sendServerRequest(
+					`/${name}`,
+					'GET',
+					500,
+					'',
+					{},
+					4365,
+					'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
+				);
+			}).then(( response ) => {
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_response_cache.does.not.cache.with.object.with.map',
+	test	: ( done ) => {
+		const app	= new Server();
+		const name	= 'testErResponseCacheCachesWithObject';
+		let i		= 0;
+
+		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false } ) } );
+		app.apply( app.er_response_cache );
+
+		app.get( `/${name}`, 'cache.request', ( event ) => {
+			event.on( 'cachedResponse', () => {
+				event.send( 'Ok, but should not have been' );
+			});
+
+			return event.end( {} );
+		});
+
+		app.listen( 4366, () => {
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				500,
+				'',
+				{},
+				4366,
+				'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
+			).then(() => {
+
+				return helpers.sendServerRequest(
+					`/${name}`,
+					'GET',
+					500,
+					'',
+					{},
+					4366,
+					'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
+				);
+			}).then(( response ) => {
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_response_cache.does.not.cache.with.object.with.big.map',
+	test	: ( done ) => {
+		const app	= new Server();
+		const name	= 'testErResponseCacheCachesWithObject';
+		let i		= 0;
+
+		app.apply( app.er_data_server, { dataServer: new DataServerMap( { persist: false, useBigMap: true } ) } );
+		app.apply( app.er_response_cache );
+
+		app.get( `/${name}`, 'cache.request', ( event ) => {
+			event.on( 'cachedResponse', () => {
+				event.send( 'Ok, but should not have been' );
+			});
+
+			return event.end( {} );
+		});
+
+		app.listen( 4367, () => {
+			helpers.sendServerRequest(
+				`/${name}`,
+				'GET',
+				500,
+				'',
+				{},
+				4367,
+				'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
+			).then(() => {
+
+				return helpers.sendServerRequest(
+					`/${name}`,
+					'GET',
+					500,
+					'',
+					{},
+					4367,
+					'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
+				);
+			}).then(( response ) => {
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
 	message	: 'Server.test.er_response_cache.does.not.cache.if.not.needed',
 	test	: ( done ) => {
 		const name	= 'testErResponseCacheDoesNotCacheEverything';

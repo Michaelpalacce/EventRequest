@@ -6,6 +6,7 @@ node_modules
 /rate_limits.json
 cache
 cacheMap
+cacheMap1
 .vagrant
 /coverage/
 Uploads/*

@@ -65,7 +65,6 @@ test({
 					assert.equal( logData.includes( 'Redirect to: REDIRECT-LINK' ), true );
 					assert.equal( logData.includes( 'Response to' ), true );
 					assert.equal( logData.includes( 'send from cache' ), true );
-					assert.equal( logData.includes( 'Header set: key with value: value' ), true );
 					assert.equal( logData.includes( 'Headers: ' ), true );
 					assert.equal( logData.includes( 'Cookies: ' ), true );
 					assert.equal( logData.includes( 'SIMPLE ERROR MESSAGE' ), true );
@@ -204,7 +203,6 @@ test({
 					assert.equal( logData.includes( 'Redirect to: REDIRECT-LINK' ), true );
 					assert.equal( logData.includes( 'Response to' ), true );
 					assert.equal( logData.includes( 'send from cache' ), true );
-					assert.equal( logData.includes( 'Header set: key with value: value' ), true );
 					assert.equal( logData.includes( 'Headers: ' ), true );
 					assert.equal( logData.includes( 'Cookies: ' ), true );
 					assert.equal( logData.includes( 'SIMPLE ERROR MESSAGE' ), true );

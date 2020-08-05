@@ -51,7 +51,7 @@ class LoggerPlugin extends PluginInterface
 	/**
 	 * @brief	Attaches events to the event request
 	 *
-	 * @details	Events attached: error, finished, send, redirect, stop, setResponseHeader, cleanUp, clearTimeout
+	 * @details	Events attached: error, finished, send, redirect, stop, cleanUp, clearTimeout
 	 *
 	 * @param	{EventRequest} event
 	 *
@@ -93,10 +93,6 @@ class LoggerPlugin extends PluginInterface
 
 		event.on( 'cachedResponse', () => {
 			logger.info( `Response to ${requestURL} send from cache` );
-		});
-
-		event.on( 'setResponseHeader', ( header ) => {
-			logger.verbose( `Header set: ${header.key} with value: ${header.value}` );
 		});
 	}
 

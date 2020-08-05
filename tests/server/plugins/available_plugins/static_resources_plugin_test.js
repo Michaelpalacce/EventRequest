@@ -6,7 +6,7 @@ const StaticResourcesPlugin		= require( '../../../../server/plugins/available_pl
 const Router					= require( '../../../../server/components/routing/router' );
 
 test({
-	message		: 'StaticResourcesPlugin setsHeader for text/css in case of css',
+	message		: 'StaticResourcesPlugin.setsHeader.for.text/css.in.case.of.css',
 	test		: ( done ) => {
 		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.css', { accept : 'text/css' } );
 		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
@@ -24,6 +24,8 @@ test({
 			method			: 'setResponseHeader',
 			shouldReturn	: () => {
 				called	++;
+
+				return eventRequest;
 			},
 			with			: [
 				['Content-Type', 'text/css']
@@ -40,7 +42,7 @@ test({
 });
 
 test({
-	message		: 'StaticResourcesPlugin setsHeader to application/javascript in case of js',
+	message		: 'StaticResourcesPlugin.setsHeader.to.application/javascript.in.case.of.js',
 	test		: ( done ) => {
 		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.js' );
 		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'] } );
@@ -58,6 +60,8 @@ test({
 			method			: 'setResponseHeader',
 			shouldReturn	: () => {
 				called	++;
+
+				return eventRequest;
 			},
 			with			: [
 				['Content-Type', 'application/javascript']

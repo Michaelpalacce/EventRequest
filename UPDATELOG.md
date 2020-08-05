@@ -1,3 +1,14 @@
+28.0.0
+- setResponseHeader no longer emits and no longer calls next with an error
+- removeResponseHeader no longer emits and no longer calls next with an error
+- Send no longer accepts Streams. If you want to send a stream, feel free to pipe it to the request.
+- Reworked send, no longer accepts isRaw.
+- send event is no longer emitted
+- Response Cache plugin now works a bit differently, but should not be a breaking change
+- Session plugin now sets the session on event cleanUp rather than event send as it is no longer emitted. This will also fix a long time bug where session was saved only on event.send...
+- Session plugin .initSession now no longer accepts a callback but returns the response
+- Fixed a bug with the static resources plugin, that was allowing files to be served outside the static folder. This WILL not happen again. Tests has been added for it
+
 27.2.2
 - Lowered the package size significantly 
 
@@ -19,7 +30,7 @@
 27.1.0
 - Node v14.x support
 - EventRequest now no longer gets the clientIp from the connection, but uses the socket
-- The EventRequest.send() method now sets a response header with the Content-Length if the response is not raw
+- The EventRequest.send() method now sets a response header with the Content-Length if the response is not raw ( this costs speed, but will be kept as best practices )
 - The response will be checked if it is finished with writableEnded and then finished ( as finished is getting deprecated )
 - The EventRequest setStatusCode, setResponseHeader and removeResponseHeader now return the instance of EventRequest so methods can be chained
 

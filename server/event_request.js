@@ -4,7 +4,6 @@
 const url				= require( 'url' );
 const { EventEmitter }	= require( 'events' );
 const ErrorHandler		= require( './components/error/error_handler' );
-const { Readable }		= require( 'stream' );
 const ValidationHandler	= require( './components/validation/validation_handler' );
 
 /**
@@ -150,82 +149,41 @@ class EventRequest extends EventEmitter
 	/**
 	 * @param	{*} [response='']
 	 * @param	{Number} [code=200]
-	 * @param	{Boolean} [raw=false]
 	 */
-	send( response = '', code = null, raw = false )
+	send( response = '', code = null )
 	{
+		if ( typeof code === 'number' )
+			this.setStatusCode( code );
+
+		let payload;
+
 		try
 		{
-			this._send( response, code, raw );
+			payload	= typeof response === 'string' ? response : JSON.stringify( response );
+			this.setResponseHeader( 'Content-Length', payload.length );
 		}
 		catch ( e )
 		{
-			this.sendError( e.toString() );
-		}
-	}
-
-	/**
-	 * @brief	Sends the response to the user
-	 *
-	 * @details	Raw is a flag to tell the eventRequest how to send the data
-	 * 			If set to false, then the response passed will be returned in a JSON format if is not already a valid string
-	 * 			If it is a valid string, then it will be returned as is
-	 *
-	 * @param	{*} [response='']
-	 * @param	{Number} [code=null]
-	 * @param	{Boolean} [raw=false]
-	 *
-	 * @return	void
-	 */
-	_send( response = '', code = null, raw = false )
-	{
-		let isRaw	= raw;
-
-		if ( code !== null && typeof code === 'number' )
-			this.setStatusCode( code );
-
-		if (
-			response !== null
-			&& typeof response !== 'undefined'
-			&& typeof response.pipe === 'function'
-			&& response instanceof Readable
-		) {
-			isRaw	= true;
-			response.pipe( this.response );
-		}
-		else
-		{
-			if ( raw === false )
-			{
-				try
-				{
-					response	= typeof response === 'string' ? response : JSON.stringify( response );
-				}
-				catch ( e )
-				{
-					response	= 'Malformed payload';
-				}
-
-				this.setResponseHeader( 'Content-Length', response.length );
-			}
-
-			this.response.end( response );
+			throw new Error( 'app.er.send.error' );
 		}
 
-		const payload	= { code, raw, headers: this.response.getHeaders() };
-
-		if ( ! isRaw || ( isRaw && ( typeof response === 'string' || typeof response === 'number' ) ) )
-			payload.response	= response;
-
-		this.emit( 'send', payload );
+		this.end( payload, 'utf8' );
 
 		this._cleanUp();
 	}
 
 	/**
-	 * @brief	Safely set header to response ( only if response is not sent )
+	 * @brief	Ends the response with the given params
 	 *
-	 * @details	Will throw an error if response is sent ( but server error that will not kill the execution )
+	 * @return	void
+	 */
+	end( ...args )
+	{
+		this.response.end.apply( this.response, args );
+	}
+
+	/**
+	 * @brief	Safely set header to response ( only if response is not sent )
 	 *
 	 * @param	{String} key
 	 * @param	{String} value
@@ -234,13 +192,8 @@ class EventRequest extends EventEmitter
 	 */
 	setResponseHeader( key, value )
 	{
-		this.emit( 'setResponseHeader', { key, value } );
-
-		if ( ! this.isFinished() )
+		if ( ! this.isFinished() && ! this.response.headersSent )
 			this.response.setHeader( key, value );
-
-		else
-			this.next( 'Trying to set header when response is already sent' );
 
 		return this;
 	}
@@ -254,13 +207,8 @@ class EventRequest extends EventEmitter
 	 */
 	removeResponseHeader( key )
 	{
-		this.emit( 'removeResponseHeader', { key } );
-
-		if ( ! this.isFinished() )
+		if ( ! this.isFinished() && ! this.response.headersSent )
 			this.response.removeHeader( key );
-
-		else
-			this.next( 'Trying to remove header when response is already sent' );
 
 		return this;
 	}
@@ -279,10 +227,10 @@ class EventRequest extends EventEmitter
 	{
 		return ! this.hasRequestHeader( key )
 				? defaultValue
-				: typeof this.headers[key.toLowerCase()] !== "undefined"
-					? this.headers[key.toLowerCase()]
-					: typeof this.headers[key] !== "undefined"
-						? this.headers[key]
+				: typeof this.headers[key] !== "undefined"
+					? this.headers[key]
+					: typeof this.headers[key.toLowerCase()] !== "undefined"
+						? this.headers[key.toLowerCase()]
 						: defaultValue;
 	}
 
@@ -384,9 +332,7 @@ class EventRequest extends EventEmitter
 		if ( err )
 			return this.sendError( err, typeof code === 'number' ? code : 500 );
 
-		const isResponseFinished	= this.isFinished();
-
-		if ( ! isResponseFinished )
+		if ( ! this.isFinished() )
 		{
 			if ( this.block.length <= 0 )
 				return this.sendError( `Cannot ${this.method} ${this.path}`, 404 );

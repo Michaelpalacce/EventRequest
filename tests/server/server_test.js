@@ -1318,6 +1318,63 @@ test({
 });
 
 test({
+	message	: 'Server.test.eventRequest.send.with.malformed.payload',
+	test	: ( done ) => {
+		const name	= 'testEventRequestSendWithMalformedPayload';
+
+		app.get( `/${name}`, ( event ) => {
+			const circular	= {};
+			circular.a		= { b: circular };
+
+			event.send( circular );
+		});
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), '{"error":{"code":"app.er.send.error"}}' );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.router.cache.if.params.are.changed',
+	test	: ( done ) => {
+		const name	= 'testRouterCacheWhenParamsAreChanged';
+
+		app.get( `/${name}/:id:`, ( event ) => {
+			event.send( event.params );
+		});
+
+		helpers.sendServerRequest( `/${name}/idOne`, 'GET', 200 ).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), JSON.stringify( { id: 'idOne' } ) );
+
+			return helpers.sendServerRequest( `/${name}/idTwo`, 'GET', 200 );
+		}).then(( response )=>{
+			assert.deepStrictEqual( response.body.toString(), JSON.stringify( { id: 'idTwo' } ) );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.eventRequest.sendError.when.response.is.finished',
+	test	: ( done ) => {
+		const name	= 'testEventSendErrorWhenFinished';
+
+		app.get( `/${name}`, ( event ) => {
+			event.response.end( 'ok' )
+			event.sendError( name );
+		});
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 200 ).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), 'ok' );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test.eventRequest.sendError.send.Error',
 	test	: ( done ) => {
 		const name	= 'testEventSendErrorWithError';
@@ -1378,22 +1435,6 @@ test({
 
 		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
 			assert.equal( response.body.toString(), '<h1>Test</h1>' );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
-	message	: 'Server.test.eventRequest.send.stream',
-	test	: ( done ) => {
-		const name	= 'testSendErrorStream';
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( fs.createReadStream( path.join( __dirname, './fixture/send/fileToStream.txt' ) ) );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString(), 'test' );
 			done();
 		}).catch( done );
 	}
