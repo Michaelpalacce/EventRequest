@@ -1384,22 +1384,6 @@ test({
 });
 
 test({
-	message	: 'Server.test.eventRequest.send.stream',
-	test	: ( done ) => {
-		const name	= 'testSendErrorStream';
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( fs.createReadStream( path.join( __dirname, './fixture/send/fileToStream.txt' ) ) );
-		} );
-
-		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
-			assert.equal( response.body.toString(), 'test' );
-			done();
-		}).catch( done );
-	}
-});
-
-test({
 	message	: 'Server.test.eventRequest.isFinished',
 	test	: ( done ) => {
 		const name					= 'testIsFinished';

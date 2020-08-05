@@ -704,23 +704,22 @@ The event request is an object that is created by the server and passed through 
 - Emits a cleanUp event and a finished event. 
 - This also removes all other event listeners and sets all the properties to undefined
 
-**send( mixed response = '', Number statusCode = 200, Boolean raw ): void** 
+**send( mixed response = '', Number statusCode = 200 ): void** 
 - Sends the response to the user with the specified statusCode
-- If response is a stream then the stream will be piped to the response
-- If the response was NOT raw, then setResponseHeader will be called with the calculated Content-Length
-- if the raw flag is set to true then the payload will not be checked and just force sent, otherwise the payload must be a string or if it is not a sting it will be JSON stringified. 
-- Emits a 'send' event and calls cleanUp
-- The event will be emitted with a response if the response was a string or the isRaw flag was set to false 
+- If the response is not a String, it will be JSON.stringified. If that fails, an error will be thrown: app.er.send.error
+- setResponseHeader will be called with the calculated Content-Length
+- calls this.end() with the payload
+
+**end( ...args ): void** 
+- This will call response.end() with the given args
 
 **setResponseHeader( String key, mixed value ): EventRequest** 
 - Sets a new header to the response.
-- Emits a 'setResponseHeader' event. 
-- If the response is finished then an error will be set to the next middleware
+- If the response is finished then nothing will happen
 
 **removeResponseHeader( String key ): EventRequest** 
 - Removes an existing header from to the response.
-- Emits a 'removeResponseHeader' event. 
-- If the response is finished then an error will be set to the next middleware
+- If the response is finished then nothing will happen
 
 **redirect( String redirectUrl, Number statusCode = 302 ): void** 
 - Redirect to the given url with the specified status code.
@@ -766,38 +765,6 @@ The event request is an object that is created by the server and passed through 
 **finished()**
 - Emitted when even cleaning up has finished and the eventRequest is completed
 - At this point the data set in the EventRequest has been cleaned up
-
-**send( Object sendData )**
-- Emitted when a response has been sent.
-- sendData contains: 
-  
-  -  **code: Number** 
-     - The status code returned
-     
-  -  **raw: Boolean** 
-     - Whether the response was tried to be sent raw without parsing it to string first
-     
-  -  **response: mixed** 
-     - The response that was returned
-     - Will not be sent if isRaw is true and the response was not either a string or a number
-     
-  -  **headers: Object**
-     - The headers that were sent
-
-**setResponseHeader( Object headerData )** 
-- Emitted when a new header was added to the response
-- headerData contains:
-  -  **key: String** 
-     - The header name
-     
-  -  **value: mixed** 
-     - The header value
-
-**removeResponseHeader( Object headerData )** 
-- Emitted when a header was removed
-- headerData contains:
-  -  **key: String** 
-     - The header name
 
 **redirect( Object redirectData )** 
 - Emitted when a redirect response was sent
@@ -1202,7 +1169,7 @@ const logger = Loggur.createLogger({
         new File({ // File logger
             logLevel : LOG_LEVELS.notice, // Logs everything below notice
             filePath : '/logs/access.log', // Log to this place ( this is calculated from the root folder ( where index.js is )
-            logLevels : { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level, combining this with the er_logging plugin that logs all request paths to a notice level, you have a nice access log. Alternatively you can log to notice yourself )
+            logLevels : { notice : LOG_LEVELS.notice } // The Log levels that this logger can only log to ( it will only log if the message to be logged is AT notice level, combining this with the er_logger plugin that logs all request paths to a notice level, you have a nice access log. Alternatively you can log to notice yourself )
         }),
         new File({
             logLevel : LOG_LEVELS.error,
@@ -2081,6 +2048,9 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
 **app.er.timeout.timedOut**
   - Thrown by the Timeout Plugin with a status of 408
   - { code: 'app.er.timeout.timedOut', status: 408 }
+
+**app.er.send.error**
+  - Thrown by event request when the send is not a string and JSON.stringify fails
 
 **app.er.staticResources.fileNotFound**
   - { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${item}`, status: 404 }
@@ -3127,10 +3097,9 @@ app.listen( 80 , () => {
 ***
 #### EventRequest Attached Functions
 
-**event.initSession( Function callback ): Promise** 
-- Initializes the session. This should be called in the beginning when you want to start the user sesion
+**event.initSession(): Promise** 
+- Initializes the session. This should be called in the beginning when you want to start the user session
 - This will initialize a new session if one does not exist and fetch the old one if one exists
-- The callback will return false if there was no error
 
 ***
 #### Attached Functionality:
@@ -3190,13 +3159,11 @@ app.apply( app.er_body_parser_multipart );
 app.apply( app.er_data_server );
 app.apply( app.er_session );
 
-// Initialize the session
-app.add( async ( event ) => {
-    event.initSession( event.next ).catch( event.next );
-});
-
 // Redirect to login if authenticated is not true
-app.add(( event ) => {
+app.add( async ( event ) => {
+    // Initialize the session
+    await event.initSession()
+
     if (
         event.path !== '/login'
         && ( event.session.get( 'authenticated' ) !== true )
@@ -3500,9 +3467,6 @@ app.listen( '80', () => {
 **Event: 'finished'**
 - Logs with a log level of 500 ( verbose ) that the event is finished
 
-**Event: 'setResponseHeader'**
-- Logs with a log level of 500 ( verbose ) which header was set with what value
-
 **Event: 'cleanUp'**
 - Logs with a log level of 300 ( notice ) the method, path, responseStatusCode, clientIp and userAgent
 
@@ -3711,7 +3675,9 @@ app.post( '/submit', ( event ) => {
 ***
 
 # [er_response_cache](#er_response_cache) 
-Adds a response caching mechanism.
+- Adds a response caching mechanism.
+- It will only cache IF you call either event.send or event.end
+- It will only cache 200 responses
 
 ***
 #### Dependencies:
@@ -3731,7 +3697,7 @@ Adds a response caching mechanism.
 ***
 #### EventRequest Attached Functions
 
-**acheCurrentRequest(): Promise**
+**cacheCurrentRequest(): Promise**
 - Caches the current request.
 - Will not cache the response if the response was not a String
 

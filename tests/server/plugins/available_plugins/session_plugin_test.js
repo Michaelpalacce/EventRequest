@@ -41,10 +41,9 @@ test({
 				called ++;
 			},
 			with			: [
-				['cleanUp',undefined],
-				['send',undefined],
+				['cleanUp', undefined],
 			],
-			called			: 2
+			called			: 1
 		});
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
@@ -52,7 +51,7 @@ test({
 
 		assert.equal( true, eventRequest.session instanceof Session );
 		assert.equal( true, typeof eventRequest.initSession !== 'undefined' );
-		assert.equal( 2, called );
+		assert.equal( 1, called );
 
 		done();
 	}

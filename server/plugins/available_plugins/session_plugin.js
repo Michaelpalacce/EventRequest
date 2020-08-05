@@ -55,14 +55,12 @@ class SessionPlugin extends PluginInterface
 				{
 					event.session	= new Session( event, this.options );
 
-					event.on( 'cleanUp', () => {
-						event.session	= undefined;
-					} );
-
-					event.on( 'send', async () => {
+					event.on( 'cleanUp', async () => {
 						if ( Object.keys( event.session.session ).length !== 0 )
 							await event.session.saveSession();
-					} );
+
+						event.session	= undefined;
+					});
 				}
 
 				event.next();
@@ -71,13 +69,11 @@ class SessionPlugin extends PluginInterface
 
 		const initSessionForPathMiddleware	= {
 			handler	: ( event ) => {
-				event.initSession	= async ( callback ) => {
-					const hasSession	= await event.session.hasSession();
-
-					if ( ! hasSession )
-						callback( await event.session.newSession() === false );
+				event.initSession	= async () => {
+					if ( ! await event.session.hasSession() )
+						return await event.session.newSession() === false;
 					else
-						callback( await event.session.fetchSession() === false );
+						return await event.session.fetchSession() === false;
 				};
 
 				event.next();

@@ -39,29 +39,7 @@ class ResponseCachePlugin extends PluginInterface
 
 		server.define( 'cache.request', ( event ) => {
 			event.cacheCurrentRequest();
-		} );
-	}
-
-	/**
-	 * @brief	Attaches an event to cache the response on send
-	 *
-	 * @param	{EventRequest} event
-	 *
-	 * @return	void
-	 */
-	attachCachingEvent( event )
-	{
-		event.on( 'send', async ( responseData ) => {
-			if ( typeof responseData.response === 'undefined' )
-				return;
-
-			const { response, code, headers }	= responseData;
-
-			const ttl			= this.getTimeToLive( event );
-			const recordName	= this.getCacheId( event );
-
-			await this.dataServer.set( recordName, { response, code, headers }, ttl, { persist: false } );
-		} );
+		});
 	}
 
 	/**
@@ -117,7 +95,7 @@ class ResponseCachePlugin extends PluginInterface
 			handler	: ( event ) => {
 				event.on( 'cleanUp', () => {
 					event.cacheCurrentRequest	= undefined;
-				} );
+				});
 
 				event.cacheCurrentRequest	= async ( options = {} ) => {
 					event.currentResponseCacheConfig	= options;
@@ -126,7 +104,27 @@ class ResponseCachePlugin extends PluginInterface
 
 					if ( cachedDataSet === null )
 					{
-						this.attachCachingEvent( event );
+						const eventEnd	= event.end;
+
+						event.end	= ( ...args ) => {
+							const code	= event.response.statusCode;
+
+							if ( ( typeof args[0] !== 'string' && typeof args[0] !== 'number' ) || code !== 200 )
+							{
+								eventEnd.apply( event, args );
+								return;
+							}
+
+							const response		= args[0];
+							const headers		= event.response.getHeaders();
+							const ttl			= this.getTimeToLive( event );
+							const recordName	= this.getCacheId( event );
+
+							this.dataServer.set( recordName, { response, code, headers }, ttl, { persist: false } );
+
+							eventEnd.apply( event, args );
+						}
+
 						event.next();
 					}
 					else
