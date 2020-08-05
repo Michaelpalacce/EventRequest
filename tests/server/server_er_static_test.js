@@ -12,7 +12,7 @@ test({
 
 		app.apply( app.er_static_resources, { paths: ['public'] } );
 
-		helpers.sendServerRequest( '/public/../index.js', 'GET', 404, '', {}, 4116 ).then(( response ) => {
+		helpers.sendServerRequest( '/public/../index.js', 'GET', 404, '', {}, 4117 ).then(( response ) => {
 			assert.deepStrictEqual(
 				response.body.toString(),
 				'{"error":{"code":"app.er.staticResources.fileNotFound","message":"File not found: /public/../index.js"}}'
@@ -21,7 +21,7 @@ test({
 			done();
 		}).catch( done );
 
-		app.listen( 4116 );
+		app.listen( 4117 );
 	}
 });
 
