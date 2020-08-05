@@ -33,13 +33,3 @@ App.Logging		= Logging;
 App.App			= App;
 
 module.exports	= App;
-
-const app		= App();
-
-app.apply( app.er_static_resources, { paths: ['server'] } );
-
-app.get( '/', async ( event )=>{
-	event.send( 'OK!' );
-});
-
-app.listen( 80 )
