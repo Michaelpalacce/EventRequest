@@ -1337,6 +1337,27 @@ test({
 });
 
 test({
+	message	: 'Server.test.router.cache.if.params.are.changed',
+	test	: ( done ) => {
+		const name	= 'testRouterCacheWhenParamsAreChanged';
+
+		app.get( `/${name}/:id:`, ( event ) => {
+			event.send( event.params );
+		});
+
+		helpers.sendServerRequest( `/${name}/idOne`, 'GET', 200 ).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), JSON.stringify( { id: 'idOne' } ) );
+
+			return helpers.sendServerRequest( `/${name}/idTwo`, 'GET', 200 );
+		}).then(( response )=>{
+			assert.deepStrictEqual( response.body.toString(), JSON.stringify( { id: 'idTwo' } ) );
+
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test.eventRequest.sendError.when.response.is.finished',
 	test	: ( done ) => {
 		const name	= 'testEventSendErrorWhenFinished';
