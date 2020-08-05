@@ -1318,6 +1318,23 @@ test({
 });
 
 test({
+	message	: 'Server.test.eventRequest.sendError.when.response.is.finished',
+	test	: ( done ) => {
+		const name	= 'testEventSendErrorWhenFinished';
+
+		app.get( `/${name}`, ( event ) => {
+			event.response.end( 'ok' )
+			event.sendError( name );
+		});
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 200 ).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), 'ok' );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test.eventRequest.sendError.send.Error',
 	test	: ( done ) => {
 		const name	= 'testEventSendErrorWithError';

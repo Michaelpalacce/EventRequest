@@ -332,9 +332,7 @@ class EventRequest extends EventEmitter
 		if ( err )
 			return this.sendError( err, typeof code === 'number' ? code : 500 );
 
-		const isResponseFinished	= this.isFinished();
-
-		if ( ! isResponseFinished )
+		if ( ! this.isFinished() )
 		{
 			if ( this.block.length <= 0 )
 				return this.sendError( `Cannot ${this.method} ${this.path}`, 404 );
