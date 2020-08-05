@@ -1318,6 +1318,25 @@ test({
 });
 
 test({
+	message	: 'Server.test.eventRequest.send.with.malformed.payload',
+	test	: ( done ) => {
+		const name	= 'testEventRequestSendWithMalformedPayload';
+
+		app.get( `/${name}`, ( event ) => {
+			const circular	= {};
+			circular.a		= { b: circular };
+
+			event.send( circular );
+		});
+
+		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
+			assert.deepStrictEqual( response.body.toString(), '{"error":{"code":"app.er.send.error"}}' );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
 	message	: 'Server.test.eventRequest.sendError.when.response.is.finished',
 	test	: ( done ) => {
 		const name	= 'testEventSendErrorWhenFinished';
