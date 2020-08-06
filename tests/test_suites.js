@@ -9,16 +9,16 @@ testSuites.eventSuite		= () => {
 testSuites.serverSuite		= () => {
 	require( './server/server_test' );
 	require( './server/server_er_static_test' );
-	require( './server/server_er_rate_limits_test' );
 	require( './server/server_er_body_parsers_test' );
 	require( './server/server_er_security_test' );
 	require( './server/server_er_logger_test' );
-	require( './server/server_er_response_cache_test' );
-	require( './server/server_er_timeout_test' );
 	require( './server/server_er_env_test' );
 	require( './server/server_er_templating_engine_test' );
-	require( './server/server_er_session_test' );
 	require( './server/server_er_validation_test' );
+	require( './server/server_er_session_test' );
+	require( './server/server_er_rate_limits_test' );
+	require( './server/server_er_timeout_test' );
+	require( './server/server_er_response_cache_test' );
 };
 
 testSuites.securitySuite		= () => {

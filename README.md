@@ -738,6 +738,10 @@ The event request is an object that is created by the server and passed through 
 - Checks if the response is finished
 - A response is finished if eventRequest.finished === true || eventRequest.response.writableEnded || eventRequest.response.finished
 
+**getErrorHandler(): ErrorHandler** 
+- Will return the instance of errorHandler attached to the EventRequest
+- If one does not exist, it will be created.
+
 **next( mixed err = undefined, Number code = undefined ): void** 
 - Calls the next middleware in the execution block. 
 - If there is nothing else to send and the response has not been sent YET, then send a server error with a status of 404
@@ -749,6 +753,7 @@ The event request is an object that is created by the server and passed through 
 - Code will be the status code sent
 - Emit is a flag whether the error should be emitted on 'on_error'
 - It will call the errorHandler directly with all the arguments specified ( in case of a custom error handler, you can send extra parameters with the first one being the EventRequest )
+- By default the ErrorHandler.handleError is async so this function is also async, unless ErrorHandler.handleError is overwritten
 - NOTE: Check the Error Handling Section for more info
 
 **validate( ...args ): ValidationResult**
@@ -2021,16 +2026,17 @@ The TestingTools export:
 ***
 #### Functions:
 
-**handleError( EventRequest event, * errorToHandle = null, Number errStatusCode = null, emitError = null ): void**
-- This function will call a callback of either the default Namespace or of a custom one, with parameters: { event, code, status, message, error, headers, emit }
-- Note The callback uses destructing: `callback( { event, code, status, message, error, headers, emit } )` so if you write your own custom callback for a  namespace make sure it takes this into account. For example: `_defaultCase( { event, code, status, error, message, headers, emit } )`. You can get as many parameters as you need and ignore the rest( or not even define them )
+**handleError( EventRequest event, * errorToHandle = null, Number errStatusCode = null, emitError = null ): Promise: void**
+- This function is **ASYNCHRONOUS**
+- This function will call a callback of either the default Namespace or of a custom one, with parameters: { event, code, status, message, error, headers, emit, formatter }
+- Note The callback uses destructing: `callback( { event, code, status, message, error, headers, emit, formatter } )` so if you write your own custom callback for a  namespace make sure it takes this into account. For example: `_defaultCase( { event, code, status, error, message, headers, emit, formatter } )`. You can get as many parameters as you need and ignore the rest( or not even define them )
 - Check Namespaces section for more information how these parameters will be generated!
 
-**addNamespace( errorCode, { message, callback, status, emit, headers } = {} ): void**
+**addNamespace( errorCode, { message, callback, status, emit, headers, formatter } = {} ): void**
 - Adds a new namespace, given an errorCode and an object containing one or more parameters 
 - Note that the namespaceOptions use Object destructing, so if you want to call it it must be in the following format:
 ~~~javascript
-errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', emit: false, headers: { headerOne: 2 }, callback: () => {} } );
+errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', emit: false, headers: { headerOne: 2 }, callback: () => {}, formatter: () => {} } );
 ~~~
 - Any parameters that are not provided will be taken from the defaultNamespace ( check Namespaces section for more info )
 
@@ -2130,6 +2136,7 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
 ***
 #### [Namespaces:](#error-handling-namespaces)
 - Error Namespaces are ways for you to attach common error handling to the same section of your application. If you have the following namespaces: `app.security.invalid.password`, `app.security.invalid.username`, `app.security.unauthorized`, `app.security.invalid.token` and lets say that everything besides `app.security.invalid.token` has been handled, what do we do with that one specifically? Well, if you attach a namespace that is `app.security` with a message of 'General Security Error' and a status of 401 or 403, then you don't have to worry that you have not handled this scenario.
+- Adding a namespace is done by: `errorHandler.addNamespace( 'code' {...} );`
 
 ~~~javscript
 const ErrorHandler    = require( 'event_request/server/components/error/error_handler' );
@@ -2150,13 +2157,13 @@ handler.addNamespace( 'app.security.unauthorized', { message: 'You are not autho
 handler.handleError( {}, 'app.security.invalid.token' );
 ~~~
 
-
-- Error Namespaces allow for a LOT of customization ( and anything not customized, will be taken from the defaultNamespace ). You can specify:
+- Error Namespaces allow for a LOT of customization ( and anything not customized, will be taken from the defaultNamespace ). When adding a namespace you can specify:
   - message - what message the user will see
   - status - This will be the status code that will be sent to the user
-  - callback - Function that will be called with `{ event, code, status, message, error, headers, emit }`. You can use any of these parameters. You don't need to define them all if they are unused.
+  - callback - Function that will be called with `{ event, code, status, message, error, headers, emit, formatter }`. You can use any of these parameters. You don't need to define them all if they are unused. This function can also be async.
   - emit - Flag whether an on_error event should be emitted. Note: this is actually done in the callback, so its entirely in your own control if you want to stop it
-  - headers - A JS Object that will be put through a for...in loop. Every key will be set as a header and every value as the respective header value.
+  - headers - A JS Object that will be put through a for...in loop. Every key will be set as a header and every value as the respective header value.  Note: this is actually done in the callback, so its entirely in your own control if you want to stop it
+  - formatter - This function will be called by the default callback at the end, to format the way the response will be sent. This way you can customize only the response if you so wish to ( for example you want to send html in one case and json in another ). The formatter accepts all the arguments of callback without the formatter argument. This function can also be async.
 
 This is the default Namespace callback:
 ~~~javascript
@@ -2175,46 +2182,48 @@ This is the default Namespace callback:
      * @param    {*} message
      * @param    {Object} headers
      * @param    {Boolean} emit
+     * @param    {Function} formatter
      *
      * @private
      *
-     * @return    void
+     * @return	void
      */
-    _defaultCase( { event, code, status, error, message, headers, emit } )
+    async _defaultCase( { event, code, status, error, message, headers, emit, formatter } )
     {
         if ( event.isFinished() )
             return;
-
-        const response = { error: { code } };
-        const toEmit = { code, status };
-
+        
+        const toEmit = { code, status, headers };
+        
         if ( message !== null && message !== undefined )
-        {
-            response.error.message = message;
             toEmit.message = message;
-        }
-
+        
         if ( error !== null && error !== undefined )
-            toEmit.error    = error;
-
+            toEmit.error = error;
+        
         if ( emit )
             event.emit( 'on_error', toEmit );
-
+        
         for ( const key in headers )
         {
             if ( ! {}.hasOwnProperty.call( headers, key ) )
                 continue;
-
+        
             event.setResponseHeader( key, headers[key] );
         }
 
-        event.send( response, status );
+       const result	= formatter( { event, code, status, error, message, headers, emit } );
+       
+      if ( result instanceof Promise )
+            event.send( await result, status );
+      else
+            event.send( result, status );
     }
 ~~~
 
 - If you ever want to send an error you can do this by simply throwing an Error with the namespace as the only message
 - If you want to include more information you can also just throw an object or a string!
-- As long as they are thrown in a middleware somewhere or a promise is rejected with them, they will be picked up by the ErrorHandling and handled appropriately.
+- As long as they are thrown in a middleware somewhere or a promise is rejected with them, they will be picked up by the ErrorHandling and handled appropriately. Note: Promise rejections will only be picked up using the async await approach. It is recomended if you want to error handle a `.catch()` you use `.catch( event.next )`
 
 ~~~javscript
 throw new Error( 'app.test.namespace' );
@@ -2225,6 +2234,7 @@ throw { code: 'app.test.namespace', status: 500 };
 ~~~
 
 - handleError will handle a wide variety of information.
+- **You can pass any parameter that you would pass when adding a namespace to the errorToHandle and they will overwrite the namespace ones**
 - **It is preffered that you pass your own object with the parameters like this: `{ code: 'app.test', status: 500, message: 'User Message', error: new Error( 'Error To Log' ), headers: { headerOne: 'value' }, emit: false };`. Note that if status code is omitted, the status code passed to handleError will be taken, if not the status code form the namespace defined by the code will be used. Same logic applies for emit. If message or headers are not passed, they will be taken from the namespace.**
 - The errorToHandle can by anything from a simple string, Error, object and others.
 - If the errorToHandle is a string and it matches the pattern of a namespace, then it will be treated as a namespace
@@ -2239,74 +2249,82 @@ const ErrorHandler = require( 'event_request/server/components/error/error_handl
 const app = require( 'event_request' )();
 
 const errorHandler  = new ErrorHandler();
+
+errorHandler.addNamespace( 'test.formatter.formatted.message', { formatter: ( { code } ) => { return code.toUpperCase() } } );
+errorHandler.addNamespace( 'test.formatter.formatted.async.message', { formatter: async ( { code } ) => { return code.toUpperCase() } } );
 errorHandler.addNamespace( 'test.exists.with.just.message', { message: 'Default Message' } );
 errorHandler.addNamespace( 'test.exists.with.message.and.status', { status: 532, message: 'Message with Status' } );
 errorHandler.addNamespace( 'test.exists.with.status', { status: 462 } );
 errorHandler.addNamespace( 'test.deep', { status: 532, message: 'DEEP message', emit: false, headers: { headerOne: 1, headerTwo: 2 } } );
 
 errorHandler.addNamespace(
-    'test.callback',
-    {
-        callback: ( { event, code, status, message, error, headers, emit } ) => {
-            if ( emit )
-                event.emit( 'on_error', { event, code, status, message, error, headers, emit } );
+	'test.callback',
+	{
+		callback: ( { event, code, status, message, error, headers, emit } ) => {
+			if ( emit )
+				event.emit( 'on_error', { event, code, status, message, error, headers, emit } );
 
-            event.send( message, status );
-        },
-        status: 532,
-        message: 'CALLBACK MESSAGE',
-        emit: false,
-        headers: { headerOne: 1, headerTwo: 2 }
-    }
+			event.send( message, status );
+		},
+		status: 532,
+		message: 'CALLBACK MESSAGE',
+		emit: false,
+		headers: { headerOne: 1, headerTwo: 2 }
+	}
 );
 
 app.add( ( event ) => {
-    event.errorHandler    = errorHandler;
-    event.next();
+	event.errorHandler    = errorHandler;
+	event.next();
 });
 
 app.add(( event ) => {
-    event.on( 'on_error', function()
-        {
-            console.log( arguments );
-        }
-    );
-    throw new Error( 'Some random error!' ); // No problem if the error is not a namespace! It will go to the default namespace
-    throw 'Some Error!'; // No problem if the error is not a namespace! It will go to the default namespace
-    throw { code: 'test.exists.with.just.message', status: 200, headers: { headerOne: 'value' }, emit: true }; // If you need that fine control!
+	event.on( 'on_error', function()
+		{
+			console.log( arguments );
+		}
+	);
 
-    event.sendError( 'test.callback', 500 ); // This will call the error Handler 'test.callback'
-    event.sendError( 'test.exists.with.just.message', 500 ); // This will call the error Handler 'test.exists.with.just.message'
-    event.sendError( 'test.exists.with.message.and.status' ); // This will call the error Handler 'test.exists.with.message.and.status'
-    event.sendError( 'test.exists.with.status' ); // This will call the error Handler 'test.exists.with.status'
-    event.sendError( 'test.deep.we.go.on.deeper' ); // This will call the error Handler 'test.deep'
+	throw new Error( 'test.formatter.formatted.message' ); //This message will be formatted
 
-    event.next( 'test.callback', 500 ); // This will call the error Handler 'test.callback'
-    event.next( 'test.exists.with.just.message', 500 ); // This will call the error Handler 'test.exists.with.just.message'
-    event.next( 'test.exists.with.message.and.status' ); // This will call the error Handler 'test.exists.with.message.and.status'
-    event.next( 'test.exists.with.status' ); // This will call the error Handler 'test.exists.with.status'
-    event.next( 'test.deep.we.go.on.deeper' ); // This will call the error Handler 'test.deep'
+	event.sendError( 'test.formatter.formatted.async.message' ); //This message will be formatted, but more importantly IF there is something after it, it may result in an error. This will be done ASYNCHRONOUSLY
 
-    event.next( new Error( 'test.callback' ), 500 ); // This will call the error Handler 'test.callback'
-    event.next( new Error( 'test.exists.with.just.message' ), 500 ); // This will call the error Handler 'test.exists.with.just.message'
-    event.next( new Error( 'test.exists.with.message.and.status' ) ); // This will call the error Handler 'test.exists.with.message.and.status'
-    event.next( new Error( 'test.exists.with.status' ) ); // This will call the error Handler 'test.exists.with.status'
-    event.next( new Error( 'test.deep.we.go.on.deeper' ) ); // This will call the error Handler 'test.deep'
+	throw new Error( 'Some random error!' ); // No problem if the error is not a namespace! It will go to the default namespace
+	throw 'Some Error!'; // No problem if the error is not a namespace! It will go to the default namespace
+	throw { code: 'test.exists.with.just.message', status: 200, headers: { headerOne: 'value' }, emit: true }; // If you need that fine control!
 
-    event.next( { code: 'test.callback' }, 500 ); // This will call the error Handler 'test.callback'
-    event.next( { code: 'test.exists.with.just.message' }, 500 ); // This will call the error Handler 'test.exists.with.just.message'
-    event.next( { code: 'test.exists.with.message.and.status', status: 502 }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
-    event.next( { code: 'test.exists.with.message.and.status', error: new Error( 'test.error' ) }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
-    event.next( { code: 'test.exists.with.message.and.status', error: 'test.error' }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
-    event.next( { code: 'test.exists.with.message.and.status', error: 'test.error', message: 'test.MESSAGE' }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
-    event.next( { code: 'test.exists.with.status' } ); // This will call the error Handler 'test.exists.with.status'
-    event.next( { code: 'test.deep.we.go.on.deeper' } ); // This will call the error Handler 'test.deep'
+	event.sendError( 'test.callback', 500 ); // This will call the error Handler 'test.callback'
+	event.sendError( 'test.exists.with.just.message', 500 ); // This will call the error Handler 'test.exists.with.just.message'
+	event.sendError( 'test.exists.with.message.and.status' ); // This will call the error Handler 'test.exists.with.message.and.status'
+	event.sendError( 'test.exists.with.status' ); // This will call the error Handler 'test.exists.with.status'
+	event.sendError( 'test.deep.we.go.on.deeper' ); // This will call the error Handler 'test.deep'
 
-    event.next( 'Error', 500 ); // This will call the error Handler default namespace
+	event.next( 'test.callback', 500 ); // This will call the error Handler 'test.callback'
+	event.next( 'test.exists.with.just.message', 500 ); // This will call the error Handler 'test.exists.with.just.message'
+	event.next( 'test.exists.with.message.and.status' ); // This will call the error Handler 'test.exists.with.message.and.status'
+	event.next( 'test.exists.with.status' ); // This will call the error Handler 'test.exists.with.status'
+	event.next( 'test.deep.we.go.on.deeper' ); // This will call the error Handler 'test.deep'
 
-    event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
+	event.next( new Error( 'test.callback' ), 500 ); // This will call the error Handler 'test.callback'
+	event.next( new Error( 'test.exists.with.just.message' ), 500 ); // This will call the error Handler 'test.exists.with.just.message'
+	event.next( new Error( 'test.exists.with.message.and.status' ) ); // This will call the error Handler 'test.exists.with.message.and.status'
+	event.next( new Error( 'test.exists.with.status' ) ); // This will call the error Handler 'test.exists.with.status'
+	event.next( new Error( 'test.deep.we.go.on.deeper' ) ); // This will call the error Handler 'test.deep'
 
-    throw new Error( 'test.exists.with.message.and.status' );
+	event.next( { code: 'test.callback' }, 500 ); // This will call the error Handler 'test.callback'
+	event.next( { code: 'test.exists.with.just.message' }, 500 ); // This will call the error Handler 'test.exists.with.just.message'
+	event.next( { code: 'test.exists.with.message.and.status', status: 502 }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
+	event.next( { code: 'test.exists.with.message.and.status', error: new Error( 'test.error' ) }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
+	event.next( { code: 'test.exists.with.message.and.status', error: 'test.error' }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
+	event.next( { code: 'test.exists.with.message.and.status', error: 'test.error', message: 'test.MESSAGE' }, 503 ); // This will call the error Handler 'test.exists.with.message.and.status'
+	event.next( { code: 'test.exists.with.status' } ); // This will call the error Handler 'test.exists.with.status'
+	event.next( { code: 'test.deep.we.go.on.deeper' } ); // This will call the error Handler 'test.deep'
+
+	event.next( 'Error', 500 ); // This will call the error Handler default namespace
+
+	event.send( 'Error', 500 ); // This will !!NOT!! call the error Handler
+
+	throw new Error( 'test.exists.with.message.and.status' );
 });
 app.listen( 80 );
 ~~~
@@ -3254,6 +3272,7 @@ app.listen( 80, () => {
 - The promise will be resolved in case of a successful render. Note: you don't have to take any further actions, at this point the html has already been streamed
 - The promise will be rejected in case of an error with the error that happened. Note: In case of an error no further actions are needed as event.next is going to be automatically called and the errorHandler will take care of the error
 - If you want to handle the error yourself, an errorCallback must be provided
+- This will not set a status code but use the one already set if any
 - 'render' event will be emitted by the EventRequest in the beginning with details on what is being rendered
 
 ***
