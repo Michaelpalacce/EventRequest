@@ -81,6 +81,55 @@ test({
 });
 
 test({
+	message	: 'EventRequest.getErrorHandler.when.nothing.is.attached',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+
+		assert.deepStrictEqual( eventRequest.getErrorHandler() instanceof ErrorHandler, true )
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.getErrorHandler.when.wrong.object.is.attached',
+	test	: ( done ) => {
+		let eventRequest			= helpers.getEventRequest();
+		eventRequest.errorHandler	= 'WRONG!';
+
+		assert.deepStrictEqual( eventRequest.getErrorHandler() instanceof ErrorHandler, true )
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.getErrorHandler.when.correct.object.is.attached',
+	test	: ( done ) => {
+		const errorHandler			= new ErrorHandler();
+		errorHandler.addNamespace( 'test', {} );
+
+		let eventRequest			= helpers.getEventRequest();
+		eventRequest.errorHandler	= errorHandler;
+
+		assert.deepStrictEqual( eventRequest.getErrorHandler() instanceof ErrorHandler, true )
+		assert.deepStrictEqual( eventRequest.getErrorHandler(), errorHandler )
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.getErrorHandler.twice.returns.same.error.handler',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		assert.deepStrictEqual( eventRequest.getErrorHandler(), eventRequest.getErrorHandler() )
+
+		done();
+	}
+});
+
+test({
 	message	: 'EventRequest.sendError.will.create.a.default.Error.Handler.if.it.is.not.correct',
 	test	: ( done ) => {
 		let eventRequest			= helpers.getEventRequest();
@@ -637,6 +686,34 @@ test({
 });
 
 test({
+	message	: 'EventRequest.next.handles.thrown.errors.when.finished',
+	test	: ( done ) => {
+		const eventRequest			= helpers.getEventRequest();
+		let error					= false;
+		const errorToThrow			= new Error( 'An Error' );
+
+		eventRequest.errorHandler	= new MockedErrorHandler();
+		eventRequest.errorHandler._mock({
+			method			: 'handleError',
+			shouldReturn	: () => { error = true; },
+			called			: 0
+		});
+
+		const callbackOne	= ( event ) => {
+			event.end( 'ok!' );
+			throw errorToThrow;
+		};
+
+		const block			= [callbackOne];
+		eventRequest._setBlock( block );
+
+		eventRequest.next();
+
+		error ? done( 'EventRequest.next error got handled but should not have' ) : done();
+	}
+});
+
+test({
 	message	: 'EventRequest.next.handles.thrown.errors.if.async',
 	test	: ( done ) => {
 		const eventRequest			= helpers.getEventRequest();
@@ -909,7 +986,7 @@ test({
 
 		eventRequest._mock({
 			method: 'send',
-			shouldReturn: ( one, two ) => {
+			shouldReturn: function( one, two ){
 				assert.deepStrictEqual( one, { error: { code: 'app.general', message: 'Cannot GET /' } } );
 				assert.equal( 404, two );
 				called	= true;

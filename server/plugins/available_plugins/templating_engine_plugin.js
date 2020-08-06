@@ -46,8 +46,8 @@ class TemplatingEnginePlugin extends PluginInterface
 
 							this.emit( 'render', { templateName, variables } );
 
-							this.setResponseHeader( 'Content-Type', 'text/html' );
-							this.send( result, 200 );
+							this.setResponseHeader( 'Content-Type', 'text/html' ).send( result );
+
 							resolve();
 						}
 						catch ( error )

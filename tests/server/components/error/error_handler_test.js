@@ -54,10 +54,12 @@ test({
 
 		errorHandler.handleError( eventRequest, error, 501 );
 
-		assert.equal( called, true );
-		assert.equal( emitCalled, 1 );
+		setTimeout(() => {
+			assert.equal( called, true );
+			assert.equal( emitCalled, 1 );
 
-		done();
+			done();
+		}, 5 );
 	}
 });
 
@@ -92,10 +94,12 @@ test({
 
 		errorHandler.handleError( eventRequest, error, 501 );
 
-		assert.equal( called, false );
-		assert.equal( emitCalled, 0 );
+		setTimeout(() => {
+			assert.equal( called, false );
+			assert.equal( emitCalled, 0 );
 
-		done();
+			done();
+		}, 5 );
 	}
 });
 
@@ -192,6 +196,60 @@ test({
 			undefined,
 			{ code: 'namespace.does.not.exist', status: 500, headers: {} },
 			{ error: { code: 'namespace.does.not.exist' } },
+			500,
+			{}
+		],
+		[
+			{ code: 'namespace.does.not.exist', formatter: ( { code } ) => { return 'modified' + code; } },
+			undefined,
+			undefined,
+			{ code: 'namespace.does.not.exist', status: 500, headers: {} },
+			'modifiednamespace.does.not.exist',
+			500,
+			{}
+		],
+		[
+			{ code: 'test.formatter.that.is.a.func' },
+			undefined,
+			undefined,
+			{ code: 'test.formatter.that.is.a.func', status: 500, headers: {} },
+			'FORMATTED',
+			500,
+			{}
+		],
+		[
+			{ code: 'test.formatter.that.is.not.a.func' },
+			undefined,
+			undefined,
+			{ code: 'test.formatter.that.is.not.a.func', status: 500, headers: {} },
+			{ error: { code: 'test.formatter.that.is.not.a.func' } },
+			500,
+			{}
+		],
+		[
+			{ code: 'namespace.does.not.exist', formatter: 'THIS WILL DO NOTHING' },
+			undefined,
+			undefined,
+			{ code: 'namespace.does.not.exist', status: 500, headers: {} },
+			{ error: { code: 'namespace.does.not.exist' } },
+			500,
+			{}
+		],
+		[
+			{ code: 'namespace.does.not.exist', formatter: async ( { code } ) => { return 'modified' + code; } },
+			undefined,
+			undefined,
+			{ code: 'namespace.does.not.exist', status: 500, headers: {} },
+			'modifiednamespace.does.not.exist',
+			500,
+			{}
+		],
+		[
+			{ code: 'namespace.does.not.exist', formatter: ( { code, status } ) => { return 'modified' + code + status; } },
+			undefined,
+			undefined,
+			{ code: 'namespace.does.not.exist', status: 500, headers: {} },
+			'modifiednamespace.does.not.exist500',
 			500,
 			{}
 		],
@@ -761,6 +819,8 @@ test({
 		let called			= false;
 		let emitCalled		= 0;
 
+		errorHandler.addNamespace( 'test.formatter.that.is.not.a.func', { formatter: 'Not a function!' } );
+		errorHandler.addNamespace( 'test.formatter.that.is.a.func', { formatter: () => { return 'FORMATTED'; } } );
 		errorHandler.addNamespace( 'test.exists.with.just.message', { message: 'Default Message' } );
 		errorHandler.addNamespace( 'test.exists.with.message.and.status', { status: 532, message: 'Message with Status' } );
 		errorHandler.addNamespace( 'test.exists.with.status', { status: 462 } );
@@ -819,10 +879,12 @@ test({
 
 		errorHandler.handleError( eventRequest, errorToHandle, errorToHandleStatus, errorToHandleEmit );
 
-		assert.deepStrictEqual( called, true );
-		assert.deepStrictEqual( emitCalled, expectedEmittedError === null ? 0 : 1 );
-		assert.deepStrictEqual( actualHeaders, expectedHeaders );
+		setTimeout(() => {
+			assert.deepStrictEqual( called, true );
+			assert.deepStrictEqual( emitCalled, expectedEmittedError === null ? 0 : 1 );
+			assert.deepStrictEqual( actualHeaders, expectedHeaders );
 
-		done();
+			done();
+		}, 5 );
 	}
 });

@@ -47,7 +47,15 @@ class EventRequest extends EventEmitter
 		// We do this so we can pass the event.next function by reference
 		const self			= this;
 		this.next			= ( ...args ) => {
-			self._next.apply( self, args );
+			try
+			{
+				self._next.apply( self, args );
+			}
+			catch ( error )
+			{
+				if ( ! this.isFinished() )
+					this.sendError( error );
+			}
 		};
 	}
 
@@ -337,30 +345,38 @@ class EventRequest extends EventEmitter
 			if ( this.block.length <= 0 )
 				return this.sendError( `Cannot ${this.method} ${this.path}`, 404 );
 
-			try
-			{
-				const next		= this.block.shift();
-				const response	= next( this );
+			const next		= this.block.shift();
+			const response	= next( this );
 
-				if ( response instanceof Promise )
-				{
-					response.catch(( error ) => {
-						setImmediate(() => {
-							if ( ! this.isFinished() )
-								this.next( error );
-						});
-					});
-				}
-			}
-			catch ( error )
+			if ( response instanceof Promise )
 			{
-				this.next( error );
+				response.catch(( error ) => {
+					setImmediate(() => {
+						if ( ! this.isFinished() )
+							this.sendError( error );
+					});
+				});
 			}
 		}
 	}
 
 	/**
+	 * @brief	Gets the error handler or creates a new one if needed
+	 *
+	 * @return	ErrorHandler
+	 */
+	getErrorHandler()
+	{
+		if ( this.errorHandler === null || typeof this.errorHandler === 'undefined' || typeof this.errorHandler.handleError !== 'function' )
+			this.errorHandler	= new ErrorHandler();
+
+		return this.errorHandler;
+	}
+
+	/**
 	 * @brief	Will send a server error in case a response has not been already sent
+	 *
+	 * @details	By default handleError is asynchronous
 	 *
 	 * @param	{Array} args
 	 *
@@ -368,12 +384,11 @@ class EventRequest extends EventEmitter
 	 */
 	sendError( ...args )
 	{
-		if ( this.errorHandler === null || typeof this.errorHandler === 'undefined' || typeof this.errorHandler.handleError !== 'function' )
-			this.errorHandler	= new ErrorHandler();
+		const errorHandler	= this.getErrorHandler();
 
 		args.unshift( this );
 
-		this.errorHandler.handleError.apply( this.errorHandler, args );
+		errorHandler.handleError.apply( errorHandler, args );
 	}
 }
 

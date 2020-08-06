@@ -14,7 +14,15 @@ class ErrorHandler
 			code: ErrorHandler.GENERAL_ERROR_CODE,
 			emit: true,
 			message: undefined,
-			headers: undefined
+			headers: undefined,
+			formatter: ( { code, message } ) => {
+				const response	= { error: { code } };
+
+				if ( message !== null && message !== undefined )
+					response.error.message	= message;
+
+				return response;
+			}
 		};
 	}
 
@@ -26,9 +34,9 @@ class ErrorHandler
 	 * @param	{Number} [errStatusCode=null]
 	 * @param	{Boolean} [emitError=null]
 	 *
-	 * @return	void
+	 * @return	Promise: void
 	 */
-	handleError( event, errorToHandle = null, errStatusCode = null, emitError = null )
+	async handleError( event, errorToHandle = null, errStatusCode = null, emitError = null )
 	{
 		let errorNamespace	= null;
 		let code;
@@ -37,15 +45,17 @@ class ErrorHandler
 		let status;
 		let headers;
 		let emit;
+		let formatter;
 
 		if ( errorToHandle !== null && typeof errorToHandle === 'object' && typeof errorToHandle.code === 'string' )
 		{
-			code	= errorToHandle.code;
-			error	= errorToHandle.error || null;
-			message	= errorToHandle.message || errorToHandle.error || null;
-			status	= errorToHandle.status || errStatusCode;
-			headers	= errorToHandle.headers || null;
-			emit	= typeof errorToHandle.emit === 'boolean' ? errorToHandle.emit : emitError;
+			code		= errorToHandle.code;
+			error		= errorToHandle.error || null;
+			message		= errorToHandle.message || errorToHandle.error || null;
+			status		= errorToHandle.status || errStatusCode;
+			headers		= errorToHandle.headers || null;
+			formatter	= typeof errorToHandle.formatter === 'function' ? errorToHandle.formatter : null;
+			emit		= typeof errorToHandle.emit === 'boolean' ? errorToHandle.emit : emitError;
 		}
 		else
 		{
@@ -88,8 +98,9 @@ class ErrorHandler
 		status			= status || errorNamespace.status;
 		emit			= typeof emit === 'boolean' ? emit : errorNamespace.emit;
 		headers			= headers || errorNamespace.headers || {};
+		formatter		= formatter || errorNamespace.formatter;
 
-		callback( { event, code, status, message, error, headers, emit } );
+		callback( { event, code, status, message, error, headers, emit, formatter } );
 	}
 
 	/**
@@ -101,10 +112,11 @@ class ErrorHandler
 	 * @param	{Number} status
 	 * @param	{Boolean} emit
 	 * @param	{Object} headers
+	 * @param	{Function} formatter
 	 *
 	 * @return	void
 	 */
-	addNamespace( code, { message, callback, status, emit, headers } = {} )
+	addNamespace( code, { message, callback, status, emit, headers, formatter } = {} )
 	{
 		if ( ! this.validateNamespaceCode( code ) )
 			return;
@@ -119,8 +131,10 @@ class ErrorHandler
 			emit	= this.defaultNamespace.emit;
 		if ( typeof headers !== 'object' )
 			headers	= this.defaultNamespace.headers;
+		if ( typeof formatter !== 'function' )
+			formatter	= this.defaultNamespace.formatter;
 
-		this.namespaces.set( code, { message, callback, status, emit, code, headers } );
+		this.namespaces.set( code, { message, callback, status, emit, code, headers, formatter } );
 	}
 
 	/**
@@ -177,24 +191,21 @@ class ErrorHandler
 	 * @param	{*} message
 	 * @param	{Object} headers
 	 * @param	{Boolean} emit
+	 * @param	{Function} formatter
 	 *
 	 * @private
 	 *
-	 * @return	void
+	 * @return	Promise: void
 	 */
-	_defaultCase( { event, code, status, error, message, headers, emit } )
+	async _defaultCase( { event, code, status, error, message, headers, emit, formatter } )
 	{
 		if ( event.isFinished() )
 			return;
 
-		const response	= { error: { code } };
 		const toEmit	= { code, status, headers };
 
 		if ( message !== null && message !== undefined )
-		{
-			response.error.message	= message;
 			toEmit.message	= message;
-		}
 
 		if ( error !== null && error !== undefined )
 			toEmit.error	= error;
@@ -211,7 +222,12 @@ class ErrorHandler
 			event.setResponseHeader( key, headers[key] );
 		}
 
-		event.send( response, status );
+		const result	= formatter( { event, code, status, error, message, headers, emit } );
+
+		if ( result instanceof Promise )
+			event.send( await result, status );
+		else
+			event.send( result, status );
 	}
 
 	/**

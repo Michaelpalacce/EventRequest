@@ -242,43 +242,35 @@ class Server extends EventEmitter
 				}
 			});
 
-			try
-			{
-				const block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
+			const block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
 
-				eventRequest._setBlock( block );
+			eventRequest._setBlock( block );
 
-				const onErrorCallback	= ( error ) => {
-					if ( eventRequest.logger !== null && eventRequest.logger !== undefined )
-						return;
+			const onErrorCallback	= ( error ) => {
+				if ( eventRequest.logger !== null && eventRequest.logger !== undefined )
+					return;
 
-					let message;
+				let message;
 
-					if ( error.error instanceof Error )
-					{
-						message			= Object.assign( {}, error );
-						message.error	= message.error.stack;
-					}
-					else if ( error instanceof Error )
-						message	= error.stack;
-					else if ( typeof error === 'object' )
-						message	= Object.assign( {}, error );
-					else
-						message	= error;
+				if ( error.error instanceof Error )
+				{
+					message			= Object.assign( {}, error );
+					message.error	= message.error.stack;
+				}
+				else if ( error instanceof Error )
+					message	= error.stack;
+				else if ( typeof error === 'object' )
+					message	= Object.assign( {}, error );
+				else
+					message	= error;
 
-					Loggur.log( message, LOG_LEVELS.error, true );
-				};
+				Loggur.log( message, LOG_LEVELS.error, true );
+			};
 
-				eventRequest.on( 'error', onErrorCallback );
-				eventRequest.on( 'on_error', onErrorCallback );
+			eventRequest.on( 'error', onErrorCallback );
+			eventRequest.on( 'on_error', onErrorCallback );
 
-				eventRequest.next();
-			}
-			catch ( error )
-			{
-				if ( ! eventRequest.isFinished() )
-					eventRequest.next( error );
-			}
+			eventRequest.next();
 		};
 	}
 
