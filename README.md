@@ -748,7 +748,7 @@ The event request is an object that is created by the server and passed through 
 - If the event is stopped and the response has not been set then send a server error with a status of 500
 - If err !== undefined send an error
 
-**sendError( mixed error = '', Number code = 500, emit = true ): void** 
+**async sendError( mixed error = '', Number code = 500, emit = true ): Promise: void** 
 - Like send but used to send errors. 
 - Code will be the status code sent
 - Emit is a flag whether the error should be emitted on 'on_error'
@@ -1243,7 +1243,7 @@ console.log( typeof Loggur.loggers['serverLogger'] !== 'undefined' );
 
 ***
 #### [Timestamp](#timestamp-processor)
-- Processor that will change the timestamp of the log to a human readable string: 08/03/20, 14:37:40 (mm/dd/yy h:m:s)
+- Processor that will change the timestamp of the log to a human readable string: 08/03/20, 14:37:40 (mm/dd/yy h : m : s)
 - Usage: `Transport.processor.time()`, `Console.processor.time()`, `File.processor.time()`
 
 #### Accepted Options:
@@ -1275,7 +1275,8 @@ console.log( typeof Loggur.loggers['serverLogger'] !== 'undefined' );
 
 #### Accepted Options:
 
-**NONE**
+**replacer: function**
+- You can provide a custom json replacer
 
 ***
 ***
@@ -2026,7 +2027,7 @@ The TestingTools export:
 ***
 #### Functions:
 
-**handleError( EventRequest event, * errorToHandle = null, Number errStatusCode = null, emitError = null ): Promise: void**
+**async handleError( EventRequest event, * errorToHandle = null, Number errStatusCode = null, emitError = null ): Promise: void**
 - This function is **ASYNCHRONOUS**
 - This function will call a callback of either the default Namespace or of a custom one, with parameters: { event, code, status, message, error, headers, emit, formatter }
 - Note The callback uses destructing: `callback( { event, code, status, message, error, headers, emit, formatter } )` so if you write your own custom callback for a  namespace make sure it takes this into account. For example: `_defaultCase( { event, code, status, error, message, headers, emit, formatter } )`. You can get as many parameters as you need and ignore the rest( or not even define them )

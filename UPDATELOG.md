@@ -1,8 +1,12 @@
+28.1.1
+- Updated documentation a bit
+- EventRequest.sendError is now async
+
 28.1.0
 - Templating Engine Plugin no longer sets status code
 - Next no longer calls next inside itself
 - Server no longer try...catch-es, error Handling is moved entriely inside the EventRequest
-- Added new formatter to the ErrorHandler. It allows you to modify ONLY the message to be sent to the user
+- Added new formatter to the ErrorHandler. It allows you to modify ONLY the message to be  sent to the user
 - ErrorHandler.handleError is now async
 - EventRequest.sendError is now async as well
 - Added EventRequest.getErrorHandler that will return/create an ErrorHandler
