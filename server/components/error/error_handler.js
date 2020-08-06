@@ -9,13 +9,13 @@ class ErrorHandler
 	{
 		this.namespaces			= new Map();
 		this.defaultNamespace	= {
-			callback: this._defaultCase.bind( this ),
-			status: 500,
-			code: ErrorHandler.GENERAL_ERROR_CODE,
-			emit: true,
-			message: undefined,
-			headers: undefined,
-			formatter: ( { code, message } ) => {
+			callback	: this._defaultCase.bind( this ),
+			status		: 500,
+			code		: ErrorHandler.GENERAL_ERROR_CODE,
+			emit		: true,
+			message		: undefined,
+			headers		: undefined,
+			formatter	: ( { code, message } ) => {
 				const response	= { error: { code } };
 
 				if ( message !== null && message !== undefined )
@@ -100,7 +100,7 @@ class ErrorHandler
 		headers			= headers || errorNamespace.headers || {};
 		formatter		= formatter || errorNamespace.formatter;
 
-		callback( { event, code, status, message, error, headers, emit, formatter } );
+		await callback( { event, code, status, message, error, headers, emit, formatter } );
 	}
 
 	/**
