@@ -1,3 +1,6 @@
+28.2.0
+- Routers can now be added more than once using the router.add( 'path', router ) syntax
+
 28.1.1
 - Updated documentation a bit
 - EventRequest.sendError is now async
