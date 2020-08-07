@@ -301,29 +301,47 @@ class Router extends PluginInterface
 	 */
 	_concat( router, path = null )
 	{
+		let middlewares;
+
 		if ( path !== null )
 		{
-			for ( const middleware of router.middleware )
+			middlewares	= [];
+			for ( const originalMiddleware of router.middleware )
 			{
-				if ( middleware.route === '/' )
-					middleware.route	= '';
+				let route	= originalMiddleware.route;
 
-				if ( middleware.route instanceof RegExp )
+				if ( route === '/' )
+					route	= '';
+
+				if ( originalMiddleware.route instanceof RegExp )
 				{
-					let regex	= middleware.route.source;
+					let regex	= originalMiddleware.route.source;
 
 					if ( regex.startsWith( '^' ) )
 						regex	= regex.substring( 1 );
 
-					middleware.route	= new RegExp( `${path}${regex}`, middleware.route.flags );
-					continue;
+					route	= new RegExp( `${path}${regex}`, originalMiddleware.route.flags );
+				}
+				else
+				{
+					route	= path + route;
 				}
 
-				middleware.route	= path + middleware.route;
+				middlewares.push( new Route({
+						handler		: originalMiddleware.getHandler(),
+						method		: originalMiddleware.getMethod(),
+						middlewares	: originalMiddleware.getMiddlewares(),
+						route
+					})
+				);
 			}
 		}
+		else
+		{
+			middlewares	= router.middleware;
+		}
 
-		this.middleware	= this.middleware.concat( router.middleware );
+		this.middleware	= this.middleware.concat( middlewares );
 
 		for ( const [key, value] of Object.entries( router.globalMiddlewares ) )
 			this.define( key, value );
