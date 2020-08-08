@@ -29,20 +29,21 @@ class EventRequest extends EventEmitter
 			list[parts.shift().trim()]	= decodeURI( parts.join( '=' ) );
 		});
 
-		this.query			= parsedUrl.query;
-		this.clientIp		= request.socket.remoteAddress;
-		this.path			= parsedUrl.pathname.trim();
-		this.method			= request.method.toUpperCase();
-		this.headers		= request.headers;
-		this.validation		= ValidationHandler;
-		this.request		= request;
-		this.response		= response;
-		this.cookies		= list;
-		this.finished		= false;
-		this.extra			= {};
-		this.params			= {};
-		this.block			= [];
-		this.errorHandler	= null;
+		this.query				= parsedUrl.query;
+		this.clientIp			= request.socket.remoteAddress;
+		this.path				= parsedUrl.pathname.trim();
+		this.method				= request.method.toUpperCase();
+		this.headers			= request.headers;
+		this.validation			= ValidationHandler;
+		this.request			= request;
+		this.response			= response;
+		this.cookies			= list;
+		this.finished			= false;
+		this.extra				= {};
+		this.params				= {};
+		this.block				= [];
+		this.errorHandler		= null;
+		this.disableXPoweredBy	= false;
 
 		// We do this so we can pass the event.next function by reference
 		const self			= this;
@@ -84,6 +85,7 @@ class EventRequest extends EventEmitter
 		this.cookies			= undefined;
 		this.params				= undefined;
 		this.clientIp			= undefined;
+		this.disableXPoweredBy	= undefined;
 		this.finished			= true;
 
 		this.emit( 'finished' );
@@ -169,6 +171,9 @@ class EventRequest extends EventEmitter
 		{
 			payload	= typeof response === 'string' ? response : JSON.stringify( response );
 			this.setResponseHeader( 'Content-Length', payload.length );
+
+			if ( this.disableXPoweredBy === false )
+				this.setResponseHeader( 'X-Powered-By', 'event_request' );
 		}
 		catch ( e )
 		{

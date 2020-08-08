@@ -1938,13 +1938,44 @@ test({
 });
 
 test({
-	message	: 'Server.testServerAddsXPoweredBy.does.not.anymore',
+	message	: 'Server.testServerAddsXPoweredBy',
 	test	: ( done ) => {
 		app.get( '/textServerAddsXPoweredBy', event => event.send( 'ok' ) );
 
 		helpers.sendServerRequest( `/textServerAddsXPoweredBy` ).then( ( response ) => {
 			assert.equal( response.body.toString(), 'ok' );
-			assert.equal( typeof response.headers['x-powered-by'] === 'undefined', true );
+			assert.equal( response.headers['x-powered-by'], 'event_request' );
+
+			done();
+		} ).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.testServerAddsXPoweredBy.when.disabled',
+	test	: ( done ) => {
+		app.get( '/textServerAddsXPoweredByWhenDisabled', ( event ) => {
+			event.disableXPoweredBy	= true;
+			event.send( 'ok' );
+		});
+
+		helpers.sendServerRequest( `/textServerAddsXPoweredByWhenDisabled` ).then( ( response ) => {
+			assert.equal( response.body.toString(), 'ok' );
+			assert.equal( response.headers['x-powered-by'], undefined );
+
+			done();
+		} ).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.testServerAddsXPoweredBy.when.send.is.not.used',
+	test	: ( done ) => {
+		app.get( '/textServerAddsXPoweredByWithoutSend', event => event.end( 'ok' ) );
+
+		helpers.sendServerRequest( `/textServerAddsXPoweredByWithoutSend` ).then( ( response ) => {
+			assert.equal( response.body.toString(), 'ok' );
+			assert.equal( response.headers['x-powered-by'], undefined );
 
 			done();
 		} ).catch( done );

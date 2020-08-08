@@ -202,6 +202,7 @@ test({
 		assert.equal( eventRequest.extra, undefined );
 		assert.equal( eventRequest.cookies, undefined );
 		assert.equal( eventRequest.params, undefined );
+		assert.equal( eventRequest.disableXPoweredBy, undefined );
 		assert.equal( eventRequest.finished, true );
 		assert.equal( eventRequest.listeners( 'test' ).length, 0 );
 
@@ -509,9 +510,10 @@ test({
 			shouldReturn	: () => { setResponseHeader = true; },
 			with			: [
 				['Location', redirectUrl],
-				['Content-Length', undefined]
+				['Content-Length', undefined],
+				['X-Powered-By', 'event_request']
 			],
-			called			: 2
+			called			: 3
 		});
 
 		eventRequest.redirect( redirectUrl, 302 );

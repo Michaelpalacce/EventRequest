@@ -682,6 +682,11 @@ The event request is an object that is created by the server and passed through 
 **errorHandler: ErrorHandler**
 - Default or Custom error handler that will be called in case of an error
 
+**disableXPoweredBy: Boolean**
+- Flag telling the framework if it should sent the X-Powered-By header.
+- Disabling it will 
+- Defaults to false
+
 ***
 #### Functions exported by the event request:
 
@@ -708,6 +713,7 @@ The event request is an object that is created by the server and passed through 
 - Sends the response to the user with the specified statusCode
 - If the response is not a String, it will be JSON.stringified. If that fails, an error will be thrown: app.er.send.error
 - setResponseHeader will be called with the calculated Content-Length
+- setResponseHeader will be called with X-Powered-By: event_request. This can be disabled by doing: `eventRequest.disableXPoweredBy = true;`
 - calls this.end() with the payload
 
 **end( ...args ): void** 
