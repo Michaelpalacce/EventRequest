@@ -1,3 +1,6 @@
+28.2.2
+- setUpPersistence with DataServerMap now works correctly without having to delete the file.
+
 28.2.1
 - X-Powered-By added when using EventRequest.send()
 

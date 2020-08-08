@@ -781,6 +781,46 @@ test({
 });
 
 test({
+	message			: 'DataServerMap._setUpPersistence.works.correctly',
+	test			: ( done ) => {
+		const persistPath	= path.join( __dirname, 'testSetUpPersistence' );
+
+		if ( fs.existsSync( persistPath ) )
+			fs.unlinkSync( persistPath );
+
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async () => {
+			const dataServer	= new DataServerMap( { persist: true, persistPath } );
+
+			assert.deepStrictEqual( fs.readFileSync( persistPath ).toString(), '{"dataType":"Map","value":[]}' );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
+	}
+});
+
+test({
+	message			: 'DataServerMap._setUpPersistence.works.correctly',
+	test			: ( done ) => {
+		const persistPath	= path.join( __dirname, 'testSetUpPersistenceBigMap' );
+
+		if ( fs.existsSync( persistPath ) )
+			fs.unlinkSync( persistPath );
+
+		// Wait in case the file has not been deleted from the FS
+		setTimeout( async () => {
+			const dataServer	= new DataServerMap( { persist: true, persistPath, useBigMap: true } );
+
+			assert.deepStrictEqual( fs.readFileSync( persistPath ).toString(), '{"dataType":"BigMap","value":{"maps":[{"dataType":"Map","value":[]}],"_limit":14000000}}' );
+
+			removeCache( dataServer );
+			done();
+		}, 10 );
+	}
+});
+
+test({
 	message			: 'DataServerMap.unlock.returns.false.on.invalid.arguments',
 	test			: ( done ) => {
 		// Wait in case the file has not been deleted from the FS
