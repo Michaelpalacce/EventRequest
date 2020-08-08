@@ -47,7 +47,7 @@ class DataServerMap extends DataServer
 		}
 		else
 		{
-			fs.writeFileSync( this.persistPath, JSON.stringify( this.useBigMap ? new BigMap() : new Map() ) );
+			fs.writeFileSync( this.persistPath, JSON.stringify( this.useBigMap ? new BigMap() : new Map(), DataServerMap.replacer ) );
 		}
 	}
 
