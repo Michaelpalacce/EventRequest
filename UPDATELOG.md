@@ -1,3 +1,6 @@
+28.2.1
+- X-Powered-By added when using EventRequest.send()
+
 28.2.0
 - Routers can now be added more than once using the router.add( 'path', router ) syntax
 
