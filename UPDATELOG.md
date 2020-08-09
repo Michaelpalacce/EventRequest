@@ -1,5 +1,6 @@
 28.2.3
 - When adding two routers together, in cases where there may be two // they will be cleared ( also allowing for adding routers on / )
+- Fixed Env Plugin line ends
 
 28.2.2
 - setUpPersistence with DataServerMap now works correctly without having to delete the file.
