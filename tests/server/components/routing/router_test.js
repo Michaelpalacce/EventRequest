@@ -272,7 +272,7 @@ test({
 });
 
 test({
-	message	: 'Router.add adds another router to a given route',
+	message	: 'Router.add.adds.another.router.to.a.given.route',
 	test	: ( done ) => {
 		let routerOne		= new Router();
 		let routerTwo		= new Router();
@@ -307,9 +307,43 @@ test({
 		routerTwo.add( '/route', routerOne );
 
 		for ( const middleware of routerTwo.middleware )
-		{
 			assert.equal( middleware.route.startsWith( '/route' ), true )
-		}
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add.adds.another.router.to.a.given.route.when.route.is./',
+	test	: ( done ) => {
+		let routerOne		= new Router();
+		let routerTwo		= new Router();
+
+		routerOne.add({
+			route	: '/test'
+		});
+
+		routerTwo.add( '/', routerOne );
+
+		assert.deepStrictEqual( routerTwo.middleware[0].route, '/test' );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add.adds.another.router.to.a.given.route.when.result.has.a.double./',
+	test	: ( done ) => {
+		let routerOne		= new Router();
+		let routerTwo		= new Router();
+
+		routerOne.add({
+			route	: '/test'
+		});
+
+		routerTwo.add( '/route/', routerOne );
+
+		assert.deepStrictEqual( routerTwo.middleware[0].route, '/route/test' );
 
 		done();
 	}
