@@ -325,6 +325,7 @@ class Router extends PluginInterface
 				else
 				{
 					route	= path + route;
+					route	= route.replace( /\/\//g, '/' );
 				}
 
 				middlewares.push( new Route({
