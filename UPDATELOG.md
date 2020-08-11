@@ -1,3 +1,6 @@
+28.2.4
+- Static Resources plugin now supports SVG as well
+
 28.2.3
 - When adding two routers together, in cases where there may be two // they will be cleared ( also allowing for adding routers on / )
 - Fixed Env Plugin line ends

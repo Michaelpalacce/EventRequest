@@ -10,6 +10,7 @@ const path				= require( 'path' );
 const PROJECT_ROOT	= path.parse( require.main.filename ).dir;
 const CSS_HEADER	= 'text/css';
 const JS_HEADER		= 'application/javascript';
+const SVG_HEADER	= 'image/svg+xml';
 
 /**
  * @brief	Static resource plugin used to server static resources
@@ -26,8 +27,8 @@ class StaticResourcesPlugin extends PluginInterface
 		const staticPaths		= Array.isArray( this.options.paths )
 								? this.options.paths
 								: typeof this.options.paths === 'string'
-								? [this.options.paths]
-								: ['public'];
+									? [this.options.paths]
+									: ['public'];
 
 		const pluginMiddlewares	= [];
 
@@ -51,6 +52,10 @@ class StaticResourcesPlugin extends PluginInterface
 
 							case '.js':
 								mimeType	= JS_HEADER;
+								break;
+
+							case '.svg':
+								mimeType	= SVG_HEADER;
 								break;
 
 							default:
