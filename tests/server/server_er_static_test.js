@@ -10,7 +10,7 @@ test({
 	test	: ( done ) => {
 		const app	= new Server();
 
-		app.apply( app.er_static_resources, { paths: ['public'] } );
+		app.apply( app.er_static, { paths: ['public'] } );
 
 		helpers.sendServerRequest( '/public/../index.js', 'GET', 404, '', {}, 4117 ).then(( response ) => {
 			assert.deepStrictEqual(
@@ -30,7 +30,7 @@ test({
 	test	: ( done ) => {
 		const app	= new Server();
 
-		app.apply( app.er_static_resources, { paths: ['public'] } );
+		app.apply( app.er_static, { paths: ['public'] } );
 
 		helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4116 ).then(( response ) => {
 			assert.deepStrictEqual(
@@ -50,7 +50,7 @@ test({
 	test	: ( done ) => {
 		const app	= new Server();
 
-		app.apply( app.er_static_resources, { paths: ['public'], cache: { cacheControl: 'private', other: 'no-transform' } } );
+		app.apply( app.er_static, { paths: ['public'], cache: { cacheControl: 'private', other: 'no-transform' } } );
 
 		helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4125 ).then(( response ) => {
 			assert.deepStrictEqual(

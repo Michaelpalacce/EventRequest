@@ -2742,7 +2742,7 @@ Server {
   er_timeout,
   er_env,
   er_rate_limits,
-  er_static_resources,
+  er_static,
   er_data_server,
   er_templating_engine,
   er_file_stream,
@@ -2936,7 +2936,7 @@ app.listen( 80, () => {
 ***
 ***
 
-# [er_static_resources](#er_static_resources)
+# [er_static](#er_static)
 - Adds a static resources path to the request.
 - By default the server has this plugin attached to allow favicon.ico to be sent
 - The Content-Type header will be set with the correct mime-type
@@ -2953,6 +2953,12 @@ app.listen( 80, () => {
 - The path/s to the static resources to be served. Defaults to 'public'
 - Can either be an array of strings or just one string
 - The path starts from the root of the project ( where the node command is being executed )
+
+**cache: Object**
+- Sets a Cache-control header using the same rules as the er_cache plugin
+- Check out er_cache plugin for more information on the rules.
+- Will only be set in case the resource is a static resource.
+- Defaults to empty
 
 ***
 #### Events:
@@ -2982,23 +2988,26 @@ const App = require( 'event_request' );
 const app = App();
 
 // This will serve everything in folder public and favicon.ico on the main folder
-app.apply( app.er_static_resources, { paths : ['public', 'favicon.ico'] } );
+app.apply( app.er_static, { paths : ['public', 'favicon.ico'] } );
+
+// This will serve everything in folder public and favicon.ico on the main folder and add a header: Cache-control: public, must-revalidate
+app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { cacheControl: 'public', revalidation: 'must-revalidate' } } );
 
 //OR
 // This will serve everything in folder public and favicon.ico on the main folder
-app.apply( 'er_static_resources', { paths : ['public', 'favicon.ico'] } );
+app.apply( 'er_static', { paths : ['public', 'favicon.ico'] } );
 
 //OR
 // This will act according to the defaults
-app.apply( 'er_static_resources' );
+app.apply( 'er_static' );
 
 //OR
 // This will act according to the defaults
-app.apply( app.er_static_resources );
+app.apply( app.er_static );
 
 //OR
 const PluginManager            = app.getPluginManager();
-const staticResourcesPlugin    = PluginManager.getPlugin( 'er_static_resources' );
+const staticResourcesPlugin    = PluginManager.getPlugin( 'er_static' );
 
 // This will serve everything in folder public and favicon.ico on the main folder
 staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
@@ -3944,20 +3953,14 @@ console.log( process.env.KEY );
 ***
 #### Exported Plugin Functions:
 
-**NONE**
+**DynamicMiddleware: cache( Object options ): Function**
+- This function generates a Dynamic Middleware
+- Options is an object that accept the same options passed to the plugin, same rules apply
 
 ***
 #### Example:
 
-- Create a new .env file with the following content: `KEY=TEST`
 ~~~javascript
-const app = require( 'event_request' )();
-
-app.apply( 'er_env' );
-
-console.log( process.env );
-
-console.log( process.env.KEY );
 ~~~
 
 ***

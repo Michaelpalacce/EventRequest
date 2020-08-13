@@ -75,6 +75,7 @@ class Server extends EventEmitter
 		this.er_env						= new EnvPlugin( 'er_env' );
 		this.er_cors					= new CorsPlugin( 'er_cors' );
 		this.er_cache					= new CacheControlPlugin( 'er_cache' );
+		this.er_static					= new StaticResourcesPlugin( 'er_static' );
 		this.er_logger					= new LoggerPlugin( 'er_logger' );
 		this.er_session					= new SessionPlugin( 'er_session' );
 		this.er_timeout					= new TimeoutPlugin( 'er_timeout' );
@@ -85,15 +86,15 @@ class Server extends EventEmitter
 		this.er_file_stream				= new FileStreamHandlerPlugin( 'er_file_stream' );
 		this.er_response_cache			= new ResponseCachePlugin( 'er_response_cache' );
 		this.er_body_parser_raw			= new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' );
-		this.er_static_resources		= new StaticResourcesPlugin( 'er_static_resources' );
 		this.er_body_parser_json		= new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' );
 		this.er_body_parser_form		= new BodyParserPlugin( FormBodyParser, 'er_body_parser_form' );
 		this.er_templating_engine		= new TemplatingEnginePlugin( 'er_templating_engine' );
 		this.er_body_parser_multipart	= new BodyParserPlugin( MultipartDataParser, 'er_body_parser_multipart' );
 
-		this.pluginManager.addPlugin( this.er_cache );
 		this.pluginManager.addPlugin( this.er_env );
 		this.pluginManager.addPlugin( this.er_cors );
+		this.pluginManager.addPlugin( this.er_cache );
+		this.pluginManager.addPlugin( this.er_static );
 		this.pluginManager.addPlugin( this.er_logger );
 		this.pluginManager.addPlugin( this.er_timeout );
 		this.pluginManager.addPlugin( this.er_session );
@@ -104,15 +105,13 @@ class Server extends EventEmitter
 		this.pluginManager.addPlugin( this.er_file_stream );
 		this.pluginManager.addPlugin( this.er_response_cache );
 		this.pluginManager.addPlugin( this.er_body_parser_raw );
-		this.pluginManager.addPlugin( this.er_static_resources );
 		this.pluginManager.addPlugin( this.er_body_parser_json );
 		this.pluginManager.addPlugin( this.er_body_parser_form );
 		this.pluginManager.addPlugin( this.er_templating_engine );
 		this.pluginManager.addPlugin( this.er_body_parser_multipart );
 
 		this.apply( this.router );
-		this.apply( this.er_static_resources, { paths: ['favicon.ico'] } );
-		this.er_static_resources.setOptions( {} );
+		this.apply( this.er_static, { paths: ['favicon.ico'] } );
 	}
 
 	/**
