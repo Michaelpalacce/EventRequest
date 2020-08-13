@@ -112,6 +112,7 @@ class Server extends EventEmitter
 
 		this.apply( this.router );
 		this.apply( this.er_static, { paths: ['favicon.ico'] } );
+		this.er_static.setOptions( {} );
 	}
 
 	/**

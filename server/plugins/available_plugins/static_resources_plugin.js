@@ -76,6 +76,7 @@ class StaticResourcesPlugin extends PluginInterface
 
 						event.setResponseHeader( 'Content-Type', mimeType ).setStatusCode( 200 );
 
+
 						const cacheControlHeader	= this.builder.build( cacheControl );
 						if ( cacheControlHeader !== '' )
 							event.setResponseHeader( CacheControl.HEADER, cacheControlHeader );
