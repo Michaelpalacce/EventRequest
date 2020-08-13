@@ -2937,7 +2937,7 @@ app.listen( 80, () => {
 # [er_static_resources](#er_static_resources)
 - Adds a static resources path to the request.
 - By default the server has this plugin attached to allow favicon.ico to be sent
-- The Content-Type header will be set with a mime type if the file is css or js
+- The Content-Type header will be set with the correct mime-type
 
 ***
 #### Dependencies:

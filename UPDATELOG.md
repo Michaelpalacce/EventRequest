@@ -1,3 +1,7 @@
+28.3.0
+- Small Documentation updates
+- Static plugin now sends an expires header for resources. This is configurable
+
 28.2.4
 - Static Resources plugin now supports SVG as well
 
