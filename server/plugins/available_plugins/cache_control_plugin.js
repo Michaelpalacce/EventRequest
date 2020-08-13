@@ -31,7 +31,7 @@ class CacheControlPlugin extends PluginInterface
 				event.setResponseHeader( CacheControl.HEADER, this.builder.build( options ) );
 
 			event.next();
-		}
+		};
 	}
 
 	/**

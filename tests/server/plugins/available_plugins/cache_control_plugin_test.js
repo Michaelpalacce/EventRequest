@@ -56,20 +56,23 @@ test({
 
 		const middleware	= plugin.getPluginMiddleware();
 
-		eventRequest._mock({
-			method			: 'setResponseHeader',
-			called			: 1,
-			shouldReturn	: ( name, value ) => {
-				assert.deepStrictEqual( name, 'Cache-control' );
-				assert.deepStrictEqual( value, 'public, must-revalidate' );
-
-				done();
-			}
+		eventRequest._mock( {
+			method	: 'setResponseHeader',
+			called	: 3,
+			with	: [
+				['Cache-control', 'public, must-revalidate'],
+				['Content-Length', 54],
+				['X-Powered-By', 'event_request'],
+			]
 		});
 
 		eventRequest._setBlock( middleware );
 
 		eventRequest.next();
+
+		setTimeout(() => {
+			done();
+		}, 50 );
 	}
 });
 
@@ -81,13 +84,22 @@ test({
 
 		const middleware	= plugin.getPluginMiddleware();
 
-		eventRequest._mock( { method : 'setResponseHeader',  called : 0 } );
+		eventRequest._mock( {
+			method	: 'setResponseHeader',
+			called	: 2,
+			with	: [
+				['Content-Length', 54],
+				['X-Powered-By', 'event_request'],
+			]
+		});
 
 		eventRequest._setBlock( middleware );
 
 		eventRequest.next();
 
-		done();
+		setTimeout(() => {
+			done();
+		}, 50 );
 	}
 });
 
@@ -97,18 +109,21 @@ test({
 		const eventRequest	= helpers.getEventRequest();
 		const plugin		= new CacheControlPlugin();
 
-		eventRequest._mock({
-			method			: 'setResponseHeader',
-			called			: 1,
-			shouldReturn	: ( name, value ) => {
-				assert.deepStrictEqual( name, 'Cache-control' );
-				assert.deepStrictEqual( value, 'public, must-revalidate' );
-
-				done();
-			}
+		eventRequest._mock( {
+			method	: 'setResponseHeader',
+			called	: 3,
+			with	: [
+				['Cache-control', 'public, must-revalidate'],
+				['Content-Length', 54],
+				['X-Powered-By', 'event_request']
+			]
 		});
 
 		plugin.cache( { cacheControl : 'public', revalidation: 'must-revalidate' } )( eventRequest );
+
+		setTimeout(() => {
+			done();
+		}, 50 );
 	}
 });
 
@@ -118,11 +133,20 @@ test({
 		const eventRequest	= helpers.getEventRequest();
 		const plugin		= new CacheControlPlugin();
 
-		eventRequest._mock( { method : 'setResponseHeader',  called : 0 } );
+		eventRequest._mock( {
+			method	: 'setResponseHeader',
+			called	: 2,
+			with	: [
+				['Content-Length', 54],
+				['X-Powered-By', 'event_request'],
+			]
+		});
 
 		plugin.cache( {} )( eventRequest );
 
-		done();
+		setTimeout(() => {
+			done();
+		}, 50 );
 	}
 });
 
@@ -132,10 +156,19 @@ test({
 		const eventRequest	= helpers.getEventRequest();
 		const plugin		= new CacheControlPlugin();
 
-		eventRequest._mock( { method : 'setResponseHeader',  called : 0 } );
+		eventRequest._mock( {
+			method	: 'setResponseHeader',
+			called	: 2,
+			with	: [
+				['Content-Length', 54],
+				['X-Powered-By', 'event_request'],
+			]
+		});
 
 		plugin.cache()( eventRequest );
 
-		done();
+		setTimeout(() => {
+			done();
+		}, 50 );
 	}
 });

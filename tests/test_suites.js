@@ -109,7 +109,7 @@ testSuites.validationSuite	= () => {
 };
 
 testSuites.pluginsSuite		= () => {
-	require( './server/plugins/available_plugins/ccahe_control_plugin_test' );
+	require( './server/plugins/available_plugins/cache_control_plugin_test' );
 	require( './server/plugins/available_plugins/data_server_plugin_test' );
 	require( './server/plugins/available_plugins/data_server_plugin_with_map_test' );
 	require( './server/plugins/available_plugins/timeout_plugin_test' );

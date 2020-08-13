@@ -525,8 +525,10 @@ app.listen( 80, () => {
 
 - You can `define` middlewares in any router or the server. Middlewares will be merged if you add a router to another router.
 - These global middlewares can be used to call a function before another step in the chain.You can add multiple middlewares per route.
+- Search for `GlobalMiddleware` in the documentation for a list of all global middlewares
  
 - Dynamic middlewares will accept the same parameters as Global Middlewares
+- Search for `DynamicMiddleware` in the documentation for a list of all dynamic middlewares
  
 - When adding global middlewares to routes they can either be a single string or multiple strings in an array.
 - When adding Dynamic Middlewares to routes they can either be a single function or multiple functions in an array.
@@ -3730,7 +3732,7 @@ app.post( '/submit', ( event ) => {
 ***
 #### Attached Functionality:
 
-Middleware: **cache.request**
+GlobalMiddleware: **cache.request**
 - Can be added to any request as a global middleware and that request will be cached if possible
 
 ***
@@ -3895,6 +3897,73 @@ console.log( process.env.KEY );
 ***
 ***
 
+# [er_cache](#er_cache) 
+- Adds a Cache-control header with the given configuration
+- Check out https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control for more details
+
+***
+#### Dependencies:
+
+**NONE**
+
+***
+#### Accepted Options:
+
+**cacheControl: String**
+- This can be one of the following: 'public', 'private', 'no-cache', 'no-store'
+- By default will not be set
+
+**revalidation: String**
+- This can be one of the following: 'must-revalidate', 'proxy-revalidate', 'immutable'
+- By default will not be set
+
+**other: String**
+- This can be one of the following: 'no-transform', 'only-if-cached'
+- By default will not be set
+
+**expirationDirectives: Object**
+- Contains keys with all the expiration directives you want to set that equal to values that MUST be numbers
+- The keys can be one of the following: 'max-age', 's-maxage', 'max-stale', 'min-fresh', 'stale-while-revalidate', 'stale-if-errors'
+- By default will not be set
+
+***
+#### Events:
+
+**NONE**
+
+***
+#### EventRequest Attached Functions
+
+**NONE**
+
+***
+#### Attached Functionality:
+
+**NONE**
+
+***
+#### Exported Plugin Functions:
+
+**NONE**
+
+***
+#### Example:
+
+- Create a new .env file with the following content: `KEY=TEST`
+~~~javascript
+const app = require( 'event_request' )();
+
+app.apply( 'er_env' );
+
+console.log( process.env );
+
+console.log( process.env.KEY );
+~~~
+
+***
+***
+***
+
 # [er_validation](#er_validation) 
 - Does not attach any functionality
 - Provides a Dynamic Middleware that can validate any EventRequest properties
@@ -3928,7 +3997,7 @@ console.log( process.env.KEY );
 ***
 #### Exported Plugin Functions:
 
-**validate( Object validationRules, Function failureCallback): Function**
+**DynamicMiddleware: validate( Object validationRules, Function failureCallback): Function**
 - This function generates a Dynamic Middleware
 - This can validate any parameter of the EventRequest like: body/query/headers/etc
 - It can validate multiple parameters at one time
@@ -4263,7 +4332,7 @@ app.listen( 80, () => {
 ***
 #### Exported Plugin Functions:
 
-**rateLimit( Object rule ): Function**
+**DynamicMiddleware: rateLimit( Object rule ): Function**
 - This function generates a Dynamic Middleware
 - The rule provided will apply ONLY for this route. 
 - It will ALWAYS match
