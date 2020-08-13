@@ -2958,7 +2958,8 @@ app.listen( 80, () => {
 - Sets a Cache-control header using the same rules as the er_cache plugin
 - Check out er_cache plugin for more information on the rules.
 - Will only be set in case the resource is a static resource.
-- Defaults to empty
+- By default it will set the default static directives: `public, max-age=604800, immutable`
+- Defaults to { static: true } 
 
 ***
 #### Events:
@@ -2987,8 +2988,11 @@ app.listen( 80, () => {
 const App = require( 'event_request' );
 const app = App();
 
-// This will serve everything in folder public and favicon.ico on the main folder
+// This will serve everything in folder public and favicon.ico on the main folder 
 app.apply( app.er_static, { paths : ['public', 'favicon.ico'] } );
+
+// This will serve everything in folder public and favicon.ico on the main folder and remove the Cache-control header
+app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { static: false } } );
 
 // This will serve everything in folder public and favicon.ico on the main folder and add a header: Cache-control: public, must-revalidate
 app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { cacheControl: 'public', revalidation: 'must-revalidate' } } );
@@ -3006,14 +3010,37 @@ app.apply( 'er_static' );
 app.apply( app.er_static );
 
 //OR
-const PluginManager            = app.getPluginManager();
-const staticResourcesPlugin    = PluginManager.getPlugin( 'er_static' );
+const PluginManager = app.getPluginManager();
+const staticResourcesPlugin = PluginManager.getPlugin( 'er_static' );
 
 // This will serve everything in folder public and favicon.ico on the main folder
 staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
 app.apply( staticResourcesPlugin );
 
 app.listen( 80 );
+~~~
+
+~~~javscript
+const app = require( 'event_request' )();
+
+// This will server all the files in the public subfolder ( a Cache-control header will be set ( Cache-Control: public, max-age=604800, immutable ) )
+app.apply( app.er_static, { paths: ['public'] } );
+
+app.listen( 80, () => {
+    app.Loggur.log( 'Server started' );
+});
+~~~
+
+~~~javascript
+const app = require( 'event_request' )();
+
+// This will server all the files in the public subfolder ( a Cache-control header will be set ( Cache-control: private ) )
+// This disables the default static Cache-control header
+app.apply( app.er_static, { paths: ['public'], cache: { static: false, cacheControl: 'private' } } );
+
+app.listen( 80, () => {
+    app.Loggur.log( 'Server started' );
+});
 ~~~
 
 ***
@@ -3967,25 +3994,21 @@ console.log( process.env.KEY );
 #### Example:
 
 ~~~javascript
-const app		= require( 'event_request' )();
+const app = require( 'event_request' );
 
-// This will server all the files in the public subfolder ( a Cache-control header will be set ( Cache-Control: public, max-age=604800, immutable ) )
-app.apply( app.er_static, { paths: ['public'] } );
+app.apply( app.er_cache, { cacheControl: 'private', expirationDirectives: { 'max-age': 123 }, revalidation: 'must-revalidate' } );
 
-app.listen( 80, () => {
-	app.Loggur.log( 'Server started' );
+app.get( '/', ( event ) => {
+    event.send( 'ok' );
 });
-~~~
 
-~~~javascript
-const app		= require( 'event_request' )();
-
-// This will server all the files in the public subfolder ( a Cache-control header will be set ( Cache-control: private ) )
-// This disables the default static Cache-control header
-app.apply( app.er_static, { paths: ['public'], cache: { static: false, cacheControl: 'private' } } );
+app.get( '/dynamic', app.er_cache.cache( { static: true } ), ( event ) => {
+    event.send( 'ok' );
+});
 
 app.listen( 80, () => {
-	app.Loggur.log( 'Server started' );
+    app.Loggur.log( 'Server started! Visit: http://localhost and check out the response headers! Look for the Cache-control header.' );
+    app.Loggur.log( 'After that visit: http://localhost/dynamic and do the same!' );
 });
 ~~~
 
