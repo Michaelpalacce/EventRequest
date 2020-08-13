@@ -23,21 +23,21 @@ test({
 		eventRequest._mock({
 			method			: 'setResponseHeader',
 			shouldReturn	: () => {
-				called	++;
-
+				called++;
 				return eventRequest;
 			},
 			with			: [
-				['Content-Type', 'text/css']
+				['Content-Type', 'text/css'],
+				['Cache-control', 'public, max-age=604800, immutable'],
 			]
 		});
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
-		assert.equal( 1, called );
-
-		done();
+		setTimeout(() => {
+			done();
+		}, 50 );
 	}
 });
 
@@ -59,21 +59,24 @@ test({
 		eventRequest._mock({
 			method			: 'setResponseHeader',
 			shouldReturn	: () => {
-				called	++;
+				called++;
 
 				return eventRequest;
 			},
 			with			: [
-				['Content-Type', 'application/javascript']
+				['Content-Type', 'application/javascript'],
+				['Cache-control', 'public, max-age=604800, immutable'],
 			]
 		});
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
-		assert.equal( 1, called );
+		setTimeout(() => {
+			assert.equal( 2, called );
 
-		done();
+			done();
+		}, 50 );
 	}
 });
 
@@ -100,16 +103,19 @@ test({
 				return eventRequest;
 			},
 			with			: [
-				['Content-Type', 'image/svg+xml']
+				['Content-Type', 'image/svg+xml'],
+				['Cache-control', 'public, max-age=604800, immutable'],
 			]
 		});
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
-		assert.equal( 1, called );
+		setTimeout(() => {
+			assert.equal( 2, called );
 
-		done();
+			done();
+		}, 50 );
 	}
 });
 
@@ -130,22 +136,25 @@ test({
 
 		eventRequest._mock({
 			method			: 'setResponseHeader',
-			shouldReturn	: () => {
-				called	++;
+			shouldReturn	: function(){
+				called++;
 
 				return eventRequest;
 			},
 			with			: [
-				['Content-Type', 'image/svg+xml']
+				['Content-Type', 'image/svg+xml'],
+				['Cache-control', 'public, max-age=604800, immutable'],
 			]
 		});
 
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
-		assert.equal( 1, called );
+		setTimeout(() => {
+			assert.equal( 2, called );
 
-		done();
+			done();
+		}, 50 );
 	}
 });
 

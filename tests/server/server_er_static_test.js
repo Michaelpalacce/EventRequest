@@ -38,6 +38,8 @@ test({
 				fs.readFileSync( path.join( PROJECT_ROOT, './public/test/index.html' ) ).toString()
 			);
 
+			assert.deepStrictEqual( response.headers['cache-control'], 'public, max-age=604800, immutable' );
+
 			done();
 		}).catch( done );
 

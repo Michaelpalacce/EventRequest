@@ -58,7 +58,7 @@
   "main": "server.js",
   "name": "event_request",
   "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text-summary node test.js --debug",
+    "test": "nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js --debug",
     "deploy": "npm run test && npm publish"
   },
   "version": "29.0.0",

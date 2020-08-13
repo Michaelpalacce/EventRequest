@@ -3935,6 +3935,12 @@ console.log( process.env.KEY );
 - The keys can be one of the following: 'max-age', 's-maxage', 'max-stale', 'min-fresh', 'stale-while-revalidate', 'stale-if-errors'
 - By default will not be set
 
+**static: Boolean**
+- This will set headers for static resources:
+- Cache-control: public, max-age=604800, immutable
+- Can be overwritten by custom directives
+- Defaults to false
+
 ***
 #### Events:
 
@@ -3961,6 +3967,26 @@ console.log( process.env.KEY );
 #### Example:
 
 ~~~javascript
+const app		= require( 'event_request' )();
+
+// This will server all the files in the public subfolder ( a Cache-control header will be set ( Cache-Control: public, max-age=604800, immutable ) )
+app.apply( app.er_static, { paths: ['public'] } );
+
+app.listen( 80, () => {
+	app.Loggur.log( 'Server started' );
+});
+~~~
+
+~~~javascript
+const app		= require( 'event_request' )();
+
+// This will server all the files in the public subfolder ( a Cache-control header will be set ( Cache-control: private ) )
+// This disables the default static Cache-control header
+app.apply( app.er_static, { paths: ['public'], cache: { static: false, cacheControl: 'private' } } );
+
+app.listen( 80, () => {
+	app.Loggur.log( 'Server started' );
+});
 ~~~
 
 ***

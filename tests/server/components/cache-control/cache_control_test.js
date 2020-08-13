@@ -29,12 +29,30 @@ test({
 const dataProvider	= [
 	[
 		{
-			cacheControl	: 'public'
+			static			: true
 		},
 		{
-			cacheControl	: 'public'
+			cacheControl			: 'public',
+			expirationDirectives	: {
+				'max-age'	: 604800
+			},
+			revalidation: 'immutable'
 		},
-		'public'
+		'public, max-age=604800, immutable'
+	],
+	[
+		{
+			static			: false
+		},
+		{},
+		''
+	],
+	[
+		{
+			static			: 123
+		},
+		{},
+		''
 	],
 	[
 		{

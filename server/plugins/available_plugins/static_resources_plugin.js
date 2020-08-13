@@ -40,7 +40,7 @@ class StaticResourcesPlugin extends PluginInterface
 
 		const cacheControl		= typeof this.options.cache === 'object'
 								? this.options.cache
-								: {};
+								: { static: true };
 
 		const pluginMiddlewares	= [];
 

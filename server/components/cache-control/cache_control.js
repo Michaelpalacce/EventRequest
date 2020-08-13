@@ -29,6 +29,9 @@ class CacheControl
 	 */
 	_configure( options = {} )
 	{
+		if ( options.static === true )
+			this.setStaticRules();
+
 		this.setCacheControl( options.cacheControl );
 		this.setRevalidationDirective( options.revalidation );
 		this.setOtherDirective( options.other );
@@ -45,6 +48,18 @@ class CacheControl
 				this.addExpirationDirective( directive, time );
 			}
 		}
+	}
+
+	/**
+	 * @brief	Sets a bunch of rules meant for static resources
+	 *
+	 * @return	void
+	 */
+	setStaticRules()
+	{
+		this.setCacheControl( 'public' );
+		this.addExpirationDirective( 'max-age', 604800 );
+		this.setRevalidationDirective( 'immutable' );
 	}
 
 	/**
