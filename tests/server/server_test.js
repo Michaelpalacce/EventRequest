@@ -44,10 +44,11 @@ test({
 		assert.equal( typeof server.pluginBag === 'object', true );
 		assert.deepStrictEqual( server.pluginManager instanceof PluginManager, true );
 
+		assert.equal( typeof server.er_cache === 'object', true );
 		assert.equal( typeof server.er_timeout === 'object', true );
 		assert.equal( typeof server.er_env === 'object', true );
 		assert.equal( typeof server.er_rate_limits === 'object', true );
-		assert.equal( typeof server.er_static_resources === 'object', true );
+		assert.equal( typeof server.er_static === 'object', true );
 		assert.equal( typeof server.er_data_server === 'object', true );
 		assert.equal( typeof server.er_templating_engine === 'object', true );
 		assert.equal( typeof server.er_file_stream === 'object', true );
@@ -282,7 +283,7 @@ test({
 		const server			= new Server();
 
 		const PluginManager		= server.getPluginManager();
-		const staticResources	= PluginManager.getPlugin( 'er_static_resources' );
+		const staticResources	= PluginManager.getPlugin( 'er_static' );
 
 		const validPlugin		= {
 			getPluginId				: ()=>{ return 'id'; },
@@ -293,7 +294,7 @@ test({
 		};
 
 		server.apply( staticResources );
-		server.apply( 'er_static_resources' );
+		server.apply( 'er_static' );
 		server.apply( validPlugin );
 
 		assert.throws(() => {
@@ -1688,9 +1689,9 @@ test({
 });
 
 test({
-	message	: 'Server.test.er_static_resources.works.as.expected',
+	message	: 'Server.test.er_static.works.as.expected',
 	test	: ( done ) => {
-		app.apply( app.er_static_resources, { paths: ['tests/server/fixture/static'] } );
+		app.apply( app.er_static, { paths: ['tests/server/fixture/static'] } );
 
 		helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js` ).then(( response ) => {
 			assert.equal( response.headers['content-type'], 'application/javascript' );
@@ -1711,10 +1712,10 @@ test({
 });
 
 test({
-	message	: 'Server.test.er_static_resources.works.as.expected.with.string',
+	message	: 'Server.test.er_static.works.as.expected.with.string',
 	test	: ( done ) => {
 		const app	= new Server();
-		app.apply( app.er_static_resources, { paths: 'tests/server/fixture/static' } );
+		app.apply( app.er_static, { paths: 'tests/server/fixture/static' } );
 
 		app.listen( 4500, ()=>{
 			helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js`, 'GET', 200, '', {}, 4500 ).then(( response ) => {
@@ -1738,10 +1739,10 @@ test({
 });
 
 test({
-	message	: 'Server.test.er_static_resources.works.as.expected.with.default',
+	message	: 'Server.test.er_static.works.as.expected.with.default',
 	test	: ( done ) => {
 		const app	= new Server();
-		app.apply( app.er_static_resources );
+		app.apply( app.er_static );
 
 		app.listen( 4311, ()=>{
 			helpers.sendServerRequest( `/public/test/index.css`, 'GET', 200, '', {}, 4311 ).then(( response ) => {

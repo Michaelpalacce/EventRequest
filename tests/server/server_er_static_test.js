@@ -10,7 +10,7 @@ test({
 	test	: ( done ) => {
 		const app	= new Server();
 
-		app.apply( app.er_static_resources, { paths: ['public'] } );
+		app.apply( app.er_static, { paths: ['public'] } );
 
 		helpers.sendServerRequest( '/public/../index.js', 'GET', 404, '', {}, 4117 ).then(( response ) => {
 			assert.deepStrictEqual(
@@ -30,7 +30,7 @@ test({
 	test	: ( done ) => {
 		const app	= new Server();
 
-		app.apply( app.er_static_resources, { paths: ['public'] } );
+		app.apply( app.er_static, { paths: ['public'] } );
 
 		helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4116 ).then(( response ) => {
 			assert.deepStrictEqual(
@@ -38,9 +38,55 @@ test({
 				fs.readFileSync( path.join( PROJECT_ROOT, './public/test/index.html' ) ).toString()
 			);
 
+			assert.deepStrictEqual( response.headers['cache-control'], 'public, max-age=604800, immutable' );
+
 			done();
 		}).catch( done );
 
 		app.listen( 4116 );
+	}
+});
+
+test({
+	message	: 'Server.test.er_static_does.serves.files.inside.static.folder.without.cache.control',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.apply( app.er_static, { paths: ['public'], cache: { static: false } } );
+
+		helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4127 ).then(( response ) => {
+			assert.deepStrictEqual(
+				response.body.toString(),
+				fs.readFileSync( path.join( PROJECT_ROOT, './public/test/index.html' ) ).toString()
+			);
+
+			assert.deepStrictEqual( response.headers['cache-control'], undefined );
+
+			done();
+		}).catch( done );
+
+		app.listen( 4127 );
+	}
+});
+
+test({
+	message	: 'Server.test.er_static_does.serves.files.inside.static.folder.with.cache',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.apply( app.er_static, { paths: ['public'], cache: { cacheControl: 'private', other: 'no-transform' } } );
+
+		helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4125 ).then(( response ) => {
+			assert.deepStrictEqual(
+				response.body.toString(),
+				fs.readFileSync( path.join( PROJECT_ROOT, './public/test/index.html' ) ).toString()
+			);
+
+			assert.deepStrictEqual( response.headers['cache-control'], 'private, no-transform' );
+
+			done();
+		}).catch( done );
+
+		app.listen( 4125 );
 	}
 });

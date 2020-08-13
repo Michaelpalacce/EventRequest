@@ -525,8 +525,10 @@ app.listen( 80, () => {
 
 - You can `define` middlewares in any router or the server. Middlewares will be merged if you add a router to another router.
 - These global middlewares can be used to call a function before another step in the chain.You can add multiple middlewares per route.
+- Search for `GlobalMiddleware` in the documentation for a list of all global middlewares
  
 - Dynamic middlewares will accept the same parameters as Global Middlewares
+- Search for `DynamicMiddleware` in the documentation for a list of all dynamic middlewares
  
 - When adding global middlewares to routes they can either be a single string or multiple strings in an array.
 - When adding Dynamic Middlewares to routes they can either be a single function or multiple functions in an array.
@@ -2740,7 +2742,7 @@ Server {
   er_timeout,
   er_env,
   er_rate_limits,
-  er_static_resources,
+  er_static,
   er_data_server,
   er_templating_engine,
   er_file_stream,
@@ -2934,10 +2936,10 @@ app.listen( 80, () => {
 ***
 ***
 
-# [er_static_resources](#er_static_resources)
+# [er_static](#er_static)
 - Adds a static resources path to the request.
 - By default the server has this plugin attached to allow favicon.ico to be sent
-- The Content-Type header will be set with a mime type if the file is css or js
+- The Content-Type header will be set with the correct mime-type
 
 ***
 #### Dependencies:
@@ -2951,6 +2953,13 @@ app.listen( 80, () => {
 - The path/s to the static resources to be served. Defaults to 'public'
 - Can either be an array of strings or just one string
 - The path starts from the root of the project ( where the node command is being executed )
+
+**cache: Object**
+- Sets a Cache-control header using the same rules as the er_cache plugin
+- Check out er_cache plugin for more information on the rules.
+- Will only be set in case the resource is a static resource.
+- By default it will set the default static directives: `public, max-age=604800, immutable`
+- Defaults to { static: true } 
 
 ***
 #### Events:
@@ -2979,30 +2988,59 @@ app.listen( 80, () => {
 const App = require( 'event_request' );
 const app = App();
 
-// This will serve everything in folder public and favicon.ico on the main folder
-app.apply( app.er_static_resources, { paths : ['public', 'favicon.ico'] } );
+// This will serve everything in folder public and favicon.ico on the main folder 
+app.apply( app.er_static, { paths : ['public', 'favicon.ico'] } );
+
+// This will serve everything in folder public and favicon.ico on the main folder and remove the Cache-control header
+app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { static: false } } );
+
+// This will serve everything in folder public and favicon.ico on the main folder and add a header: Cache-control: public, must-revalidate
+app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { cacheControl: 'public', revalidation: 'must-revalidate' } } );
 
 //OR
 // This will serve everything in folder public and favicon.ico on the main folder
-app.apply( 'er_static_resources', { paths : ['public', 'favicon.ico'] } );
+app.apply( 'er_static', { paths : ['public', 'favicon.ico'] } );
 
 //OR
 // This will act according to the defaults
-app.apply( 'er_static_resources' );
+app.apply( 'er_static' );
 
 //OR
 // This will act according to the defaults
-app.apply( app.er_static_resources );
+app.apply( app.er_static );
 
 //OR
-const PluginManager            = app.getPluginManager();
-const staticResourcesPlugin    = PluginManager.getPlugin( 'er_static_resources' );
+const PluginManager = app.getPluginManager();
+const staticResourcesPlugin = PluginManager.getPlugin( 'er_static' );
 
 // This will serve everything in folder public and favicon.ico on the main folder
 staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
 app.apply( staticResourcesPlugin );
 
 app.listen( 80 );
+~~~
+
+~~~javscript
+const app = require( 'event_request' )();
+
+// This will server all the files in the public subfolder ( a Cache-control header will be set ( Cache-Control: public, max-age=604800, immutable ) )
+app.apply( app.er_static, { paths: ['public'] } );
+
+app.listen( 80, () => {
+    app.Loggur.log( 'Server started' );
+});
+~~~
+
+~~~javascript
+const app = require( 'event_request' )();
+
+// This will server all the files in the public subfolder ( a Cache-control header will be set ( Cache-control: private ) )
+// This disables the default static Cache-control header
+app.apply( app.er_static, { paths: ['public'], cache: { static: false, cacheControl: 'private' } } );
+
+app.listen( 80, () => {
+    app.Loggur.log( 'Server started' );
+});
 ~~~
 
 ***
@@ -3730,7 +3768,7 @@ app.post( '/submit', ( event ) => {
 ***
 #### Attached Functionality:
 
-Middleware: **cache.request**
+GlobalMiddleware: **cache.request**
 - Can be added to any request as a global middleware and that request will be cached if possible
 
 ***
@@ -3895,6 +3933,89 @@ console.log( process.env.KEY );
 ***
 ***
 
+# [er_cache](#er_cache) 
+- Adds a Cache-control header with the given configuration
+- Check out https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control for more details
+
+***
+#### Dependencies:
+
+**NONE**
+
+***
+#### Accepted Options:
+
+**cacheControl: String**
+- This can be one of the following: 'public', 'private', 'no-cache', 'no-store'
+- By default will not be set
+
+**revalidation: String**
+- This can be one of the following: 'must-revalidate', 'proxy-revalidate', 'immutable'
+- By default will not be set
+
+**other: String**
+- This can be one of the following: 'no-transform', 'only-if-cached'
+- By default will not be set
+
+**expirationDirectives: Object**
+- Contains keys with all the expiration directives you want to set that equal to values that MUST be numbers
+- The keys can be one of the following: 'max-age', 's-maxage', 'max-stale', 'min-fresh', 'stale-while-revalidate', 'stale-if-errors'
+- By default will not be set
+
+**static: Boolean**
+- This will set headers for static resources:
+- Cache-control: public, max-age=604800, immutable
+- Can be overwritten by custom directives
+- Defaults to false
+
+***
+#### Events:
+
+**NONE**
+
+***
+#### EventRequest Attached Functions
+
+**NONE**
+
+***
+#### Attached Functionality:
+
+**NONE**
+
+***
+#### Exported Plugin Functions:
+
+**DynamicMiddleware: cache( Object options ): Function**
+- This function generates a Dynamic Middleware
+- Options is an object that accept the same options passed to the plugin, same rules apply
+
+***
+#### Example:
+
+~~~javascript
+const app = require( 'event_request' );
+
+app.apply( app.er_cache, { cacheControl: 'private', expirationDirectives: { 'max-age': 123 }, revalidation: 'must-revalidate' } );
+
+app.get( '/', ( event ) => {
+    event.send( 'ok' );
+});
+
+app.get( '/dynamic', app.er_cache.cache( { static: true } ), ( event ) => {
+    event.send( 'ok' );
+});
+
+app.listen( 80, () => {
+    app.Loggur.log( 'Server started! Visit: http://localhost and check out the response headers! Look for the Cache-control header.' );
+    app.Loggur.log( 'After that visit: http://localhost/dynamic and do the same!' );
+});
+~~~
+
+***
+***
+***
+
 # [er_validation](#er_validation) 
 - Does not attach any functionality
 - Provides a Dynamic Middleware that can validate any EventRequest properties
@@ -3928,7 +4049,7 @@ console.log( process.env.KEY );
 ***
 #### Exported Plugin Functions:
 
-**validate( Object validationRules, Function failureCallback): Function**
+**DynamicMiddleware: validate( Object validationRules, Function failureCallback): Function**
 - This function generates a Dynamic Middleware
 - This can validate any parameter of the EventRequest like: body/query/headers/etc
 - It can validate multiple parameters at one time
@@ -4263,7 +4384,7 @@ app.listen( 80, () => {
 ***
 #### Exported Plugin Functions:
 
-**rateLimit( Object rule ): Function**
+**DynamicMiddleware: rateLimit( Object rule ): Function**
 - This function generates a Dynamic Middleware
 - The rule provided will apply ONLY for this route. 
 - It will ALWAYS match

@@ -1,9 +1,8 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers }	= require( '../../../test_helper' );
-const CorsPlugin						= require( '../../../../server/plugins/available_plugins/cors_plugin' );
-const Server							= require( '../../../../server/server' );
+const { assert, test, helpers }	= require( '../../../test_helper' );
+const CorsPlugin				= require( '../../../../server/plugins/available_plugins/cors_plugin' );
 
 test({
 	message	: 'CorsPlugin.constructor.on.defaults.does.not.throw',
