@@ -5,6 +5,7 @@ const testSuites		= require( './tests/test_suites' );
 require( './tests/test_bootstrap' );
 
 const startTests	= () => {
+	testSuites.cacheControlSuite();
 	testSuites.eventSuite();
 	testSuites.bigMapSuite();
 	testSuites.securitySuite();

@@ -1,6 +1,7 @@
 'use strict';
 
 const PluginInterface	= require( '../plugin_interface' );
+const CacheControl		= require( '../../components/cache-control/cache_control' );
 const fs				= require( 'fs' );
 const path				= require( 'path' );
 
@@ -17,6 +18,13 @@ const SVG_HEADER	= 'image/svg+xml';
  */
 class StaticResourcesPlugin extends PluginInterface
 {
+	constructor( pluginId, options = {} )
+	{
+		super( pluginId, options );
+
+		this.builder	= new CacheControl();
+	}
+
 	/**
 	 * @brief	Sets the given path as the static path where resources can be delivered easily
 	 *
@@ -30,13 +38,17 @@ class StaticResourcesPlugin extends PluginInterface
 									? [this.options.paths]
 									: ['public'];
 
+		const cacheControl		= typeof this.options.cache === 'object'
+								? this.options.cache
+								: {};
+
 		const pluginMiddlewares	= [];
 
 		staticPaths.forEach( ( staticPath ) => {
 			const regExp	= new RegExp( '^(/' + staticPath + ')' );
 			staticPath		= path.join( PROJECT_ROOT, staticPath );
 
-			pluginMiddlewares.push( {
+			pluginMiddlewares.push({
 				route	: regExp,
 				handler	: ( event ) => {
 					const item	= path.join( PROJECT_ROOT, event.path );
@@ -64,6 +76,10 @@ class StaticResourcesPlugin extends PluginInterface
 
 						event.setResponseHeader( 'Content-Type', mimeType ).setStatusCode( 200 );
 
+						const cacheControlHeader	= this.builder.build( cacheControl );
+						if ( cacheControlHeader !== '' )
+							event.setResponseHeader( CacheControl.HEADER, cacheControlHeader );
+
 						fs.createReadStream( item ).pipe( event.response );
 					}
 					else
@@ -71,7 +87,7 @@ class StaticResourcesPlugin extends PluginInterface
 						event.next( { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${event.path}`, status: 404 } );
 					}
 				}
-			} );
+			});
 		});
 
 		return pluginMiddlewares;

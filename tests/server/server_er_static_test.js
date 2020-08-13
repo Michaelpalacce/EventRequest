@@ -44,3 +44,25 @@ test({
 		app.listen( 4116 );
 	}
 });
+
+test({
+	message	: 'Server.test.er_static_does.serves.files.inside.static.folder.with.cache',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.apply( app.er_static_resources, { paths: ['public'], cache: { cacheControl: 'private', other: 'no-transform' } } );
+
+		helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4116 ).then(( response ) => {
+			assert.deepStrictEqual(
+				response.body.toString(),
+				fs.readFileSync( path.join( PROJECT_ROOT, './public/test/index.html' ) ).toString()
+			);
+
+			assert.deepStrictEqual( response.headers['cache-control'], 'private, no-transform' );
+
+			done();
+		}).catch( done );
+
+		app.listen( 4116 );
+	}
+});

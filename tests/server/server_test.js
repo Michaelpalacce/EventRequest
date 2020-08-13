@@ -44,6 +44,7 @@ test({
 		assert.equal( typeof server.pluginBag === 'object', true );
 		assert.deepStrictEqual( server.pluginManager instanceof PluginManager, true );
 
+		assert.equal( typeof server.er_cache === 'object', true );
 		assert.equal( typeof server.er_timeout === 'object', true );
 		assert.equal( typeof server.er_env === 'object', true );
 		assert.equal( typeof server.er_rate_limits === 'object', true );

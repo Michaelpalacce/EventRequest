@@ -33,14 +33,3 @@ App.Logging		= Logging;
 App.App			= App;
 
 module.exports	= App;
-
-
-const CacheControl	= require( './server/components/cache-control/cache_control' );
-
-const cacheControl	= new CacheControl();
-
-cacheControl.setCacheControl( 'public' );
-
-console.log( cacheControl.build() );
-
-

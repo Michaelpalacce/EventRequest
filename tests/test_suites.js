@@ -8,6 +8,7 @@ testSuites.eventSuite		= () => {
 
 testSuites.serverSuite		= () => {
 	require( './server/server_test' );
+	require( './server/server_er_cache_test' );
 	require( './server/server_er_static_test' );
 	require( './server/server_er_body_parsers_test' );
 	require( './server/server_er_security_test' );
@@ -80,6 +81,10 @@ testSuites.errorSuite		= () => {
 	require( './server/components/error/error_handler_test' );
 };
 
+testSuites.cacheControlSuite		= () => {
+	require( './server/components/cache-control/cache_control_test' );
+};
+
 testSuites.helpersSuite		= () => {
 	require( './server/components/helpers/unique_id_test' );
 };
@@ -104,6 +109,7 @@ testSuites.validationSuite	= () => {
 };
 
 testSuites.pluginsSuite		= () => {
+	require( './server/plugins/available_plugins/ccahe_control_plugin_test' );
 	require( './server/plugins/available_plugins/data_server_plugin_test' );
 	require( './server/plugins/available_plugins/data_server_plugin_with_map_test' );
 	require( './server/plugins/available_plugins/timeout_plugin_test' );

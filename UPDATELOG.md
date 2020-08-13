@@ -1,6 +1,7 @@
 28.3.0
 - Small Documentation updates
-- Static plugin now sends an expires header for resources. This is configurable
+- Static plugin now supports caching for each path
+- Added er_cache plugin that is responsible for setting a Cache-control header
 
 28.2.4
 - Static Resources plugin now supports SVG as well

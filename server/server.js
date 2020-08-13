@@ -22,6 +22,7 @@ const SessionPlugin				= require( './plugins/available_plugins/session_plugin' )
 const SecurityPlugin			= require( './plugins/available_plugins/security_plugin' );
 const CorsPlugin				= require( './plugins/available_plugins/cors_plugin' );
 const ValidationPlugin			= require( './plugins/available_plugins/validation_plugin' );
+const CacheControlPlugin		= require( './plugins/available_plugins/cache_control_plugin' );
 
 const JsonBodyParser			= require( './components/body_parsers/json_body_parser' );
 const MultipartDataParser		= require( './components/body_parsers/multipart_data_parser' );
@@ -71,41 +72,43 @@ class Server extends EventEmitter
 	setUpDefaultPlugins()
 	{
 		// attached like this to enable smart autocomplete in IDE's
-		this.er_timeout					= new TimeoutPlugin( 'er_timeout' );
 		this.er_env						= new EnvPlugin( 'er_env' );
-		this.er_rate_limits				= new RateLimitsPlugin( 'er_rate_limits' );
-		this.er_static_resources		= new StaticResourcesPlugin( 'er_static_resources' );
-		this.er_data_server				= new DataServerPlugin( 'er_data_server' );
-		this.er_templating_engine		= new TemplatingEnginePlugin( 'er_templating_engine' );
-		this.er_file_stream				= new FileStreamHandlerPlugin( 'er_file_stream' );
+		this.er_cors					= new CorsPlugin( 'er_cors' );
+		this.er_cache					= new CacheControlPlugin( 'er_cache' );
 		this.er_logger					= new LoggerPlugin( 'er_logger' );
 		this.er_session					= new SessionPlugin( 'er_session' );
+		this.er_timeout					= new TimeoutPlugin( 'er_timeout' );
 		this.er_security				= new SecurityPlugin( 'er_security' );
-		this.er_cors					= new CorsPlugin( 'er_cors' );
+		this.er_validation				= new ValidationPlugin( 'er_validation' );
+		this.er_rate_limits				= new RateLimitsPlugin( 'er_rate_limits' );
+		this.er_data_server				= new DataServerPlugin( 'er_data_server' );
+		this.er_file_stream				= new FileStreamHandlerPlugin( 'er_file_stream' );
 		this.er_response_cache			= new ResponseCachePlugin( 'er_response_cache' );
+		this.er_body_parser_raw			= new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' );
+		this.er_static_resources		= new StaticResourcesPlugin( 'er_static_resources' );
 		this.er_body_parser_json		= new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' );
 		this.er_body_parser_form		= new BodyParserPlugin( FormBodyParser, 'er_body_parser_form' );
+		this.er_templating_engine		= new TemplatingEnginePlugin( 'er_templating_engine' );
 		this.er_body_parser_multipart	= new BodyParserPlugin( MultipartDataParser, 'er_body_parser_multipart' );
-		this.er_body_parser_raw			= new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' );
-		this.er_validation				= new ValidationPlugin( 'er_validation' );
 
-		this.pluginManager.addPlugin( this.er_timeout );
+		this.pluginManager.addPlugin( this.er_cache );
 		this.pluginManager.addPlugin( this.er_env );
-		this.pluginManager.addPlugin( this.er_rate_limits );
-		this.pluginManager.addPlugin( this.er_static_resources );
-		this.pluginManager.addPlugin( this.er_data_server );
-		this.pluginManager.addPlugin( this.er_templating_engine );
-		this.pluginManager.addPlugin( this.er_file_stream );
+		this.pluginManager.addPlugin( this.er_cors );
 		this.pluginManager.addPlugin( this.er_logger );
+		this.pluginManager.addPlugin( this.er_timeout );
 		this.pluginManager.addPlugin( this.er_session );
 		this.pluginManager.addPlugin( this.er_security );
-		this.pluginManager.addPlugin( this.er_cors );
+		this.pluginManager.addPlugin( this.er_validation );
+		this.pluginManager.addPlugin( this.er_rate_limits );
+		this.pluginManager.addPlugin( this.er_data_server );
+		this.pluginManager.addPlugin( this.er_file_stream );
 		this.pluginManager.addPlugin( this.er_response_cache );
+		this.pluginManager.addPlugin( this.er_body_parser_raw );
+		this.pluginManager.addPlugin( this.er_static_resources );
 		this.pluginManager.addPlugin( this.er_body_parser_json );
 		this.pluginManager.addPlugin( this.er_body_parser_form );
+		this.pluginManager.addPlugin( this.er_templating_engine );
 		this.pluginManager.addPlugin( this.er_body_parser_multipart );
-		this.pluginManager.addPlugin( this.er_body_parser_raw );
-		this.pluginManager.addPlugin( this.er_validation );
 
 		this.apply( this.router );
 		this.apply( this.er_static_resources, { paths: ['favicon.ico'] } );
