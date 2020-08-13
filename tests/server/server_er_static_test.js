@@ -52,7 +52,7 @@ test({
 
 		app.apply( app.er_static_resources, { paths: ['public'], cache: { cacheControl: 'private', other: 'no-transform' } } );
 
-		helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4116 ).then(( response ) => {
+		helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4125 ).then(( response ) => {
 			assert.deepStrictEqual(
 				response.body.toString(),
 				fs.readFileSync( path.join( PROJECT_ROOT, './public/test/index.html' ) ).toString()
@@ -63,6 +63,6 @@ test({
 			done();
 		}).catch( done );
 
-		app.listen( 4116 );
+		app.listen( 4125 );
 	}
 });
