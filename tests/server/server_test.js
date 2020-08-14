@@ -1331,7 +1331,13 @@ test({
 		});
 
 		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
-			assert.deepStrictEqual( response.body.toString(), '{"error":{"code":"app.er.send.error"}}' );
+			assert.deepStrictEqual(
+				response.body.toString().indexOf(
+					'{"error":{"code":"app.general","message":"Converting circular structure to JSON'
+				) !== -1,
+				true
+			);
+
 			done();
 		}).catch( done );
 	}

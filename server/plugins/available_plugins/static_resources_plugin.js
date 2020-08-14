@@ -18,11 +18,9 @@ const SVG_HEADER	= 'image/svg+xml';
  */
 class StaticResourcesPlugin extends PluginInterface
 {
-	constructor( pluginId, options = {} )
+	setServerOnRuntime( server )
 	{
-		super( pluginId, options );
-
-		this.builder	= new CacheControl();
+		this.server	= server;
 	}
 
 	/**
@@ -49,11 +47,12 @@ class StaticResourcesPlugin extends PluginInterface
 			staticPath		= path.join( PROJECT_ROOT, staticPath );
 
 			pluginMiddlewares.push({
-				route	: regExp,
-				handler	: ( event ) => {
+				route		: regExp,
+				middlewares	: this.server.er_cache.cache( cacheControl ),
+				handler		: ( event ) => {
 					const item	= path.join( PROJECT_ROOT, event.path );
 
-					if ( fs.existsSync( item ) && item.indexOf( staticPath ) !== -1 )
+					if ( fs.existsSync( item ) && fs.statSync( item ).isFile() && item.indexOf( staticPath ) !== -1 )
 					{
 						let mimeType	= '*/*';
 						switch ( path.extname( item ) )
@@ -76,20 +75,19 @@ class StaticResourcesPlugin extends PluginInterface
 
 						event.setResponseHeader( 'Content-Type', mimeType ).setStatusCode( 200 );
 
-						const cacheControlHeader	= this.builder.build( cacheControl );
-
-						if ( cacheControlHeader !== '' )
-							event.setResponseHeader( CacheControl.HEADER, cacheControlHeader );
-
 						fs.createReadStream( item ).pipe( event.response );
 					}
 					else
 					{
+						event.removeResponseHeader( CacheControl.HEADER );
+
 						event.next( { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${event.path}`, status: 404 } );
 					}
 				}
 			});
 		});
+
+		this.options	= {};
 
 		return pluginMiddlewares;
 	}

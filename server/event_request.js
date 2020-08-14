@@ -167,18 +167,11 @@ class EventRequest extends EventEmitter
 
 		let payload;
 
-		try
-		{
-			payload	= typeof response === 'string' ? response : JSON.stringify( response );
-			this.setResponseHeader( 'Content-Length', payload.length );
+		payload	= typeof response === 'string' ? response : JSON.stringify( response );
+		this.setResponseHeader( 'Content-Length', payload.length );
 
-			if ( this.disableXPoweredBy === false )
-				this.setResponseHeader( 'X-Powered-By', 'event_request' );
-		}
-		catch ( e )
-		{
-			throw new Error( 'app.er.send.error' );
-		}
+		if ( this.disableXPoweredBy === false )
+			this.setResponseHeader( 'X-Powered-By', 'event_request' );
 
 		this.end( payload, 'utf8' );
 

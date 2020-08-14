@@ -3,7 +3,7 @@
 const AVAILABLE_CACHE_CONTROL			= ['public', 'private', 'no-cache', 'no-store'];
 const AVAILABLE_EXPIRATION_DIRECTIVES	= ['max-age', 's-maxage', 'max-stale', 'min-fresh', 'stale-while-revalidate', 'stale-if-errors'];
 const AVAILABLE_REVALIDATION_DIRECTIVES	= ['must-revalidate', 'proxy-revalidate', 'immutable'];
-const AVAILABLE_OTHER_DIRECTIVES		= ['no-transform', 'only-if-cached'];
+const AVAILABLE_OTHER_DIRECTIVES		= ['no-transform'];
 
 /**
  * @brief	Builder class responsible for creating a cache control header
