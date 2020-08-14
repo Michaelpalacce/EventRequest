@@ -1,3 +1,10 @@
+29.1.0
+- app.er.send.error has been removed
+- er_static now uses the dynamic middleware of er_cache
+- Fixed a bug with er_static that crashed on dirs
+- only-if-cached has been removed from the cache control
+- Added updates to the README
+
 29.0.0
 - Small Documentation updates
 - Static plugin now supports caching for each path

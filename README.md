@@ -159,7 +159,7 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
    - rate_limiter => require( 'event_request/server/components/rate_limiter/bucket' )
 
 # [Plugins:](#plugins-info)
-- Plugins are parts of the server that attach functionality to the EventRequest
+- Plugins are parts of the server that attach functionality to the EventRequest or the Server
 - They can be retrieved from App() ( look at the plugins section for more info )
 
 ***
@@ -713,7 +713,7 @@ The event request is an object that is created by the server and passed through 
 
 **send( mixed response = '', Number statusCode = 200 ): void** 
 - Sends the response to the user with the specified statusCode
-- If the response is not a String, it will be JSON.stringified. If that fails, an error will be thrown: app.er.send.error
+- If the response is not a String, it will be JSON.stringified. If that fails, an error will be thrown
 - setResponseHeader will be called with the calculated Content-Length
 - setResponseHeader will be called with X-Powered-By: event_request. This can be disabled by doing: `eventRequest.disableXPoweredBy = true;`
 - calls this.end() with the payload
@@ -2064,9 +2064,6 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
   - Thrown by the Timeout Plugin with a status of 408
   - { code: 'app.er.timeout.timedOut', status: 408 }
 
-**app.er.send.error**
-  - Thrown by event request when the send is not a string and JSON.stringify fails
-
 **app.er.staticResources.fileNotFound**
   - { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${item}`, status: 404 }
   - Thrown by the Timeout Plugin with a status of 408
@@ -2725,7 +2722,11 @@ However if the global persist is set to false, this will not work
 
 ***
 # [Plugins](#plugins-section)
-- Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**
+- Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**. Some Plugins may require other plugins as a dependencies and will throw if missing.
+- After plugins have been attached to the app they can be retrieved using `app.getPlugin( 'plugin_id' )` if needed.
+- There is no rule preventing you to attach multiple plugins with the same name but keep in mind some are NOT supposed to be reattached ( each plugin has a note describing whether they can be reattached or not ). Also keep in mind when calling `app.getPlugin` you will fetch only the latest applied plugin.
+- Some plugins do not need to be attached as they provide a dynamic middleware and can work without being applied ( however they may offer some benefits to being applied )
+- Custom plugins may also be created as long as they follow the basic principles of the PluginInterface 
 - Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
     plugin all you have to do is do: server.apply( 'pluginId' )
 - To enable IDE's smart autocomplete to work in your favor all the plugins 
@@ -2940,6 +2941,7 @@ app.listen( 80, () => {
 - Adds a static resources path to the request.
 - By default the server has this plugin attached to allow favicon.ico to be sent
 - The Content-Type header will be set with the correct mime-type
+- **This Plugin can be re-applied multiple times with different configurations.**
 
 ***
 #### Dependencies:
@@ -3049,7 +3051,8 @@ app.listen( 80, () => {
 
 # [er_data_server](#er_data_server)
 - Adds a Caching Server using the DataServer provided in the constructor if any.
-- This plugin will add a DataServer to: `event.dataServer` 
+- This plugin will add a DataServer to: `event.dataServer`
+- **This Plugin can NOT be re-applied multiple times.**
 
 ***
 #### Dependencies:
@@ -3127,6 +3130,7 @@ app.listen( 80 , () => {
 - Adds a Session class.
 - The session works with a cookie or a header.
 - The cookie/header will be sent back to the client who must then return the cookie/header back.
+- **This Plugin can NOT be re-applied multiple times.**
 
 ***
 #### Dependencies:
@@ -3283,6 +3287,7 @@ app.listen( 80, () => {
 - Adds a templating engine to the event request ( the default templating engine is used just to render static HTML )
 - If you want to add a templating engine you have to set the engine parameters in the options as well as a templating directory
 - Use this ONLY if you want to serve static data or when testing
+- **This Plugin can NOT be re-applied multiple times.**
 
 ***
 #### Dependencies:
@@ -3385,6 +3390,7 @@ router.get( '/preview', ( event ) => {
 - An 'stream_start' event will be emitted by the EventRequest the moment the stream is going to be started 
 - Each file stream has a getType method that returns whether it is a video, text, image or audio
 - Files with no extension will be treated as text files
+- **This Plugin can NOT be re-applied multiple times.**
 
 ***
 #### Dependencies:
@@ -3493,6 +3499,7 @@ app.listen( '80', () => {
 - Adds a logger to the eventRequest
 - Attaches a log( data, level ) function to the process for easier access
 - This can be controlled and turned off. The process.log( data, level ) calls the given logger
+- **This Plugin can NOT be re-applied multiple times.**
 
 ***
 #### Dependencies:
@@ -3591,7 +3598,7 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 - multipart body parser supports: multipart/form-data
 - er_body_parser_raw is a fallback body parser that will return the data as a raw string if no other parser supports the request. The default body parser has a limit of 10MB. It can optionally be added as a final parser manually to have it's maxPayloadLength changed
 - THE BODY PARSER PLUGINS WILL NOT PARSE DATE IF event.body exists when hitting the middleware
-
+- **This Plugin can NOT be re-applied multiple times, however you can add each plugin without an issue.**
 
 ***
 ***
@@ -3742,6 +3749,7 @@ app.post( '/submit', ( event ) => {
 - Adds a response caching mechanism.
 - It will only cache IF you call either event.send or event.end
 - It will only cache 200 responses
+- **This Plugin can NOT be re-applied multiple times.**
 
 ***
 #### Dependencies:
@@ -3882,6 +3890,7 @@ app.listen( 80, () => {
 # [er_env](#er_env) 
 - Adds environment variables from a .env file to the process.env Object. In case the .env file changes
 - This plugin will automatically update the process.env and will delete the old environment variables.
+- **This Plugin can NOT be re-applied multiple times.**
 
 ***
 #### Dependencies:
@@ -3936,6 +3945,7 @@ console.log( process.env.KEY );
 # [er_cache](#er_cache) 
 - Adds a Cache-control header with the given configuration
 - Check out https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control for more details
+- **This Plugin can be re-applied multiple times with different configurations.**
 
 ***
 #### Dependencies:
@@ -3954,7 +3964,7 @@ console.log( process.env.KEY );
 - By default will not be set
 
 **other: String**
-- This can be one of the following: 'no-transform', 'only-if-cached'
+- This can be one of the following: 'no-transform'
 - By default will not be set
 
 **expirationDirectives: Object**
@@ -4019,6 +4029,7 @@ app.listen( 80, () => {
 # [er_validation](#er_validation) 
 - Does not attach any functionality
 - Provides a Dynamic Middleware that can validate any EventRequest properties
+- **This Plugin can be re-applied multiple times with different configurations.**
 
 ***
 #### Dependencies:
@@ -4212,6 +4223,7 @@ app.listen( 80, () => {
 # [er_cors](#er_cors) 
 - Adds commonly used CORS headers
 - In case of an options request returns 204 status code
+- **This Plugin can NOT be re-applied multiple times.**
 - Defaults to:
 
 ~~~javascript
@@ -4329,6 +4341,7 @@ app.listen( 80, () => {
 - Instead of passing fileLocation you can pass the rules directly as an array
 - If you provide the same dataStore to two servers they should work without an issue
 - If you don't provide a dataStore, then the er_data_server data store will be used. If that plugin is not set, then the default bucket one will be used
+- **This Plugin can be re-applied multiple times with different configurations, however it may not be the best idea to do so.**
 
 ***
 #### Dependencies:
@@ -4641,6 +4654,7 @@ app.listen( 80, () => {
 # [er_security](#er_security) 
 - Adds common security http headers
 - Options for all the headers can be passed directly in the options and later changed as all components used by the security plugin implement a builder pattern
+- **This Plugin can be re-applied multiple times with different configurations, however it may not be a good idea to do so.**
 
 ***
 #### Dependencies:

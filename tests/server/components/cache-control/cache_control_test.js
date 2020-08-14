@@ -199,14 +199,12 @@ const dataProvider	= [
 		{
 			other	: 'only-if-cached'
 		},
-		{
-			other	: 'only-if-cached'
-		},
-		'only-if-cached'
+		{},
+		''
 	],
 	[
 		{
-			other					: 'only-if-cached',
+			other					: 'no-transform',
 			expirationDirectives	: {
 				'max-age'	: 123,
 				's-maxage'	: 'wrong'
@@ -214,18 +212,18 @@ const dataProvider	= [
 			revalidation			: 'must-revalidate'
 		},
 		{
-			other					: 'only-if-cached',
+			other					: 'no-transform',
 			expirationDirectives	: {
 				'max-age'	: 123,
 			},
 			revalidation			: 'must-revalidate'
 		},
-		'max-age=123, must-revalidate, only-if-cached'
+		'max-age=123, must-revalidate, no-transform'
 	],
 	[
 		{
 			cacheControl			: 'private',
-			other					: 'only-if-cached!!!',
+			other					: 'only-if-cached',
 			expirationDirectives	: {
 				'max-age'	: 123,
 				'min-fresh'	: 123123,
