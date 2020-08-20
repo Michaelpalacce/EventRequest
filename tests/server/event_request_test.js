@@ -333,6 +333,25 @@ test({
 });
 
 test({
+	message	: 'EventRequest.send.method.emits.send',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		let sendCalled		= false;
+
+		eventRequest.on( 'send', ( { payload, code } ) => {
+			assert.deepStrictEqual( payload, '' );
+			assert.deepStrictEqual( code, 200 );
+			sendCalled	= true;
+		});
+
+		eventRequest.send( '' );
+
+		assert.deepStrictEqual( sendCalled, true );
+		done();
+	}
+});
+
+test({
 	message	: 'EventRequest.setResponseHeader.returns.EventRequest',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
