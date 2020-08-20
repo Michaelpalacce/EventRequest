@@ -240,6 +240,7 @@ class Server extends EventEmitter
 				if ( eventRequest !== null && eventRequest !== undefined )
 				{
 					eventRequest.next( error );
+					eventRequest._cleanUp();
 					eventRequest	= null;
 				}
 			});

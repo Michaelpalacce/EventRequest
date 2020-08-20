@@ -104,26 +104,17 @@ class ResponseCachePlugin extends PluginInterface
 
 					if ( cachedDataSet === null )
 					{
-						const eventEnd	= event.end;
-
-						event.end	= ( ...args ) => {
-							const code	= event.response.statusCode;
-
-							if ( ( typeof args[0] !== 'string' && typeof args[0] !== 'number' ) || code !== 200 )
-							{
-								eventEnd.apply( event, args );
+						event.on( 'send', ( { payload, code } ) => {
+							if ( code < 200 || code >= 300 )
 								return;
-							}
 
-							const response		= args[0];
+							const response		= payload;
 							const headers		= event.response.getHeaders();
 							const ttl			= this.getTimeToLive( event );
 							const recordName	= this.getCacheId( event );
 
 							this.dataServer.set( recordName, { response, code, headers }, ttl, { persist: false } );
-
-							eventEnd.apply( event, args );
-						};
+						});
 
 						event.next();
 					}

@@ -319,7 +319,7 @@ test({
 });
 
 test({
-	message	: 'EventRequest.send.method.calls.cleanUp',
+	message	: 'EventRequest.send.method.does.not.call.cleanUp',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
@@ -328,21 +328,7 @@ test({
 
 		eventRequest.send( '' );
 
-		cleanUp	? done() : done( 'EventRequest cleanUp event not emitted on send' );
-	}
-});
-
-test({
-	message		: 'EventRequest.send.sends.a.stream',
-	test		: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let cleanUp			= false;
-
-		eventRequest.on( 'cleanUp', () => { cleanUp = true; });
-
-		eventRequest.send( '' );
-
-		cleanUp	? done() : done( 'EventRequest cleanUp event not emitted on send' );
+		cleanUp	? done( 'EventRequest cleanUp event was emitted on send But should not have been' ) : done();
 	}
 });
 

@@ -716,6 +716,7 @@ The event request is an object that is created by the server and passed through 
 - If the response is not a String, it will be JSON.stringified. If that fails, an error will be thrown
 - setResponseHeader will be called with the calculated Content-Length
 - setResponseHeader will be called with X-Powered-By: event_request. This can be disabled by doing: `eventRequest.disableXPoweredBy = true;`
+- Emits a `send` event just before calling this.end()
 - calls this.end() with the payload
 
 **end( ...args ): void** 
@@ -773,11 +774,15 @@ The event request is an object that is created by the server and passed through 
 
 **cleanUp()** 
 - Emitted when the event request is about to begin the cleanUp phase.
-- At this point the data set in the EventRequest has not been cleaned up
+- At this point the data set in the EventRequest has not been cleaned up and is about to be.
+- At this point the response should be sent to the client
 
 **finished()**
-- Emitted when even cleaning up has finished and the eventRequest is completed
+- Emitted when the event cleaning up has finished and the eventRequest is completed
 - At this point the data set in the EventRequest has been cleaned up
+
+**send( String payload, Number code )**
+- Emitted when the event.send() is called, just before the event is actually sent
 
 **redirect( Object redirectData )** 
 - Emitted when a redirect response was sent
@@ -2844,7 +2849,8 @@ The plugin Manager exports the following functions:
 
 
 # [er_timeout](#er_timeout)
-- Adds a timeout to the request
+- Adds a timeout to the socket.
+- This plugin internally calls response.setTimeout()
 
 ***
 #### Dependencies:
@@ -2867,7 +2873,7 @@ The plugin Manager exports the following functions:
 ~~~javascript
 function callback( event )
 {
-    event.next( { code: 'app.er.timeout.timedOut', status: 408 } );
+    event.sendError( { code: 'app.er.timeout.timedOut', status: 408 } );
 }
 ~~~
 
@@ -2876,7 +2882,7 @@ function callback( event )
 #### Events:
 
 **clearTimeout()**
-- Emitted when the event.clearTimeout() function is called if there was a timeout to be cleared
+- Emitted when the timeout is cleared
 
 ***
 #### EventRequest Attached Functions
@@ -2885,11 +2891,13 @@ function callback( event )
 - Clears the Request Timeout
 - Will do nothing if there is no timeout
 
+**event.setTimeout( Number milliseconds ): void**
+- Sets a new timeout for the event request 
+
 ***
 #### Attached Functionality:
 
-**event.internalTimeout: Timeout**
-- The request timeout set in the EventRequest
+**NONE**
 
 ***
 #### Exported Plugin Functions:
@@ -3747,8 +3755,8 @@ app.post( '/submit', ( event ) => {
 
 # [er_response_cache](#er_response_cache) 
 - Adds a response caching mechanism.
-- It will only cache IF you call either event.send or event.end
-- It will only cache 200 responses
+- It will only cache IF you call event.send
+- It will only cache 2xx responses
 - **This Plugin can NOT be re-applied multiple times.**
 
 ***
@@ -3764,7 +3772,8 @@ app.post( '/submit', ( event ) => {
 ***
 #### Events:
 
-**NONE**
+**cachedResponse()**
+- Emits if the response is sent from the cache.
 
 ***
 #### EventRequest Attached Functions

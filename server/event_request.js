@@ -158,7 +158,7 @@ class EventRequest extends EventEmitter
 
 	/**
 	 * @param	{*} [response='']
-	 * @param	{Number} [code=200]
+	 * @param	{Number} [code=null]
 	 */
 	send( response = '', code = null )
 	{
@@ -173,9 +173,8 @@ class EventRequest extends EventEmitter
 		if ( this.disableXPoweredBy === false )
 			this.setResponseHeader( 'X-Powered-By', 'event_request' );
 
+		this.emit( 'send', { payload, code: this.response.statusCode } );
 		this.end( payload, 'utf8' );
-
-		this._cleanUp();
 	}
 
 	/**
