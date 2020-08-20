@@ -1,3 +1,6 @@
+29.2.1
+- Empty Release, NPM not showing README.md, issue is github actions. Will publish directly from master from now on
+
 29.2.0
 - EventRequest now emits a 'send' event BEFORE the data is sent
 - er_timeout now sets a timeout directly for the response
