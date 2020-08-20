@@ -23,6 +23,7 @@ const SecurityPlugin			= require( './plugins/available_plugins/security_plugin' 
 const CorsPlugin				= require( './plugins/available_plugins/cors_plugin' );
 const ValidationPlugin			= require( './plugins/available_plugins/validation_plugin' );
 const CacheControlPlugin		= require( './plugins/available_plugins/cache_control_plugin' );
+const EtagPlugin				= require( './plugins/available_plugins/etag_plugin' );
 
 const JsonBodyParser			= require( './components/body_parsers/json_body_parser' );
 const MultipartDataParser		= require( './components/body_parsers/multipart_data_parser' );
@@ -74,6 +75,7 @@ class Server extends EventEmitter
 		// attached like this to enable smart autocomplete in IDE's
 		this.er_env						= new EnvPlugin( 'er_env' );
 		this.er_cors					= new CorsPlugin( 'er_cors' );
+		this.er_etag					= new EtagPlugin( 'er_etag' );
 		this.er_cache					= new CacheControlPlugin( 'er_cache' );
 		this.er_static					= new StaticResourcesPlugin( 'er_static' );
 		this.er_logger					= new LoggerPlugin( 'er_logger' );
@@ -93,6 +95,7 @@ class Server extends EventEmitter
 
 		this.pluginManager.addPlugin( this.er_env );
 		this.pluginManager.addPlugin( this.er_cors );
+		this.pluginManager.addPlugin( this.er_etag );
 		this.pluginManager.addPlugin( this.er_cache );
 		this.pluginManager.addPlugin( this.er_static );
 		this.pluginManager.addPlugin( this.er_logger );
