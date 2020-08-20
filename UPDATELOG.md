@@ -1,3 +1,8 @@
+29.3.0
+- Added er_etag plugin
+- Added Documentation about er_etag plugin
+- Added tests for er_etag plugin
+
 29.2.1
 - Empty Release, NPM not showing README.md, issue is github actions. Will publish directly from master from now on
 
