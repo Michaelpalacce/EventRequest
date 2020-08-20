@@ -6,137 +6,59 @@ const TimeoutPlugin				= require( '../../../../server/plugins/available_plugins/
 const Router					= require( '../../../../server/components/routing/router' );
 
 test({
-	message	: 'TimeoutPlugin times out when added',
+	message	: 'TimeoutPlugin.times.out.when.added',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
-		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0 } );
+		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 1 } );
 		let router				= new Router();
 		let error				= false;
 
 		let pluginMiddlewares	= timeoutPlugin.getPluginMiddleware();
+
+		eventRequest.response._mock({
+			method			: 'setTimeout',
+			with			: [
+				[1]
+			],
+			shouldReturn	: () => {
+				error	= true;
+			}
+		});
 
 		assert.deepStrictEqual( 1, pluginMiddlewares.length );
 
 		router.add( pluginMiddlewares[0] );
 		router.add( helpers.getEmptyMiddleware() );
 
-		eventRequest.on( 'on_error', ( err ) => {
-			assert.deepStrictEqual( typeof err === 'object', true );
-			assert.deepStrictEqual( err, { code: 'app.er.timeout.timedOut', status: 408, headers: {} } );
-			error	= true;
-		});
-
 		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
 		eventRequest.next();
 
 		assert.deepStrictEqual( true, typeof eventRequest.clearTimeout !== 'undefined' );
-		assert.deepStrictEqual( true, typeof eventRequest.internalTimeout !== 'undefined' );
+		assert.deepStrictEqual( true, typeof eventRequest.setTimeout !== 'undefined' );
 
 		// Since the timeout is in the event loop, add the done callback at the end of the event loop
 		setTimeout(() => {
 			error ? done() : done( 'Request did not time out and it should have' );
-		});
+		}, 50 );
 	}
 });
 
 test({
-	message	: 'TimeoutPlugin times out when added with custom callback',
-	test	: ( done ) => {
-		let eventRequest		= helpers.getEventRequest();
-
-		const callback			= ( event ) => {
-			assert.deepStrictEqual( event, eventRequest );
-			assert.equal( true, typeof eventRequest.clearTimeout !== 'undefined' );
-			assert.equal( true, typeof eventRequest.internalTimeout !== 'undefined' );
-
-			done();
-		};
-
-		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0, callback } );
-		let router				= new Router();
-
-		let pluginMiddlewares	= timeoutPlugin.getPluginMiddleware();
-
-		assert.equal( 1, pluginMiddlewares.length );
-
-		router.add( pluginMiddlewares[0] );
-		router.add( helpers.getEmptyMiddleware() );
-
-		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		eventRequest.next();
-	}
-});
-
-test({
-	message	: 'TimeoutPlugin stream_start',
+	message	: 'TimeoutPlugin.clearTimeout',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0 } );
 		let router				= new Router();
-		let called				= false;
+		let called				= 0;
 
 		let pluginMiddlewares	= timeoutPlugin.getPluginMiddleware();
 
-		assert.equal( 1, pluginMiddlewares.length );
-
-		router.add( pluginMiddlewares[0] );
-		router.add( helpers.getEmptyMiddleware() );
-
-		eventRequest.on( 'error', ( err ) => {});
-
-		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		eventRequest.next();
-
-		eventRequest.on( 'clearTimeout', () => {
-			called	= true;
+		eventRequest.response._mock({
+			method			: 'setTimeout',
+			shouldReturn	: () => {
+				called++;
+			}
 		});
-
-		eventRequest.emit( 'stream_start' );
-		assert.equal( false, typeof eventRequest.internalTimeout !== 'undefined' );
-
-		setTimeout(() => {
-			called ? done() : done( 'clearTimeout not called' );
-		});
-	}
-});
-
-test({
-	message	: 'TimeoutPlugin stream_end',
-	test	: ( done ) => {
-		let eventRequest		= helpers.getEventRequest();
-		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0 } );
-		let router				= new Router();
-
-		let pluginMiddlewares	= timeoutPlugin.getPluginMiddleware();
-
-		assert.equal( 1, pluginMiddlewares.length );
-
-		router.add( pluginMiddlewares[0] );
-		router.add( helpers.getEmptyMiddleware() );
-
-		eventRequest.on( 'error', ( err ) => {});
-
-		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
-		eventRequest.next();
-
-		eventRequest.emit( 'stream_start' );
-		assert.equal( true, typeof eventRequest.internalTimeout === 'undefined' );
-
-		eventRequest.emit( 'stream_end' );
-		assert.equal( true, typeof eventRequest.internalTimeout !== 'undefined' );
-
-		done();
-	}
-});
-
-test({
-	message	: 'TimeoutPlugin clearTimeout',
-	test	: ( done ) => {
-		let eventRequest		= helpers.getEventRequest();
-		let timeoutPlugin		= new TimeoutPlugin( 'id', { timeout: 0 } );
-		let router				= new Router();
-
-		let pluginMiddlewares	= timeoutPlugin.getPluginMiddleware();
 
 		assert.equal( 1, pluginMiddlewares.length );
 
@@ -149,8 +71,10 @@ test({
 		eventRequest.next();
 
 		eventRequest.clearTimeout();
-		assert.equal( true, typeof eventRequest.internalTimeout === 'undefined' );
 
-		done();
+		setTimeout(() => {
+			assert.deepStrictEqual( called, 2 );
+			done();
+		}, 50 );
 	}
 });

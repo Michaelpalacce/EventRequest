@@ -1,3 +1,11 @@
+29.2.0
+- EventRequest now emits a 'send' event BEFORE the data is sent
+- er_timeout now sets a timeout directly for the response
+- er_timeout no longer listens for stream_start and stream_end
+- event_request 'send' no longer calls cleanUp but it will be called naturally when the response is finished
+- Documentation updated
+- Tests updated and added
+
 29.1.1
 - Empty Release, NPM not showing README.md
 

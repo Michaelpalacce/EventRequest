@@ -31,7 +31,7 @@ class TimeoutPlugin extends PluginInterface
 		this.callback	= typeof this.options.callback === 'function'
 						? this.options.callback :
 						( event ) => {
-							event.next( { code: 'app.er.timeout.timedOut', status: 408 } );
+							event.sendError( { code: 'app.er.timeout.timedOut', status: 408 } );
 						};
 	}
 
@@ -45,55 +45,9 @@ class TimeoutPlugin extends PluginInterface
 	 */
 	setTimeout( event, timeout )
 	{
-		event.internalTimeout	= setTimeout( () => {
-				if ( ! event.isFinished() )
-					this.callback( event );
-			},
-			timeout
-		);
-	}
-
-	/**
-	 * @brief	Adds a new function to the event: clearTimeout
-	 *
-	 * @param	{EventRequest} event
-	 *
-	 * @return	void
-	 */
-	addEventFunctionality( event )
-	{
-		event.clearTimeout	= () =>
-		{
-			if ( event.internalTimeout !== null && event.internalTimeout !== undefined )
-			{
-				clearTimeout( event.internalTimeout );
-				event.emit( 'clearTimeout' );
-			}
-
-			event.internalTimeout	= undefined;
-		};
-	}
-
-	/**
-	 * @brief	Clean up the internal timeout on cleanUp event
-	 *
-	 * @param	{EventRequest} event
-	 *
-	 * @return	void
-	 */
-	setEvents( event )
-	{
-		event.on( 'cleanUp', () =>
-		{
-			event.clearTimeout();
-		});
-
-		event.on( 'stream_start', () => {
-			event.clearTimeout();
-		});
-
-		event.on( 'stream_end', () => {
-			this.setTimeout( event, this.timeout );
+		event.response.setTimeout( timeout, () => {
+			if ( ! event.isFinished() )
+				this.callback( event );
 		});
 	}
 
@@ -110,8 +64,21 @@ class TimeoutPlugin extends PluginInterface
 		const pluginMiddleware	= {
 			handler	: ( event ) => {
 				this.setTimeout( event, this.timeout );
-				this.addEventFunctionality( event );
-				this.setEvents( event );
+
+				event.clearTimeout	= () => {
+					event.emit( 'clearTimeout' );
+					event.response.setTimeout( 0 );
+				};
+
+				event.setTimeout	= ( timeout ) => {
+					this.setTimeout( event, timeout );
+				};
+
+				event.on( 'cleanUp', () =>
+				{
+					event.clearTimeout	= null;
+					event.setTimeout	= null;
+				});
 
 				event.next();
 			}
