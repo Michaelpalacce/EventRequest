@@ -10,9 +10,9 @@ test({
 		const bucket	= new Bucket();
 
 		bucket.init().then(() => {
-			assert.equal( bucket.refillTime, 60000 );
-			assert.equal( bucket.maxAmount, 1000 );
-			assert.equal( bucket.refillAmount, 100 );
+			assert.deepStrictEqual( bucket.refillTime, 60000 );
+			assert.deepStrictEqual( bucket.maxAmount, 1000 );
+			assert.deepStrictEqual( bucket.refillAmount, 100 );
 			done();
 		});
 	}
@@ -96,14 +96,14 @@ test({
 
 			const lastUpdate	= bucket.lastUpdate;
 
-			assert.equal( await bucket._getValue(), 999 );
+			assert.deepStrictEqual( await bucket._getValue(), 999 );
 			assert.notEqual( await bucket._getValue(), bucket.maxAmount );
 
 			setTimeout( async () => {
 				await bucket.reset();
 
 				assert.notEqual( await bucket._getLastUpdate(), lastUpdate );
-				assert.equal( await bucket._getValue(), bucket.maxAmount );
+				assert.deepStrictEqual( await bucket._getValue(), bucket.maxAmount );
 
 				done();
 			}, 1000 );
@@ -117,9 +117,9 @@ test({
 		const bucket	= new Bucket();
 
 		bucket.init().then( async () => {
-			assert.equal( await bucket.get(), bucket.maxAmount );
+			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
 			await bucket.reduce();
-			assert.equal( await bucket.get(), 999 );
+			assert.deepStrictEqual( await bucket.get(), 999 );
 
 			done();
 		});
@@ -132,9 +132,9 @@ test({
 		const bucket	= new Bucket( 1, 1, 10 );
 
 		bucket.init().then( async () => {
-			assert.equal( await bucket.get(), bucket.maxAmount );
-			assert.equal( await bucket.reduce(), true );
-			assert.equal( await bucket.get(), 9 );
+			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
+			assert.deepStrictEqual( await bucket.reduce(), true );
+			assert.deepStrictEqual( await bucket.get(), 9 );
 
 			done();
 		});
@@ -147,9 +147,9 @@ test({
 		const bucket	= new Bucket( 1, 1, 10 );
 
 		bucket.init().then( async () => {
-			assert.equal( await bucket.get(), bucket.maxAmount );
-			assert.equal( await bucket.reduce( 11 ), false );
-			assert.equal( await bucket.get(), bucket.maxAmount );
+			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
+			assert.deepStrictEqual( await bucket.reduce( 11 ), false );
+			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
 
 			done();
 		});
@@ -162,10 +162,10 @@ test({
 		const bucket	= new Bucket( 1, 1, 10 );
 
 		bucket.init().then( async () => {
-			assert.equal( await bucket.get(), bucket.maxAmount );
-			assert.equal( await bucket.reduce(), true );
+			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
+			assert.deepStrictEqual( await bucket.reduce(), true );
 			setTimeout( async () => {
-				assert.equal( await bucket.get(), bucket.maxAmount );
+				assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
 				done();
 			}, 1050 );
 		});
@@ -178,14 +178,14 @@ test({
 		const bucket	= new Bucket( 1, 1, 10 );
 
 		bucket.init().then( async () => {
-			assert.equal( await bucket.get(), bucket.maxAmount );
-			assert.equal( await bucket.reduce(), true );
-			assert.equal( await bucket.get(), 9 );
+			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
+			assert.deepStrictEqual( await bucket.reduce(), true );
+			assert.deepStrictEqual( await bucket.get(), 9 );
 
 			setTimeout( async() => {
 				// Should have refilled twice but is refilled only once ( and minus one token is 9 )
-				assert.equal( await bucket.reduce(), true );
-				assert.equal( await bucket.get(), 9 );
+				assert.deepStrictEqual( await bucket.reduce(), true );
+				assert.deepStrictEqual( await bucket.get(), 9 );
 				done();
 			}, 2100 );
 		});
@@ -198,7 +198,7 @@ test({
 		const bucket	= new Bucket( 1, 100, 10000 );
 
 		bucket.init().then( async () => {
-			assert.equal( await bucket.get(), bucket.maxAmount );
+			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
 
 			const promises	= [];
 
@@ -229,7 +229,7 @@ test({
 		const expectedFalseTokens	= 500;
 
 		bucket.init().then( async () => {
-			assert.equal( await bucket.get(), bucket.maxAmount );
+			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
 
 			const promises	= [];
 
@@ -265,7 +265,7 @@ test({
 		const expectedFalseTokens	= 5000;
 
 		bucket.init().then( async () => {
-			assert.equal( await bucket.get(), bucket.maxAmount );
+			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
 
 			const promises	= [];
 
@@ -275,7 +275,7 @@ test({
 			}
 
 			setTimeout( async () => {
-				assert.equal( await bucket.isFull(), true )
+				assert.deepStrictEqual( await bucket.isFull(), true )
 
 				for ( let i = 0; i < 15000; i ++ )
 				{
