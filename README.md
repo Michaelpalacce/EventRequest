@@ -2752,6 +2752,8 @@ However if the global persist is set to false, this will not work
 ~~~
 Server {
   er_timeout,
+  er_etag,
+  er_cache,
   er_env,
   er_rate_limits,
   er_static,
@@ -3951,6 +3953,98 @@ app.apply( 'er_env' );
 console.log( process.env );
 
 console.log( process.env.KEY );
+~~~
+
+***
+***
+***
+
+# [er_etag](#er_etag) 
+- This plugin provides helpful functions for setting and parsing ETags
+- See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-Match
+- See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
+- See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+- **This Plugin can NOT be re-applied multiple times.**
+
+***
+#### Dependencies:
+
+**NONE**
+
+***
+#### Accepted Options:
+
+**strong: Boolean**
+- Flag indicating if a strong or weak caching mechanism should be used
+- This flag can be overwritten by every function that this plugin exposes
+- Defaults to true
+
+***
+#### Events:
+
+**NONE**
+
+***
+#### EventRequest Attached Functions
+
+**etag( String|Buffer|fs.Stats payload, Boolean strong ): String**
+- Returns the Etag ready to be set directly to the ETag header.
+- Depending on strong this function will prepend W/ for weak etags
+- If strong is passed, then this value will overwrite the plugin strong value
+- This function will throw a TypeError with code: `app.er.er_etag.invalid.payload` if payload is an incorrect format
+
+**getConditionalResult( String|Buffer|fs.Stats payload, Boolean strong ): Object**
+- This function checks if the event contains "Conditional" Headers: `If-None-Match` or `If-Match` and processes if the response should continue according to them and the calculated etag of the payload.
+- This function returns an object containing 2 keys: `pass` and `etag`
+- `pass` indicates if the request should continue execution. 
+- `etag` is the calculated etag for the payload
+- If strong is passed, then this value will overwrite the plugin strong value
+
+**conditionalSend( String|Buffer payload, Number code, Boolean strong ): void**
+- This function sends the payload depending on the conditional headers.
+- This function uses getConditionalResult to determiner if the response should be sent.
+- In the case that the response SHOULD NOT be sent, then according to the method either a 412 or a 304 empty response will be sent.
+- This method will set a ETag header with the calculated value
+- If strong is passed, then this value will overwrite the plugin strong value
+- **NOTE: This function does not accept fs.Stats as a parameter**
+
+**setEtagHeader( String etag ): EventRequest**
+- This method sets a computed etag header.
+
+***
+#### Attached Functionality:
+
+**NONE**
+
+***
+#### Exported Plugin Functions:
+
+**etag( String|Buffer|fs.Stats payload, Boolean strong ): String**
+- No differences
+
+**getConditionalResult( EventRequest event, String|Buffer|fs.Stats payload, Boolean strong ): Object**
+- Only difference is this function accepts EventRequest as a first parameter
+
+**conditionalSend( EventRequest event, String|Buffer payload, Number code, Boolean strong ): void**
+- Only difference is this function accepts EventRequest as a first parameter
+
+***
+#### Example:
+
+- Example of conditionalSend
+~~~javascript
+const app = require( 'event_request' )();
+
+app.apply( app.er_etag, { strong: true } );
+
+app.get( '/', ( event ) => {
+    event.conditionalSend( 'Some Fancy Body!' );
+});
+
+app.listen( 80, () => {
+    app.Loggur.log( `Server started! Try going to http://localhost and check the network tab after refreshing the page. An empty response with a status of 304 should have been sent! ( it is better visible if you curl it, it may seem like nothing is happening, but check the response size )` );
+});
+
 ~~~
 
 ***

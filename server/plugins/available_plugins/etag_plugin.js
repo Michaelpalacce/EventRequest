@@ -144,6 +144,7 @@ class EtagPlugin extends PluginInterface
 					break;
 			}
 		}
+		console.log( payload );
 
 		event.send( payload, code );
 	}
@@ -162,12 +163,14 @@ class EtagPlugin extends PluginInterface
 				event.conditionalSend		= this.conditionalSend.bind( this, event );
 				event.setEtagHeader			= ( etag ) => {
 					event.setResponseHeader( 'ETag', etag );
+					return event;
 				};
 
 				event.on( 'cleanUp', () => {
 					event.etag					= null;
 					event.getConditionalResult	= null;
 					event.conditionalSend		= null;
+					event.setEtagHeader			= null;
 				});
 
 				event.next();
