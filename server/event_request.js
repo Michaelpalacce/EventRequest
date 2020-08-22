@@ -189,7 +189,7 @@ class EventRequest extends EventEmitter
 		if ( Buffer.isBuffer( response ) )
 			return response;
 
-		return typeof response === 'string' ? response : JSON.stringify( response )
+		return typeof response === 'string' ? response : JSON.stringify( response );
 	}
 
 	/**

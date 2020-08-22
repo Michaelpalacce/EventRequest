@@ -1,7 +1,12 @@
 const { assert, test, helpers }	= require( '../test_helper' );
 const { Server }				= require( './../../index' );
+const crypto					= require( 'crypto' );
 const fs						= require( 'fs' );
 const path						= require( 'path' );
+
+// In linux hashes are calculated differently
+const strongHash	= `"${crypto.createHash( 'sha1' ).update( fs.statSync( path.join( __dirname, './plugins/available_plugins/fixture/etag_test_file' ) ).mtimeMs.toString() ).digest( 'hex' )}"`;
+const weakHash		= `W/"${crypto.createHash( 'md5' ).update( fs.statSync( path.join( __dirname, './plugins/available_plugins/fixture/etag_test_file' ) ).mtimeMs.toString() ).digest( 'hex' )}"`;
 
 test({
 	message	: 'Server.test.er_etag.adds.a.middleware',
@@ -149,7 +154,7 @@ test({
 
 		const server	= app.listen( port );
 
-		helpers.sendServerRequest( '/', 'GET', 200, '', {}, port, '"d4a112c3ffcf1b27f883ef0949de75c6fac76454"' ).then(( response ) => {
+		helpers.sendServerRequest( '/', 'GET', 200, '', {}, port, strongHash ).then(( response ) => {
 			server.close();
 			done();
 		}).catch( done );
@@ -170,7 +175,7 @@ test({
 
 		const server	= app.listen( port );
 
-		helpers.sendServerRequest( '/', 'GET', 200, '', {}, port, 'W/"873b9a9f491c321c0c6de48c7d82d751"' ).then(( response ) => {
+		helpers.sendServerRequest( '/', 'GET', 200, '', {}, port, weakHash ).then(( response ) => {
 			server.close();
 			done();
 		}).catch( done );

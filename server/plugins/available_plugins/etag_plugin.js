@@ -45,7 +45,7 @@ class EtagPlugin extends PluginInterface
 	etag( payload, strong = this.strong )
 	{
 		const algo		= strong ? 'sha1' : 'md5';
-		const prefix	= strong ? '' : 'W/'
+		const prefix	= strong ? '' : 'W/';
 
 		if ( Buffer.isBuffer( payload ) || typeof payload === 'string' )
 			return `${prefix}"${crypto.createHash( algo ).update( payload ).digest( 'hex' )}"`;
@@ -188,7 +188,7 @@ class EtagPlugin extends PluginInterface
 	 */
 	_extractHeaderValues( header )
 	{
-		return header.split( ',' ).map( x => x.trim() );
+		return header.split( ',' ).map( ( x ) => { return x.trim(); } );
 	}
 }
 
