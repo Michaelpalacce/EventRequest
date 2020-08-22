@@ -1,11 +1,15 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers }	= require( '../../../test_helper' );
-const Server							= require( '../../../../server/server' );
-const fs								= require( 'fs' );
-const path								= require( 'path' );
-const EtagPlugin						= require( '../../../../server/plugins/available_plugins/etag_plugin' );
+const { assert, test, helpers }	= require( '../../../test_helper' );
+const crypto					= require( 'crypto' );
+const fs						= require( 'fs' );
+const path						= require( 'path' );
+const EtagPlugin				= require( '../../../../server/plugins/available_plugins/etag_plugin' );
+
+// In linux hashes are calculated differently
+const strongHash	= `"${crypto.createHash( 'sha1' ).update( fs.statSync( path.join( __dirname, './fixture/etag_test_file' ) ).mtimeMs.toString() ).digest( 'hex' )}"`;
+const weakHash		= `W/"${crypto.createHash( 'md5' ).update( fs.statSync( path.join( __dirname, './fixture/etag_test_file' ) ).mtimeMs.toString() ).digest( 'hex' )}"`;
 
 test({
 	message	: 'EtagPlugin.constructor.on.defaults',
@@ -648,7 +652,7 @@ const dataProvider	= [
 		{
 			shouldSend	: false,
 			code		: 200,
-			etag		: '"d4a112c3ffcf1b27f883ef0949de75c6fac76454"',
+			etag		: strongHash,
 			payload		: '',
 			pass		: true
 		},
@@ -663,7 +667,7 @@ const dataProvider	= [
 		{
 			shouldSend	: false,
 			code		: 200,
-			etag		: '"d4a112c3ffcf1b27f883ef0949de75c6fac76454"',
+			etag		: strongHash,
 			payload		: '',
 			pass		: true
 		},
@@ -678,7 +682,7 @@ const dataProvider	= [
 		{
 			shouldSend	: false,
 			code		: 200,
-			etag		: 'W/"873b9a9f491c321c0c6de48c7d82d751"',
+			etag		: weakHash,
 			payload		: '',
 			pass		: true
 		},
