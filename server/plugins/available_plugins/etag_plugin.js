@@ -72,31 +72,32 @@ class EtagPlugin extends PluginInterface
 	{
 		const etag	= this.etag( payload, strong );
 		let pass	= true;
+		let header	= null;
 
 		switch ( true )
 		{
 			case event.hasRequestHeader( IF_NONE_MATCH_CONDITIONAL_HEADER_NAME ):
-				const ifNoneMatchHeader	= this._extractHeaderValues( event.getRequestHeader( IF_NONE_MATCH_CONDITIONAL_HEADER_NAME ) );
+				header	= this._extractHeaderValues( event.getRequestHeader( IF_NONE_MATCH_CONDITIONAL_HEADER_NAME ) );
 
-				if ( ifNoneMatchHeader.length === 1 && ifNoneMatchHeader[0] === '*' )
+				if ( header.length === 1 && header[0] === '*' )
 				{
 					pass	= false;
 					break;
 				}
 
-				for ( const value of ifNoneMatchHeader )
+				for ( const value of header )
 					if ( value === etag )
 						pass	= false;
 
 				break;
 
 			case event.hasRequestHeader( IF_MATCH_CONDITIONAL_HEADER_NAME ):
-				const ifMatchHeader	= this._extractHeaderValues( event.getRequestHeader( IF_MATCH_CONDITIONAL_HEADER_NAME ) );
+				header	= this._extractHeaderValues( event.getRequestHeader( IF_MATCH_CONDITIONAL_HEADER_NAME ) );
 
-				if ( ifMatchHeader.length === 1 && ifMatchHeader[0] === '*' )
+				if ( header.length === 1 && header[0] === '*' )
 					break;
 
-				pass	= ifMatchHeader.reduce(( accumulator, value ) => {
+				pass	= header.reduce(( accumulator, value ) => {
 					if ( value === etag )
 						return true;
 
@@ -144,7 +145,6 @@ class EtagPlugin extends PluginInterface
 					break;
 			}
 		}
-		console.log( payload );
 
 		event.send( payload, code );
 	}
