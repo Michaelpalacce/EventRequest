@@ -51,7 +51,7 @@ class EtagPlugin extends PluginInterface
 			return `${prefix}"${crypto.createHash( algo ).update( payload ).digest( 'hex' )}"`;
 
 		else if ( payload instanceof Stats )
-			return `${prefix}"${crypto.createHash( algo ).update( payload.mtimeMs.toString() ).digest( 'hex' )}"`;
+			return `${prefix}"${crypto.createHash( algo ).update( `${payload.mtimeMs.toString()}-${payload.size.toString()}` ).digest( 'hex' )}"`;
 
 		else
 			throw new TypeError( 'app.er.er_etag.invalid.payload' );

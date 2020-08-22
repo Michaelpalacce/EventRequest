@@ -4,9 +4,10 @@ const crypto					= require( 'crypto' );
 const fs						= require( 'fs' );
 const path						= require( 'path' );
 
+const fileStats					= fs.statSync( path.join( __dirname, './plugins/available_plugins/fixture/etag_test_file' ) );
 // In linux hashes are calculated differently
-const strongHash	= `"${crypto.createHash( 'sha1' ).update( fs.statSync( path.join( __dirname, './plugins/available_plugins/fixture/etag_test_file' ) ).mtimeMs.toString() ).digest( 'hex' )}"`;
-const weakHash		= `W/"${crypto.createHash( 'md5' ).update( fs.statSync( path.join( __dirname, './plugins/available_plugins/fixture/etag_test_file' ) ).mtimeMs.toString() ).digest( 'hex' )}"`;
+const strongHash				= `"${crypto.createHash( 'sha1' ).update( `${fileStats.mtimeMs.toString()}-${fileStats.size.toString()}` ).digest( 'hex' )}"`;
+const weakHash					= `W/"${crypto.createHash( 'md5' ).update( `${fileStats.mtimeMs.toString()}-${fileStats.size.toString()}` ).digest( 'hex' )}"`;
 
 test({
 	message	: 'Server.test.er_etag.adds.a.middleware',

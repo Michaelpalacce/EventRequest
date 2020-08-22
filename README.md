@@ -2957,6 +2957,7 @@ app.listen( 80, () => {
 - Adds a static resources path to the request.
 - By default the server has this plugin attached to allow favicon.ico to be sent
 - The Content-Type header will be set with the correct mime-type
+- Supports Cache-Control header and ETag header
 - **This Plugin can be re-applied multiple times with different configurations.**
 
 ***
@@ -2978,6 +2979,17 @@ app.listen( 80, () => {
 - Will only be set in case the resource is a static resource.
 - By default it will set the default static directives: `public, max-age=604800, immutable`
 - Defaults to { static: true } 
+
+**useEtag: Boolean**
+- Indicates whether ETags of the files should be sent, doing so will result in browser caching using ETags
+- The plugin will be responsible for checking following requests if they have matching ETags and no response will be sent in that case
+- You can use both cache and ETags however results may vary
+- Defaults to true
+
+**strong: Boolean**
+- Only usable if useEtag is set to true
+- Indicates if strong etags should be used
+- Defaults to true
 
 ***
 #### Events:
@@ -3011,6 +3023,9 @@ app.apply( app.er_static, { paths : ['public', 'favicon.ico'] } );
 
 // This will serve everything in folder public and favicon.ico on the main folder and remove the Cache-control header
 app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { static: false } } );
+
+// This will serve everything in folder public and favicon.ico on the main folder and remove the Cache-control header, however sets an ETag header
+app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { static: false }, useEtag: true } );
 
 // This will serve everything in folder public and favicon.ico on the main folder and add a header: Cache-control: public, must-revalidate
 app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { cacheControl: 'public', revalidation: 'must-revalidate' } } );

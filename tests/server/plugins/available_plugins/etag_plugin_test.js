@@ -7,9 +7,10 @@ const fs						= require( 'fs' );
 const path						= require( 'path' );
 const EtagPlugin				= require( '../../../../server/plugins/available_plugins/etag_plugin' );
 
+const fileStats					= fs.statSync( path.join( __dirname, './fixture/etag_test_file' ) );
 // In linux hashes are calculated differently
-const strongHash	= `"${crypto.createHash( 'sha1' ).update( fs.statSync( path.join( __dirname, './fixture/etag_test_file' ) ).mtimeMs.toString() ).digest( 'hex' )}"`;
-const weakHash		= `W/"${crypto.createHash( 'md5' ).update( fs.statSync( path.join( __dirname, './fixture/etag_test_file' ) ).mtimeMs.toString() ).digest( 'hex' )}"`;
+const strongHash				= `"${crypto.createHash( 'sha1' ).update( `${fileStats.mtimeMs.toString()}-${fileStats.size.toString()}` ).digest( 'hex' )}"`;
+const weakHash					= `W/"${crypto.createHash( 'md5' ).update( `${fileStats.mtimeMs.toString()}-${fileStats.size.toString()}` ).digest( 'hex' )}"`;
 
 test({
 	message	: 'EtagPlugin.constructor.on.defaults',
