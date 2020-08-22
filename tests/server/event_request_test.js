@@ -211,19 +211,67 @@ test({
 });
 
 test({
-	message	: 'EventRequest.send.calls.response.end.when.not.raw',
+	message			: 'EventRequest.formatResponse',
+	dataProvider	: [
+		['test', 'test'],
+		[{ key: 'value' }, '{"key":"value"}'],
+		[[1,2,3,4,5], '[1,2,3,4,5]'],
+		[Buffer.from( 'TEST' ), Buffer.from( 'TEST' )],
+		[undefined, '']
+	],
+	test			: ( done, data, expected ) => {
+		let eventRequest	= helpers.getEventRequest();
+		assert.deepStrictEqual( eventRequest.formatResponse( data ), expected );
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.send.calls.formatResponse',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
-		let send			= false;
-		eventRequest.response._mock({
-			method			: 'end',
-			shouldReturn	: () => { send = true; },
+		let formatResponse	= false;
+		const data			= 'DataToSend';
+
+		eventRequest._mock({
+			method			: 'formatResponse',
+			shouldReturn	: ( payload ) => {
+				assert.deepStrictEqual( payload, data );
+				formatResponse	= true;
+
+				return payload;
+			},
 			called			: 1
 		});
 
-		eventRequest.send( '' );
+		eventRequest.send( data );
 
-		send	? done() : done( 'Send did not get called' );
+		assert.deepStrictEqual( formatResponse, true );
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.send.calls.response.end',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		let send			= false;
+		const data			= 'DataToSend';
+
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: ( payload, encoding ) => {
+				assert.deepStrictEqual( payload, data );
+				assert.deepStrictEqual( encoding, 'utf8' );
+				send	= true;
+			},
+			called			: 1
+		});
+
+		eventRequest.send( data );
+
+		assert.deepStrictEqual( send, true );
+		done();
 	}
 });
 
@@ -241,6 +289,29 @@ test({
 		eventRequest.send();
 
 		send	? done() : done( 'Send did not get called' );
+	}
+});
+
+test({
+	message	: 'EventRequest.send.when.response.is.buffer',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		const payload		= Buffer.from( 'test' );
+
+		let send			= false;
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: ( payload ) => {
+				assert.deepStrictEqual( payload, Buffer.from( 'test' ) );
+				send	= true;
+			},
+			called			: 1
+		});
+
+		eventRequest.send( payload );
+
+		assert.deepStrictEqual( send, true );
+		done();
 	}
 });
 

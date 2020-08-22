@@ -8,6 +8,7 @@ testSuites.eventSuite		= () => {
 
 testSuites.serverSuite		= () => {
 	require( './server/server_test' );
+	require( './server/server_er_etag_test' );
 	require( './server/server_er_cache_test' );
 	require( './server/server_er_static_test' );
 	require( './server/server_er_body_parsers_test' );
@@ -109,6 +110,7 @@ testSuites.validationSuite	= () => {
 };
 
 testSuites.pluginsSuite		= () => {
+	require( './server/plugins/available_plugins/etag_plugin_test' );
 	require( './server/plugins/available_plugins/cache_control_plugin_test' );
 	require( './server/plugins/available_plugins/data_server_plugin_test' );
 	require( './server/plugins/available_plugins/data_server_plugin_with_map_test' );

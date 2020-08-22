@@ -2,8 +2,14 @@ const { assert, test, helpers }	= require( '../test_helper' );
 const { Server }				= require( './../../index' );
 const fs						= require( 'fs' );
 const path						= require( 'path' );
+const crypto					= require( 'crypto' );
 
 const PROJECT_ROOT				= path.parse( require.main.filename ).dir;
+
+const fileStats					= fs.statSync( path.join( PROJECT_ROOT, './public/test/index.html' ) );
+// In linux hashes are calculated differently
+const strongHash				= `"${crypto.createHash( 'sha1' ).update( `${fileStats.mtimeMs.toString()}-${fileStats.size.toString()}` ).digest( 'hex' )}"`;
+const weakHash					= `W/"${crypto.createHash( 'md5' ).update( `${fileStats.mtimeMs.toString()}-${fileStats.size.toString()}` ).digest( 'hex' )}"`;
 
 test({
 	message	: 'Server.test.er_static_does.not.serve.files.outside.static.folder',
@@ -156,6 +162,60 @@ test({
 		}).catch( done );
 
 		app.listen( 4116 );
+	}
+});
+
+test({
+	message	: 'Server.test.er_static_does.serves.files.inside.static.folder.with.etag',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.apply( app.er_static, { paths: ['public'], cache: { static: false }, useEtag: true } );
+
+		app.listen( 4170, () => {
+			helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4170 ).then(( response ) => {
+				assert.deepStrictEqual(
+					response.body.toString(),
+					fs.readFileSync( path.join( PROJECT_ROOT, './public/test/index.html' ) ).toString()
+				);
+
+				assert.deepStrictEqual( response.headers['cache-control'], undefined );
+				assert.deepStrictEqual( response.headers['etag'], strongHash );
+
+				return helpers.sendServerRequest( '/public/test/index.html', 'GET', 304, '', { 'if-none-match': response.headers['etag'] }, 4170, '' );
+			}).then(( response ) => {
+				assert.deepStrictEqual( response.headers['etag'], strongHash );
+
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_static_does.serves.files.inside.static.folder.with.etag.weak',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.apply( app.er_static, { paths: ['public'], cache: { static: false }, useEtag: true, strong: false } );
+
+		app.listen( 4171, () => {
+			helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4171 ).then(( response ) => {
+				assert.deepStrictEqual(
+					response.body.toString(),
+					fs.readFileSync( path.join( PROJECT_ROOT, './public/test/index.html' ) ).toString()
+				);
+
+				assert.deepStrictEqual( response.headers['cache-control'], undefined );
+				assert.deepStrictEqual( response.headers['etag'], weakHash );
+
+				return helpers.sendServerRequest( '/public/test/index.html', 'GET', 304, '', { 'if-none-match': response.headers['etag'] }, 4171, '' );
+			}).then(( response ) => {
+				assert.deepStrictEqual( response.headers['etag'], weakHash );
+
+				done();
+			}).catch( done );
+		});
 	}
 });
 

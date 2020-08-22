@@ -40,6 +40,14 @@ class StaticResourcesPlugin extends PluginInterface
 								? this.options.cache
 								: { static: true };
 
+		const useEtag			= typeof this.options.useEtag === 'boolean'
+								? this.options.useEtag
+								: false;
+
+		const strong			= typeof this.options.strong === 'boolean'
+								? this.options.strong
+								: true;
+
 		const pluginMiddlewares	= [];
 
 		staticPaths.forEach( ( staticPath ) => {
@@ -49,10 +57,12 @@ class StaticResourcesPlugin extends PluginInterface
 			pluginMiddlewares.push({
 				route		: regExp,
 				middlewares	: this.server.er_cache.cache( cacheControl ),
+				method		: 'GET',
 				handler		: ( event ) => {
-					const item	= path.join( PROJECT_ROOT, event.path );
+					const item		= path.join( PROJECT_ROOT, event.path );
+					let fileStat	= null;
 
-					if ( fs.existsSync( item ) && fs.statSync( item ).isFile() && item.indexOf( staticPath ) !== -1 )
+					if ( fs.existsSync( item ) && ( fileStat = fs.statSync( item ) ).isFile() && item.indexOf( staticPath ) !== -1 )
 					{
 						let mimeType	= '*/*';
 						switch ( path.extname( item ) )
@@ -71,6 +81,20 @@ class StaticResourcesPlugin extends PluginInterface
 
 							default:
 								break;
+						}
+
+						if ( useEtag )
+						{
+							const plugin			= this.server.er_etag;
+							const { etag, pass }	= plugin.getConditionalResult( event, fileStat, strong );
+
+							event.setResponseHeader( 'ETag', etag );
+
+							if ( ! pass )
+							{
+								event.send( '', 304 );
+								return;
+							}
 						}
 
 						event.setResponseHeader( 'Content-Type', mimeType ).setStatusCode( 200 );

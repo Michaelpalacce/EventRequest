@@ -6,6 +6,15 @@ const StaticResourcesPlugin		= require( '../../../../server/plugins/available_pl
 const Router					= require( '../../../../server/components/routing/router' );
 const { Server }				= require( '../../../../index' );
 
+const crypto					= require( 'crypto' );
+const fs						= require( 'fs' );
+const path						= require( 'path' );
+
+const fileStats					= fs.statSync( path.join( __dirname, '../../../fixture/test.svg' ) );
+// In linux hashes are calculated differently
+const strongHash				= `"${crypto.createHash( 'sha1' ).update( `${fileStats.mtimeMs.toString()}-${fileStats.size.toString()}` ).digest( 'hex' )}"`;
+const weakHash					= `W/"${crypto.createHash( 'md5' ).update( `${fileStats.mtimeMs.toString()}-${fileStats.size.toString()}` ).digest( 'hex' )}"`;
+
 test({
 	message		: 'StaticResourcesPlugin.setsHeader.for.text/css.in.case.of.css',
 	test		: ( done ) => {
@@ -204,6 +213,136 @@ test({
 		eventRequest.next();
 
 		assert.equal( 2, called );
+
+		done();
+	}
+});
+
+test({
+	message		: 'StaticResourcesPlugin.with.useEtag.when.given',
+	test		: ( done ) => {
+		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.svg' );
+		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'], cache : {}, useEtag: true } );
+		staticResourcesPlugin.setServerOnRuntime( new Server() );
+
+		let router	= new Router();
+		let called	= 0;
+
+		let pluginMiddlewares		= staticResourcesPlugin.getPluginMiddleware();
+
+		assert.equal( 1, pluginMiddlewares.length );
+
+		router.add( pluginMiddlewares[0] );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			shouldReturn	: () => {
+				called	++;
+
+				return eventRequest;
+			},
+			with			: [
+				['ETag', strongHash],
+				['Content-Type', 'image/svg+xml'],
+			]
+		});
+
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest.next();
+
+		assert.deepStrictEqual( 2, called );
+
+		done();
+	}
+});
+
+test({
+	message		: 'StaticResourcesPlugin.with.useEtag.when.given.with.if-none-match',
+	test		: ( done ) => {
+		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.svg', { 'if-none-match': strongHash } );
+		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'], cache : {}, useEtag: true } );
+		staticResourcesPlugin.setServerOnRuntime( new Server() );
+
+		let router				= new Router();
+		let called				= 0;
+		let sendCalled			= 0;
+
+		let pluginMiddlewares	= staticResourcesPlugin.getPluginMiddleware();
+
+		assert.equal( 1, pluginMiddlewares.length );
+
+		router.add( pluginMiddlewares[0] );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			shouldReturn	: () => {
+				called	++;
+
+				return eventRequest;
+			},
+			with			: [
+				['ETag', strongHash],
+			]
+		});
+
+		eventRequest._mock({
+			method			: 'send',
+			shouldReturn	: () => {
+				sendCalled	++;
+
+				return eventRequest;
+			},
+			with			: [
+				['', 304],
+			]
+		});
+
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest.next();
+
+		assert.deepStrictEqual( 1, called );
+		assert.deepStrictEqual( 1, sendCalled );
+
+		done();
+	}
+});
+
+test({
+	message		: 'StaticResourcesPlugin.with.useEtag.when.given.and.strong.is.false',
+	test		: ( done ) => {
+		let eventRequest			= helpers.getEventRequest( 'GET', '/tests/fixture/test.svg' );
+		let staticResourcesPlugin	= new StaticResourcesPlugin( 'id', { paths : ['tests'], cache : {}, useEtag: true, strong: false } );
+		staticResourcesPlugin.setServerOnRuntime( new Server() );
+
+		let router				= new Router();
+		let called				= 0;
+
+		let pluginMiddlewares	= staticResourcesPlugin.getPluginMiddleware();
+
+		assert.equal( 1, pluginMiddlewares.length );
+
+		router.add( pluginMiddlewares[0] );
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			shouldReturn	: () => {
+				called	++;
+
+				return eventRequest;
+			},
+			with			: [
+				['ETag', weakHash],
+				['Content-Type', 'image/svg+xml'],
+			]
+		});
+
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest.next();
+
+		assert.deepStrictEqual( 2, called );
 
 		done();
 	}

@@ -167,7 +167,7 @@ class EventRequest extends EventEmitter
 
 		let payload;
 
-		payload	= typeof response === 'string' ? response : JSON.stringify( response );
+		payload	= this.formatResponse( response );
 		this.setResponseHeader( 'Content-Length', payload.length );
 
 		if ( this.disableXPoweredBy === false )
@@ -175,6 +175,21 @@ class EventRequest extends EventEmitter
 
 		this.emit( 'send', { payload, code: this.response.statusCode } );
 		this.end( payload, 'utf8' );
+	}
+
+	/**
+	 * @brief	Formats the response to be sent
+	 *
+	 * @param	{String|Buffer} response
+	 *
+	 * @return	{String|Buffer}
+	 */
+	formatResponse( response = '' )
+	{
+		if ( Buffer.isBuffer( response ) )
+			return response;
+
+		return typeof response === 'string' ? response : JSON.stringify( response );
 	}
 
 	/**

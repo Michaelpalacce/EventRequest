@@ -1,3 +1,11 @@
+29.3.0
+- Added er_etag plugin
+- EventRequest.send now accepts a Buffer as well. Buffers will not be modified
+- Added a new EventRequest.formatResponse Function that can be used to format the payload you are going to send in a format that is applicable ( String or Buffer )
+- er_static can now work with etags
+- Added Documentation about er_etag plugin
+- Added tests for er_etag plugin
+
 29.2.1
 - Empty Release, NPM not showing README.md, issue is github actions. Will publish directly from master from now on
 

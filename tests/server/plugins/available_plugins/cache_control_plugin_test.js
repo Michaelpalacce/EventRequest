@@ -1,11 +1,9 @@
 'use strict';
 
 // Dependencies
-const { Mock, assert, test, helpers }	= require( '../../../test_helper' );
-const CorsPlugin						= require( '../../../../server/plugins/available_plugins/cors_plugin' );
-const Server							= require( '../../../../server/server' );
-const CacheControl						= require( '../../../../server/components/cache-control/cache_control' );
-const CacheControlPlugin				= require( '../../../../server/plugins/available_plugins/cache_control_plugin' );
+const { assert, test, helpers }	= require( '../../../test_helper' );
+const CacheControl				= require( '../../../../server/components/cache-control/cache_control' );
+const CacheControlPlugin		= require( '../../../../server/plugins/available_plugins/cache_control_plugin' );
 
 test({
 	message	: 'CacheControlPlugin.constructor.on.defaults',
