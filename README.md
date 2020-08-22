@@ -713,7 +713,7 @@ The event request is an object that is created by the server and passed through 
 
 **send( mixed response = '', Number statusCode = 200 ): void** 
 - Sends the response to the user with the specified statusCode
-- If the response is not a String, it will be JSON.stringified. If that fails, an error will be thrown
+- The response formatting is done by calling `event.formatResponse`.
 - setResponseHeader will be called with the calculated Content-Length
 - setResponseHeader will be called with X-Powered-By: event_request. This can be disabled by doing: `eventRequest.disableXPoweredBy = true;`
 - Emits a `send` event just before calling this.end()
@@ -721,6 +721,9 @@ The event request is an object that is created by the server and passed through 
 
 **end( ...args ): void** 
 - This will call response.end() with the given args
+
+**formatResponse( mixed payload ): String|Buffer** 
+- If the response is a buffer it will be returned directly without any modifications to it, otherwise if the response is not a String, it will be JSON.stringified. JSON.stringify may throw an error, that will not be caught.
 
 **setResponseHeader( String key, mixed value ): EventRequest** 
 - Sets a new header to the response.
@@ -2068,6 +2071,9 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
 **app.er.timeout.timedOut**
   - Thrown by the Timeout Plugin with a status of 408
   - { code: 'app.er.timeout.timedOut', status: 408 }
+
+**app.er.er_etag.invalid.payload**
+  - Thrown by the Etag Plugin when the payload is not a String, Buffer or fs.Stats
 
 **app.er.staticResources.fileNotFound**
   - { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${item}`, status: 404 }

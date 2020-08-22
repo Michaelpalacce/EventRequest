@@ -2229,6 +2229,23 @@ test({
 });
 
 test({
+	message	: 'Server.test.with.Buffer',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.get( '/testSendWithBuffer', ( event ) => {
+			event.send( Buffer.from( 'TEST' ) );
+		});
+
+		app.listen( 4251, () => {
+			helpers.sendServerRequest( '/testSendWithBuffer', 'GET', 200, '', {}, 4251,  'TEST' ).then(() => {
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
 	message	: 'Server.testGlobalMiddlewaresWithFunctions',
 	test	: ( done ) => {
 

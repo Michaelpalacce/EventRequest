@@ -1,5 +1,7 @@
 29.3.0
 - Added er_etag plugin
+- EventRequest.send now accepts a Buffer as well. Buffers will not be modified
+- Added a new EventRequest.formatResponse Function that can be used to format the payload you are going to send in a format that is applicable ( String or Buffer )
 - Added Documentation about er_etag plugin
 - Added tests for er_etag plugin
 
