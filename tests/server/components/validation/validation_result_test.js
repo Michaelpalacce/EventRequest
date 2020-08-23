@@ -21,7 +21,7 @@ test({
 });
 
 test({
-	message	: 'ValidationResult hasValidationFailed',
+	message	: 'ValidationResult.hasValidationFailed',
 	test	: ( done ) => {
 		const result		= new ValidationResult( { key: 123 }, { key: 'numeric' } );
 
@@ -33,7 +33,7 @@ test({
 });
 
 test({
-	message	: 'ValidationResult hasValidationFailed if one has failed',
+	message	: 'ValidationResult.hasValidationFailed.if.one.has.failed',
 	test	: ( done ) => {
 		const result		= new ValidationResult( { key: 123 }, { key: 'array' } );
 
@@ -45,7 +45,7 @@ test({
 });
 
 test({
-	message	: 'ValidationResult getValidationResult',
+	message	: 'ValidationResult.getValidationResult',
 	test	: ( done ) => {
 		const result		= new ValidationResult( { key: 123 }, { key: 'string' } );
 
@@ -57,7 +57,7 @@ test({
 });
 
 test({
-	message	: 'ValidationResult getValidationResult when something has failed',
+	message	: 'ValidationResult.getValidationResult.when.something.has.failed',
 	test	: ( done ) => {
 		const result		= new ValidationResult( { key: 123 }, { key: 'array' } );
 

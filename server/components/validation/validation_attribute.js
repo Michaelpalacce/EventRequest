@@ -50,7 +50,7 @@ class ValidationAttribute
 	}
 
 	/**
-	 * @brief	Returns true otherwise returns reason why it is not valid
+	 * @brief	Returns false otherwise returns reason why it is not valid
 	 *
 	 * @return	Array|Boolean
 	 */

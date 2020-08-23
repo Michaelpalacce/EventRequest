@@ -1,5 +1,6 @@
 29.4.0
 - Validation Improvements
+- Updated the way maxCounter is calculated in the Bucket
 - Tests Updated
 
 29.3.0
