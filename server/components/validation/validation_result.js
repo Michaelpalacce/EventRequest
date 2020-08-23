@@ -34,7 +34,7 @@ class ValidationResult
 		this.validationFailed	= false;
 		const failures			= {};
 
-		this._formResult( this.validationInput, this.skeleton, this.result, failures );
+		this.result				= this._formResult( this.validationInput, this.skeleton, failures );
 
 		if ( this.validationFailed )
 		{
@@ -49,18 +49,44 @@ class ValidationResult
 	 *
 	 * @param	{Object} validationInput
 	 * @param	{Object} skeleton
-	 * @param	{Object} result
 	 * @param	{Object} failures
 	 *
 	 * @private
 	 *
-	 * @return	void
+	 * @return	Object|Array
 	 */
-	_formResult( validationInput, skeleton, result, failures )
+	_formResult( validationInput, skeleton, failures )
 	{
-		let key;
+		let result	= {};
 
-		for ( key in skeleton )
+		if ( this._isSingleObjectArray( skeleton ) )
+		{
+			if ( Array.isArray( validationInput ) )
+			{
+				const rules	= skeleton[0];
+				result		= [];
+
+				for ( let i = 0; i < validationInput.length; i ++ )
+				{
+					failures[i]				= {};
+					const validationEntry	= validationInput[i];
+					result.push( this._formResult( validationEntry, rules, failures[i] ) );
+				}
+
+				return result;
+			}
+			else
+			{
+				this.validationFailed	= true;
+				failures[0]				= {};
+
+				this._formResult( validationInput, skeleton[0], failures[0] );
+
+				return [];
+			}
+		}
+
+		for ( const key in skeleton )
 		{
 			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( skeleton, key ) )
@@ -69,15 +95,13 @@ class ValidationResult
 			let value	= validationInput[key];
 			const rules	= skeleton[key];
 
-			if ( typeof rules === 'object' && typeof rules.$default === 'undefined' && typeof rules.$rules === 'undefined' )
+			if ( this._isActualRuleObject( rules ) )
 			{
 				if ( value === undefined )
 					value	= {};
 
-				result[key]		= {};
 				failures[key]	= {};
-
-				this._formResult( value, rules, result[key], failures[key] );
+				result[key]		= this._formResult( value, rules, failures[key] );
 				continue;
 			}
 
@@ -92,12 +116,45 @@ class ValidationResult
 			}
 			else
 			{
-				result[attribute.key]	= typeof attribute.value === 'undefined'
-										|| attribute.value === null
+				result[attribute.key]	= typeof attribute.value === 'undefined' || attribute.value === null
 										? attribute.default
 										: attribute.value;
 			}
 		}
+
+		return result;
+	}
+
+	/**
+	 * @brief	Returns if the rules object is valid or not
+	 *
+	 * @details	If $default or $rules are set, that means that the object is an instructional object for the ValidationAttribute
+	 *
+	 * @param	{Object} rules
+	 *
+	 * @private
+	 *
+	 * @return	{Boolean}
+	 */
+	_isActualRuleObject( rules )
+	{
+		return typeof rules === 'object' && typeof rules.$default === 'undefined' && typeof rules.$rules === 'undefined';
+	}
+
+	/**
+	 * @brief	Checks if the element given is an Array that contains only one element that is an object
+	 *
+	 * @details	This is done because if we want to validate an array of arrays this is the way that the data is passed to be validated
+	 *
+	 * @param	{*} array
+	 *
+	 * @private
+	 *
+	 * @return	{Boolean}
+	 */
+	_isSingleObjectArray(array )
+	{
+		return Array.isArray( array ) && array.length === 1 && typeof array[0] === 'object';
 	}
 
 	/**

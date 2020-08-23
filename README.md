@@ -1411,6 +1411,7 @@ console.log( result.getValidationResult() );
 - skeleton must have the keys that are to be validated that point to a string of rules separated by ||
 
 - if the object to be validated is multi dimensional then you can specify the multi dimensional keys as well ( see example below )
+- if the object to be validated contains an array of object you have to specify an array for the given key and provide only ONE Object that will be used to validate all the arrays( see example below )
 
 - Asserting that an input is a string|numeric|boolean will do type conversion on the input to the appropriate type. You should retrieve the value FROM the validation result for correct result
 
@@ -1617,21 +1618,31 @@ console.log( resultTwo.getValidationResult() );
 ~~~javascript
 const validationHandler = require( 'event_request/server/components/validation/validation_handler' )
 
-const dataToValidate    = {
-    testOne    : 123,
-    testTwo    : '123',
-    123            : [1,2,3,4,5],
-    testThree    : {
-        'deepOne'    : 123,
-        deepTwo    : {
-            deeperOne    : 123,
-            deeperTwo    : '123',
-            deeperFour    : '4'
-        }
+const dataToValidate = {
+    testOne : 123,
+    testTwo : '123',
+    123 : [1,2,3,4,5],
+    testThree : {
+        'deepOne' : 123,
+        deepTwo : {
+            deeperOne : 123,
+            deeperTwo : '123',
+            deeperFour : '4'
+        },
+        deepThree : [
+            {
+                deepThreeOne: 'stringOne',
+                deepThreeTwo: '1542'
+            },
+            {
+                deepThreeOne: 'stringOne',
+                deepThreeTwo: 1542
+            }
+        ]
     },
-    testFour    : true,
-    testFive    : 'true',
-    testSix        : '1',
+    testFour: true,
+    testFive: 'true',
+    testSix : '1'
 };
 
 const result    = validationHandler.validate(
@@ -1647,7 +1658,14 @@ const result    = validationHandler.validate(
                 deeperTwo    : 'numeric||range:123-124',
                 deeperThree    : { $rules: 'optional||min:2||max:5', $default: 4 },
                 deeperFour    : { $rules: 'optional||numeric||min:2||max:5', $default: 4 }
-            }
+            },
+
+            deepThree : [
+                {
+                    deepThreeOne: 'string',
+                    deepThreeTwo: 'numeric'
+                }
+            ]
         },
         testFour    : 'boolean',
         testFive    : 'boolean',
@@ -1666,7 +1684,17 @@ console.log( result.getValidationResult() );
 //   testTwo: 123,
 //   testThree: {
 //     deepOne: 123,
-//     deepTwo: { deeperOne: '123', deeperTwo: 123, deeperThree: 4, deeperFour: 4 }
+//     deepTwo: { deeperOne: '123', deeperTwo: 123, deeperThree: 4, deeperFour: 4 },
+//     deepThree : [
+//     {
+//         deepThreeOne: 'stringOne',
+//         deepThreeTwo: 1542
+//     },
+//     {
+//         deepThreeOne: 'stringOne',
+//         deepThreeTwo: 1542
+//     }
+//     ]
 //   },
 //   testFour: true,
 //   testFive: true,
@@ -1689,7 +1717,17 @@ const dataToValidate    = {
             deeperOne    : 123,
             deeperTwo    : '123',
             deeperFour    : '4'
-        }
+        },
+        deepThree : [
+            {
+                deepThreeOne: 'stringOne',
+                deepThreeTwo: '1542'
+            },
+            {
+                deepThreeOne: 'stringOne',
+                deepThreeTwo: 'string'
+            }
+        ]
     },
     testFour    : true,
     testFive    : 'true',
@@ -1715,7 +1753,13 @@ const result    = validationHandler.validate(
                 deeperOne    : 'string||range:2-4',
                 deeperTwo    : 'numeric||range:123-124',
                 deeperThree    : { $rules: 'optional||min:2||max:5', $default: 4 },
-                deeperFour    : { $rules: 'optional||numeric||min:2||max:5', $default: 4 }
+                deeperFour    : { $rules: 'optional||numeric||min:2||max:5', $default: 4 },
+                deepThree : [
+                    {
+                         deepThreeOne: 'string',
+                         deepThreeTwo: 'numeric'
+                    }
+                ]
             }
         },
         testFour    : 'boolean',
@@ -1741,7 +1785,7 @@ console.log( result.hasValidationFailed() );
 console.log( result.getValidationResult() );
 
 // true
-//{ testEight: [ 'numeric' ], testNine: { deep: { deeper: deepest: ['string'] } } }
+//{ testThree: { deepThree: { 1:{ deepThreeTwo: [ 'numeric' ] } } },testEight: [ 'numeric' ], testNine: { deep: { deeper: deepest: ['string'] } } }
 ~~~
 
 ***
@@ -1782,7 +1826,7 @@ This class can be used to limit data in one way or another.
 
 **dataStoreRefetchInterval: Number**
 - Milliseconds after which a retry should be sent to the dataStore ( usually should be set to 1 or 2, set to more if the dataStore cannot handle a lot of traffic )
-- Used to set the maxCounter using the following formula: Math.max( Math.floor( 10000 / dataStoreRefetchInterval ), 1 )
+- Used to set the maxCounter using the following formula: Math.min( Math.floor( 10000 / dataStoreRefetchInterval ), 1000 )
 - Defaults to 1
 
 ***

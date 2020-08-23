@@ -1,3 +1,8 @@
+29.4.0
+- Validation Improvements
+- Updated the way maxCounter is calculated in the Bucket
+- Tests Updated
+
 29.3.0
 - Added er_etag plugin
 - EventRequest.send now accepts a Buffer as well. Buffers will not be modified
@@ -13,7 +18,7 @@
 - EventRequest now emits a 'send' event BEFORE the data is sent
 - er_timeout now sets a timeout directly for the response
 - er_timeout no longer listens for stream_start and stream_end
-- event_request 'send' no longer calls cleanUp but it will be called naturally when the response is finished
+- event_request 'send' no longer calls cleanUp, but it will be called naturally when the response is finished
 - Documentation updated
 - Tests updated and added
 
