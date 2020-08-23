@@ -80,7 +80,7 @@ class ValidationResult
 				this.validationFailed	= true;
 				failures[0]				= {};
 
-				this._formResult( validationInput, skeleton[0], failures[0] )
+				this._formResult( validationInput, skeleton[0], failures[0] );
 
 				return [];
 			}
