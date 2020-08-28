@@ -711,15 +711,16 @@ The event request is an object that is created by the server and passed through 
 - Emits a cleanUp event and a finished event. 
 - This also removes all other event listeners and sets all the properties to undefined
 
-**send( mixed response = '', Number statusCode = 200 ): void** 
+**send( mixed response = '', Number statusCode = 200 ): Promise** 
 - Sends the response to the user with the specified statusCode
 - The response formatting is done by calling `event.formatResponse`.
 - setResponseHeader will be called with the calculated Content-Length
 - setResponseHeader will be called with X-Powered-By: event_request. This can be disabled by doing: `eventRequest.disableXPoweredBy = true;`
 - Emits a `send` event just before calling this.end()
+- The send function is entirely synchronous until the response has to be sent ( when calling this.end() ). The this.end() promise is returned. This is done for consistency with sendError
 - calls this.end() with the payload
 
-**end( ...args ): void** 
+**async end( ...args ): void** 
 - This will call response.end() with the given args
 
 **formatResponse( mixed payload ): String|Buffer** 
@@ -875,7 +876,7 @@ server.listen( '80',() => {
 
 **apply( PluginInterface|Object|String plugin, Object options ): Server** 
 - Applies a new plugin with the specified options
-- This method uses ductyping to determine valid plugins. Check the PluginInterface Section to see the list of required functions
+- This method uses duck-typing to determine valid plugins. Check the PluginInterface Section to see the list of required functions
 - It first calls setOptions, then checks for dependencies, then calls plugin.setServerOnRuntime then calls plugin.getPluginMiddleware
 
 **getPlugin( String|PluginInterface pluginId ): PluginInterface** 
