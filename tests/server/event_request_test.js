@@ -227,6 +227,17 @@ test({
 });
 
 test({
+	message	: 'EventRequest.send.returns.Promise',
+	test	: ( done ) => {
+		let eventRequest	= helpers.getEventRequest();
+		const data			= 'DataToSend';
+
+		assert.deepStrictEqual( eventRequest.send( data ) instanceof Promise, true );
+		done();
+	}
+});
+
+test({
 	message	: 'EventRequest.send.calls.formatResponse',
 	test	: ( done ) => {
 		let eventRequest	= helpers.getEventRequest();
