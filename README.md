@@ -3029,7 +3029,7 @@ app.listen( 80, () => {
 - Indicates whether ETags of the files should be sent, doing so will result in browser caching using ETags
 - The plugin will be responsible for checking following requests if they have matching ETags and no response will be sent in that case
 - You can use both cache and ETags however results may vary
-- Defaults to true
+- Defaults to false
 
 **strong: Boolean**
 - Only usable if useEtag is set to true
