@@ -1,3 +1,8 @@
+29.4.1
+- Small Documentation improvements
+- EventRequest.send will now return a promise
+- EventRequest.end is now async for consistency with sendError
+
 29.4.0
 - Validation Improvements
 - Updated the way maxCounter is calculated in the Bucket
