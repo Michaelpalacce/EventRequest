@@ -7,6 +7,16 @@ const DataServer	= require( '../server/components/caching/data_server' );
 
 const TEST_ROOT		= path.parse( __dirname ).dir;
 
+/**
+ * @brief	Deletes all FILES from a given directory
+ *
+ * @details	This action is not recursive and is synchronous
+ *
+ * @param	String dir
+ * @param	Array whiteList
+ *
+ * @return	void
+ */
 function clearUpDirectory( dir, whiteList )
 {
 	if ( fs.existsSync( dir ) )

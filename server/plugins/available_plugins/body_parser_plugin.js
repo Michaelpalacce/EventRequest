@@ -14,9 +14,9 @@ class BodyParserPlugin extends PluginInterface
 	{
 		super( pluginId, options );
 
-		this.parserClass		= parser;
-		this.parserOptions		= options;
-		this.shouldAttach		= false;
+		this.parserClass	= parser;
+		this.parserOptions	= options;
+		this.shouldAttach	= false;
 
 		this.setOptions( options );
 	}

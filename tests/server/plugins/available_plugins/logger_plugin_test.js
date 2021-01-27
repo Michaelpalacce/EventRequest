@@ -48,9 +48,8 @@ test({
 				['on_error', undefined],
 				['finished', undefined],
 				['redirect', undefined],
-				['cachedResponse', undefined],
 			],
-			called			: 7
+			called			: 5
 		});
 
 		router.add( middleware[0] );
@@ -61,7 +60,7 @@ test({
 
 		// DO this to wait for the log to complete
 		setImmediate(() => {
-			assert.equal( called, 6 );
+			assert.equal( called, 5 );
 			assert.equal( true, eventRequest.logger instanceof Logger );
 
 			done();

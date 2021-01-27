@@ -230,6 +230,7 @@ class Server extends EventEmitter
 	{
 		return ( request, response ) => {
 			let eventRequest	= new EventRequest( request, response );
+			const block			= this.router.getExecutionBlockForCurrentEvent( eventRequest );
 
 			request.on( 'close', () => {
 				if ( eventRequest !== null && eventRequest !== undefined )
@@ -248,12 +249,8 @@ class Server extends EventEmitter
 				}
 			});
 
-			const block	= this.router.getExecutionBlockForCurrentEvent( eventRequest );
-
-			eventRequest._setBlock( block );
-
 			const onErrorCallback	= ( error ) => {
-				if ( eventRequest.logger !== null && eventRequest.logger !== undefined )
+				if ( eventRequest.logger )
 					return;
 
 				let message;
@@ -275,6 +272,8 @@ class Server extends EventEmitter
 
 			eventRequest.on( 'error', onErrorCallback );
 			eventRequest.on( 'on_error', onErrorCallback );
+
+			eventRequest._setBlock( block );
 
 			eventRequest.next();
 		};

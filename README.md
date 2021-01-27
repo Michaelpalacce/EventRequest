@@ -919,6 +919,7 @@ calling Loggur.log you will call both of the loggers.
 - If you need finer control then you can always use the loggers created by the Loggur.
 - The Loggur and any Logger class are hot swappable in regards to the log function.
 
+
 The `Logging` Suite exported by the module contains the following:
 - Loggur -> instance of Loggur used to log data and create Loggers. Generally this class can be used to log data
 - Logger -> The Logger class. Every logger can be attached to the Loggur, which will call all the loggers
@@ -928,6 +929,23 @@ The `Logging` Suite exported by the module contains the following:
 - Log -> The Log object used by all the internal classes
 - LOG_LEVELS -> The Default log levels
 - The Loggur can be accessed directly from the server { Loggur }
+
+## Disabling Logging:
+- If you want to disable Logging done by the framework you can do:
+~~~javascript
+const { Loggur } = require( 'event_request' );
+
+Loggur.disableDefault();
+~~~
+
+- Alternatively to disable logging you can add a middleware that removes all listeners:
+~~~javascript
+app.add( ( event ) => {
+   event.removeAllListeners('error')
+   event.removeAllListeners('on_error')
+   event.next();
+});
+~~~
 
 ## Default Logger:
 - The default logger is attached directly to the Loggur instance. it can be enabled or disabled by calling Loggur.enableDefault() or Loggur.disableDefault(). 
@@ -2066,7 +2084,7 @@ The TestingTools export:
 
 # [Error Handling | ErrorHandler](#error-handling-errorHandler)
 - The EventRequest has a default ErrorHandler set in it
-- It is a good idea to insantiate a new ErrorHandler OUTSIDE the eventRequest for speed. You can attach a preconfigured ErrorHandler rather than configuring the one created every request.
+- It is a good idea to instantiate a new ErrorHandler OUTSIDE the eventRequest for speed. You can attach a preconfigured ErrorHandler rather than configuring the one created every request.
 - The Error Handler supports error namespaces. An error namespace is a string error code, that is separated by dots: `app.module.someError`. Every Dot represents a new Error namespace. They may take a second to get the hang on but are a powerful tool when you understand them better!
 - Error Handling in the framework is done entirely using error codes.
 - Every Error Code thrown in the app will be in the following namespace: `app.er`
@@ -2083,7 +2101,7 @@ The TestingTools export:
 #### Events:
 
 **on_error: ( mixed error )**
-- This is called in cases
+- This is called by the default error handler in case of an error
 
 ***
 #### Functions:
@@ -2193,6 +2211,18 @@ errorHandler.addNamespace( 'app.test.namespace', { message: 'I am a message', em
   - Thrown by the validation plugin when there is an error with validation. Could be that the EventRequest has a missing property or validation of input failed
   - { status: 400, code: 'app.er.validation.error', message: { [validationParameter]: validationResult.getValidationResult() } }
   - { status: 400, code: 'app.er.validation.error', message: `Could not validate ${toValidate} as it is not a property of the EventRequest` }
+
+***
+***
+#### [Custom Error Handler:](#custom-error-handler)
+- You can specify a custom error handler very easily:
+~~~javascript
+event.errorHandler = {
+    handleError: () => {
+        event.send( 'Custom Error Handling' )
+    }
+}
+~~~~
 
 ***
 ***
@@ -2852,6 +2882,8 @@ app.listen( 80, () => {
 ***
 
 # [PluginInterface](#plugin-interface)
+The PluginInterface is a general interface that must be implemented by all other plugins attached to the framework.
+
 The PluginInterface has a getPluginMiddleware method that must return an array of middleware objects implementing handler,
 route, method keys or instances of Route. 
 
@@ -2862,7 +2894,8 @@ The PluginInterface implements a getPluginDependencies method that returns an Ar
 These plugins must be installed before the dependant plugin is.
 
 The PluginInterface implements a setServerOnRuntime method that passes the server as the first and only argument.
-Here the plugin can interact with the server.pluginBag to store any data it seems fit or may modify the server in one way or another.
+The PluginInterface can interact with a special pluginBag prop attached to the server during setServerOnRuntime
+to store any data it seems fit or may modify the server in one way or another.
 
 The PluginInterface implements a getPluginId method that returns the id of the plugin ( these must be unique ).
 
@@ -3098,10 +3131,10 @@ app.apply( staticResourcesPlugin );
 app.listen( 80 );
 ~~~
 
-~~~javscript
+~~~javascript
 const app = require( 'event_request' )();
 
-// This will server all the files in the public subfolder ( a Cache-control header will be set ( Cache-Control: public, max-age=604800, immutable ) )
+// This will serve all the files in the public subfolder ( a Cache-control header will be set ( Cache-Control: public, max-age=604800, immutable ) )
 app.apply( app.er_static, { paths: ['public'] } );
 
 app.listen( 80, () => {
@@ -3608,9 +3641,6 @@ app.listen( '80', () => {
 **Event: 'redirect'**
 - Logs with a log level of 400 ( info ) where the redirect was to
 
-**Event: 'cachedResponse'**
-- Logs with a log level of 400 ( info ) which url was send from the cache
-
 **Event: 'finished'**
 - Logs with a log level of 500 ( verbose ) that the event is finished
 
@@ -3812,6 +3842,8 @@ app.apply( app.er_body_parser_raw, { maxPayloadLength: 10485760 } );
 app.post( '/submit', ( event ) => {
     console.log( event.body );
     console.log( event.rawBody );
+    // This will be filled if files were processed by er_body_parser_multipart
+    console.log( event.$files );
 
     event.send();
 });

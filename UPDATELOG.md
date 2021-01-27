@@ -1,3 +1,8 @@
+29.5.0
+- Small Documentation improvement and examples added for how to remove logging and remove error handling
+- Small code cleanup
+- Logger no longer logs on 'cachedResponse'
+
 29.4.1
 - Small Documentation improvements
 - EventRequest.send will now return a promise

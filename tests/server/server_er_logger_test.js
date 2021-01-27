@@ -33,7 +33,6 @@ test({
 			process.log( 'TESTLOG' );
 
 			event.emit( 'redirect', { redirectUrl: 'REDIRECT-LINK' } );
-			event.emit( 'cachedResponse' );
 			event.emit( 'stop' );
 			event.emit( 'clearTimeout' );
 			event.emit( 'on_error', new Error( 'error' ) );
@@ -63,8 +62,6 @@ test({
 					assert.equal( logData.includes( 'Event finished' ), true );
 					assert.equal( logData.includes( 'Server.test_er_logger/Master' ), true );
 					assert.equal( logData.includes( 'Redirect to: REDIRECT-LINK' ), true );
-					assert.equal( logData.includes( 'Response to' ), true );
-					assert.equal( logData.includes( 'send from cache' ), true );
 					assert.equal( logData.includes( 'Headers: ' ), true );
 					assert.equal( logData.includes( 'Cookies: ' ), true );
 					assert.equal( logData.includes( 'SIMPLE ERROR MESSAGE' ), true );
@@ -171,7 +168,6 @@ test({
 			process.log( 'TESTLOG' );
 
 			event.emit( 'redirect', { redirectUrl: 'REDIRECT-LINK' } );
-			event.emit( 'cachedResponse' );
 			event.emit( 'stop' );
 			event.emit( 'clearTimeout' );
 			event.emit( 'on_error', new Error( 'error' ) );
@@ -201,8 +197,6 @@ test({
 					assert.equal( logData.includes( 'Event finished' ), true );
 					assert.equal( logData.includes( 'Server.test_er_logger/Master' ), true );
 					assert.equal( logData.includes( 'Redirect to: REDIRECT-LINK' ), true );
-					assert.equal( logData.includes( 'Response to' ), true );
-					assert.equal( logData.includes( 'send from cache' ), true );
 					assert.equal( logData.includes( 'Headers: ' ), true );
 					assert.equal( logData.includes( 'Cookies: ' ), true );
 					assert.equal( logData.includes( 'SIMPLE ERROR MESSAGE' ), true );

@@ -51,7 +51,7 @@ class LoggerPlugin extends PluginInterface
 	/**
 	 * @brief	Attaches events to the event request
 	 *
-	 * @details	Events attached: error, finished, send, redirect, stop, cleanUp, clearTimeout
+	 * @details	Events attached: error, on_error, finished, redirect, cleanUp
 	 *
 	 * @param	{EventRequest} event
 	 *
@@ -60,7 +60,6 @@ class LoggerPlugin extends PluginInterface
 	attachEventsToEventRequest( event )
 	{
 		const logger		= this.getLogger();
-		const requestURL	= event.request.url;
 
 		const errCallback	= ( error ) => {
 			let message;
@@ -89,10 +88,6 @@ class LoggerPlugin extends PluginInterface
 
 		event.on( 'redirect', ( redirect ) => {
 			logger.info( `Redirect to: ${redirect.redirectUrl} with status code: ${redirect.statusCode}` );
-		});
-
-		event.on( 'cachedResponse', () => {
-			logger.info( `Response to ${requestURL} send from cache` );
 		});
 	}
 

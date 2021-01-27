@@ -11,7 +11,7 @@ let server		= null;
 /**
  * @brief	Creates a new server, or return existing instance
  *
- * @returns	Server
+ * @return	Server
  */
 const App		= () => {
 	return server || ( server = new Server() );
