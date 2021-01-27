@@ -122,9 +122,9 @@ test({
 				500,
 				'',
 				{},
-				4365,
-				'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
-			).then(() => {
+				4365
+			).then(( res) => {
+				assert.strictEqual( res.body.toString().includes( 'ERR_INVALID_ARG_TYPE' ), true );
 
 				return helpers.sendServerRequest(
 					`/${name}`,
@@ -132,10 +132,11 @@ test({
 					500,
 					'',
 					{},
-					4365,
-					'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
+					4365
 				);
-			}).then(( response ) => {
+			}).then(( res ) => {
+				assert.strictEqual( res.body.toString().includes( 'ERR_INVALID_ARG_TYPE' ), true );
+
 				done();
 			}).catch( done );
 		});
@@ -167,9 +168,9 @@ test({
 				500,
 				'',
 				{},
-				4366,
-				'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
-			).then(() => {
+				4366
+			).then(( res ) => {
+				assert.strictEqual( res.body.toString().includes( 'ERR_INVALID_ARG_TYPE' ), true );
 
 				return helpers.sendServerRequest(
 					`/${name}`,
@@ -177,10 +178,11 @@ test({
 					500,
 					'',
 					{},
-					4366,
-					'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
+					4366
 				);
-			}).then(( response ) => {
+			}).then(( res ) => {
+				assert.strictEqual( res.body.toString().includes( 'ERR_INVALID_ARG_TYPE' ), true );
+
 				done();
 			}).catch( done );
 		});
@@ -212,9 +214,9 @@ test({
 				500,
 				'',
 				{},
-				4367,
-				'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
-			).then(() => {
+				4367
+			).then(( res ) => {
+				assert.strictEqual( res.body.toString().includes( 'ERR_INVALID_ARG_TYPE' ), true );
 
 				return helpers.sendServerRequest(
 					`/${name}`,
@@ -222,10 +224,11 @@ test({
 					500,
 					'',
 					{},
-					4367,
-					'{"error":{"code":"ERR_INVALID_ARG_TYPE","message":"The \\"chunk\\" argument must be of type string or an instance of Buffer. Received an instance of Object"}}'
+					4367
 				);
-			}).then(( response ) => {
+			}).then(( res ) => {
+				assert.strictEqual( res.body.toString().includes( 'ERR_INVALID_ARG_TYPE' ), true );
+
 				done();
 			}).catch( done );
 		});
