@@ -1,3 +1,6 @@
+29.5.1
+- Updated Maintained badge
+
 29.5.0
 - Small Documentation improvement and examples added for how to remove logging and remove error handling
 - Small code cleanup
