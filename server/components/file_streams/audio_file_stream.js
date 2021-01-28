@@ -40,14 +40,12 @@ class AudioFileStream extends AbstractFileStream
 
 			event.setResponseHeader( 'Content-Range', `bytes ${start}-${end}/${fileSize}` );
 			event.setResponseHeader( 'Accept-Ranges', 'bytes' );
-			event.setResponseHeader( 'Content-Length', ( end - start ) + 1 );
 			event.setStatusCode( 206 );
 
 			stream	= fs.createReadStream( file, { start, end } );
 		}
 		else
 		{
-			event.setResponseHeader( 'Content-Length', fileSize );
 			event.setStatusCode( 200 );
 
 			stream	= fs.createReadStream( file );

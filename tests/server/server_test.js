@@ -1779,7 +1779,6 @@ test({
 				|| event.getFileStream( path.join( __dirname, './fixture/file_streams/test.unsupported' ) ) !== null
 				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
 				|| event.response.getHeader( 'Content-Range' ) == null
-				|| event.response.getHeader( 'Content-Length' ) == null
 				|| ! event.response.getHeader( 'Content-Range' ).includes( 'bytes' )
 				|| event.response.getHeader( 'Accept-Ranges' ) !== 'bytes'
 				|| event.response.statusCode !== 206
@@ -1795,7 +1794,6 @@ test({
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp4' ) ) == null
 				|| event.getFileStream( path.join( __dirname, './fixture/file_streams/test.unsupported' ) ) !== null
 				|| event.response.getHeader( 'Content-Type' ) !== 'video/mp4'
-				|| event.response.getHeader( 'Content-Length' ) == null
 				|| event.response.getHeader( 'Content-Range' ) != null
 				|| event.response.getHeader( 'Accept-Ranges' ) != null
 				|| event.response.statusCode !== 200
@@ -1811,7 +1809,6 @@ test({
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp3' ) ) == null
 				|| event.response.getHeader( 'Content-Type' ) !== 'audio/mp3'
 				|| event.response.getHeader( 'Content-Range' ) == null
-				|| event.response.getHeader( 'Content-Length' ) == null
 				|| ! event.response.getHeader( 'Content-Range' ).includes( 'bytes' )
 				|| event.response.getHeader( 'Accept-Ranges' ) !== 'bytes'
 				|| event.response.statusCode !== 206
@@ -1826,7 +1823,6 @@ test({
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/test.mp3' ) ) == null
 				|| event.response.getHeader( 'Content-Type' ) !== 'audio/mp3'
-				|| event.response.getHeader( 'Content-Length' ) == null
 				|| event.response.getHeader( 'Content-Range' ) != null
 				|| event.response.getHeader( 'Accept-Ranges' ) != null
 				|| event.response.statusCode !== 200
@@ -1840,7 +1836,6 @@ test({
 		app.get( '/testErFileStreamImage', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/image.webp' ) ) === null
-				|| event.response.getHeader( 'Content-Length' ) != null
 				|| event.response.getHeader( 'Content-Range' ) != null
 				|| event.response.getHeader( 'Accept-Ranges' ) != null
 				|| event.response.statusCode !== 200
@@ -1854,7 +1849,6 @@ test({
 		app.get( '/testErFileStreamText', ( event ) => {
 			if (
 				event.getFileStream( path.join( __dirname, './fixture/file_streams/text.txt' ) ) === null
-				|| event.response.getHeader( 'Content-Length' ) != null
 				|| event.response.getHeader( 'Content-Range' ) != null
 				|| event.response.getHeader( 'Accept-Ranges' ) != null
 				|| event.response.statusCode !== 200
@@ -1881,8 +1875,8 @@ test({
 
 		const responses	= [];
 
-		responses.push( helpers.sendServerRequest( `/testErFileStreamVideoWithRange`, 'GET', 206, '', { range: 'bytes=1-50'} ) );
-		responses.push( helpers.sendServerRequest( `/testErFileStreamAudioWithRange`, 'GET', 206, '', { range: 'bytes=1-50'} ) );
+		responses.push( helpers.sendServerRequest( `/testErFileStreamVideoWithRange`, 'GET', 206, '', { range: 'bytes=1-2' } ) );
+		responses.push( helpers.sendServerRequest( `/testErFileStreamAudioWithRange`, 'GET', 206, '', { range: 'bytes=1-2'} ) );
 		responses.push( helpers.sendServerRequest( `/testErFileStreamVideoWithOutRange` ) );
 		responses.push( helpers.sendServerRequest( `/testErFileStreamAudioWithOutRange` ) );
 		responses.push( helpers.sendServerRequest( `/testErFileStreamImage` ) );

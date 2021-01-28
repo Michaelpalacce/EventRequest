@@ -56,10 +56,9 @@ test({
 
 		eventRequest._mock( {
 			method	: 'setResponseHeader',
-			called	: 3,
+			called	: 2,
 			with	: [
 				['Cache-control', 'public, must-revalidate'],
-				['Content-Length', 54],
 				['X-Powered-By', 'event_request'],
 			]
 		});
@@ -84,9 +83,8 @@ test({
 
 		eventRequest._mock( {
 			method	: 'setResponseHeader',
-			called	: 2,
+			called	: 1,
 			with	: [
-				['Content-Length', 54],
 				['X-Powered-By', 'event_request'],
 			]
 		});
@@ -109,10 +107,9 @@ test({
 
 		eventRequest._mock( {
 			method	: 'setResponseHeader',
-			called	: 3,
+			called	: 2,
 			with	: [
 				['Cache-control', 'public, must-revalidate'],
-				['Content-Length', 54],
 				['X-Powered-By', 'event_request']
 			]
 		});
@@ -133,9 +130,8 @@ test({
 
 		eventRequest._mock( {
 			method	: 'setResponseHeader',
-			called	: 2,
+			called	: 1,
 			with	: [
-				['Content-Length', 54],
 				['X-Powered-By', 'event_request'],
 			]
 		});
@@ -156,9 +152,8 @@ test({
 
 		eventRequest._mock( {
 			method	: 'setResponseHeader',
-			called	: 2,
+			called	: 1,
 			with	: [
-				['Content-Length', 54],
 				['X-Powered-By', 'event_request'],
 			]
 		});

@@ -7,7 +7,7 @@ const JsonBodyParser							= require( './../../server/components/body_parsers/js
 const BodyParserPlugin							= require( './../../server/plugins/available_plugins/body_parser_plugin' );
 
 test({
-	message	: 'Server.test er_body_parser_json.does.not.parse.anything.but.application/json',
+	message	: 'Server.test.er_body_parser_json.does.not.parse.anything.but.application/json',
 	test	: ( done ) => {
 		const name			= 'testErJsonBodyParserParsesApplicationJson';
 		const formDataKey	= 'testErJsonBodyParserParsesApplicationJson';
@@ -609,43 +609,6 @@ test({
 });
 
 test({
-	message	: 'Server.test.body_parser_handler.fallback.parser',
-	test	: ( done ) => {
-		const name	= 'testBodyParserHandlerFallbackParser';
-		const app	= new Server();
-
-		app.apply( app.er_body_parser_json );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( { body: event.body, rawBody: event.rawBody } );
-		} );
-
-		const responses	= [];
-
-		responses.push(
-			helpers.sendServerRequest(
-				`/${name}`,
-				'GET',
-				200,
-				'SomeRandomData',
-				{ 'content-type': 'somethingDoesntMatter' },
-				3901,
-				JSON.stringify( { body: 'SomeRandomData', rawBody: 'SomeRandomData' } )
-			)
-		);
-
-		const server	= app.listen( 3901, () => {
-			Promise.all( responses ).then(() => {
-				setTimeout(() => {
-					server.close();
-					done();
-				}, 500 );
-			}).catch( done );
-		} );
-	}
-});
-
-test({
 	message	: 'Server.test.er_body_parser.setOptions.without.anything',
 	test	: ( done ) => {
 		const app	= new Server();
@@ -751,25 +714,6 @@ test({
 				done();
 			}).catch( done );
 		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_body_parser.setServerOnRuntime.without.pluginbag.creates.one',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		assert.deepStrictEqual( typeof app.pluginBag.parsers, 'undefined' );
-
-		app.apply( app.er_body_parser_json );
-		assert.deepStrictEqual( typeof app.pluginBag.parsers, 'object' );
-		assert.deepStrictEqual( Object.keys( app.pluginBag.parsers ).length, 1 );
-
-		app.apply( app.er_body_parser_form );
-		assert.deepStrictEqual( typeof app.pluginBag.parsers, 'object' );
-		assert.deepStrictEqual( Object.keys( app.pluginBag.parsers ).length, 2 );
-
-		done();
 	}
 });
 

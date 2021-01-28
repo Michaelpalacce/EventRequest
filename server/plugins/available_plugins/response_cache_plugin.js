@@ -108,7 +108,7 @@ class ResponseCachePlugin extends PluginInterface
 							if ( code < 200 || code >= 300 )
 								return;
 
-							const response		= payload;
+							const response		= Buffer.isBuffer( payload ) ? payload.toString() : payload;
 							const headers		= event.response.getHeaders();
 							const ttl			= this.getTimeToLive( event );
 							const recordName	= this.getCacheId( event );

@@ -139,8 +139,8 @@ class EventRequest extends EventEmitter
 			if ( ! {}.hasOwnProperty.call( options, optionName ) )
 				continue;
 
-			if ( optionName.toLowerCase() === 'expires' || optionName.toLowerCase() === 'max-age' )
-				options[optionName]	= new Date( new Date().getTime() + options[optionName] * 1000 );
+			if ( optionName.toLowerCase() === 'expires' )
+				options[optionName]	= new Date( new Date().getTime() + options[optionName] * 1000 ).toUTCString();
 
 			cookie	+= ` ${optionName}=${options[optionName]};`;
 		}
@@ -167,10 +167,7 @@ class EventRequest extends EventEmitter
 		if ( typeof code === 'number' )
 			this.setStatusCode( code );
 
-		let payload;
-
-		payload	= this.formatResponse( response );
-		this.setResponseHeader( 'Content-Length', payload.length );
+		let payload	= this.formatResponse( response );
 
 		if ( this.disableXPoweredBy === false )
 			this.setResponseHeader( 'X-Powered-By', 'event_request' );

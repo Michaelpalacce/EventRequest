@@ -167,6 +167,51 @@ test({
 });
 
 test({
+	message		: 'ResponseCachePlugin.caches.if.response.is.buffer',
+	test		: ( done ) => {
+		let eventRequest		= helpers.getEventRequest( 'GET', '/test/responseCachePlugin/BUFFER' );
+		let eventRequest2		= helpers.getEventRequest( 'GET', '/test/responseCachePlugin/BUFFER' );
+		let responseCachePlugin	= new ResponseCachePlugin( 'id' );
+		let dataServer			= helpers.getDataServer();
+		let router				= new Router();
+
+		responseCachePlugin.dataServer	= dataServer;
+		let pluginMiddlewares			= responseCachePlugin.getPluginMiddleware();
+
+		eventRequest2.on( 'cachedResponse', () => {
+			done();
+		} );
+
+		assert.equal( 1, pluginMiddlewares.length );
+
+		eventRequest.dataServer		= dataServer;
+		eventRequest2.dataServer	= dataServer;
+
+		router.add( pluginMiddlewares[0] );
+		router.add({
+			route	: '/test/responseCachePlugin/BUFFER',
+			handler	: ( event ) => {
+				event.cacheCurrentRequest();
+			}
+		});
+		router.add({
+			handler	: ( event ) => {
+				event.send( Buffer.from( 'test' ) );
+			}
+		});
+		router.add( helpers.getEmptyMiddleware() );
+
+		eventRequest._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest ) );
+		eventRequest.next();
+
+		setTimeout(() => {
+			eventRequest2._setBlock( router.getExecutionBlockForCurrentEvent( eventRequest2 ) );
+			eventRequest2.next();
+		}, 50 );
+	}
+});
+
+test({
 	message		: 'ResponseCachePlugin.getCacheId.doesn\'t.use.ip.by.default',
 	test		: ( done ) => {
 		let path				= '/path';
