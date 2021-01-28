@@ -714,7 +714,6 @@ The event request is an object that is created by the server and passed through 
 **send( mixed response = '', Number statusCode = 200 ): Promise** 
 - Sends the response to the user with the specified statusCode
 - The response formatting is done by calling `event.formatResponse`.
-- setResponseHeader will be called with the calculated Content-Length
 - setResponseHeader will be called with X-Powered-By: event_request. This can be disabled by doing: `eventRequest.disableXPoweredBy = true;`
 - Emits a `send` event just before calling this.end()
 - The send function is entirely synchronous until the response has to be sent ( when calling this.end() ). The this.end() promise is returned. This is done for consistency with sendError

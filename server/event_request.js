@@ -139,8 +139,8 @@ class EventRequest extends EventEmitter
 			if ( ! {}.hasOwnProperty.call( options, optionName ) )
 				continue;
 
-			if ( optionName.toLowerCase() === 'expires' || optionName.toLowerCase() === 'max-age' )
-				options[optionName]	= new Date( new Date().getTime() + options[optionName] * 1000 );
+			if ( optionName.toLowerCase() === 'expires' )
+				options[optionName]	= new Date( new Date().getTime() + options[optionName] * 1000 ).toUTCString();
 
 			cookie	+= ` ${optionName}=${options[optionName]};`;
 		}
