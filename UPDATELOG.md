@@ -1,3 +1,8 @@
+29.5.2
+- Send no longer sets Content-Length as it is set automatically on request end
+- The body parser plugin now works differently. It no longer requires a plugin bag. It also does not use the body parser handler, hence it will not always handle the body. The fallback parser now needs to be added manually by adding the raw body parser
+- Small bugfix for the response_cache_plugin
+
 29.5.1
 - Updated Maintained badge
 

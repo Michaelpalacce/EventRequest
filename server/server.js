@@ -87,10 +87,10 @@ class Server extends EventEmitter
 		this.er_data_server				= new DataServerPlugin( 'er_data_server' );
 		this.er_file_stream				= new FileStreamHandlerPlugin( 'er_file_stream' );
 		this.er_response_cache			= new ResponseCachePlugin( 'er_response_cache' );
+		this.er_templating_engine		= new TemplatingEnginePlugin( 'er_templating_engine' );
 		this.er_body_parser_raw			= new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' );
 		this.er_body_parser_json		= new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' );
 		this.er_body_parser_form		= new BodyParserPlugin( FormBodyParser, 'er_body_parser_form' );
-		this.er_templating_engine		= new TemplatingEnginePlugin( 'er_templating_engine' );
 		this.er_body_parser_multipart	= new BodyParserPlugin( MultipartDataParser, 'er_body_parser_multipart' );
 
 		this.pluginManager.addPlugin( this.er_env );
@@ -107,10 +107,10 @@ class Server extends EventEmitter
 		this.pluginManager.addPlugin( this.er_data_server );
 		this.pluginManager.addPlugin( this.er_file_stream );
 		this.pluginManager.addPlugin( this.er_response_cache );
+		this.pluginManager.addPlugin( this.er_templating_engine );
 		this.pluginManager.addPlugin( this.er_body_parser_raw );
 		this.pluginManager.addPlugin( this.er_body_parser_json );
 		this.pluginManager.addPlugin( this.er_body_parser_form );
-		this.pluginManager.addPlugin( this.er_templating_engine );
 		this.pluginManager.addPlugin( this.er_body_parser_multipart );
 
 		this.apply( this.router );

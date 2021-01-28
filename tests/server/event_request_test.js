@@ -597,10 +597,9 @@ test({
 			shouldReturn	: () => { setResponseHeader = true; },
 			with			: [
 				['Location', redirectUrl],
-				['Content-Length', undefined],
 				['X-Powered-By', 'event_request']
 			],
-			called			: 3
+			called			: 2
 		});
 
 		eventRequest.redirect( redirectUrl, 302 );

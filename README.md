@@ -785,7 +785,7 @@ The event request is an object that is created by the server and passed through 
 - Emitted when the event cleaning up has finished and the eventRequest is completed
 - At this point the data set in the EventRequest has been cleaned up
 
-**send( String payload, Number code )**
+**send( String|Buffer payload, Number code )**
 - Emitted when the event.send() is called, just before the event is actually sent
 
 **redirect( Object redirectData )** 
@@ -3694,17 +3694,15 @@ app.apply( app.er_logger, { logger: SomeCustomLogger, attachToProcess: false } )
 ***
 
 # [er_body_parser_json, er_body_parser_form, er_body_parser_multipart, er_body_parser_raw](#er_body_parsers)
-- Adds a JsonBodyParser, FormBodyParser or MultipartBodyParser bodyParsers respectively that can be set up
-- They all implement the design principle behind the BodyParser 
-- These plugins are basically one and the same and even tho many may be added they will use a single body parser handler.
-- There will not be multiple middleware that will be attached
-- Parsers are fired according to the content-type header
+- Adds a JsonBodyParser, FormBodyParser, MultipartBodyParser or RawBodyParser bodyParsers respectively
+- They all implement the design principle behind the BodyParser
+- Parsers are only fired if they support the given content-type
 - json parser supports: application/json
 - form body parser supports: application/x-www-form-urlencoded
 - multipart body parser supports: multipart/form-data
 - er_body_parser_raw is a fallback body parser that will return the data as a raw string if no other parser supports the request. The default body parser has a limit of 10MB. It can optionally be added as a final parser manually to have it's maxPayloadLength changed
-- THE BODY PARSER PLUGINS WILL NOT PARSE DATE IF event.body exists when hitting the middleware
-- **This Plugin can NOT be re-applied multiple times, however you can add each plugin without an issue.**
+- THE BODY PARSER PLUGINS WILL NOT PARSE DATA IF event.body exists when hitting the middleware
+- This Plugin can be re-applied multiple times with different body parsers
 
 ***
 ***
