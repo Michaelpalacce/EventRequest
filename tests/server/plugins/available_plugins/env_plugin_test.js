@@ -8,7 +8,7 @@ const path						= require( 'path' );
 const fs						= require( 'fs' );
 
 test({
-	message	: 'EnvPlugin setServerOnRuntime and test file watcher',
+	message	: 'EnvPlugin.setServerOnRuntime',
 	test	: ( done ) => {
 		const MockServer	= Mock( Server );
 		const server		= new MockServer();
@@ -16,29 +16,42 @@ test({
 
 		fs.writeFileSync( fileLocation,
 			'TESTKEY=TESTVALUE\n' +
-			'TESTKEYTWO=TESTVALUE=WITH=ENTER'
+			'TESTKEYTWO=TESTVALUE=WITH=ENTER\r\n\r'
 		);
 
-		let originalContent	= fs.readFileSync( fileLocation );
-		originalContent		= originalContent.toString( 'utf-8' );
-
-		let envPlugin		= new EnvPlugin( 'id', { fileLocation } );
+		const envPlugin	= new EnvPlugin( 'id', { fileLocation } );
 
 		envPlugin.setServerOnRuntime( server );
 
 		assert.equal( 'TESTVALUE', process.env.TESTKEY );
 		assert.equal( 'TESTVALUE=WITH=ENTER', process.env.TESTKEYTWO );
 
-		fs.writeFileSync( fileLocation, 'TEST=VALUE' );
+		delete( process.env.TESTKEY );
+		delete( process.env.TESTKEYTWO );
 
-		setTimeout(() => {
-			assert.equal( 'VALUE', process.env.TEST );
-			assert.equal( true, typeof process.env.TESTKEY === 'undefined' );
-			assert.equal( true, typeof process.env.TESTKEYTWO === 'undefined' );
+		done();
+	}
+});
 
-			fs.writeFileSync( fileLocation, originalContent );
+test({
+	message	: 'EnvPlugin.setServerOnRuntime.if.file.not.exists',
+	test	: ( done ) => {
+		const MockServer	= Mock( Server );
+		const server		= new MockServer();
+		const fileLocation	= path.join( __dirname, '/fixture/.env');
 
-			done();
-		}, 200 );
+		fs.writeFileSync( fileLocation,
+			'TESTKEY=TESTVALUE\n' +
+			'TESTKEYTWO=TESTVALUE=WITH=ENTER\r\n\r'
+		);
+
+		const envPlugin	= new EnvPlugin( 'id', { fileLocation: './wrong' } );
+
+		envPlugin.setServerOnRuntime( server );
+
+		assert.deepStrictEqual( process.env.TESTKEY, undefined );
+		assert.deepStrictEqual( process.env.TESTKEYTWO, undefined );
+
+		done();
 	}
 });

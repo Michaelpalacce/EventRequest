@@ -804,7 +804,7 @@ test({
 	dataProvider	: placesToSplitProvider,
 	test			: ( done, placeToSplit ) => {
 		let tempDir			= path.join( __dirname, './fixture/testUploads' );
-		let multipartParser	= new MockMultipartDataParser( { tempDir } );
+		let multipartParser	= new MockMultipartDataParser( { tempDir, cleanUpItemsTimeoutMS: 1 } );
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
 			undefined,
@@ -834,6 +834,8 @@ test({
 		multipartParser.parse( eventRequest ).then(( parsedData ) => {
 			const body	= parsedData.body;
 
+			if ( fs.existsSync( body.$files[0].path ) )
+
 			// Sync delay
 			setTimeout(() => {
 				assert.deepStrictEqual( parsedData.rawBody, {} );
@@ -847,7 +849,7 @@ test({
 
 				multipartParser.terminate();
 				done();
-			}, 100 );
+			}, 60 );
 		}).catch( done );
 	}
 });

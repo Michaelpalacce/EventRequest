@@ -162,7 +162,7 @@ test({
 		setTimeout(() => {
 			// The json body parser was never done, since the event finished prematurely
 			done();
-		}, 100 );
+		}, 50 );
 	}
 });
 

@@ -4,34 +4,14 @@ const fs				= require( 'fs' );
 const path				= require( 'path' );
 const PluginInterface	= require( '../plugin_interface' );
 
-const ENV_FILENAME	= '.env';
-const ENV_SEPARATOR	= '=';
+const ENV_FILENAME		= '.env';
+const ENV_SEPARATOR		= '=';
 
 /**
  * @brief	Env Plugin responsible for parsing .env file and adding those variables to the process.env
  */
 class EnvPlugin extends PluginInterface
 {
-	constructor( id, options )
-	{
-		super( id, options );
-
-		this.envVariableKeys	= [];
-		this.watcher			= null;
-	}
-
-	/**
-	 * @brief	Removes the old environment variables so new ones can be set
-	 *
-	 * @return	void
-	 */
-	removeOldEnvVariables()
-	{
-		this.envVariableKeys.forEach(( envKey ) => {
-			delete process.env[envKey];
-		});
-	}
-
 	/**
 	 * @brief	Loads the file to the process.env
 	 *
@@ -40,20 +20,13 @@ class EnvPlugin extends PluginInterface
 	loadFileInEnv()
 	{
 		const absFilePath	= this.getEnvFileAbsPath();
-		const fileExists	= fs.existsSync( absFilePath );
-		if ( fileExists )
+
+		if ( fs.existsSync( absFilePath ) )
 		{
-			this.removeOldEnvVariables();
-			// Reset the env variables array so we can populate it anew
-			this.envVariableKeys	= [];
-			const lines				= fs.readFileSync( absFilePath, 'utf-8' ).split( /\r?\n/ );
-
-			for ( const line of lines )
+			for ( const line of fs.readFileSync( absFilePath, 'utf-8' ).split( /\r?\n/ ) )
 			{
-				const parts	= line.split( ENV_SEPARATOR );
-				const key	= parts.shift();
-
-				this.envVariableKeys.push( key );
+				const parts			= line.split( ENV_SEPARATOR );
+				const key			= parts.shift();
 
 				process.env[key]	= parts.join( ENV_SEPARATOR ).replace( '\r', '' ).replace( '\n', '' );
 			}
@@ -70,7 +43,6 @@ class EnvPlugin extends PluginInterface
 	setServerOnRuntime( server )
 	{
 		this.loadFileInEnv();
-		this.attachFileWatcherToEnvFile();
 	}
 
 	/**
@@ -83,20 +55,6 @@ class EnvPlugin extends PluginInterface
 		return typeof this.options.fileLocation === 'string'
 			? this.options.fileLocation
 			: path.join( path.parse( require.main.filename ).dir, ENV_FILENAME );
-	}
-
-	/**
-	 * @brief	Attach a file watcher to the env file to reload the env variables on change
-	 *
-	 * @return	void
-	 */
-	attachFileWatcherToEnvFile()
-	{
-		this.watcher	= fs.watch( this.getEnvFileAbsPath() );
-
-		this.watcher.on( 'change', () => {
-			this.loadFileInEnv();
-		});
 	}
 }
 

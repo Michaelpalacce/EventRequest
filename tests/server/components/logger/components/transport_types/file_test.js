@@ -65,6 +65,7 @@ test({
 
 		fileTransport.getWriteStream();
 
+		// OS sync delay
 		setTimeout(() => {
 			assert.deepStrictEqual( fs.existsSync( dir ), true );
 

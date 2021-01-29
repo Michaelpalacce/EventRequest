@@ -41,7 +41,6 @@ test({
 		assert.equal( true, server.router instanceof Router );
 		assert.equal( 1, server.router.middleware.length );
 		assert.equal( 2, Object.keys( server.plugins ).length );
-		assert.equal( typeof server.pluginBag === 'object', true );
 		assert.deepStrictEqual( server.pluginManager instanceof PluginManager, true );
 
 		assert.equal( typeof server.er_cache === 'object', true );
@@ -54,7 +53,6 @@ test({
 		assert.equal( typeof server.er_file_stream === 'object', true );
 		assert.equal( typeof server.er_logger === 'object', true );
 		assert.equal( typeof server.er_session === 'object', true );
-		assert.equal( typeof server.er_response_cache === 'object', true );
 		assert.equal( typeof server.er_body_parser_json === 'object', true );
 		assert.equal( typeof server.er_body_parser_form === 'object', true );
 		assert.equal( typeof server.er_body_parser_multipart === 'object', true );

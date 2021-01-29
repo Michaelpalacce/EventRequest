@@ -35,33 +35,12 @@ test({
 });
 
 test({
-	message	: 'Server.test.er_env.attaches.environment.variables.to.process.when.changed',
-	test	: ( done ) => {
-		const fileLocation	= path.join( __dirname, './fixture/.env' );
-		app.apply( app.er_env, { fileLocation } );
-
-		assert.equal( process.env.TESTKEY, 'TESTVALUE' );
-
-		fs.writeFileSync( fileLocation, 'TESTKEY=TESTVALUE2' )
-
-		setTimeout(()=>{
-			assert.equal( process.env.TESTKEY, 'TESTVALUE2' );
-			fs.writeFileSync( fileLocation, 'TESTKEY=TESTVALUE' )
-			setTimeout(()=>{
-				done();
-			}, 100 );
-		}, 200 );
-	}
-});
-
-test({
 	message	: 'Server.test.er_env.if.file.not.exists',
 	test	: ( done ) => {
 		const fileLocation	= path.join( __dirname, './fixture/.envNotExisting' );
 
-		assert.throws(() => {
-			app.apply( app.er_env, { fileLocation } );
-		});
+		// Does not throw
+		app.apply( app.er_env, { fileLocation } );
 
 		done();
 	}
@@ -71,9 +50,8 @@ test({
 	message	: 'Server.test.er_env.defaults',
 	test	: ( done ) => {
 
-		assert.throws(() => {
-			app.apply( app.er_env );
-		});
+		// Does not throw
+		app.apply( app.er_env );
 
 		done();
 	}
