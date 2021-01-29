@@ -849,7 +849,7 @@ test({
 
 				multipartParser.terminate();
 				done();
-			}, 60 );
+			}, 75 );
 		}).catch( done );
 	}
 });
