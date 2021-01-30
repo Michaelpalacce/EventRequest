@@ -47,7 +47,7 @@ class TemplatingEnginePlugin extends PluginInterface
 								? `${templateName}.${this.templateExtension}`
 								: `index.${this.templateExtension}`;
 
-				this.render( path.resolve( path.join( this.templateDir, templateName ) ), variables ).then( ( result )=>{
+				this.render( path.resolve( path.join( this.templateDir, templateName ) ), variables ).then( ( result ) => {
 					if ( result && result.length > 0  && ! eventRequest.isFinished() )
 					{
 						eventRequest.setResponseHeader( 'Content-Type', 'text/html' ).send( result );

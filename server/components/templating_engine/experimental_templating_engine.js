@@ -72,12 +72,16 @@ class TemplatingEngine extends DefaultTemplatingEngine
 					r$r	+= `r$r.push(\`` + line.replace( /`/g, '\\`' ).replace( '$', '\\$' ) + `\`);` + this.EOL;
 				}
 			}
-		}
+		};
 
 		// Add local variables so we don't have to use this. to access variables
 		let i	= 0;
 		for ( const key in variables )
 		{
+			/* istanbul ignore next */
+			if ( ! {}.hasOwnProperty.call( variables, key ) )
+				continue;
+
 			r$r	+= `let ${key} = args[${i}];` + this.EOL;
 			++i;
 		}
@@ -87,7 +91,7 @@ class TemplatingEngine extends DefaultTemplatingEngine
 		while( match = this.variablesRe.exec( template ) )
 		{
 			const matchIndex	= match.index;
-			const matchedString	= match[0]
+			const matchedString	= match[0];
 			const matchLength	= matchedString.length;
 
 			addCode( template.slice( cursor, matchIndex ) );
@@ -107,7 +111,7 @@ class TemplatingEngine extends DefaultTemplatingEngine
 		// Finish up
 		r$r	+= 'return r$r.join("");';
 
-		return new Function( '...args', r$r ).apply( null, Object.values( variables ) )
+		return new Function( '...args', r$r ).apply( null, Object.values( variables ) );
 	}
 }
 
