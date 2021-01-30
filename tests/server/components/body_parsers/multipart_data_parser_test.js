@@ -847,7 +847,6 @@ test({
 				assert.equal( body.$files[1].name, 'a.html' );
 				assert.equal( body.$files[1].contentType, 'text/html' );
 
-				multipartParser.terminate();
 				done();
 			}, 100 );
 		}).catch( done );
