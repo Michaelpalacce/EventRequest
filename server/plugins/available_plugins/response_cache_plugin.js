@@ -5,8 +5,11 @@ const PluginInterface	= require( '../plugin_interface' );
 // Defaults for the plugin
 const DEFAULT_TTL		= 60 * 5000;
 const DEFAULT_USE_IP	= false;
+
 /**
  * @brief	Plugin responsible for caching requests to the cache server.
+ *
+ * @deprecated	This will be removed completely from the server, it will not be supported at all anymore.
  */
 class ResponseCachePlugin extends PluginInterface
 {

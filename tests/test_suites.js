@@ -20,7 +20,6 @@ testSuites.serverSuite		= () => {
 	require( './server/server_er_session_test' );
 	require( './server/server_er_rate_limits_test' );
 	require( './server/server_er_timeout_test' );
-	require( './server/server_er_response_cache_test' );
 };
 
 testSuites.securitySuite		= () => {
@@ -67,6 +66,7 @@ testSuites.templatingEngine		= () => {
 testSuites.rateLimiterSuite		= () => {
 	require( './server/components/rate_limiter/bucket_test' );
 	require( './server/components/rate_limiter/bucket_with_data_server_map_test' );
+	require( './server/components/rate_limiter/bucket_with_data_server_big_map_test' );
 };
 
 testSuites.fileStreamSuite		= () => {
@@ -121,10 +121,13 @@ testSuites.pluginsSuite		= () => {
 	require( './server/plugins/available_plugins/session_plugin_with_map_test' );
 	require( './server/plugins/available_plugins/templating_engine_plugin_test' );
 	require( './server/plugins/available_plugins/logger_plugin_test' );
-	require( './server/plugins/available_plugins/response_cache_plugin_test' );
-	require( './server/plugins/available_plugins/response_cache_plugin_with_map_test' );
 	require( './server/plugins/available_plugins/cors_plugin_test' );
 	require( './server/plugins/available_plugins/validation_plugin_test' );
 };
+
+
+// require( './server/plugins/available_plugins/response_cache_plugin_test' );				// Deprecated
+// require( './server/plugins/available_plugins/response_cache_plugin_with_map_test' );		// Deprecated
+// require( './server/server_er_response_cache_test' );										// Deprecated
 
 module.exports	= testSuites;

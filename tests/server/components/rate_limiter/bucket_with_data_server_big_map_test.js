@@ -1,13 +1,13 @@
 'use strict';
 
 const { Mock, assert, test }	= require( '../../../test_helper' );
-const DataServerMap				= require( '../../../../server/components/caching/data_server_map' );
+const DataServerMap			= require( '../../../../server/components/caching/data_server_map' );
 const Bucket					= require( '../../../../server/components/rate_limiter/bucket' );
 
 test({
-	message	: 'Bucket.with.map.constructor.on.new.data.server',
+	message	: 'Bucket.with.big.map.constructor.on.new.data.server',
 	test	: ( done ) => {
-		const dataStore	= new DataServerMap( { persist: false } );
+		const dataStore	= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket	= new Bucket( 100, 60, 1000, Bucket.DEFAULT_PREFIX, null, dataStore );
 
 		bucket.init().then(() => {
@@ -20,10 +20,10 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.handleError.on.error.throws',
+	message	: 'Bucket.with.big.map.handleError.on.error.throws',
 	test	: ( done ) => {
 		const MockDataServer	= Mock( DataServerMap );
-		const dataServer		= new MockDataServer( { persist: false } );
+		const dataServer		= new MockDataServer( { persist: false, useBigMap: true } );
 		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 
 		process.once( 'uncaughtException', ( reason, p ) => {
@@ -44,9 +44,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.reset.resets.the.value.to.maxAmount.and.updates.lastUpdate',
+	message	: 'Bucket.with.big.map.reset.resets.the.value.to.maxAmount.and.updates.lastUpdate',
 	test	: ( done ) => {
-		const dataServer	= new DataServerMap( { persist: false } );
+		const dataServer	= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket		= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {
@@ -70,9 +70,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.get.gets.the.current.amount.of.tokens',
+	message	: 'Bucket.with.big.map.get.gets.the.current.amount.of.tokens',
 	test	: ( done ) => {
-		const dataServer	= new DataServerMap( { persist: false } );
+		const dataServer	= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket		= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {
@@ -86,9 +86,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.reduce.reduces.the.amount.of.tokens.and.returns.true',
+	message	: 'Bucket.with.big.map.reduce.reduces.the.amount.of.tokens.and.returns.true',
 	test	: ( done ) => {
-		const dataServer	= new DataServerMap( { persist: false } );
+		const dataServer	= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket		= new Bucket( 1, 1, 10, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {
@@ -102,9 +102,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.reduce.reduces.the.amount.of.tokens.and.returns.false.if.not.enough.tokens',
+	message	: 'Bucket.with.big.map.reduce.reduces.the.amount.of.tokens.and.returns.false.if.not.enough.tokens',
 	test	: ( done ) => {
-		const dataServer	= new DataServerMap( { persist: false } );
+		const dataServer	= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket		= new Bucket( 1, 1, 10, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {
@@ -118,9 +118,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.reduce.reduces.the.amount.of.tokens.and.refills.after.time',
+	message	: 'Bucket.with.big.map.reduce.reduces.the.amount.of.tokens.and.refills.after.time',
 	test	: ( done ) => {
-		const dataServer	= new DataServerMap( { persist: false } );
+		const dataServer	= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket		= new Bucket( 1, 1/10, 10, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {
@@ -135,9 +135,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.reduce.does.not.refill.more.than.max',
+	message	: 'Bucket.with.big.map.reduce.does.not.refill.more.than.max',
 	test	: ( done ) => {
-		const dataServer	= new DataServerMap( { persist: false } );
+		const dataServer	= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket		= new Bucket( 1, 1/10, 10, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {
@@ -156,9 +156,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.reduceRaceCondition',
+	message	: 'Bucket.with.big.map.reduceRaceCondition',
 	test	: ( done ) => {
-		const dataServer	= new DataServerMap( { persist: false } );
+		const dataServer	= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket		= new Bucket( 1, 100, 10000, undefined, undefined, dataServer );
 
 		bucket.init().then( async () => {
@@ -187,9 +187,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.reduceRaceCondition.fails.after.a.set.amount',
+	message	: 'Bucket.with.big.map.reduceRaceCondition.fails.after.a.set.amount',
 	test	: ( done ) => {
-		const dataServer			= new DataServerMap( { persist: false } );
+		const dataServer			= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket				= new Bucket( 1, 100, 10000, undefined, undefined, dataServer );
 		const expectedFalseTokens	= 500;
 
@@ -224,9 +224,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.reduceRaceConditionWithRefill',
+	message	: 'Bucket.with.big.map.reduceRaceConditionWithRefill',
 	test	: ( done ) => {
-		const dataServer			= new DataServerMap( { persist: false } );
+		const dataServer			= new DataServerMap( { persist: false, useBigMap: true } );
 		const bucket				= new Bucket( 5000, 1, 10000, undefined, undefined, dataServer );
 		const expectedFalseTokens	= 5000;
 
@@ -270,10 +270,10 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map._doLock.if.max.counter.is.reached',
+	message	: 'Bucket.with.big.map._doLock.if.max.counter.is.reached',
 	test	: ( done ) => {
 		const MockDataServer	= Mock( DataServerMap );
-		const dataServer		= new MockDataServer( { persist: false } );
+		const dataServer		= new MockDataServer( { persist: false, useBigMap: true } );
 		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 		bucket.maxCounter		= 10;
 
@@ -295,10 +295,10 @@ test({
 });
 
 test({
-	message	: 'Bucket.with.map.reduce.when.cannot.obtain.lock',
+	message	: 'Bucket.with.big.map.reduce.when.cannot.obtain.lock',
 	test	: ( done ) => {
 		const MockDataServer	= Mock( DataServerMap );
-		const dataServer		= new MockDataServer( { persist: false } );
+		const dataServer		= new MockDataServer( { persist: false, useBigMap: true } );
 		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
 		bucket.maxCounter		= 10;
 

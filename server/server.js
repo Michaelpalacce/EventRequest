@@ -17,7 +17,6 @@ const TemplatingEnginePlugin	= require( './plugins/available_plugins/templating_
 const FileStreamHandlerPlugin	= require( './plugins/available_plugins/file_stream_handler_plugin' );
 const LoggerPlugin				= require( './plugins/available_plugins/logger_plugin' );
 const BodyParserPlugin			= require( './plugins/available_plugins/body_parser_plugin' );
-const ResponseCachePlugin		= require( './plugins/available_plugins/response_cache_plugin' );
 const SessionPlugin				= require( './plugins/available_plugins/session_plugin' );
 const SecurityPlugin			= require( './plugins/available_plugins/security_plugin' );
 const CorsPlugin				= require( './plugins/available_plugins/cors_plugin' );
@@ -48,7 +47,6 @@ class Server extends EventEmitter
 		this.Loggur			= Loggur;
 
 		this.plugins		= [];
-		this.pluginBag		= {};
 
 		this.setUpDefaultPlugins();
 	}
@@ -86,7 +84,6 @@ class Server extends EventEmitter
 		this.er_rate_limits				= new RateLimitsPlugin( 'er_rate_limits' );
 		this.er_data_server				= new DataServerPlugin( 'er_data_server' );
 		this.er_file_stream				= new FileStreamHandlerPlugin( 'er_file_stream' );
-		this.er_response_cache			= new ResponseCachePlugin( 'er_response_cache' );
 		this.er_templating_engine		= new TemplatingEnginePlugin( 'er_templating_engine' );
 		this.er_body_parser_raw			= new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' );
 		this.er_body_parser_json		= new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' );
@@ -106,7 +103,6 @@ class Server extends EventEmitter
 		this.pluginManager.addPlugin( this.er_rate_limits );
 		this.pluginManager.addPlugin( this.er_data_server );
 		this.pluginManager.addPlugin( this.er_file_stream );
-		this.pluginManager.addPlugin( this.er_response_cache );
 		this.pluginManager.addPlugin( this.er_templating_engine );
 		this.pluginManager.addPlugin( this.er_body_parser_raw );
 		this.pluginManager.addPlugin( this.er_body_parser_json );

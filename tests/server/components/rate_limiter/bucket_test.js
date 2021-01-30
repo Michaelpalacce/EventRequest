@@ -5,7 +5,7 @@ const DataServer				= require( '../../../../server/components/caching/data_serve
 const Bucket					= require( '../../../../server/components/rate_limiter/bucket' );
 
 test({
-	message	: 'Bucket.constructor on defaults',
+	message	: 'Bucket.constructor.on.defaults',
 	test	: ( done ) => {
 		const bucket	= new Bucket();
 
@@ -43,51 +43,7 @@ test({
 });
 
 test({
-	message	: 'Bucket._doLock.if.max.counter.is.reached',
-	test	: ( done ) => {
-		const MockDataServer	= Mock( DataServer );
-		const dataServer		= new MockDataServer({persist: false });
-		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
-
-		bucket.init().then( async () => {
-			dataServer._mock({
-				method			: 'lock',
-				shouldReturn	: async () => {
-					return false;
-				}
-			});
-
-			const promise	= new Promise( ( resolve, reject ) => {
-				bucket._doLock( resolve, reject, 0 ).catch( done );
-			});
-
-			promise.then(( status ) => { status === false ? done() : done( `Status should have been false but is ${status}` ); }).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Bucket.reduce.when.cannot.obtain.lock',
-	test	: ( done ) => {
-		const MockDataServer	= Mock( DataServer );
-		const dataServer		= new MockDataServer({persist: false });
-		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
-
-		bucket.init().then( async () => {
-			dataServer._mock({
-				method			: 'lock',
-				shouldReturn	: async () => {
-					return false;
-				}
-			});
-
-			await bucket.reduce().catch( done ) === false ? done() : done( 'Should not have reduced' );
-		});
-	}
-});
-
-test({
-	message	: 'Bucket.reset resets the value to maxAmount and updates lastUpdate',
+	message	: 'Bucket.reset.resets.the.value.to.maxAmount.and.updates.lastUpdate',
 	test	: ( done ) => {
 		const bucket	= new Bucket();
 
@@ -106,13 +62,13 @@ test({
 				assert.deepStrictEqual( await bucket._getValue(), bucket.maxAmount );
 
 				done();
-			}, 1000 );
+			}, 5 );
 		});
 	}
 });
 
 test({
-	message	: 'Bucket.get gets the current amount of tokens',
+	message	: 'Bucket.get.gets.the.current.amount.of.tokens',
 	test	: ( done ) => {
 		const bucket	= new Bucket();
 
@@ -127,7 +83,7 @@ test({
 });
 
 test({
-	message	: 'Bucket.reduce reduces the amount of tokens and returns true',
+	message	: 'Bucket.reduce.reduces.the.amount.of.tokens.and.returns.true',
 	test	: ( done ) => {
 		const bucket	= new Bucket( 1, 1, 10 );
 
@@ -142,7 +98,7 @@ test({
 });
 
 test({
-	message	: 'Bucket.reduce reduces the amount of tokens and returns false if not enough tokens',
+	message	: 'Bucket.reduce.reduces.the.amount.of.tokens.and.returns.false.if.not.enough.tokens',
 	test	: ( done ) => {
 		const bucket	= new Bucket( 1, 1, 10 );
 
@@ -157,9 +113,9 @@ test({
 });
 
 test({
-	message	: 'Bucket.reduce reduces the amount of tokens and refills after time',
+	message	: 'Bucket.reduce.reduces.the.amount.of.tokens.and.refills.after.time',
 	test	: ( done ) => {
-		const bucket	= new Bucket( 1, 1, 10 );
+		const bucket	= new Bucket( 1, 1 / 10, 10 );
 
 		bucket.init().then( async () => {
 			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
@@ -167,15 +123,15 @@ test({
 			setTimeout( async () => {
 				assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
 				done();
-			}, 1050 );
+			}, 125 );
 		});
 	}
 });
 
 test({
-	message	: 'Bucket.reduce does not refill more than max',
+	message	: 'Bucket.reduce.does.not.refill.more.than.max',
 	test	: ( done ) => {
-		const bucket	= new Bucket( 1, 1, 10 );
+		const bucket	= new Bucket( 1, 1/10, 10 );
 
 		bucket.init().then( async () => {
 			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
@@ -187,7 +143,7 @@ test({
 				assert.deepStrictEqual( await bucket.reduce(), true );
 				assert.deepStrictEqual( await bucket.get(), 9 );
 				done();
-			}, 2100 );
+			}, 210 );
 		});
 	}
 });
@@ -223,7 +179,7 @@ test({
 });
 
 test({
-	message	: 'Bucket.reduceRaceCondition fails after a set amount',
+	message	: 'Bucket.reduceRaceCondition.fails.after.a.set.amount',
 	test	: ( done ) => {
 		const bucket				= new Bucket( 1, 100, 10000 );
 		const expectedFalseTokens	= 500;
@@ -299,6 +255,52 @@ test({
 					);
 				});
 			}, 2010 );
+		});
+	}
+});
+
+test({
+	message	: 'Bucket._doLock.if.max.counter.is.reached',
+	test	: ( done ) => {
+		const MockDataServer	= Mock( DataServer );
+		const dataServer		= new MockDataServer( { persist: false } );
+		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
+		bucket.maxCounter		= 10;
+
+		bucket.init().then( async () => {
+			dataServer._mock({
+				method			: 'lock',
+				shouldReturn	: async () => {
+					return false;
+				}
+			});
+
+			const promise	= new Promise( ( resolve, reject ) => {
+				bucket._doLock( resolve, reject, 0 ).catch( done );
+			});
+
+			promise.then(( status ) => { status === false ? done() : done( `Status should have been false but is ${status}` ); }).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Bucket.reduce.when.cannot.obtain.lock',
+	test	: ( done ) => {
+		const MockDataServer	= Mock( DataServer );
+		const dataServer		= new MockDataServer( { persist: false } );
+		const bucket			= new Bucket( undefined, undefined, undefined, undefined, undefined, dataServer );
+		bucket.maxCounter		= 10;
+
+		bucket.init().then( async () => {
+			dataServer._mock({
+				method			: 'lock',
+				shouldReturn	: async () => {
+					return false;
+				}
+			});
+
+			await bucket.reduce().catch( done ) === false ? done() : done( 'Should not have reduced' );
 		});
 	}
 });

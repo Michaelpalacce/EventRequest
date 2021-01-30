@@ -652,7 +652,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with connection delay policy limiting',
+	message	: 'Server.test.er_rate_limits.with.connection.delay.policy.limiting',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithConnectionDelayPolicy';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -730,7 +730,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with strict policy',
+	message	: 'Server.test.er_rate_limits.with.strict.policy',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicy';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -753,7 +753,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limitsSTRESS with strict policy STRESS',
+	message	: 'Server.test.er_rate_limitsSTRESS.with.strict.policy.STRESS',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicyStress';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -786,7 +786,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with specified methods matches',
+	message	: 'Server.test.er_rate_limits.with.specified.methods.matches',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethods';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -809,7 +809,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with multiple specified methods matches',
+	message	: 'Server.test.er_rate_limits.with.multiple.specified.methods.matches',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicyWithMultipleSpecifiedMethods';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -832,7 +832,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with specified methods does not match if method is not the same',
+	message	: 'Server.test.er_rate_limits.with.specified.methods.does.not.match.if.method.is.not.the.same',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethodsThatDoNotMatch';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -854,7 +854,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with stopPropagation',
+	message	: 'Server.test.er_rate_limits.with.stopPropagation',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithPropagation';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -888,7 +888,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits with multiple rules',
+	message	: 'Server.test.er_rate_limits.with.multiple.rules',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsWithMultipleRules';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -911,7 +911,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits strict overrides connection delay',
+	message	: 'Server.test.er_rate_limits.strict.overrides.connection.delay',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsStrictOverridesConnectionDelayPolicy';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -934,7 +934,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits connection delay overrides permissive',
+	message	: 'Server.test.er_rate_limits.connection.delay.overrides.permissive',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsConnectionDelayOverridesPermissivePolicy';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
@@ -957,7 +957,7 @@ test({
 });
 
 test({
-	message	: 'Server.test er_rate_limits connection delay returns 429 if no more retries',
+	message	: 'Server.test.er_rate_limits.connection.delay.returns.429.if.no.more.retries',
 	test	: ( done ) => {
 		const name			= 'testErRateLimitsConnectionDelayReturns429IfNoMoreRetries';
 		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );

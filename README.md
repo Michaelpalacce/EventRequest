@@ -2838,7 +2838,6 @@ Server {
   er_session,
   er_security,
   er_cors,
-  er_response_cache,
   er_body_parser_json,
   er_body_parser_form,
   er_body_parser_multipart,
@@ -2893,8 +2892,6 @@ The PluginInterface implements a getPluginDependencies method that returns an Ar
 These plugins must be installed before the dependant plugin is.
 
 The PluginInterface implements a setServerOnRuntime method that passes the server as the first and only argument.
-The PluginInterface can interact with a special pluginBag prop attached to the server during setServerOnRuntime
-to store any data it seems fit or may modify the server in one way or another.
 
 The PluginInterface implements a getPluginId method that returns the id of the plugin ( these must be unique ).
 
@@ -3850,7 +3847,9 @@ app.post( '/submit', ( event ) => {
 ***
 ***
 
+
 # [er_response_cache](#er_response_cache) 
+## DEPRECATION NOTICE: this plugin was a very early adaptation of caching. You should be using browser caching instead of an approach like this. Check out er_etag and er_cache
 - Adds a response caching mechanism.
 - It will only cache IF you call event.send
 - It will only cache 2xx responses
