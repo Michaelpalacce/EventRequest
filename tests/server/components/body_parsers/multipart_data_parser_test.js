@@ -846,7 +846,7 @@ test({
 				assert.equal( body.$files[1].contentType, 'text/html' );
 
 				done();
-			}, 10 );
+			}, 20 );
 		}).catch( done );
 	}
 });
