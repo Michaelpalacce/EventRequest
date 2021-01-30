@@ -69,7 +69,7 @@ class TemplatingEngine extends DefaultTemplatingEngine
 				{
 					// Strip line of specific characters
 					// Remove ` | Escape $
-					r$r	+= `r$r.push(\`` + line.replace( /`/g, '\`' ).replace( '$', '\\$' ) + `\`);` + this.EOL;
+					r$r	+= `r$r.push(\`` + line.replace( /`/g, '\\`' ).replace( '$', '\\$' ) + `\`);` + this.EOL;
 				}
 			}
 		}
@@ -84,7 +84,7 @@ class TemplatingEngine extends DefaultTemplatingEngine
 
 		let match;
 
-		while( match	= this.variablesRe.exec( template ) )
+		while( match = this.variablesRe.exec( template ) )
 		{
 			const matchIndex	= match.index;
 			const matchedString	= match[0]
