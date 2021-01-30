@@ -1,5 +1,7 @@
 'use strict';
 
+const { readFile }	= require( 'fs' ).promises;
+
 /**
  * @brief	Default templating engine that just returns the HTML directly
  */
@@ -11,11 +13,26 @@ class TemplatingEngine
 	 * @param	{String} html
 	 * @param	{Object} variables
 	 *
-	 * @returns	String
+	 * @returns	{String}
 	 */
 	render( html, variables )
 	{
 		return html;
+	}
+
+	/**
+	 * @brief	Reads and renders a html file
+	 *
+	 * @param	{String} templateLocation
+	 * @param	{Object} variables
+	 *
+	 * @return	{Promise<String>}
+	 */
+	async renderFile( templateLocation, variables )
+	{
+		const data	= await readFile( templateLocation );
+
+		return this.render( data.toString(), variables );
 	}
 }
 

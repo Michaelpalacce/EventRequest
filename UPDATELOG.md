@@ -1,3 +1,7 @@
+30.0.0
+- Added new experimental templating engine
+- Changed the way er_templating_engine works to be more customizable
+
 29.5.3
 - Removed pluginBag it's use was confusing and was unnecessary 
 - DEPRECATED er_response_cache

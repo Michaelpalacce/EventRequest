@@ -1,3 +1,5 @@
+const TemplatingEngine			= require( '../../server/components/templating_engine/experimental_templating_engine' );
+const templatingEngine			= new TemplatingEngine();
 const { assert, test, helpers }	= require( '../test_helper' );
 const path						= require( 'path' );
 const { App, Server }			= require( './../../index' );
@@ -9,20 +11,10 @@ test({
 	test	: ( done ) => {
 		const name			= 'testTemplatingEngine';
 		const deepName		= 'testTemplatingEngineDeep';
+
 		const templateDir 	= path.join( __dirname, './fixture/templates' );
-		let renderCalled	= 0;
 
 		app.apply( app.er_templating_engine, { templateDir } );
-
-		app.add({
-			handler	: ( event ) => {
-				event.on( 'render', () => {
-					renderCalled++;
-				} );
-
-				event.next();
-			}
-		});
 
 		app.get( `/${name}`, ( event ) => {
 			event.render( 'index' );
@@ -41,27 +33,69 @@ test({
 			assert.equal( response.body.toString().includes( 'THIS_IS_THE_DEEP_HTML_FILE' ), true );
 			assert.equal( response.headers['content-type'], 'text/html' );
 
-			assert.equal( renderCalled, 2 );
 			done();
 		}).catch( done );
 	}
 });
 
 test({
-	message	: 'Server.test.er_templating_engine.attaches.a.render.function.that.calls.next.on.error',
+	message	: 'Server.test.er_templating_engine.with.custom.ext',
 	test	: ( done ) => {
-		const name			= 'testTemplatingEngineFail';
-		const templateDir 	= path.join( __dirname, './fixture/templates' );
+		const name			= 'testTemplatingEngineCustomExt';
+		const app			= new Server();
+		const templateDir	= path.join( __dirname, './fixture/templates' );
 
-		app.apply( app.er_templating_engine, { templateDir } );
+		app.apply( app.er_templating_engine, { templateDir, templateExtension: 'customext' } );
 
 		app.get( `/${name}`, ( event ) => {
-			event.render( 'fail' );
+			event.render( 'index' );
 		} );
 
-		helpers.sendServerRequest( `/${name}`, 'GET', 500 ).then(( response ) => {
-			done();
-		}).catch( done );
+		app.listen( 4326, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4326 ).then(( response ) => {
+				assert.equal( response.body.toString().includes( 'THIS_IS_THE_CUSTOM_INDEX_HTML_FILE' ), true );
+				assert.equal( response.headers['content-type'], 'text/html' );
+
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
+	message	: 'Server.test.er_templating_engine.with.secondary.templating.engine',
+	test	: ( done ) => {
+		const name			= 'testTemplatingEngineSecondaryTemplatingEngine';
+		const app			= new Server();
+		const templateDir	= path.join( __dirname, './fixture/templates' );
+
+		app.apply( app.er_templating_engine, { templateDir, render: templatingEngine.renderFile.bind( templatingEngine ) } );
+
+		app.get( `/${name}`, ( event ) => {
+			event.render( 'custom_templating_engine',
+				{
+					XSS_ATTEMPT: '<script\x0Ctype="text/javascript">javascript:alert(1);</script>\n',
+					test: 'TEST VARIABLE',
+					testSwitch: '1',
+					test1: 'SWITCH!!',
+					testSwitch2: '1',
+					testSwitch2Var: 'SHOULD NOT BE THERE'
+				}
+				);
+		} );
+
+		app.listen( 4327, () => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4327 ).then(( response ) => {
+				assert.equal( response.body.toString().includes( 'TEST VARIABLE' ), true );
+				assert.equal( response.body.toString().includes( '&lt;script' ), true );
+				assert.equal( response.body.toString().includes( 'SWITCH!!' ), true );
+				assert.equal( response.body.toString().includes( 'NEW VARIABLE' ), true );
+				assert.equal( response.body.toString().includes( 'SHOULD NOT BE THERE' ), false );
+				assert.equal( response.headers['content-type'], 'text/html' );
+
+				done();
+			}).catch( done );
+		});
 	}
 });
 
@@ -120,9 +154,9 @@ test({
 
 		app.get( `/${name}`, ( event ) => {
 			event.finished	= true;
-			event.render( null, {}, ( error )=>{
+			event.render( null, {} ).catch( ( err ) => {
 				event.finished	= false;
-				event.send( error );
+				event.send( err );
 			});
 		});
 
@@ -141,22 +175,26 @@ test({
 		const app			= new Server();
 		const templateDir 	= path.join( __dirname, './fixture/templates' );
 
-		app.apply( app.er_templating_engine, { templateDir } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.templatingEngine	= {
-				render	: () => {
-					throw new Error( 'Could not render' )
+		app.apply(
+			app.er_templating_engine,
+			{
+				templateDir,
+				render: ()=>{
+					return new Promise (( resolve, reject ) => {
+						reject( 'error' );
+					});
 				}
 			}
+		);
 
-			event.render( null, {}, ( error )=>{
-				event.send( error );
-			});
+		app.get( `/${name}`, ( event ) => {
+			event.render( null, {} ).catch( ( err ) => {
+				event.send( err );
+			} );
 		});
 
 		app.listen( 4323, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4323, '{"code":"app.err.templatingEngine.errorRendering"}' ).then(( response ) => {
+			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4323, 'error' ).then(( response ) => {
 				done();
 			}).catch( done );
 		});

@@ -1,20 +1,55 @@
 'use strict';
 
-class TemplatingEngine
+const DefaultTemplatingEngine	= require( './default_templating_engine' );
+
+/**
+ * @brief	Class used to render html with JS
+ *
+ * @details	Supports syntax for:
+ * 			if, for, while, switch using <% %>
+ *
+ * 			You can also inject JS code using <?js /> syntax
+ *
+ * 			Variables can be rendered by doing <% variableName %>
+ *
+ * 			Experimental: XSS protection
+ *
+ * 			WIP: COMMENTS. HTML comments of template syntax is NOT going to work as expected!
+ * 			WIP: INCLUDES. Including other templates is currently NOT supported
+ */
+class TemplatingEngine extends DefaultTemplatingEngine
 {
 	constructor()
 	{
-		this.variablesRe	= /<%([^%>]+)?%>|<\?js(.+?)\/>/gm;
+		super();
+
+		this.variablesRe	= /<%([^%>]+)?%>|<\?js([\s\S]+?)\/>/gm;
 		this.emptyRe		= /([\s]+)/gm;
-		this.logicalRe		= /(^( )?(if|else|for|while|switch|case|break|{|}))(.*)?/g;
 		this.EOL			= '\n';
 	}
 
+	/**
+	 * @brief	Renders a template given specific variables
+	 *
+	 * @param	{String} template
+	 * @param	{Object} variables
+	 *
+	 * @return	{String}
+	 */
 	render( template, variables )
 	{
 		let r$r		= 'const r$r=[];' + this.EOL;
 		let cursor	= 0;
 
+		/**
+		 * @brief	Builder function for the template
+		 *
+		 * @param	line String
+		 * @param	isJs Boolean
+		 * @param	insertDirectly Boolean
+		 *
+		 * @return	void
+		 */
 		const addCode	= ( line, isJs, insertDirectly = false ) => {
 			if ( isJs )
 			{
@@ -24,14 +59,9 @@ class TemplatingEngine
 					return ;
 				}
 
-				if ( line.match( this.logicalRe ) )
-					r$r	+= line + this.EOL;
-				else
-				{
-					// Escape HTML variables
-					line	= line.trim();
-					r$r		+= `r$r.push( typeof ${line}==='string'?${line}.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'):${line});${this.EOL}`;
-				}
+				// Escape HTML variables
+				line	= line.trim();
+				r$r		+= `r$r.push( typeof ${line}==='string'?${line}.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'):${line});${this.EOL}`;
 			}
 			else
 			{
@@ -65,7 +95,7 @@ class TemplatingEngine
 			if ( match[1] )
 				addCode( match[1], true );
 
-			// Case when <<< >>> syntax is used
+			// Case when <?js ... /> syntax is used
 			else
 				addCode( match[2], true, true );
 
@@ -77,7 +107,7 @@ class TemplatingEngine
 		// Finish up
 		r$r	+= 'return r$r.join("");';
 
-		return new Function( '...args', r$r ).apply( null, Object.values( variables ) );
+		return new Function( '...args', r$r ).apply( null, Object.values( variables ) )
 	}
 }
 

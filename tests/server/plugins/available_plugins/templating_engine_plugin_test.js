@@ -25,10 +25,10 @@ test({
 
 		eventRequest._mock({
 			method			: 'send',
-			shouldReturn	: () => {
+			shouldReturn	: ( data ) => {
+				assert.deepStrictEqual( data.includes( 'RENDERED!!!' ), true );
 				called	++;
 			},
-			with			: [['rendered']],
 			called			: 1
 		});
 
@@ -56,9 +56,6 @@ test({
 			assert.equal( 1, called );
 			assert.equal( 1, setHeaderCalled );
 			assert.equal( false, typeof eventRequest.render === 'undefined' );
-			assert.equal( false, typeof eventRequest.templateDir === 'undefined' );
-			assert.equal( false, typeof eventRequest.templatingEngine === 'undefined' );
-
 			done();
 		});
 	}
