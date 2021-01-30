@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+</head>
+<body>
+
+<?js switch( testSwitch ){
+		case '1': />
+			<%test1%>
+<?js		break;
+ } />
+
+<?js switch( testSwitch2 ){
+		case '2': />
+			<%testSwitch2Var%>
+<?js		break;
+ } />
+<?js let newVar = 'NEW VARIABLE'; />
+
+<% newVar %>
+
+<% test %>
+
+<% XSS_ATTEMPT %>
+
+</body>
+<script>
+	`${test}`
+
+	//${test}
+	var x, y;
+	x = 5 + 6;
+	y = x * 10;
+	// document.getElementById("demo").innerHTML = y;
+</script>
+</html>

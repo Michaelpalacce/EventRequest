@@ -1,17 +1,29 @@
 'use strict';
 
 const PluginInterface			= require( '../plugin_interface' );
-const { readFile }				= require( 'fs' ).promises;
 const path						= require( 'path' );
 const DefaultTemplatingEngine	= require( '../../components/templating_engine/default_templating_engine' );
+
 const PROJECT_ROOT				= path.parse( require.main.filename ).dir;
 const DEFAULT_TEMPLATING_DIR	= path.join( PROJECT_ROOT, './public' );
+const DEFAULT_TEMPLATE_EXT		= 'html';
 
 /**
  * @brief	Templating engine plugin that attaches a render functionality to the eventRequest
  */
 class TemplatingEnginePlugin extends PluginInterface
 {
+	constructor( pluginId, options = {} )
+	{
+		super( pluginId, options );
+
+		this.templatingEngine	= null;
+		this.templateDir		= null;
+		this.templateExtension	= null;
+
+		this.setOptions( options );
+	}
+
 	/**
 	 * @brief	Attaches a render function to the event request
 	 *
@@ -26,46 +38,57 @@ class TemplatingEnginePlugin extends PluginInterface
 		 *
 		 * @param	{String} templateName
 		 * @param	{Object} variables
-		 * @param	{CallableFunction} errorCallback
 		 *
 		 * @return	Promise
 		 */
-		eventRequest.render	= function( templateName, variables = {}, errorCallback = null )
-		{
-			const renderPromise	= new Promise(( resolve,reject ) => {
+		eventRequest.render	=  ( templateName, variables = {} ) => {
+			return new Promise( async ( resolve,reject ) => {
 				templateName	= typeof templateName === 'string' && templateName.length > 0
-								? templateName + '.html'
-								: 'index.html';
+								? `${templateName}.${this.templateExtension}`
+								: `index.${this.templateExtension}`;
 
-				readFile( path.join( this.templateDir, templateName ), 'utf8' ).then( ( html ) => {
-					if ( html && html.length > 0  && ! this.isFinished() )
+				this.render( path.resolve( path.join( this.templateDir, templateName ) ), variables ).then( ( result ) => {
+					if ( result && result.length > 0  && ! eventRequest.isFinished() )
 					{
-						try
-						{
-							const result	= this.templatingEngine.render( html, variables );
+						eventRequest.setResponseHeader( 'Content-Type', 'text/html' ).send( result );
 
-							this.emit( 'render', { templateName, variables } );
-
-							this.setResponseHeader( 'Content-Type', 'text/html' ).send( result );
-
-							resolve();
-						}
-						catch ( error )
-						{
-							reject( { code: 'app.err.templatingEngine.errorRendering' } );
-						}
+						resolve();
 					}
 					else
 					{
 						reject( { code: 'app.err.templatingEngine.errorRendering' } );
 					}
-				}).catch( () => { reject( { code: 'app.err.templatingEngine.errorRendering' } ); } );
+				}).catch( reject );
 			});
-
-			renderPromise.catch( errorCallback === null ? eventRequest.next : errorCallback );
-
-			return renderPromise;
 		};
+	}
+
+	/**
+	 * @details	The render function should return a promise
+	 * 			The render function should accept the template location as a first argument and the variables as second
+	 * 			The templateDir must be a real directory, relative and absolute paths are ok
+	 * 			The templateExtension can be anything extension e.g. 'html', 'ejs'. The dot must not be added
+	 * 			Note that when you pass a function, if that function uses 'this' anywhere it will point to the templatingEnginePlugin
+	 * 				due to the way JS behaves. Consider binding the function to the correct instance before passing:
+	 * 				https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_objects/Function/bind
+	 *
+	 * @param	{Object} options
+	 */
+	setOptions( options )
+	{
+		const defaultTemplatingEngine	= new DefaultTemplatingEngine();
+
+		this.render						= typeof options.render === 'function'
+										? options.render
+										: defaultTemplatingEngine.renderFile.bind( defaultTemplatingEngine );
+
+		this.templateDir				= typeof options.templateDir === 'string'
+										? options.templateDir
+										: DEFAULT_TEMPLATING_DIR;
+
+		this.templateExtension			= typeof options.templateExtension === 'string'
+										? options.templateExtension
+										: DEFAULT_TEMPLATE_EXT;
 	}
 
 	/**
@@ -73,30 +96,18 @@ class TemplatingEnginePlugin extends PluginInterface
 	 *
 	 * @details	Also adds a render function to the eventRequest
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware()
 	{
-		const templatingEngine	= typeof this.options.engine !== 'undefined'
-								&& typeof this.options.engine.render !== 'undefined'
-								? this.options.engine
-								: new DefaultTemplatingEngine();
-
-		const templateDir		= typeof this.options.templateDir !== 'undefined'
-								? this.options.templateDir
-								: DEFAULT_TEMPLATING_DIR;
-
 		const pluginMiddleware	= {
 			handler	: ( event ) => {
-				event.templateDir		= templateDir;
-				event.templatingEngine	= templatingEngine;
+				this.attachRenderFunction( event );
 
 				event.on( 'cleanUp', () => {
-					event.templateDir		= undefined;
-					event.templatingEngine	= undefined;
-				} );
+					event.render	= undefined;
+				});
 
-				this.attachRenderFunction( event );
 				event.next();
 			}
 		};
