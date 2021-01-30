@@ -834,8 +834,6 @@ test({
 		multipartParser.parse( eventRequest ).then(( parsedData ) => {
 			const body	= parsedData.body;
 
-			if ( fs.existsSync( body.$files[0].path ) )
-
 			// Sync delay
 			setTimeout(() => {
 				assert.deepStrictEqual( parsedData.rawBody, {} );
@@ -848,7 +846,7 @@ test({
 				assert.equal( body.$files[1].contentType, 'text/html' );
 
 				done();
-			}, 100 );
+			}, 20 );
 		}).catch( done );
 	}
 });
