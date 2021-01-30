@@ -804,7 +804,7 @@ test({
 	dataProvider	: placesToSplitProvider,
 	test			: ( done, placeToSplit ) => {
 		let tempDir			= path.join( __dirname, './fixture/testUploads' );
-		let multipartParser	= new MockMultipartDataParser( { tempDir, cleanUpItemsTimeoutMS: 25 } );
+		let multipartParser	= new MockMultipartDataParser( { tempDir, cleanUpItemsTimeoutMS: 50 } );
 		let eventRequest	= helpers.getEventRequest(
 			undefined,
 			undefined,
@@ -849,7 +849,7 @@ test({
 
 				multipartParser.terminate();
 				done();
-			}, 50 );
+			}, 75 );
 		}).catch( done );
 	}
 });
