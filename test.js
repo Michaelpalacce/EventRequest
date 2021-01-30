@@ -5,6 +5,7 @@ const testSuites		= require( './tests/test_suites' );
 require( './tests/test_bootstrap' );
 
 const startTests	= () => {
+	testSuites.bodyParserSuite();
 	testSuites.cacheControlSuite();
 	testSuites.eventSuite();
 	testSuites.bigMapSuite();
@@ -20,7 +21,6 @@ const startTests	= () => {
 	testSuites.serverSuite();
 	testSuites.cachingSuite();
 	testSuites.rateLimiterSuite();
-	testSuites.bodyParserSuite();
 
 	runAllTests();
 };
