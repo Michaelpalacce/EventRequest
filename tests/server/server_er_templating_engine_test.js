@@ -88,6 +88,7 @@ test({
 			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4327 ).then(( response ) => {
 				assert.equal( response.body.toString().includes( 'TEST VARIABLE' ), true );
 				assert.equal( response.body.toString().includes( '&lt;script' ), true );
+				assert.equal( response.body.toString().includes( '${test}' ), true );
 				assert.equal( response.body.toString().includes( 'SWITCH!!' ), true );
 				assert.equal( response.body.toString().includes( 'NEW VARIABLE' ), true );
 				assert.equal( response.body.toString().includes( 'SHOULD NOT BE THERE' ), false );
