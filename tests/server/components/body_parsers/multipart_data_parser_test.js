@@ -2,7 +2,6 @@
 
 const { Mock, Mocker, assert, test, helpers }	= require( '../../../test_helper' );
 const MultipartDataParser						= require( '../../../../server/components/body_parsers/multipart_data_parser' );
-const os										= require( 'os' );
 const fs										= require( 'fs' );
 const path										= require( 'path' );
 
@@ -831,22 +830,65 @@ test({
 			}
 		});
 
-		multipartParser.parse( eventRequest ).then(( parsedData ) => {
-			const body	= parsedData.body;
+		multipartParser.parse( eventRequest ).then( async ( parsedData ) => {
+			const body		= parsedData.body;
 
-			// Sync delay
-			setTimeout(() => {
-				assert.deepStrictEqual( parsedData.rawBody, {} );
-				assert.equal( fs.readFileSync( body.$files[0].path ).toString().includes( 'Content of a.txt.' ), true );
-				assert.equal( body.text, 'text default' );
-				assert.equal( body.$files[0].name, 'a.txt' );
-				assert.equal( body.$files[0].contentType, 'text/plain' );
-				assert.equal( fs.readFileSync( body.$files[1].path ).toString().includes( '<!DOCTYPE html><title>Content of a.html.</title>' ), true );
-				assert.equal( body.$files[1].name, 'a.html' );
-				assert.equal( body.$files[1].contentType, 'text/html' );
+			const fileOne	= await waitFileExistsAndRead( body.$files[0].path );
+			const fileTwo	= await waitFileExistsAndRead( body.$files[1].path );
 
-				done();
-			}, 50 );
+			if ( fileOne === null || fileTwo === null )
+			{
+				done( 'File not created!' );
+				return;
+			}
+
+			assert.deepStrictEqual( parsedData.rawBody, {} );
+			assert.deepStrictEqual( fileOne.includes( 'Content of a.txt.' ), true, `FileOne: ${fileOne}` );
+			assert.deepStrictEqual( body.text, 'text default' );
+			assert.deepStrictEqual( body.$files[0].name, 'a.txt' );
+			assert.deepStrictEqual( body.$files[0].contentType, 'text/plain' );
+			assert.deepStrictEqual( fileTwo.includes( '<!DOCTYPE html><title>Content of a.html.</title>' ), true, `FileTwo: ${fileTwo}` );
+			assert.deepStrictEqual( body.$files[1].name, 'a.html' );
+			assert.deepStrictEqual( body.$files[1].contentType, 'text/html' );
+
+			done();
+
 		}).catch( done );
 	}
 });
+
+/**
+ * @brief	Waits for a file to exist and return the contents
+ *
+ * @param	{String} file
+ *
+ * @return	{Promise<String>}
+ */
+function waitFileExistsAndRead( file )
+{
+	return new Promise(( resolve ) => {
+		let counter		= 0;
+		const interval	= setInterval( async () => {
+			let result;
+			try
+			{
+				result	= fs.readFileSync( file ).toString();
+			}
+			catch ( error )
+			{
+				result	= null;
+			}
+
+			if ( result !== null && result.length > 0 )
+			{
+				clearInterval( interval );
+				resolve( result );
+			}
+			else if ( counter++ >= 100 )
+			{
+				clearInterval( interval );
+				resolve( null );
+			}
+		}, 2 );
+	});
+}

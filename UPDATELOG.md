@@ -1,6 +1,7 @@
 30.0.1
 - Added test that ${} does get escaped in the templating engine
 - Added docker-compose for internal testing for different node versions. Created dockerfiles because otherwise volumes share the file system
+- Added 15.x tests for linux and windows
 
 30.0.0
 - Added new experimental templating engine
