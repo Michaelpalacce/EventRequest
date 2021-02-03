@@ -85,7 +85,7 @@ test({
 	message	: 'Server.test.er_logger.logs.errors.if.thrown',
 	test	: ( done ) => {
 		const name					= 'testErLoggerWithErrorThrown';
-		const relativeLogLocation	= './tests/server/fixture/logger/testLog.log';
+		const relativeLogLocation	= './tests/server/fixture/logger/testLogError.log';
 		const fileTransport			= new File({
 			logLevel	: Loggur.LOG_LEVELS.debug,
 			filePath	: relativeLogLocation
@@ -142,7 +142,7 @@ test({
 	message	: 'Server.test.er_logger.when.user.agent.is.set',
 	test	: ( done ) => {
 		const name					= 'testErLogger';
-		const relativeLogLocation	= './tests/server/fixture/logger/testLog.log';
+		const relativeLogLocation	= './tests/server/fixture/logger/testLogUserAgent.log';
 		const fileTransport			= new File({
 			logLevel	: Loggur.LOG_LEVELS.debug,
 			filePath	: relativeLogLocation
