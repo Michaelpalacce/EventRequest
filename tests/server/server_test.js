@@ -2120,7 +2120,7 @@ test({
 test({
 	message	: 'Server.eventRequest.on.error.with.a.logger',
 	test	: ( done ) => {
-		const relativeLogLocation	= './tests/server/fixture/logger/testWithoutLoggerLog.log';
+		const relativeLogLocation	= './tests/server/fixture/logger/testWithLoggerLog.log';
 		const fileTransport			= new File({
 			logLevel	: Loggur.LOG_LEVELS.debug,
 			filePath	: relativeLogLocation
@@ -2138,7 +2138,7 @@ test({
 		Loggur.disableDefault();
 		Loggur.addLogger( 'test', logger );
 
-		app.get( '/eventRequestOnErrorWithoutALogger', ( event ) => {
+		app.get( '/eventRequestOnErrorWithALogger', ( event ) => {
 			event.logger	= {};
 			event.emit( 'on_error', 'ERROR!' );
 			event.emit( 'on_error', new Error( 'ERROR ! ERROR' ) );
@@ -2151,7 +2151,7 @@ test({
 		});
 
 		helpers.sendServerRequest(
-			'/eventRequestOnErrorWithoutALogger',
+			'/eventRequestOnErrorWithALogger',
 			'GET',
 			200,
 			'',

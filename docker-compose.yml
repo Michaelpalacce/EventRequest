@@ -1,0 +1,24 @@
+version: '3.6'
+
+services:
+
+    node12:
+        build:
+            context: .
+            dockerfile: Dockerfile-12
+        working_dir: /app
+        command: node test.js
+
+    node14:
+        build:
+            context: .
+            dockerfile: Dockerfile-14
+        working_dir: /app
+        command: node test.js
+
+    node15:
+        build:
+            context: .
+            dockerfile: Dockerfile-15
+        working_dir: /app
+        command: node test.js
