@@ -1,3 +1,7 @@
+30.0.2
+- Added MIME type support for the image file streamer
+- Removed 'stream_start' event from being dispatched
+
 30.0.1
 - Added test that ${} does get escaped in the templating engine
 - Added docker-compose for internal testing for different node versions. Created dockerfiles because otherwise volumes share the file system

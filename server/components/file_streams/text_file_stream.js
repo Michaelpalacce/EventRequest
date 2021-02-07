@@ -9,6 +9,7 @@ const AbstractFileStream	= require( './abstract_file_stream' );
  */
 class TextFileStream extends AbstractFileStream
 {
+	//@TODO ADD MIME TYPES
 	constructor()
 	{
 		super(
@@ -34,11 +35,7 @@ class TextFileStream extends AbstractFileStream
 	 */
 	getFileStream( event, file, options = {} )
 	{
-		const stream	= fs.createReadStream( file, options );
-
-		event.emit( 'stream_start', { stream } );
-
-		return stream;
+		return fs.createReadStream( file, options );
 	}
 }
 

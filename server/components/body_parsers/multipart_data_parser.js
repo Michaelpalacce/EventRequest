@@ -1,5 +1,7 @@
 'use strict';
 
+// !!! ABANDON ALL HOPE YE WHO ENTER HERE !!! //
+
 // Dependencies
 const os				= require( 'os' );
 const path				= require( 'path' );
@@ -624,7 +626,7 @@ class MultipartDataParser extends EventEmitter
 	/**
 	 * @brief	Separates and organizes the parts into files and properties, then returns them
 	 *
-	 * @return	Object
+	 * @return	{Object}
 	 */
 	formatParts()
 	{

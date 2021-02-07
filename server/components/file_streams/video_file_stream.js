@@ -51,8 +51,6 @@ class VideoFileStream extends AbstractFileStream
 			stream	= fs.createReadStream( file );
 		}
 
-		event.emit( 'stream_start', { stream } );
-
 		return stream;
 	}
 }

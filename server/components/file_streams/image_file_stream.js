@@ -2,6 +2,7 @@
 
 // Dependencies
 const fs					= require( 'fs' );
+const path					= require( 'path' );
 const AbstractFileStream	= require( './abstract_file_stream' );
 
 /**
@@ -11,12 +12,15 @@ class ImageFileStream extends AbstractFileStream
 {
 	constructor()
 	{
-		super(
-			[
-				'.apng', '.bmp', '.gif', '.ico', '.cur', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.png', '.svg', '.tif', '.tiff', '.webp'
-			],
-			'image'
-		);
+		super( [], 'image' );
+		this.formats	= {
+			'.apng'	: 'image/apng',		'.avif'	: 'image/avif',		'.gif'		: 'image/gif',		'.jpg'	: 'image/jpeg',
+			'.jpeg'	: 'image/jpeg',		'.jfif'	: 'image/jpeg',		'.pjpeg'	: 'image/jpeg',		'.pjp'	: 'image/jpeg',
+			'.png'	: 'image/png',		'.svg'	: 'image/svg+xml',	'.webp'		: 'image/webp',		'.ico'	: 'image/x-icon',
+			'.bmp'	: 'image/bmp',
+		};
+
+		this.SUPPORTED_FORMATS	= Object.keys( this.formats );
 	}
 
 	/**
@@ -30,9 +34,12 @@ class ImageFileStream extends AbstractFileStream
 	 */
 	getFileStream( event, file, options = {} )
 	{
-		const stream	= fs.createReadStream( file, options );
+		const stream		= fs.createReadStream( file, options );
+		const parsedPath	= path.parse( file )
+		const mimeType		= this.formats[parsedPath.ext.toLowerCase()];
 
-		event.emit( 'stream_start', { stream } );
+		if ( typeof mimeType === 'string' )
+			event.setResponseHeader( 'Content-Type', mimeType );
 
 		return stream;
 	}

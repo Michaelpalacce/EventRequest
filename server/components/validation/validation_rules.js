@@ -404,6 +404,6 @@ assert.assertFalse			= ( actual ) => {
 	return false;
 };
 
-assert.getLength				= getLength;
+assert.getLength			= getLength;
 
 module.exports	= assert;

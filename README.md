@@ -3617,7 +3617,6 @@ app.get( '/preview', ( event ) => {
   - Audio: '.mp3', '.flac', '.wav', '.aiff', '.aac'
 - The VideoFileStream can be paired up with an HTML5 video player to stream videos to it
 - The AudioFileStream can also be paired up with an HTML5 video player to stream audio to it
-- An 'stream_start' event will be emitted by the EventRequest the moment the stream is going to be started 
 - Each file stream has a getType method that returns whether it is a video, text, image or audio
 - Files with no extension will be treated as text files
 - **This Plugin can NOT be re-applied multiple times.**
@@ -3635,8 +3634,7 @@ app.get( '/preview', ( event ) => {
 ***
 #### Events:
 
-**stream_start ( FileStream stream )**
-- Emitted when the stream is started successfully
+**NONE**
 
 ***
 #### EventRequest Attached Functions
