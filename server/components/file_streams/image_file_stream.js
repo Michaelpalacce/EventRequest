@@ -35,7 +35,7 @@ class ImageFileStream extends AbstractFileStream
 	getFileStream( event, file, options = {} )
 	{
 		const stream		= fs.createReadStream( file, options );
-		const parsedPath	= path.parse( file )
+		const parsedPath	= path.parse( file );
 		const mimeType		= this.formats[parsedPath.ext.toLowerCase()];
 
 		if ( typeof mimeType === 'string' )
