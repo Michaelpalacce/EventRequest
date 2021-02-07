@@ -13,6 +13,7 @@ class ImageFileStream extends AbstractFileStream
 	constructor()
 	{
 		super( [], 'image' );
+		// @TODO NEW MIME-TYPE COMPONENT SHOULD BE MADE
 		this.formats	= {
 			'.apng'	: 'image/apng',		'.avif'	: 'image/avif',		'.gif'		: 'image/gif',		'.jpg'	: 'image/jpeg',
 			'.jpeg'	: 'image/jpeg',		'.jfif'	: 'image/jpeg',		'.pjpeg'	: 'image/jpeg',		'.pjp'	: 'image/jpeg',

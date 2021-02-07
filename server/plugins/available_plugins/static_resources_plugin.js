@@ -65,6 +65,7 @@ class StaticResourcesPlugin extends PluginInterface
 					if ( fs.existsSync( item ) && ( fileStat = fs.statSync( item ) ).isFile() && item.indexOf( staticPath ) !== -1 )
 					{
 						let mimeType	= '*/*';
+						// @TODO NEW MIME-TYPE COMPONENT SHOULD BE MADE
 						switch ( path.extname( item ) )
 						{
 							case '.css':

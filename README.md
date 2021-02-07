@@ -104,25 +104,13 @@ server.listen( '80',() => {
 });
 ~~~
 
-# [Plugins](#plugins):
+# [External Plug-ins](#external-plugins):
 - https://www.npmjs.com/package/er_memcached_data_server - memcached data server [![Build Status](https://travis-ci.com/Michaelpalacce/er_memcached_data_server.svg?branch=master)](https://travis-ci.com/Michaelpalacce/er_memcached_data_server)
 - https://www.npmjs.com/package/er_redis_data_server - redis data server [![Build Status](https://travis-ci.com/Michaelpalacce/er_redis_data_server.svg?branch=master)](https://travis-ci.com/Michaelpalacce/er_redis_data_server)
 
 # [Example Projects:](#example-projects)
 - https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
 - https://github.com/Michaelpalacce/ChatApp - An unfinished chat app using a combination of EventRequest and Socket.IO
-
-# [Properties exported by the Module:](#module-properties)
-    App, // The Singleton Instance of the Framework that can be used to retrieve the Web Server at any point
-
-    Server, // The Server of the framework. This is just the class and not the actual isntance. Use this only if you want to create multiple servers
-
-    Testing, // Testing tools ( Mock, Tester( constructor ), logger( logger used by the testing suite ), test( function to use to add tests ), runAllTests( way to run all tests added by test )
-
-    Logging, // Contains helpful logging functions
-
-    Loggur, // Easier access to the Logging.Loggur instance
-
 
 # [Getting started:](#getting-started)
 
@@ -143,7 +131,7 @@ used to attach dynamic functionality to routes
 
 EventRequest is an object passed to each middleware. It holds all data about the request and has a lot of helpful functionality used for sending responses.
 
-The framework has a set of components. These components are individual and can be used outside of the framework.
+The framework has a set of components. These components are individual and can be used outside of the framework (Supposedly).
 
 The framework also has a set of plugins that are pre included. Each Plugin modifies the Server / Event Request a bit and "plugs in" new functionality.
 
@@ -160,10 +148,6 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
    - error => require( 'event_request/server/components/error/error_handler' )
    - file_streams => require( 'event_request/server/components/file_streams/file_stream' )
    - rate_limiter => require( 'event_request/server/components/rate_limiter/bucket' )
-
-# [Plugins:](#plugins-info)
-- Plugins are parts of the server that attach functionality to the EventRequest or the Server
-- They can be retrieved from App() ( look at the plugins section for more info )
 
 ***
 ***
@@ -2935,46 +2919,46 @@ However if the global persist is set to false, this will not work
 
 
 ***
-# [Plugins](#plugins-section)
-- Plugins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**. Some Plugins may require other plugins as a dependencies and will throw if missing.
+# [Plug-ins](#plugins-section)
+- Plug-ins can be added by using **server.apply( PluginInterfaceObject ||'pluginId', options )**. Some Plug-ins may require other plugins as a dependencies and will throw if missing.
 - After plugins have been attached to the app they can be retrieved using `app.getPlugin( 'plugin_id' )` if needed.
 - There is no rule preventing you to attach multiple plugins with the same name but keep in mind some are NOT supposed to be reattached ( each plugin has a note describing whether they can be reattached or not ). Also keep in mind when calling `app.getPlugin` you will fetch only the latest applied plugin.
 - Some plugins do not need to be attached as they provide a dynamic middleware and can work without being applied ( however they may offer some benefits to being applied )
 - Custom plugins may also be created as long as they follow the basic principles of the PluginInterface 
-- Plugins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
+- Plug-ins can be added to the server.pluginManager and configured. Later on if you want to apply the preconfigured
     plugin all you have to do is do: server.apply( 'pluginId' )
 - To enable IDE's smart autocomplete to work in your favor all the plugins 
    available in the pluginManager are exported as values in the server:
 - The plugin interface can be retrieved like so:
 
-
 ~~~javascript
      const PluginInterface  = require( 'event_request/server/plugins/plugin_interface' );
 ~~~
 
+- Available Plug-ins:
 ~~~
 Server {
-  er_timeout,
-  er_etag,
-  er_cache,
-  er_env,
-  er_rate_limits,
-  er_static,
-  er_data_server,
-  er_templating_engine,
-  er_file_stream,
-  er_logger,
-  er_session,
-  er_security,
-  er_cors,
-  er_body_parser_json,
-  er_body_parser_form,
-  er_body_parser_multipart,
-  er_body_parser_raw,
-  er_validation,
+  er_timeout, -> Adds a request timeout functionality
+  er_etag, -> Adds etag helpers 
+  er_cache, -> Adds a Cache-control header with the given configuration to routes
+  er_env, -> Reads an environment file and adds it to process.env
+  er_rate_limits, -> Rate limiting for routes
+  er_static, -> Serves static resources
+  er_data_server, -> Adds a Caching Data Server 
+  er_templating_engine, -> Attaches a render function 
+  er_file_stream, -> Adds file streaming capabilities
+  er_logger, -> Adds logging
+  er_session, -> Adds session helpers 
+  er_security, -> Adds different security headers
+  er_cors, -> Adds CORS headers
+  er_body_parser_json, -> Adds json body parser
+  er_body_parser_form, -> Adds form body parser
+  er_body_parser_multipart, -> Adds multipart body parser
+  er_body_parser_raw, -> Adds raw body parser
+  er_validation, -> Adds input validation helpers
 }
 ~~~
-- Generally all the integrated plug-ins begin with `er_`
+- Generally all the internal plug-ins begin with `er_`
 
 ~~~javascript
 const App = require( 'event_request' );
@@ -3057,7 +3041,6 @@ The plugin Manager exports the following functions:
 **getPlugin( id )** - returns a PluginInterface otherwise throw
 
 # Available plugins:
-
 
 # [er_timeout](#er_timeout)
 - Adds a timeout to the socket.
@@ -4326,12 +4309,14 @@ app.listen( 80, () => {
 ~~~javascript
 const app = require( 'event_request' );
 
+// Cache all requests
 app.apply( app.er_cache, { cacheControl: 'private', expirationDirectives: { 'max-age': 123 }, revalidation: 'must-revalidate' } );
 
 app.get( '/', ( event ) => {
     event.send( 'ok' );
 });
 
+// Cache only GET requests to /dynamic
 app.get( '/dynamic', app.er_cache.cache( { static: true } ), ( event ) => {
     event.send( 'ok' );
 });
