@@ -8,6 +8,7 @@ public/*
 .nyc_output/*
 /server/components/logger/components/transport_types/fixtures/*.log
 /tests/server/components/body_parsers/fixture/testUploads/*
+/docs/
 
 package-lock.json
 rate_limits.json
