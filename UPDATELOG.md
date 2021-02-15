@@ -1,3 +1,6 @@
+30.0.3
+- Fixed JSON body parser bug
+
 30.0.2
 - Added MIME type support for the image file streamer
 - Removed 'stream_start' event from being dispatched

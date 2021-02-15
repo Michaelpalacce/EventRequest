@@ -99,9 +99,6 @@ class JsonBodyParser extends EventEmitter
 					{
 						rawBody		= rawBody.toString();
 						const body	= JSON.parse( rawBody );
-						for ( const index in body )
-							body[index]	= decodeURIComponent( body[index] );
-
 						resolve( { body, rawBody } );
 					}
 					catch ( error )
