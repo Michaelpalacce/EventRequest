@@ -111,6 +111,259 @@ test({
 	}
 });
 
+test({
+	message	: 'CorsPlugin.getPluginMiddleware.with.er_dynamic.origin.and.empty.origin.header',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest();
+		const plugin		= new CorsPlugin( '', { origin : 'er_dynamic' } );
+
+		const middleware	= plugin.getPluginMiddleware();
+		assert.equal( Array.isArray( middleware ), true );
+		assert.equal( middleware.length, 1 );
+
+		const funcToCall	= middleware[0].handler;
+		let called			= 0;
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			called			: 2,
+			with			: [
+				[ 'Access-Control-Allow-Origin', '*' ],
+				[ 'Access-Control-Allow-Headers', '*' ],
+			],
+			shouldReturn	: () => {
+				called++;
+			}
+		});
+
+		eventRequest._mock({
+			method			: 'next',
+			shouldReturn	: () => {
+				called === 2 ? done() : done( 'The setResponseHeader was not called enough times' );
+			}
+		});
+
+		funcToCall( eventRequest );
+	}
+});
+
+test({
+	message	: 'CorsPlugin.getPluginMiddleware.with.er_dynamic.origin.and.non.empty.origin.header',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest( undefined, undefined, { origin: 'http://example.org' } );
+		const plugin		= new CorsPlugin( '', { origin : 'er_dynamic' } );
+
+		const middleware	= plugin.getPluginMiddleware();
+		assert.equal( Array.isArray( middleware ), true );
+		assert.equal( middleware.length, 1 );
+
+		const funcToCall	= middleware[0].handler;
+		let called			= 0;
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			called			: 2,
+			with			: [
+				[ 'Access-Control-Allow-Origin', 'http://example.org' ],
+				[ 'Access-Control-Allow-Headers', '*' ],
+			],
+			shouldReturn	: () => {
+				called++;
+			}
+		});
+
+		eventRequest._mock({
+			method			: 'next',
+			shouldReturn	: () => {
+				called === 2 ? done() : done( 'The setResponseHeader was not called enough times' );
+			}
+		});
+
+		funcToCall( eventRequest );
+	}
+});
+
+test({
+	message	: 'CorsPlugin.getPluginMiddleware.with.many.origins.when.empty',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest( undefined, undefined, { origin: 'http://example.org' } );
+		const plugin		= new CorsPlugin( '', { origin : [] } );
+
+		const middleware	= plugin.getPluginMiddleware();
+		assert.equal( Array.isArray( middleware ), true );
+		assert.equal( middleware.length, 1 );
+
+		const funcToCall	= middleware[0].handler;
+		let called			= 0;
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			called			: 2,
+			with			: [
+				[ 'Access-Control-Allow-Origin', '*' ],
+				[ 'Access-Control-Allow-Headers', '*' ],
+			],
+			shouldReturn	: () => {
+				called++;
+			}
+		});
+
+		eventRequest._mock({
+			method			: 'next',
+			shouldReturn	: () => {
+				called === 2 ? done() : done( 'The setResponseHeader was not called enough times' );
+			}
+		});
+
+		funcToCall( eventRequest );
+	}
+});
+
+test({
+	message	: 'CorsPlugin.getPluginMiddleware.with.many.origins.when.matching',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest( undefined, undefined, { origin: 'http://example.org' } );
+		const plugin		= new CorsPlugin( '', { origin : ['http://example.org'] } );
+
+		const middleware	= plugin.getPluginMiddleware();
+		assert.equal( Array.isArray( middleware ), true );
+		assert.equal( middleware.length, 1 );
+
+		const funcToCall	= middleware[0].handler;
+		let called			= 0;
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			called			: 2,
+			with			: [
+				[ 'Access-Control-Allow-Origin', 'http://example.org' ],
+				[ 'Access-Control-Allow-Headers', '*' ],
+			],
+			shouldReturn	: () => {
+				called++;
+			}
+		});
+
+		eventRequest._mock({
+			method			: 'next',
+			shouldReturn	: () => {
+				called === 2 ? done() : done( 'The setResponseHeader was not called enough times' );
+			}
+		});
+
+		funcToCall( eventRequest );
+	}
+});
+
+test({
+	message	: 'CorsPlugin.getPluginMiddleware.with.many.origins.when.origin.not.matches.returns.first',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest( undefined, undefined, { origin: 'WONTMATCH' } );
+		const plugin		= new CorsPlugin( '', { origin : ['http://example.org'] } );
+
+		const middleware	= plugin.getPluginMiddleware();
+		assert.equal( Array.isArray( middleware ), true );
+		assert.equal( middleware.length, 1 );
+
+		const funcToCall	= middleware[0].handler;
+		let called			= 0;
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			called			: 2,
+			with			: [
+				[ 'Access-Control-Allow-Origin', 'http://example.org' ],
+				[ 'Access-Control-Allow-Headers', '*' ],
+			],
+			shouldReturn	: () => {
+				called++;
+			}
+		});
+
+		eventRequest._mock({
+			method			: 'next',
+			shouldReturn	: () => {
+				called === 2 ? done() : done( 'The setResponseHeader was not called enough times' );
+			}
+		});
+
+		funcToCall( eventRequest );
+	}
+});
+
+
+
+test({
+	message	: 'CorsPlugin.getPluginMiddleware.with.many.origins.when.origin.matches.second',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest( undefined, undefined, { origin: 'http://second.org' } );
+		const plugin		= new CorsPlugin( '', { origin : ['http://example.org', 'http://second.org'] } );
+
+		const middleware	= plugin.getPluginMiddleware();
+		assert.equal( Array.isArray( middleware ), true );
+		assert.equal( middleware.length, 1 );
+
+		const funcToCall	= middleware[0].handler;
+		let called			= 0;
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			called			: 2,
+			with			: [
+				[ 'Access-Control-Allow-Origin', 'http://second.org' ],
+				[ 'Access-Control-Allow-Headers', '*' ],
+			],
+			shouldReturn	: () => {
+				called++;
+			}
+		});
+
+		eventRequest._mock({
+			method			: 'next',
+			shouldReturn	: () => {
+				called === 2 ? done() : done( 'The setResponseHeader was not called enough times' );
+			}
+		});
+
+		funcToCall( eventRequest );
+	}
+});
+
+test({
+	message	: 'CorsPlugin.getPluginMiddleware.with.many.origins.when.empty.with.empty.origin',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest( undefined, undefined, undefined );
+		const plugin		= new CorsPlugin( '', { origin : [] } );
+
+		const middleware	= plugin.getPluginMiddleware();
+		assert.equal( Array.isArray( middleware ), true );
+		assert.equal( middleware.length, 1 );
+
+		const funcToCall	= middleware[0].handler;
+		let called			= 0;
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			called			: 2,
+			with			: [
+				[ 'Access-Control-Allow-Origin', '*' ],
+				[ 'Access-Control-Allow-Headers', '*' ],
+			],
+			shouldReturn	: () => {
+				called++;
+			}
+		});
+
+		eventRequest._mock({
+			method			: 'next',
+			shouldReturn	: () => {
+				called === 2 ? done() : done( 'The setResponseHeader was not called enough times' );
+			}
+		});
+
+		funcToCall( eventRequest );
+	}
+});
 
 test({
 	message	: 'CorsPlugin.getPluginMiddleware.with.non.default.settings.and.preflight.request',

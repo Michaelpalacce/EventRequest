@@ -4547,9 +4547,11 @@ const defaults = {
 ***
 #### Accepted Options:
 
-**origin: String**
+**origin: String|Array**
 - The allowed origins 
 - Sets Access-Control-Allow-Origin
+- If an array is passed then the origin will be retrieved from the request 'origin' header and echoed back if in the array, otherwise set the origin as the first value in that array
+- You can also set the origin to `er_dynamic` which will always echo back the request 'origin' header
 - Defaults to '*'
 
 **headers: Array**
@@ -4624,6 +4626,36 @@ app.apply( app.er_cors, {
     maxAge: 200,
     credentials: true,
 });
+
+app.add(( event ) => {
+    event.send( event.response.getHeaders() );
+});
+
+app.listen( 80, () => {
+    app.Loggur.log( 'Server started, try going to http://localhost and check the body. It will have the returned headers!' )
+});
+~~~
+
+- Multiple origins
+~~~javascript
+const app = require( 'event_request' )();
+
+app.apply( app.er_cors, { origin: ['http://example.com', 'http://localhost'] });
+
+app.add(( event ) => {
+    event.send( event.response.getHeaders() );
+});
+
+app.listen( 80, () => {
+    app.Loggur.log( 'Server started, try going to http://localhost and check the body. It will have the returned headers!' )
+});
+~~~
+
+- Echoes back the requested origin with er_dynamic
+~~~javascript
+const app = require( 'event_request' )();
+
+app.apply( app.er_cors, { origin: 'er_dynamic' });
 
 app.add(( event ) => {
     event.send( event.response.getHeaders() );

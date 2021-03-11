@@ -27,12 +27,13 @@ test({
 		[path.join( __dirname, './fixtures/testFile.svg' ), 'image/svg+xml'],
 		[path.join( __dirname, './fixtures/testFile.webp' ), 'image/webp'],
 		[path.join( __dirname, './fixtures/testFile.ico' ), 'image/x-icon'],
-		[path.join( __dirname, './fixtures/testFile.bmp' ), 'image/bmp']
+		[path.join( __dirname, './fixtures/testFile.bmp' ), 'image/bmp'],
+		[path.join( __dirname, './fixtures/testFile.unknown' ), null],
 	],
 	test			: ( done, filePath, expectedMimeType ) => {
 		const eventRequest	= helpers.getEventRequest( undefined, undefined, undefined );
 		const fileStream	= new ImageFileStream();
-		let mimeType		= '';
+		let mimeType		= null;
 
 		eventRequest._mock({
 			method			: 'setResponseHeader',

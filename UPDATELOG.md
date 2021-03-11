@@ -1,3 +1,6 @@
+30.1.0
+- Improved er_cors so it accepts an array of origins and also a er_dynamic value that will always match
+
 30.0.3
 - Fixed JSON body parser bug
 

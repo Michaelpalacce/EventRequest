@@ -16,7 +16,7 @@ class CorsPlugin extends PluginInterface
 	 */
 	applyCors( event )
 	{
-		const origin		= typeof this.options.origin === 'string'
+		const origin		= Array.isArray( this.options.origin ) || typeof this.options.origin === 'string'
 							? this.options.origin
 							: '*';
 
@@ -44,7 +44,23 @@ class CorsPlugin extends PluginInterface
 							? this.options.exposedHeaders.join( ', ' )
 							: null;
 
-		event.setResponseHeader( 'Access-Control-Allow-Origin', origin );
+		if ( ! Array.isArray( origin ) )
+		{
+			if ( origin === 'er_dynamic' )
+				event.setResponseHeader( 'Access-Control-Allow-Origin', event.getRequestHeader( 'origin' ) || '*' );
+			else
+				event.setResponseHeader( 'Access-Control-Allow-Origin', origin );
+		}
+		else
+		{
+			const requestOrigin	= event.getRequestHeader( 'origin' );
+
+			if ( origin.includes( requestOrigin ) )
+				event.setResponseHeader( 'Access-Control-Allow-Origin', requestOrigin );
+			else
+				event.setResponseHeader( 'Access-Control-Allow-Origin', origin[0] || '*' )
+		}
+
 		event.setResponseHeader( 'Access-Control-Allow-Headers', headers );
 
 		if ( exposedHeader !== null )
