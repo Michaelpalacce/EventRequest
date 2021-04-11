@@ -1,3 +1,6 @@
+30.2.0
+- Improved session plugin it now accepts a flag isSecureCookie that determines if the cookie should be sent with SameSite: None; Secure for CORS enabled sites
+
 30.1.0
 - Improved er_cors so it accepts an array of origins and also a er_dynamic value that will always match
 

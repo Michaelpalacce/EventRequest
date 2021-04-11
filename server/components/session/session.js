@@ -35,6 +35,10 @@ class Session
 								? this.options.isCookieSession
 								: true;
 
+		this.isSecureCookie		= typeof this.options.isSecureCookie === 'boolean'
+								? this.options.isSecureCookie
+								: false
+
 		this.sessionId			= this.isCookieSession ?
 									typeof event.cookies[this.sessionKey] !== 'undefined'
 										? event.cookies[this.sessionKey]
@@ -86,7 +90,7 @@ class Session
 		this.session	= {};
 
 		if ( this.isCookieSession )
-			this.event.setCookie( this.sessionKey, this.sessionId, { expires: - this.ttl } );
+			this.event.setCookie( this.sessionKey, this.sessionId, { expires: - this.ttl, SameSite: this.isSecureCookie ? 'None; Secure' : 'Lax' } );
 	}
 
 	/**
@@ -110,7 +114,7 @@ class Session
 			this.sessionId	= sessionId;
 
 			if ( this.isCookieSession )
-				this.event.setCookie( this.sessionKey, this.sessionId, { expires: this.ttl } );
+				this.event.setCookie( this.sessionKey, this.sessionId, { expires: this.ttl, SameSite: this.isSecureCookie ? 'None; Secure' : 'Lax' } );
 			else
 				this.event.setResponseHeader( this.sessionKey, this.sessionId );
 

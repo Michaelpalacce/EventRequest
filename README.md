@@ -3347,6 +3347,7 @@ app.listen( 80 , () => {
 - Adds a Session class.
 - The session works with a cookie or a header.
 - The cookie/header will be sent back to the client who must then return the cookie/header back.
+- In the case of CORS enabled websites, look at the isSecureCookie option
 - **This Plugin can NOT be re-applied multiple times.**
 
 ***
@@ -3372,6 +3373,11 @@ app.listen( 80 , () => {
 **isCookieSession: Boolean**
 - Flag that determines if the session is in a cookie or a header
 - Defaults to true ( session cookie )
+
+**isSecureCookie: Boolean**
+- Flag that determines if the cookie to be set should be set with `SameSite: None; Secure`
+- This is used when you want to enable CORS
+- Defaults to false
 
 ***
 #### Events:
@@ -5348,7 +5354,7 @@ app.listen( 80, () => {
 
 **addFrameSrc( String uri ): void**
 - Adds a 'frame-src' directive with the given uri
-- This will add single quotes if needed
+- Tfhis will add single quotes if needed
 
 **addManifestSrc( String uri ): void**
 - Adds a 'manifest-src' directive with the given uri

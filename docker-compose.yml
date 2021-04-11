@@ -7,18 +7,19 @@ services:
             context: .
             dockerfile: Dockerfile-12
         working_dir: /app
-        command: node test.js
+        command: node test.js --silent
 
     node14:
         build:
             context: .
             dockerfile: Dockerfile-14
         working_dir: /app
-        command: node test.js
+        command: node test.js --silent
+#        command: nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js --debug
 
     node15:
         build:
             context: .
             dockerfile: Dockerfile-15
         working_dir: /app
-        command: node test.js
+        command: node test.js --silent

@@ -35,6 +35,7 @@ test({
 		assert.equal( 32, session.sessionIdLength );
 		assert.equal( null, session.sessionId );
 		assert.equal( true, typeof session.session === 'object' );
+		assert.equal( false, session.isSecureCookie );
 
 		done();
 	}
@@ -65,7 +66,7 @@ test({
 		let sessionIdLength		= 1000;
 
 		let options	= {
-			ttl, sessionKey, sessionIdLength, isCookieSession: false
+			ttl, sessionKey, sessionIdLength, isCookieSession: false, isSecureCookie: true
 		};
 
 		assert.doesNotThrow(() => {
@@ -75,9 +76,10 @@ test({
 		assert.equal( true, session.event instanceof EventRequest );
 		assert.equal( true, typeof session.server !== 'undefined' );
 		assert.equal( true, typeof session.options === 'object' );
-		assert.equal( true, session.isCookieSession === false );
+		assert.equal( false, session.isCookieSession );
 		assert.equal( ttl, session.ttl );
 		assert.equal( sessionKey, session.sessionKey );
+		assert.equal( true, session.isSecureCookie );
 		assert.equal( sessionIdLength, session.sessionIdLength );
 		assert.equal( true, typeof session.session === 'object' );
 
@@ -165,7 +167,74 @@ test({
 
 		eventRequest._mock({
 			method			: 'setCookie',
-			shouldReturn	: () => {
+			shouldReturn	: ( sessionKey, sessionId, options ) => {
+				assert.deepStrictEqual( true, typeof options.SameSite === 'string' )
+				assert.deepStrictEqual( true, options.SameSite.includes( 'Lax' ) )
+				setCookie	= true;
+			},
+			called			: 2
+		});
+
+		let hasSession	= await session.hasSession();
+
+		if ( ! hasSession )
+		{
+			const sessionId	= await session.newSession();
+
+			if ( sessionId === false )
+			{
+				done( 'Could not create a new session' );
+			}
+			else
+			{
+				if ( setCookie === true )
+				{
+					hasSession	= await session.hasSession();
+					if ( hasSession === true )
+					{
+						assert.deepStrictEqual( typeof session.session.id, 'string' );
+
+						await session.removeSession();
+
+						assert.equal( await session.hasSession(), false );
+
+						assert.deepStrictEqual( session.session, {} );
+						assert.deepStrictEqual( typeof session.session.id, 'undefined' );
+
+						done();
+					}
+					else
+					{
+						done( 'There is no session where there should have been' );
+					}
+				}
+				else
+				{
+					done( 'Set cookie should have been called when creating a new session but was not' );
+				}
+			}
+		}
+		else
+		{
+			done( 'There is a session but there shouldn\'t be one' );
+		}
+	}
+});
+
+test({
+	message	: 'Session.hasSession.newSession.and.removeSession.when.there.is.a.session.with.secure.cookie',
+	test	: async ( done ) => {
+		let sessionId			= 'sessionId';
+		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
+		eventRequest.dataServer	= helpers.getDataServer();
+		let session				= new Session( eventRequest, { isSecureCookie: true } );
+		let setCookie			= false;
+
+		eventRequest._mock({
+			method			: 'setCookie',
+			shouldReturn	: ( sessionKey, sessionId, options ) => {
+				assert.deepStrictEqual( true, typeof options.SameSite === 'string' )
+				assert.deepStrictEqual( true, options.SameSite.includes( 'None; Secure' ) )
 				setCookie	= true;
 			},
 			called			: 2
