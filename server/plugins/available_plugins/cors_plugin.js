@@ -58,7 +58,7 @@ class CorsPlugin extends PluginInterface
 			if ( origin.includes( requestOrigin ) )
 				event.setResponseHeader( 'Access-Control-Allow-Origin', requestOrigin );
 			else
-				event.setResponseHeader( 'Access-Control-Allow-Origin', origin[0] || '*' )
+				event.setResponseHeader( 'Access-Control-Allow-Origin', origin[0] || '*' );
 		}
 
 		event.setResponseHeader( 'Access-Control-Allow-Headers', headers );

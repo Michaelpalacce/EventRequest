@@ -37,7 +37,7 @@ class Session
 
 		this.isSecureCookie		= typeof this.options.isSecureCookie === 'boolean'
 								? this.options.isSecureCookie
-								: false
+								: false;
 
 		this.sessionId			= this.isCookieSession ?
 									typeof event.cookies[this.sessionKey] !== 'undefined'
