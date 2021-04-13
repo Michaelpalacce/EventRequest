@@ -1,5 +1,5 @@
 FROM node:14.15.4-alpine
 
-COPY . /app
-
 RUN npm i -g nyc
+
+COPY . /app

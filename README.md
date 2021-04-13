@@ -325,6 +325,8 @@ App().listen( 80 );
 - A router can be added by calling .add on another router with a string route: ( String route, Router router )
 - All the new router's routes will be pefixed with the given route
 - All the global middleware will be merged as well
+- When the router being added has a regexp as a route, the regexp will NOT be modified so you have to set it beforehand
+- If the previous router has routes that are empty, they will be replaced with: `/^${path}?(.+)/`
 
 ~~~javascript
 const app = require( 'event_request' )();
@@ -373,7 +375,8 @@ const app = require( 'event_request' )();
 // You can also attach the router to a route
 const userRouter = app.Router();
 
-userRouter.get( /\/path/, ( event ) => {
+// RegExp does not get modified!
+userRouter.get( /\/user\/path/, ( event ) => {
     event.send( event.params );
 });
 
