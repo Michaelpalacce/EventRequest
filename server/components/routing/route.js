@@ -13,6 +13,12 @@ const DEFAULT_ROUTE_HANDLER	= ( event ) => {
 };
 
 /**
+ * @brief	RegEx used to match routes that need to be parsed
+ * @var		{RegExp} ROUTE_REGEX
+ */
+const ROUTE_REGEX	= /^:([^:]+):$/;
+
+/**
  * @brief	Defines a single route in the site
  */
 class Route
@@ -22,6 +28,7 @@ class Route
 		this.handler		= null;
 		this.route			= null;
 		this.method			= null;
+		this.routeParts		= [];
 		this.middlewares	= [];
 		this.sanitize( routeConfig );
 	}
@@ -54,6 +61,8 @@ class Route
 		this.route			= typeof routeConfig.route === 'string' || routeConfig.route instanceof RegExp
 							? routeConfig.route
 							: '';
+
+		this.routeParts		= typeof this.route === 'string' ? this.route.split( '/' ) : [];
 
 		this.method			= typeof routeConfig.method === 'string'
 							? routeConfig.method.toUpperCase()
@@ -187,9 +196,8 @@ class Route
 			return result !== null;
 		}
 
-		const routeRe				= /^:([^:]+):$/;
 		const requestedRouteParts	= requestedRoute.split( '/' );
-		const routeParts			= this.route.split( '/' );
+		const routeParts			= this.routeParts;
 		let hasWrongPart			= false;
 
 		if ( requestedRouteParts.length === routeParts.length )
@@ -198,16 +206,12 @@ class Route
 				if ( hasWrongPart )
 					return;
 
-				const result	= pathPart.match( routeRe );
+				const result	= pathPart.match( ROUTE_REGEX );
 				if ( result !== null )
-				{
 					matchedParams[result[1]]	= requestedRouteParts[index];
-				}
 				else
-				{
 					if ( pathPart !== requestedRouteParts[index] )
 						hasWrongPart	= true;
-				}
 			});
 
 			return ! hasWrongPart;

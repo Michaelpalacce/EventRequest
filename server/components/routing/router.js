@@ -233,7 +233,7 @@ class Router extends PluginInterface
 
 			if ( Router.matchMethod( event.method, route ) && Router.matchRoute( event.path, route, params ) )
 			{
-				event.params	= Object.assign( event.params, params );
+				event.params	= { ...event.params, ...params };
 
 				// This will only push if there are any middlewares returned
 				block.push.apply( block, this._getGlobalMiddlewaresForRoute( route ) );
@@ -243,7 +243,7 @@ class Router extends PluginInterface
 
 		if ( this.cachingIsEnabled && ! this.cache.isFull() )
 		{
-			const params	= Object.assign( {}, event.params );
+			const params	= { ...event.params };
 
 			this.cache.setBlock( blockKey, { block: block.slice(), params } );
 		}
@@ -384,17 +384,10 @@ class Router extends PluginInterface
 	{
 		let route;
 
-		switch ( true )
-		{
-			case typeof method === 'string':
-			case Array.isArray( method ):
-				route	= new Route( { method } );
-				break;
-
-			default:
-				route	= method;
-				break;
-		}
+		if ( typeof method === 'string' || Array.isArray( method ) )
+			route	= new Route( { method } );
+		else
+			route	= method;
 
 		if ( ! ( route instanceof Route ) )
 			return false;
@@ -416,9 +409,7 @@ class Router extends PluginInterface
 	static matchRoute( requestedRoute, route, matchedParams = {} )
 	{
 		if ( typeof route === 'string' || route instanceof RegExp )
-		{
 			route	= new Route( { route } );
-		}
 
 		if ( ! ( route instanceof Route ) )
 			return false;

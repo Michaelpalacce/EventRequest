@@ -52,16 +52,12 @@ class FileStreamHandlerPlugin extends PluginInterface
 			const fileStream	= event.getFileStream( file, options );
 
 			if ( fileStream !== null )
-			{
 				fileStream.pipe( event.response );
-			}
 			else
-			{
 				if ( typeof errCallback !== 'function' )
 					this.next( 'Could not find a FileStream that supports that format', 400 );
 				else
 					errCallback();
-			}
 		};
 	}
 

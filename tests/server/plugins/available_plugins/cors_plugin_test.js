@@ -31,10 +31,47 @@ test({
 });
 
 test({
-	message	: 'CorsPlugin.getPluginMiddleware',
+	message	: 'CorsPlugin.getPluginMiddleware.setResponseHeader',
 	test	: ( done ) => {
 		const eventRequest	= helpers.getEventRequest();
 		const plugin		= new CorsPlugin();
+
+		const middleware	= plugin.getPluginMiddleware();
+		assert.equal( Array.isArray( middleware ), true );
+		assert.equal( middleware.length, 1 );
+
+		const funcToCall	= middleware[0].handler;
+		let called			= 0;
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			called			: 2,
+			with			: [
+				[ 'Access-Control-Allow-Origin', '*' ],
+				[ 'Access-Control-Allow-Headers', '*' ],
+			],
+			shouldReturn	: () => {
+				called++;
+			}
+		});
+
+		eventRequest._mock({
+			method			: 'next',
+			shouldReturn	: () => {
+				called === 2 ? done() : done( 'The setResponseHeader was not called enough times' );
+			}
+		});
+
+		funcToCall( eventRequest );
+	}
+});
+
+test({
+	message	: 'CorsPlugin.getPluginMiddleware.setResponseHeader.setOptions.changes.nothing',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest();
+		const plugin		= new CorsPlugin();
+		plugin.setOptions();
 
 		const middleware	= plugin.getPluginMiddleware();
 		assert.equal( Array.isArray( middleware ), true );

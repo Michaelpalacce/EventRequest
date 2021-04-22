@@ -2072,7 +2072,7 @@ The TestingTools export:
 - By default the er_templating_engine plugin comes with a templating engine that just fetches the file and returns is as is
 - No extra configurations are needed to use that.
 - There is an experimental version of another templating engine that supports variables, loops and other logic inside it
-- The ExperimentalTemplatingEngine has some robust XSS protection as well.
+- The ExperimentalTemplatingEngine has some XSS protection as well.
 
 #### How to apply:
 ~~~javascript
@@ -2082,7 +2082,7 @@ const templatingEngine = new TemplatingEngine();
 
 app.apply( app.er_templating_engine, { templateDir: '.', render: templatingEngine.renderFile.bind( templatingEngine ) } );
 
-app.get( '/', async ( event ) => {
+app.get( '/', ( event ) => {
     const variables	= { test: 'TEST!!', hello: 'HELLO WORLD!!'};
 
     // You need to have a file called test.html in the main directory for this setup to work
@@ -2097,7 +2097,7 @@ app.listen( 80 );
 1. Raw JS syntax: You can use `<?js />` and write any piece of JS code you want. This will not be displayed by the user, but you can do variable assignment here, loops, instantiate objects, etc.
 - This will display `Hello World!` 5 times
 ~~~html
-<?js for(let i =0;i<5;i++){ />
+<?js for(let i=0;i<5;i++){ />
     Hello World!
 <?js } />
 ~~~
@@ -2133,7 +2133,7 @@ OR
 #### How to use:
 - After you've applied the templating engine, you can call the render function like:
 ~~~javascript
-app.get( '/', async ( event ) => {
+app.get( '/', ( event ) => {
     const variables	= { test: 'TEST!!', hello: 'HELLO WORLD!!'};
 
     // You need to have a file called test.html in the main directory for this setup to work
@@ -4677,6 +4677,7 @@ app.listen( 80, () => {
 ***
 
 # [er_rate_limits](#er_rate_limits)
+- THIS PLUGIN NEEDS WORK, IT'S WAY TOO RESOURCE CONSUMING
 - Adds a Rate limits plugin to the server. 
 - The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
 - The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist and useFile is set to true

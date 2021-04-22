@@ -1,3 +1,9 @@
+30.3.0
+- Small route improvements
+- Added a warning to the er_rate_limits plugin, it's way too resource intensive, do not use.
+- Modified the cors plugin so that the options are calculated only once
+- Some small code improvements
+
 30.2.0
 - Improved session plugin it now accepts a flag isSecureCookie that determines if the cookie should be sent with SameSite: None; Secure for CORS enabled sites
 
