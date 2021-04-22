@@ -315,12 +315,11 @@ class Router extends PluginInterface
 
 				if ( originalMiddleware.route instanceof RegExp )
 				{
-					let regex	= originalMiddleware.route.source;
-
-					if ( regex.startsWith( '^' ) )
-						regex	= regex.substring( 1 );
-
-					route	= new RegExp( `${path}${regex}`, originalMiddleware.route.flags );
+					route	= originalMiddleware.route;
+				}
+				else if ( originalMiddleware.route === '' )
+				{
+					route	= new RegExp( `^${path}?(.+)` );
 				}
 				else
 				{

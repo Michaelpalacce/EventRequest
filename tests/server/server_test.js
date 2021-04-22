@@ -208,15 +208,15 @@ test({
 		const promises	= [];
 
 		promises.push( helpers.sendServerRequest( '', 'GET', 404 ) );
-		promises.push( helpers.sendServerRequest( '/value', 'GET', 404 ) );
+		promises.push( helpers.sendServerRequest( '/value', 'GET', 200 ) );
 		promises.push( helpers.sendServerRequest( '', 'POST', 404 ) );
 		promises.push( helpers.sendServerRequest( '/', 'DELETE', 404 ) );
 		promises.push( helpers.sendServerRequest( '/', 'PATCH', 404 ) );
-		promises.push( helpers.sendServerRequest( name, 'GET', 404 ) );
-		promises.push( helpers.sendServerRequest( name, 'POST', 404 ) );
+		promises.push( helpers.sendServerRequest( name, 'GET', 200 ) );
+		promises.push( helpers.sendServerRequest( name, 'POST', 200 ) );
 		promises.push( helpers.sendServerRequest( name, 'DELETE', 404 ) );
 		promises.push( helpers.sendServerRequest( name, 'PATCH', 404 ) );
-		promises.push( helpers.sendServerRequest( `${name}/randomUser`, 'GET', 404 ) );
+		promises.push( helpers.sendServerRequest( `${name}/randomUser`, 'GET', 200 ) );
 
 		promises.push( helpers.sendServerRequest( `/testAdding`, 'GET', 200, '', {}, 3333, name ) );
 		promises.push( helpers.sendServerRequest( `/testAdding/value`, 'GET', 200, '', {}, 3333, name ) );

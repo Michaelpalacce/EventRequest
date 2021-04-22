@@ -133,7 +133,7 @@ test({
 });
 
 test({
-	message	: 'Router.add.another.router.with.middleware.with.regex.removes.^.if.present',
+	message	: 'Router.add.another.router.with.middleware.with.regex.does.not.modify.regexp',
 	test	: ( done ) => {
 		const router	= new Router();
 
@@ -143,7 +143,24 @@ test({
 		router.add( '/users', routerTwo );
 
 		assert.deepStrictEqual( router.middleware.length, 1 );
-		assert.deepStrictEqual( router.middleware[0].getRoute(), /\/users\/test/ );
+		assert.deepStrictEqual( router.middleware[0].getRoute(), /^\/test/ );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Router.add.another.router.with.middleware.with.empty.route.sets.regex.to.match.all',
+	test	: ( done ) => {
+		const router	= new Router();
+
+		const routerTwo	= new Router();
+		routerTwo.get(() => {});
+
+		router.add( '/users', routerTwo );
+
+		assert.deepStrictEqual( router.middleware.length, 1 );
+		assert.deepStrictEqual( router.middleware[0].getRoute(), /^\/users?(.+)/ );
 
 		done();
 	}
@@ -307,7 +324,8 @@ test({
 		routerTwo.add( '/route', routerOne );
 
 		for ( const middleware of routerTwo.middleware )
-			assert.equal( middleware.route.startsWith( '/route' ), true )
+			if ( ! ( middleware.route instanceof RegExp ) )
+				assert.equal( middleware.route.startsWith( '/route' ), true )
 
 		done();
 	}

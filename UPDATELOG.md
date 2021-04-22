@@ -1,8 +1,13 @@
-30.3.0
+31.1.0
 - Small route improvements
 - Added a warning to the er_rate_limits plugin, it's way too resource intensive, do not use.
 - Modified the cors plugin so that the options are calculated only once
 - Some small code improvements
+
+31.0.0
+- RegExp when adding two routers with a path will not be evaluated anymore.
+- When adding two routers with a path if the router being added has routes that are empty, they will now be changed to a regexp: `^${path}?(.+)`
+- DEV: Code coverage is now done with docker-compose as well as testing on node 12,14,15 
 
 30.2.0
 - Improved session plugin it now accepts a flag isSecureCookie that determines if the cookie should be sent with SameSite: None; Secure for CORS enabled sites
