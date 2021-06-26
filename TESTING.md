@@ -1,6 +1,6 @@
 If you want to run the tests, you have to have docker and docker compose installed and then run
 
-~~~
+~~~shell
 docker-compose up -d --build
 ~~~
 
