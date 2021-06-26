@@ -1,3 +1,8 @@
+32.0.0
+- Added Tests for Node 16.x
+- Changed when the cleanUp is called. It will no longer be called during request.close event but during response.close event due to changes in when the request.close event is called ( it is called if data is finished sending )
+- Added additional tests for this new behavior and more tests to test the eventRequest.isFinished
+
 31.1.0
 - Small route improvements
 - Added a warning to the er_rate_limits plugin, it's way too resource intensive, do not use.

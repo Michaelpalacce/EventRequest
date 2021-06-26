@@ -320,7 +320,7 @@ class EventRequest extends EventEmitter
 	 */
 	isFinished()
 	{
-		return this.finished === true || this.response.writableEnded || this.response.finished;
+		return this.finished === true || this.response.writableEnded;
 	}
 
 	/**

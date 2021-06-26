@@ -228,7 +228,7 @@ class Server extends EventEmitter
 			let eventRequest	= new EventRequest( request, response );
 			const block			= this.router.getExecutionBlockForCurrentEvent( eventRequest );
 
-			request.on( 'close', () => {
+			response.on( 'close', () => {
 				if ( eventRequest !== null && eventRequest !== undefined )
 				{
 					eventRequest._cleanUp();

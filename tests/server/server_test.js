@@ -1982,13 +1982,13 @@ test({
 });
 
 test({
-	message	: 'Server.attach.when.request.close.is.called.twice.does.not.throw',
+	message	: 'Server.attach.when.response.close.is.called.twice.does.not.throw',
 	test	: ( done ) => {
 		const app	= new Server();
 		let called	= 0;
 
 		app.get( '/testCloseTwice', ( event ) => {
-			const request	= event.request;
+			const response	= event.response;
 
 			event.on( 'cleanUp',() => {
 				called	++;
@@ -1996,7 +1996,7 @@ test({
 
 			event.send( '' );
 
-			request.emit( 'close' )
+			response.emit( 'close' )
 		});
 
 		helpers.sendServerRequest(

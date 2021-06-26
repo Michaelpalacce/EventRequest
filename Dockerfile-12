@@ -1,5 +1,5 @@
 FROM node:12.20.1-alpine
 
-RUN npm i -g nyc
+RUN npm i -g nyc nodemon
 
 COPY . /app

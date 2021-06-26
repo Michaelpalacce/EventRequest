@@ -31,9 +31,9 @@ test({
 test({
 	message	: 'EventRequest.should.parse.url',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest( '', '/test?testParam=testValue' );
+		const eventRequest	= helpers.getEventRequest( '', '/test?testParam=testValue' );
 
-		assert.equal( eventRequest.path, '/test', 'EventRequest could not parse path' );
+		assert.strictEqual( eventRequest.path, '/test', 'EventRequest could not parse path' );
 		assert.deepEqual( eventRequest.query, { testParam : 'testValue' }, 'EventRequest could not parse query' );
 
 		done();
@@ -45,9 +45,9 @@ test({
 	test	: ( done ) => {
 		let methods	= ['GET', 'DELETE', 'PUT', 'POST'];
 		methods.forEach( ( method ) => {
-			let eventRequest	= helpers.getEventRequest( method );
+			const eventRequest	= helpers.getEventRequest( method );
 
-			assert.equal( eventRequest.method, method, `Could not validate that ${eventRequest.method} and ${method} are equal!` );
+			assert.strictEqual( eventRequest.method, method, `Could not validate that ${eventRequest.method} and ${method} are equal!` );
 		});
 
 		done();
@@ -58,7 +58,7 @@ test({
 	message	: 'EventRequest.parses.headers',
 	test	: ( done ) => {
 		let headers			= { headerKey : 'headerValue' };
-		let eventRequest	= helpers.getEventRequest( undefined, undefined, headers );
+		const eventRequest	= helpers.getEventRequest( undefined, undefined, headers );
 
 		assert.deepEqual( eventRequest.headers, headers );
 
@@ -69,7 +69,7 @@ test({
 test({
 	message	: 'EventRequest.errorHandler.does.not.need.to.be.an.instance.of.ErrorHandler',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 
 		assert.doesNotThrow( () => {
 			eventRequest.errorHandler	= new ErrorHandler();
@@ -83,7 +83,7 @@ test({
 test({
 	message	: 'EventRequest.getErrorHandler.when.nothing.is.attached',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 
 		assert.deepStrictEqual( eventRequest.getErrorHandler() instanceof ErrorHandler, true )
 
@@ -94,7 +94,7 @@ test({
 test({
 	message	: 'EventRequest.getErrorHandler.when.wrong.object.is.attached',
 	test	: ( done ) => {
-		let eventRequest			= helpers.getEventRequest();
+		const eventRequest			= helpers.getEventRequest();
 		eventRequest.errorHandler	= 'WRONG!';
 
 		assert.deepStrictEqual( eventRequest.getErrorHandler() instanceof ErrorHandler, true )
@@ -109,7 +109,7 @@ test({
 		const errorHandler			= new ErrorHandler();
 		errorHandler.addNamespace( 'test', {} );
 
-		let eventRequest			= helpers.getEventRequest();
+		const eventRequest			= helpers.getEventRequest();
 		eventRequest.errorHandler	= errorHandler;
 
 		assert.deepStrictEqual( eventRequest.getErrorHandler() instanceof ErrorHandler, true )
@@ -122,7 +122,7 @@ test({
 test({
 	message	: 'EventRequest.getErrorHandler.twice.returns.same.error.handler',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		assert.deepStrictEqual( eventRequest.getErrorHandler(), eventRequest.getErrorHandler() )
 
 		done();
@@ -132,7 +132,7 @@ test({
 test({
 	message	: 'EventRequest.sendError.will.create.a.default.Error.Handler.if.it.is.not.correct',
 	test	: ( done ) => {
-		let eventRequest			= helpers.getEventRequest();
+		const eventRequest			= helpers.getEventRequest();
 		let errorToThrow			= 'Error to throw';
 		let called					= false;
 
@@ -152,7 +152,7 @@ test({
 test({
 	message	: 'EventRequest._cleanUp.emits.event:.cleanUp',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
 
 		eventRequest.on( 'cleanUp', () => { cleanUp = true; });
@@ -166,7 +166,7 @@ test({
 test({
 	message	: 'EventRequest._cleanUp.emits.event:.finished',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let finished		= false;
 		eventRequest.on( 'finished', () => { finished = true; });
 
@@ -179,32 +179,32 @@ test({
 test({
 	message	: 'EventRequest._cleanUp.cleans.up.data',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		eventRequest.on( 'test', () => {} );
 
-		assert.equal( eventRequest.listeners( 'test' ).length, 1 );
+		assert.strictEqual( eventRequest.listeners( 'test' ).length, 1 );
 
 		eventRequest._cleanUp();
 
-		assert.equal( eventRequest.internalTimeout, undefined );
-		assert.equal( eventRequest.query, undefined );
-		assert.equal( eventRequest.headers, undefined );
-		assert.equal( eventRequest.method, undefined );
-		assert.equal( eventRequest.path, undefined );
-		assert.equal( eventRequest.block, undefined );
-		assert.equal( eventRequest.validation, undefined );
-		assert.equal( eventRequest.request, undefined );
-		assert.equal( eventRequest.clientIp, undefined );
-		assert.equal( eventRequest.extra, undefined );
-		assert.equal( eventRequest.body, undefined );
-		assert.equal( eventRequest.fileStreamHandler, undefined );
-		assert.equal( eventRequest.errorHandler, undefined );
-		assert.equal( eventRequest.extra, undefined );
-		assert.equal( eventRequest.cookies, undefined );
-		assert.equal( eventRequest.params, undefined );
-		assert.equal( eventRequest.disableXPoweredBy, undefined );
-		assert.equal( eventRequest.finished, true );
-		assert.equal( eventRequest.listeners( 'test' ).length, 0 );
+		assert.strictEqual( eventRequest.internalTimeout, undefined );
+		assert.strictEqual( eventRequest.query, undefined );
+		assert.strictEqual( eventRequest.headers, undefined );
+		assert.strictEqual( eventRequest.method, undefined );
+		assert.strictEqual( eventRequest.path, undefined );
+		assert.strictEqual( eventRequest.block, undefined );
+		assert.strictEqual( eventRequest.validation, undefined );
+		assert.strictEqual( eventRequest.request, undefined );
+		assert.strictEqual( eventRequest.clientIp, undefined );
+		assert.strictEqual( eventRequest.extra, undefined );
+		assert.strictEqual( eventRequest.body, undefined );
+		assert.strictEqual( eventRequest.fileStreamHandler, undefined );
+		assert.strictEqual( eventRequest.errorHandler, undefined );
+		assert.strictEqual( eventRequest.extra, undefined );
+		assert.strictEqual( eventRequest.cookies, undefined );
+		assert.strictEqual( eventRequest.params, undefined );
+		assert.strictEqual( eventRequest.disableXPoweredBy, undefined );
+		assert.strictEqual( eventRequest.finished, true );
+		assert.strictEqual( eventRequest.listeners( 'test' ).length, 0 );
 
 		done();
 	}
@@ -220,7 +220,7 @@ test({
 		[undefined, '']
 	],
 	test			: ( done, data, expected ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		assert.deepStrictEqual( eventRequest.formatResponse( data ), expected );
 		done();
 	}
@@ -229,7 +229,7 @@ test({
 test({
 	message	: 'EventRequest.send.returns.Promise',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		const data			= 'DataToSend';
 
 		assert.deepStrictEqual( eventRequest.send( data ) instanceof Promise, true );
@@ -240,7 +240,7 @@ test({
 test({
 	message	: 'EventRequest.send.calls.formatResponse',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let formatResponse	= false;
 		const data			= 'DataToSend';
 
@@ -265,7 +265,7 @@ test({
 test({
 	message	: 'EventRequest.send.calls.response.end',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let send			= false;
 		const data			= 'DataToSend';
 
@@ -289,7 +289,7 @@ test({
 test({
 	message	: 'EventRequest.send.when.response.is.not.given',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
@@ -306,7 +306,7 @@ test({
 test({
 	message	: 'EventRequest.send.when.response.is.buffer',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		const payload		= Buffer.from( 'test' );
 
 		let send			= false;
@@ -329,7 +329,7 @@ test({
 test({
 	message	: 'EventRequest.send.with.malformed.payload',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
@@ -352,7 +352,7 @@ test({
 test({
 	message	: 'EventRequest.getRequestHeaderIfItDoesNotExist',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 
 		eventRequest._mock({
 			method			: 'hasRequestHeader',
@@ -368,7 +368,7 @@ test({
 test({
 	message	: 'EventRequest.send.calls.response.end.when.raw',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let send			= false;
 		eventRequest.response._mock({
 			method			: 'end',
@@ -386,7 +386,7 @@ test({
 test({
 	message	: 'EventRequest.sets.status.code',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		eventRequest.response._mock({
 			method			: 'end',
 			shouldReturn	: () => {}
@@ -395,7 +395,7 @@ test({
 		let statusCode	= 200;
 		eventRequest.send( '', statusCode );
 
-		assert.equal( eventRequest.response.statusCode, statusCode );
+		assert.strictEqual( eventRequest.response.statusCode, statusCode );
 		done();
 	}
 });
@@ -403,7 +403,7 @@ test({
 test({
 	message	: 'EventRequest.send.method.does.not.call.cleanUp',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let cleanUp			= false;
 
 		eventRequest.on( 'cleanUp', () => { cleanUp = true; });
@@ -417,7 +417,7 @@ test({
 test({
 	message	: 'EventRequest.send.method.emits.send',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let sendCalled		= false;
 
 		eventRequest.on( 'send', ( { payload, code } ) => {
@@ -436,7 +436,7 @@ test({
 test({
 	message	: 'EventRequest.setResponseHeader.returns.EventRequest',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 
 		assert.deepStrictEqual( eventRequest.setResponseHeader( 'key', 'value' ), eventRequest );
 
@@ -447,7 +447,7 @@ test({
 test({
 	message	: 'EventRequest.removeResponseHeader.returns.EventRequest',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 
 		assert.deepStrictEqual( eventRequest.removeResponseHeader( 'key' ), eventRequest );
 
@@ -458,12 +458,12 @@ test({
 test({
 	message	: 'EventRequest.setStatusCode.changes.the.status.code',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		eventRequest.setStatusCode( 200 );
 
-		assert.equal( 200, eventRequest.response.statusCode );
+		assert.strictEqual( 200, eventRequest.response.statusCode );
 		eventRequest.setStatusCode( 'wrong' );
-		assert.equal( 500, eventRequest.response.statusCode );
+		assert.strictEqual( 500, eventRequest.response.statusCode );
 
 		done();
 	}
@@ -472,7 +472,7 @@ test({
 test({
 	message	: 'EventRequest.setStatusCode.returns.eventRequest',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		assert.deepStrictEqual( eventRequest.setStatusCode( 200 ), eventRequest );
 
 		done();
@@ -482,8 +482,8 @@ test({
 test({
 	message	: 'EventRequest.setResponseHeader.sets.the.header.in.the.response.if.response.is.not.sent',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		assert.equal( eventRequest.isFinished(), false );
+		const eventRequest	= helpers.getEventRequest();
+		assert.strictEqual( eventRequest.isFinished(), false );
 		let setHeader	= false;
 
 		eventRequest.response._mock({
@@ -501,8 +501,8 @@ test({
 test({
 	message	: 'EventRequest.removeResponseHeader.removes.the.header.in.the.response.if.response.is.not.sent',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		assert.equal( eventRequest.isFinished(), false );
+		const eventRequest	= helpers.getEventRequest();
+		assert.strictEqual( eventRequest.isFinished(), false );
 		let removeHeader	= false;
 
 		eventRequest.response._mock({
@@ -520,9 +520,9 @@ test({
 test({
 	message	: 'EventRequest setResponseHeader does not set header when event is finished and throws error',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 
-		assert.equal( eventRequest.isFinished(), false );
+		assert.strictEqual( eventRequest.isFinished(), false );
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
@@ -544,9 +544,9 @@ test({
 test({
 	message	: 'EventRequest removeResponseHeader does not remove header when event is finished and throws error',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 
-		assert.equal( eventRequest.isFinished(), false );
+		assert.strictEqual( eventRequest.isFinished(), false );
 
 		eventRequest.response._mock({
 			method			: 'removeHeader',
@@ -568,14 +568,14 @@ test({
 test({
 	message	: 'EventRequest.redirect emits a redirect event',
 	test	: ( done ) => {
-		let eventRequest		= helpers.getEventRequest();
+		const eventRequest		= helpers.getEventRequest();
 		let redirectUrl			= '/test';
 		let redirectStatusCode	= 302;
 		let redirect			= false;
 
 		eventRequest.on( 'redirect', ( redirectOptions ) => {
-			assert.equal( redirectOptions.redirectUrl, redirectUrl );
-			assert.equal( redirectOptions.statusCode, redirectStatusCode );
+			assert.strictEqual( redirectOptions.redirectUrl, redirectUrl );
+			assert.strictEqual( redirectOptions.statusCode, redirectStatusCode );
 			redirect	= true;
 		});
 
@@ -588,7 +588,7 @@ test({
 test({
 	message	: 'EventRequest.redirect.sets.header',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		let setResponseHeader		= false;
 		let redirectUrl		= '/test';
 
@@ -611,12 +611,12 @@ test({
 test({
 	message	: 'EventRequest.redirect.does.not.redirect.if.response.is.finished',
 	test	: ( done ) => {
-		let eventRequest		= helpers.getEventRequest();
+		const eventRequest		= helpers.getEventRequest();
 		let MockedErrorHandler	= Mock( ErrorHandler );
 		let errorHandler		= new MockedErrorHandler();
 		let errorCalled			= false;
 
-		assert.equal( eventRequest.isFinished(), false );
+		assert.strictEqual( eventRequest.isFinished(), false );
 
 		eventRequest.response._mock({
 			method			: 'setHeader',
@@ -644,23 +644,50 @@ test({
 	}
 });
 
+// Internally this works since finished is associated with the writableEnded property
 test({
 	message	: 'EventRequest.isFinished.returns.response.finished',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
+		const eventRequest	= helpers.getEventRequest();
 		eventRequest.response._mock({
 			method			: 'finished',
 			shouldReturn	: true
 		});
 
-		assert.equal( eventRequest.isFinished(), true );
+		assert.strictEqual( eventRequest.isFinished(), true );
 
 		eventRequest.response._mock({
 			method			: 'finished',
 			shouldReturn	: false
 		});
 
-		assert.equal( eventRequest.isFinished(), false );
+		assert.strictEqual( eventRequest.isFinished(), false );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.isFinished.returns.response.finished.withWritableEnded',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest();
+
+		assert.strictEqual( eventRequest.isFinished(), false );
+		eventRequest.response.end( '' );
+		assert.strictEqual( eventRequest.isFinished(), true );
+
+		done();
+	}
+});
+
+test({
+	message	: 'EventRequest.isFinished.returns.response.finished.whenCleanup.sets.finished.to.true',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest();
+
+		assert.strictEqual( eventRequest.isFinished(), false );
+		eventRequest._cleanUp();
+		assert.strictEqual( eventRequest.isFinished(), true );
 
 		done();
 	}
@@ -669,8 +696,8 @@ test({
 test({
 	message	: 'EventRequest._setBlock.should.set.block',
 	test	: ( done ) => {
-		let eventRequest	= helpers.getEventRequest();
-		let block			= ['test'];
+		const eventRequest	= helpers.getEventRequest();
+		const block			= ['test'];
 		eventRequest._setBlock( block );
 
 		assert.deepEqual( eventRequest.block, block );
@@ -836,7 +863,7 @@ test({
 test({
 	message	: 'EventRequest.next.sends.error.on.error',
 	test	: ( done ) => {
-		let eventRequest			= helpers.getEventRequest();
+		const eventRequest			= helpers.getEventRequest();
 		let error					= false;
 		let errorToSend				= 'Error was thrown.';
 		let errorCode				= 503;
@@ -851,7 +878,7 @@ test({
 
 		let callback	= () => {};
 
-		let block		= [callback];
+		const block		= [callback];
 		eventRequest._setBlock( block );
 
 		eventRequest.next( errorToSend, errorCode );
@@ -863,7 +890,7 @@ test({
 test({
 	message	: 'EventRequest.next.calls.errorHandler.on.no.more.middleware',
 	test	: ( done ) => {
-		let eventRequest			= helpers.getEventRequest();
+		const eventRequest			= helpers.getEventRequest();
 		let error					= false;
 
 		eventRequest.errorHandler	= new MockedErrorHandler();
@@ -874,7 +901,7 @@ test({
 			called			: 1
 		});
 
-		let block	= [];
+		const block	= [];
 		eventRequest._setBlock( block );
 
 		eventRequest.next();
@@ -886,7 +913,7 @@ test({
 test({
 	message	: 'EventRequest.sendError.emits.an.error.event',
 	test	: ( done ) => {
-		let eventRequest			= helpers.getEventRequest();
+		const eventRequest			= helpers.getEventRequest();
 		let errorToThrow			= 'Error to throw';
 		let error					= false;
 
@@ -911,7 +938,7 @@ test({
 		const eventRequest		= helpers.getEventRequest();
 		const ValidationHandler	= require( '../../server/components/validation/validation_handler' );
 
-		assert.equal( typeof eventRequest.validation, 'object' );
+		assert.strictEqual( typeof eventRequest.validation, 'object' );
 		assert.deepStrictEqual( eventRequest.validation, ValidationHandler );
 
 		done();
@@ -948,12 +975,12 @@ test({
 			}
 		});
 
-		assert.equal( eventRequest.setCookie.apply( eventRequest, setCookieArguments ), shouldReturnTrue );
-		assert.equal( wasCalled, shouldReturnTrue );
+		assert.strictEqual( eventRequest.setCookie.apply( eventRequest, setCookieArguments ), shouldReturnTrue );
+		assert.strictEqual( wasCalled, shouldReturnTrue );
 
 		for( const option in options )
 		{
-			assert.equal( cookieSet.includes( option ), true );
+			assert.strictEqual( cookieSet.includes( option ), true );
 		}
 
 		done();
@@ -986,7 +1013,7 @@ test({
 
 		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
 
-		assert.equal( eventRequest.getRequestHeader( headerName ), headerValue );
+		assert.strictEqual( eventRequest.getRequestHeader( headerName ), headerValue );
 
 		done();
 	}
@@ -1000,8 +1027,8 @@ test({
 
 		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
 
-		assert.equal( eventRequest.getRequestHeader( headerName.toUpperCase() ), headerValue );
-		assert.equal( eventRequest.getRequestHeader( headerName.toLowerCase() ), headerValue );
+		assert.strictEqual( eventRequest.getRequestHeader( headerName.toUpperCase() ), headerValue );
+		assert.strictEqual( eventRequest.getRequestHeader( headerName.toLowerCase() ), headerValue );
 
 		done();
 	}
@@ -1015,8 +1042,8 @@ test({
 
 		const eventRequest	= helpers.getEventRequest();
 
-		assert.equal( eventRequest.getRequestHeader( headerName ), null );
-		assert.equal( eventRequest.getRequestHeader( headerName, headerValue ), headerValue );
+		assert.strictEqual( eventRequest.getRequestHeader( headerName ), null );
+		assert.strictEqual( eventRequest.getRequestHeader( headerName, headerValue ), headerValue );
 
 		done();
 	}
@@ -1029,7 +1056,7 @@ test({
 
 		const eventRequest	= helpers.getEventRequest();
 
-		assert.equal( eventRequest.hasRequestHeader( headerName ), false );
+		assert.strictEqual( eventRequest.hasRequestHeader( headerName ), false );
 
 		done();
 	}
@@ -1043,7 +1070,7 @@ test({
 
 		const eventRequest	= helpers.getEventRequest( '', '/', { [headerName]: headerValue });
 
-		assert.equal( eventRequest.hasRequestHeader( headerName ), true );
+		assert.strictEqual( eventRequest.hasRequestHeader( headerName ), true );
 
 		done();
 	}
@@ -1060,7 +1087,7 @@ test({
 
 		const eventRequest	= helpers.getEventRequest( '', '/', headers );
 
-		assert.equal( eventRequest.getRequestHeaders(), headers );
+		assert.strictEqual( eventRequest.getRequestHeaders(), headers );
 
 		done();
 	}
@@ -1076,14 +1103,14 @@ test({
 			method: 'send',
 			shouldReturn: function( one, two ){
 				assert.deepStrictEqual( one, { error: { code: 'app.general', message: 'Cannot GET /' } } );
-				assert.equal( 404, two );
+				assert.strictEqual( 404, two );
 				called	= true;
 			}
 		});
 
 		eventRequest.next();
 
-		assert.equal( called, true );
+		assert.strictEqual( called, true );
 
 		done();
 	}

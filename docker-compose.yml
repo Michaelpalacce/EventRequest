@@ -9,7 +9,7 @@ services:
         working_dir: /app
         volumes:
           - ./coverage:/app/coverage
-        command: node test.js --silent
+        command: node test.js
 
     node14:
         build:
@@ -18,8 +18,8 @@ services:
         working_dir: /app
         volumes:
           - ./coverage:/app/coverage
-        command: node test.js --silent
-#        command: nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js --silent
+#        command: node test.js
+        command: nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js
 
     node15:
         build:
@@ -28,4 +28,23 @@ services:
         working_dir: /app
         volumes:
           - ./coverage:/app/coverage
-        command: node test.js --silent
+        command: node test.js
+
+    node16:
+        build:
+            context: .
+            dockerfile: Dockerfile-16
+        working_dir: /app
+        volumes:
+          - ./coverage:/app/coverage
+        command: node test.js
+
+#    node-test:
+#        build:
+#            context: .
+#            dockerfile: Dockerfile-16
+#        working_dir: /app
+#        volumes:
+##          - ./coverage:/app/coverage
+#            - ./:/app
+#        command: nodemon -L test.js
