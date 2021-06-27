@@ -64,6 +64,20 @@ class StaticResourcesPlugin extends PluginInterface
 
 					if ( fs.existsSync( item ) && ( fileStat = fs.statSync( item ) ).isFile() && item.indexOf( staticPath ) !== -1 )
 					{
+						if ( useEtag )
+						{
+							const plugin			= this.server.er_etag;
+							const { etag, pass }	= plugin.getConditionalResult( event, fileStat, strong );
+
+							event.setResponseHeader( 'ETag', etag );
+
+							if ( ! pass )
+							{
+								event.send( '', 304 );
+								return;
+							}
+						}
+
 						let mimeType	= '*/*';
 						// @TODO NEW MIME-TYPE COMPONENT SHOULD BE MADE
 						switch ( path.extname( item ) )
@@ -82,20 +96,6 @@ class StaticResourcesPlugin extends PluginInterface
 
 							default:
 								break;
-						}
-
-						if ( useEtag )
-						{
-							const plugin			= this.server.er_etag;
-							const { etag, pass }	= plugin.getConditionalResult( event, fileStat, strong );
-
-							event.setResponseHeader( 'ETag', etag );
-
-							if ( ! pass )
-							{
-								event.send( '', 304 );
-								return;
-							}
 						}
 
 						event.setResponseHeader( 'Content-Type', mimeType ).setStatusCode( 200 );

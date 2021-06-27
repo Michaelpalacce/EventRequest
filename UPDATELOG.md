@@ -1,3 +1,7 @@
+32.1.0
+- etag plugin small changes to how it searches for header values
+- Improvements to the cache control plugin.
+
 32.0.0
 - Added Tests for Node 16.x
 - Changed when the cleanUp is called. It will no longer be called during request.close event but during response.close event due to changes in when the request.close event is called ( it is called if data is finished sending )

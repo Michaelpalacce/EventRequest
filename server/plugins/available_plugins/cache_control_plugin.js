@@ -24,14 +24,12 @@ class CacheControlPlugin extends PluginInterface
 	 */
 	cache( options = {} )
 	{
-		return ( event ) => {
-			const header	= this.builder.build( options );
+		const header	= this.builder.build( options );
 
-			if ( header !== '' )
-				event.setResponseHeader( CacheControl.HEADER, this.builder.build( options ) );
-
-			event.next();
-		};
+		if ( header !== '' )
+			return event => event.setResponseHeader( CacheControl.HEADER, header ).next();
+		else
+			return event => event.next();
 	}
 
 	/**
