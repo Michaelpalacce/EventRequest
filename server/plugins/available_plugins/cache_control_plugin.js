@@ -27,9 +27,9 @@ class CacheControlPlugin extends PluginInterface
 		const header	= this.builder.build( options );
 
 		if ( header !== '' )
-			return event => event.setResponseHeader( CacheControl.HEADER, header ).next();
+			return ( event ) => event.setResponseHeader( CacheControl.HEADER, header ).next();
 		else
-			return event => event.next();
+			return ( event ) => event.next();
 	}
 
 	/**
