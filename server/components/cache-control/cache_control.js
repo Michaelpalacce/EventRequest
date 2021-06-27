@@ -10,14 +10,9 @@ const AVAILABLE_OTHER_DIRECTIVES		= ['no-transform'];
  */
 class CacheControl
 {
-	/**
-	 * @param	{Object} [options={}]
-	 */
-	constructor( options = {} )
+	constructor()
 	{
 		this.options	= {};
-
-		this._configure( options );
 	}
 
 	/**

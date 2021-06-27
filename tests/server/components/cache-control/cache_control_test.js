@@ -14,18 +14,6 @@ test({
 	}
 });
 
-test({
-	message	: 'CacheControl.constructor.on.options',
-	test	: ( done ) => {
-		const options	= { cacheControl : 'private' };
-		const builder	= new CacheControl( options );
-
-		assert.deepStrictEqual( builder.options, options );
-
-		done();
-	}
-});
-
 const dataProvider	= [
 	[
 		{
@@ -328,7 +316,9 @@ test({
 	message	: 'CacheControl._configure',
 	dataProvider,
 	test	: ( done, options, expectedOptions, expectedBuildResult ) => {
-		const builder	= new CacheControl( options );
+		const builder	= new CacheControl();
+
+		builder._configure( options )
 
 		assert.deepStrictEqual( builder.options, expectedOptions );
 
@@ -368,9 +358,9 @@ test({
 	message	: 'CacheControl.build',
 	dataProvider,
 	test	: ( done, options, expectedOptions, expectedBuildResult ) => {
-		const builder	= new CacheControl( options );
+		const builder	= new CacheControl();
 
-		assert.deepStrictEqual( builder.build(), expectedBuildResult );
+		assert.deepStrictEqual( builder.build( options ), expectedBuildResult );
 
 		done();
 	}
@@ -380,23 +370,11 @@ test({
 	message	: 'CacheControl.build.resets.options.and.can.build.again',
 	dataProvider,
 	test	: ( done, options, expectedOptions, expectedBuildResult ) => {
-		const builder	= new CacheControl( options );
-
-		assert.deepStrictEqual( builder.build(), expectedBuildResult );
-		assert.deepStrictEqual( builder.options, {} );
-		assert.deepStrictEqual( builder.build(), '' );
-
-		done();
-	}
-});
-
-test({
-	message	: 'CacheControl.build.with.options',
-	dataProvider,
-	test	: ( done, options, expectedOptions, expectedBuildResult ) => {
 		const builder	= new CacheControl();
 
 		assert.deepStrictEqual( builder.build( options ), expectedBuildResult );
+		assert.deepStrictEqual( builder.options, {} );
+		assert.deepStrictEqual( builder.build(), '' );
 
 		done();
 	}

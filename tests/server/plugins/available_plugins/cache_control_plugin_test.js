@@ -106,12 +106,13 @@ test({
 		const plugin		= new CacheControlPlugin();
 
 		eventRequest._mock( {
-			method	: 'setResponseHeader',
-			called	: 2,
-			with	: [
+			method			: 'setResponseHeader',
+			called			: 2,
+			with			: [
 				['Cache-control', 'public, must-revalidate'],
 				['X-Powered-By', 'event_request']
-			]
+			],
+			shouldReturn	: _ => eventRequest
 		});
 
 		plugin.cache( { cacheControl : 'public', revalidation: 'must-revalidate' } )( eventRequest );

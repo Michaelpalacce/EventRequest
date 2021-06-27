@@ -85,10 +85,7 @@ class EtagPlugin extends PluginInterface
 					break;
 				}
 
-				for ( const value of header )
-					if ( value === etag )
-						pass	= false;
-
+				pass	= header.indexOf( etag ) === -1;
 				break;
 
 			case event.hasRequestHeader( IF_MATCH_CONDITIONAL_HEADER_NAME ):
@@ -97,12 +94,7 @@ class EtagPlugin extends PluginInterface
 				if ( header.length === 1 && header[0] === '*' )
 					break;
 
-				pass	= header.reduce(( accumulator, value ) => {
-					if ( value === etag )
-						return true;
-
-					return accumulator;
-				}, false );
+				pass	= header.indexOf( etag ) !== -1;
 				break;
 
 			default:
