@@ -1,3 +1,6 @@
+32.2.0
+- EventRequest.send will send an empty buffer if method was HEAD
+
 32.1.0
 - etag plugin small changes to how it searches for header values
 - Improvements to the cache control plugin.

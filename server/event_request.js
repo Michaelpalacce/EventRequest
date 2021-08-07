@@ -167,10 +167,10 @@ class EventRequest extends EventEmitter
 		if ( typeof code === 'number' )
 			this.setStatusCode( code );
 
-		let payload	= this.formatResponse( response );
-
 		if ( this.disableXPoweredBy === false )
 			this.setResponseHeader( 'X-Powered-By', 'event_request' );
+
+		let payload	= this.method === 'HEAD' ? Buffer.from( '' ) : this.formatResponse( response );
 
 		this.emit( 'send', { payload, code: this.response.statusCode } );
 
