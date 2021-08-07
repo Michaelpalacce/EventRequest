@@ -54,14 +54,14 @@
   "bugs": {
     "url": "https://github.com/Michaelpalacce/EventRequest/issues"
   },
-  "homepage": "https://github.com/Michaelpalacce/EventRequest#readme",
+  "homepage": "https://stefangenov.site/projects#EventRequest",
   "main": "server.js",
   "name": "event_request",
   "scripts": {
     "test": "nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js --debug",
     "deploy": "npm run test && npm publish"
   },
-  "version": "32.1.0",
+  "version": "32.2.0",
   "devDependencies": {
     "nyc": "^15.1.0"
   }

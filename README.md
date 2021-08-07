@@ -709,6 +709,7 @@ The event request is an object that is created by the server and passed through 
 - setResponseHeader will be called with X-Powered-By: event_request. This can be disabled by doing: `eventRequest.disableXPoweredBy = true;`
 - Emits a `send` event just before calling this.end()
 - The send function is entirely synchronous until the response has to be sent ( when calling this.end() ). The this.end() promise is returned. This is done for consistency with sendError
+- If the method was HEAD then no response will be sent ( response data will be overwritten by an empty buffer )
 - calls this.end() with the payload
 
 **async end( ...args ): void** 

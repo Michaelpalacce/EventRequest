@@ -238,6 +238,30 @@ test({
 });
 
 test({
+	message	: 'EventRequest.send.returns.empty.string.if.method.is.head.even.if.data.is.passed',
+	test	: ( done ) => {
+		const eventRequest	= helpers.getEventRequest( 'HEAD' );
+		let send			= false;
+		const data			= 'DataToSend';
+
+		eventRequest.response._mock({
+			method			: 'end',
+			shouldReturn	: ( payload, encoding ) => {
+				assert.deepStrictEqual( payload, Buffer.from( '' ) );
+				assert.deepStrictEqual( encoding, 'utf8' );
+				send	= true;
+			},
+			called			: 1
+		});
+
+		eventRequest.send( data );
+
+		assert.deepStrictEqual( send, true );
+		done();
+	}
+});
+
+test({
 	message	: 'EventRequest.send.calls.formatResponse',
 	test	: ( done ) => {
 		const eventRequest	= helpers.getEventRequest();
