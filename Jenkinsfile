@@ -91,13 +91,15 @@ pipeline {
 		stage( 'NodeJS-16 commit' ) {
 		    agent { label 'nodejs-16' }
 			steps {
-                if ( commit )
-                {
-                    withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
-                        sh """
-                            echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
-                            npm publish
-                        """
+                script {
+                    if ( commit )
+                    {
+                        withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
+                            sh """
+                                echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
+                                npm publish
+                            """
+                        }
                     }
                 }
 			}
