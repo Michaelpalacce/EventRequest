@@ -54,7 +54,7 @@ pipeline {
 			}
 		}
 		stage( 'Run Tests' ) {
-		    parallel {
+// 		    parallel {
 		        stage( 'NodeJS-16 Tests') {
 		            agent { label 'nodejs-16' }
         			steps {
@@ -85,7 +85,7 @@ pipeline {
                         """
         			}
         		}
-		    }
+// 		    }
 		}
 
 		stage( 'NodeJS-16 commit' ) {
