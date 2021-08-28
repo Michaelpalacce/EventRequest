@@ -6,9 +6,9 @@ def notifyBuild(String buildStatus = 'STARTED') {
       subject: "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
       to: '$DEFAULT_RECIPIENTS',
       body: """
-STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':
+Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':
 
-Check console output at "${env.JENKINS_URL}/job/${env.JOB_NAME}/${env.BUILD_NUMBER}"
+Check console output at "${env.JENKINS_URL}job/${env.JOB_NAME}/${env.BUILD_NUMBER}"
 """
     )
 }
@@ -19,7 +19,7 @@ def notifyFailed() {
       body: """
 FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':
 
-Check console output at "${env.JENKINS_URL}/job/${env.JOB_NAME}/${env.BUILD_NUMBER}"
+Check console output at "${env.JENKINS_URL}job/${env.JOB_NAME}/${env.BUILD_NUMBER}"
 """
     )
 }
@@ -30,7 +30,7 @@ def notifySuccessful() {
       body: """
 SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':
 
-Check console output at "${env.JENKINS_URL}/job/${env.JOB_NAME}/${env.BUILD_NUMBER}"
+Check console output at "${env.JENKINS_URL}job/${env.JOB_NAME}/${env.BUILD_NUMBER}"
 """
     )
 }
