@@ -768,20 +768,16 @@ test({
 		const promises	= [];
 
 		for ( let i = 0; i < 100; i ++ )
-		{
 			promises.push( helpers.sendServerRequest( `/${name}` ) );
-		}
 
 		setTimeout(() => {
 			for ( let i = 0; i < 50; i ++ )
-			{
 				promises.push( helpers.sendServerRequest( `/${name}` ) );
-			}
 
 			Promise.all( promises).then(() => {
 				done();
 			}).catch( done );
-		}, 2100 );
+		}, 5000 );
 	}
 });
 
