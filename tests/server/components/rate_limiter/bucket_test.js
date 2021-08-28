@@ -217,26 +217,22 @@ test({
 test({
 	message	: 'Bucket.reduceRaceConditionWithRefill',
 	test	: ( done ) => {
-		const bucket				= new Bucket( 5000, 1, 10000 );
-		const expectedFalseTokens	= 5000;
+		const bucket				= new Bucket( 50, 1, 100 );
+		const expectedFalseTokens	= 50;
 
 		bucket.init().then( async () => {
 			assert.deepStrictEqual( await bucket.get(), bucket.maxAmount );
 
 			const promises	= [];
 
-			for ( let i = 0; i < 10000; i ++ )
-			{
+			for ( let i = 0; i < 100; i ++ )
 				promises.push( bucket.reduce() );
-			}
 
 			setTimeout( async () => {
 				assert.deepStrictEqual( await bucket.isFull(), true )
 
-				for ( let i = 0; i < 15000; i ++ )
-				{
+				for ( let i = 0; i < 150; i ++ )
 					promises.push( bucket.reduce() );
-				}
 
 				Promise.all( promises ).then(( responses ) => {
 					let falseResponses	= 0;
@@ -254,7 +250,7 @@ test({
 							: false
 					);
 				});
-			}, 3000 );
+			}, 2010 );
 		});
 	}
 });
