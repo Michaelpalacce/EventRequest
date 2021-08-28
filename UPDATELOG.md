@@ -1,4 +1,7 @@
-32.2.0
+32.2.2
+- Added a Jenkinsfile
+
+32.2.1
 - Updates to test, to run even when resources are limited
 
 32.2.0
