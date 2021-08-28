@@ -58,12 +58,10 @@ pipeline {
 		        stage( 'NodeJS-16 Tests') {
 		            agent { label 'nodejs-16' }
         			steps {
-        				withCredentials([string(credentialsId: 'github-access-token', variable: 'GITHUBTOKEN')]) {
-        					sh """
-                				npm i
-                				node test.js --silent
-        					"""
-        				}
+                        sh """
+                            npm i
+                            node test.js --silent
+                        """
         			}
 		        }
 
@@ -71,24 +69,20 @@ pipeline {
         		stage( 'NodeJS-14 Tests' ) {
         		    agent { label 'nodejs-14' }
         			steps {
-        				withCredentials([string(credentialsId: 'github-access-token', variable: 'GITHUBTOKEN')]) {
-        					sh """
-                				npm i
-                				node test.js --silent
-        					"""
-        				}
+                        sh """
+                            npm i
+                            node test.js --silent
+                        """
         			}
         		}
 
 				stage( 'NodeJS-12 Tests' ) {
         		    agent { label 'nodejs-12' }
         			steps {
-        				withCredentials([string(credentialsId: 'github-access-token', variable: 'GITHUBTOKEN')]) {
-        					sh """
-                				npm i
-                				node test.js --silent
-        					"""
-        				}
+                        sh """
+                            npm i
+                            node test.js --silent
+                        """
         			}
         		}
 		    }
@@ -97,14 +91,12 @@ pipeline {
 		stage( 'NodeJS-16 commit' ) {
 		    agent { label 'nodejs-16' }
 			steps {
-			    withCredentials([string(credentialsId: 'github-access-token', variable: 'GITHUBTOKEN')]) {
-    				withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
-    					sh """
-    					    echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
-    					    npm publish
-    					"""
-    				}
-				}
+                withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
+                    sh """
+                        echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
+                        npm publish
+                    """
+                }
 			}
 		}
    }
