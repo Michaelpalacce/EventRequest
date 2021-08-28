@@ -59,7 +59,7 @@ pipeline {
 		            agent { label 'nodejs-16' }
         			steps {
                         sh """
-                            npm i
+                            npm ci
                             node test.js --silent
                         """
         			}
@@ -70,7 +70,7 @@ pipeline {
         		    agent { label 'nodejs-14' }
         			steps {
                         sh """
-                            npm i
+                            npm ci
                             node test.js --silent
                         """
         			}
@@ -80,7 +80,7 @@ pipeline {
         		    agent { label 'nodejs-12' }
         			steps {
                         sh """
-                            npm i
+                            npm ci
                             node test.js --silent
                         """
         			}
