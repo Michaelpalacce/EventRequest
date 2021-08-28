@@ -53,7 +53,7 @@ pipeline {
 				notifyBuild()
 			}
 		}
-		stage( 'Run Tests' ) {
+// 		stage( 'Run Tests' ) {
 // 		    parallel {
 		        stage( 'NodeJS-16 Tests') {
 		            agent { label 'nodejs-16' }
@@ -86,7 +86,7 @@ pipeline {
         			}
         		}
 // 		    }
-		}
+// 		}
 
 		stage( 'NodeJS-16 commit' ) {
 		    agent { label 'nodejs-16' }
