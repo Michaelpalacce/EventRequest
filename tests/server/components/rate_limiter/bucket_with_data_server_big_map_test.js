@@ -241,10 +241,8 @@ test({
 			setTimeout( async () => {
 				assert.equal( await bucket.isFull(), true )
 
-				for ( let i = 0; i < 15000; i ++ )
-				{
+				for ( let i = 0; i < 150; i ++ )
 					promises.push( bucket.reduce() );
-				}
 
 				Promise.all( promises ).then(( responses ) => {
 					let falseResponses	= 0;

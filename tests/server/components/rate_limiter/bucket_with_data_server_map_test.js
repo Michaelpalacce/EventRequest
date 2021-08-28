@@ -227,26 +227,22 @@ test({
 	message	: 'Bucket.with.map.reduceRaceConditionWithRefill',
 	test	: ( done ) => {
 		const dataServer			= new DataServerMap( { persist: false } );
-		const bucket				= new Bucket( 5000, 1, 10000, undefined, undefined, dataServer );
-		const expectedFalseTokens	= 5000;
+		const bucket				= new Bucket( 50, 1, 100, undefined, undefined, dataServer );
+		const expectedFalseTokens	= 50;
 
 		bucket.init().then( async () => {
 			assert.equal( await bucket.get(), bucket.maxAmount );
 
 			const promises	= [];
 
-			for ( let i = 0; i < 10000; i ++ )
-			{
+			for ( let i = 0; i < 100; i ++ )
 				promises.push( bucket.reduce() );
-			}
 
 			setTimeout( async () => {
 				assert.equal( await bucket.isFull(), true )
 
-				for ( let i = 0; i < 15000; i ++ )
-				{
+				for ( let i = 0; i < 150; i ++ )
 					promises.push( bucket.reduce() );
-				}
 
 				Promise.all( promises ).then(( responses ) => {
 					let falseResponses	= 0;
