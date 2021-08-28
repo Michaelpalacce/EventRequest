@@ -60,9 +60,6 @@ pipeline {
         			steps {
         				withCredentials([string(credentialsId: 'github-access-token', variable: 'GITHUBTOKEN')]) {
         					sh """
-        						git clone https://github.com/Michaelpalacce/EventRequest.git eventRequest
-        						cd eventRequest
-        						git remote set-url origin https://$GITHUBTOKEN@github.com/Michaelpalacce/EventRequest.git
                 				npm i
                 				node test.js --silent
         					"""
@@ -76,9 +73,6 @@ pipeline {
         			steps {
         				withCredentials([string(credentialsId: 'github-access-token', variable: 'GITHUBTOKEN')]) {
         					sh """
-        						git clone https://github.com/Michaelpalacce/EventRequest.git eventRequest
-        						cd eventRequest
-        						git remote set-url origin https://$GITHUBTOKEN@github.com/Michaelpalacce/EventRequest.git
                 				npm i
                 				node test.js --silent
         					"""
@@ -91,9 +85,6 @@ pipeline {
         			steps {
         				withCredentials([string(credentialsId: 'github-access-token', variable: 'GITHUBTOKEN')]) {
         					sh """
-        						git clone https://github.com/Michaelpalacce/EventRequest.git eventRequest
-        						cd eventRequest
-        						git remote set-url origin https://$GITHUBTOKEN@github.com/Michaelpalacce/EventRequest.git
                 				npm i
                 				node test.js --silent
         					"""
@@ -109,8 +100,6 @@ pipeline {
 			    withCredentials([string(credentialsId: 'github-access-token', variable: 'GITHUBTOKEN')]) {
     				withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
     					sh """
-        					git clone https://github.com/Michaelpalacce/EventRequest.git eventRequest
-        					cd eventRequest
     					    echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
     					    npm publish
     					"""

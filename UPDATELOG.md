@@ -1,3 +1,6 @@
+32.2.3
+- Fix in jenkinsfile
+
 32.2.2
 - Added a Jenkinsfile
 
