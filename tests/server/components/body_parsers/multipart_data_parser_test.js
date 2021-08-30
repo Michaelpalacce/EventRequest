@@ -889,6 +889,6 @@ function waitFileExistsAndRead( file )
 				clearInterval( interval );
 				resolve( null );
 			}
-		}, 5 );
+		}, 100 );
 	});
 }
