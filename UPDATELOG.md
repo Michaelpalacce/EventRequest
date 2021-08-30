@@ -1,3 +1,6 @@
+32.2.4
+- Fix for conditional in Jenkinsfile
+
 32.2.3
 - Fix in jenkinsfile
 

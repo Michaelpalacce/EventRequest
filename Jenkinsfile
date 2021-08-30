@@ -53,56 +53,52 @@ pipeline {
 				notifyBuild()
 			}
 		}
-// 		stage( 'Run Tests' ) {
-// 		    parallel {
-		        stage( 'NodeJS-16 Tests') {
-		            agent { label 'nodejs-16' }
-        			steps {
-                        sh """
-                            npm ci
-                            node test.js --silent
-                        """
-        			}
-		        }
-
-
-        		stage( 'NodeJS-14 Tests' ) {
-        		    agent { label 'nodejs-14' }
-        			steps {
-                        sh """
-                            npm ci
-                            node test.js --silent
-                        """
-        			}
-        		}
-
-				stage( 'NodeJS-12 Tests' ) {
-        		    agent { label 'nodejs-12' }
-        			steps {
-                        sh """
-                            npm ci
-                            node test.js --silent
-                        """
-        			}
-        		}
-// 		    }
-// 		}
-
-		stage( 'NodeJS-16 commit' ) {
-		    agent { label 'nodejs-16' }
+		stage( 'NodeJS-16 Tests') {
+			agent { label 'nodejs-16' }
 			steps {
-                script {
-                    if ( commit )
-                    {
-                        withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
-                            sh """
-                                echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
-                                npm publish
-                            """
-                        }
-                    }
-                }
+				sh """
+					npm ci
+					node test.js --silent
+				"""
 			}
 		}
-   }
+
+
+		stage( 'NodeJS-14 Tests' ) {
+			agent { label 'nodejs-14' }
+			steps {
+				sh """
+					npm ci
+					node test.js --silent
+				"""
+			}
+		}
+
+		stage( 'NodeJS-12 Tests' ) {
+			agent { label 'nodejs-12' }
+			steps {
+				sh """
+					npm ci
+					node test.js --silent
+				"""
+			}
+		}
+
+		stage( 'NodeJS-16 commit' ) {
+			agent { label 'nodejs-16' }
+			steps {
+				script {
+					if ( commit.toBoolean() )
+					{
+						withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
+							sh """
+								echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
+								npm publish
+							"""
+						}
+					}
+				}
+			}
+		}
+	}
 }
