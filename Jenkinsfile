@@ -37,6 +37,12 @@ Check console output at "${env.JENKINS_URL}job/${env.JOB_NAME}/${env.BUILD_NUMBE
 
 pipeline {
 	agent any
+    parameters {
+        booleanParam(name: 'commit', defaultValue: false, description: 'Do you want to commit to npm?')
+        booleanParam(name: 'build16', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
+        booleanParam(name: 'build14', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
+        booleanParam(name: 'build12', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
+    }
 
 	post{
 		failure{
@@ -48,12 +54,13 @@ pipeline {
 	}
 
 	stages {
-		stage('Notify'){
-			steps{
-				notifyBuild()
-			}
-		}
 		stage( 'NodeJS-16 Tests') {
+		    when {
+		        beforeAgent true;
+		        expression{
+		            return build16.toBoolean()
+		        }
+		    }
 			agent { label 'nodejs-16' }
 			steps {
 				sh """
@@ -65,6 +72,12 @@ pipeline {
 
 
 		stage( 'NodeJS-14 Tests' ) {
+		    when {
+		        beforeAgent true;
+		        expression{
+		            return build14.toBoolean()
+		        }
+		    }
 			agent { label 'nodejs-14' }
 			steps {
 				sh """
@@ -75,6 +88,12 @@ pipeline {
 		}
 
 		stage( 'NodeJS-12 Tests' ) {
+		    when {
+		        beforeAgent true;
+		        expression{
+		            return build12.toBoolean()
+		        }
+		    }
 			agent { label 'nodejs-12' }
 			steps {
 				sh """
@@ -85,17 +104,20 @@ pipeline {
 		}
 
 		stage( 'NodeJS-16 commit' ) {
+		    when {
+		        beforeAgent true;
+		        expression{
+		            return commit.toBoolean()
+		        }
+		    }
 			agent { label 'nodejs-16' }
 			steps {
 				script {
-					if ( commit.toBoolean() )
-					{
-						withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
-							sh """
-								echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
-								npm publish
-							"""
-						}
+		        	withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
+						sh """
+							echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
+							npm publish
+						"""
 					}
 				}
 			}
