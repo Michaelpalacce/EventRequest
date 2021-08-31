@@ -38,7 +38,7 @@ Check console output at "${env.JENKINS_URL}job/${env.JOB_NAME}/${env.BUILD_NUMBE
 pipeline {
 	agent any
     parameters {
-        booleanParam(name: 'commit', defaultValue: false, description: 'Do you want to commit to npm?')
+        booleanParam(name: 'publish', defaultValue: false, description: 'Do you want to publish to npm?')
         booleanParam(name: 'build16', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
         booleanParam(name: 'build14', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
         booleanParam(name: 'build12', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
@@ -107,7 +107,7 @@ pipeline {
 		    when {
 		        beforeAgent true;
 		        expression{
-		            return commit.toBoolean()
+		            return publish.toBoolean()
 		        }
 		    }
 			agent { label 'nodejs-16' }
