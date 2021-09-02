@@ -36,7 +36,7 @@ Check console output at "${env.JENKINS_URL}job/${env.JOB_NAME}/${env.BUILD_NUMBE
 }
 
 pipeline {
-	agent any
+	agent none
     parameters {
         booleanParam(name: 'publish', defaultValue: false, description: 'Do you want to publish to npm?')
         booleanParam(name: 'build16', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
