@@ -77,9 +77,8 @@ class Mocker
 		{
 			let currentArguments	= this.getWithArguments();
 			if ( ! Array.isArray( currentArguments ) )
-			{
 				throw new Error( 'Invalid arguments provided' );
-			}
+
 			for ( let index = 0; index < currentArguments.length; ++ index )
 			{
 				let value	= currentArguments[index];

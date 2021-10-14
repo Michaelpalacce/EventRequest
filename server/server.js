@@ -110,7 +110,7 @@ class Server extends EventEmitter
 		this.pluginManager.addPlugin( this.er_body_parser_multipart );
 
 		this.apply( this.router );
-		this.apply( this.er_static, { paths: ['favicon.ico'] } );
+		this.apply( this.er_static, { paths: ['favicon.ico'], type: StaticResourcesPlugin.ABSOLUTE } );
 	}
 
 	/**

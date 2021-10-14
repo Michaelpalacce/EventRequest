@@ -1,3 +1,8 @@
+33.0.0
+- ! BREAKING CHANGE ! Updated the static plugin with a new type of serving content ( dynamic ) and set it to default 
+- Some test improvements and some convention fixes
+- Added new Mime Type Plugin
+
 32.2.4
 - Fix for conditional in Jenkinsfile
 

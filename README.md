@@ -150,12 +150,30 @@ The framework also has a set of plugins that are pre included. Each Plugin modif
    - error => require( 'event_request/server/components/error/error_handler' )
    - file_streams => require( 'event_request/server/components/file_streams/file_stream' )
    - rate_limiter => require( 'event_request/server/components/rate_limiter/bucket' )
+   - mime_type => require( 'event_request/server/components/mime_type/mime_type' )
 
 ***
 ***
 ***
 
+# [MimeType](#mime-type)
+- Component used to fetch the mime type of files
+
+#### Methods: 
+
+**findMimeType( extension: String, getFirst: Boolean = true ):String|Array**
+- This will get the mime type of the given extension
+- If nothing is found, return */*
+- If getFirst is true, will return the (usually more common and only) first mime-type
+
+**findExtension( mimeType: String ): null|String**
+- This will get the extension given a mime type
+- If nothing is found, return null
+
 ***
+***
+***
+
 # [Router|Routing](#router-and-routing)
 - The router is used to route request to the appropriate middleware
 
@@ -3164,6 +3182,7 @@ app.listen( 80, () => {
 - The path/s to the static resources to be served. Defaults to 'public'
 - Can either be an array of strings or just one string
 - The path starts from the root of the project ( where the node command is being executed )
+- On more information how the files will be served, please see the type explanation further down
 
 **cache: Object**
 - Sets a Cache-control header using the same rules as the er_cache plugin
@@ -3182,6 +3201,13 @@ app.listen( 80, () => {
 - Only usable if useEtag is set to true
 - Indicates if strong etags should be used
 - Defaults to true
+
+**type: Number**
+- One of two constants: StaticResourcesPlugin.DYNAMIC or StaticResourcesPlugin.ABSOLUTE
+- Defaults to StaticResourcesPlugin.DYNAMIC
+- Changes the way that the static plugin works. If set to dynamic with a path of /css THEN all files under {{PROJECT_ROOT}}/css
+will be served WITHOUT the /css in front. If there was a file in {{PROJECT_ROOT}}/css/main/main.css it will be served as /main/main.css. 
+If set to ABSOLUTE path, then /css/main/main.css must be used
 
 ***
 #### Events:
@@ -3210,21 +3236,24 @@ app.listen( 80, () => {
 const App = require( 'event_request' );
 const app = App();
 
-// This will serve everything in folder public and favicon.ico on the main folder 
-app.apply( app.er_static, { paths : ['public', 'favicon.ico'] } );
+// This will serve everything in folder public and dist. e.g. /public/index.html will be served as /index.html 
+app.apply( app.er_static, { paths : ['public', 'dist'] } );
 
-// This will serve everything in folder public and favicon.ico on the main folder and remove the Cache-control header
-app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { static: false } } );
+// This will serve everything in folder public and dist from the project root. e.g. /public/index.html will be served as /public/index.html 
+app.apply( app.er_static, { paths : ['public', 'dist'], type: 2 } );
 
-// This will serve everything in folder public and favicon.ico on the main folder and remove the Cache-control header, however sets an ETag header
-app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { static: false }, useEtag: true } );
+// This will serve everything in folder public on the main folder and remove the Cache-control header
+app.apply( app.er_static, { paths : ['public'], cache: { static: false } } );
 
-// This will serve everything in folder public and favicon.ico on the main folder and add a header: Cache-control: public, must-revalidate
-app.apply( app.er_static, { paths : ['public', 'favicon.ico'], cache: { cacheControl: 'public', revalidation: 'must-revalidate' } } );
+// This will serve everything in folder public on the main folder and remove the Cache-control header, however sets an ETag header
+app.apply( app.er_static, { paths : ['public'], cache: { static: false }, useEtag: true } );
+
+// This will serve everything in folder public on the main folder and add a header: Cache-control: public, must-revalidate
+app.apply( app.er_static, { paths : ['public'], cache: { cacheControl: 'public', revalidation: 'must-revalidate' } } );
 
 //OR
-// This will serve everything in folder public and favicon.ico on the main folder
-app.apply( 'er_static', { paths : ['public', 'favicon.ico'] } );
+// This will serve everything in folder public on the main folder
+app.apply( 'er_static', { paths : ['public'] } );
 
 //OR
 // This will act according to the defaults
@@ -3238,8 +3267,8 @@ app.apply( app.er_static );
 const PluginManager = app.getPluginManager();
 const staticResourcesPlugin = PluginManager.getPlugin( 'er_static' );
 
-// This will serve everything in folder public and favicon.ico on the main folder
-staticResourcesPlugin.setOptions( { paths : ['public', 'favicon.ico'] } );
+// This will serve everything in folder public on the main folder
+staticResourcesPlugin.setOptions( { paths : ['public'] } );
 app.apply( staticResourcesPlugin );
 
 app.listen( 80 );

@@ -37,12 +37,12 @@ Check console output at "${env.JENKINS_URL}job/${env.JOB_NAME}/${env.BUILD_NUMBE
 
 pipeline {
 	agent none
-    parameters {
-        booleanParam(name: 'publish', defaultValue: false, description: 'Do you want to publish to npm?')
-        booleanParam(name: 'build16', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
-        booleanParam(name: 'build14', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
-        booleanParam(name: 'build12', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
-    }
+	parameters {
+		booleanParam(name: 'publish', defaultValue: false, description: 'Do you want to publish to npm?')
+		booleanParam(name: 'build16', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
+		booleanParam(name: 'build14', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
+		booleanParam(name: 'build12', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
+	}
 
 	post{
 		failure{
@@ -70,14 +70,13 @@ pipeline {
 			}
 		}
 
-
 		stage( 'NodeJS-14 Tests' ) {
-		    when {
-		        beforeAgent true;
-		        expression{
-		            return build14.toBoolean()
-		        }
-		    }
+			when {
+				beforeAgent true;
+				expression{
+					return build14.toBoolean()
+				}
+			}
 			agent { label 'nodejs-14' }
 			steps {
 				sh """
@@ -88,12 +87,12 @@ pipeline {
 		}
 
 		stage( 'NodeJS-12 Tests' ) {
-		    when {
-		        beforeAgent true;
-		        expression{
-		            return build12.toBoolean()
-		        }
-		    }
+			when {
+				beforeAgent true;
+				expression{
+					return build12.toBoolean()
+				}
+			}
 			agent { label 'nodejs-12' }
 			steps {
 				sh """
@@ -104,16 +103,16 @@ pipeline {
 		}
 
 		stage( 'NodeJS-16 commit' ) {
-		    when {
-		        beforeAgent true;
-		        expression{
-		            return publish.toBoolean()
-		        }
-		    }
+			when {
+				beforeAgent true;
+				expression{
+					return publish.toBoolean()
+				}
+			}
 			agent { label 'nodejs-16' }
 			steps {
 				script {
-		        	withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
+					withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
 						sh """
 							echo "//registry.npmjs.org/:_authToken=$NPMTOKEN" >> ~/.npmrc
 							npm publish

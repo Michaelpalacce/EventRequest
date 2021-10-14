@@ -63,6 +63,10 @@ testSuites.templatingEngine		= () => {
 	require( './server/components/templating_engine/default_templating_engine_test' );
 };
 
+testSuites.mimeTypeSuite		= () => {
+	require( './server/components/mime_type/mime_type_test' );
+};
+
 testSuites.rateLimiterSuite		= () => {
 	require( './server/components/rate_limiter/bucket_test' );
 	require( './server/components/rate_limiter/bucket_with_data_server_map_test' );

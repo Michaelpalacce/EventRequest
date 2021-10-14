@@ -1697,18 +1697,18 @@ test({
 	test	: ( done ) => {
 		app.apply( app.er_static, { paths: ['tests/server/fixture/static'] } );
 
-		helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js` ).then(( response ) => {
-			assert.equal( response.headers['content-type'], 'application/javascript' );
+		helpers.sendServerRequest( `/test_file.js` ).then(( response ) => {
+			assert.equal( response.headers['content-type'], 'text/javascript' );
 			assert.equal( response.body.toString(), 'const test=\'123\';' );
 
-			return helpers.sendServerRequest( '/tests/server/fixture/static/test.css' );
+			return helpers.sendServerRequest( '/test.css' );
 		}).then(( response ) => {
 			assert.equal( response.headers['content-type'], 'text/css' );
 			assert.equal( response.body.toString(), 'body{background:black;}' );
 
-			return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404 );
+			return helpers.sendServerRequest( '/unknown_file.js', 'GET', 404 );
 		}).then(( response ) => {
-			assert.equal( response.body.toString().includes( '{"error":{"code":"app.er.staticResources.fileNotFound","message":"File not found' ), true );
+			assert.equal( response.body.toString().includes( '{"error":{"code":"app.general","message":"Cannot GET /unknown_file.js"}}' ), true );
 
 			done();
 		}).catch( done )
@@ -1722,18 +1722,18 @@ test({
 		app.apply( app.er_static, { paths: 'tests/server/fixture/static' } );
 
 		app.listen( 4500, ()=>{
-			helpers.sendServerRequest( `/tests/server/fixture/static/test_file.js`, 'GET', 200, '', {}, 4500 ).then(( response ) => {
-				assert.equal( response.headers['content-type'], 'application/javascript' );
+			helpers.sendServerRequest( `/test_file.js`, 'GET', 200, '', {}, 4500 ).then(( response ) => {
+				assert.equal( response.headers['content-type'], 'text/javascript' );
 				assert.equal( response.body.toString(), 'const test=\'123\';' );
 
-				return helpers.sendServerRequest( '/tests/server/fixture/static/test.css', 'GET', 200, '', {}, 4500 );
+				return helpers.sendServerRequest( '/test.css', 'GET', 200, '', {}, 4500 );
 			}).then(( response ) => {
 				assert.equal( response.headers['content-type'], 'text/css' );
 				assert.equal( response.body.toString(), 'body{background:black;}' );
 
-				return helpers.sendServerRequest( '/tests/server/fixture/static/unknown_file.js', 'GET', 404, '', {}, 4500 );
+				return helpers.sendServerRequest( '/unknown_file.js', 'GET', 404, '', {}, 4500 );
 			}).then(( response ) => {
-				assert.equal( response.body.toString().includes( '{"error":{"code":"app.er.staticResources.fileNotFound","message":"File not found' ), true );
+				assert.equal( response.body.toString().includes( '{"error":{"code":"app.general","message":"Cannot GET /unknown_file.js"}}' ), true );
 				setTimeout(()=>{
 					done();
 				}, 100 )
@@ -1749,10 +1749,10 @@ test({
 		app.apply( app.er_static );
 
 		app.listen( 4311, ()=>{
-			helpers.sendServerRequest( `/public/test/index.css`, 'GET', 200, '', {}, 4311 ).then(( response ) => {
+			helpers.sendServerRequest( `/test/index.css`, 'GET', 200, '', {}, 4311 ).then(( response ) => {
 				assert.equal( response.body.toString().includes( 'body' ), true );
 
-				return helpers.sendServerRequest( '/public/test/index.html', 'GET', 200, '', {}, 4311 );
+				return helpers.sendServerRequest( '/test/index.html', 'GET', 200, '', {}, 4311 );
 			}).then(( response ) => {
 				assert.equal( response.body.toString().includes( 'Hello World!' ), true );
 
