@@ -127,7 +127,7 @@ class StaticResourcesPlugin extends PluginInterface
 							return event.send( '', 304 );
 					}
 
-					this._sendFile( event, file )
+					this._sendFile( event, file );
 				}
 			});
 		});

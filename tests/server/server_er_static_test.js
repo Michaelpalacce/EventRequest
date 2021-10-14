@@ -12,24 +12,46 @@ const strongHash				= `"${crypto.createHash( 'sha1' ).update( `${fileStats.mtime
 const weakHash					= `W/"${crypto.createHash( 'md5' ).update( `${fileStats.mtimeMs.toString()}-${fileStats.size.toString()}` ).digest( 'hex' )}"`;
 
 test({
+	message	: 'Server.test.er_static_does.not.serve.files.from.static.folder.that.does.not.exist',
+	test	: ( done ) => {
+		const app	= new Server();
+
+		app.apply( app.er_static, { paths: ['WRONGWRONG'] } );
+
+		app.listen( 4258, () => {
+			helpers.sendServerRequest( '/index.js', 'GET', 404, '', {}, 4258 ).then(( response ) => {
+				assert.deepStrictEqual(
+					response.body.toString(),
+					'{"error":{"code":"app.general","message":"Cannot GET /index.js"}}'
+				);
+
+				assert.deepStrictEqual( response.headers['cache-control'], 'public, max-age=604800, immutable' );
+
+				done();
+			}).catch( done );
+		});
+	}
+});
+
+test({
 	message	: 'Server.test.er_static_does.not.serve.files.outside.static.folder',
 	test	: ( done ) => {
 		const app	= new Server();
 
 		app.apply( app.er_static, { paths: ['public'] } );
 
-		helpers.sendServerRequest( '/../index.js', 'GET', 404, '', {}, 4228 ).then(( response ) => {
-			assert.deepStrictEqual(
-				response.body.toString(),
-				'{"error":{"code":"app.er.staticResources.fileNotFound","message":"File not found: /../index.js"}}'
-			);
+		app.listen( 4228, () => {
+			helpers.sendServerRequest( '/../index.js', 'GET', 404, '', {}, 4228 ).then(( response ) => {
+				assert.deepStrictEqual(
+					response.body.toString(),
+					'{"error":{"code":"app.er.staticResources.fileNotFound","message":"File not found: /../index.js"}}'
+				);
 
-			assert.deepStrictEqual( response.headers['cache-control'], 'public, max-age=604800, immutable' );
+				assert.deepStrictEqual( response.headers['cache-control'], 'public, max-age=604800, immutable' );
 
-			done();
-		}).catch( done );
-
-		app.listen( 4228 );
+				done();
+			}).catch( done );
+		});
 	}
 });
 

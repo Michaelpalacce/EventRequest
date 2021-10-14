@@ -27,6 +27,10 @@ module.exports	= {
 	 */
 	findExtension( mimeType ) {
 		for ( const key in data ) {
+			/* istanbul ignore next */
+			if ( ! {}.hasOwnProperty.call( data, key ) )
+				continue;
+
 			const value	= data[key];
 			if ( value.includes( mimeType ) ) {
 				return key;
