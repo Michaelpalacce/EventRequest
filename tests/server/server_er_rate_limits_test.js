@@ -15,7 +15,7 @@ test({
 
 		const app			= new Server();
 
-		app.apply( app.er_rate_limits );
+		app.apply( app.er_rate_limits, {} );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -124,7 +124,7 @@ test({
 });
 
 test({
-	message	: 'Server.test.er_rate_limits.with.dynamic.middleware',
+	message	: 'Server.test.er_rate_limits.with.dynamic.middleware.xxx',
 	test	: ( done ) => {
 		const name	= 'testErRateLimitsWithDynamicGlobalMiddleware';
 

@@ -178,7 +178,7 @@ class RateLimitsPlugin extends PluginInterface
 	 * @return	Function
 	 */
 	rateLimit( rule ) {
-		if ( this.dataStore === null ) {
+		if ( ! this.dataStore ) {
 			this.dataStore	= new DataServer({
 				ttl		: -1,
 				persist	: false
@@ -312,9 +312,6 @@ class RateLimitsPlugin extends PluginInterface
 				case STRICT_POLICY:
 					resolve( true );
 					break;
-
-				default:
-					reject( `Invalid policy ${policy}` );
 			}
 		});
 	}

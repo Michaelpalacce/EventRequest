@@ -1,9 +1,7 @@
-If you want to run the tests, you have to have docker and docker compose installed and then run
+Tests can be run with
 
-~~~shell
-docker-compose up -d --build
+~~~bash
+npm run test
 ~~~
 
-You can run it without the -d flag if you want to keep an eye of the logs.
-
-Feel free to use `dc up -d node-test` for testing purposes with whichever NodeJS version you want ( uncomment it first in the docker-compose.yml file ). 
+This will also generate a coverage report in `./coverage/lcov-report/index.html`
