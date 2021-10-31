@@ -334,7 +334,6 @@ test({
 			app.getPlugin( app.er_rate_limits ).rateLimit( rule ),
 		], ( event ) => {
 			assert.deepStrictEqual( event.rateLimited, true );
-			assert.deepStrictEqual( event.erRateLimitRules.length, 2 );
 			event.send( name );
 		} );
 

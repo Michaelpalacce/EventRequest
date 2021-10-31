@@ -4,8 +4,6 @@ const Bucket			= require( './../../components/rate_limiter/bucket' );
 const PluginInterface	= require( './../plugin_interface' );
 const Router			= require( './../../components/routing/router' );
 const DataServer		= require( './../../components/caching/data_server' );
-const fs				= require( 'fs' );
-const path				= require( 'path' );
 
 /**
  * @brief	Status code send during strict policy in case of rate limit reached
@@ -47,14 +45,8 @@ const CONNECTION_DELAY_POLICY			= 'connection_delay';
  */
 const STRICT_POLICY						= 'strict';
 
-const PROJECT_ROOT						= path.parse( require.main.filename ).dir;
-
-const OPTIONS_FILE_PATH					= 'fileLocation';
 const OPTIONS_DATA_STORE				= 'dataStore';
 const OPTIONS_RULES						= 'rules';
-const OPTIONS_USE_FILE					= 'useFile';
-
-const DEFAULT_FILE_LOCATION				= path.join( PROJECT_ROOT, 'rate_limits.json' );
 const DEFAULT_DATA_STORE				= null;
 const DEFAULT_RULE						= {
 	"path":"",
@@ -78,89 +70,36 @@ class RateLimitsPlugin extends PluginInterface
 	{
 		super( pluginId, options );
 
+		this.buckets	= {};
+
 		this.setOptions( options );
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	setOptions( options )
-	{
+	setOptions( options ) {
 		super.setOptions( options );
 
-		this.useFile		= typeof options[OPTIONS_USE_FILE] === 'boolean'
-							? options[OPTIONS_USE_FILE]
-							: false;
+		this.rules		= Array.isArray( options[OPTIONS_RULES] )
+						? options[OPTIONS_RULES]
+						: [DEFAULT_RULE];
 
-		this.rules			= Array.isArray( options[OPTIONS_RULES] )
-							? options[OPTIONS_RULES]
-							: [];
+		this.dataStore	= options[OPTIONS_DATA_STORE] instanceof DataServer
+						? options[OPTIONS_DATA_STORE]
+						: DEFAULT_DATA_STORE;
 
-		this.fileLocation	= typeof options[OPTIONS_FILE_PATH] === 'string'
-							? options[OPTIONS_FILE_PATH]
-							: DEFAULT_FILE_LOCATION;
-
-		this.dataStore		= options[OPTIONS_DATA_STORE] instanceof DataServer
-							? options[OPTIONS_DATA_STORE]
-							: DEFAULT_DATA_STORE;
+		this.rules.forEach( this.validateRule );
 	}
 
 	/**
-	 * @brief	Loads the config into memory and uses the configuration set there to set rules for the server
-	 *
-	 * @return	void
-	 */
-	loadConfig()
-	{
-		let config	= [DEFAULT_RULE];
-
-		if ( this.rules.length !== 0 )
-		{
-			config	= this.rules;
-		}
-		else if ( ! fs.existsSync( this.fileLocation ) && this.useFile )
-		{
-			const writeStream	= fs.createWriteStream( this.fileLocation );
-
-			writeStream.write( JSON.stringify( config ) );
-			writeStream.end();
-		}
-		else if ( this.useFile )
-		{
-			const buffer	= fs.readFileSync( this.fileLocation );
-
-			try
-			{
-				config	= JSON.parse( buffer.toString( 'utf-8' ) || JSON.stringify( config ) );
-			} catch ( e ) {}
-		}
-
-		this.sanitizeConfig( config );
-	}
-
-	/**
-	 * @brief	Parses and sanitizes the config
-	 *
-	 * @param	{Array} [config=[]]
-	 *
-	 * @return	void
-	 */
-	sanitizeConfig( config = [] )
-	{
-		config.forEach( this.validateRule );
-
-		this.rules	= config;
-	}
-
-	/**
-	 * @brief	Does rule validation
+	 * @brief	Does rule validation for each parameter
 	 *
 	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */
-	validateRule( options )
-	{
+	validateRule( options ) {
 		if (
 			typeof options.maxAmount === 'number'
 			&& typeof options.refillTime === 'number'
@@ -175,9 +114,8 @@ class RateLimitsPlugin extends PluginInterface
 			if (
 				policy === CONNECTION_DELAY_POLICY
 				&& ( typeof options.delayTime !== 'number' || typeof options.delayRetries !== 'number' )
-			) {
+			)
 				throw new Error( `app.er.rateLimits.${CONNECTION_DELAY_POLICY}.missingDelayTimeOrDelayRetries` );
-			}
 
 			if ( typeof options.stopPropagation !== 'boolean' )
 				options.stopPropagation	= false;
@@ -186,70 +124,60 @@ class RateLimitsPlugin extends PluginInterface
 				options.ipLimit	= false;
 		}
 		else
-		{
 			throw new Error( 'app.er.rateLimits.invalidOptions' );
-		}
 	}
 
 	/**
-	 * @brief	Gets a new Bucket from the rule options
+	 * Gets a Bucket from the rule options and key
 	 *
 	 * @param	{String} key
 	 * @param	{Object} options
 	 *
 	 * @return	Bucket
 	 */
-	async getNewBucketFromOptions( key, options )
-	{
-		const maxAmount		= options.maxAmount;
-		const refillTime	= options.refillTime;
-		const refillAmount	= options.refillAmount;
+	async getBucketFromOptions( key, options ) {
+		if ( typeof this.buckets[key] !== 'undefined' )
+			return this.buckets[key];
 
-		const bucket		= new Bucket( refillAmount, refillTime, maxAmount, null, key, this.dataStore );
+		this.buckets[key]	= new Bucket( 
+			options.refillAmount,
+			options.refillTime,
+			options.maxAmount,
+			null,
+			key,
+			this.dataStore
+		);
 
-		await bucket.init();
-
-		return bucket;
+		return await this.buckets[key].init();
 	}
 
 	/**
-	 * @brief	Attaches the listener
-	 *
-	 * @details	Loads the config, attaches a process that will clear the IP based buckets if they are full once every 60 minutes
+	 * If a DataStore was not passed, gets the data store from the server er_data_server plugin, otherwise 
+	 * creates a new datastore with persistence and not ttl.
 	 *
 	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */
-	setServerOnRuntime( server )
-	{
-		this.loadConfig();
-
-		if ( this.dataStore === null )
-		{
+	setServerOnRuntime( server ) {
+		if ( this.dataStore === null ) {
 			if ( server.hasPlugin( 'er_data_server' ) )
-			{
-				this.dataStore	= server.getPlugin( 'er_data_server' ).getServer();
-				return;
-			}
+				return this.dataStore	= server.getPlugin( 'er_data_server' ).getServer();
 
 			this.dataStore	= new DataServer( { ttl : -1 } );
 		}
 	}
 
 	/**
-	 * @brief	Global middleware that can be used to dynamically rate limit requests
-	 *
-	 * @details	Cretes a default data store if one is not set
+	 * Global middleware that can be used to dynamically rate limit requests
+	 * Creates a default data store if one is not set.
 	 *
 	 * @param	{Object} rule
 	 *
 	 * @return	Function
 	 */
-	rateLimit( rule )
-	{
-		if ( this.dataStore === null )
-		{
+	rateLimit( rule ) {
+		if ( this.dataStore === null ) {
 			this.dataStore	= new DataServer({
 				ttl		: -1,
 				persist	: false
@@ -273,21 +201,18 @@ class RateLimitsPlugin extends PluginInterface
 	}
 
 	/**
-	 * @brief	Gets the plugin middlewares
+	 * Gets the plugin middlewares
 	 *
-	 * @returns	Array
+	 * @returns`Array
 	 */
-	getPluginMiddleware()
-	{
-		return [{
-			handler: ( event ) => {
-				this._rateLimit( event, this.rules.slice() );
-			}
-		}];
+	getPluginMiddleware() {
+		return [{ handler: ( event ) => this._rateLimit( event, this.rules.slice() ) }];
 	}
 
 	/**
-	 * @brief	Checks whether the client's ip has reached the limit of requests
+	 * Checks whether the client's ip has reached the limit of requests.
+	 * Adds a rateLimited key IF one is not set already. This also detects that this is the first time
+	 * this plugin is invoked and will attach an on `cleanUp` event
 	 *
 	 * @param	{EventRequest} eventRequest
 	 * @param	{Array} rules
@@ -299,134 +224,111 @@ class RateLimitsPlugin extends PluginInterface
 		if ( eventRequest.isFinished() )
 			return;
 
-		if ( typeof eventRequest.rateLimited !== 'boolean' )
-			eventRequest.rateLimited		= false;
+		if ( typeof eventRequest.rateLimited !== 'boolean' ){
 
-		if ( typeof eventRequest.erRateLimitRules !== 'object' )
-			eventRequest.erRateLimitRules	= rules;
-		else
-			eventRequest.erRateLimitRules	= Object.assign( eventRequest.erRateLimitRules, rules );
+			eventRequest.rateLimited	= false;
 
-		eventRequest.on( 'cleanUp', () => {
-			eventRequest.rateLimited		= undefined;
-			eventRequest.erRateLimitRules	= undefined;
-		});
+			eventRequest.on( 'cleanUp', () => {
+				eventRequest.rateLimited	= undefined;
+			});
+		}
 
-		const path							= eventRequest.path;
-		const method						= eventRequest.method;
-		const clientIp						= eventRequest.clientIp;
+		const path		= eventRequest.path;
+		const method	= eventRequest.method;
+		const clientIp	= eventRequest.clientIp;
+		let i;
 
-		let hasConnectionDelayPolicy		= false;
-		let connectionDelayPolicyOptions	= null;
-		let bucketsHit						= [];
-
-		for ( let i = 0; i < rules.length; ++ i )
-		{
+		for ( i = 0; i < rules.length; ++ i ) {
 			const rule			= rules[i];
 			const ruleMethod	= rule.methods;
 			const rulePath		= rule.path;
 
-			if ( Router.matchMethod( method, ruleMethod ) && Router.matchRoute( path, rulePath ) )
-			{
+			if (
+				 Router.matchMethod( method, ruleMethod ) 
+				 && Router.matchRoute( path, rulePath ) 
+			) {
 				const ipLimit	= rule.ipLimit;
 				const policy	= rule.policy;
+				const bucketKey	= `${Bucket.DEFAULT_PREFIX}${rulePath}${policy}${ipLimit ? clientIp : ''}`;
 
-				let bucketKey	= Bucket.DEFAULT_PREFIX;
-				bucketKey	+= `${rulePath}${policy}`;
+				const bucket	= await this.getBucketFromOptions( bucketKey, rule );
 
-				if ( ipLimit === true )
-					bucketKey	+= clientIp;
+				eventRequest.rateLimited	= ! await bucket.reduce();
 
-				const bucket	= await this.getNewBucketFromOptions( bucketKey, rule );
-				const hasToken	= await bucket.reduce();
+				if ( eventRequest.rateLimited ) {
+					const shouldRateLimit	= await this._shouldRateLimitRule( rule );
 
-				if ( ! hasToken )
-				{
-					const refillTime			= rule.refillTime;
-					eventRequest.rateLimited	= true;
-					eventRequest.emit( 'rateLimited', { policy, rule } );
-					bucketsHit.push( bucket );
-
-					switch( policy )
-					{
-						case PERMISSIVE_POLICY:
-							break;
-
-						case CONNECTION_DELAY_POLICY:
-							if ( ! hasConnectionDelayPolicy )
-							{
-								hasConnectionDelayPolicy		= true;
-								connectionDelayPolicyOptions	= rule;
-							}
-
-							break;
-
-						case STRICT_POLICY:
-							this.sendRetryAfterRequest( eventRequest, refillTime );
-							return;
-					}
+					if ( shouldRateLimit )
+						return await this.sendRetryAfterResponse( eventRequest, rule.refillTime );
 
 					if ( rule.stopPropagation === true )
-					{
 						break;
-					}
 				}
 			}
-		}
-
-		if ( hasConnectionDelayPolicy )
-		{
-			const rule			= connectionDelayPolicyOptions;
-			const buckets		= bucketsHit;
-			const delayTime		= rule.delayTime;
-			const delayRetries	= rule.delayRetries;
-			const refillTime	= rule.refillTime;
-
-			let tries			= 0;
-
-			const interval		= setInterval( async() => {
-				if ( ++ tries >= delayRetries )
-				{
-					clearInterval( interval );
-					this.sendRetryAfterRequest( eventRequest, refillTime );
-					return;
-				}
-
-				for ( let b = 0; b < buckets.length; ++ b )
-				{
-					const bucket	= buckets[b];
-
-					if ( ! await bucket.reduce() )
-						return;
-				}
-
-				clearInterval( interval );
-				eventRequest.next();
-			}, delayTime * 1000 );
-
-			return;
 		}
 
 		eventRequest.next();
 	}
 
 	/**
-	 * @brief	Sends a 429 response
+	 * Returns true if the request has been rate limited and a retry after should be sent,
+	 * otherwise return false
+	 * 
+	 * @param	{Object} rule
+	 * 
+	 * @returns	Promise<boolean>
+	 */
+	async _shouldRateLimitRule( rule ) {
+		return new Promise(( resolve, reject ) => {
+			switch( policy )
+			{
+				case PERMISSIVE_POLICY:
+					resolve( false );
+					break;
+	
+				case CONNECTION_DELAY_POLICY:
+					const delayTime		= rule.delayTime;
+					const delayRetries	= rule.delayRetries;
+					let tries			= 0;
+	
+					const interval		= setInterval( async() => {
+						if ( ++ tries >= delayRetries ) {
+							clearInterval( interval );
+							return resolve( true );
+						}
+						
+						if ( ! await bucket.reduce() )
+							return;
+	
+						clearInterval( interval );
+						resolve( false );
+					}, delayTime * 1000 );
+					break;
+	
+				case STRICT_POLICY:
+					resolve( true );
+					break;
+
+				default:
+					reject( `Invalid policy ${policy}` );
+			}
+		});
+	}
+
+	/**
+	 * Sends a 429 response whenever a request was rateLimited
 	 *
 	 * @param	{EventRequest} eventRequest
 	 * @param	{Number} retryAfterTime
 	 *
 	 * @return	void
 	 */
-	sendRetryAfterRequest( eventRequest, retryAfterTime )
-	{
-		eventRequest.sendError(
-			{
-				code: 'app.er.rateLimits.tooManyRequests',
-				status: TOO_MANY_REQUESTS_STATUS_CODE,
-				headers: { 'Retry-After': retryAfterTime }
-			}
-		);
+	async sendRetryAfterResponse( eventRequest, retryAfterTime ) {
+		await eventRequest.sendError({
+			code: 'app.er.rateLimits.tooManyRequests',
+			status: TOO_MANY_REQUESTS_STATUS_CODE,
+			headers: { 'Retry-After': retryAfterTime }
+		});
 	}
 }
 

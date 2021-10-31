@@ -1,3 +1,9 @@
+33.1.0
+- Improvements to rate limits plugin. Tried to speed it up as possible and remove legacy stuff.
+- Removed saving configuration to a file for rate limits plugin
+- Removed rateLimited event.
+- Removed file usage for rate limits plugin
+
 33.0.0
 - ! BREAKING CHANGE ! Updated the static plugin with a new type of serving content ( dynamic ) and set it to default 
 - Some test improvements and some convention fixes

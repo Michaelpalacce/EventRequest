@@ -72,6 +72,8 @@ class Bucket
 
 		await this._getUniqueKey().catch( this.handleError );
 		await this.reset();
+
+		return this;
 	}
 
 	/**

@@ -1861,7 +1861,7 @@ This class can be used to limit data in one way or another.
 ***
 #### The class has the following functions:
 
-**async init(): void**
+**async init(): Bucket**
 - This has to be called before using the class
 
 **async reset(): void**
@@ -4753,11 +4753,7 @@ app.listen( 80, () => {
 ***
 #### Events:
 
-**rateLimited( String policy, Object rule )**
-- The policy will be which policy applied the rate limiting 
-- There may be more than one rateLimited event emitted
-- Returns all the rule settings that rate limited the request
-- This is emitted before any actions are taken
+**NONE**
 
 ***
 #### EventRequest Attached Functions
@@ -4769,9 +4765,6 @@ app.listen( 80, () => {
 
 **event.rateLimited: Boolean**
 - Flag depicting whether the request was rate limited or not
-
-**eventRequest.erRateLimitRules: Array**
-- Will hold all the rules that the plugin has along with the buckets
 
 ***
 #### Exported Plugin Functions:
@@ -4787,7 +4780,7 @@ app.listen( 80, () => {
 
 ***
 #### Notes:
-If you want to create custom rate limiting you can get er_rate_limits plugin and use getNewBucketFromOptions to get a new bucket, given options for it
+If you want to create custom rate limiting you can get er_rate_limits plugin and use getBucketFromOptions to get a new bucket, given options for it
 options['maxAmount']
 options['refillTime']
 options['refillAmount']
@@ -4961,7 +4954,6 @@ app.get( '/testRouteTwo', [
     app.er_rate_limits.rateLimit( ruleTwo ),
     app.er_rate_limits.rateLimit( rule )
 ], ( event ) => {
-    app.Loggur.log( event.erRateLimitRules, undefined, true );
     event.send( `You have been rate limited by permissive: ${event.rateLimited}` );
 });
 
