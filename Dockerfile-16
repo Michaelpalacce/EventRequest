@@ -1,5 +1,0 @@
-FROM node:16.2.0-alpine
-
-RUN npm i -g nyc nodemon
-
-COPY . /app
