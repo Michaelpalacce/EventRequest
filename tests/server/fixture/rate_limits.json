@@ -48,6 +48,18 @@
 	"ipLimit": false
   },
   {
+	"path": "/testErRateLimitsWithUnknownPolicy",
+	"methods": [],
+	"maxAmount": 1,
+	"refillTime": 3,
+	"refillAmount": 1,
+	"policy": "UNKNOWN",
+	"delayTime": 1,
+	"delayRetries": 1,
+	"stopPropagation": false,
+	"ipLimit": false
+  },
+  {
 	"path": "/testErRateLimitsWithStrictPolicyStress",
 	"methods": [],
 	"maxAmount": 100,

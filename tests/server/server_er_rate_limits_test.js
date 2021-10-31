@@ -124,7 +124,7 @@ test({
 });
 
 test({
-	message	: 'Server.test.er_rate_limits.with.dynamic.middleware.xxx',
+	message	: 'Server.test.er_rate_limits.with.dynamic.middleware',
 	test	: ( done ) => {
 		const name	= 'testErRateLimitsWithDynamicGlobalMiddleware';
 
@@ -609,6 +609,29 @@ test({
 	message	: 'Server.test.er_rate_limits.with.strict.policy',
 	test	: ( done ) => {
 		const name	= 'testErRateLimitsWithStrictPolicy';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
+
+		if ( ! app.hasPlugin( app.er_rate_limits ) )
+			app.apply( app.er_rate_limits, { rules } );
+
+		app.get( `/${name}`, ( event ) => {
+			event.send( name );
+		} );
+
+		helpers.sendServerRequest( `/${name}` ).then(( response ) => {
+			return helpers.sendServerRequest( `/${name}`, 'GET', 429 );
+		}).then(( response ) => {
+			assert.deepStrictEqual( typeof response.headers['retry-after'], 'string' );
+			assert.equal( response.body.toString(), JSON.stringify( { error: { code : 'app.er.rateLimits.tooManyRequests' } } ) );
+			done();
+		}).catch( done );
+	}
+});
+
+test({
+	message	: 'Server.test.er_rate_limits.with.unknown.policy.defaults.to.strict',
+	test	: ( done ) => {
+		const name	= 'testErRateLimitsWithUnknownPolicy';
 		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )

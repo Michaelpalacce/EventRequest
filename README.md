@@ -4714,12 +4714,8 @@ app.listen( 80, () => {
 ***
 
 # [er_rate_limits](#er_rate_limits)
-- THIS PLUGIN NEEDS WORK, IT'S WAY TOO RESOURCE CONSUMING
 - Adds a Rate limits plugin to the server. 
 - The rate limits plugin can monitor incoming requests and stop/delay/allow them if they are too many
-- The rate limits plugin will create a new rate_limits.json file in the root project folder IF one does not exist and useFile is set to true
-- If one exists, then the existing one's configuration will be taken. 
-- Instead of passing fileLocation you can pass the rules directly as an array
 - If you provide the same dataStore to two servers they should work without an issue
 - If you don't provide a dataStore, then the er_data_server data store will be used. If that plugin is not set, then the default bucket one will be used
 - **This Plugin can be re-applied multiple times with different configurations, however it may not be the best idea to do so.**
@@ -4732,25 +4728,13 @@ app.listen( 80, () => {
 ***
 #### Accepted Options:
 
-**fileLocation**
-- The absolute path to the rate limits json file.
-- The rules will be validated.
-- Defaults to ROOT DIR / rate_limits.json
-
 **dataStore**
 - The dataStore to use for the buckets
 - Defaults to the LeakyBucket default DataStore
 
 **rules**
-- Optional parameter that if passed will have more weight than the rate_limits.json file.
-- If this is passed the file will never be created/loaded
-- The structure of this option must be the same as the one in the rate_limits.json file.
 - The rules will be validated.
 - Defaults to empty
-
-**useFile**
-- Optional parameter that determines if the rate limits should be fetched from a file ( specified by fileLocation ) or not
-- Defaults to false
 
 ***
 #### Events:
@@ -4807,6 +4791,8 @@ Rate limit rule options:
 
 **policy: String** 
 - The type of rate limiting to be applied
+- strict, permissive and connection_delay available
+- If invalid, will be strict by default
 
 **delayTime: Number** 
 - must be given if policy is connection_delay. After what time in seconds should we retry

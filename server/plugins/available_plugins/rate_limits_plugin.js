@@ -310,6 +310,7 @@ class RateLimitsPlugin extends PluginInterface
 					break;
 
 				case STRICT_POLICY:
+				default:
 					resolve( true );
 					break;
 			}
