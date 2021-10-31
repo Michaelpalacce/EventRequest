@@ -33,110 +33,6 @@ test({
 });
 
 test({
-	message	: 'Server.test.er_rate_limits.when.using.file.and.file.does.not.exist',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsUsingFileCreatesFile';
-		const fileLocation	= path.join( __dirname, './fixture/er_rate_limits_when_file_does_not_exist.json' );
-
-		if ( fs.existsSync( fileLocation ) )
-			fs.unlinkSync( fileLocation );
-
-		const app			= new Server();
-
-		app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			event.send( name );
-		} );
-
-		app.listen( 4330, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4330 ).then(( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( fs.existsSync( fileLocation ), true );
-
-				fs.unlinkSync( fileLocation );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.when.using.file.and.json.is.invalid',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsUsingFileInvalidJson';
-		const fileLocation	= path.join( __dirname, './fixture/er_rate_limits_invalid_json.json' );
-		const app			= new Server();
-
-		app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			assert.deepStrictEqual( app.er_rate_limits.rules, [{
-				path: '',
-				methods: [],
-				maxAmount: 10000,
-				refillTime: 10,
-				refillAmount: 1000,
-				policy: 'connection_delay',
-				delayTime: 3,
-				delayRetries: 5,
-				stopPropagation: false,
-				ipLimit: false
-			}] );
-
-			event.send( name );
-		} );
-
-		app.listen( 4331, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4331 ).then(( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( fs.existsSync( fileLocation ), true );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.when.using.file.and.file.is.empty',
-	test	: ( done ) => {
-		const name			= 'testErRateLimitsUsingFileEmptyFile';
-		const fileLocation	= path.join( __dirname, './fixture/er_rate_limits_empty.json' );
-		const app			= new Server();
-
-		app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
-
-		app.get( `/${name}`, ( event ) => {
-			assert.deepStrictEqual( app.er_rate_limits.rules, [{
-				path: '',
-				methods: [],
-				maxAmount: 10000,
-				refillTime: 10,
-				refillAmount: 1000,
-				policy: 'connection_delay',
-				delayTime: 3,
-				delayRetries: 5,
-				stopPropagation: false,
-				ipLimit: false
-			}] );
-
-			event.send( name );
-		} );
-
-		app.listen( 4332, () => {
-			helpers.sendServerRequest( `/${name}`, 'GET', 200, '', {}, 4332 ).then(( response ) => {
-				assert.equal( response.body.toString(), name );
-				assert.equal( fs.existsSync( fileLocation ), true );
-
-				done();
-			}).catch( done );
-		});
-	}
-});
-
-test({
 	message	: 'Server.test.er_rate_limits.with.rules.in.an.array.instead.of.json',
 	test	: ( done ) => {
 		const name	= 'testErRateLimitsWithRulesInAnArray';
@@ -174,19 +70,6 @@ test({
 				}, 200 );
 			}).catch( done );
 		} );
-	}
-});
-
-test({
-	message	: 'Server.test.er_rate_limits.sanitize.config.on.default',
-	test	: ( done ) => {
-		const app	= new Server();
-
-		app.er_rate_limits.sanitizeConfig();
-
-		assert.deepStrictEqual( app.er_rate_limits.rules, [] );
-
-		done();
 	}
 });
 
@@ -327,11 +210,9 @@ test({
 			"policy": 'permissive'
 		};
 
-		app.apply( app.er_rate_limits );
-
 		app.get( `/${name}`, [
-			app.getPlugin( app.er_rate_limits ).rateLimit( ruleTwo ),
-			app.getPlugin( app.er_rate_limits ).rateLimit( rule ),
+			app.er_rate_limits.rateLimit( ruleTwo ),
+			app.er_rate_limits.rateLimit( rule ),
 		], ( event ) => {
 			assert.deepStrictEqual( event.rateLimited, true );
 			event.send( name );
@@ -397,19 +278,19 @@ test({
 		const appOne	= new Server();
 		const appTwo	= new Server();
 
-		const name			= 'testErRateLimitsBucketWorksCrossApps';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name		= 'testErRateLimitsBucketWorksCrossApps';
+		const rules		= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
-		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
-		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
+		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { rules, dataStore } );
+		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { rules, dataStore } );
 
 		appOne.get( `/${name}`, ( event ) => {
 			event.send( name );
-		} );
+		});
 
 		appTwo.get( `/${name}`, ( event ) => {
 			event.send( name );
-		} );
+		});
 
 		const serverOne	= appOne.listen( 3360 );
 		const serverTwo	= appTwo.listen( 3361 );
@@ -506,11 +387,11 @@ test({
 		const appOne	= new Server();
 		const appTwo	= new Server();
 
-		const name			= 'testErRateLimitsBucketWorksCrossApps';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name		= 'testErRateLimitsBucketWorksCrossApps';
+		const rules		= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
-		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
-		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
+		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { rules, dataStore } );
+		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { rules, dataStore } );
 
 		appOne.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -543,11 +424,11 @@ test({
 		const appOne	= new Server();
 		const appTwo	= new Server();
 
-		const name			= 'testErRateLimitsBucketWorksCrossApps';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name		= 'testErRateLimitsBucketWorksCrossApps';
+		const rules		= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
-		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
-		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { fileLocation, dataStore, useFile: true } );
+		appOne.apply( new RateLimitsPlugin( 'rate_limits' ), { rules, dataStore } );
+		appTwo.apply( new RateLimitsPlugin( 'rate_limits' ), { rules, dataStore } );
 
 		appOne.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -575,11 +456,11 @@ test({
 test({
 	message	: 'Server.test er_rate_limits.with.params',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithParams';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsWithParams';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}/:test:`, ( event ) => {
 			event.send( name );
@@ -594,24 +475,20 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.permissive.limiting',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithPermissiveLimiting';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-		let called			= 0;
+		const name	= 'testErRateLimitsWithPermissiveLimiting';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
+		let called	= 0;
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			called ++;
 
 			if ( called > 1 )
-			{
 				assert.equal( event.rateLimited, true );
-			}
 			else
-			{
 				assert.equal( event.rateLimited, false );
-			}
 
 			event.send( name );
 		} );
@@ -628,11 +505,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.permissive.limiting.refills',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithPermissiveLimitingRefills';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsWithPermissiveLimitingRefills';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			assert.equal( event.rateLimited, false );
@@ -653,12 +530,12 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.connection.delay.policy.limiting',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithConnectionDelayPolicy';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-		const now			= Math.floor( new Date().getTime() / 1000 );
+		const name	= 'testErRateLimitsWithConnectionDelayPolicy';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
+		const now	= Math.floor( new Date().getTime() / 1000 );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -731,11 +608,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.strict.policy',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicy';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsWithStrictPolicy';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -754,11 +631,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limitsSTRESS.with.strict.policy.STRESS',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyStress';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsWithStrictPolicyStress';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -783,11 +660,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.specified.methods.matches',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethods';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethods';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -806,11 +683,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.multiple.specified.methods.matches',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyWithMultipleSpecifiedMethods';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsWithStrictPolicyWithMultipleSpecifiedMethods';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -829,11 +706,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.specified.methods.does.not.match.if.method.is.not.the.same',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethodsThatDoNotMatch';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsWithStrictPolicyWithSpecifiedMethodsThatDoNotMatch';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -851,12 +728,12 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.stopPropagation',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithPropagation';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
-		let called			= 0;
+		const name	= 'testErRateLimitsWithPropagation';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
+		let called	= 0;
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			called ++;
@@ -885,11 +762,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.multiple.rules',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithMultipleRules';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsWithMultipleRules';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -908,11 +785,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.strict.overrides.connection.delay',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsStrictOverridesConnectionDelayPolicy';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsStrictOverridesConnectionDelayPolicy';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -931,11 +808,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.connection.delay.overrides.permissive',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsConnectionDelayOverridesPermissivePolicy';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsConnectionDelayOverridesPermissivePolicy';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -954,11 +831,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.connection.delay.returns.429.if.no.more.retries',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsConnectionDelayReturns429IfNoMoreRetries';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsConnectionDelayReturns429IfNoMoreRetries';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			event.send( name );
@@ -976,11 +853,11 @@ test({
 test({
 	message	: 'Server.test.er_rate_limits.with.strict.policy.with.ip.limit',
 	test	: ( done ) => {
-		const name			= 'testErRateLimitsWithStrictPolicyWithIpLimit';
-		const fileLocation	= path.join( __dirname, './fixture/rate_limits.json' );
+		const name	= 'testErRateLimitsWithStrictPolicyWithIpLimit';
+		const rules	= JSON.parse( fs.readFileSync( path.join( __dirname, './fixture/rate_limits.json' ) ).toString() );
 
 		if ( ! app.hasPlugin( app.er_rate_limits ) )
-			app.apply( app.er_rate_limits, { fileLocation, useFile: true } );
+			app.apply( app.er_rate_limits, { rules } );
 
 		app.get( `/${name}`, ( event ) => {
 			try

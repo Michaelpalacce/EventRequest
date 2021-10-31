@@ -71,8 +71,7 @@ class RateLimitsPlugin extends PluginInterface
 		super( pluginId, options );
 
 		this.buckets	= {};
-
-		this.setOptions( options );
+		this.rules		= [];
 	}
 
 	/**
@@ -139,7 +138,7 @@ class RateLimitsPlugin extends PluginInterface
 		if ( typeof this.buckets[key] !== 'undefined' )
 			return this.buckets[key];
 
-		this.buckets[key]	= new Bucket( 
+		this.buckets[key]	= new Bucket(
 			options.refillAmount,
 			options.refillTime,
 			options.maxAmount,
@@ -152,7 +151,7 @@ class RateLimitsPlugin extends PluginInterface
 	}
 
 	/**
-	 * If a DataStore was not passed, gets the data store from the server er_data_server plugin, otherwise 
+	 * If a DataStore was not passed, gets the data store from the server er_data_server plugin, otherwise
 	 * creates a new datastore with persistence and not ttl.
 	 *
 	 * @param	{Server} server
@@ -161,8 +160,10 @@ class RateLimitsPlugin extends PluginInterface
 	 */
 	setServerOnRuntime( server ) {
 		if ( this.dataStore === null ) {
-			if ( server.hasPlugin( 'er_data_server' ) )
-				return this.dataStore	= server.getPlugin( 'er_data_server' ).getServer();
+			if ( server.hasPlugin( 'er_data_server' ) ) {
+				this.dataStore	= server.getPlugin( 'er_data_server' ).getServer();
+				return;
+			}
 
 			this.dataStore	= new DataServer( { ttl : -1 } );
 		}
@@ -244,22 +245,24 @@ class RateLimitsPlugin extends PluginInterface
 			const rulePath		= rule.path;
 
 			if (
-				 Router.matchMethod( method, ruleMethod ) 
-				 && Router.matchRoute( path, rulePath ) 
+				Router.matchMethod( method, ruleMethod )
+				&& Router.matchRoute( path, rulePath )
 			) {
 				const ipLimit	= rule.ipLimit;
 				const policy	= rule.policy;
 				const bucketKey	= `${Bucket.DEFAULT_PREFIX}${rulePath}${policy}${ipLimit ? clientIp : ''}`;
 
 				const bucket	= await this.getBucketFromOptions( bucketKey, rule );
+				const hasToken	= await bucket.reduce();
 
-				eventRequest.rateLimited	= ! await bucket.reduce();
+				if ( ! hasToken ) {
+					eventRequest.rateLimited	= true;
+					const shouldRateLimit		= await this._shouldRateLimitRule( rule, bucket );
 
-				if ( eventRequest.rateLimited ) {
-					const shouldRateLimit	= await this._shouldRateLimitRule( rule );
-
-					if ( shouldRateLimit )
-						return await this.sendRetryAfterResponse( eventRequest, rule.refillTime );
+					if ( shouldRateLimit ) {
+						await this.sendRetryAfterResponse( eventRequest, rule.refillTime );
+						return;
+					}
 
 					if ( rule.stopPropagation === true )
 						break;
@@ -273,38 +276,39 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * Returns true if the request has been rate limited and a retry after should be sent,
 	 * otherwise return false
-	 * 
+	 *
 	 * @param	{Object} rule
-	 * 
+	 * @param	{Bucket} bucket
+	 *
 	 * @returns	Promise<boolean>
 	 */
-	async _shouldRateLimitRule( rule ) {
+	async _shouldRateLimitRule( rule, bucket ) {
 		return new Promise(( resolve, reject ) => {
-			switch( policy )
+			switch( rule.policy )
 			{
 				case PERMISSIVE_POLICY:
 					resolve( false );
 					break;
-	
+
 				case CONNECTION_DELAY_POLICY:
 					const delayTime		= rule.delayTime;
 					const delayRetries	= rule.delayRetries;
 					let tries			= 0;
-	
+
 					const interval		= setInterval( async() => {
 						if ( ++ tries >= delayRetries ) {
 							clearInterval( interval );
 							return resolve( true );
 						}
-						
+
 						if ( ! await bucket.reduce() )
 							return;
-	
+
 						clearInterval( interval );
 						resolve( false );
 					}, delayTime * 1000 );
 					break;
-	
+
 				case STRICT_POLICY:
 					resolve( true );
 					break;

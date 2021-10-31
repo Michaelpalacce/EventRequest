@@ -7,8 +7,6 @@ services:
             context: .
             dockerfile: Dockerfile-12
         working_dir: /app
-        volumes:
-          - ./coverage:/app/coverage
         command: node test.js
 
     node14:
@@ -26,8 +24,6 @@ services:
             context: .
             dockerfile: Dockerfile-15
         working_dir: /app
-        volumes:
-          - ./coverage:/app/coverage
         command: node test.js
 
     node16:
@@ -35,8 +31,6 @@ services:
             context: .
             dockerfile: Dockerfile-16
         working_dir: /app
-        volumes:
-          - ./coverage:/app/coverage
         command: node test.js
 
 #    node-test:
@@ -45,6 +39,5 @@ services:
 #            dockerfile: Dockerfile-16
 #        working_dir: /app
 #        volumes:
-##          - ./coverage:/app/coverage
 #            - ./:/app
 #        command: nodemon -L test.js

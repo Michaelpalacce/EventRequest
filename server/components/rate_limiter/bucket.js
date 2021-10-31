@@ -6,8 +6,7 @@ const { makeId }	= require( '../helpers/unique_id' );
 /**
  * @brief	Leaky bucket implementation
  */
-class Bucket
-{
+class Bucket {
 	/**
 	 * @details	Refill Amount is how many tokens to refill after the refillTime
 	 * 			Refill Time is how often tokens should be renewed
@@ -42,16 +41,12 @@ class Bucket
 		this.maxCounter					= Math.min( Math.floor( 10000 / dataStoreRefetchInterval ), 1000 );
 
 		if ( dataStore === null || ! ( dataStore instanceof DataServer ) )
-		{
 			this.dataStore	= new DataServer({
 				ttl		: -1,
 				persist	: false
 			});
-		}
 		else
-		{
 			this.dataStore	= dataStore;
-		}
 
 		this.key	= key;
 	}
@@ -59,7 +54,7 @@ class Bucket
 	/**
 	 * @brief	Initializes the bucket
 	 *
-	 * @return	void
+	 * @return	{Bucket}
 	 */
 	async init()
 	{
@@ -67,7 +62,7 @@ class Bucket
 		{
 			await this._getValue().catch( this.handleError );
 			await this._getLastUpdate().catch( this.handleError );
-			return;
+			return this;
 		}
 
 		await this._getUniqueKey().catch( this.handleError );
