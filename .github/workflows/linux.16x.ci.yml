@@ -37,7 +37,7 @@ jobs:
             - name: Run codacy-coverage-reporter
               uses: codacy/codacy-coverage-reporter-action@master
               with:
-                  project-token: f0fdcfc826ef4a0aaff49160a624fcae
+                  project-token: ${{ secrets.CODACY_TOKEN }}
                   coverage-reports: lcov.info
 
     codecov-reporter:
