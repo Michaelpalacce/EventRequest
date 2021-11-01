@@ -17,8 +17,7 @@ class EtagPlugin extends PluginInterface
 	 * @param	{String} pluginId
 	 * @param	{Object} options
 	 */
-	constructor( pluginId, options = {} )
-	{
+	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
 
 		this.setOptions( options );
@@ -27,8 +26,7 @@ class EtagPlugin extends PluginInterface
 	/**
 	 * @param	{Object} options
 	 */
-	setOptions( options = {} )
-	{
+	setOptions( options = {} ) {
 		this.strong	= typeof options.strong === 'boolean'
 					? options.strong
 					: DEFAULT_IS_STRONG;
@@ -42,8 +40,7 @@ class EtagPlugin extends PluginInterface
 	 *
 	 * @return	String
 	 */
-	etag( payload, strong = this.strong )
-	{
+	etag( payload, strong = this.strong ) {
 		const algo		= strong ? 'sha1' : 'md5';
 		const prefix	= strong ? '' : 'W/';
 

@@ -1,12 +1,13 @@
 'use strict';
 
 // Dependencies
-const { assert, test, helpers }	= require( '../../../test_helper' );
+const { assert, test, helpers, Mock }	= require( '../../../test_helper' );
 const Session					= require( './../../../../server/components/session/session' );
 const EventRequest				= require( './../../../../server/event_request' );
+const DataServer				= require( './../../../../server/components/caching/data_server' );
 
 test({
-	message	: 'Session constructor on default throws',
+	message	: 'Session.constructor.on.default.throws',
 	test	: ( done ) => {
 		assert.throws(() => {
 			new Session()
@@ -17,25 +18,22 @@ test({
 });
 
 test({
-	message	: 'Session constructor on correct arguments does not throw',
+	message	: 'Session.constructor.on.correct.arguments.does.not.throw',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
-		let session				= null;
-		assert.doesNotThrow(() => {
-			session	= new Session( eventRequest )
-		});
+		let session				= new Session( eventRequest );
 
-		assert.equal( true, session.event instanceof EventRequest );
-		assert.equal( true, typeof session.server !== 'undefined' );
-		assert.equal( true, typeof session.options === 'object' );
-		assert.equal( 7776000, session.ttl );
-		assert.equal( 'sid', session.sessionKey );
-		assert.equal( true, session.isCookieSession );
-		assert.equal( 32, session.sessionIdLength );
-		assert.equal( null, session.sessionId );
-		assert.equal( true, typeof session.session === 'object' );
-		assert.equal( false, session.isSecureCookie );
+		assert.deepStrictEqual( true, session.event instanceof EventRequest );
+		assert.deepStrictEqual( true, typeof session.server !== 'undefined' );
+		assert.deepStrictEqual( true, typeof session.options === 'object' );
+		assert.deepStrictEqual( 7776000, session.ttl );
+		assert.deepStrictEqual( 'sid', session.sessionKey );
+		assert.deepStrictEqual( true, session.isCookieSession );
+		assert.deepStrictEqual( 32, session.sessionIdLength );
+		assert.deepStrictEqual( undefined, session.sessionId );
+		assert.deepStrictEqual( undefined, session.session );
+		assert.deepStrictEqual( false, session.isSecureCookie );
 
 		done();
 	}
@@ -55,76 +53,75 @@ test({
 });
 
 test({
-	message	: 'Session constructor on custom arguments',
+	message	: 'Session.constructor.on.custom.arguments',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
-		let session				= null;
-
 		let ttl					= 10;
 		let sessionKey			= 'differentSid';
 		let sessionIdLength		= 1000;
-
 		let options	= {
 			ttl, sessionKey, sessionIdLength, isCookieSession: false, isSecureCookie: true
 		};
+		let session				= new Session( eventRequest, options );
 
-		assert.doesNotThrow(() => {
-			session	= new Session( eventRequest, options )
-		});
-
-		assert.equal( true, session.event instanceof EventRequest );
-		assert.equal( true, typeof session.server !== 'undefined' );
-		assert.equal( true, typeof session.options === 'object' );
-		assert.equal( false, session.isCookieSession );
-		assert.equal( ttl, session.ttl );
-		assert.equal( sessionKey, session.sessionKey );
-		assert.equal( true, session.isSecureCookie );
-		assert.equal( sessionIdLength, session.sessionIdLength );
-		assert.equal( true, typeof session.session === 'object' );
+		assert.deepStrictEqual( true, session.event instanceof EventRequest );
+		assert.deepStrictEqual( 'object', typeof session.server );
+		assert.deepStrictEqual( true, typeof session.options === 'object' );
+		assert.deepStrictEqual( false, session.isCookieSession );
+		assert.deepStrictEqual( ttl, session.ttl );
+		assert.deepStrictEqual( sessionKey, session.sessionKey );
+		assert.deepStrictEqual( true, session.isSecureCookie );
+		assert.deepStrictEqual( sessionIdLength, session.sessionIdLength );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Session constructor on custom arguments',
-	test	: ( done ) => {
+	message	: 'Session.constructor.on.custom.arguments.with.cookie',
+	test	: async ( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
 		eventRequest.dataServer	= helpers.getDataServer();
+		await eventRequest.dataServer.set( `${Session.SESSION_PREFIX}${sessionId}`, {} );
 		let session				= null;
 
 		assert.doesNotThrow(() => {
 			session	= new Session( eventRequest )
 		});
 
-		assert.equal( sessionId, session.getSessionId() );
+		await session.init();
+
+		assert.deepStrictEqual( sessionId, session.getSessionId() );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Session constructor on custom arguments with headers',
-	test	: ( done ) => {
+	message	: 'Session.constructor.on.custom.arguments.with.headers',
+	test	: async ( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { testSid : sessionId } );
 		eventRequest.dataServer	= helpers.getDataServer();
+		await eventRequest.dataServer.set( `${Session.SESSION_PREFIX}${sessionId}`, {} );
 		let session				= null;
 
 		assert.doesNotThrow(() => {
 			session	= new Session( eventRequest, { isCookieSession: false, sessionKey: 'testSid' } )
 		});
 
-		assert.equal( sessionId, session.getSessionId() );
+		await session.init();
+
+		assert.deepStrictEqual( sessionId, session.getSessionId() );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Session _makeNewSessionId returns an id depending on the sessionKeyLength',
+	message	: 'Session._makeNewSessionId.returns.an.id.depending.on.the.sessionKeyLength',
 	test	: ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
@@ -142,7 +139,7 @@ test({
 });
 
 test({
-	message	: 'Session hasSession when there is no session',
+	message	: 'Session.hasSession.when.there.is.no.session',
 	test	: ( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
@@ -157,7 +154,7 @@ test({
 });
 
 test({
-	message	: 'Session hasSession, newSession and removeSession when there is a session',
+	message	: 'Session.hasSession.newSession.and.removeSession.when.there.is.a.session',
 	test	: async ( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
@@ -179,45 +176,35 @@ test({
 
 		if ( ! hasSession )
 		{
-			const sessionId	= await session.newSession();
+			await session.newSession();
+			const sessionId	= session.getSessionId();
 
 			if ( sessionId === false )
-			{
 				done( 'Could not create a new session' );
-			}
-			else
-			{
-				if ( setCookie === true )
-				{
+			else {
+				if ( setCookie === true ) {
 					hasSession	= await session.hasSession();
-					if ( hasSession === true )
-					{
-						assert.deepStrictEqual( typeof session.session.id, 'string' );
+					if ( hasSession === true ) {
+						assert.deepStrictEqual( session.sessionId, sessionId );
 
 						await session.removeSession();
 
-						assert.equal( await session.hasSession(), false );
+						assert.deepStrictEqual( await session.hasSession(), false );
 
 						assert.deepStrictEqual( session.session, {} );
-						assert.deepStrictEqual( typeof session.session.id, 'undefined' );
+						assert.deepStrictEqual( session.sessionId, null );
 
 						done();
 					}
 					else
-					{
 						done( 'There is no session where there should have been' );
-					}
 				}
 				else
-				{
 					done( 'Set cookie should have been called when creating a new session but was not' );
-				}
 			}
 		}
 		else
-		{
 			done( 'There is a session but there shouldn\'t be one' );
-		}
 	}
 });
 
@@ -242,47 +229,36 @@ test({
 
 		let hasSession	= await session.hasSession();
 
-		if ( ! hasSession )
-		{
-			const sessionId	= await session.newSession();
+		if ( ! hasSession ) {
+			await session.newSession();
+			const sessionId	= session.getSessionId();
 
 			if ( sessionId === false )
-			{
 				done( 'Could not create a new session' );
-			}
-			else
-			{
-				if ( setCookie === true )
-				{
+			else {
+				if ( setCookie === true ) {
 					hasSession	= await session.hasSession();
-					if ( hasSession === true )
-					{
-						assert.deepStrictEqual( typeof session.session.id, 'string' );
+					if ( hasSession === true ) {
+						assert.deepStrictEqual( session.sessionId, sessionId );
 
 						await session.removeSession();
 
-						assert.equal( await session.hasSession(), false );
+						assert.deepStrictEqual( await session.hasSession(), false );
 
 						assert.deepStrictEqual( session.session, {} );
-						assert.deepStrictEqual( typeof session.session.id, 'undefined' );
+						assert.deepStrictEqual( session.sessionId, null );
 
 						done();
 					}
 					else
-					{
 						done( 'There is no session where there should have been' );
-					}
 				}
 				else
-				{
 					done( 'Set cookie should have been called when creating a new session but was not' );
-				}
 			}
 		}
 		else
-		{
 			done( 'There is a session but there shouldn\'t be one' );
-		}
 	}
 });
 
@@ -304,33 +280,27 @@ test({
 
 		let hasSession	= await session.hasSession();
 
-		if ( ! hasSession )
-		{
-			const sessionId	= await session.newSession();
+		if ( ! hasSession ) {
+			await session.newSession();
+			const sessionId	= session.getSessionId();
 
 			if ( sessionId === false )
-			{
 				done( 'Could not create a new session' );
-			}
-			else
-			{
+			else {
 				if ( setCookie === true )
-				{
 					done( 'Set cookie should NOT have been called when creating a new session but was' );
-				}
-				else
-				{
+				else {
 					hasSession	= await session.hasSession();
 					if ( hasSession === true )
 					{
-						assert.deepStrictEqual( typeof session.session.id, 'string' );
+						assert.deepStrictEqual( session.sessionId, sessionId );
 
 						await session.removeSession();
 
-						assert.equal( await session.hasSession(), false );
+						assert.deepStrictEqual( await session.hasSession(), false );
 
 						assert.deepStrictEqual( session.session, {} );
-						assert.deepStrictEqual( typeof session.session.id, 'undefined' );
+						assert.deepStrictEqual( session.sessionId, null );
 
 						done();
 					}
@@ -373,17 +343,18 @@ test({
 
 test({
 	message	: 'Session.add.has.adds.a.variable.in.the.session',
-	test	: ( done ) => {
+	test	: async ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= new Session( eventRequest );
+		await session.init();
 
 		assert.deepStrictEqual( {}, session.session );
 		session.add( 'key', 'value' );
 
 		assert.deepStrictEqual( { key : 'value' }, session.session );
-		assert.equal( true, session.has( 'key') );
-		assert.equal( 'value', session.get( 'key' ) );
+		assert.deepStrictEqual( true, session.has( 'key') );
+		assert.deepStrictEqual( 'value', session.get( 'key' ) );
 		session.delete( 'key' );
 		assert.deepStrictEqual( session.get( 'key' ), null );
 
@@ -392,19 +363,19 @@ test({
 });
 
 test({
-	message	: 'Session fetchSession if session does not exist',
+	message	: 'Session.fetchSession.if.session.does.not.exist',
 	test	: async ( done ) => {
 		let sessionId			= 'sessionId2';
 		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
 		eventRequest.dataServer	= helpers.getDataServer();
 		let session				= new Session( eventRequest );
 
-		await session.fetchSession() === false ? done() : done( 'There should be no session to fetch' );
+		await session.fetchSession() === null ? done() : done( 'There should be no session to fetch' );
 	}
 });
 
 test({
-	message	: 'Session fetchSession if session exists',
+	message	: 'Session.fetchSession.if.session.exists',
 	test	: async ( done ) => {
 		let sessionId			= 'sessionId2';
 		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
@@ -431,14 +402,67 @@ test({
 });
 
 test({
-	message	: 'Session getSessionId returns sessionId',
-	test	: ( done ) => {
-		let sessionId			= 'sessionId2';
-		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
+	message	: 'Session.getSessionId.returns.sessionId',
+	test	: async ( done ) => {
+		const sessionId			= 'sessionId2';
+		const eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
 		eventRequest.dataServer	= helpers.getDataServer();
-		let session				= new Session( eventRequest );
+		await eventRequest.dataServer.set( `${Session.SESSION_PREFIX}${sessionId}`, {} );
+		const session			= new Session( eventRequest );
+		await session.init();
 
-		assert.equal( sessionId, session.getSessionId() );
+		assert.deepStrictEqual( sessionId, session.getSessionId() );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Session.newSession.cannotSaveSession',
+	test	: async ( done ) => {
+		const eventRequest		= helpers.getEventRequest();
+		const MockedDataServer	= Mock( DataServer );
+		eventRequest.dataServer	= new MockedDataServer( { persist: false } );
+		eventRequest.dataServer._mock({
+			method: "set",
+			shouldReturn: () => null
+		});
+		const session			= new Session( eventRequest );
+		let thrown				= false;
+
+		await session.newSession().catch(() => { thrown = true; });
+
+		done( ! thrown );
+	}
+});
+
+test({
+	message	: 'Session.getAll',
+	test	: async ( done ) => {
+		const eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		const session			= new Session( eventRequest );
+		await session.init();
+		session.add( 'test', 1 );
+		session.add( 'test2', 2 );
+
+		assert.deepStrictEqual( { test: 1, test2: 2 }, session.getAll() );
+
+		done();
+	}
+});
+
+test({
+	message	: 'Session.set.is.an.alias.of.add',
+	test	: async ( done ) => {
+		const eventRequest		= helpers.getEventRequest();
+		eventRequest.dataServer	= helpers.getDataServer();
+		const session			= new Session( eventRequest );
+		await session.init();
+		session.set( 'test', 1 );
+		session.set( 'test2', 2 );
+
+		assert.deepStrictEqual( { test: 1, test2: 2 }, session.getAll() );
 
 		done();
 	}

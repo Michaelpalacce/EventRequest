@@ -12,10 +12,8 @@ const TTL	= 7776000;
 /**
  * @brief	Session container
  */
-class Session
-{
-	constructor( event, options = {} )
-	{
+class Session {
+	constructor( event, options = {} ) {
 		this.event				= event;
 		this.options			= options;
 
@@ -39,20 +37,28 @@ class Session
 								? this.options.isSecureCookie
 								: false;
 
-		this.sessionId			= this.isCookieSession ?
-									typeof event.cookies[this.sessionKey] !== 'undefined'
-										? event.cookies[this.sessionKey]
-										: null
-									: event.hasRequestHeader( this.sessionKey )
-										? event.getRequestHeader( this.sessionKey )
-										: null;
-
-		this.session			= {};
-
 		if ( typeof event.dataServer === 'undefined' )
 			throw new Error( 'app.er.session.missingDataServer' );
 
 		this.server				= event.dataServer;
+
+		// Attach set as an alias
+		this.set				= this.add;
+	}
+
+	/**
+	 * Initializes the session. This must be called before anything else. The other methods do not check if this has been called
+	 * intentionally to save on some speed.
+	 *
+	 * @return	{Promise<void>}
+	 */
+	async init() {
+		this.sessionId	= this.isCookieSession ?
+							this.event.cookies[this.sessionKey] ?? null
+							: this.event.getRequestHeader( this.sessionKey, null );
+
+		if ( ! await this.fetchSession() )
+			await this.newSession();
 	}
 
 	/**
@@ -60,8 +66,7 @@ class Session
 	 *
 	 * @return	String
 	 */
-	_makeNewSessionId()
-	{
+	_makeNewSessionId() {
 		return uniqueId.makeId( this.sessionIdLength );
 	}
 
@@ -70,8 +75,7 @@ class Session
 	 *
 	 * @return	Boolean
 	 */
-	async hasSession()
-	{
+	async hasSession() {
 		if ( this.sessionId === null )
 			return false;
 
@@ -83,55 +87,46 @@ class Session
 	 *
 	 * @return	void
 	 */
-	async removeSession()
-	{
+	async removeSession() {
 		await this.server.delete( Session.SESSION_PREFIX + this.sessionId );
 
 		this.session	= {};
+		this.sessionId	= null;
 
 		if ( this.isCookieSession )
 			this.event.setCookie( this.sessionKey, this.sessionId, { expires: - this.ttl, SameSite: this.isSecureCookie ? 'None; Secure' : 'Lax' } );
 	}
 
 	/**
-	 * @brief	Starts a new session
+	 * Starts a new session.
+	 * Returns the sessionId or null on error.
 	 *
-	 * @return	String|Boolean
+	 * @return	void
 	 */
-	async newSession()
-	{
-		const sessionId	= this._makeNewSessionId();
-		this.session	= {
-			id	: sessionId
-		};
+	async newSession() {
+		this.sessionId	= this._makeNewSessionId();
+		this.session	= {};
 
-		if ( ! await this.saveSession( sessionId ) )
-		{
-			return false;
-		}
-		else
-		{
-			this.sessionId	= sessionId;
-
+		if ( await this.saveSession() )
 			if ( this.isCookieSession )
 				this.event.setCookie( this.sessionKey, this.sessionId, { expires: this.ttl, SameSite: this.isSecureCookie ? 'None; Secure' : 'Lax' } );
 			else
 				this.event.setResponseHeader( this.sessionKey, this.sessionId );
-
-			return sessionId;
-		}
+		else
+			throw new Error( 'app.er.session.couldNotSaveSessionToDataServer' );
 	}
 
 	/**
-	 * @brief	Adds a new variable to the session
+	 * Adds a new variable to the session
+	 *
+	 * @deprecated	Use set instead
 	 *
 	 * @param	{String} name
 	 * @param	{*} value
 	 *
 	 * @return	void
 	 */
-	add( name, value )
-	{
+	add( name, value ) {
 		this.session[name]	= value;
 	}
 
@@ -142,8 +137,7 @@ class Session
 	 *
 	 * @return	void
 	 */
-	delete( name )
-	{
+	delete( name ) {
 		delete this.session[name];
 	}
 
@@ -154,22 +148,19 @@ class Session
 	 *
 	 * @return	Boolean
 	 */
-	has( name )
-	{
+	has( name ) {
 		return typeof this.session[name] !== 'undefined';
 	}
 
 	/**
-	 * @brief	Gets a session variable
-	 *
-	 * @details	Returns null if the value does not exist
+	 * Gets a session variable.
+	 * Returns null if the value does not exist.
 	 *
 	 * @param	{String} name
 	 *
 	 * @return	 *
 	 */
-	get( name )
-	{
+	get( name ) {
 		if ( ! this.has( name ) )
 			return null;
 
@@ -177,37 +168,38 @@ class Session
 	}
 
 	/**
-	 * @brief	Save the session to the memory storage
+	 * Gets all session variables.
 	 *
-	 * @details	Returns true if the session was saved successfully
-	 *
-	 * @param	{String} [sessionId=this.sessionId]
-	 *
-	 * @return	Boolean
+	 * @return	 {Object}
 	 */
-	async saveSession( sessionId = this.sessionId )
-	{
-		if ( sessionId === null )
-			return false;
-
-		return await this.server.set( Session.SESSION_PREFIX + sessionId, this.session, this.ttl ) !== null;
+	getAll() {
+		return this.session;
 	}
 
 	/**
-	 * @brief	Fetches the session if it exists
-	 *
-	 * @details	Returns true if it was successfully fetched and false on error
+	 * Save the session to the memory storage.
+	 * Returns true if the session was saved successfully.
 	 *
 	 * @return	Boolean
 	 */
-	async fetchSession()
-	{
-		if ( ! await this.server.touch( Session.SESSION_PREFIX + this.sessionId ) )
+	async saveSession() {
+		if ( ! this.session || ! this.sessionId )
 			return false;
 
-		this.session	= await this.server.get( Session.SESSION_PREFIX + this.sessionId );
+		return await this.server.set( Session.SESSION_PREFIX + this.sessionId, this.session, this.ttl ) !== null;
+	}
 
-		return true;
+	/**
+	 * Fetches the session if it exists
+	 * Returns the session if it exists, otherwise return null
+	 *
+	 * @return	Boolean
+	 */
+	async fetchSession() {
+		if ( ! await this.server.touch( Session.SESSION_PREFIX + this.sessionId ) )
+			return null;
+
+		return this.session	= await this.server.get( Session.SESSION_PREFIX + this.sessionId );
 	}
 
 	/**
@@ -215,8 +207,7 @@ class Session
 	 *
 	 * @return	String
 	 */
-	getSessionId()
-	{
+	getSessionId() {
 		return this.sessionId;
 	}
 }

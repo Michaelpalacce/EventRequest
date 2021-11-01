@@ -16,15 +16,15 @@ test({
 			session	= new Session( eventRequest )
 		});
 
-		assert.equal( true, session.event instanceof EventRequest );
-		assert.equal( true, typeof session.server !== 'undefined' );
-		assert.equal( true, typeof session.options === 'object' );
-		assert.equal( 7776000, session.ttl );
-		assert.equal( 'sid', session.sessionKey );
-		assert.equal( true, session.isCookieSession );
-		assert.equal( 32, session.sessionIdLength );
-		assert.equal( null, session.sessionId );
-		assert.equal( true, typeof session.session === 'object' );
+		assert.deepStrictEqual( true, session.event instanceof EventRequest );
+		assert.deepStrictEqual( true, typeof session.server !== 'undefined' );
+		assert.deepStrictEqual( true, typeof session.options === 'object' );
+		assert.deepStrictEqual( 7776000, session.ttl );
+		assert.deepStrictEqual( 'sid', session.sessionKey );
+		assert.deepStrictEqual( true, session.isCookieSession );
+		assert.deepStrictEqual( 32, session.sessionIdLength );
+		assert.deepStrictEqual( undefined, session.sessionId );
+		assert.deepStrictEqual( undefined, session.session );
 
 		done();
 	}
@@ -49,30 +49,33 @@ test({
 			session	= new Session( eventRequest, options )
 		});
 
-		assert.equal( true, session.event instanceof EventRequest );
-		assert.equal( true, typeof session.server !== 'undefined' );
-		assert.equal( true, typeof session.options === 'object' );
-		assert.equal( true, session.isCookieSession === false );
-		assert.equal( ttl, session.ttl );
-		assert.equal( sessionKey, session.sessionKey );
-		assert.equal( sessionIdLength, session.sessionIdLength );
-		assert.equal( true, typeof session.session === 'object' );
+		assert.deepStrictEqual( true, session.event instanceof EventRequest );
+		assert.deepStrictEqual( true, typeof session.server !== 'undefined' );
+		assert.deepStrictEqual( true, typeof session.options === 'object' );
+		assert.deepStrictEqual( true, session.isCookieSession === false );
+		assert.deepStrictEqual( ttl, session.ttl );
+		assert.deepStrictEqual( sessionKey, session.sessionKey );
+		assert.deepStrictEqual( sessionIdLength, session.sessionIdLength );
+		assert.deepStrictEqual( undefined, session.session );
 
 		done();
 	}
 });
 
 test({
-	message	: 'Session.with.map.constructor.on.custom.arguments',
-	test	: ( done ) => {
+	message	: 'Session.with.map.constructor.on.custom.arguments.with.cookie',
+	test	: async( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { cookie : 'sid=' + sessionId } );
 		eventRequest.dataServer	= new DataServerMap( { persist: false } );
+		await eventRequest.dataServer.set( `${Session.SESSION_PREFIX}${sessionId}`, {} );
 		let session				= null;
 
 		assert.doesNotThrow(() => {
 			session	= new Session( eventRequest )
 		});
+
+		await session.init();
 
 		assert.equal( sessionId, session.getSessionId() );
 
@@ -82,15 +85,17 @@ test({
 
 test({
 	message	: 'Session.with.map.constructor.on.custom.arguments.with.headers',
-	test	: ( done ) => {
+	test	: async ( done ) => {
 		let sessionId			= 'sessionId';
 		let eventRequest		= helpers.getEventRequest( undefined, undefined, { testSid : sessionId } );
 		eventRequest.dataServer	= new DataServerMap( { persist: false } );
+		await eventRequest.dataServer.set( `${Session.SESSION_PREFIX}${sessionId}`, {} );
 		let session				= null;
 
 		assert.doesNotThrow(() => {
 			session	= new Session( eventRequest, { isCookieSession: false, sessionKey: 'testSid' } )
 		});
+		await session.init();
 
 		assert.equal( sessionId, session.getSessionId() );
 
@@ -150,9 +155,9 @@ test({
 
 		let hasSession	= await session.hasSession();
 
-		if ( ! hasSession )
-		{
-			const sessionId	= await session.newSession();
+		if ( ! hasSession ) {
+			await session.newSession();
+			const sessionId	= session.getSessionId();
 
 			if ( sessionId === false )
 			{
@@ -165,14 +170,14 @@ test({
 					hasSession	= await session.hasSession();
 					if ( hasSession === true )
 					{
-						assert.deepStrictEqual( typeof session.session.id, 'string' );
+						assert.deepStrictEqual( session.sessionId, sessionId );
 
 						await session.removeSession();
 
-						assert.equal( await session.hasSession(), false );
+						assert.deepStrictEqual( await session.hasSession(), false );
 
 						assert.deepStrictEqual( session.session, {} );
-						assert.deepStrictEqual( typeof session.session.id, 'undefined' );
+						assert.deepStrictEqual( session.sessionId, null );
 
 						done();
 					}
@@ -214,7 +219,9 @@ test({
 
 		if ( ! hasSession )
 		{
-			const sessionId	= await session.newSession();
+
+			await session.newSession();
+			const sessionId	= session.getSessionId();
 
 			if ( sessionId === false )
 			{
@@ -231,14 +238,14 @@ test({
 					hasSession	= await session.hasSession();
 					if ( hasSession === true )
 					{
-						assert.deepStrictEqual( typeof session.session.id, 'string' );
+						assert.deepStrictEqual( session.sessionId, sessionId );
 
 						await session.removeSession();
 
-						assert.equal( await session.hasSession(), false );
+						assert.deepStrictEqual( await session.hasSession(), false );
 
 						assert.deepStrictEqual( session.session, {} );
-						assert.deepStrictEqual( typeof session.session.id, 'undefined' );
+						assert.deepStrictEqual( session.sessionId, null );
 
 						done();
 					}
@@ -281,10 +288,11 @@ test({
 
 test({
 	message	: 'Session.with.map.add,.has.adds.a.variable.in.the.session',
-	test	: ( done ) => {
+	test	: async ( done ) => {
 		let eventRequest		= helpers.getEventRequest();
 		eventRequest.dataServer	= new DataServerMap( { persist: false } );
 		let session				= new Session( eventRequest );
+		await session.init();
 
 		assert.deepStrictEqual( {}, session.session );
 		session.add( 'key', 'value' );
@@ -307,7 +315,7 @@ test({
 		eventRequest.dataServer	= new DataServerMap( { persist: false } );
 		let session				= new Session( eventRequest );
 
-		await session.fetchSession() === false ? done() : done( 'There should be no session to fetch' );
+		await session.fetchSession() === null ? done() : done( 'There should be no session to fetch' );
 	}
 });
 
@@ -340,11 +348,13 @@ test({
 
 test({
 	message	: 'Session.with.map.getSessionId.returns.sessionId',
-	test	: ( done ) => {
+	test	: async ( done ) => {
 		let sessionId			= 'sessionId2';
 		let eventRequest		= helpers.getEventRequest(  undefined, undefined, { cookie : 'sid=' + sessionId }  );
-		eventRequest.dataServer	= new DataServerMap( { persist: false } );
+		eventRequest.dataServer	= helpers.getDataServer();
+		await eventRequest.dataServer.set( `${Session.SESSION_PREFIX}${sessionId}`, {} );
 		let session				= new Session( eventRequest );
+		await session.init();
 
 		assert.equal( sessionId, session.getSessionId() );
 

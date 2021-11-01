@@ -1,3 +1,13 @@
+33.2.0
+- Session component improvements
+- Session plugin improvements
+- Added `set` as an alias of add in Session component and `add` has been deprecated
+- New error: app.er.session.couldNotSaveSessionToDataServer when saving a session but an error ocurrs
+- init added to session to init the session from the cookie or headers
+- initSession removed from the session plugin, the new init function is used and it is done automatically
+- Added new `getAll` to the session to return all values stored directly
+- Documentation improvements
+
 33.1.0
 - Improvements to rate limits plugin. Tried to speed it up as possible and remove legacy stuff.
 - Removed saving configuration to a file for rate limits plugin

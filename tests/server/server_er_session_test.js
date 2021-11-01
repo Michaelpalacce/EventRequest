@@ -18,18 +18,14 @@ test({
 		app.apply( app.er_session );
 
 		app.get( `/${name}`, async ( event ) => {
-			await event.initSession();
-
-			assert.equal( event.session instanceof Session, true );
+			assert.deepStrictEqual( event.session instanceof Session, true );
 			const session	= event.session;
 
-			if ( session.has( 'authenticated' ) === false )
-			{
+			if ( session.has( 'authenticated' ) === false ) {
 				assert.deepStrictEqual( session.get( 'authenticated' ), null );
 				session.add( 'authenticated', true );
 			}
-			else
-			{
+			else {
 				assert.equal( session.get( 'authenticated' ), true );
 				event.setResponseHeader( 'authenticated', 1 );
 			}
@@ -85,8 +81,6 @@ test({
 		app.apply( app.er_session );
 
 		app.get( `/${name}`, async ( event ) => {
-			await event.initSession();
-
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -153,8 +147,6 @@ test({
 		app.apply( app.er_session );
 
 		app.get( `/${name}`, async ( event ) => {
-			await event.initSession();
-
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -223,8 +215,6 @@ test({
 		app.apply( app.er_session );
 
 		app.get( `/${name}`, async ( event ) => {
-			await event.initSession();
-
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -292,7 +282,6 @@ test({
 		app.apply( app.er_session, { isCookieSession: false } );
 
 		app.get( `/${name}`, async ( event ) => {
-			await event.initSession();
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -351,8 +340,6 @@ test({
 		app.apply( app.er_session, { isCookieSession: false } );
 
 		app.get( `/${name}`, async ( event ) => {
-			await event.initSession();
-
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
@@ -413,8 +400,6 @@ test({
 		app.apply( app.er_session, { isCookieSession: false } );
 
 		app.get( `/${name}`, async ( event ) => {
-			await event.initSession();
-
 			assert.equal( event.session instanceof Session, true );
 			const session	= event.session;
 
