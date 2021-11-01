@@ -13,7 +13,6 @@ A highly customizable backend server in NodeJs. Any feedback is most welcome!
 [![windows-16.x](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.16x.ci.yml/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.16x.ci.yml)
 [![windows-17.x](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.17x.ci.yml/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.17x.ci.yml)
 
-[![codecov](https://codecov.io/gh/Michaelpalacce/EventRequest/branch/master/graph/badge.svg)](https://codecov.io/gh/Michaelpalacce/EventRequest)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/3c843dd2bc454f06b10eb60820dc6d1b)](https://www.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Michaelpalacce/EventRequest&amp;utm_campaign=Badge_Coverage)
 
 [![CodeFactor](https://www.codefactor.io/repository/github/michaelpalacce/eventrequest/badge)](https://www.codefactor.io/repository/github/michaelpalacce/eventrequest)
