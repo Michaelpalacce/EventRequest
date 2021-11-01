@@ -54,7 +54,9 @@ class Session {
 	 */
 	async init() {
 		this.sessionId	= this.isCookieSession ?
-							this.event.cookies[this.sessionKey] ?? null
+							typeof this.event.cookies[this.sessionKey] === 'undefined'
+								? null
+								: this.event.cookies[this.sessionKey]
 							: this.event.getRequestHeader( this.sessionKey, null );
 
 		if ( ! await this.fetchSession() )
