@@ -50,5 +50,5 @@ jobs:
                   name: lcov.info
             - uses: codecov/codecov-action@v1
               with:
-                  token: f0fdcfc826ef4a0aaff49160a624fcae 
+                  token: AYqwGvvdbAM8fTZjC0E9
                   file: ./lcov.info
