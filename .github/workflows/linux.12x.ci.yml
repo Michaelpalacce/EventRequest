@@ -1,5 +1,5 @@
 # This workflow will do a clean install of NodeJS 12.x on linux for every push or pull request on master
-# It will then run the tests of the app. After the tests have been run it will upload coverage reports for codacy and codecov
+# It will then run the tests of the app.
 
 name: linux-12.x
 
@@ -19,36 +19,3 @@ jobs:
     - run: npm i
     - run: npm run build --if-present
     - run: npm test
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: lcov.info
-        path: coverage/lcov.info
-
-  codacy-coverage-reporter:
-    needs: build
-    runs-on: ubuntu-latest
-    name: codacy-coverage-reporter
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: lcov.info
-      - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@master
-        with:
-          project-token: f0fdcfc826ef4a0aaff49120a624fcae
-          coverage-reports: lcov.info
-
-  codecov-reporter:
-    needs: build
-    runs-on: ubuntu-latest
-    name: codecov-reporter
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: lcov.info
-      - uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./lcov.info
