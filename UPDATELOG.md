@@ -1,3 +1,6 @@
+33.3.0
+- Jenkins tests for node 17
+
 33.2.0
 - Session component improvements
 - Session plugin improvements

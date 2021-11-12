@@ -39,9 +39,10 @@ pipeline {
 	agent none
 	parameters {
 		booleanParam(name: 'publish', defaultValue: false, description: 'Do you want to publish to npm?')
+		booleanParam(name: 'build17', defaultValue: true, description: 'Do you want to build the project on NodeJS 17?')
 		booleanParam(name: 'build16', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
-		booleanParam(name: 'build14', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
-		booleanParam(name: 'build12', defaultValue: true, description: 'Do you want to build the project on NodeJS 16?')
+		booleanParam(name: 'build14', defaultValue: true, description: 'Do you want to build the project on NodeJS 14?')
+		booleanParam(name: 'build12', defaultValue: true, description: 'Do you want to build the project on NodeJS 12?')
 	}
 
 	post{
@@ -62,6 +63,21 @@ pipeline {
 		        }
 		    }
 			agent { label 'nodejs-16' }
+			steps {
+				sh """
+					npm ci
+					node test.js --silent
+				"""
+			}
+		}
+		stage( 'NodeJS-17 Tests') {
+		    when {
+		        beforeAgent true;
+		        expression{
+		            return build17.toBoolean()
+		        }
+		    }
+			agent { label 'nodejs-17' }
 			steps {
 				sh """
 					npm ci
@@ -109,7 +125,7 @@ pipeline {
 					return publish.toBoolean()
 				}
 			}
-			agent { label 'nodejs-16' }
+			agent { label 'nodejs-17' }
 			steps {
 				script {
 					withCredentials([string(credentialsId: 'npm-access-token', variable: 'NPMTOKEN')]) {
