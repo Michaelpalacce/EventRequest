@@ -83,9 +83,9 @@ helpers.getEmptyMiddleware	= () => {
 /**
  * @brief	Returns a mocked instance of the eventRequest
  *
- * @property	{String} [requestMethod='']
- * @property	{String} [requestUrl='/']
- * @property	{Object} [headers={}]
+ * @param	{String} [requestMethod='']
+ * @param	{String} [requestUrl='/']
+ * @param	{Object} [headers={}]
  *
  * @return	EventRequest
  */
@@ -111,13 +111,13 @@ helpers.getEventRequest	= ( requestMethod = '', requestUrl = '/', headers = {} )
 /**
  * @brief	Sends a request to the server and returns a Promise
  *
- * @property	{String} path
- * @property	{String} [method='GET']
- * @property	{Number} [statusCode=200]
- * @property	{*} [data='']
- * @property	{Object} [headers={}]
- * @property	{Number} [port=3333]
- * @property	{String} [expectedBody=null]
+ * @param	{String} path
+ * @param	{String} [method='GET']
+ * @param	{Number} [statusCode=200]
+ * @param	{*} [data='']
+ * @param	{Object} [headers={}]
+ * @param	{Number} [port=3333]
+ * @param	{String} [expectedBody=null]
  *
  * @return	Promise
  */

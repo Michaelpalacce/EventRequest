@@ -6,7 +6,7 @@
  *
  * @details	One day in seconds
  *
- * @var		Number
+ * @var		{Number}
  */
 const DEFAULT_MAX_AGE			= 86400;
 const DEFAULT_ENFORCE			= true;
@@ -15,7 +15,7 @@ const DEFAULT_REPORT_URI		= '';
 /**
  * @brief	Name of the Expect-CT header
  *
- * @var		String
+ * @var		{String}
  */
 const HEADER_NAME				= 'Expect-CT';
 
@@ -40,9 +40,7 @@ class ExpectCT {
 	/**
 	 * @brief	Parses the options given to the ExpectCT class
 	 *
-	 * @property	{Object} [options={}]
-	 *
-	 * @return	void
+	 * @param	{Object} [options={}]
 	 */
 	parseOptions( options = {} ) {
 		this.setEnabled( options.enabled );
@@ -63,9 +61,7 @@ class ExpectCT {
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @property	{Boolean} [enabled=true]
-	 *
-	 * @return	void
+	 * @param	{Boolean} [enabled=true]
 	 */
 	setEnabled( enabled = true ) {
 		this.enabled	= typeof enabled === 'boolean' ? enabled : true;
@@ -74,9 +70,7 @@ class ExpectCT {
 	/**
 	 * @brief	Sets the enforce flag
 	 *
-	 * @property	{Boolean} [enforce=true]
-	 *
-	 * @return	void
+	 * @param	{Boolean} [enforce=true]
 	 */
 	enforce( enforce = true ) {
 		this.isEnforce	= typeof enforce === 'boolean' ? enforce : this.isEnforce;
@@ -85,9 +79,7 @@ class ExpectCT {
 	/**
 	 * @brief	Sets the enforce flag
 	 *
-	 * @property	{Number} maxAge
-	 *
-	 * @return	void
+	 * @param	{Number} maxAge
 	 */
 	setMaxAge( maxAge ) {
 		this.maxAge	= typeof maxAge === 'number' ? maxAge : this.maxAge;
@@ -96,9 +88,7 @@ class ExpectCT {
 	/**
 	 * @brief	Sets the reportUri
 	 *
-	 * @property	{String} reportUri
-	 *
-	 * @return	void
+	 * @param	{String} reportUri
 	 */
 	setReportUri( reportUri ) {
 		this.reportUri	= typeof reportUri === 'string' ? reportUri : this.reportUri;
@@ -107,7 +97,7 @@ class ExpectCT {
 	/**
 	 * @brief	Returns the header name
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getHeader() {
 		return HEADER_NAME;
@@ -116,7 +106,7 @@ class ExpectCT {
 	/**
 	 * @brief	Builds the header
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	build() {
 		if ( ! this.enabled )

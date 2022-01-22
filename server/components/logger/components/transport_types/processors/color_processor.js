@@ -15,15 +15,13 @@ const DEFAULT_LOG_COLORS		= {
 };
 
 /**
- * @property	{Object} options
+ * @param	{Object} options
  *
- * @return	Function
+ * @return	{Function}
  */
 module.exports	= ( { logColors = DEFAULT_LOG_COLORS } = {} ) => {
 	/**
 	 * @brief	Adds colors to the message, uniqueId and timestamp
-	 *
-	 * @return	void
 	 */
 	return ( context = {} ) => {
 		const propertiesToTest = ['level', 'uniqueId', 'timestamp', 'isRaw', 'message'];

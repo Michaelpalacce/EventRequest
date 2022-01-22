@@ -11,8 +11,8 @@ const ValidationHandler	= require( './components/validation/validation_handler' 
  */
 class EventRequest extends EventEmitter {
 	/**
-	 * @property	{IncomingMessage} request
-	 * @property	{ServerResponse} response
+	 * @param	{IncomingMessage} request
+	 * @param	{ServerResponse} response
 	 */
 	constructor( request, response ) {
 		super();
@@ -90,7 +90,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Easier access to the validation
 	 *
-	 * @property	{*} args
+	 * @param	{*} args
 	 *
 	 * @return	ValidationResult
 	 */
@@ -105,9 +105,9 @@ class EventRequest extends EventEmitter {
 	 * 			The options should be an object where all the keys will be taken as is as well as the values
 	 * 			And they will be used to make an cookie header
 	 *
-	 * @property	{String} name
-	 * @property	{String} value
-	 * @property	{Object} [options={}]
+	 * @param	{String} name
+	 * @param	{String} value
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Boolean
 	 */
@@ -149,8 +149,8 @@ class EventRequest extends EventEmitter {
 	}
 
 	/**
-	 * @property	{*} [response='']
-	 * @property	{Number} [code=null]
+	 * @param	{*} [response='']
+	 * @param	{Number} [code=null]
 	 *
 	 * @return	Promise
 	 */
@@ -171,7 +171,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Formats the response to be sent
 	 *
-	 * @property	{String|Buffer} response
+	 * @param	{String|Buffer} response
 	 *
 	 * @return	{String|Buffer}
 	 */
@@ -194,8 +194,8 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Safely set header to response ( only if response is not sent )
 	 *
-	 * @property	{String} key
-	 * @property	{String} value
+	 * @param	{String} key
+	 * @param	{String} value
 	 *
 	 * @return	EventRequest
 	 */
@@ -209,7 +209,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Removes a set header
 	 *
-	 * @property	{String} key
+	 * @param	{String} key
 	 *
 	 * @return	EventRequest
 	 */
@@ -225,8 +225,8 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @details	If the key does not exist, then return the default value if passed. Defaults to NULL
 	 *
-	 * @property	{String} key
-	 * @property	{String} [defaultValue=null]
+	 * @param	{String} key
+	 * @param	{String} [defaultValue=null]
 	 *
 	 * @return	String
 	 */
@@ -252,7 +252,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Checks if the desired header exists
 	 *
-	 * @property	{String} key
+	 * @param	{String} key
 	 *
 	 * @return	Boolean
 	 */
@@ -263,7 +263,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Sets the status code of the response
 	 *
-	 * @property	{Number} code
+	 * @param	{Number} code
 	 *
 	 * @return	EventRequest
 	 */
@@ -276,8 +276,8 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Used to send a redirect response to a given redirectUrl
 	 *
-	 * @property	{String} redirectUrl
-	 * @property	{Number} [statusCode=302]
+	 * @param	{String} redirectUrl
+	 * @param	{Number} [statusCode=302]
 	 *
 	 * @return	void
 	 */
@@ -305,7 +305,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Sets the current execution block
 	 *
-	 * @property	{Array} block
+	 * @param	{Array} block
 	 *
 	 * @return	void
 	 */
@@ -320,8 +320,8 @@ class EventRequest extends EventEmitter {
 	 * 			if the event is stopped and the response has not been set then send a server error
 	 * 			This function is wrapped by the next() function
 	 *
-	 * @property	{*} err
-	 * @property	{Number} code
+	 * @param	{*} err
+	 * @param	{Number} code
 	 *
 	 * @return	void
 	 */
@@ -364,7 +364,7 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @details	By default handleError is asynchronous
 	 *
-	 * @property	{Array} args
+	 * @param	{Array} args
 	 *
 	 * @return	void
 	 */

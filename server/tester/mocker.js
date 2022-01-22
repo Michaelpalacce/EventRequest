@@ -64,7 +64,7 @@ class Mocker {
 	/**
 	 * @brief	Assert whether correct with arguments are passed
 	 *
-	 * @property	{Array} args
+	 * @param	{Array} args
 	 *
 	 * @return	void
 	 */
@@ -128,7 +128,7 @@ class Mocker {
 	/**
 	 * @brief	Gets the next function to execute
 	 *
-	 * @property	{Array} args
+	 * @param	{Array} args
 	 *
 	 * @return	mixed
 	 */

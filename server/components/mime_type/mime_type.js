@@ -5,12 +5,13 @@ const data	= require( './mime_types_data' );
  */
 module.exports	= {
 	/**
-	 * Gets a mime type by the extension
-	 * If getFirst is passed, then the first mime type is returned ( in case where there may be more than one mime type per extension ),
-	 * otherwise an array is returned
+	 * @brief	Gets a mime type by the extension
 	 *
-	 * @property	{String} extension
-	 * @property	{Boolean} getFirst
+	 * @details	If getFirst is passed, then the first mime type is returned ( in case where there may be more than
+	 * 				one mime type per extension ),otherwise an array is returned
+	 *
+	 * @param	{String} extension
+	 * @param	{Boolean} getFirst
 	 *
 	 * @return	{Array|String}
 	 */
@@ -19,9 +20,9 @@ module.exports	= {
 	},
 
 	/**
-	 * Searches for an extension given the mimeType
+	 * @brief	Searches for an extension given the mimeType
 	 *
-	 * @property	{String} mimeType
+	 * @param	{String} mimeType
 	 *
 	 * @return	{null|String}
 	 */

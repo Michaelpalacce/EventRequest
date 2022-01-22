@@ -8,21 +8,13 @@ const { makeId }	= require( '../helpers/unique_id' );
  */
 class Bucket {
 	/**
-	 * @details	Refill Amount is how many tokens to refill after the refillTime
-	 * 			Refill Time is how often tokens should be renewed
-	 * 			Max Amount is the max amount of tokens to be kept
-	 * 			The given data store will be used, if none given an in memory one will be used
-	 * 			Prefix will be used to prefix all keys in the datastore
-	 * 			key should be passed if this Bucket wants to connect to another one in the datastore or you want to specify your own key
-	 * 			dataStoreRefetchInterval will be how often to retry the dataStore in ms, should be 1 or 2 but may be increased if the dataStore can't handle the traffice
-	 *
-	 * @property	{Number} [refillAmount=100]
-	 * @property	{Number} [refillTime=60]
-	 * @property	{Number} [maxAmount=1000]
-	 * @property	{String} [prefix=Bucket.DEFAULT_PREFIX]
-	 * @property	{String} [key=null]
-	 * @property	{DataServer} [dataStore=null]
-	 * @property	{Number} [dataStoreRefetchInterval=1]
+	 * @param	{Number} [refillAmount=100]				- Refill Amount is how many tokens to refill after the refillTime
+	 * @param	{Number} [refillTime=60]				- Refill Time is how often tokens should be renewed
+	 * @param	{Number} [maxAmount=1000]				- Max Amount is the max amount of tokens to be kept
+	 * @param	{String} [prefix=Bucket.DEFAULT_PREFIX]	- Prefix will be used to prefix all keys in the datastore
+	 * @param	{String} [key=null]						- Key should be passed if this Bucket wants to connect to another one in the datastore or you want to specify your own key
+	 * @param	{DataServer} [dataStore=null]			- The given data store will be used, if none given an in memory one will be used
+	 * @param	{Number} [dataStoreRefetchInterval=1]	- dataStoreRefetchInterval will be how often to retry the dataStore in ms, should be 1 or 2 but may be increased if the dataStore can't handle the traffice
 	 */
 	constructor(
 		refillAmount = 100,
@@ -72,9 +64,7 @@ class Bucket {
 	/**
 	 * @brief	Handles promise errors
 	 *
-	 * @property	{Error} error
-	 *
-	 * @return	void
+	 * @param	{Error} error
 	 */
 	handleError( error ) {
 		setImmediate(() => {
@@ -85,7 +75,9 @@ class Bucket {
 	/**
 	 * @brief	Creates a unique key that is not present in the data store
 	 *
-	 * @return	String
+	 * @private
+	 *
+	 * @return	{String}
 	 */
 	async _getUniqueKey() {
 		let key		= null;
@@ -102,7 +94,9 @@ class Bucket {
 	/**
 	 * @brief	Gets the current value
 	 *
-	 * @return	Number
+	 * @private
+	 *
+	 * @return	{Number}
 	 */
 	async _getValue() {
 		const result	= await this.dataStore.get( `${this.key}//value` ).catch( this.handleError );
@@ -118,9 +112,9 @@ class Bucket {
 	/**
 	 * @brief	Sets the value
 	 *
-	 * @property	{Number} value
+	 * @private
 	 *
-	 * @return	void
+	 * @param	{Number} value
 	 */
 	async _setValue( value ) {
 		await this.dataStore.set( `${this.key}//value`, value ).catch( this.handleError );
@@ -129,7 +123,9 @@ class Bucket {
 	/**
 	 * @brief	Gets the current value
 	 *
-	 * @return	Promise
+	 * @private
+	 *
+	 * @return	{Promise}
 	 */
 	async _getLastUpdate() {
 		const result	= await this.dataStore.get( `${this.key}//lastUpdate` ).catch( this.handleError );
@@ -146,9 +142,9 @@ class Bucket {
 	/**
 	 * @brief	Sets the lastUpdate
 	 *
-	 * @property	{Number} lastUpdate
+	 * @private
 	 *
-	 * @return	void
+	 * @param	{Number} lastUpdate
 	 */
 	async _setLastUpdate( lastUpdate ) {
 		await this.dataStore.set( `${this.key}//lastUpdate`, lastUpdate ).catch( this.handleError );
@@ -157,7 +153,7 @@ class Bucket {
 	/**
 	 * @brief	Resets the value to the maximum available tokens
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async reset() {
 		await this._setValue( this.maxAmount ).catch( this.handleError );
@@ -167,7 +163,9 @@ class Bucket {
 	/**
 	 * @brief	Fetches new data from the DataStore
 	 *
-	 * @return	Object
+	 * @private
+	 *
+	 * @return	{Object}
 	 */
 	async _fetchData() {
 		const lastUpdate	= parseInt( await this._getLastUpdate().catch( this.handleError ) );
@@ -179,7 +177,9 @@ class Bucket {
 	/**
 	 * @brief	Lock the execution
 	 *
-	 * @return	Promise
+	 * @private
+	 *
+	 * @return	{Promise}
 	 */
 	_lock() {
 		return new Promise( async ( resolve, reject ) => {
@@ -190,11 +190,12 @@ class Bucket {
 	/**
 	 * @brief	Implement a locking mechanism
 	 *
-	 * @property	{Function} resolve
-	 * @property	{Function} reject
-	 * @property	{Number} counter
+	 * @private
+	 * @param	{Function} resolve
+	 * @param	{Function} reject
+	 * @param	{Number} counter
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async _doLock( resolve, reject, counter = 0 ) {
 		const result	= await this.dataStore.lock( `${this.key}//lock` ).catch( this.handleError );
@@ -215,7 +216,9 @@ class Bucket {
 	/**
 	 * @brief	Unlocks the given key
 	 *
-	 * @return	Promise
+	 * @private
+	 *
+	 * @return	{Promise}
 	 */
 	async _unlock() {
 		await this.dataStore.unlock( `${this.key}//lock` ).catch( this.handleError );
@@ -224,11 +227,12 @@ class Bucket {
 	/**
 	 * @brief	Gets the current available tokens
 	 *
+	 * @private
 	 * @details	The data does not need to be passed ( it is passed from the reduce function to reduce calls to the data store )
 	 *
-	 * @property	{Object} data
+	 * @param	{Object} [data=null]
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async get( data = null ) {
 		if ( data === null )
@@ -243,9 +247,9 @@ class Bucket {
 	 *
 	 * @details	Resolves to true if there are tokens left otherwise, rejects to false
 	 *
-	 * @property	{Number} [tokens=1]
+	 * @param	{Number} [tokens=1]
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	async reduce( tokens = 1 ) {
 		const lockHandle	= await this._lock().catch( this.handleError );
@@ -274,9 +278,9 @@ class Bucket {
 	/**
 	 * @brief	How much should be refilled given the last update
 	 *
-	 * @property	{Number} lastUpdate
+	 * @param	{Number} lastUpdate
 	 *
-	 * @return	Number
+	 * @return	{Number}
 	 */
 	_refillCount( lastUpdate ) {
 		return Math.floor( ( this._getCurrentTime() - lastUpdate ) / this.refillTime );
@@ -285,7 +289,7 @@ class Bucket {
 	/**
 	 * @brief	Checks if the bucket has all tokens available
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	async isFull() {
 		return await this.get() === this.maxAmount;
@@ -294,7 +298,7 @@ class Bucket {
 	/**
 	 * @brief	Gets the current timestamp in seconds
 	 *
-	 * @return	Number
+	 * @return	{Number}
 	 */
 	_getCurrentTime() {
 		return Date.now();

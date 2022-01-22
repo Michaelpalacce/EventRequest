@@ -38,17 +38,17 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Configures the DataServer.
+	 * @brief	Configures the DataServer.
 	 *
-	 * @details		This is intentionally separated from the constructor so that it could be overwritten in any other implementations of the caching.
+	 * @details	This is intentionally separated from the constructor so that it could be overwritten in any other implementations of the caching.
 	 *
 	 * @private
-	 * @property	{Object} options
-	 * @property	{Number} options.defaultTtl			- Default time to live for resources set to the data server
-	 * @property	{String} options.persistPath		- Path to persist the data
-	 * @property	{Number} options.persistInterval	- Time in seconds to persist data
-	 * @property	{Number} options.gcInterval			- Time in seconds to garbage collect data in the DataServer
-	 * @property	{Number} options.persist			- Flag whether data should be persisted
+	 * @param	{Object} options
+	 * @param	{Number} options.defaultTtl			- Default time to live for resources set to the data server
+	 * @param	{String} options.persistPath		- Path to persist the data
+	 * @param	{Number} options.persistInterval	- Time in seconds to persist data
+	 * @param	{Number} options.gcInterval			- Time in seconds to garbage collect data in the DataServer
+	 * @param	{Boolean} options.persist			- Flag whether data should be persisted
 	 */
 	_configure( options ) {
 		this.defaultTtl			= typeof options.ttl === 'number'
@@ -131,13 +131,13 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Gets the value from the server
+	 * @brief	Gets the value from the server
 	 *
 	 * @async
-	 * @property	{String} key
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async get( key, options = {} ) {
 		if ( typeof key !== 'string' || typeof options !== 'object' )
@@ -147,12 +147,12 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Any operations with the data server should reject if the data server is not responding
+	 * @brief	Any operations with the data server should reject if the data server is not responding
 	 *
-	 * @private
-	 * @property	{*} [returnValue=null]
+	 * @protected
+	 * @param	{*} [returnValue=null]
 	 *
-	 * @return		{*}
+	 * @return	{*}
 	 */
 	_handleServerDown( returnValue = null ) {
 		const error	= 'The data server is not responding';
@@ -164,16 +164,16 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Gets the data
+	 * @brief	Gets the data
 	 *
-	 * @details		Prunes the data if it is expired
+	 * @details	Prunes the data if it is expired
 	 *
 	 * @private
 	 * @async
-	 * @property	{String} key
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async _get( key, options = {} ) {
 		return new Promise( async ( resolve ) => {
@@ -187,15 +187,15 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Sets the value to the data server
+	 * @brief	Sets the value to the data server
 	 *
 	 * @async
-	 * @property	{String} key
-	 * @property	{*} value
-	 * @property	{Number} [ttl=0]
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{*} value
+	 * @param	{Number} [ttl=0]
+	 * @param	{Object} [options={}]
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async set( key, value, ttl = 0, options = {} ) {
 		if (
@@ -212,18 +212,18 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Sets the data
+	 * @brief	Sets the data
 	 *
-	 * @details		Resolves the data if it was correctly set, otherwise resolves to null
+	 * @details	Resolves the data if it was correctly set, otherwise resolves to null
 	 *
 	 * @private
 	 * @async
-	 * @property	{String} key
-	 * @property	{*} value
-	 * @property	{Number} ttl
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{*} value
+	 * @param	{Number} ttl
+	 * @param	{Object} options
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async _set( key, value, ttl, options ) {
 		return new Promise(( resolve ) => {
@@ -237,14 +237,14 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Increment a numeric key value
+	 * @brief	Increment a numeric key value
 	 *
 	 * @async
-	 * @property	{String} key
-	 * @property	{Number} [value=1]
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{Number} [value=1]
+	 * @param	{Object} [options={}]
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async increment( key, value = 1, options = {} ) {
 		if (
@@ -259,17 +259,17 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Increment a numeric key value
+	 * @brief	Increment a numeric key value
 	 *
-	 * @details		Does no async operations intentionally
+	 * @details	Does no async operations intentionally
 	 *
 	 * @async
 	 * @private
-	 * @property	{String} key
-	 * @property	{Number} value
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{Number} value
+	 * @param	{Object} options
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async _increment( key, value, options ) {
 		return new Promise( async ( resolve, reject ) => {
@@ -291,14 +291,14 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Decrements a numeric key value
+	 * @brief	Decrements a numeric key value
 	 *
 	 * @async
-	 * @property	{String} key
-	 * @property	{Number} [value=1]
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{Number} [value=1]
+	 * @param	{Object} [options={}]
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async decrement( key, value = 1, options = {} ) {
 		if (
@@ -313,17 +313,17 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Decrements a numeric key value
+	 * @brief	Decrements a numeric key value
 	 *
-	 * @details		Does no async operations intentionally
+	 * @details	Does no async operations intentionally
 	 *
 	 * @async
 	 * @private
-	 * @property	{String} key
-	 * @property	{Number} value
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{Number} value
+	 * @param	{Object} options
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async _decrement( key, value, options ) {
 		return new Promise( async ( resolve, reject ) => {
@@ -345,13 +345,13 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Locking mechanism. Will return a boolean if the lock was ok
+	 * @brief	Locking mechanism. Will return a boolean if the lock was ok
 	 *
 	 * @async
-	 * @property	{String} key
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async lock( key, options = {} ) {
 		if ( typeof key !== 'string' || typeof options !== 'object' )
@@ -361,14 +361,14 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Locking mechanism. Will return a boolean if the lock was ok
+	 * @brief	Locking mechanism. Will return a boolean if the lock was ok
 	 *
 	 * @async
 	 * @private
-	 * @property	{String} key
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
-	 * @return		{Boolean}
+	 * @return	{Boolean}
 	 */
 	async _lock( key, options ) {
 		return new Promise(( resolve ) => {
@@ -385,13 +385,13 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Releases the lock
+	 * @brief	Releases the lock
 	 *
 	 * @async
-	 * @property	{String} key
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async unlock( key, options = {} ) {
 		if ( typeof key !== 'string' || typeof options !== 'object' )
@@ -401,14 +401,14 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Releases the key
+	 * @brief	Releases the key
 	 *
 	 * @async
 	 * @private
-	 * @property	{String} key
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
-	 * @return		{Boolean}
+	 * @return	{Boolean}
 	 */
 	async _unlock( key, options ) {
 		return new Promise(( resolve ) => {
@@ -422,15 +422,15 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Makes a new dataSet from the data
+	 * @brief	Makes a new dataSet from the data
 	 *
 	 * @private
-	 * @property	{String} key
-	 * @property	{*} value
-	 * @property	{Number} ttl
-	 * @property	{Boolean} persist
+	 * @param	{String} key
+	 * @param	{*} value
+	 * @param	{Number} ttl
+	 * @param	{Boolean} persist
 	 *
-	 * @return		{Object}
+	 * @return	{Object}
 	 */
 	_makeDataSet( key, value, ttl, persist ) {
 		const expirationDate	= this._getExpirationDateFromTtl( ttl );
@@ -438,16 +438,16 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Touches the given key
+	 * @brief	Touches the given key
 	 *
-	 * @details		Checks if the arguments are correct
+	 * @details	Checks if the arguments are correct
 	 *
 	 * @async
-	 * @property	{String} key
-	 * @property	{Number} [ttl=0]
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{Number} [ttl=0]
+	 * @param	{Object} [options={}]
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async touch( key, ttl = 0, options = {} ) {
 		if ( typeof key !== 'string' || typeof ttl !== 'number' || typeof options !== 'object' )
@@ -457,15 +457,15 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Touches the key
+	 * @brief	Touches the key
 	 *
 	 * @async
 	 * @private
-	 * @property	{String} key
-	 * @property	{Number} ttl
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{Number} ttl
+	 * @param	{Object} options
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async _touch( key, ttl, options ) {
 		return new Promise( async ( resolve ) => {
@@ -481,14 +481,14 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Removes a key if it is expired, otherwise, return it
+	 * @brief	Removes a key if it is expired, otherwise, return it
 	 *
 	 * @async
 	 * @private
-	 * @property	{String} key
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async _prune( key, options ) {
 		return new Promise( async ( resolve ) => {
@@ -511,15 +511,15 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Completely removes the key from the server
+	 * @brief	Completely removes the key from the server
 	 *
-	 * @details		Returns true on success and false on failure. If the key does not exist, false will be returned
+	 * @details	Returns true on success and false on failure. If the key does not exist, false will be returned
 	 *
 	 * @async
-	 * @property	{String} key
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	async delete( key, options = {} ) {
 		if ( typeof key === 'string' && typeof options === 'object' )
@@ -529,14 +529,14 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Deletes the key from the server
+	 * @brief	Deletes the key from the server
 	 *
 	 * @async
 	 * @private
-	 * @property	{String} key
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	_delete( key, options ) {
 		return new Promise(( resolve ) => {
@@ -650,12 +650,12 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Gets the ttl depending on the values given
+	 * @brief	Gets the ttl depending on the values given
 	 *
 	 * @private
-	 * @property	{Number} [ttl=-1]
+	 * @param	{Number} [ttl=-1]
 	 *
-	 * @return		{Number}
+	 * @return	{Number}
 	 */
 	_getTtl( ttl = -1 ) {
 		if ( ttl === -1 )
@@ -665,12 +665,12 @@ class DataServer extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Gets the expiration date of the record given the ttl
+	 * @brief	Gets the expiration date of the record given the ttl
 	 *
-	 * @private
-	 * @property	{Number} [ttl=-1]
+	 * @protected
+	 * @param	{Number} [ttl=-1]
 	 *
-	 * @return		{Number}
+	 * @return	{Number}
 	 */
 	_getExpirationDateFromTtl( ttl = -1 ) {
 		return new Date().getTime() / 1000 + this._getTtl( ttl );

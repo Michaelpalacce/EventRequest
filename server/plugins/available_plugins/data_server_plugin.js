@@ -32,7 +32,7 @@ class DataServerPlugin extends PluginInterface {
 	/**
 	 * @brief	Uses Duck-Typing to check if the Data Server is a valid data server
 	 *
-	 * @property	{Object} dataServer
+	 * @param	{Object} dataServer
 	 *
 	 * @return {boolean}
 	 */

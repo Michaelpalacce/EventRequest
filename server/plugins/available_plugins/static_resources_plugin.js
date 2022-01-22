@@ -179,8 +179,8 @@ class StaticResourcesPlugin extends PluginInterface {
 	 * Finds a file starting from a dir
 	 * If start Path is a file, then it will be returned directly :)
 	 *
-	 * @property	{String} startPath
-	 * @property	{String} fileToFind
+	 * @param	{String} startPath
+	 * @param	{String} fileToFind
 	 *
 	 * @return	{String|null}
 	 */
@@ -211,8 +211,8 @@ class StaticResourcesPlugin extends PluginInterface {
 	 * Sends a given file.
 	 * Sets the correct Content-Type header as well as the correct status code
 	 *
-	 * @property	{EventRequest} event
-	 * @property	{String} file
+	 * @param	{EventRequest} event
+	 * @param	{String} file
 	 */
 	_sendFile( event, file ) {
 		event.setResponseHeader( 'Content-Type', MimeType.findMimeType( path.extname( file ) ) ).setStatusCode( 200 );

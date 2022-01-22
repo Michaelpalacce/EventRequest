@@ -19,9 +19,9 @@ const DEFAULT_LOG_LEVEL	= LOG_LEVELS.notice;
  */
 class Log {
 	/**
-	 * @property	{*} log
-	 * @property	{Number} level
-	 * @property	{Boolean} isRaw
+	 * @param	{*} log
+	 * @param	{Number} level
+	 * @param	{Boolean} isRaw
 	 */
 	constructor( log, level, isRaw ) {
 		this.level		= 0;
@@ -37,11 +37,9 @@ class Log {
 	/**
 	 * @brief	Processes the given log
 	 *
-	 * @property	{*} [message='']
-	 * @property	{Number} [level=LOG_LEVELS.error]
-	 * @property	{Boolean} [isRaw=false]
-	 *
-	 * @return	void
+	 * @param	{*} [message='']
+	 * @param	{Number} [level=LOG_LEVELS.error]
+	 * @param	{Boolean} [isRaw=false]
 	 */
 	processLog( message = '', level = LOG_LEVELS.error, isRaw = false ) {
 		let logType		= typeof message;
@@ -73,7 +71,7 @@ class Log {
 	/**
 	 * @brief	Gets the log level of the provided log
 	 *
-	 * @return	Number
+	 * @return	{Number}
 	 */
 	getLevel() {
 		return this.level;
@@ -82,7 +80,7 @@ class Log {
 	/**
 	 * @brief	Gets the log message of the provided log
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getMessage() {
 		return this.message;
@@ -91,7 +89,7 @@ class Log {
 	/**
 	 * @brief	Gets the raw log message of the provided log
 	 *
-	 * @return	mixed
+	 * @return	{*}
 	 */
 	getRawMessage() {
 		return this.rawMessage;
@@ -100,7 +98,7 @@ class Log {
 	/**
 	 * @brief	Gets whether this log is attempting to be logged raw
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	getIsRaw() {
 		return this.isRaw;
@@ -109,7 +107,7 @@ class Log {
 	/**
 	 * @brief	Gets the log timestamp of the provided log in UNIX time
 	 *
-	 * @return	Number
+	 * @return	{Number}
 	 */
 	getTimestamp() {
 		return this.timestamp;
@@ -118,16 +116,14 @@ class Log {
 	/**
 	 * @brief	Get the unique id set by the Loggur
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getUniqueId() {
 		return this.uniqueId;
 	}
 
 	/**
-	 * @property	{String} uniqueId
-	 *
-	 * @return	void
+	 * @param	{String} uniqueId
 	 */
 	setUniqueId( uniqueId ) {
 		this.uniqueId	= uniqueId;
@@ -136,7 +132,7 @@ class Log {
 	/**
 	 * @brief	Get the log in a string format
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	toString() {
 		return `{Level: ${this.getLevel()}, Message: ${this.getMessage()}, Time: ${this.getTimestamp()}`;
@@ -145,11 +141,11 @@ class Log {
 	/**
 	 * @brief	Get a new instance of the Log
 	 *
-	 * @property	{*} log
-	 * @property	{Number} level
-	 * @property	{Boolean} isRaw
+	 * @param	{*} log
+	 * @param	{Number} level
+	 * @param	{Boolean} isRaw
 	 *
-	 * @return	Log
+	 * @return	{Log}
 	 */
 	static getInstance( log, level, isRaw ) {
 		if ( log instanceof Log ) {
@@ -165,7 +161,7 @@ class Log {
 	/**
 	 * @brief	Get the current time in UNIX format
 	 *
-	 * @return	Number
+	 * @return	{Number}
 	 */
 	static getUNIXTime() {
 		return Date.now() / 1000;

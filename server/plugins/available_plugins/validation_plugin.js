@@ -7,8 +7,8 @@ const PluginInterface	= require( '../plugin_interface' );
  */
 class ValidationPlugin extends PluginInterface {
 	/**
-	 * @property	{String} pluginId
-	 * @property	{Object} [options={}]
+	 * @param	{String} pluginId
+	 * @param	{Object} [options={}]
 	 */
 	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
@@ -17,7 +17,7 @@ class ValidationPlugin extends PluginInterface {
 	}
 
 	/**
-	 * @property	{Object} options
+	 * @param	{Object} options
 	 */
 	setOptions( options ) {
 		super.setOptions( options );
@@ -34,8 +34,8 @@ class ValidationPlugin extends PluginInterface {
 	 *
 	 * @details	This will merge the result with the properties that are being validated
 	 *
-	 * @property	{Object} validationRules
-	 * @property	{Function} failureCallback
+	 * @param	{Object} validationRules
+	 * @param	{Function} failureCallback
 	 *
 	 * @return	Function
 	 */

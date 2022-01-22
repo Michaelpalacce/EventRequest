@@ -18,15 +18,11 @@ test({
 });
 
 test({
-	message	: 'UniqueId.makeId.with.not.a.number.argument',
+	message	: 'UniqueId.makeId makes a random ID with the correct length defaults to 32',
 	test	: ( done ) => {
-		const idOne	= uniqueId.makeId( 10 );
-		const idTwo	= uniqueId.makeId( 'wrong' );
+		const idOne	= uniqueId.makeId();
 
-		assert.equal( idOne.length, 10 );
-		assert.equal( idTwo.length, 10 );
-		assert.notEqual( idOne, idTwo );
-
+		assert.equal( idOne.length, 32 );
 		done();
 	}
 });

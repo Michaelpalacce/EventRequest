@@ -46,10 +46,10 @@ const ERROR_INVALID_METADATA					= 'app.er.bodyParser.multipart.invalidMetadata'
  */
 class MultipartDataParser extends EventEmitter {
 	/**
-	 * @property	{Object} [options={}]
-	 * @property	{Number} options.maxPayload				- Maximum payload in bytes to parse if set to 0 means infinite
-	 * @property	{String} options.tempDir				- The directory where to keep the uploaded files before moving
-	 * @property	{String} options.cleanUpItemsTimeoutMS	- After what time should the files be deleted if any. Defaults to 100
+	 * @param	{Object} [options={}]
+	 * @param	{Number} options.maxPayload				- Maximum payload in bytes to parse if set to 0 means infinite
+	 * @param	{String} options.tempDir				- The directory where to keep the uploaded files before moving
+	 * @param	{String} options.cleanUpItemsTimeoutMS	- After what time should the files be deleted if any. Defaults to 100
 	 */
 	constructor( options = {} ) {
 		super();
@@ -112,9 +112,9 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Upgrades the given data part and adds it DATA_TYPE_FILE properties
+	 * @brief	Upgrades the given data part and adds it DATA_TYPE_FILE properties
 	 *
-	 * @property	{Object} part
+	 * @param	{Object} part
 	 */
 	upgradeToFileTypePart( part ) {
 		part.file	= null;
@@ -123,9 +123,9 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Upgrades the given data part and adds it DATA_TYPE_PARAMETER properties
+	 * @brief	Upgrades the given data part and adds it DATA_TYPE_PARAMETER properties
 	 *
-	 * @property	{Object} part
+	 * @param	{Object} part
 	 */
 	upgradeToParameterTypePart( part ) {
 		part.type	= DATA_TYPE_PARAMETER;
@@ -172,9 +172,9 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Determines the OS line end and sets it for future use
+	 * @brief	Determines the OS line end and sets it for future use
 	 *
-	 * @property	{Buffer} chunk
+	 * @param	{Buffer} chunk
 	 */
 	determineEOL( chunk ) {
 		const data	= chunk.toString( DEFAULT_BUFFER_ENCODING );
@@ -189,9 +189,9 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Callback called when data is received by the server
+	 * @brief	Callback called when data is received by the server
 	 *
-	 * @property	{Buffer} chunk
+	 * @param	{Buffer} chunk
 	 */
 	onDataReceivedCallback( chunk ) {
 		try {
@@ -203,10 +203,10 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Flushes the given buffer to the part.file stream
+	 * @brief	Flushes the given buffer to the part.file stream
 	 *
-	 * @property	{Object} part
-	 * @property	{Buffer} buffer
+	 * @param	{Object} part
+	 * @param	{Buffer} buffer
 	 */
 	flushBuffer( part, buffer ) {
 		if ( part.type === DATA_TYPE_PARAMETER )
@@ -220,9 +220,9 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Extracts chunk data as they come in
+	 * @brief	Extracts chunk data as they come in
 	 *
-	 * @property	{Buffer} chunk
+	 * @param	{Buffer} chunk
 	 */
 	extractChunkData( chunk ) {
 		let boundaryOffset	= 0;
@@ -390,20 +390,20 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Emits an event with an error
+	 * @brief	Emits an event with an error
 	 *
-	 * @property	{String} message	- The message to throw
+	 * @param	{String} message	- The message to throw
 	 */
 	handleError( message ) {
 		throw new Error( message );
 	}
 
 	/**
-	 * @brief		Return if the current body type is supported by the current body parser
+	 * @brief	Return if the current body type is supported by the current body parser
 	 *
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
-	 * @return		{Boolean}
+	 * @return	{Boolean}
 	 */
 	supports( event ) {
 		const contentType	= event.getRequestHeader( CONTENT_TYPE_HEADER );
@@ -411,13 +411,13 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Get header data from event
+	 * @brief	Get header data from event
 	 *
-	 * @details		Will return false on error
+	 * @details	Will return false on error
 	 *
-	 * @property	{Object} headers	- The headers object to extract the needed headers from
+	 * @param	{Object} headers	- The headers object to extract the needed headers from
 	 *
-	 * @return		{Object|Boolean}
+	 * @return	{Object|Boolean}
 	 */
 	static getHeaderData( headers ) {
 		const contentType	= typeof headers[CONTENT_TYPE_HEADER] === 'string'
@@ -443,12 +443,12 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Parses the body
+	 * @brief	Parses the body
 	 *
 	 * @async
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	parse( event ) {
 		return new Promise(( resolve, reject ) => {
@@ -488,11 +488,11 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Integrity check the event header data and payload length
+	 * @brief	Integrity check the event header data and payload length
 	 *
-	 * @brief		Returns an error and header data in the callback
+	 * @brief	Returns an error and header data in the callback
 	 *
-	 * @property	{Function} callback
+	 * @param	{Function} callback
 	 */
 	integrityCheck( callback ) {
 		let headerData	= MultipartDataParser.getHeaderData( this.event.headers );
@@ -528,12 +528,12 @@ class MultipartDataParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Extracted for testing purposes
+	 * @brief	Extracted for testing purposes
 	 *
 	 * @private
-	 * @details		I can't simulate an error when unlinking so this test is ignored for now
+	 * @details	I can't simulate an error when unlinking so this test is ignored for now
 	 *
-	 * @property	{String} absFilePath	- path of the file to remove
+	 * @param	{String} absFilePath	- path of the file to remove
 	 */
 	_removeFile( absFilePath ) {
 		/* istanbul ignore next */

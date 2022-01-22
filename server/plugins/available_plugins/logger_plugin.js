@@ -17,7 +17,7 @@ class LoggerPlugin extends PluginInterface {
 	/**
 	 * @brief	Attaches a process.log function for easier use
 	 *
-	 * @property	{Server} server
+	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */
@@ -48,7 +48,7 @@ class LoggerPlugin extends PluginInterface {
 	 *
 	 * @details	Events attached: error, on_error, finished, redirect, cleanUp
 	 *
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
 	 * @return	void
 	 */

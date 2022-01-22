@@ -15,9 +15,7 @@ class RouterCache {
 	/**
 	 * @brief	Sets the caching key limit
 	 *
-	 * @property	{Number} [keyLimit=5000]
-	 *
-	 * @return	void
+	 * @param	{Number} [keyLimit=5000]
 	 */
 	setKeyLimit( keyLimit = RouterCache.DEFAULT_KEY_LIMIT ) {
 		this.keyLimit	= keyLimit;
@@ -29,7 +27,7 @@ class RouterCache {
 	 * @details	If the key is nto cached, then null will be returned.
 	 * 			This will trigger a cache clear first
 	 *
-	 * @property	{String} key
+	 * @param	{String} key
 	 *
 	 * @return	{Object|null}
 	 */
@@ -45,11 +43,11 @@ class RouterCache {
 	/**
 	 * @brief	Renews the block's date
 	 *
-	 * @property	{Object} block
+	 * @param	{Object} block
 	 *
 	 * @private
 	 *
-	 * @return	Object
+	 * @return	{Object}
 	 */
 	_renewBlock( block ) {
 		block.date	= Date.now();
@@ -60,9 +58,7 @@ class RouterCache {
 	/**
 	 * @brief	Removes the key if it is set
 	 *
-	 * @property	{String} key
-	 *
-	 * @return	void
+	 * @param	{String} key
 	 */
 	deleteBlock( key ) {
 		delete this._cache[key];
@@ -71,8 +67,8 @@ class RouterCache {
 	/**
 	 * @brief	Sets a block, given a key
 	 *
-	 * @property	{string} key
-	 * @property	{Object} block
+	 * @param	{string} key
+	 * @param	{Object} block
 	 *
 	 * @return	{Object}
 	 */
@@ -86,10 +82,8 @@ class RouterCache {
 	 * @details	ttl is the amount of time in milliseconds a key has to be inactive to be deleted
 	 * 			This function will only attempt to clear once in the given interval of time: debounceInterval
 	 *
-	 * @property	{Number} [ttl=3600000]
-	 * @property	{Number} [debounceInterval=60000]
-	 *
-	 * @return	void
+	 * @param	{Number} [ttl=3600000]
+	 * @param	{Number} [debounceInterval=60000]
 	 */
 	clear( ttl = this.ttl, debounceInterval = this.cacheClearDebounce ) {
 		if ( this.lastClearCacheAttempt + debounceInterval > Date.now() )
@@ -112,7 +106,7 @@ class RouterCache {
 	 *
 	 * @details	If the keyLimit is set to 0 then the cache will have an unlimited size
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	isFull() {
 		if ( this.keyLimit === 0 )

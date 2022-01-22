@@ -7,8 +7,8 @@ module.exports	= {
 	/**
 	 * @brief	Validates the given object and returns validation results for each object property
 	 *
-	 * @property	{Object} validationInput
-	 * @property	{Object} skeleton
+	 * @param	{Object} validationInput
+	 * @param	{Object} skeleton
 	 *
 	 * @return	ValidationResult
 	 */

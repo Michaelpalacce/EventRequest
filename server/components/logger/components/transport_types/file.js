@@ -18,12 +18,10 @@ class File extends Transport {
 	/**
 	 * @brief	Sanitizes the config
 	 *
-	 * @details	Accepted options:
-	 * 			- filePath - String - the location of the file to log to -> if it is not provided the transport will not log
-	 *
-	 * @property	{Object} options
-	 *
-	 * @return	void
+	 * @param	{Object} options
+	 * @param	{String} options.filePath		- The location of the file to log to -> if it is not provided the transport will not log
+	 * @param	{String} options.processors		- Holds an array of processors to apply to the log
+	 * @param	{Function} options.formatter	- Formatter function
 	 */
 	sanitizeConfig( options ) {
 		super.sanitizeConfig( options );
@@ -49,7 +47,7 @@ class File extends Transport {
 	/**
 	 * @brief	Get a new write stream for the given path
 	 *
-	 * @return	WriteStream
+	 * @return	{WriteStream}
 	 */
 	getWriteStream() {
 		const file	= path.parse( this.filePath );
@@ -66,7 +64,7 @@ class File extends Transport {
 	/**
 	 * @brief	Gets the file name with added timestamp
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getFileName() {
 		const file	= path.parse( this.filePath );
@@ -77,7 +75,7 @@ class File extends Transport {
 	/**
 	 * @brief	Gets the beginning of the current day
 	 *
-	 * @return	Number
+	 * @return	{Number}
 	 */
 	getCurrentDayTimestamp() {
 		const now			= new Date();
@@ -88,11 +86,9 @@ class File extends Transport {
 	/**
 	 * @brief	Logs the log in a file
 	 *
-	 * @property	{Array} data
-	 * @property	{Function} resolve
-	 * @property	{Function} reject
-	 *
-	 * @return	void
+	 * @param	{Array} data
+	 * @param	{Function} resolve
+	 * @param	{Function} reject
 	 */
 	_log( data, resolve, reject ) {
 		const writeStream	= this.getWriteStream();

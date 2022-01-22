@@ -9,8 +9,8 @@ class TemplatingEngine {
 	/**
 	 * @brief	Return the HTML directly
 	 *
-	 * @property	{String} html
-	 * @property	{Object} variables
+	 * @param	{String} html
+	 * @param	{Object} variables
 	 *
 	 * @returns	{String}
 	 */
@@ -21,10 +21,10 @@ class TemplatingEngine {
 	/**
 	 * @brief	Reads and renders a html file
 	 *
-	 * @property	{String} templateLocation
-	 * @property	{Object} variables
+	 * @param	{String} templateLocation
+	 * @param	{Object} variables
 	 *
-	 * @return	{Promise<String>}
+	 * @return	{String}
 	 */
 	async renderFile( templateLocation, variables ) {
 		const data	= await readFile( templateLocation );

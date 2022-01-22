@@ -7,8 +7,8 @@
  */
 class PluginInterface {
 	/**
-	 * @property	{String} pluginId
-	 * @property	{Object} [options={}]
+	 * @param	{String} pluginId
+	 * @param	{Object} [options={}]
 	 */
 	constructor( pluginId, options = {} ) {
 		this.options	= options;
@@ -40,7 +40,7 @@ class PluginInterface {
 	 *
 	 * @details	This method should attach to any events dispatched by the server
 	 *
-	 * @property	{Server} server
+	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */
@@ -50,7 +50,7 @@ class PluginInterface {
 	/**
 	 * @brief	Sets new options for the plugin
 	 *
-	 * @property	{Object} options
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */

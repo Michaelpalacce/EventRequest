@@ -29,8 +29,8 @@ class TemplatingEngine extends DefaultTemplatingEngine {
 	/**
 	 * @brief	Renders a template given specific variables
 	 *
-	 * @property	{String} template
-	 * @property	{Object} variables
+	 * @param	{String} template
+	 * @param	{Object} variables
 	 *
 	 * @return	{String}
 	 */
@@ -41,11 +41,9 @@ class TemplatingEngine extends DefaultTemplatingEngine {
 		/**
 		 * @brief	Builder function for the template
 		 *
-		 * @property	line String
-		 * @property	isJs Boolean
-		 * @property	insertDirectly Boolean
-		 *
-		 * @return	void
+		 * @param	{String} line
+		 * @param	{Boolean} isJs
+		 * @param	{Boolean} insertDirectly
 		 */
 		const addCode	= ( line, isJs, insertDirectly = false ) => {
 			if ( isJs ) {

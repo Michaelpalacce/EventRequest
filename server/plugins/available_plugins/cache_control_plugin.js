@@ -16,7 +16,7 @@ class CacheControlPlugin extends PluginInterface {
 	/**
 	 * @brief	Dynamic Middleware that will add a cache header to the current request with the options provided
 	 *
-	 * @property	{Object} [options={}]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	Function
 	 */

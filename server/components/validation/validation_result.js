@@ -7,8 +7,8 @@ const ValidationAttribute	= require( './validation_attribute' );
  */
 class ValidationResult {
 	/**
-	 * @property	{Object} validationInput
-	 * @property	{Object} skeleton
+	 * @param	{Object} validationInput
+	 * @param	{Object} skeleton
 	 */
 	constructor( validationInput, skeleton ) {
 		this.validationInput	= validationInput;
@@ -43,9 +43,9 @@ class ValidationResult {
 	/**
 	 * @brief	Forms the result using recursion
 	 *
-	 * @property	{Object} validationInput
-	 * @property	{Object} skeleton
-	 * @property	{Object} failures
+	 * @param	{Object} validationInput
+	 * @param	{Object} skeleton
+	 * @param	{Object} failures
 	 *
 	 * @private
 	 *
@@ -116,7 +116,7 @@ class ValidationResult {
 	 *
 	 * @details	If $default or $rules are set, that means that the object is an instructional object for the ValidationAttribute
 	 *
-	 * @property	{Object} rules
+	 * @param	{Object} rules
 	 *
 	 * @private
 	 *
@@ -131,7 +131,7 @@ class ValidationResult {
 	 *
 	 * @details	This is done because if we want to validate an array of arrays this is the way that the data is passed to be validated
 	 *
-	 * @property	{*} array
+	 * @param	{*} array
 	 *
 	 * @private
 	 *
@@ -144,7 +144,7 @@ class ValidationResult {
 	/**
 	 * @brief	Sanitizes the failures object to not report any empty properties
 	 *
-	 * @property	{Object} failures
+	 * @param	{Object} failures
 	 *
 	 * @private
 	 *

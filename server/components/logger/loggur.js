@@ -30,8 +30,6 @@ class Loggur {
 
 	/**
 	 * @brief	Enables the default logger
-	 *
-	 * @return	void
 	 */
 	enableDefault() {
 		this.enableDefaultLogger	= true;
@@ -39,8 +37,6 @@ class Loggur {
 
 	/**
 	 * @brief	Disables the default logger
-	 *
-	 * @return	void
 	 */
 	disableDefault() {
 		this.enableDefaultLogger	= false;
@@ -51,10 +47,10 @@ class Loggur {
 	 *
 	 * @details	Configuration for the logger can be passed here and if valid the logger will be created and added
 	 *
-	 * @property	{String} loggerId
-	 * @property	{Logger|Object} [logger={}]
+	 * @param	{String} loggerId
+	 * @param	{Logger|Object} [logger={}]
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	addLogger( loggerId, logger = {} ) {
 		if ( typeof logger === 'object' && ! ( logger instanceof Logger ) )
@@ -73,14 +69,14 @@ class Loggur {
 	 *
 	 * @details	Returns false if the logger is not added
 	 *
-	 * @property	{String} loggerId
+	 * @param	{String} loggerId
 	 *
-	 * @return	Logger|Boolean
+	 * @return	{Logger|null}
 	 */
 	getLogger( loggerId ) {
 		let logger	= this.loggers[loggerId];
 		if ( logger === undefined )
-			return false;
+			return null;
 
 		return logger;
 	}
@@ -88,9 +84,9 @@ class Loggur {
 	/**
 	 * @brief	Create a new logger
 	 *
-	 * @property	{Object} [loggerConfig={}]
+	 * @param	{Object} [loggerConfig={}]
 	 *
-	 * @return	Logger
+	 * @return	{Logger}
 	 */
 	createLogger( loggerConfig = {} ) {
 		return new Logger( loggerConfig, this.uniqueId );
@@ -99,7 +95,7 @@ class Loggur {
 	/**
 	 * @brief	Returns a single instance of the default logger
 	 *
-	 * @return	Logger
+	 * @return	{Logger}
 	 */
 	getDefaultLogger() {
 		if ( this.defaultLogger === null ) {
@@ -115,7 +111,7 @@ class Loggur {
 	/**
 	 * @brief	Logs the data
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	log() {
 		const loggersPromises	= [];
@@ -139,9 +135,7 @@ class Loggur {
 	/**
 	 * @brief	Sets the Log Level of all the attached Loggers
 	 *
-	 * @property	{Number} logLevel
-	 *
-	 * @return	void
+	 * @param	{Number} logLevel
 	 */
 	setLogLevel( logLevel ) {
 		if ( Object.keys( this.loggers ).length !== 0 ) {

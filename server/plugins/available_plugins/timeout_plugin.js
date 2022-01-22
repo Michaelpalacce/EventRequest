@@ -35,8 +35,8 @@ class TimeoutPlugin extends PluginInterface {
 	/**
 	 * @brief	Set a timeout to the eventRequest
 	 *
-	 * @property	{EventRequest} event
-	 * @property	{Number} timeout
+	 * @param	{EventRequest} event
+	 * @param	{Number} timeout
 	 *
 	 * @return	void
 	 */

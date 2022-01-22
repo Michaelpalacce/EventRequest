@@ -32,7 +32,7 @@ class EnvPlugin extends PluginInterface {
 	/**
 	 * @brief	Loads the env variables on runtime
 	 *
-	 * @property	{Server} server
+	 * @param	{Server} server
 	 *
 	 * @return	void
 	 */

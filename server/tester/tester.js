@@ -40,7 +40,7 @@ class Tester {
 	 *
 	 * @details	This is done so we can run the test many times per instance
 	 *
-	 * @property	{Object} options
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */
@@ -119,7 +119,7 @@ class Tester {
 	/**
 	 * @brief	Formats the given test object by adding needed internal fields
 	 *
-	 * @property	{Object} test
+	 * @param	{Object} test
 	 *
 	 * @return	Array
 	 */
@@ -175,7 +175,7 @@ class Tester {
 	/**
 	 * @brief	Adds the given test to the queue
 	 *
-	 * @property	{Object} test
+	 * @param	{Object} test
 	 *
 	 * @return	void
 	 */
@@ -199,8 +199,8 @@ class Tester {
 	/**
 	 * @brief	Called if there is an error in the test
 	 *
-	 * @property	{Object} test
-	 * @property	{*} error
+	 * @param	{Object} test
+	 * @param	{*} error
 	 */
 	errorCallback( test, error ) {
 		if ( error instanceof Error ) {
@@ -248,8 +248,8 @@ class Tester {
 	/**
 	 * @brief	Called by the done function of the tests
 	 *
-	 * @property	{Object} test
-	 * @property	{*} err
+	 * @param	{Object} test
+	 * @param	{*} err
 	 *
 	 * @return	void
 	 */
@@ -269,7 +269,7 @@ class Tester {
 	/**
 	 * @brief	Checks the given test's status and determines what should happen
 	 *
-	 * @property	{Object} test
+	 * @param	{Object} test
 	 *
 	 * @return	Boolean
 	 */
@@ -349,7 +349,7 @@ class Tester {
 	 *
 	 * @details	This will produce an output directly to the console of the user
 	 *
-	 * @property	{Object} options
+	 * @param	{Object} options
 	 *
 	 * @return	void
 	 */

@@ -10,7 +10,7 @@ class FileStreamHandlerPlugin extends PluginInterface {
 	/**
 	 * @brief	Attaches the function stream file to the event
 	 *
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
 	 * @return	void
 	 */
@@ -20,8 +20,8 @@ class FileStreamHandlerPlugin extends PluginInterface {
 		 *
 		 * @details	The file must be the absolute path to the file to be streamed
 		 *
-		 * @property	{String} file
-		 * @property	{Object} [options={}]
+		 * @param	{String} file
+		 * @param	{Object} [options={}]
 		 *
 		 * @return	ReadStream|null
 		 */
@@ -39,9 +39,9 @@ class FileStreamHandlerPlugin extends PluginInterface {
 		 *
 		 * @details	The file must be the absolute path to the file to be streamed
 		 *
-		 * @property	{String} file
-		 * @property	{Object} [options={}]
-		 * @property	{Function} [errCallback=null]
+		 * @param	{String} file
+		 * @param	{Object} [options={}]
+		 * @param	{Function} [errCallback=null]
 		 *
 		 * @return	void
 		 */

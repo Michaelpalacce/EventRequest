@@ -16,9 +16,9 @@ const RESET		= '\u001b[0m';
 /**
  * @brief	Colorize the logs
  *
- * @property	{String} log
+ * @param	{String} log
  *
- * @return	String
+ * @return	{String}
  */
 colorize.red		= ( log ) => { return RED + log + RESET; };
 colorize.black		= ( log ) => { return BLACK + log + RESET; };

@@ -15,8 +15,8 @@ const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
  */
 class Logger {
 	/**
-	 * @property	{Object} [options={}]
-	 * @property	{Boolean} [uniqueId=null]
+	 * @param	{Object} [options={}]
+	 * @param	{Boolean} [uniqueId=null]
 	 */
 	constructor( options = {}, uniqueId = null ) {
 		if ( typeof uniqueId !== 'string' )
@@ -33,20 +33,18 @@ class Logger {
 	/**
 	 * @brief	Sanitize the loggers config
 	 *
-	 * @details	Accepted options:
-	 * 			- serverName - String - The name of the server to be concatenated with the uniqueId - Defaults to empty
-	 * 			- transports - Array - Array of the transports to be added to the logger - Defaults to empty
-	 * 			- logLevel - Number - The log severity level -> Defaults to error
-	 * 			- logLevels - Object - JSON object with all the log severity levels and their values
-	 * 						All added log levels will be attached to the instance of the logger class -> Defaults to LOG_LEVELS
-	 * 			- capture - Boolean - Whether to attach event listeners for process.on
-	 * 						uncaughtException and unhandledRejection - Defaults to false
-	 * 			- dieOnCapture - Boolean - If the process should exit in case of a caught exception -> Defaults to true
-	 * 			- unhandledExceptionLevel - Number - What level should the unhandled exceptions be logged at -> Defaults to error
-	 *
-	 * @property	{Object} options
-	 *
-	 * @return	void
+	 * @param	{Object} options
+	 * @param	{String} [options.serverName=""]				- The name of the server to be concatenated with the uniqueId
+	 * @param	{Array} [options.transports=[]]					- Array of the transports to be added to the logger
+	 * @param	{Number} [options.logLevel=LOG_LEVELS.error]	- The log severity level
+	 * @param	{Object} [options.logLevels=LOG_LEVELS]			- JSON object with all the log severity levels and their values
+	 * 																	All added log levels will be attached to the instance
+	 * 																	of the logger class
+	 * @param	{Boolean} [options.capture=false]				- Whether to attach event listeners for process.on
+	 * 																	uncaughtException and unhandledRejection
+	 * @param	{Boolean} [options.dieOnCapture=true]			- If the process should exit in case of a caught exception
+	 * @param	{Number} [options.unhandledExceptionLevel=LOG_LEVELS.error]
+	 * 																- What level should the unhandled exceptions be logged at
 	 */
 	sanitizeConfig( options ) {
 		this.serverName					= typeof options.serverName === 'string'
@@ -90,9 +88,7 @@ class Logger {
 	/**
 	 * @brief	Sets the Log Level of the Logger
 	 *
-	 * @property	{Number} logLevel
-	 *
-	 * @return	void
+	 * @param	{Number} logLevel
 	 */
 	setLogLevel( logLevel ) {
 		this.logLevel	= logLevel;
@@ -103,8 +99,6 @@ class Logger {
 	 *
 	 * @details	If capture is set to true only. If dieOnCapture is set to false the process won't die but this is
 	 * 			not recommended
-	 *
-	 * @return	void
 	 */
 	/* istanbul ignore next */
 	attachUnhandledEventListener() {
@@ -137,8 +131,6 @@ class Logger {
 
 	/**
 	 * @brief	Attach the provided log levels to the logger for convenience
-	 *
-	 * @return	void
 	 */
 	attachLogLevelsToLogger() {
 		for ( let key in this.logLevels ) {
@@ -160,11 +152,11 @@ class Logger {
 	}
 
 	/**
-	 * @brief	Add a transport to the logger
+	 * @brief	Add transport to the logger
 	 *
-	 * @property	{*} transport
+	 * @param	{*} transport
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	addTransport( transport ) {
 		if ( transport instanceof Transport ) {
@@ -180,7 +172,7 @@ class Logger {
 	 *
 	 * @brief	{*} log
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	supports( log ) {
 		if ( ! ( log instanceof Log ) )
@@ -192,7 +184,7 @@ class Logger {
 	/**
 	 * @brief	Returns a unique id to be set in the log
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getUniqueId() {
 		return typeof this.serverName === 'string'
@@ -203,11 +195,11 @@ class Logger {
 	/**
 	 * @brief	Logs the given data
 	 *
-	 * @property	{*} log
-	 * @property	{Number} [level=null]
-	 * @property	{Boolean} [isRaw=false]
+	 * @param	{*} log
+	 * @param	{Number} [level=null]
+	 * @param	{Boolean} [isRaw=false]
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	log( log, level = null, isRaw = false ) {
 		log				= Log.getInstance( log, level, isRaw );

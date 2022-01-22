@@ -53,9 +53,7 @@ class ContentSecurityPolicy {
 	/**
 	 * @brief	Parses the given options and sets the different directives in keys
 	 *
-	 * @property	{Object} options
-	 *
-	 * @return	void
+	 * @param	{Object} options
 	 */
 	parseOptions( options ) {
 		this.setEnabled( options['enabled'] );
@@ -95,8 +93,6 @@ class ContentSecurityPolicy {
 
 	/**
 	 * @brief	Enables xss protection
-	 *
-	 * @return	void
 	 */
 	xss() {
 		this.addDefaultSrc( 'none' );
@@ -115,9 +111,7 @@ class ContentSecurityPolicy {
 	}
 
 	/**
-	 * @property	{String} mimeType
-	 *
-	 * @return	void
+	 * @param	{String} mimeType
 	 */
 	allowPluginType( mimeType ) {
 		if ( MIME_TYPE_REGEXP.test( mimeType ) )
@@ -127,9 +121,7 @@ class ContentSecurityPolicy {
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @property	{Boolean} [enabled=true]
-	 *
-	 * @return	void
+	 * @param	{Boolean} [enabled=true]
 	 */
 	setEnabled( enabled = true ) {
 		this.enabled	= typeof enabled === 'boolean' ? enabled : true;
@@ -138,7 +130,7 @@ class ContentSecurityPolicy {
 	/**
 	 * @brief	Gets the header according to whether CSP is set to report only
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getHeader() {
 		return this.reportOnly ? REPORT_ONLY_HEADER_NAME : HEADER_NAME;
@@ -147,9 +139,7 @@ class ContentSecurityPolicy {
 	/**
 	 * @brief	Sets the header to be in report only mode
 	 *
-	 * @property	{String} uri
-	 *
-	 * @return	void
+	 * @param	{String} uri
 	 */
 	setReportOnly( uri ) {
 		if ( typeof uri !== 'string' || uri === '' )
@@ -165,9 +155,7 @@ class ContentSecurityPolicy {
 	 *
 	 * @details	The report-uri header won't be added for you, you have to specify that yourself
 	 *
-	 * @property	{String} uri
-	 *
-	 * @return	void
+	 * @param	{String} uri
 	 */
 	setReportOnlyWithReportTo( uri ) {
 		if ( typeof uri !== 'string' || uri === '' )
@@ -179,95 +167,77 @@ class ContentSecurityPolicy {
 	}
 
 	/**
-	 * @return	void
+	 * @brief	Adds sandbox directive
 	 */
 	enableSandbox() {
 		this._addDirective( SANDBOX_KEY );
 	}
 
 	/**
-	 * @return	void
+	 * @brief	Adds upgrade insecure requests directive
 	 */
 	upgradeInsecureRequests() {
 		this._addDirective( UPGRADE_INSECURE_REQUESTS_JEY );
 	}
 
 	/**
-	 * @property	{String} value
-	 *
-	 * @return	void
+	 * @param	{String} value
 	 */
 	allowSandboxValue( value ) {
 		this._addDirective( SANDBOX_KEY, value );
 	}
 
 	/**
-	 * @property	{String} uri
-	 *
-	 * @return	void
+	 * @param	{String} uri
 	 */
 	addBaseUri( uri ) {
 		this._addDirective( BASE_URI_KEY, this._decorateFetchDirectiveSource( uri ) );
 	}
 
 	/**
-	 * @property	{String} uri
-	 *
-	 * @return	void
+	 * @param	{String} uri
 	 */
 	restrictFormActionUrl( uri ) {
 		this._addDirective( FORM_ACTION_KEY, this._decorateFetchDirectiveSource( uri ) );
 	}
 
 	/**
-	 * @property	{String} uri
-	 *
-	 * @return	void
+	 * @param	{String} uri
 	 */
 	addFrameAncestors( uri ) {
 		this._addDirective( FRAME_ANCESTORS_KEY, this._decorateFetchDirectiveSource( uri ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addScriptSrc( source ) {
 		this._addDirective( SCRIPT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addImgSrc( source ) {
 		this._addDirective( IMAGE_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addChildSrc( source ) {
 		this._addDirective( CHILD_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addConnectSrc( source ) {
 		this._addDirective( CONNECT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addDefaultSrc( source ) {
 		this._addDirective( DEFAULT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
@@ -275,62 +245,48 @@ class ContentSecurityPolicy {
 
 	/**
 	 * @brief	Enables all src for self only
-	 *
-	 * @return	void
 	 */
 	enableSelf() {
 		this._addDirective( DEFAULT_SRC_KEY, "'self'" );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addFontSrc( source ) {
 		this._addDirective( FONT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addFrameSrc( source ) {
 		this._addDirective( FRAME_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addManifestSrc( source ) {
 		this._addDirective( MANIFEST_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addMediaSrc( source ) {
 		this._addDirective( MEDIA_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addObjectSrc( source ) {
 		this._addDirective( OBJECT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @property	{String} source
-	 *
-	 * @return	void
+	 * @param	{String} source
 	 */
 	addStyleSrc( source ) {
 		this._addDirective( STYLE_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
@@ -339,7 +295,7 @@ class ContentSecurityPolicy {
 	/**
 	 * @brief	Builds the CSP header
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	build() {
 		if ( ! this.enabled )
@@ -376,9 +332,9 @@ class ContentSecurityPolicy {
 	 *
 	 * @details	Adds quotes when needed
 	 *
-	 * @property	{String} source
+	 * @param	{String} source
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	_decorateFetchDirectiveSource( source ) {
 		if ( DIRECTIVES_SPECIAL_ARGUMENTS.includes( source ) )
@@ -390,10 +346,8 @@ class ContentSecurityPolicy {
 	/**
 	 * @brief	Adds a new directive
 	 *
-	 * @property	{String} directive
-	 * @property	{String} [value='']
-	 *
-	 * @return	void
+	 * @param	{String} directive
+	 * @param	{String} [value='']
 	 */
 	_addDirective( directive, value = '' ) {
 		if ( typeof this.directives[directive] === 'undefined' )

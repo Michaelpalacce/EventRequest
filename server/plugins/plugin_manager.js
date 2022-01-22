@@ -11,7 +11,7 @@ class PluginManager {
 	/**
 	 * @brief	Adds a plugin to the Manager
 	 *
-	 * @property	{PluginInterface} plugin
+	 * @param	{PluginInterface} plugin
 	 *
 	 * @return	void
 	 */
@@ -25,7 +25,7 @@ class PluginManager {
 	/**
 	 * @brief	Checks whether the given plugin id corresponds to a plugin added to the manager
 	 *
-	 * @property	{String} id
+	 * @param	{String} id
 	 *
 	 * @return	Boolean
 	 */
@@ -36,7 +36,7 @@ class PluginManager {
 	/**
 	 * @brief	Removes a plugin by id
 	 *
-	 * @property	{String} id
+	 * @param	{String} id
 	 *
 	 * @return	void
 	 */
@@ -56,7 +56,7 @@ class PluginManager {
 	/**
 	 * @brief	Returns if the given plugin is a valid plugin interface
 	 *
-	 * @property	{PluginInterface|Object} plugin
+	 * @param	{PluginInterface|Object} plugin
 	 *
 	 * @return	Boolean
 	 */
@@ -71,7 +71,7 @@ class PluginManager {
 	/**
 	 * @brief	Gets a plugin given an id
 	 *
-	 * @property	{String} id
+	 * @param	{String} id
 	 *
 	 * @return	PluginInterface
 	 */

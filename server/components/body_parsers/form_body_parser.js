@@ -15,9 +15,9 @@ const CONTENT_TYPE_HEADER			= 'content-type';
  */
 class FormBodyParser extends EventEmitter {
 	/**
-	 * @property	{Object} options
-	 * @property	{Number} options.maxPayloadLength - The max size of the body to be parsed
-	 * @property	{Boolean} options.strict - Whether the received payload must match the content-length
+	 * @param	{Object} options
+	 * @param	{Number} options.maxPayloadLength - The max size of the body to be parsed
+	 * @param	{Boolean} options.strict - Whether the received payload must match the content-length
 	 */
 	constructor( options = {} ) {
 		super();
@@ -34,11 +34,11 @@ class FormBodyParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Returns true if the current body parser supports teh given request
+	 * @brief	Returns true if the current body parser supports teh given request
 	 *
-	 * @property	{EventRequest} event	- The current EventRequest
+	 * @param	{EventRequest} event	- The current EventRequest
 	 *
-	 * @return		{Boolean}				- Returns Boolean if the `content-type` is supported
+	 * @return	{Boolean}				- Returns Boolean if the `content-type` is supported
 	 */
 	supports( event ) {
 		const contentType	= event.getRequestHeader( CONTENT_TYPE_HEADER );
@@ -46,12 +46,12 @@ class FormBodyParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Parses the request
+	 * @brief	Parses the request
 	 *
 	 * @async
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
-	 * @return		{Promise<Object>}
+	 * @return	{Promise<Object>}
 	 */
 	parse( event ) {
 		return new Promise(( resolve, reject ) => {

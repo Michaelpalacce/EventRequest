@@ -83,9 +83,9 @@ class ValidationAttribute {
 	/**
 	 * @brief	Validates each rule separately
 	 *
-	 * @property	{String} rule
-	 * @property	{Number} index
-	 * @property	{Object} params
+	 * @param	{String} rule
+	 * @param	{Number} index
+	 * @param	{Object} params
 	 *
 	 * @return	String|Boolean
 	 */
@@ -248,7 +248,7 @@ class ValidationAttribute {
 	/**
 	 * @brief	Splits the rule additionally and returns any params found
 	 *
-	 * @property	{String} rule
+	 * @param	{String} rule
 	 *
 	 * @return	Object
 	 */

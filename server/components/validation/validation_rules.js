@@ -6,7 +6,7 @@ let assert	= {};
 /**
  * @brief	Gets the type of the value
  *
- * @property	{*} value
+ * @param	{*} value
  *
  * @return	String
  */
@@ -17,7 +17,7 @@ function getType( value ) {
 /**
  * @brief	Gets the array of the value
  *
- * @property	{*} value
+ * @param	{*} value
  *
  * @return	Number
  */
@@ -48,8 +48,8 @@ const EMAIL_REGEX	= /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
 /**
  * @brief	Assert if the two values are equal ignoring type coercion
  *
- * @property	{*} actual
- * @property	{*} expected
+ * @param	{*} actual
+ * @param	{*} expected
  *
  * @return	Boolean
  */
@@ -60,8 +60,8 @@ assert.assertEqual	= ( actual, expected ) => {
 /**
  * @brief	Assert if the two values are equal acknowledges type coercion
  *
- * @property	{*} actual
- * @property	{*} expected
+ * @param	{*} actual
+ * @param	{*} expected
  *
  * @return	Boolean
  */
@@ -72,8 +72,8 @@ assert.assertStrictEqual	= ( actual, expected ) => {
 /**
  * @brief	Assert if the two values are NOT equal ignoring type coercion
  *
- * @property	{*} actual
- * @property	{*} expected
+ * @param	{*} actual
+ * @param	{*} expected
  *
  * @return	Boolean
  */
@@ -84,8 +84,8 @@ assert.assertNotEqual	= ( actual, expected ) => {
 /**
  * @brief	Assert if the two values are NOT equal acknowledges type coercion
  *
- * @property	{*} actual
- * @property	{*} expected
+ * @param	{*} actual
+ * @param	{*} expected
  *
  * @return	Boolean
  */
@@ -96,7 +96,7 @@ assert.assertStrictNotEqual	= ( actual, expected ) => {
 /**
  * @brief	Assert that the given value is a string
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -107,7 +107,7 @@ assert.assertIsString		= ( actual ) => {
 /**
  * @brief	Assert that the given value is NOT a string
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -118,7 +118,7 @@ assert.assertNotString		= ( actual ) => {
 /**
  * @brief	Assert that the given value is a number
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -131,7 +131,7 @@ assert.assertIsNumeric		= ( actual ) => {
 /**
  * @brief	Asserts that the given value is NOT a number
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -142,7 +142,7 @@ assert.assertNotNumeric		= ( actual ) => {
 /**
  * @brief	Asserts that the given value is an array
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -153,7 +153,7 @@ assert.assertIsArray		= ( actual ) => {
 /**
  * @brief	Asserts that the given value is NOT an array
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -166,7 +166,7 @@ assert.assertNotArray		= ( actual ) => {
  *
  * @details	Will check for an empty String, empty Object or empty Array
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -183,7 +183,7 @@ assert.assertIsEmpty		= ( actual ) => {
  *
  * @details	Will check for a non empty String, non empty Object and non empty Array
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -203,7 +203,7 @@ assert.assertNotEmpty		= ( actual ) => {
 /**
  * @brief	Assert that the given value is a Date Object or a value that can be cast to a date
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -214,7 +214,7 @@ assert.assertIsDate			= ( actual ) => {
 /**
  * @brief	Assert that the given value is a Date Object
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -225,7 +225,7 @@ assert.assertIsDateObject	= ( actual ) => {
 /**
  * @brief	Assert that the given value is NOT a Date Object or a value that can be cast to a date
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -236,7 +236,7 @@ assert.assertNotDate		= ( actual ) => {
 /**
  * @brief	Assert that the given value is NOT a Date Object
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -247,8 +247,8 @@ assert.assertNotDateObject	= ( actual ) => {
 /**
  * @brief	Assert that the given value is the given internal type like: string, number, array etc
  *
- * @property	{*} actual
- * @property	{String} internalType
+ * @param	{*} actual
+ * @param	{String} internalType
  *
  * @return	Boolean
  */
@@ -259,8 +259,8 @@ assert.assertIsInternalType	= ( actual, internalType ) => {
 /**
  * @brief	Assert that the given value is NOT the given internal type like: string, number, array etc
  *
- * @property	{*} actual
- * @property	{String} internalType
+ * @param	{*} actual
+ * @param	{String} internalType
  *
  * @return	Boolean
  */
@@ -271,7 +271,7 @@ assert.assertNotInternalType	= ( actual, internalType ) => {
 /**
  * @brief	Asserts that the given value is a valid email address
  *
- * @property	{String} actual
+ * @param	{String} actual
  *
  * @return	Boolean
  */
@@ -282,7 +282,7 @@ assert.assertIsValidEmail		= ( actual ) => {
 /**
  * @brief	Asserts that the given value is NOT a valid email address
  *
- * @property	{String} actual
+ * @param	{String} actual
  *
  * @return	Boolean
  */
@@ -293,8 +293,8 @@ assert.assertNotValidEmail		= ( actual ) => {
 /**
  * @brief	Asserts that the given value is bigger than the given comparator
  *
- * @property	{*} actual
- * @property	{*} comparator
+ * @param	{*} actual
+ * @param	{*} comparator
  *
  * @return	Boolean
  */
@@ -305,8 +305,8 @@ assert.assertBiggerThan			= ( actual, comparator ) => {
 /**
  * @brief	Asserts that the given value is bigger or equal in regards to the given comparator
  *
- * @property	{*} actual
- * @property	{*} comparator
+ * @param	{*} actual
+ * @param	{*} comparator
  *
  * @return	Boolean
  */
@@ -317,8 +317,8 @@ assert.assertBiggerOrEqual		= ( actual, comparator ) => {
 /**
  * @brief	Asserts that the given value is smaller than the given comparator
  *
- * @property	{*} actual
- * @property	{*} comparator
+ * @param	{*} actual
+ * @param	{*} comparator
  *
  * @return	Boolean
  */
@@ -329,8 +329,8 @@ assert.assertSmallerThan		= ( actual, comparator ) => {
 /**
  * @brief	Asserts that the given value is smaller or equal in regards to the given comparator
  *
- * @property	{*} actual
- * @property	{*} comparator
+ * @param	{*} actual
+ * @param	{*} comparator
  *
  * @return	Boolean
  */
@@ -341,7 +341,7 @@ assert.assertSmallerOrEqual		= ( actual, comparator ) => {
 /**
  * @brief	Assert that the given value is a Boolean
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -354,7 +354,7 @@ assert.assertIsBoolean			= ( actual ) => {
 /**
  * @brief	Assert that the given value is NOT a Boolean
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -365,7 +365,7 @@ assert.assertNotBoolean			= ( actual ) => {
 /**
  * @brief	Asserts that the given value is or casts to TRUE
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */
@@ -385,7 +385,7 @@ assert.assertTrue				= ( actual ) => {
 /**
  * @brief	Asserts that the given value is or casts to FALSE
  *
- * @property	{*} actual
+ * @param	{*} actual
  *
  * @return	Boolean
  */

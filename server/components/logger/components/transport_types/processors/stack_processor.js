@@ -1,11 +1,9 @@
 /**
- * @return	Function
+ * @return	{Function}
  */
 module.exports	= () => {
 	/**
 	 * @brief	Replaces the message with the Error stack
-	 *
-	 * @return	void
 	 */
 	return ( context = {} ) => {
 		const propertiesToTest = ['rawMessage', 'message'];

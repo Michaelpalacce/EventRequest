@@ -13,8 +13,8 @@ const IF_MATCH_CONDITIONAL_HEADER_NAME		= 'If-Match';
  */
 class EtagPlugin extends PluginInterface {
 	/**
-	 * @property	{String} pluginId
-	 * @property	{Object} options
+	 * @param	{String} pluginId
+	 * @param	{Object} options
 	 */
 	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
@@ -23,7 +23,7 @@ class EtagPlugin extends PluginInterface {
 	}
 
 	/**
-	 * @property	{Object} options
+	 * @param	{Object} options
 	 */
 	setOptions( options = {} ) {
 		this.strong	= typeof options.strong === 'boolean'
@@ -34,8 +34,8 @@ class EtagPlugin extends PluginInterface {
 	/**
 	 * @brief	Calculates the ETag for a payload
 	 *
-	 * @property	{String|Buffer|Stats} payload
-	 * @property	{Boolean} strong
+	 * @param	{String|Buffer|Stats} payload
+	 * @param	{Boolean} strong
 	 *
 	 * @return	String
 	 */
@@ -58,9 +58,9 @@ class EtagPlugin extends PluginInterface {
 	 *
 	 * @details	This function will calculate
 	 *
-	 * @property	{EventRequest} event
-	 * @property	{String|Buffer|Stats} payload
-	 * @property	{Boolean} strong
+	 * @param	{EventRequest} event
+	 * @param	{String|Buffer|Stats} payload
+	 * @param	{Boolean} strong
 	 *
 	 * @return	Object
 	 */
@@ -100,10 +100,10 @@ class EtagPlugin extends PluginInterface {
 	/**
 	 * @brief	Conditionally sends the request depending on the IF-* conditional headers
 	 *
-	 * @property	{EventRequest} event
-	 * @property	{String|Buffer} payload
-	 * @property	{Number} code
-	 * @property	{Boolean} strong
+	 * @param	{EventRequest} event
+	 * @param	{String|Buffer} payload
+	 * @param	{Number} code
+	 * @param	{Boolean} strong
 	 *
 	 * @return	{void}
 	 */
@@ -164,7 +164,7 @@ class EtagPlugin extends PluginInterface {
 	/**
 	 * @brief	Extracts the conditional headers values
 	 *
-	 * @property	{String} header
+	 * @param	{String} header
 	 *
 	 * @private
 	 *

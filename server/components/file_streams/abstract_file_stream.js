@@ -5,8 +5,8 @@ const path	= require( 'path' );
 
 class AbstractFileStream {
 	/**
-	 * @property	{Array} supportedFormats
-	 * @property	{String} streamType
+	 * @param	{Array} [supportedFormats=[]]
+	 * @param	{String} [streamType='unknown']
 	 */
 	constructor( supportedFormats = [], streamType = 'unknown' ) {
 		this.SUPPORTED_FORMATS	= supportedFormats;
@@ -16,9 +16,9 @@ class AbstractFileStream {
 	/**
 	 * @brief	Check whether the given file is supported by the file stream
 	 *
-	 * @property	{String} file
+	 * @param	{String} file - the file to check if it is supported
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	supports( file ) {
 		const parsedPath	= path.parse( file );
@@ -28,7 +28,7 @@ class AbstractFileStream {
 	/**
 	 * @brief	Gets the type of file this stream supports
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getType() {
 		return this._streamType;

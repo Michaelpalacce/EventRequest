@@ -1,14 +1,11 @@
-
 const os	= require( 'os' );
 
 /**
- * @return	Function
+ * @return	{Function}
  */
 module.exports	= () => {
 	/**
 	 * @brief	Replaces the message with the Error stack
-	 *
-	 * @return	void
 	 */
 	return ( context = {} ) => {
 		if ( typeof context.message === 'string' )

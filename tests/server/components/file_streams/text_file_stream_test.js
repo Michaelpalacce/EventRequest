@@ -10,8 +10,17 @@ const DEFAULT_TEST_FILE			= path.join( __dirname, './fixtures/testFile.txt' );
 test({
 	message	: 'TextFileStream.getFileStream',
 	test	: ( done ) => {
-		const eventRequest	= helpers.getEventRequest( undefined, undefined, undefined );
-		const fileStream	= new TextFileStream();
+		const eventRequest		= helpers.getEventRequest( undefined, undefined, undefined );
+		const fileStream		= new TextFileStream();
+		let mimeType			= null;
+		let expectedMimeType	= "text/plain";
+
+		eventRequest._mock({
+			method			: 'setResponseHeader',
+			shouldReturn	: ( key, value ) => {
+				mimeType	= value;
+			}
+		});
 
 		const stream	= fileStream.getFileStream( eventRequest, DEFAULT_TEST_FILE );
 
@@ -25,6 +34,7 @@ test({
 
 		stream.on( 'end', () => {
 			assert.deepStrictEqual( Buffer.concat( data ).toString(), 'This is a test file. It has a bit of data.' );
+			assert.deepStrictEqual( mimeType, expectedMimeType );
 			done();
 		});
 	}

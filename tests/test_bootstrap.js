@@ -12,8 +12,8 @@ const TEST_ROOT		= path.parse( __dirname ).dir;
  *
  * @details	This action is not recursive and is synchronous
  *
- * @property	String dir
- * @property	Array whiteList
+ * @param	String dir
+ * @param	Array whiteList
  *
  * @return	void
  */

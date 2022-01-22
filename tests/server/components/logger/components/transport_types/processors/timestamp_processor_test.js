@@ -7,7 +7,7 @@ const timestampProcessor	= require( './../../../../../../../server/components/lo
 /**
  * @brief	Gets the timestamp from the Log
  *
- * @property	{Number} timestamp
+ * @param	{Number} timestamp
  *
  * @return	{String}
  */

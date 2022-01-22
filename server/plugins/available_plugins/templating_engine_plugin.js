@@ -25,7 +25,7 @@ class TemplatingEnginePlugin extends PluginInterface {
 	/**
 	 * @brief	Attaches a render function to the event request
 	 *
-	 * @property	{EventRequest} eventRequest
+	 * @param	{EventRequest} eventRequest
 	 *
 	 * @return	void
 	 */
@@ -33,8 +33,8 @@ class TemplatingEnginePlugin extends PluginInterface {
 		/**
 		 * @brief	Renders the template given
 		 *
-		 * @property	{String} templateName
-		 * @property	{Object} variables
+		 * @param	{String} templateName
+		 * @param	{Object} variables
 		 *
 		 * @return	Promise
 		 */
@@ -67,7 +67,7 @@ class TemplatingEnginePlugin extends PluginInterface {
 	 * 				due to the way JS behaves. Consider binding the function to the correct instance before passing:
 	 * 				https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_objects/Function/bind
 	 *
-	 * @property	{Object} options
+	 * @param	{Object} options
 	 */
 	setOptions( options ) {
 		const defaultTemplatingEngine	= new DefaultTemplatingEngine();

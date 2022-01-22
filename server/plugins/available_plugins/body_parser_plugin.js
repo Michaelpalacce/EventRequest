@@ -4,9 +4,9 @@ const PluginInterface	= require( './../plugin_interface' );
 
 class BodyParserPlugin extends PluginInterface {
 	/**
-	 * @property	{JsonBodyParser|MultipartDataParser|RawBodyParser|FormBodyParser} parser
-	 * @property	{String} pluginId
-	 * @property	{Object} [options={}]
+	 * @param	{JsonBodyParser|MultipartDataParser|RawBodyParser|FormBodyParser} parser
+	 * @param	{String} pluginId
+	 * @param	{Object} [options={}]
 	 */
 	constructor( parser, pluginId, options = {} ) {
 		super( pluginId, options );
@@ -20,7 +20,7 @@ class BodyParserPlugin extends PluginInterface {
 	/**
 	 * @brief	Set the parser if given
 	 *
-	 * @property	{Object} [options={}]
+	 * @param	{Object} [options={}]
 	 *
 	 * @return	void
 	 */
