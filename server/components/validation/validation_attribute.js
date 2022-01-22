@@ -121,7 +121,7 @@ class ValidationAttribute {
 				return this.value === false ? false : VALIDATION_ERRORS.weakIsFalse;
 
 			case VALIDATION_ERRORS.numeric: {
-				let result	= assert.assertIsNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.numeric;
+				const result	= assert.assertIsNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.numeric;
 
 				if ( result === false )
 					this.value	= parseInt( this.value );
@@ -140,8 +140,8 @@ class ValidationAttribute {
 			case VALIDATION_ERRORS.filled:
 				return assert.assertNotEmpty( this.value ) ? false : VALIDATION_ERRORS.filled;
 
-			case VALIDATION_ERRORS.range:
-				let range	= params.params[0].split( '-' );
+			case VALIDATION_ERRORS.range: {
+				const range	= params.params[0].split( '-' );
 				valueLength	= assert.getLength( this.value );
 
 				if ( range.length !== 2 || assert.assertIsEmpty( range[0] ) || assert.assertIsEmpty( range[1] ) )
@@ -150,47 +150,52 @@ class ValidationAttribute {
 				return assert.assertBiggerOrEqual( valueLength, Number( range[0] ) ) && assert.assertSmallerOrEqual( valueLength, Number( range[1] ) )
 					? false
 					: VALIDATION_ERRORS.range;
+			}
 
-			case VALIDATION_ERRORS.min:
+			case VALIDATION_ERRORS.min: {
 				valueLength	= assert.getLength( this.value );
-				let min		= params.params[0];
+				const min	= params.params[0];
 
 				if ( params.params.length !== 1 || assert.assertIsEmpty( min ) )
 					return VALIDATION_ERRORS.rules;
 
 				return assert.assertBiggerOrEqual( valueLength, Number( min ) ) ? false : VALIDATION_ERRORS.min;
+			}
 
-			case VALIDATION_ERRORS.max:
+			case VALIDATION_ERRORS.max: {
 				valueLength	= assert.getLength( this.value );
-				let max		= params.params[0];
+				const max	= params.params[0];
 
 				if ( params.params.length !== 1 || assert.assertIsEmpty( max ) )
 					return VALIDATION_ERRORS.rules;
 
 				return assert.assertSmallerOrEqual( valueLength, Number( max ) ) ? false : VALIDATION_ERRORS.max;
+			}
 
 			case VALIDATION_ERRORS.email:
 				return assert.assertIsValidEmail( this.value ) ? false : VALIDATION_ERRORS.email;
 
-			case VALIDATION_ERRORS.isTrue:
-				let isTrueForIsTrueValidation	= assert.assertTrue( this.value );
+			case VALIDATION_ERRORS.isTrue: {
+				const isTrueForIsTrueValidation	= assert.assertTrue( this.value );
 
 				if ( isTrueForIsTrueValidation )
 					this.value	= true;
 
 				return isTrueForIsTrueValidation ? false : VALIDATION_ERRORS.isTrue;
+			}
 
-			case VALIDATION_ERRORS.isFalse:
-				let isFalseForIsFalseValidation	= assert.assertFalse( this.value );
+			case VALIDATION_ERRORS.isFalse: {
+				const isFalseForIsFalseValidation	= assert.assertFalse( this.value );
 
 				if ( isFalseForIsFalseValidation )
 					this.value	= false;
 
 				return isFalseForIsFalseValidation ? false : VALIDATION_ERRORS.isFalse;
+			}
 
-			case VALIDATION_ERRORS.boolean:
-				let isTrueForBooleanValidation	= assert.assertTrue( this.value );
-				let isFalseForBooleanValidation	= assert.assertFalse( this.value );
+			case VALIDATION_ERRORS.boolean: {
+				const isTrueForBooleanValidation	= assert.assertTrue( this.value );
+				const isFalseForBooleanValidation	= assert.assertFalse( this.value );
 
 				if ( isTrueForBooleanValidation )
 					this.value	= true;
@@ -199,11 +204,12 @@ class ValidationAttribute {
 					this.value	= false;
 
 				return isTrueForBooleanValidation || isFalseForBooleanValidation ? false : VALIDATION_ERRORS.boolean;
+			}
 
 			case VALIDATION_ERRORS.notBoolean:
 				return assert.assertNotBoolean( this.value ) ? false : VALIDATION_ERRORS.notBoolean;
 
-			case VALIDATION_ERRORS.same:
+			case VALIDATION_ERRORS.same: {
 				sameEntry	= params.params[0];
 
 				if ( params.params.length !== 1 )
@@ -212,8 +218,9 @@ class ValidationAttribute {
 				inputEntry	= this.data[sameEntry];
 
 				return assert.assertStrictEqual( this.value, inputEntry ) ? false : VALIDATION_ERRORS.same;
+			}
 
-			case VALIDATION_ERRORS.different:
+			case VALIDATION_ERRORS.different: {
 				sameEntry	= params.params[0];
 
 				if ( params.params.length !== 1 )
@@ -222,14 +229,16 @@ class ValidationAttribute {
 				inputEntry	= this.data[sameEntry];
 
 				return assert.assertStrictNotEqual( this.value, inputEntry ) ? false : VALIDATION_ERRORS.different;
+			}
 
-			case VALIDATION_ERRORS.equals:
-				let comparator	= params.params[0];
+			case VALIDATION_ERRORS.equals: {
+				const comparator	= params.params[0];
 
 				if ( params.params.length !== 1)
 					return VALIDATION_ERRORS.rules;
 
 				return assert.assertStrictEqual( this.value, comparator ) ? false : VALIDATION_ERRORS.equals;
+			}
 
 			default:
 				return VALIDATION_ERRORS.rules;
