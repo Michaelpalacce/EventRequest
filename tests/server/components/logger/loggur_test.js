@@ -81,7 +81,7 @@ test({
 		let testLogger	= loggur.createLogger({});
 		loggur.addLogger( loggerName, testLogger );
 		assert.equal( loggur.getLogger( loggerName ), testLogger );
-		assert.equal( loggur.getLogger( loggerName ) !== false, true );
+		assert.equal( loggur.getLogger( loggerName ) !== null, true );
 
 		done();
 	}
@@ -92,7 +92,7 @@ test({
 	test	: ( done ) => {
 		let loggur		= helpers.getMockedLoggur();
 		let loggerName	= 'testLogger';
-		assert.equal( loggur.getLogger( loggerName ), false );
+		assert.equal( loggur.getLogger( loggerName ), null );
 
 		done();
 	}

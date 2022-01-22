@@ -11,8 +11,8 @@ const ValidationHandler	= require( './components/validation/validation_handler' 
  */
 class EventRequest extends EventEmitter {
 	/**
-	 * @property	{IncomingMessage} request
-	 * @property	{ServerResponse} response
+	 * @param	{IncomingMessage} request
+	 * @param	{ServerResponse} response
 	 */
 	constructor( request, response ) {
 		super();
@@ -62,8 +62,6 @@ class EventRequest extends EventEmitter {
 	 * @details	Removes all listeners from the eventEmitter
 	 * 			Stops the event
 	 * 			Clears internal pointers
-	 *
-	 * @return	void
 	 */
 	_cleanUp() {
 		this.emit( 'cleanUp' );
@@ -90,9 +88,9 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Easier access to the validation
 	 *
-	 * @property	{*} args
+	 * @param	{*} args
 	 *
-	 * @return	ValidationResult
+	 * @return	{ValidationResult}
 	 */
 	validate( ...args ) {
 		return this.validation.validate.apply( this.validation, args );
@@ -105,11 +103,11 @@ class EventRequest extends EventEmitter {
 	 * 			The options should be an object where all the keys will be taken as is as well as the values
 	 * 			And they will be used to make an cookie header
 	 *
-	 * @property	{String} name
-	 * @property	{String} value
-	 * @property	{Object} [options={}]
+	 * @param	{String} name
+	 * @param	{String} value
+	 * @param	{Object} [options={}]
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	setCookie( name, value, options = {} ) {
 		const cookieHeaderName	= 'set-cookie';
@@ -149,10 +147,10 @@ class EventRequest extends EventEmitter {
 	}
 
 	/**
-	 * @property	{*} [response='']
-	 * @property	{Number} [code=null]
+	 * @param	{*} [response='']
+	 * @param	{Number} [code=null]
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	send( response = '', code = null ) {
 		if ( typeof code === 'number' )
@@ -171,7 +169,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Formats the response to be sent
 	 *
-	 * @property	{String|Buffer} response
+	 * @param	{String|Buffer} response
 	 *
 	 * @return	{String|Buffer}
 	 */
@@ -185,7 +183,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Ends the response with the given params
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async end( ...args ) {
 		this.response.end.apply( this.response, args );
@@ -194,10 +192,10 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Safely set header to response ( only if response is not sent )
 	 *
-	 * @property	{String} key
-	 * @property	{String} value
+	 * @param	{String} key
+	 * @param	{String} value
 	 *
-	 * @return	EventRequest
+	 * @return	{EventRequest}
 	 */
 	setResponseHeader( key, value ) {
 		if ( ! this.isFinished() && ! this.response.headersSent )
@@ -209,9 +207,9 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Removes a set header
 	 *
-	 * @property	{String} key
+	 * @param	{String} key
 	 *
-	 * @return	EventRequest
+	 * @return	{EventRequest}
 	 */
 	removeResponseHeader( key ) {
 		if ( ! this.isFinished() && ! this.response.headersSent )
@@ -225,10 +223,10 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @details	If the key does not exist, then return the default value if passed. Defaults to NULL
 	 *
-	 * @property	{String} key
-	 * @property	{String} [defaultValue=null]
+	 * @param	{String} key
+	 * @param	{String} [defaultValue=null]
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getRequestHeader( key, defaultValue = null ) {
 		return ! this.hasRequestHeader( key )
@@ -243,7 +241,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Return all the headers for the current request
 	 *
-	 * @return	Object
+	 * @return	{Object}
 	 */
 	getRequestHeaders() {
 		return this.headers;
@@ -252,9 +250,9 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Checks if the desired header exists
 	 *
-	 * @property	{String} key
+	 * @param	{String} key
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	hasRequestHeader( key ) {
 		return typeof this.headers[key.toLowerCase()] !== 'undefined' || typeof this.headers[key] !== 'undefined';
@@ -263,9 +261,9 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Sets the status code of the response
 	 *
-	 * @property	{Number} code
+	 * @param	{Number} code
 	 *
-	 * @return	EventRequest
+	 * @return	{EventRequest}
 	 */
 	setStatusCode( code ) {
 		this.response.statusCode	= typeof code === 'number' ? code : 500;
@@ -276,10 +274,8 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Used to send a redirect response to a given redirectUrl
 	 *
-	 * @property	{String} redirectUrl
-	 * @property	{Number} [statusCode=302]
-	 *
-	 * @return	void
+	 * @param	{String} redirectUrl
+	 * @param	{Number} [statusCode=302]
 	 */
 	redirect( redirectUrl, statusCode = 302 ) {
 		this.emit( 'redirect', { redirectUrl, statusCode } );
@@ -296,7 +292,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Checks if the response is finished
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	isFinished() {
 		return this.finished === true || this.response.writableEnded;
@@ -305,9 +301,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Sets the current execution block
 	 *
-	 * @property	{Array} block
-	 *
-	 * @return	void
+	 * @param	{Array} block
 	 */
 	_setBlock( block ) {
 		this.block	= block;
@@ -320,10 +314,8 @@ class EventRequest extends EventEmitter {
 	 * 			if the event is stopped and the response has not been set then send a server error
 	 * 			This function is wrapped by the next() function
 	 *
-	 * @property	{*} err
-	 * @property	{Number} code
-	 *
-	 * @return	void
+	 * @param	{*} err
+	 * @param	{Number} code
 	 */
 	_next( err, code ) {
 		if ( err )
@@ -350,7 +342,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Gets the error handler or creates a new one if needed
 	 *
-	 * @return	ErrorHandler
+	 * @return	{ErrorHandler}
 	 */
 	getErrorHandler() {
 		if ( this.errorHandler === null || typeof this.errorHandler === 'undefined' || typeof this.errorHandler.handleError !== 'function' )
@@ -364,9 +356,7 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @details	By default handleError is asynchronous
 	 *
-	 * @property	{Array} args
-	 *
-	 * @return	void
+	 * @param	{Array} args
 	 */
 	sendError( ...args ) {
 		const errorHandler	= this.getErrorHandler();

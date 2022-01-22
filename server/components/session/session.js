@@ -5,7 +5,7 @@ const uniqueId	= require( './../helpers/unique_id' );
 /**
  * @details	Time the session should be kept. Defaults to 90 days
  *
- * @var		Number TTL
+ * @var		{Number} TTL
  */
 const TTL	= 7776000;
 
@@ -50,7 +50,7 @@ class Session {
 	 * Initializes the session. This must be called before anything else. The other methods do not check if this has been called
 	 * intentionally to save on some speed.
 	 *
-	 * @return	{Promise<void>}
+	 * @return	{Promise}
 	 */
 	async init() {
 		this.sessionId	= this.isCookieSession ?
@@ -66,7 +66,7 @@ class Session {
 	/**
 	 * @brief	Creates a new SessionId
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	_makeNewSessionId() {
 		return uniqueId.makeId( this.sessionIdLength );
@@ -75,7 +75,7 @@ class Session {
 	/**
 	 * @brief	Checks if the user has a session
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	async hasSession() {
 		if ( this.sessionId === null )
@@ -86,8 +86,6 @@ class Session {
 
 	/**
 	 * @brief	Removes the session from the caching server
-	 *
-	 * @return	void
 	 */
 	async removeSession() {
 		await this.server.delete( Session.SESSION_PREFIX + this.sessionId );
@@ -100,10 +98,9 @@ class Session {
 	}
 
 	/**
-	 * Starts a new session.
-	 * Returns the sessionId or null on error.
+	 * @brief	Starts a new session.
 	 *
-	 * @return	void
+	 * @details	Returns the sessionId or null on error.
 	 */
 	async newSession() {
 		this.sessionId	= this._makeNewSessionId();
@@ -119,14 +116,12 @@ class Session {
 	}
 
 	/**
-	 * Adds a new variable to the session
+	 * @brief	Adds a new variable to the session
 	 *
 	 * @deprecated	Use set instead
 	 *
-	 * @property	{String} name
-	 * @property	{*} value
-	 *
-	 * @return	void
+	 * @param	{String} name
+	 * @param	{*} value
 	 */
 	add( name, value ) {
 		this.session[name]	= value;
@@ -135,9 +130,7 @@ class Session {
 	/**
 	 * @brief	Deletes a variable from the session
 	 *
-	 * @property	{String} name
-	 *
-	 * @return	void
+	 * @param	{String} name
 	 */
 	delete( name ) {
 		delete this.session[name];
@@ -146,21 +139,22 @@ class Session {
 	/**
 	 * @brief	Checks if a variable exists in the session
 	 *
-	 * @property	{String} name
+	 * @param	{String} name
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	has( name ) {
 		return typeof this.session[name] !== 'undefined';
 	}
 
 	/**
-	 * Gets a session variable.
-	 * Returns null if the value does not exist.
+	 * @brief	Gets a session variable.
 	 *
-	 * @property	{String} name
+	 * @details	Returns null if the value does not exist.
 	 *
-	 * @return	 *
+	 * @param	{String} name
+	 *
+	 * @return	{*}
 	 */
 	get( name ) {
 		if ( ! this.has( name ) )
@@ -170,7 +164,7 @@ class Session {
 	}
 
 	/**
-	 * Gets all session variables.
+	 * @brief	Gets all session variables.
 	 *
 	 * @return	 {Object}
 	 */
@@ -179,10 +173,11 @@ class Session {
 	}
 
 	/**
-	 * Save the session to the memory storage.
-	 * Returns true if the session was saved successfully.
+	 * @brief	Save the session to the memory storage.
 	 *
-	 * @return	Boolean
+	 * @details	Returns true if the session was saved successfully.
+	 *
+	 * @return	{Boolean}
 	 */
 	async saveSession() {
 		if ( ! this.session || ! this.sessionId )
@@ -192,10 +187,11 @@ class Session {
 	}
 
 	/**
-	 * Fetches the session if it exists
-	 * Returns the session if it exists, otherwise return null
+	 * @brief	Fetches the session if it exists
 	 *
-	 * @return	Boolean
+	 * @details	Returns the session if it exists, otherwise return null
+	 *
+	 * @return	{Boolean}
 	 */
 	async fetchSession() {
 		if ( ! await this.server.touch( Session.SESSION_PREFIX + this.sessionId ) )
@@ -207,7 +203,7 @@ class Session {
 	/**
 	 * @brief	Returns the sessionId
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getSessionId() {
 		return this.sessionId;
@@ -217,7 +213,7 @@ class Session {
 /**
  * @brief	Default prefix set before every key that is set in the store
  *
- * @var		String SESSION_PREFIX
+ * @var		{String} SESSION_PREFIX
  */
 Session.SESSION_PREFIX	= '$S:';
 

@@ -26,9 +26,11 @@ class Transport {
 	/**
 	 * @brief	Sanitize the given options
 	 *
-	 * @property	{Object} options
-	 *
-	 * @return	void
+	 * @param	{Object} options
+	 * @param	{Number} options.logLevel	- The default log level. One of LOG_LEVELS or any other whole number
+	 * @param	{Object} options.logLevels	- All of the log levels that this transport can work with
+	 * @param	{Object} options.processors	- Holds an array of processors to apply to the log
+	 * @param	{Object} options.formatter	- Formatter function
 	 */
 	sanitizeConfig( options ) {
 		this.logLevel			= typeof options.logLevel === 'number'
@@ -48,9 +50,9 @@ class Transport {
 	/**
 	 * @brief	Get an instance of the current transport
 	 *
-	 * @property	{Object} [options={}]
+	 * @param	{Object} [options={}]
 	 *
-	 * @return	Transport
+	 * @return	{Transport}
 	 */
 	static getInstance( options = {} ) {
 		return new this( options );
@@ -59,9 +61,9 @@ class Transport {
 	/**
 	 * @brief	Returns whether the current log is supported by the transport
 	 *
-	 * @property	{Log} log
+	 * @param	{Log} log
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	supports( log ) {
 		if ( ! ( log instanceof Log ) )
@@ -76,13 +78,11 @@ class Transport {
 	/**
 	 * @brief	The method that actually logs the data
 	 *
-	 * @property	{Array} data
-	 * @property	{Function} resolve
-	 * @property	{Function} reject
-	 *
 	 * @private
+	 * @param	{Array} data
+	 * @param	{Function} resolve
+	 * @param	{Function} reject
 	 *
-	 * @return	void
 	 */
 	_log( data, resolve, reject ) {
 		resolve();
@@ -91,11 +91,10 @@ class Transport {
 	/**
 	 * @brief	Creates an object to be used in the processors
 	 *
-	 * @property	{Log} log
-	 *
 	 * @private
+	 * @param	{Log} log
 	 *
-	 * @return	Object
+	 * @return	{Object}
 	 */
 	_createProcessorsObject( log ) {
 		return {
@@ -112,9 +111,9 @@ class Transport {
 	/**
 	 * @brief	Saves the log
 	 *
-	 * @property	{Log} logg
+	 * @param	{Log} log
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	log( log ) {
 		return new Promise(( resolve, reject ) => {

@@ -4,40 +4,34 @@
 const fs					= require( 'fs' );
 const path					= require( 'path' );
 const AbstractFileStream	= require( './abstract_file_stream' );
+const { findMimeType }		= require( '../mime_type/mime_type' );
 
 /**
  * @brief	Used to stream text files
  */
 class ImageFileStream extends AbstractFileStream {
 	constructor() {
-		super( [], 'image' );
-		// @TODO NEW MIME-TYPE COMPONENT SHOULD BE MADE
-		this.formats	= {
-			'.apng'	: 'image/apng',		'.avif'	: 'image/avif',		'.gif'		: 'image/gif',		'.jpg'	: 'image/jpeg',
-			'.jpeg'	: 'image/jpeg',		'.jfif'	: 'image/jpeg',		'.pjpeg'	: 'image/jpeg',		'.pjp'	: 'image/jpeg',
-			'.png'	: 'image/png',		'.svg'	: 'image/svg+xml',	'.webp'		: 'image/webp',		'.ico'	: 'image/x-icon',
-			'.bmp'	: 'image/bmp',
-		};
-
-		this.SUPPORTED_FORMATS	= Object.keys( this.formats );
+		super( [
+			'.gif', '.jpg', '.jpeg', '.bmp',
+			'.png', '.svg', '.webp', '.ico'
+		], 'image' );
 	}
 
 	/**
 	 * @brief	Gets the file stream for the file
 	 *
-	 * @property	{EventRequest} event
-	 * @property	{String} file
-	 * @property	{Object} [options={}]
+	 * @param	{EventRequest} event
+	 * @param	{String} file
+	 * @param	{Object} [options={}]
 	 *
-	 * @return	ReadStream
+	 * @return	{ReadStream}
 	 */
 	getFileStream( event, file, options = {} ) {
 		const stream		= fs.createReadStream( file, options );
 		const parsedPath	= path.parse( file );
-		const mimeType		= this.formats[parsedPath.ext.toLowerCase()];
+		const mimeType		= findMimeType( parsedPath.ext.toLowerCase() );
 
-		if ( typeof mimeType === 'string' )
-			event.setResponseHeader( 'Content-Type', mimeType );
+		event.setResponseHeader( 'Content-Type', mimeType );
 
 		return stream;
 	}

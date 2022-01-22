@@ -4,9 +4,9 @@ const PluginInterface	= require( './../plugin_interface' );
 
 class BodyParserPlugin extends PluginInterface {
 	/**
-	 * @property	{JsonBodyParser|MultipartDataParser|RawBodyParser|FormBodyParser} parser
-	 * @property	{String} pluginId
-	 * @property	{Object} [options={}]
+	 * @param	{JsonBodyParser|MultipartDataParser|RawBodyParser|FormBodyParser} parser
+	 * @param	{String} pluginId
+	 * @param	{Object} [options={}]
 	 */
 	constructor( parser, pluginId, options = {} ) {
 		super( pluginId, options );
@@ -20,9 +20,7 @@ class BodyParserPlugin extends PluginInterface {
 	/**
 	 * @brief	Set the parser if given
 	 *
-	 * @property	{Object} [options={}]
-	 *
-	 * @return	void
+	 * @param	{Object} [options={}]
 	 */
 	setOptions( options = {} ) {
 		super.setOptions( options );
@@ -36,7 +34,7 @@ class BodyParserPlugin extends PluginInterface {
 	 * @details	This plugin can be configured multiple times if needed and reused. If other plugins have similar functionality
 	 * 			this plugin will not overwrite their properties
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		const pluginMiddleware	= {

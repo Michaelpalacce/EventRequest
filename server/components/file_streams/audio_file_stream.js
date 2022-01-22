@@ -16,14 +16,14 @@ class AudioFileStream extends AbstractFileStream {
 	/**
 	 * @brief	Gets the file stream for the file
 	 *
-	 * @property	{EventRequest} event
-	 * @property	{String} file
-	 * @property	{Object} [options={}]
+	 * @param	{EventRequest} event
+	 * @param	{String} file
+	 * @param	{Object} [options={}]
 	 *
-	 * @return	ReadStream
+	 * @return	{ReadStream}
 	 */
 	getFileStream( event, file, options = {} ) {
-		let stream		= null;
+		let stream;
 		const stat		= fs.statSync( file );
 		const fileSize	= stat.size;
 		const range		= event.getRequestHeader( 'range' );

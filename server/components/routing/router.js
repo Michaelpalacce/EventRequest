@@ -26,9 +26,7 @@ class Router extends PluginInterface {
 	/**
 	 * @brief	Enables or disables caching
 	 *
-	 * @property	{Boolean} [enable=true]
-	 *
-	 * @return	void
+	 * @param	{Boolean} [enable=true]
 	 */
 	enableCaching( enable = true ) {
 		this.cachingIsEnabled	= enable;
@@ -36,8 +34,6 @@ class Router extends PluginInterface {
 
 	/**
 	 * @brief	Sets the caching key limit
-	 *
-	 * @return	void
 	 */
 	setKeyLimit( ...args ) {
 		this.cache.setKeyLimit.apply( this.cache, args );
@@ -46,10 +42,10 @@ class Router extends PluginInterface {
 	/**
 	 * @brief	Defines a middleware to be used globally
 	 *
-	 * @property	{String} middlewareName
-	 * @property	{Function} middleware
+	 * @param	{String} middlewareName
+	 * @param	{Function} middleware
 	 *
-	 * @return	Router
+	 * @return	{Router}
 	 */
 	define( middlewareName, middleware ) {
 		if (
@@ -68,9 +64,7 @@ class Router extends PluginInterface {
 	/**
 	 * @brief	Attaches methods to the server on runtime
 	 *
-	 * @property	{Server} server
-	 *
-	 * @return	void
+	 * @param	{Server} server
 	 */
 	setServerOnRuntime( server ) {
 		this.setUpHttpMethodsToObject( server );
@@ -78,7 +72,7 @@ class Router extends PluginInterface {
 		/**
 		 * @brief	Function that adds a middleware to the block chain of the router
 		 *
-		 * @returns	Server
+		 * @returns	{Server}
 		 */
 		server.add	= ( ...args ) => {
 			this.add.apply( this, args );
@@ -88,11 +82,7 @@ class Router extends PluginInterface {
 	}
 
 	/**
-	 * @brief	Adds .post, .put, .get, .delete methods to the object
-	 *
 	 * @details	If route is a function then the handler will be treated as middlewares
-	 *
-	 * @return	void
 	 */
 	setUpHttpMethodsToObject( object ) {
 		const methods				= ['POST', 'PUT', 'GET', 'DELETE', 'HEAD', 'PATCH', 'COPY'];
@@ -163,7 +153,7 @@ class Router extends PluginInterface {
 	 *
 	 * 			Accepts a route and an instance of a router ( String route, Router router )
 	 *
-	 * @returns	Router
+	 * @returns	{Router}
 	 */
 	add( ...args ) {
 		let first	= args[0];
@@ -196,9 +186,9 @@ class Router extends PluginInterface {
 	/**
 	 * @brief	This will process the request and return the appropriate block chain
 	 *
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getExecutionBlockForCurrentEvent( event ) {
 		const blockKey	= `${event.path}${event.method}`;
@@ -238,11 +228,11 @@ class Router extends PluginInterface {
 	/**
 	 * @brief	Gets all the global middlewares for the given route
 	 *
-	 * @property	{Route} route
+	 * @param	{Route} route
 	 *
 	 * @private
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	_getGlobalMiddlewaresForRoute( route ) {
 		const middlewares	= [];
@@ -273,12 +263,12 @@ class Router extends PluginInterface {
 	 *
 	 * @details	If a path is passed, then that path will be used to prefix all the middlewares
 	 *
-	 * @property	{Router} router
-	 * @property	{String} path
+	 * @param	{Router} router
+	 * @param	{String} path
 	 *
 	 * @private
 	 *
-	 * @return	Router
+	 * @return	{Router}
 	 */
 	_concat( router, path = null ) {
 		let middlewares;
@@ -323,7 +313,7 @@ class Router extends PluginInterface {
 	/**
 	 * @brief	Exported for local instances
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	matchMethod() {
 		return Router.matchMethod.apply( Router, arguments );
@@ -332,7 +322,7 @@ class Router extends PluginInterface {
 	/**
 	 * @brief	Exported for local instances
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	matchRoute() {
 		return Router.matchRoute.apply( Router, arguments );
@@ -343,10 +333,10 @@ class Router extends PluginInterface {
 	 *
 	 * @details	If a string or an array is passed, then it will be converted to a Route
 	 *
-	 * @property	{String} requestedMethod
-	 * @property	{Route|Array|String} method
+	 * @param	{String} requestedMethod
+	 * @param	{Route|Array|String} method
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	static matchMethod( requestedMethod, method ) {
 		let route;
@@ -367,11 +357,11 @@ class Router extends PluginInterface {
 	 *
 	 * @details	Returns bool if there was a successful match
 	 *
-	 * @property	{String} requestedRoute
-	 * @property	{String|RegExp|Route} route
-	 * @property	{Object} [matchedParams={}]
+	 * @param	{String} requestedRoute
+	 * @param	{String|RegExp|Route} route
+	 * @param	{Object} [matchedParams={}]
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	static matchRoute( requestedRoute, route, matchedParams = {} ) {
 		if ( typeof route === 'string' || route instanceof RegExp )

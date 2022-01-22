@@ -16,7 +16,15 @@ const DEFAULT_PERSIST_FILE	= path.join( PROJECT_ROOT, 'cacheMap' );
  */
 class DataServerMap extends DataServer {
 	/**
-	 * @property	{Object} options
+	 * @private
+	 * @param	{Object} options
+	 * @param	{Number} options.defaultTtl			- Default time to live for resources set to the data server
+	 * @param	{String} options.persistPath		- Path to persist the data
+	 * @param	{Number} options.persistInterval	- Time in seconds to persist data
+	 * @param	{Number} options.gcInterval			- Time in seconds to garbage collect data in the DataServer
+	 * @param	{Boolean} options.persist			- Flag whether data should be persisted
+	 * @param	{Boolean} options.useBigMap			- Flag should we use a Map or a BigMap ( BigMap is a custom-made class
+	 * 														that can hold an infinite amount of data )
 	 *
 	 * @return	void
 	 */
@@ -34,7 +42,7 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Sets up the persistence
 	 *
-	 * @return	void
+	 * @private
 	 */
 	_setUpPersistence() {
 		if ( fs.existsSync( this.persistPath ) ) {
@@ -48,7 +56,7 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Stops the server
 	 *
-	 * @return	void
+	 * @private
 	 */
 	_stop() {
 		if ( fs.existsSync( this.persistPath ) )
@@ -60,12 +68,14 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Gets the data
 	 *
+	 * @private
+	 * @async
 	 * @details	Prunes the data if it is expired
 	 *
-	 * @property	{String} key
-	 * @property	{Object} [options={}]
+	 * @param	{String} key
+	 * @param	{Object} [options={}]
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async _get( key, options = {} ) {
 		return new Promise( async ( resolve ) => {
@@ -81,14 +91,16 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Sets the data
 	 *
+	 * @private
+	 * @async
 	 * @details	Resolves the data if it was correctly set, otherwise resolves to null
 	 *
-	 * @property	{String} key
-	 * @property	{*} value
-	 * @property	{Number} ttl
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{*} value
+	 * @param	{Number} ttl		- Time to live for the record
+	 * @param	{Object} options
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async _set( key, value, ttl, options ) {
 		return new Promise(( resolve ) => {
@@ -107,13 +119,15 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Increment a numeric key value
 	 *
+	 * @private
+	 * @async
 	 * @details	Does no async operations intentionally
 	 *
-	 * @property	{String} key
-	 * @property	{Number} value
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{Number} value
+	 * @param	{Object} options
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async _increment( key, value, options ) {
 		return new Promise( async ( resolve, reject ) => {
@@ -137,13 +151,15 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Decrements a numeric key value
 	 *
+	 * @private
+	 * @async
 	 * @details	Does no async operations intentionally
 	 *
-	 * @property	{String} key
-	 * @property	{Number} value
-	 * @property	{Object} options
+	 * @param	{String} key
+	 * @param	{Number} value
+	 * @param	{Object} options
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async _decrement( key, value, options ) {
 		return new Promise( async ( resolve, reject ) => {
@@ -167,10 +183,12 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Locking mechanism. Will return a boolean if the lock was ok
 	 *
-	 * @property	{String} key
-	 * @property	{Object} options
+	 * @private
+	 * @async
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	async _lock( key, options ) {
 		return new Promise(( resolve ) => {
@@ -186,12 +204,14 @@ class DataServerMap extends DataServer {
 	}
 
 	/**
-	 * @brief	Releases the key
+	 * @brief	Releases the lock
 	 *
-	 * @property	{String} key
-	 * @property	{Object} options
+	 * @private
+	 * @async
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	async _unlock( key, options ) {
 		return new Promise(( resolve ) => {
@@ -203,17 +223,19 @@ class DataServerMap extends DataServer {
 	}
 
 	/**
-	 * @brief	Touches the key
+	 * @brief	Touches the given key
 	 *
-	 * @property	{String} key
-	 * @property	{Number} ttl
-	 * @property	{Object} options
+	 * @private
+	 * @async
+	 * @param	{String} key
+	 * @param	{Number} ttl
+	 * @param	{Object} options
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async _touch( key, ttl, options ) {
 		return new Promise( async ( resolve ) => {
-			const dataSet	= await this._prune( key );
+			const dataSet	= await this._prune( key, options );
 
 			if ( dataSet === null )
 				return resolve( false );
@@ -230,10 +252,12 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Removes a key if it is expired, otherwise, return it
 	 *
-	 * @property	{String} key
-	 * @property	{Object} options
+	 * @private
+	 * @async
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async _prune( key, options ) {
 		return new Promise( async ( resolve ) => {
@@ -259,10 +283,12 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Deletes the key from the server
 	 *
-	 * @property	{String} key
-	 * @property	{Object} options
+	 * @private
+	 * @async
+	 * @param	{String} key
+	 * @param	{Object} options
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	_delete( key, options ) {
 		return new Promise(( resolve ) => {
@@ -278,9 +304,10 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Returns how many keys there are
 	 *
+	 * @private
 	 * @details	THIS IS USED FOR TESTING PURPOSES ONLY
 	 *
-	 * @return	Number
+	 * @return	{Number}
 	 */
 	/* istanbul ignore next */
 	length() {
@@ -290,7 +317,7 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Performs Garbage collection to free up memory
 	 *
-	 * @return	void
+	 * @private
 	 */
 	_garbageCollect() {
 		this.server.forEach( ( value, key ) => {
@@ -301,7 +328,7 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Saves the data to a file periodically
 	 *
-	 * @return	void
+	 * @private
 	 */
 	_saveData() {
 		let serverData	= this.useBigMap ? new BigMap() : new Map();
@@ -347,7 +374,7 @@ class DataServerMap extends DataServer {
 	/**
 	 * @brief	Merge server data from file
 	 *
-	 * @return	void
+	 * @private
 	 */
 	_loadData() {
 		let serverData;
@@ -369,10 +396,10 @@ class DataServerMap extends DataServer {
 	}
 
 	/**
-	 * @property	{*} key
-	 * @property	{*} value
+	 * @param	{*} key
+	 * @param	{*} value
 	 *
-	 * @return	*
+	 * @return	{*}
 	 */
 	static replacer( key, value ) {
 		const originalObject	= this[key];
@@ -388,16 +415,15 @@ class DataServerMap extends DataServer {
 
 			return { dataType : 'BigMap', value: { maps: value, _limit : originalObject._limit } };
 		}
-
 		else
 			return value;
 	}
 
 	/**
-	 * @property	{*} key
-	 * @property	{*} value
+	 * @param	{*} key
+	 * @param	{*} value
 	 *
-	 * @return	*
+	 * @return	{*}
 	 */
 	static reviver( key, value ) {
 		if( typeof value === 'object' && value !== null && value.dataType === 'Map' )

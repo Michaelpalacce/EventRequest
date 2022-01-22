@@ -10,9 +10,9 @@ class Console extends Transport {
 	/**
 	 * @brief	Sanitize the config
 	 *
-	 * @property	{Object} options
-	 *
-	 * @return	void
+	 * @param	{Object} options
+	 * @param	{Array[Function]} options.processors		- Holds an array of processors to apply to the log
+	 * @param	{Function} options.formatter				- Formatter function
 	 */
 	sanitizeConfig( options ) {
 		super.sanitizeConfig( options );
@@ -29,11 +29,9 @@ class Console extends Transport {
 	/**
 	 * @brief	Logs the data
 	 *
-	 * @property	{Array} data
-	 * @property	{Function} resolve
-	 * @property	{Function} reject
-	 *
-	 * @return	void
+	 * @param	{Array} data
+	 * @param	{Function} resolve
+	 * @param	{Function} reject
 	 */
 	_log( data, resolve, reject ) {
 		console.log.apply( this, data );

@@ -15,9 +15,9 @@ const CONTENT_TYPE_HEADER				= 'content-type';
  */
 class JsonBodyParser extends EventEmitter {
 	/**
-	 * @property	{Object} [options={}]
-	 * @property	{Number} options.maxPayloadLength	- The max size of the body to be parsed
-	 * @property	{Boolean} options.strict			- Whether the received payload must match the content-length
+	 * @param	{Object} [options={}]
+	 * @param	{Number} options.maxPayloadLength	- The max size of the body to be parsed
+	 * @param	{Boolean} options.strict			- Whether the received payload must match the content-length
 	 */
 	constructor( options = {} ) {
 		super();
@@ -34,11 +34,11 @@ class JsonBodyParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Returns a boolean if the current body parser supports the request
+	 * @brief	Returns a boolean if the current body parser supports the request
 	 *
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
-	 * @return		{Boolean}
+	 * @return	{Boolean}
 	 */
 	supports( event ) {
 		const contentType	= event.getRequestHeader( CONTENT_TYPE_HEADER );
@@ -46,12 +46,12 @@ class JsonBodyParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Parses the request
+	 * @brief	Parses the request
 	 *
 	 * @async
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
-	 * @return		{Promise<Object>}
+	 * @return	{Promise<Object>}
 	 */
 	parse( event ) {
 		return new Promise(( resolve, reject ) => {

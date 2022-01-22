@@ -5,7 +5,7 @@
  *
  * @details	One year in seconds
  *
- * @var		Number
+ * @var		{Number}
  */
 const DEFAULT_MAX_AGE					= 31536000;
 const DEFAULT_INCLUDE_SUB_DOMAINS		= false;
@@ -14,7 +14,7 @@ const DEFAULT_PRELOAD					= false;
 /**
  * @brief	Name of the HSTS header
  *
- * @var		String
+ * @var		{String}
  */
 const HEADER_NAME						= 'Strict-Transport-Security';
 
@@ -39,9 +39,7 @@ class HttpStrictTransportSecurity {
 	/**
 	 * @brief	Parses the options given to the HSTS class
 	 *
-	 * @property	{Object} [options={}]
-	 *
-	 * @return	void
+	 * @param	{Object} [options={}]
 	 */
 	parseOptions( options = {} ) {
 		this.setEnabled( options.enabled );
@@ -62,9 +60,7 @@ class HttpStrictTransportSecurity {
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @property	{Boolean} [enabled=true]
-	 *
-	 * @return	void
+	 * @param	{Boolean} [enabled=true]
 	 */
 	setEnabled( enabled = true ) {
 		this.enabled	= typeof enabled === 'boolean' ? enabled : true;
@@ -73,9 +69,7 @@ class HttpStrictTransportSecurity {
 	/**
 	 * @brief	Sets the component's to either be preloaded or not
 	 *
-	 * @property	{Boolean} [preload=true]
-	 *
-	 * @return	void
+	 * @param	{Boolean} [preload=true]
 	 */
 	preload( preload = true ) {
 		this.doPreload	= typeof preload === 'boolean' ? preload : this.doPreload;
@@ -84,9 +78,7 @@ class HttpStrictTransportSecurity {
 	/**
 	 * @brief	Sets the enforce flag
 	 *
-	 * @property	{Number} maxAge
-	 *
-	 * @return	void
+	 * @param	{Number} maxAge
 	 */
 	setMaxAge( maxAge ) {
 		this.maxAge	= typeof maxAge === 'number' ? maxAge : this.maxAge;
@@ -95,9 +87,7 @@ class HttpStrictTransportSecurity {
 	/**
 	 * @brief	Enable or disable includeSubDomains
 	 *
-	 * @property	{Boolean} [include=true]
-	 *
-	 * @return	void
+	 * @param	{Boolean} [include=true]
 	 */
 	includeSubDomains( include = true ) {
 		this.doIncludeSubDomains	= typeof include === 'boolean' ? include : this.doIncludeSubDomains;
@@ -106,7 +96,7 @@ class HttpStrictTransportSecurity {
 	/**
 	 * @brief	Returns the header name
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getHeader() {
 		return HEADER_NAME;
@@ -115,7 +105,7 @@ class HttpStrictTransportSecurity {
 	/**
 	 * @brief	Builds the header
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	build() {
 		if ( ! this.enabled )

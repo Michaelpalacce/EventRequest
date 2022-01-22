@@ -14,6 +14,7 @@ const DEFAULT_ROUTE_HANDLER	= ( event ) => {
 
 /**
  * @brief	RegEx used to match routes that need to be parsed
+ *
  * @var		{RegExp} ROUTE_REGEX
  */
 const ROUTE_REGEX	= /^:([^:]+):$/;
@@ -34,7 +35,7 @@ class Route {
 	/**
 	 * @brief	Returns an empty unmatched object to work with
 	 *
-	 * @return	Object
+	 * @return	{Object}
 	 */
 	static getMatchObject() {
 		return {
@@ -46,9 +47,7 @@ class Route {
 	/**
 	 * @brief	Sets Route options
 	 *
-	 * @property	{Object} routeConfig
-	 *
-	 * @return	void
+	 * @param	{Object} routeConfig
 	 */
 	sanitize( routeConfig ) {
 		if ( typeof routeConfig !== 'object' || routeConfig === null )
@@ -81,9 +80,9 @@ class Route {
 	 * 			String
 	 * 			Function
 	 *
-	 * @property	{Object} routeConfig
+	 * @param	{Object} routeConfig
 	 *
-	 * @return	*
+	 * @return	{*}
 	 */
 	parseGlobalMiddlewares( routeConfig ) {
 		switch ( true ) {
@@ -104,7 +103,7 @@ class Route {
 	/**
 	 * @brief	Returns the current route
 	 *
-	 * @return	String|RegExp
+	 * @return	{String|RegExp}
 	 */
 	getRoute() {
 		return this.route;
@@ -113,7 +112,7 @@ class Route {
 	/**
 	 * @brief	Returns the current handler
 	 *
-	 * @return	Function
+	 * @return	{Function}
 	 */
 	getHandler() {
 		return this.handler;
@@ -122,7 +121,7 @@ class Route {
 	/**
 	 * @brief	Returns the current method(s)
 	 *
-	 * @return	Array|String
+	 * @return	{Array|String}
 	 */
 	getMethod() {
 		return this.method;
@@ -131,7 +130,7 @@ class Route {
 	/**
 	 * @brief	Returns the middlewares set for the current route
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getMiddlewares() {
 		return this.middlewares;
@@ -140,9 +139,9 @@ class Route {
 	/**
 	 * @brief	Matches the requestedMethod with the route's one
 	 *
-	 * @property	{String} requestedMethod
+	 * @param	{String} requestedMethod
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	matchMethod( requestedMethod ) {
 		requestedMethod	= requestedMethod.toUpperCase();
@@ -157,10 +156,10 @@ class Route {
 	 *
 	 * @details	Sets the matchedParams with any parameters found
 	 *
-	 * @property	{String} requestedRoute
-	 * @property	{Object} [matchedParams={}]
+	 * @param	{String} requestedRoute
+	 * @param	{Object} [matchedParams={}]
 	 *
-	 * @return	Object
+	 * @return	{Object}
 	 */
 	matchPath( requestedRoute, matchedParams = {} ) {
 		if ( requestedRoute === '' )

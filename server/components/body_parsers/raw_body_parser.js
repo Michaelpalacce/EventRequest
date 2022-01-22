@@ -8,8 +8,8 @@ const { EventEmitter }	= require( 'events' );
  */
 class RawBodyParser extends EventEmitter {
 	/**
-	 * @property	{Object} [options={}]
-	 * @property	{Number} options.maxPayloadLength	- The max size of the body to be parsed
+	 * @param	{Object} [options={}]
+	 * @param	{Number} options.maxPayloadLength	- The max size of the body to be parsed
 	 */
 	constructor( options = {} ) {
 		super();
@@ -22,22 +22,22 @@ class RawBodyParser extends EventEmitter {
 	}
 
 	/**
-	 * @brief		Returns a boolean if the current body parser supports the request
+	 * @brief	Returns a boolean if the current body parser supports the request
 	 *
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
-	 * @return		{Boolean}
+	 * @return	{Boolean}
 	 */
 	supports( event ) {
 		return true;
 	}
 
 	/**
-	 * @brief		Parses the request
+	 * @brief	Parses the request
 	 *
-	 * @property	{EventRequest} event
+	 * @param	{EventRequest} event
 	 *
-	 * @return		{Promise}
+	 * @return	{Promise}
 	 */
 	parse( event ) {
 		return new Promise(( resolve ) => {

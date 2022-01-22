@@ -52,7 +52,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Adds a new middleware to the router
 	 *
-	 * @return	Server
+	 * @return	{Server}
 	 */
 	define() {
 		this.router.define.apply( this.router, arguments );
@@ -62,8 +62,6 @@ class Server extends EventEmitter {
 
 	/**
 	 * @brief	Sets up the default plugins
-	 *
-	 * @return	void
 	 */
 	setUpDefaultPlugins() {
 		// attached like this to enable smart autocomplete in IDE's
@@ -112,7 +110,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Returns the plugin manager
 	 *
-	 * @return	PluginManager
+	 * @return	{PluginManager}
 	 */
 	getPluginManager() {
 		return this.pluginManager;
@@ -121,7 +119,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Creates a new router
 	 *
-	 * @return	Router
+	 * @return	{Router}
 	 */
 	Router() {
 		return new RouterClass();
@@ -133,10 +131,10 @@ class Server extends EventEmitter {
 	 * @details	The plugin manager can be used to extract and set up plugins and then add them to the server just by
 	 * 			giving their plugin ids
 	 *
-	 * @property	{PluginInterface|Object|String} plugin
-	 * @property	{Object} options
+	 * @param	{PluginInterface|Object|String} plugin
+	 * @param	{Object} options
 	 *
-	 * @return	Server
+	 * @return	{Server}
 	 */
 	apply( plugin, options = null ) {
 		if ( typeof plugin === 'string' )
@@ -156,9 +154,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Attaches a PluginInterface to the server
 	 *
-	 * @property	{PluginInterface} plugin
-	 *
-	 * @return	void
+	 * @param	{PluginInterface} plugin
 	 */
 	_attachPlugin( plugin ) {
 		const pluginDependencies	= plugin.getPluginDependencies();
@@ -181,9 +177,9 @@ class Server extends EventEmitter {
 	 *
 	 * @details	Will throw if the plugin is not attached
 	 *
-	 * @property	{String|PluginInterface} pluginId
+	 * @param	{String|PluginInterface} pluginId
 	 *
-	 * @return	PluginInterface
+	 * @return	{PluginInterface}
 	 */
 	getPlugin( pluginId ) {
 		const id	= typeof pluginId === 'string' ? pluginId : pluginId.getPluginId();
@@ -197,9 +193,9 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Checks whether the server has a plugin with the given id
 	 *
-	 * @property	{String|PluginInterface} pluginId
+	 * @param	{String|PluginInterface} pluginId
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	hasPlugin( pluginId ) {
 		const id	= typeof pluginId === 'string' ? pluginId : pluginId.getPluginId();
@@ -210,7 +206,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Callback for the http.createServer
 	 *
-	 * @return	Function
+	 * @return	{Function}
 	 */
 	attach() {
 		return ( request, response ) => {
@@ -264,7 +260,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Starts the server on the given port
 	 *
-	 * @return	Server
+	 * @return	{Server}
 	 */
 	listen() {
 		const httpServer	= http.createServer( this.attach() );

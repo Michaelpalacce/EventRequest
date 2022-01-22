@@ -1,7 +1,7 @@
 /**
- * List of mime types taken from: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+ * @brief	List of mime types taken from: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
  *
- * @var	{Object}
+ * @var		{Object}
  */
 module.exports	= {
 	'.arc'		: ['application/x-freearc'],
@@ -23,7 +23,7 @@ module.exports	= {
 	'.gif'		: ['image/gif'],
 	'.html'		: ['text/html'],
 	'.htm'		: ['text/html'],
-	'.ico'		: ['image/vnd.microsoft.icon'],
+	'.ico'		: ['image/x-icon'],
 	'.ics'		: ['text/calendar'],
 	'.jar'		: ['application/java-archive'],
 	'.jpg'		: ['image/jpeg'],

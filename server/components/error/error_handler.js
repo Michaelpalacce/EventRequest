@@ -27,12 +27,12 @@ class ErrorHandler {
 	/**
 	 * @brief	Handles an error
 	 *
-	 * @property	{EventRequest} event
-	 * @property	{*} [errorToHandle=null]
-	 * @property	{Number} [errStatusCode=null]
-	 * @property	{Boolean} [emitError=null]
+	 * @param	{EventRequest} event
+	 * @param	{*} [errorToHandle=null]
+	 * @param	{Number} [errStatusCode=null]
+	 * @param	{Boolean} [emitError=null]
 	 *
-	 * @return	Promise: void
+	 * @return	{Promise}
 	 */
 	async handleError( event, errorToHandle = null, errStatusCode = null, emitError = null ) {
 		let errorNamespace	= null;
@@ -97,15 +97,14 @@ class ErrorHandler {
 	/**
 	 * @brief	Adds a new namespace
 	 *
-	 * @property	{String} code
-	 * @property	{*} message
-	 * @property	{Function} callback
-	 * @property	{Number} status
-	 * @property	{Boolean} emit
-	 * @property	{Object} headers
-	 * @property	{Function} formatter
-	 *
-	 * @return	void
+	 * @param	{String} code
+	 * @param	{Object} object
+	 * @param	{*} object.message
+	 * @param	{Function} object.callback
+	 * @param	{Number} object.status
+	 * @param	{Boolean} object.emit
+	 * @param	{Object} object.headers
+	 * @param	{Function} object.formatter
 	 */
 	addNamespace( code, { message, callback, status, emit, headers, formatter } = {} ) {
 		if ( ! this.validateNamespaceCode( code ) )
@@ -130,7 +129,7 @@ class ErrorHandler {
 	/**
 	 * @brief	Validates that the provided errorCode is a string and does not have any white space characters
 	 *
-	 * @property	{String} errorCode
+	 * @param	{String} errorCode
 	 *
 	 * @return	{Boolean}
 	 */
@@ -141,7 +140,7 @@ class ErrorHandler {
 	/**
 	 * @brief	Returns the expectation that contains the errorCode and message
 	 *
-	 * @property	{String} errorCode
+	 * @param	{String} errorCode
 	 *
 	 * @return	{Object|null}
 	 */
@@ -166,23 +165,23 @@ class ErrorHandler {
 	/**
 	 * @brief	Fallback namespace that will be called whenever there is no namespace for the given error code OR the namespace match does not have a callback
 	 *
+	 * @private
 	 * @details	This callback will set any headers provided
 	 * 			This callback will set the status code given
 	 * 			This callback will format an appropriate message in case of an error
 	 * 			This callback emit an error IF needed
 	 *
-	 * @property	{EventRequest} event
-	 * @property	{String} errorCode
-	 * @property	{Number} status
-	 * @property	{*} error
-	 * @property	{*} message
-	 * @property	{Object} headers
-	 * @property	{Boolean} emit
-	 * @property	{Function} formatter
+	 * @param	{Object} object
+	 * @param	{EventRequest} object.event	- the EventRequest object
+	 * @param	{String} object.code		- error code to send
+	 * @param	{Number} object.status		- status code to return
+	 * @param	{*} object.error			- the error message or object
+	 * @param	{*} object.message			- the error message -> this will take precedence over the error in regards to the message
+	 * @param	{Object} object.headers		- extra headers to set
+	 * @param	{Boolean} object.emit		- Flag to emit the error or not
+	 * @param	{Function} object.formatter	- The error formatter
 	 *
-	 * @private
-	 *
-	 * @return	Promise: void
+	 * @return	{Promise}
 	 */
 	async _defaultCase( { event, code, status, error, message, headers, emit, formatter } ) {
 		if ( event.isFinished() )
@@ -210,17 +209,18 @@ class ErrorHandler {
 		const result	= formatter( { event, code, status, error, message, headers, emit } );
 
 		if ( result instanceof Promise )
-			event.send( await result, status );
+			await event.send( await result, status );
 		else
-			event.send( result, status );
+			await event.send( result, status );
 	}
 
 	/**
 	 * @brief	Formats the error in a presentable format
 	 *
-	 * @property	{*} error
+	 * @private
+	 * @param	{*} error	- the error to format ( will extract the message if Error object, otherwise return )
 	 *
-	 * @return	*
+	 * @return	{*}
 	 */
 	_formatError( error ) {
 		if ( error instanceof Error )

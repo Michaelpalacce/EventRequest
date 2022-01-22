@@ -7,10 +7,10 @@ const Route				= require( '../../../../server/components/routing/route' );
 /**
  * @brief	Gets a route with the given arguments
  *
- * @property	Function handler
- * @property	mixed route
- * @property	mixed method
- * @property	Array middlewares
+ * @param	Function handler
+ * @param	mixed route
+ * @param	mixed method
+ * @param	Array middlewares
  *
  * @return	Route
  */

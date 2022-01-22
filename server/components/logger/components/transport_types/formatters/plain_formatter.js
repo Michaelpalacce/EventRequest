@@ -5,7 +5,7 @@
  *
  * @details	noRaw is by default false, which allows raw logs
  *
- * @return	Function
+ * @return	{Function}
  */
 module.exports	= ( { noRaw = false } = {} ) => {
 	/**
@@ -13,9 +13,9 @@ module.exports	= ( { noRaw = false } = {} ) => {
 	 *
 	 * @details	This will return an array of all the data that needs to be logged
 	 *
-	 * @property	{Object} context
+	 * @param	{Object} context
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	return ( context = {} ) => {
 		const propertiesToTest = ['uniqueId', 'timestamp', 'isRaw', 'rawMessage', 'message'];

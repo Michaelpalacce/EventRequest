@@ -8,15 +8,15 @@ class BigMap {
 	}
 
 	/**
-	 * @brief		Sets the value for the given key
+	 * @brief	Sets the value for the given key
 	 *
-	 * @details		This function will create a new Map as is needed
-	 * 				A new map will be created every 8,000,000 keys
+	 * @details	This function will create a new Map as is needed
+	 * 			A new map will be created every 8,000,000 keys
 	 *
-	 * @property	{*} key		- the key to set
-	 * @property	{*} value	- the value to set
+	 * @param	{*} key		- the key to set
+	 * @param	{*} value	- the value to set
 	 *
-	 * @return		*
+	 * @return	*
 	 */
 	set( key, value ) {
 		let mapToSet	= null;
@@ -37,11 +37,11 @@ class BigMap {
 	}
 
 	/**
-	 * @brief		Gets a value given a key
+	 * @brief	Gets a value given a key
 	 *
-	 * @property	{*} key	- the key to get
+	 * @param	{*} key	- the key to get
 	 *
-	 * @return		{*}		- element that was set
+	 * @return	{*}		- element that was set
 	 */
 	get( key ) {
 		const map	= this._findMapWithKey( key );
@@ -53,13 +53,13 @@ class BigMap {
 	}
 
 	/**
-	 * @brief		Deletes a value given a key
+	 * @brief	Deletes a value given a key
 	 *
-	 * @details		This will remove the Map if it becomes empty when the key is deleted
+	 * @details	This will remove the Map if it becomes empty when the key is deleted
 	 *
-	 * @property	{*} key	- the key of the value to delete
+	 * @param	{*} key	- the key of the value to delete
 	 *
-	 * @return		*		- The value that was deleted
+	 * @return	*		- The value that was deleted
 	 */
 	delete( key ) {
 		const map	= this._findMapWithKey( key );
@@ -76,11 +76,11 @@ class BigMap {
 	}
 
 	/**
-	 * @brief		Checks if a key exists
+	 * @brief	Checks if a key exists
 	 *
-	 * @property	{*} key		- the key to check if exists
+	 * @param	{*} key		- the key to check if exists
 	 *
-	 * @return		{Boolean}	- a flag whether the key exists
+	 * @return	{Boolean}	- a flag whether the key exists
 	 */
 	has( key ) {
 		return typeof this._findMapWithKey( key ) !== 'undefined';
@@ -114,8 +114,8 @@ class BigMap {
 	}
 
 	/**
-	 * @property	{Function} callbackFn	- function that will be called
-	 * @property	{*} thisArg				- this argument to bind to
+	 * @param	{Function} callbackFn	- function that will be called
+	 * @param	{*} thisArg				- this argument to bind to
 	 */
 	forEach ( callbackFn, thisArg ) {
 		if ( thisArg )
@@ -193,13 +193,12 @@ class BigMap {
 	}
 
 	/**
-	 * @brief		Finds which map exactly has the given key and returns it
-	 *
-	 * @property	{*} key
+	 * @brief	Finds which map exactly has the given key and returns it
 	 *
 	 * @private
+	 * @param	{*} key
 	 *
-	 * @return		{Map}
+	 * @return	{Map}
 	 */
 	_findMapWithKey( key ) {
 		for ( let index = this.maps.length - 1; index >= 0; index-- ) {

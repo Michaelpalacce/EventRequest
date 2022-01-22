@@ -7,15 +7,17 @@ const AudioFileStream	= require( './audio_file_stream' );
 const TextFileStream	= require( './text_file_stream' );
 const ImageFileStream	= require( './image_file_stream' );
 
+
 module.exports			= {
 	/**
 	 * @brief	Gets the file streamer responsible for handling the given file type
 	 *
-	 * @details	Returns null if a file streamer is not found
+	 * @details	Returns null if a file streamer is not found.
+	 * 			The fileStreams are created intentionally inside
 	 *
-	 * @property	{String} file
+	 * @param	{String} file
 	 *
-	 * @return	VideoFileStream|AudioFileStream|ImageFileStream|TextFileStream|null
+	 * @return	{AbstractFileStream|null}
 	 */
 	getFileStreamerForType	: ( file ) => {
 		const fileStreams	= [

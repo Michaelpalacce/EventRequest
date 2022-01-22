@@ -17,9 +17,7 @@ class LoggerPlugin extends PluginInterface {
 	/**
 	 * @brief	Attaches a process.log function for easier use
 	 *
-	 * @property	{Server} server
-	 *
-	 * @return	void
+	 * @param	{Server} server
 	 */
 	setServerOnRuntime( server ) {
 		if ( this.options.attachToProcess === true )
@@ -31,7 +29,7 @@ class LoggerPlugin extends PluginInterface {
 	 *
 	 * @details	This MUST be called AFTER the setOptions because once created this will not respect the options
 	 *
-	 * @return	Logger
+	 * @return	{Logger}
 	 */
 	getLogger() {
 		if ( this.logger === null || this.logger === undefined ) {
@@ -48,9 +46,7 @@ class LoggerPlugin extends PluginInterface {
 	 *
 	 * @details	Events attached: error, on_error, finished, redirect, cleanUp
 	 *
-	 * @property	{EventRequest} event
-	 *
-	 * @return	void
+	 * @param	{EventRequest} event
 	 */
 	attachEventsToEventRequest( event ) {
 		const logger		= this.getLogger();
@@ -87,7 +83,7 @@ class LoggerPlugin extends PluginInterface {
 	/**
 	 * @brief	Gets the plugin middleware, responsible for attaching logging functionality to the event request and adding a logger
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		const logger			= this.getLogger();

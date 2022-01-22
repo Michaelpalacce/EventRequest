@@ -7,8 +7,8 @@
  */
 class PluginInterface {
 	/**
-	 * @property	{String} pluginId
-	 * @property	{Object} [options={}]
+	 * @param	{String} pluginId
+	 * @param	{Object} [options={}]
 	 */
 	constructor( pluginId, options = {} ) {
 		this.options	= options;
@@ -18,7 +18,7 @@ class PluginInterface {
 	/**
 	 * @brief	Returns the pluginId
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getPluginId() {
 		return this.pluginId;
@@ -29,7 +29,7 @@ class PluginInterface {
 	 *
 	 * @details	If the dependencies are not added to the server, then an error will be thrown
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginDependencies() {
 		return [];
@@ -40,9 +40,7 @@ class PluginInterface {
 	 *
 	 * @details	This method should attach to any events dispatched by the server
 	 *
-	 * @property	{Server} server
-	 *
-	 * @return	void
+	 * @param	{Server} server
 	 */
 	setServerOnRuntime( server ) {
 	}
@@ -50,9 +48,7 @@ class PluginInterface {
 	/**
 	 * @brief	Sets new options for the plugin
 	 *
-	 * @property	{Object} options
-	 *
-	 * @return	void
+	 * @param	{Object} options
 	 */
 	setOptions( options ) {
 		this.options	= options;
@@ -64,7 +60,7 @@ class PluginInterface {
 	 * @details	These will be retrieved by the server and each one will be added to the router
 	 * 			They must be normal middleware objects implementing handler, route, method keys or instances of Route
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		return [];

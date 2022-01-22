@@ -1,3 +1,8 @@
+34.0.0
+* Housekeeping, more work done on JSDoc
+* Improvements to file streams. Implemented MimeTypes in image file stream
+* Changed the default makeId length to 32
+
 33.5.0
 * Housekeeping, work done on JSDoc
 

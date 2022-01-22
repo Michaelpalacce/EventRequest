@@ -3,15 +3,15 @@
 /**
  * @brief	You can pass your own JSON replacer
  *
- * @return	Function
+ * @return	{Function}
  */
 module.exports	= ( { replacer = null } = {} ) => {
 	/**
 	 * @brief	Formats the given log to a JSON
 	 *
-	 * @property	{Object} context
+	 * @param	{Object} context
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	return ( context = {} ) => {
 		delete context.rawMessage;

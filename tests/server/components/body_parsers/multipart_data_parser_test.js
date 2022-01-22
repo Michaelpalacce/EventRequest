@@ -860,7 +860,7 @@ test({
 /**
  * @brief	Waits for a file to exist and return the contents
  *
- * @property	{String} file
+ * @param	{String} file
  *
  * @return	{Promise<String>}
  */

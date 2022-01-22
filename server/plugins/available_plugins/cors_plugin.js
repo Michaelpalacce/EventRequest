@@ -7,8 +7,8 @@ const PluginInterface	= require( '../plugin_interface' );
  */
 class CorsPlugin extends PluginInterface {
 	/**
-	 * @property	{String} pluginId
-	 * @property	{Object} options
+	 * @param	{String} pluginId
+	 * @param	{Object} options
 	 */
 	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
@@ -16,7 +16,7 @@ class CorsPlugin extends PluginInterface {
 	}
 
 	/**
-	 * @property	{Object} options
+	 * @param	{Object} options
 	 */
 	setOptions( options = {} ) {
 		super.setOptions( options );
@@ -53,9 +53,7 @@ class CorsPlugin extends PluginInterface {
 	/**
 	 * @brief	Applies all the CORS headers to the response
 	 *
-	 * @property	{EventRequest} event
-	 *
-	 * @return	void
+	 * @param	{EventRequest} event
 	 */
 	applyCors( event ) {
 		if ( ! Array.isArray( this.origin ) ) {
@@ -96,7 +94,7 @@ class CorsPlugin extends PluginInterface {
 	/**
 	 * @brief	Gets the cors middleware that adds the extra CORS headers
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		return [{ handler : this.applyCors.bind( this ) }];

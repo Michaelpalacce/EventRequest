@@ -13,8 +13,6 @@ const ENV_SEPARATOR		= '=';
 class EnvPlugin extends PluginInterface {
 	/**
 	 * @brief	Loads the file to the process.env
-	 *
-	 * @return	void
 	 */
 	loadFileInEnv() {
 		const absFilePath	= this.getEnvFileAbsPath();
@@ -32,9 +30,7 @@ class EnvPlugin extends PluginInterface {
 	/**
 	 * @brief	Loads the env variables on runtime
 	 *
-	 * @property	{Server} server
-	 *
-	 * @return	void
+	 * @param	{Server} server
 	 */
 	setServerOnRuntime( server ) {
 		this.loadFileInEnv();
@@ -43,7 +39,7 @@ class EnvPlugin extends PluginInterface {
 	/**
 	 * @brief	Gets the absolute file path to the .env file
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getEnvFileAbsPath() {
 		return typeof this.options.fileLocation === 'string'

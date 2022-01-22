@@ -40,9 +40,7 @@ class Tester {
 	 *
 	 * @details	This is done so we can run the test many times per instance
 	 *
-	 * @property	{Object} options
-	 *
-	 * @return	void
+	 * @param	{Object} options
 	 */
 	initialize( options ) {
 		this.errors			= [];
@@ -119,9 +117,9 @@ class Tester {
 	/**
 	 * @brief	Formats the given test object by adding needed internal fields
 	 *
-	 * @property	{Object} test
+	 * @param	{Object} test
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	formatTest( test ) {
 		if ( typeof test !== 'object' || typeof test.message !== 'string' || typeof test.test !== 'function' )
@@ -175,9 +173,7 @@ class Tester {
 	/**
 	 * @brief	Adds the given test to the queue
 	 *
-	 * @property	{Object} test
-	 *
-	 * @return	void
+	 * @param	{Object} test
 	 */
 	addTest( test ) {
 		this.tests	= this.tests.concat( this.formatTest( test ) );
@@ -187,8 +183,6 @@ class Tester {
 	 * @brief	Called if the test passes successfully
 	 *
 	 * @details	It will output the index of the test as well as the message
-	 *
-	 * @return	void
 	 */
 	successCallback( test ) {
 		test.status	= TEST_STATUSES.success;
@@ -199,8 +193,8 @@ class Tester {
 	/**
 	 * @brief	Called if there is an error in the test
 	 *
-	 * @property	{Object} test
-	 * @property	{*} error
+	 * @param	{Object} test
+	 * @param	{*} error
 	 */
 	errorCallback( test, error ) {
 		if ( error instanceof Error ) {
@@ -225,8 +219,6 @@ class Tester {
 
 	/**
 	 * @brief	Called when all the tests have finished
-	 *
-	 * @return	void
 	 */
 	finished() {
 		this.hasFinished	= true;
@@ -248,10 +240,8 @@ class Tester {
 	/**
 	 * @brief	Called by the done function of the tests
 	 *
-	 * @property	{Object} test
-	 * @property	{*} err
-	 *
-	 * @return	void
+	 * @param	{Object} test
+	 * @param	{*} err
 	 */
 	doneCallback( test, err ) {
 		if ( this.hasFinished || this.stop )
@@ -269,9 +259,9 @@ class Tester {
 	/**
 	 * @brief	Checks the given test's status and determines what should happen
 	 *
-	 * @property	{Object} test
+	 * @param	{Object} test
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	checkTestStatus( test ) {
 		switch ( test.status ) {
@@ -292,8 +282,6 @@ class Tester {
 
 	/**
 	 * @brief	Call next test
-	 *
-	 * @return	void
 	 */
 	done() {
 		let test	= this.tests.shift();
@@ -349,9 +337,7 @@ class Tester {
 	 *
 	 * @details	This will produce an output directly to the console of the user
 	 *
-	 * @property	{Object} options
-	 *
-	 * @return	void
+	 * @param	{Object} options
 	 */
 	runAllTests( options = {} ) {
 		this.initialize( options );
