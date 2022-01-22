@@ -32,22 +32,19 @@ const REPORT_URI_KEY			= 'report-uri';
 /**
  * @brief	Formats an Expect-CT header
  */
-class ExpectCT
-{
-	constructor( options = {} )
-	{
+class ExpectCT {
+	constructor( options = {} ) {
 		this.parseOptions( options );
 	}
 
 	/**
 	 * @brief	Parses the options given to the ExpectCT class
 	 *
-	 * @param	{Object} [options={}]
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	void
 	 */
-	parseOptions( options = {} )
-	{
+	parseOptions( options = {} ) {
 		this.setEnabled( options.enabled );
 
 		this.maxAge		= typeof options[OPTIONS_MAX_AGE_KEY] === 'number'
@@ -66,48 +63,44 @@ class ExpectCT
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @param	{Boolean} [enabled=true]
+	 * @property	{Boolean} [enabled=true]
 	 *
 	 * @return	void
 	 */
-	setEnabled( enabled = true )
-	{
+	setEnabled( enabled = true ) {
 		this.enabled	= typeof enabled === 'boolean' ? enabled : true;
 	}
 
 	/**
 	 * @brief	Sets the enforce flag
 	 *
-	 * @param	{Boolean} [enforce=true]
+	 * @property	{Boolean} [enforce=true]
 	 *
 	 * @return	void
 	 */
-	enforce( enforce = true )
-	{
+	enforce( enforce = true ) {
 		this.isEnforce	= typeof enforce === 'boolean' ? enforce : this.isEnforce;
 	}
 
 	/**
 	 * @brief	Sets the enforce flag
 	 *
-	 * @param	{Number} maxAge
+	 * @property	{Number} maxAge
 	 *
 	 * @return	void
 	 */
-	setMaxAge( maxAge )
-	{
+	setMaxAge( maxAge ) {
 		this.maxAge	= typeof maxAge === 'number' ? maxAge : this.maxAge;
 	}
 
 	/**
 	 * @brief	Sets the reportUri
 	 *
-	 * @param	{String} reportUri
+	 * @property	{String} reportUri
 	 *
 	 * @return	void
 	 */
-	setReportUri( reportUri )
-	{
+	setReportUri( reportUri ) {
 		this.reportUri	= typeof reportUri === 'string' ? reportUri : this.reportUri;
 	}
 
@@ -116,8 +109,7 @@ class ExpectCT
 	 *
 	 * @return	String
 	 */
-	getHeader()
-	{
+	getHeader() {
 		return HEADER_NAME;
 	}
 
@@ -126,8 +118,7 @@ class ExpectCT
 	 *
 	 * @return	String
 	 */
-	build()
-	{
+	build() {
 		if ( ! this.enabled )
 			return '';
 

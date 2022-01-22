@@ -8,32 +8,28 @@ const AbstractFileStream	= require( './abstract_file_stream' );
 /**
  * @brief	Used to stream audio files
  */
-class AudioFileStream extends AbstractFileStream
-{
-	constructor()
-	{
+class AudioFileStream extends AbstractFileStream {
+	constructor() {
 		super( ['.mp3', '.flac', '.wav', '.aiff', '.aac'], 'audio' );
 	}
 
 	/**
 	 * @brief	Gets the file stream for the file
 	 *
-	 * @param	{EventRequest} event
-	 * @param	{String} file
-	 * @param	{Object} [options={}]
+	 * @property	{EventRequest} event
+	 * @property	{String} file
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	ReadStream
 	 */
-	getFileStream( event, file, options = {} )
-	{
+	getFileStream( event, file, options = {} ) {
 		let stream		= null;
 		const stat		= fs.statSync( file );
 		const fileSize	= stat.size;
 		const range		= event.getRequestHeader( 'range' );
 
 		event.setResponseHeader( 'Content-Type', `audio/${path.parse( file ).ext.substring( 1 )}` );
-		if ( range )
-		{
+		if ( range ) {
 			const parts	= range.replace( /bytes=/, "" ).split( "-" );
 			const start	= parseInt( parts[0], 10 );
 			const end	= parts[1] ? parseInt( parts[1], 10 ) : fileSize - 1;
@@ -44,8 +40,7 @@ class AudioFileStream extends AbstractFileStream
 
 			stream	= fs.createReadStream( file, { start, end } );
 		}
-		else
-		{
+		else {
 			event.setStatusCode( 200 );
 
 			stream	= fs.createReadStream( file );

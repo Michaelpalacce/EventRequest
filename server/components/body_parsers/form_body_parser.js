@@ -13,16 +13,13 @@ const CONTENT_TYPE_HEADER			= 'content-type';
 /**
  * @brief	FormBodyParser responsible for parsing application/x-www-form-urlencoded forms
  */
-class FormBodyParser extends EventEmitter
-{
+class FormBodyParser extends EventEmitter {
 	/**
-	 * @param	{Object} options
-	 * 				Accepts options:
-	 * 					- maxPayloadLength - Number - The max size of the body to be parsed
-	 * 					- strict - Boolean - Whether the received payload must match the content-length
+	 * @property	{Object} options
+	 * @property	{Number} options.maxPayloadLength - The max size of the body to be parsed
+	 * @property	{Boolean} options.strict - Whether the received payload must match the content-length
 	 */
-	constructor( options = {} )
-	{
+	constructor( options = {} ) {
 		super();
 		this.setMaxListeners( 0 );
 
@@ -37,23 +34,26 @@ class FormBodyParser extends EventEmitter
 	}
 
 	/**
-	 * @brief	Returns true if the current body parser supports teh given request
+	 * @brief		Returns true if the current body parser supports teh given request
 	 *
-	 * @param	{EventRequest} event
+	 * @property	{EventRequest} event	- The current EventRequest
 	 *
-	 * @return	Boolean
+	 * @return		{Boolean}				- Returns Boolean if the `content-type` is supported
 	 */
-	supports( event )
-	{
+	supports( event ) {
 		const contentType	= event.getRequestHeader( CONTENT_TYPE_HEADER );
 		return typeof contentType === 'string' && contentType.match( FORM_PARSER_SUPPORTED_TYPE ) !== null;
 	}
 
 	/**
-	 * @inheritDoc
+	 * @brief		Parses the request
+	 *
+	 * @async
+	 * @property	{EventRequest} event
+	 *
+	 * @return		{Promise<Object>}
 	 */
-	parse( event )
-	{
+	parse( event ) {
 		return new Promise(( resolve, reject ) => {
 			let rawBody			= [];
 			let payloadLength	= 0;
@@ -61,10 +61,8 @@ class FormBodyParser extends EventEmitter
 			if ( ! this.supports( event ) )
 				return reject( { code: 'app.er.bodyParser.form.notSupported' } );
 
-			event.request.on( 'data', ( data ) =>
-			{
-				if ( ! event.isFinished() )
-				{
+			event.request.on( 'data', ( data ) => {
+				if ( ! event.isFinished() ) {
 					payloadLength += data.length;
 
 					if ( payloadLength <= this.maxPayloadLength )
@@ -73,8 +71,7 @@ class FormBodyParser extends EventEmitter
 			});
 
 			event.request.on( 'end', () => {
-				if ( ! event.isFinished() )
-				{
+				if ( ! event.isFinished() ) {
 					rawBody	= Buffer.concat( rawBody, payloadLength );
 
 					if ( payloadLength > this.maxPayloadLength || payloadLength === 0 )
@@ -97,8 +94,7 @@ class FormBodyParser extends EventEmitter
 					const body			= {};
 					const payloadParts	= payload.split( '&' );
 
-					for ( let i = 0; i < payloadParts.length; ++ i )
-					{
+					for ( let i = 0; i < payloadParts.length; ++ i ) {
 						let param	= payloadParts[i].split( '=' );
 
 						if ( param.length !== 2 )

@@ -1,38 +1,33 @@
 /**
  * @brief	Big Map class that implements the public API of Map
  */
-class BigMap
-{
-	constructor ( ...parameters )
-	{
+class BigMap {
+	constructor ( ...parameters ) {
 		this.maps	= [new Map( ...parameters )];
 		this._limit	= 14000000;
 	}
 
 	/**
-	 * @brief	Sets the value for the given key
+	 * @brief		Sets the value for the given key
 	 *
-	 * @details	This function will create a new Map as is needed
-	 * 			A new map will be created every 8,000,000 keys
+	 * @details		This function will create a new Map as is needed
+	 * 				A new map will be created every 8,000,000 keys
 	 *
-	 * @param	{*} key
-	 * @param	{*} value
+	 * @property	{*} key		- the key to set
+	 * @property	{*} value	- the value to set
 	 *
-	 * @return	*
+	 * @return		*
 	 */
-	set( key, value )
-	{
+	set( key, value ) {
 		let mapToSet	= null;
 		this.maps.forEach( ( map ) => {
 			if ( map.has( key ) )
 				mapToSet	= map;
 		});
 
-		if ( mapToSet === null )
-		{
+		if ( mapToSet === null ) {
 			mapToSet	= this.maps[this.maps.length - 1];
-			if ( mapToSet.size >= this._limit )
-			{
+			if ( mapToSet.size >= this._limit ) {
 				mapToSet	= new Map();
 				this.maps.push( mapToSet );
 			}
@@ -42,14 +37,13 @@ class BigMap
 	}
 
 	/**
-	 * @brief	Gets a value given a key
+	 * @brief		Gets a value given a key
 	 *
-	 * @param	{*} key
+	 * @property	{*} key	- the key to get
 	 *
-	 * @return	*
+	 * @return		{*}		- element that was set
 	 */
-	get( key )
-	{
+	get( key ) {
 		const map	= this._findMapWithKey( key );
 
 		if ( typeof map === 'undefined' )
@@ -59,16 +53,15 @@ class BigMap
 	}
 
 	/**
-	 * @brief	Deletes a value given a key
+	 * @brief		Deletes a value given a key
 	 *
-	 * @details	This will remove the Map if it becomes empty when the key is deleted
+	 * @details		This will remove the Map if it becomes empty when the key is deleted
 	 *
-	 * @param	{*} key
+	 * @property	{*} key	- the key of the value to delete
 	 *
-	 * @return	*
+	 * @return		*		- The value that was deleted
 	 */
-	delete( key )
-	{
+	delete( key ) {
 		const map	= this._findMapWithKey( key );
 
 		if ( typeof map === 'undefined' )
@@ -83,14 +76,13 @@ class BigMap
 	}
 
 	/**
-	 * @brief	Checks if a key exists
+	 * @brief		Checks if a key exists
 	 *
-	 * @param	{*} key
+	 * @property	{*} key		- the key to check if exists
 	 *
-	 * @return	Boolean
+	 * @return		{Boolean}	- a flag whether the key exists
 	 */
-	has( key )
-	{
+	has( key ) {
 		return typeof this._findMapWithKey( key ) !== 'undefined';
 	}
 
@@ -98,11 +90,8 @@ class BigMap
 	 * @brief	Clears all the maps
 	 *
 	 * @details	This will set a new Map to work with
-	 *
-	 * @return	void
 	 */
-	clear()
-	{
+	clear() {
 		const oldMaps	= this.maps;
 		this.maps		= [new Map()];
 
@@ -113,10 +102,9 @@ class BigMap
 	/**
 	 * @brief	Returns the current size of the BigMap
 	 *
-	 * @return	Number
+	 * @return	{Number}
 	 */
-	get size()
-	{
+	get size() {
 		let size = 0;
 
 		for ( let map of this.maps )
@@ -126,22 +114,19 @@ class BigMap
 	}
 
 	/**
-	 * @param	{Function} callbackFn
-	 * @param	{*} thisArg
+	 * @property	{Function} callbackFn	- function that will be called
+	 * @property	{*} thisArg				- this argument to bind to
 	 */
-	forEach ( callbackFn, thisArg )
-	{
+	forEach ( callbackFn, thisArg ) {
 		if ( thisArg )
-			for ( const result of this )
-			{
+			for ( const result of this ) {
 				const key	= result[0];
 				const value	= result[1];
 
 				callbackFn.call( this, value, key, this );
 			}
 		else
-			for ( const result of this )
-			{
+			for ( const result of this ) {
 				const key	= result[0];
 				const value	= result[1];
 
@@ -154,8 +139,7 @@ class BigMap
 	 *
 	 * @return	{Iterator}
 	 */
-	entries()
-	{
+	entries() {
 		return this._propIterator( 'entries' );
 	}
 
@@ -164,8 +148,7 @@ class BigMap
 	 *
 	 * @return	{Iterator}
 	 */
-	keys()
-	{
+	keys() {
 		return this._propIterator( 'keys' );
 	}
 
@@ -174,8 +157,7 @@ class BigMap
 	 *
 	 * @return	{Iterator}
 	 */
-	values()
-	{
+	values() {
 		return this._propIterator( 'values' );
 	}
 
@@ -184,10 +166,8 @@ class BigMap
 	 *
 	 * @return	{Generator}
 	 */
-	*[Symbol.iterator] ()
-	{
-		for ( const map of this.maps )
-		{
+	*[Symbol.iterator] () {
+		for ( const map of this.maps ) {
 			for ( const value of map )
 				yield value;
 		}
@@ -196,15 +176,15 @@ class BigMap
 	/**
 	 * @brief	Returns an Iterator for the given element
 	 *
+	 * @private
+	 *
 	 * @return	{Iterator|Object}
 	 */
-	_propIterator( elementToGet )
-	{
+	_propIterator( elementToGet ) {
 		const that	= this;
 
 		return {
-			*[Symbol.iterator]()
-			{
+			*[Symbol.iterator]() {
 				for ( const map of that.maps )
 					for ( const element of map[elementToGet]() )
 						yield element;
@@ -213,18 +193,16 @@ class BigMap
 	}
 
 	/**
-	 * @brief	Finds which map exactly has the given key and returns it
+	 * @brief		Finds which map exactly has the given key and returns it
 	 *
-	 * @param	{*} key
+	 * @property	{*} key
 	 *
 	 * @private
 	 *
-	 * @return	Map
+	 * @return		{Map}
 	 */
-	_findMapWithKey( key )
-	{
-		for ( let index = this.maps.length - 1; index >= 0; index-- )
-		{
+	_findMapWithKey( key ) {
+		for ( let index = this.maps.length - 1; index >= 0; index-- ) {
 			const map = this.maps[index];
 
 			if ( map.has( key ) )

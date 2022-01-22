@@ -2,15 +2,13 @@
 
 const PluginInterface	= require( './../plugin_interface' );
 
-class BodyParserPlugin extends PluginInterface
-{
+class BodyParserPlugin extends PluginInterface {
 	/**
-	 * @param	{JsonBodyParser|MultipartDataParser|RawBodyParser|FormBodyParser} parser
-	 * @param	{String} pluginId
-	 * @param	{Object} [options={}]
+	 * @property	{JsonBodyParser|MultipartDataParser|RawBodyParser|FormBodyParser} parser
+	 * @property	{String} pluginId
+	 * @property	{Object} [options={}]
 	 */
-	constructor( parser, pluginId, options = {} )
-	{
+	constructor( parser, pluginId, options = {} ) {
 		super( pluginId, options );
 
 		this.parserClass	= parser;
@@ -22,12 +20,11 @@ class BodyParserPlugin extends PluginInterface
 	/**
 	 * @brief	Set the parser if given
 	 *
-	 * @param	{Object} [options={}]
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	void
 	 */
-	setOptions( options = {} )
-	{
+	setOptions( options = {} ) {
 		super.setOptions( options );
 
 		this.parserOptions	= options;
@@ -41,19 +38,16 @@ class BodyParserPlugin extends PluginInterface
 	 *
 	 * @return	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		const pluginMiddleware	= {
-			handler	: ( event ) =>
-			{
+			handler	: ( event ) => {
 				if ( event.body !== null && event.body !== undefined )
 					return event.next();
 
 				const ParserClass	= this.parserClass;
 				const parser		= new ParserClass( this.parserOptions );
 
-				if ( parser.supports( event ) )
-				{
+				if ( parser.supports( event ) ) {
 					event.body		= {};
 					event.rawBody	= {};
 

@@ -7,11 +7,9 @@ const AbstractFileStream	= require( './abstract_file_stream' );
 /**
  * @brief	Used to stream text files
  */
-class TextFileStream extends AbstractFileStream
-{
+class TextFileStream extends AbstractFileStream {
 	//@TODO ADD MIME TYPES
-	constructor()
-	{
+	constructor() {
 		super(
 			[
 				'.txt', '.js', '.php', '.html', '.json', '.cpp', '.h',
@@ -27,14 +25,13 @@ class TextFileStream extends AbstractFileStream
 	/**
 	 * @brief	Gets the file stream for the file
 	 *
-	 * @param	{EventRequest} event
-	 * @param	{String} file
-	 * @param	{Object} [options={}]
+	 * @property	{EventRequest} event
+	 * @property	{String} file
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	ReadStream
 	 */
-	getFileStream( event, file, options = {} )
-	{
+	getFileStream( event, file, options = {} ) {
 		return fs.createReadStream( file, options );
 	}
 }

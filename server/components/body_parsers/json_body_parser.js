@@ -13,16 +13,13 @@ const CONTENT_TYPE_HEADER				= 'content-type';
 /**
  * @brief	JsonBodyParser responsible for parsing application/json forms
  */
-class JsonBodyParser extends EventEmitter
-{
+class JsonBodyParser extends EventEmitter {
 	/**
-	 * @param	{Object} options
-	 * 				Accepts options:
-	 * 					- maxPayloadLength - Number - The max size of the body to be parsed
-	 * 					- strict - Boolean - Whether the received payload must match the content-length
+	 * @property	{Object} [options={}]
+	 * @property	{Number} options.maxPayloadLength	- The max size of the body to be parsed
+	 * @property	{Boolean} options.strict			- Whether the received payload must match the content-length
 	 */
-	constructor( options = {} )
-	{
+	constructor( options = {} ) {
 		super();
 		this.setMaxListeners( 0 );
 
@@ -37,27 +34,26 @@ class JsonBodyParser extends EventEmitter
 	}
 
 	/**
-	 * @brief	Returns a boolean if the current body parser supports the request
+	 * @brief		Returns a boolean if the current body parser supports the request
 	 *
-	 * @param	{EventRequest} event
+	 * @property	{EventRequest} event
 	 *
-	 * @return	Boolean
+	 * @return		{Boolean}
 	 */
-	supports( event )
-	{
+	supports( event ) {
 		const contentType	= event.getRequestHeader( CONTENT_TYPE_HEADER );
 		return typeof contentType === 'string' && contentType.match( JSON_BODY_PARSER_SUPPORTED_TYPE ) !== null;
 	}
 
 	/**
-	 * @brief	Parses the request
+	 * @brief		Parses the request
 	 *
-	 * @param	{EventRequest} event
+	 * @async
+	 * @property	{EventRequest} event
 	 *
-	 * @return	Promise
+	 * @return		{Promise<Object>}
 	 */
-	parse( event )
-	{
+	parse( event ) {
 		return new Promise(( resolve, reject ) => {
 			let rawBody		= [];
 			let payloadLength	= 0;
@@ -65,10 +61,8 @@ class JsonBodyParser extends EventEmitter
 			if ( ! this.supports( event ) )
 				return reject( { code: 'app.er.bodyParser.json.notSupported' } );
 
-			event.request.on( 'data', ( data ) =>
-			{
-				if ( ! event.isFinished() )
-				{
+			event.request.on( 'data', ( data ) => {
+				if ( ! event.isFinished() ) {
 					payloadLength	+= data.length;
 
 					if ( payloadLength <= this.maxPayloadLength )
@@ -77,8 +71,7 @@ class JsonBodyParser extends EventEmitter
 			});
 
 			event.request.on( 'end', () => {
-				if ( ! event.isFinished() )
-				{
+				if ( ! event.isFinished() ) {
 					rawBody	= Buffer.concat( rawBody, payloadLength );
 
 					if ( payloadLength > this.maxPayloadLength || payloadLength === 0 )
@@ -95,14 +88,12 @@ class JsonBodyParser extends EventEmitter
 						return resolve( { body: {}, rawBody: {} } );
 					}
 
-					try
-					{
+					try {
 						rawBody		= rawBody.toString();
 						const body	= JSON.parse( rawBody );
 						resolve( { body, rawBody } );
 					}
-					catch ( error )
-					{
+					catch ( error ) {
 						reject( { code: 'app.er.bodyParser.json.errorParsing' } );
 					}
 				}

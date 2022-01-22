@@ -11,10 +11,8 @@ const cluster				= require( 'cluster' );
 /**
  * @brief	Container that holds all the different loggers
  */
-class Loggur
-{
-	constructor()
-	{
+class Loggur {
+	constructor() {
 		this.loggers				= {};
 		this.LOG_LEVELS				= LOG_LEVELS;
 		this.defaultLogger			= null;
@@ -35,8 +33,7 @@ class Loggur
 	 *
 	 * @return	void
 	 */
-	enableDefault()
-	{
+	enableDefault() {
 		this.enableDefaultLogger	= true;
 	}
 
@@ -45,8 +42,7 @@ class Loggur
 	 *
 	 * @return	void
 	 */
-	disableDefault()
-	{
+	disableDefault() {
 		this.enableDefaultLogger	= false;
 	}
 
@@ -55,18 +51,16 @@ class Loggur
 	 *
 	 * @details	Configuration for the logger can be passed here and if valid the logger will be created and added
 	 *
-	 * @param	{String} loggerId
-	 * @param	{Logger|Object} [logger={}]
+	 * @property	{String} loggerId
+	 * @property	{Logger|Object} [logger={}]
 	 *
 	 * @return	Boolean
 	 */
-	addLogger( loggerId, logger = {} )
-	{
-		if ( typeof logger === 'object' && ( logger instanceof Logger ) === false )
+	addLogger( loggerId, logger = {} ) {
+		if ( typeof logger === 'object' && ! ( logger instanceof Logger ) )
 			logger	= this.createLogger( logger );
 
-		if ( logger instanceof Logger && typeof this.loggers[loggerId] === 'undefined' )
-		{
+		if ( logger instanceof Logger && typeof this.loggers[loggerId] === 'undefined' ) {
 			this.loggers[loggerId]	= logger;
 			return true;
 		}
@@ -79,12 +73,11 @@ class Loggur
 	 *
 	 * @details	Returns false if the logger is not added
 	 *
-	 * @param	{String} loggerId
+	 * @property	{String} loggerId
 	 *
 	 * @return	Logger|Boolean
 	 */
-	getLogger( loggerId )
-	{
+	getLogger( loggerId ) {
 		let logger	= this.loggers[loggerId];
 		if ( logger === undefined )
 			return false;
@@ -95,12 +88,11 @@ class Loggur
 	/**
 	 * @brief	Create a new logger
 	 *
-	 * @param	{Object} [loggerConfig={}]
+	 * @property	{Object} [loggerConfig={}]
 	 *
 	 * @return	Logger
 	 */
-	createLogger( loggerConfig = {} )
-	{
+	createLogger( loggerConfig = {} ) {
 		return new Logger( loggerConfig, this.uniqueId );
 	}
 
@@ -109,10 +101,8 @@ class Loggur
 	 *
 	 * @return	Logger
 	 */
-	getDefaultLogger()
-	{
-		if ( this.defaultLogger === null )
-		{
+	getDefaultLogger() {
+		if ( this.defaultLogger === null ) {
 			this.defaultLogger	= this.createLogger({
 				serverName	: 'Default',
 				logLevel	: LOG_LEVELS.debug
@@ -127,22 +117,17 @@ class Loggur
 	 *
 	 * @return	Promise
 	 */
-	log()
-	{
+	log() {
 		const loggersPromises	= [];
 
-		if ( Object.keys( this.loggers ).length !== 0 )
-		{
-			for ( const loggerId in this.loggers )
-			{
+		if ( Object.keys( this.loggers ).length !== 0 ) {
+			for ( const loggerId in this.loggers ) {
 				const logger	= this.loggers[loggerId];
 				loggersPromises.push( logger.log.apply( logger, arguments ) );
 			}
 		}
-		else
-		{
-			if ( this.enableDefaultLogger )
-			{
+		else {
+			if ( this.enableDefaultLogger ) {
 				const logger	= this.getDefaultLogger();
 				loggersPromises.push( logger.log.apply( logger, arguments ) );
 			}
@@ -154,19 +139,16 @@ class Loggur
 	/**
 	 * @brief	Sets the Log Level of all the attached Loggers
 	 *
-	 * @param	{Number} logLevel
+	 * @property	{Number} logLevel
 	 *
 	 * @return	void
 	 */
-	setLogLevel( logLevel )
-	{
-		if ( Object.keys( this.loggers ).length !== 0 )
-		{
+	setLogLevel( logLevel ) {
+		if ( Object.keys( this.loggers ).length !== 0 ) {
 			for ( let loggerId in this.loggers )
 				this.loggers[loggerId].setLogLevel( logLevel );
 		}
-		else
-		{
+		else {
 			if ( this.enableDefaultLogger )
 				this.getDefaultLogger().setLogLevel( logLevel );
 		}

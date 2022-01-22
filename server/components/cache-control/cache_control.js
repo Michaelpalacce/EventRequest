@@ -8,22 +8,23 @@ const AVAILABLE_OTHER_DIRECTIVES		= ['no-transform'];
 /**
  * @brief	Builder class responsible for creating a cache control header
  */
-class CacheControl
-{
-	constructor()
-	{
+class CacheControl {
+	constructor() {
 		this.options	= {};
 	}
 
 	/**
-	 * @brief	Parses the options passed and sets the correct attributes
+	 * @brief		Parses the options passed and sets the correct attributes
 	 *
-	 * @param	{Object} [options={}]
-	 *
-	 * @return	void
+	 * @private
+	 * @property	{Object} [options={}]
+	 * @property	{Boolean} options.static				- flag should set a bunch of rules meant for static resources
+	 * @property	{Boolean} options.cacheControl			- flag should set cache control
+	 * @property	{Boolean} options.revalidation			- flag should set revalidation directive
+	 * @property	{Boolean} options.other					- flag should set other directive
+	 * @property	{Boolean} options.expirationDirectives	- CacheControl.addExpirationDirective
 	 */
-	_configure( options = {} )
-	{
+	_configure( options = {} ) {
 		if ( options.static === true )
 			this.setStaticRules();
 
@@ -31,10 +32,8 @@ class CacheControl
 		this.setRevalidationDirective( options.revalidation );
 		this.setOtherDirective( options.other );
 
-		if ( typeof options.expirationDirectives === 'object' )
-		{
-			for ( const directive in options.expirationDirectives )
-			{
+		if ( typeof options.expirationDirectives === 'object' ) {
+			for ( const directive in options.expirationDirectives ) {
 				/* istanbul ignore next */
 				if ( ! {}.hasOwnProperty.call( options.expirationDirectives, directive ) )
 					continue;
@@ -47,27 +46,21 @@ class CacheControl
 
 	/**
 	 * @brief	Sets a bunch of rules meant for static resources
-	 *
-	 * @return	void
 	 */
-	setStaticRules()
-	{
+	setStaticRules() {
 		this.setCacheControl( 'public' );
 		this.addExpirationDirective( 'max-age', 604800 );
 		this.setRevalidationDirective( 'immutable' );
 	}
 
 	/**
-	 * @brief	Sets the Cache Control directive
+	 * @brief		Sets the Cache Control directive
 	 *
-	 * @details	This function checks from an array of possible values and if nothing matches, does not set anything.
+	 * @details		This function checks from an array of possible values and if nothing matches, does not set anything.
 	 *
-	 * @param	{String} directive
-	 *
-	 * @return	void
+	 * @property	{String} directive
 	 */
-	setCacheControl( directive )
-	{
+	setCacheControl( directive ) {
 		if ( AVAILABLE_CACHE_CONTROL.indexOf( directive ) === -1 )
 			return;
 
@@ -75,18 +68,15 @@ class CacheControl
 	}
 
 	/**
-	 * @brief	Adds an expiration directive
+	 * @brief		Adds an expiration directive
 	 *
-	 * @details	This function checks from an array of possible values and if nothing matches, does not set anything.
-	 * 			This function will check if time is a Number and if it is not it will not set anything
+	 * @details		This function checks from an array of possible values and if nothing matches, does not set anything.
+	 * 				This function will check if time is a Number and if it is not it will not set anything
 	 *
-	 * @param	{String} directive
-	 * @param	{Number} time
-	 *
-	 * @return	void
+	 * @property	{String} directive
+	 * @property	{Number} time
 	 */
-	addExpirationDirective( directive, time )
-	{
+	addExpirationDirective( directive, time ) {
 		if ( AVAILABLE_EXPIRATION_DIRECTIVES.indexOf( directive ) === -1 || typeof time !== 'number' )
 			return;
 
@@ -97,16 +87,13 @@ class CacheControl
 	}
 
 	/**
-	 * @brief	Sets the revalidation directive
+	 * @brief		Sets the revalidation directive
 	 *
-	 * @details	This function checks from an array of possible values and if nothing matches, does not set anything.
+	 * @details		This function checks from an array of possible values and if nothing matches, does not set anything.
 	 *
-	 * @param	{String} directive
-	 *
-	 * @return	void
+	 * @property	{String} directive
 	 */
-	setRevalidationDirective( directive )
-	{
+	setRevalidationDirective( directive ) {
 		if ( AVAILABLE_REVALIDATION_DIRECTIVES.indexOf( directive ) === -1 )
 			return;
 
@@ -114,16 +101,13 @@ class CacheControl
 	}
 
 	/**
-	 * @brief	Sets the other directive
+	 * @brief		Sets the other directive
 	 *
-	 * @details	This function checks from an array of possible values and if nothing matches, does not set anything.
+	 * @details		This function checks from an array of possible values and if nothing matches, does not set anything.
 	 *
-	 * @param	{String} directive
-	 *
-	 * @return	void
+	 * @property	{String} directive
 	 */
-	setOtherDirective( directive )
-	{
+	setOtherDirective( directive ) {
 		if ( AVAILABLE_OTHER_DIRECTIVES.indexOf( directive ) === -1 )
 			return;
 
@@ -131,19 +115,17 @@ class CacheControl
 	}
 
 	/**
-	 * @brief	Appends to the header
+	 * @brief		Appends to the header
 	 *
-	 * @details	This will check if a comma needs to be added
-	 *
-	 * @param	{String} header
-	 * @param	{String} value
+	 * @details		This will check if a comma needs to be added
 	 *
 	 * @private
+	 * @property	{String} header
+	 * @property	{String} value
 	 *
-	 * @return	{String}
+	 * @return		{String}
 	 */
-	_append( header, value )
-	{
+	_append( header, value ) {
 		if ( header !== '' )
 			header	+= ', ';
 
@@ -152,17 +134,21 @@ class CacheControl
 	}
 
 	/**
-	 * @brief	Builds the cache control header
+	 * @brief		Builds the cache control header
 	 *
-	 * @details	This function will build the cache control header and clean up the builder, so it can be reused again
-	 * 			You can pass another options object that will be validated via _configure as long as it is not empty
+	 * @details		This function will build the cache control header and clean up the builder, so it can be reused again
+	 * 				You can pass another options object that will be validated via _configure as long as it is not empty
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} [options={}]
+	 * @property	{Boolean} options.static				- flag should set a bunch of rules meant for static resources
+	 * @property	{Boolean} options.cacheControl			- flag should set cache control
+	 * @property	{Boolean} options.revalidation			- flag should set revalidation directive
+	 * @property	{Boolean} options.other					- flag should set other directive
+	 * @property	{Boolean} options.expirationDirectives	- CacheControl.addExpirationDirective
 	 *
-	 * @return	{String}
+	 * @return		{String}
 	 */
-	build( options = {} )
-	{
+	build( options = {} ) {
 		if ( Object.keys( options ).length !== 0 )
 			this._configure( options );
 
@@ -172,8 +158,7 @@ class CacheControl
 			headerValue	= this._append( headerValue, this.options.cacheControl );
 
 		if ( this.options.expirationDirectives )
-			for ( const directive in this.options.expirationDirectives )
-			{
+			for ( const directive in this.options.expirationDirectives ) {
 				/* istanbul ignore next */
 				if ( ! {}.hasOwnProperty.call( this.options.expirationDirectives, directive ) )
 					continue;

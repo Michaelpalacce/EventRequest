@@ -14,9 +14,7 @@ const PROJECT_ROOT	= path.parse( require.main.filename ).dir;
 /**
  * @brief	Static resource plugin used to server static resources
  */
-class StaticResourcesPlugin extends PluginInterface
-{
-
+class StaticResourcesPlugin extends PluginInterface {
 	/**
 	 * Defines a dynamic static resource, meaning that the path given will be taken from the project ROOT and styles will
 	 * 	be searched for inside this path.
@@ -36,8 +34,7 @@ class StaticResourcesPlugin extends PluginInterface
 	 */
 	static ABSOLUTE	= 2;
 
-	setServerOnRuntime( server )
-	{
+	setServerOnRuntime( server ) {
 		this.server	= server;
 	}
 
@@ -46,8 +43,7 @@ class StaticResourcesPlugin extends PluginInterface
 	 *
 	 * @return	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		const pluginMiddlewares	= this._getPluginMiddlewares();
 		this.options			= {};
 
@@ -116,8 +112,7 @@ class StaticResourcesPlugin extends PluginInterface
 					if ( ! file )
 						return event.next();
 
-					if ( useEtag )
-					{
+					if ( useEtag ) {
 						const plugin			= this.server.er_etag;
 						const { etag, pass }	= plugin.getConditionalResult( event, fs.statSync( file ), strong );
 
@@ -155,10 +150,8 @@ class StaticResourcesPlugin extends PluginInterface
 					const item		= path.join( PROJECT_ROOT, event.path );
 					let fileStat	= null;
 
-					if ( fs.existsSync( item ) && ( fileStat = fs.statSync( item ) ).isFile() && item.indexOf( staticPath ) !== -1 )
-					{
-						if ( useEtag )
-						{
+					if ( fs.existsSync( item ) && ( fileStat = fs.statSync( item ) ).isFile() && item.indexOf( staticPath ) !== -1 ) {
+						if ( useEtag ) {
 							const plugin			= this.server.er_etag;
 							const { etag, pass }	= plugin.getConditionalResult( event, fileStat, strong );
 
@@ -170,8 +163,7 @@ class StaticResourcesPlugin extends PluginInterface
 
 						this._sendFile( event, item );
 					}
-					else
-					{
+					else {
 						event.removeResponseHeader( CacheControl.HEADER );
 
 						event.next( { code: 'app.er.staticResources.fileNotFound', message: `File not found: ${event.path}`, status: 404 } );
@@ -187,8 +179,8 @@ class StaticResourcesPlugin extends PluginInterface
 	 * Finds a file starting from a dir
 	 * If start Path is a file, then it will be returned directly :)
 	 *
-	 * @param	{String} startPath
-	 * @param	{String} fileToFind
+	 * @property	{String} startPath
+	 * @property	{String} fileToFind
 	 *
 	 * @return	{String|null}
 	 */
@@ -219,8 +211,8 @@ class StaticResourcesPlugin extends PluginInterface
 	 * Sends a given file.
 	 * Sets the correct Content-Type header as well as the correct status code
 	 *
-	 * @param	{EventRequest} event
-	 * @param	{String} file
+	 * @property	{EventRequest} event
+	 * @property	{String} file
 	 */
 	_sendFile( event, file ) {
 		event.setResponseHeader( 'Content-Type', MimeType.findMimeType( path.extname( file ) ) ).setStatusCode( 200 );

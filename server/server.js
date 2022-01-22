@@ -32,13 +32,11 @@ const RawBodyParser				= require( './components/body_parsers/raw_body_parser' );
 /**
  * @brief	Server class responsible for receiving requests and sending responses
  */
-class Server extends EventEmitter
-{
+class Server extends EventEmitter {
 	/**
 	 * @brief	Initializes the Server
 	 */
-	constructor()
-	{
+	constructor() {
 		super();
 		this.setMaxListeners( 0 );
 
@@ -56,8 +54,7 @@ class Server extends EventEmitter
 	 *
 	 * @return	Server
 	 */
-	define()
-	{
+	define() {
 		this.router.define.apply( this.router, arguments );
 
 		return this;
@@ -68,8 +65,7 @@ class Server extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	setUpDefaultPlugins()
-	{
+	setUpDefaultPlugins() {
 		// attached like this to enable smart autocomplete in IDE's
 		this.er_env						= new EnvPlugin( 'er_env' );
 		this.er_cors					= new CorsPlugin( 'er_cors' );
@@ -118,8 +114,7 @@ class Server extends EventEmitter
 	 *
 	 * @return	PluginManager
 	 */
-	getPluginManager()
-	{
+	getPluginManager() {
 		return this.pluginManager;
 	}
 
@@ -128,8 +123,7 @@ class Server extends EventEmitter
 	 *
 	 * @return	Router
 	 */
-	Router()
-	{
+	Router() {
 		return new RouterClass();
 	}
 
@@ -139,13 +133,12 @@ class Server extends EventEmitter
 	 * @details	The plugin manager can be used to extract and set up plugins and then add them to the server just by
 	 * 			giving their plugin ids
 	 *
-	 * @param	{PluginInterface|Object|String} plugin
-	 * @param	{Object} options
+	 * @property	{PluginInterface|Object|String} plugin
+	 * @property	{Object} options
 	 *
 	 * @return	Server
 	 */
-	apply( plugin, options = null )
-	{
+	apply( plugin, options = null ) {
 		if ( typeof plugin === 'string' )
 			plugin	= this.pluginManager.getPlugin( plugin );
 
@@ -163,12 +156,11 @@ class Server extends EventEmitter
 	/**
 	 * @brief	Attaches a PluginInterface to the server
 	 *
-	 * @param	{PluginInterface} plugin
+	 * @property	{PluginInterface} plugin
 	 *
 	 * @return	void
 	 */
-	_attachPlugin( plugin )
-	{
+	_attachPlugin( plugin ) {
 		const pluginDependencies	= plugin.getPluginDependencies();
 		const pluginId				= plugin.getPluginId();
 
@@ -189,12 +181,11 @@ class Server extends EventEmitter
 	 *
 	 * @details	Will throw if the plugin is not attached
 	 *
-	 * @param	{String|PluginInterface} pluginId
+	 * @property	{String|PluginInterface} pluginId
 	 *
 	 * @return	PluginInterface
 	 */
-	getPlugin( pluginId )
-	{
+	getPlugin( pluginId ) {
 		const id	= typeof pluginId === 'string' ? pluginId : pluginId.getPluginId();
 
 		if ( this.hasPlugin( id ) )
@@ -206,12 +197,11 @@ class Server extends EventEmitter
 	/**
 	 * @brief	Checks whether the server has a plugin with the given id
 	 *
-	 * @param	{String|PluginInterface} pluginId
+	 * @property	{String|PluginInterface} pluginId
 	 *
 	 * @return	Boolean
 	 */
-	hasPlugin( pluginId )
-	{
+	hasPlugin( pluginId ) {
 		const id	= typeof pluginId === 'string' ? pluginId : pluginId.getPluginId();
 
 		return typeof this.plugins[id] !== 'undefined';
@@ -222,23 +212,20 @@ class Server extends EventEmitter
 	 *
 	 * @return	Function
 	 */
-	attach()
-	{
+	attach() {
 		return ( request, response ) => {
 			let eventRequest	= new EventRequest( request, response );
 			const block			= this.router.getExecutionBlockForCurrentEvent( eventRequest );
 
 			response.on( 'close', () => {
-				if ( eventRequest !== null && eventRequest !== undefined )
-				{
+				if ( eventRequest !== null && eventRequest !== undefined ) {
 					eventRequest._cleanUp();
 					eventRequest	= null;
 				}
 			});
 
 			response.on( 'error', ( error ) => {
-				if ( eventRequest !== null && eventRequest !== undefined )
-				{
+				if ( eventRequest !== null && eventRequest !== undefined ) {
 					eventRequest.next( error );
 					eventRequest._cleanUp();
 					eventRequest	= null;
@@ -251,8 +238,7 @@ class Server extends EventEmitter
 
 				let message;
 
-				if ( error.error instanceof Error )
-				{
+				if ( error.error instanceof Error ) {
 					message			= Object.assign( {}, error );
 					message.error	= message.error.stack;
 				}
@@ -280,8 +266,7 @@ class Server extends EventEmitter
 	 *
 	 * @return	Server
 	 */
-	listen()
-	{
+	listen() {
 		const httpServer	= http.createServer( this.attach() );
 
 		return httpServer.listen.apply( httpServer, arguments );

@@ -11,11 +11,10 @@ const IF_MATCH_CONDITIONAL_HEADER_NAME		= 'If-Match';
 /**
  * @brief	Etag Plugin responsible for setting an etag Header for responses.
  */
-class EtagPlugin extends PluginInterface
-{
+class EtagPlugin extends PluginInterface {
 	/**
-	 * @param	{String} pluginId
-	 * @param	{Object} options
+	 * @property	{String} pluginId
+	 * @property	{Object} options
 	 */
 	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
@@ -24,7 +23,7 @@ class EtagPlugin extends PluginInterface
 	}
 
 	/**
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 */
 	setOptions( options = {} ) {
 		this.strong	= typeof options.strong === 'boolean'
@@ -35,8 +34,8 @@ class EtagPlugin extends PluginInterface
 	/**
 	 * @brief	Calculates the ETag for a payload
 	 *
-	 * @param	{String|Buffer|Stats} payload
-	 * @param	{Boolean} strong
+	 * @property	{String|Buffer|Stats} payload
+	 * @property	{Boolean} strong
 	 *
 	 * @return	String
 	 */
@@ -59,25 +58,22 @@ class EtagPlugin extends PluginInterface
 	 *
 	 * @details	This function will calculate
 	 *
-	 * @param	{EventRequest} event
-	 * @param	{String|Buffer|Stats} payload
-	 * @param	{Boolean} strong
+	 * @property	{EventRequest} event
+	 * @property	{String|Buffer|Stats} payload
+	 * @property	{Boolean} strong
 	 *
 	 * @return	Object
 	 */
-	getConditionalResult( event, payload, strong = this.strong )
-	{
+	getConditionalResult( event, payload, strong = this.strong ) {
 		const etag	= this.etag( payload, strong );
 		let pass	= true;
 		let header	= null;
 
-		switch ( true )
-		{
+		switch ( true ) {
 			case event.hasRequestHeader( IF_NONE_MATCH_CONDITIONAL_HEADER_NAME ):
 				header	= this._extractHeaderValues( event.getRequestHeader( IF_NONE_MATCH_CONDITIONAL_HEADER_NAME ) );
 
-				if ( header.length === 1 && header[0] === '*' )
-				{
+				if ( header.length === 1 && header[0] === '*' ) {
 					pass	= false;
 					break;
 				}
@@ -104,24 +100,21 @@ class EtagPlugin extends PluginInterface
 	/**
 	 * @brief	Conditionally sends the request depending on the IF-* conditional headers
 	 *
-	 * @param	{EventRequest} event
-	 * @param	{String|Buffer} payload
-	 * @param	{Number} code
-	 * @param	{Boolean} strong
+	 * @property	{EventRequest} event
+	 * @property	{String|Buffer} payload
+	 * @property	{Number} code
+	 * @property	{Boolean} strong
 	 *
 	 * @return	{void}
 	 */
-	conditionalSend( event, payload, code = null, strong = this.strong )
-	{
+	conditionalSend( event, payload, code = null, strong = this.strong ) {
 		payload					= event.formatResponse( payload );
 		const { pass, etag }	= this.getConditionalResult( event, payload, strong );
 
 		event.setResponseHeader( 'ETag', etag );
 
-		if ( ! pass )
-		{
-			switch ( event.method.toUpperCase() )
-			{
+		if ( ! pass ) {
+			switch ( event.method.toUpperCase() ) {
 				case 'GET':
 				case 'HEAD':
 					payload	= '';
@@ -143,8 +136,7 @@ class EtagPlugin extends PluginInterface
 	 *
 	 * @return	{Object[]}
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		const middleware	= {
 			handler	: ( event ) => {
 				event.etag					= this.etag.bind( this );
@@ -172,14 +164,13 @@ class EtagPlugin extends PluginInterface
 	/**
 	 * @brief	Extracts the conditional headers values
 	 *
-	 * @param	{String} header
+	 * @property	{String} header
 	 *
 	 * @private
 	 *
 	 * @return	{String[]}
 	 */
-	_extractHeaderValues( header )
-	{
+	_extractHeaderValues( header ) {
 		return header.split( ',' ).map( ( x ) => { return x.trim(); } );
 	}
 }

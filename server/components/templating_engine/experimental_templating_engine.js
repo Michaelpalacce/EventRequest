@@ -17,10 +17,8 @@ const DefaultTemplatingEngine	= require( './default_templating_engine' );
  * 			WIP: COMMENTS. HTML comments of template syntax is NOT going to work as expected!
  * 			WIP: INCLUDES. Including other templates is currently NOT supported
  */
-class TemplatingEngine extends DefaultTemplatingEngine
-{
-	constructor()
-	{
+class TemplatingEngine extends DefaultTemplatingEngine {
+	constructor() {
 		super();
 
 		this.variablesRe	= /<%([^%>]+)?%>|<\?js([\s\S]+?)\/>/gm;
@@ -31,30 +29,27 @@ class TemplatingEngine extends DefaultTemplatingEngine
 	/**
 	 * @brief	Renders a template given specific variables
 	 *
-	 * @param	{String} template
-	 * @param	{Object} variables
+	 * @property	{String} template
+	 * @property	{Object} variables
 	 *
 	 * @return	{String}
 	 */
-	render( template, variables )
-	{
+	render( template, variables ) {
 		let r$r		= 'const r$r=[];' + this.EOL;
 		let cursor	= 0;
 
 		/**
 		 * @brief	Builder function for the template
 		 *
-		 * @param	line String
-		 * @param	isJs Boolean
-		 * @param	insertDirectly Boolean
+		 * @property	line String
+		 * @property	isJs Boolean
+		 * @property	insertDirectly Boolean
 		 *
 		 * @return	void
 		 */
 		const addCode	= ( line, isJs, insertDirectly = false ) => {
-			if ( isJs )
-			{
-				if ( insertDirectly )
-				{
+			if ( isJs ) {
+				if ( insertDirectly ) {
 					r$r	+= line + this.EOL;
 					return ;
 				}
@@ -63,10 +58,8 @@ class TemplatingEngine extends DefaultTemplatingEngine
 				line	= line.trim();
 				r$r		+= `r$r.push( typeof ${line}==='string'?${line}.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'):${line});${this.EOL}`;
 			}
-			else
-			{
-				if ( line.length !== 0 && line.match( this.emptyRe )[0] !== line)
-				{
+			else {
+				if ( line.length !== 0 && line.match( this.emptyRe )[0] !== line) {
 					// Strip line of specific characters
 					// Remove ` | Escape $
 					r$r	+= `r$r.push(\`` + line.replace( /`/g, '\\`' ).replace( '$', '\\$' ) + `\`);` + this.EOL;
@@ -76,8 +69,7 @@ class TemplatingEngine extends DefaultTemplatingEngine
 
 		// Add local variables so we don't have to use this. to access variables
 		let i	= 0;
-		for ( const key in variables )
-		{
+		for ( const key in variables ) {
 			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( variables, key ) )
 				continue;
@@ -88,8 +80,7 @@ class TemplatingEngine extends DefaultTemplatingEngine
 
 		let match;
 
-		while( match = this.variablesRe.exec( template ) )
-		{
+		while( match = this.variablesRe.exec( template ) ) {
 			const matchIndex	= match.index;
 			const matchedString	= match[0];
 			const matchLength	= matchedString.length;
@@ -114,6 +105,5 @@ class TemplatingEngine extends DefaultTemplatingEngine
 		return new Function( '...args', r$r ).apply( null, Object.values( variables ) );
 	}
 }
-
 
 module.exports	= TemplatingEngine;

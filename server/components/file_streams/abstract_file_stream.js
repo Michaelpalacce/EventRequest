@@ -3,14 +3,12 @@
 // Dependencies
 const path	= require( 'path' );
 
-class AbstractFileStream
-{
+class AbstractFileStream {
 	/**
-	 * @param	{Array} supportedFormats
-	 * @param	{String} streamType
+	 * @property	{Array} supportedFormats
+	 * @property	{String} streamType
 	 */
-	constructor( supportedFormats = [], streamType = 'unknown' )
-	{
+	constructor( supportedFormats = [], streamType = 'unknown' ) {
 		this.SUPPORTED_FORMATS	= supportedFormats;
 		this._streamType		= streamType;
 	}
@@ -18,12 +16,11 @@ class AbstractFileStream
 	/**
 	 * @brief	Check whether the given file is supported by the file stream
 	 *
-	 * @param	{String} file
+	 * @property	{String} file
 	 *
 	 * @return	Boolean
 	 */
-	supports( file )
-	{
+	supports( file ) {
 		const parsedPath	= path.parse( file );
 		return this.SUPPORTED_FORMATS.indexOf( parsedPath.ext.toLowerCase() ) !== -1;
 	}
@@ -33,8 +30,7 @@ class AbstractFileStream
 	 *
 	 * @return	String
 	 */
-	getType()
-	{
+	getType() {
 		return this._streamType;
 	}
 }

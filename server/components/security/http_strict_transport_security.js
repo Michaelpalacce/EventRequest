@@ -31,22 +31,19 @@ const PRELOAD_KEY						= 'preload';
 /**
  * @brief	Formats a HSTS header
  */
-class HttpStrictTransportSecurity
-{
-	constructor( options = {} )
-	{
+class HttpStrictTransportSecurity {
+	constructor( options = {} ) {
 		this.parseOptions( options );
 	}
 
 	/**
 	 * @brief	Parses the options given to the HSTS class
 	 *
-	 * @param	{Object} [options={}]
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	void
 	 */
-	parseOptions( options = {} )
-	{
+	parseOptions( options = {} ) {
 		this.setEnabled( options.enabled );
 
 		this.maxAge					= typeof options[OPTIONS_MAX_AGE_KEY] === 'number'
@@ -65,48 +62,44 @@ class HttpStrictTransportSecurity
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @param	{Boolean} [enabled=true]
+	 * @property	{Boolean} [enabled=true]
 	 *
 	 * @return	void
 	 */
-	setEnabled( enabled = true )
-	{
+	setEnabled( enabled = true ) {
 		this.enabled	= typeof enabled === 'boolean' ? enabled : true;
 	}
 
 	/**
 	 * @brief	Sets the component's to either be preloaded or not
 	 *
-	 * @param	{Boolean} [preload=true]
+	 * @property	{Boolean} [preload=true]
 	 *
 	 * @return	void
 	 */
-	preload( preload = true )
-	{
+	preload( preload = true ) {
 		this.doPreload	= typeof preload === 'boolean' ? preload : this.doPreload;
 	}
 
 	/**
 	 * @brief	Sets the enforce flag
 	 *
-	 * @param	{Number} maxAge
+	 * @property	{Number} maxAge
 	 *
 	 * @return	void
 	 */
-	setMaxAge( maxAge )
-	{
+	setMaxAge( maxAge ) {
 		this.maxAge	= typeof maxAge === 'number' ? maxAge : this.maxAge;
 	}
 
 	/**
 	 * @brief	Enable or disable includeSubDomains
 	 *
-	 * @param	{Boolean} [include=true]
+	 * @property	{Boolean} [include=true]
 	 *
 	 * @return	void
 	 */
-	includeSubDomains( include = true )
-	{
+	includeSubDomains( include = true ) {
 		this.doIncludeSubDomains	= typeof include === 'boolean' ? include : this.doIncludeSubDomains;
 	}
 
@@ -115,8 +108,7 @@ class HttpStrictTransportSecurity
 	 *
 	 * @return	String
 	 */
-	getHeader()
-	{
+	getHeader() {
 		return HEADER_NAME;
 	}
 
@@ -125,8 +117,7 @@ class HttpStrictTransportSecurity
 	 *
 	 * @return	String
 	 */
-	build()
-	{
+	build() {
 		if ( ! this.enabled )
 			return '';
 

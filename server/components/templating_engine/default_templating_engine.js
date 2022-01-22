@@ -5,31 +5,28 @@ const { readFile }	= require( 'fs' ).promises;
 /**
  * @brief	Default templating engine that just returns the HTML directly
  */
-class TemplatingEngine
-{
+class TemplatingEngine {
 	/**
 	 * @brief	Return the HTML directly
 	 *
-	 * @param	{String} html
-	 * @param	{Object} variables
+	 * @property	{String} html
+	 * @property	{Object} variables
 	 *
 	 * @returns	{String}
 	 */
-	render( html, variables )
-	{
+	render( html, variables ) {
 		return html;
 	}
 
 	/**
 	 * @brief	Reads and renders a html file
 	 *
-	 * @param	{String} templateLocation
-	 * @param	{Object} variables
+	 * @property	{String} templateLocation
+	 * @property	{Object} variables
 	 *
 	 * @return	{Promise<String>}
 	 */
-	async renderFile( templateLocation, variables )
-	{
+	async renderFile( templateLocation, variables ) {
 		const data	= await readFile( templateLocation );
 
 		return this.render( data.toString(), variables );

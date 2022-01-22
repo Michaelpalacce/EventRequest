@@ -9,8 +9,8 @@ module.exports	= {
 	 * If getFirst is passed, then the first mime type is returned ( in case where there may be more than one mime type per extension ),
 	 * otherwise an array is returned
 	 *
-	 * @param	{String} extension
-	 * @param	{Boolean} getFirst
+	 * @property	{String} extension
+	 * @property	{Boolean} getFirst
 	 *
 	 * @return	{Array|String}
 	 */
@@ -21,7 +21,7 @@ module.exports	= {
 	/**
 	 * Searches for an extension given the mimeType
 	 *
-	 * @param	{String} mimeType
+	 * @property	{String} mimeType
 	 *
 	 * @return	{null|String}
 	 */
@@ -32,9 +32,8 @@ module.exports	= {
 				continue;
 
 			const value	= data[key];
-			if ( value.includes( mimeType ) ) {
+			if ( value.includes( mimeType ) )
 				return key;
-			}
 		}
 
 		return null;

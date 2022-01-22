@@ -18,22 +18,19 @@ const TRANSPORT_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
 /**
  * @brief	Transport class used by the other Transport types
  */
-class Transport
-{
-	constructor( options = {} )
-	{
+class Transport {
+	constructor( options = {} ) {
 		this.sanitizeConfig( options );
 	}
 
 	/**
 	 * @brief	Sanitize the given options
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	sanitizeConfig( options )
-	{
+	sanitizeConfig( options ) {
 		this.logLevel			= typeof options.logLevel === 'number'
 								? options.logLevel
 								: TRANSPORT_DEFAULT_LOG_LEVEL;
@@ -51,24 +48,22 @@ class Transport
 	/**
 	 * @brief	Get an instance of the current transport
 	 *
-	 * @param	{Object} [options={}]
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	Transport
 	 */
-	static getInstance( options = {} )
-	{
+	static getInstance( options = {} ) {
 		return new this( options );
 	}
 
 	/**
 	 * @brief	Returns whether the current log is supported by the transport
 	 *
-	 * @param	{Log} log
+	 * @property	{Log} log
 	 *
 	 * @return	Boolean
 	 */
-	supports( log )
-	{
+	supports( log ) {
 		if ( ! ( log instanceof Log ) )
 			return false;
 
@@ -81,30 +76,28 @@ class Transport
 	/**
 	 * @brief	The method that actually logs the data
 	 *
-	 * @param	{Array} data
-	 * @param	{Function} resolve
-	 * @param	{Function} reject
+	 * @property	{Array} data
+	 * @property	{Function} resolve
+	 * @property	{Function} reject
 	 *
 	 * @private
 	 *
 	 * @return	void
 	 */
-	_log( data, resolve, reject )
-	{
+	_log( data, resolve, reject ) {
 		resolve();
 	}
 
 	/**
 	 * @brief	Creates an object to be used in the processors
 	 *
-	 * @param	{Log} log
+	 * @property	{Log} log
 	 *
 	 * @private
 	 *
 	 * @return	Object
 	 */
-	_createProcessorsObject( log )
-	{
+	_createProcessorsObject( log ) {
 		return {
 			timestamp	: log.getTimestamp(),
 			isRaw		: log.getIsRaw(),
@@ -119,12 +112,11 @@ class Transport
 	/**
 	 * @brief	Saves the log
 	 *
-	 * @param	{Log} logg
+	 * @property	{Log} logg
 	 *
 	 * @return	Promise
 	 */
-	log( log )
-	{
+	log( log ) {
 		return new Promise(( resolve, reject ) => {
 			if ( ! this.supports( log ) )
 				return resolve();

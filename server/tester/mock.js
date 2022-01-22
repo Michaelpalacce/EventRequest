@@ -6,23 +6,20 @@ const Mocker	= require( './mocker' );
 /**
  * @brief	Used to create a MockedObject
  *
- * @param	{*} objectToMock
+ * @property	{*} objectToMock
  *
  * @return	Function
  */
-let Mock	= function ( objectToMock )
-{
-	if ( typeof objectToMock === 'object' )
-	{
+let Mock	= function ( objectToMock ) {
+	if ( typeof objectToMock === 'object' ) {
 		/**
 		 * @brief	Method used to mock other methods
 		 *
-		 * @param	{Object} mockMethodOptions
+		 * @property	{Object} mockMethodOptions
 		 *
 		 * @return	Object
 		 */
-		objectToMock._mock = ( mockMethodOptions )=>
-		{
+		objectToMock._mock = ( mockMethodOptions )=> {
 			Mocker( objectToMock, mockMethodOptions );
 
 			return objectToMock;
@@ -31,17 +28,15 @@ let Mock	= function ( objectToMock )
 		return objectToMock;
 	}
 
-	class MockedClass extends objectToMock
-	{
+	class MockedClass extends objectToMock {
 		/**
 		 * @brief	Method used to mock other methods
 		 *
-		 * @param	{Object} mockMethodOptions
+		 * @property	{Object} mockMethodOptions
 		 *
 		 * @return	MockedClass
 		 */
-		_mock( mockMethodOptions )
-		{
+		_mock( mockMethodOptions ) {
 			Mocker( this, mockMethodOptions );
 
 			return this;

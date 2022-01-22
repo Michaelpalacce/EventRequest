@@ -10,21 +10,17 @@ const ENV_SEPARATOR		= '=';
 /**
  * @brief	Env Plugin responsible for parsing .env file and adding those variables to the process.env
  */
-class EnvPlugin extends PluginInterface
-{
+class EnvPlugin extends PluginInterface {
 	/**
 	 * @brief	Loads the file to the process.env
 	 *
 	 * @return	void
 	 */
-	loadFileInEnv()
-	{
+	loadFileInEnv() {
 		const absFilePath	= this.getEnvFileAbsPath();
 
-		if ( fs.existsSync( absFilePath ) )
-		{
-			for ( const line of fs.readFileSync( absFilePath, 'utf-8' ).split( /\r?\n/ ) )
-			{
+		if ( fs.existsSync( absFilePath ) ) {
+			for ( const line of fs.readFileSync( absFilePath, 'utf-8' ).split( /\r?\n/ ) ) {
 				const parts			= line.split( ENV_SEPARATOR );
 				const key			= parts.shift();
 
@@ -36,12 +32,11 @@ class EnvPlugin extends PluginInterface
 	/**
 	 * @brief	Loads the env variables on runtime
 	 *
-	 * @param	{Server} server
+	 * @property	{Server} server
 	 *
 	 * @return	void
 	 */
-	setServerOnRuntime( server )
-	{
+	setServerOnRuntime( server ) {
 		this.loadFileInEnv();
 	}
 
@@ -50,8 +45,7 @@ class EnvPlugin extends PluginInterface
 	 *
 	 * @return	String
 	 */
-	getEnvFileAbsPath()
-	{
+	getEnvFileAbsPath() {
 		return typeof this.options.fileLocation === 'string'
 			? this.options.fileLocation
 			: path.join( path.parse( require.main.filename ).dir, ENV_FILENAME );

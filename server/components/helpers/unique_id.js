@@ -4,7 +4,7 @@ module.exports	= {
 	/**
 	 * @brief	Helper method that generates a random string
 	 *
-	 * @param	{Number} length
+	 * @property	{Number} length
 	 *
 	 * @return	String
 	 */

@@ -5,10 +5,8 @@ const PluginInterface	= require( '../plugin_interface' );
 /**
  * @brief	Timeout plugin that adds a timeout to the event request
  */
-class TimeoutPlugin extends PluginInterface
-{
-	constructor( id, options = {} )
-	{
+class TimeoutPlugin extends PluginInterface {
+	constructor( id, options = {} ) {
 		super( id, options );
 
 		this.timeout	= null;
@@ -20,8 +18,7 @@ class TimeoutPlugin extends PluginInterface
 	/**
 	 * @inheritDoc
 	 */
-	setOptions( options )
-	{
+	setOptions( options ) {
 		super.setOptions( options );
 
 		this.timeout	= typeof this.options.timeout === 'number'
@@ -38,13 +35,12 @@ class TimeoutPlugin extends PluginInterface
 	/**
 	 * @brief	Set a timeout to the eventRequest
 	 *
-	 * @param	{EventRequest} event
-	 * @param	{Number} timeout
+	 * @property	{EventRequest} event
+	 * @property	{Number} timeout
 	 *
 	 * @return	void
 	 */
-	setTimeout( event, timeout )
-	{
+	setTimeout( event, timeout ) {
 		event.response.setTimeout( timeout, () => {
 			if ( ! event.isFinished() )
 				this.callback( event );
@@ -59,8 +55,7 @@ class TimeoutPlugin extends PluginInterface
 	 *
 	 * @return	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		const pluginMiddleware	= {
 			handler	: ( event ) => {
 				this.setTimeout( event, this.timeout );
@@ -74,8 +69,7 @@ class TimeoutPlugin extends PluginInterface
 					this.setTimeout( event, timeout );
 				};
 
-				event.on( 'cleanUp', () =>
-				{
+				event.on( 'cleanUp', () => {
 					event.clearTimeout	= null;
 					event.setTimeout	= null;
 				});

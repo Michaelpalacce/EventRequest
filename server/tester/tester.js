@@ -29,10 +29,8 @@ const DEFAULT_LOG_LEVEL	= LOG_LEVELS.warning;
 /**
  * @brief	Tester class that holds all tests that should be executed
  */
-class Tester
-{
-	constructor()
-	{
+class Tester {
+	constructor() {
 		this.tests			= [];
 		this.consoleLogger	= null;
 	}
@@ -42,12 +40,11 @@ class Tester
 	 *
 	 * @details	This is done so we can run the test many times per instance
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	initialize( options )
-	{
+	initialize( options ) {
 		this.errors			= [];
 		this.successes		= [];
 		this.skipped		= [];
@@ -90,10 +87,8 @@ class Tester
 
 		const argv	= process.argv.slice( 2 );
 
-		for ( let command of argv )
-		{
-			switch ( true )
-			{
+		for ( let command of argv ) {
+			switch ( true ) {
 				case command.match( /--filter=/ ) !== null:
 					this.filter	= command.substring( 9 );
 					break;
@@ -115,8 +110,7 @@ class Tester
 			}
 		}
 
-		if ( this.silent )
-		{
+		if ( this.silent ) {
 			// Will display only errors
 			this.consoleLogger.logLevel	= LOG_LEVELS.error;
 		}
@@ -125,12 +119,11 @@ class Tester
 	/**
 	 * @brief	Formats the given test object by adding needed internal fields
 	 *
-	 * @param	{Object} test
+	 * @property	{Object} test
 	 *
 	 * @return	Array
 	 */
-	formatTest( test )
-	{
+	formatTest( test ) {
 		if ( typeof test !== 'object' || typeof test.message !== 'string' || typeof test.test !== 'function' )
 			throw new Error( 'Invalid test provided' );
 
@@ -145,12 +138,10 @@ class Tester
 		else
 			test.status	= TEST_STATUSES.pending;
 
-		if ( Array.isArray( test.dataProvider ) )
-		{
+		if ( Array.isArray( test.dataProvider ) ) {
 			let i	= 0;
 
-			for ( const data of test.dataProvider )
-			{
+			for ( const data of test.dataProvider ) {
 				const newTest	= {};
 
 				newTest.message	= test.message + '#' + i;
@@ -160,8 +151,7 @@ class Tester
 					const newData	= [done].concat( data );
 					const response	= test.test.apply( this, newData );
 
-					if ( response instanceof Promise )
-					{
+					if ( response instanceof Promise ) {
 						response.catch(( error ) => {
 							setImmediate(() => {
 								done( error );
@@ -175,8 +165,7 @@ class Tester
 				++ i;
 			}
 		}
-		else
-		{
+		else {
 			tests.push( test );
 		}
 
@@ -186,12 +175,11 @@ class Tester
 	/**
 	 * @brief	Adds the given test to the queue
 	 *
-	 * @param	{Object} test
+	 * @property	{Object} test
 	 *
 	 * @return	void
 	 */
-	addTest( test )
-	{
+	addTest( test ) {
 		this.tests	= this.tests.concat( this.formatTest( test ) );
 	}
 
@@ -202,8 +190,7 @@ class Tester
 	 *
 	 * @return	void
 	 */
-	successCallback( test )
-	{
+	successCallback( test ) {
 		test.status	= TEST_STATUSES.success;
 		this.successes.push( test );
 		this.consoleLogger.success( `${this.index}. ${test.message}` );
@@ -212,13 +199,11 @@ class Tester
 	/**
 	 * @brief	Called if there is an error in the test
 	 *
-	 * @param	{Object} test
-	 * @param	{*} error
+	 * @property	{Object} test
+	 * @property	{*} error
 	 */
-	errorCallback( test, error )
-	{
-		if ( error instanceof Error )
-		{
+	errorCallback( test, error ) {
+		if ( error instanceof Error ) {
 			if ( this.debug )
 				error	= error.stack;
 
@@ -232,8 +217,7 @@ class Tester
 		this.consoleLogger.error( `--------------------BEGIN ERROR--------------------` );
 		this.consoleLogger.error( `${this.index}. ${test.message} failed with the following error: ${error}` );
 		this.consoleLogger.error( `---------------------END ERROR---------------------` );
-		if ( this.dieOnFirstError )
-		{
+		if ( this.dieOnFirstError ) {
 			this.stop	= true;
 			this.finished();
 		}
@@ -244,8 +228,7 @@ class Tester
 	 *
 	 * @return	void
 	 */
-	finished()
-	{
+	finished() {
 		this.hasFinished	= true;
 
 		const logPromises	= [];
@@ -265,13 +248,12 @@ class Tester
 	/**
 	 * @brief	Called by the done function of the tests
 	 *
-	 * @param	{Object} test
-	 * @param	{*} err
+	 * @property	{Object} test
+	 * @property	{*} err
 	 *
 	 * @return	void
 	 */
-	doneCallback( test, err )
-	{
+	doneCallback( test, err ) {
 		if ( this.hasFinished || this.stop )
 			throw new Error( 'Done called after finishing up. There could be a potential error!' );
 
@@ -287,14 +269,12 @@ class Tester
 	/**
 	 * @brief	Checks the given test's status and determines what should happen
 	 *
-	 * @param	{Object} test
+	 * @property	{Object} test
 	 *
 	 * @return	Boolean
 	 */
-	checkTestStatus( test )
-	{
-		switch ( test.status )
-		{
+	checkTestStatus( test ) {
+		switch ( test.status ) {
 			case TEST_STATUSES.incomplete:
 				this.incomplete.push( test );
 				this.consoleLogger.warning( `${this.index}. INCOMPLETE ${test.message}` );
@@ -315,18 +295,15 @@ class Tester
 	 *
 	 * @return	void
 	 */
-	done()
-	{
+	done() {
 		let test	= this.tests.shift();
 
-		if ( this.stop || test === undefined )
-		{
+		if ( this.stop || test === undefined ) {
 			this.finished();
 			return;
 		}
 
-		if ( this.filter !== false && test.message.indexOf( this.filter ) === -1 )
-		{
+		if ( this.filter !== false && test.message.indexOf( this.filter ) === -1 ) {
 			this.done();
 			return;
 		}
@@ -334,8 +311,7 @@ class Tester
 		++ this.index;
 
 		let status	= this.checkTestStatus( test );
-		if ( status	=== true )
-		{
+		if ( status	=== true ) {
 			this.done();
 			return;
 		}
@@ -347,13 +323,11 @@ class Tester
 			this.doneCallback( test, err );
 		};
 
-		try
-		{
+		try {
 			const testToExecute	= test.test;
 			const response		= testToExecute( callback );
 
-			if ( response instanceof Promise )
-			{
+			if ( response instanceof Promise ) {
 				response.catch(( error ) => {
 					setImmediate(() => {
 						this.doneCallback( test, error );
@@ -361,8 +335,7 @@ class Tester
 				});
 			}
 		}
-		catch ( error )
-		{
+		catch ( error ) {
 			if ( ! this.stop && ! this.hasFinished )
 				this.doneCallback( test, error );
 
@@ -376,12 +349,11 @@ class Tester
 	 *
 	 * @details	This will produce an output directly to the console of the user
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	runAllTests( options = {} )
-	{
+	runAllTests( options = {} ) {
 		this.initialize( options );
 		this.consoleLogger.error( `${this.tests.length} tests found.` );
 

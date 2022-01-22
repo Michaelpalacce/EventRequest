@@ -14,15 +14,13 @@ const DEFAULT_PERSIST_FILE	= path.join( PROJECT_ROOT, 'cacheMap' );
 /**
  * @brief	A standard in memory data server that implements a map instead of an object
  */
-class DataServerMap extends DataServer
-{
+class DataServerMap extends DataServer {
 	/**
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	_configure( options )
-	{
+	_configure( options ) {
 		options.persistPath	=  typeof options.persistPath === 'string'
 							? options.persistPath
 							: DEFAULT_PERSIST_FILE;
@@ -38,17 +36,13 @@ class DataServerMap extends DataServer
 	 *
 	 * @return	void
 	 */
-	_setUpPersistence()
-	{
-		if ( fs.existsSync( this.persistPath ) )
-		{
+	_setUpPersistence() {
+		if ( fs.existsSync( this.persistPath ) ) {
 			this._loadData();
 			this._garbageCollect();
 		}
 		else
-		{
 			fs.writeFileSync( this.persistPath, JSON.stringify( this.useBigMap ? new BigMap() : new Map(), DataServerMap.replacer ) );
-		}
 	}
 
 	/**
@@ -56,8 +50,7 @@ class DataServerMap extends DataServer
 	 *
 	 * @return	void
 	 */
-	_stop()
-	{
+	_stop() {
 		if ( fs.existsSync( this.persistPath ) )
 			fs.unlinkSync( this.persistPath );
 
@@ -69,13 +62,12 @@ class DataServerMap extends DataServer
 	 *
 	 * @details	Prunes the data if it is expired
 	 *
-	 * @param	{String} key
-	 * @param	{Object} [options={}]
+	 * @property	{String} key
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	Promise
 	 */
-	async _get( key, options = {} )
-	{
+	async _get( key, options = {} ) {
 		return new Promise( async ( resolve ) => {
 			const dataSet	= await this._prune( key, options );
 
@@ -91,15 +83,14 @@ class DataServerMap extends DataServer
 	 *
 	 * @details	Resolves the data if it was correctly set, otherwise resolves to null
 	 *
-	 * @param	{String} key
-	 * @param	{*} value
-	 * @param	{Number} ttl
-	 * @param	{Object} options
+	 * @property	{String} key
+	 * @property	{*} value
+	 * @property	{Number} ttl
+	 * @property	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _set( key, value, ttl, options )
-	{
+	async _set( key, value, ttl, options ) {
 		return new Promise(( resolve ) => {
 			const persist	= typeof options.persist !== 'boolean'
 							? this.persist
@@ -118,14 +109,13 @@ class DataServerMap extends DataServer
 	 *
 	 * @details	Does no async operations intentionally
 	 *
-	 * @param	{String} key
-	 * @param	{Number} value
-	 * @param	{Object} options
+	 * @property	{String} key
+	 * @property	{Number} value
+	 * @property	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _increment( key, value, options )
-	{
+	async _increment( key, value, options ) {
 		return new Promise( async ( resolve, reject ) => {
 			const dataSet	= await this._prune( key, options );
 
@@ -149,14 +139,13 @@ class DataServerMap extends DataServer
 	 *
 	 * @details	Does no async operations intentionally
 	 *
-	 * @param	{String} key
-	 * @param	{Number} value
-	 * @param	{Object} options
+	 * @property	{String} key
+	 * @property	{Number} value
+	 * @property	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _decrement( key, value, options )
-	{
+	async _decrement( key, value, options ) {
 		return new Promise( async ( resolve, reject ) => {
 			const dataSet	= await this._prune( key, options );
 
@@ -178,13 +167,12 @@ class DataServerMap extends DataServer
 	/**
 	 * @brief	Locking mechanism. Will return a boolean if the lock was ok
 	 *
-	 * @param	{String} key
-	 * @param	{Object} options
+	 * @property	{String} key
+	 * @property	{Object} options
 	 *
 	 * @return	Boolean
 	 */
-	async _lock( key, options )
-	{
+	async _lock( key, options ) {
 		return new Promise(( resolve ) => {
 			const ttl		= -1;
 			const persist	= false;
@@ -200,13 +188,12 @@ class DataServerMap extends DataServer
 	/**
 	 * @brief	Releases the key
 	 *
-	 * @param	{String} key
-	 * @param	{Object} options
+	 * @property	{String} key
+	 * @property	{Object} options
 	 *
 	 * @return	Boolean
 	 */
-	async _unlock( key, options )
-	{
+	async _unlock( key, options ) {
 		return new Promise(( resolve ) => {
 			if ( this.server.has( key ) )
 				this.server.delete( key );
@@ -218,14 +205,13 @@ class DataServerMap extends DataServer
 	/**
 	 * @brief	Touches the key
 	 *
-	 * @param	{String} key
-	 * @param	{Number} ttl
-	 * @param	{Object} options
+	 * @property	{String} key
+	 * @property	{Number} ttl
+	 * @property	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _touch( key, ttl, options )
-	{
+	async _touch( key, ttl, options ) {
 		return new Promise( async ( resolve ) => {
 			const dataSet	= await this._prune( key );
 
@@ -244,26 +230,23 @@ class DataServerMap extends DataServer
 	/**
 	 * @brief	Removes a key if it is expired, otherwise, return it
 	 *
-	 * @param	{String} key
-	 * @param	{Object} options
+	 * @property	{String} key
+	 * @property	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	async _prune( key, options )
-	{
+	async _prune( key, options ) {
 		return new Promise( async ( resolve ) => {
 			const now		= new Date().getTime() / 1000;
 
 			const dataSet	= this.server.get( key );
 
-			if ( typeof dataSet !== 'undefined' && dataSet.expirationDate === null )
-			{
+			if ( typeof dataSet !== 'undefined' && dataSet.expirationDate === null ) {
 				dataSet.expirationDate	= Infinity;
 				this.server.set( key, dataSet );
 			}
 
-			if ( typeof dataSet === 'undefined' || now > dataSet.expirationDate )
-			{
+			if ( typeof dataSet === 'undefined' || now > dataSet.expirationDate ) {
 				await this.delete( key );
 
 				return resolve( null );
@@ -276,13 +259,12 @@ class DataServerMap extends DataServer
 	/**
 	 * @brief	Deletes the key from the server
 	 *
-	 * @param	{String} key
-	 * @param	{Object} options
+	 * @property	{String} key
+	 * @property	{Object} options
 	 *
 	 * @return	Promise
 	 */
-	_delete( key, options )
-	{
+	_delete( key, options ) {
 		return new Promise(( resolve ) => {
 			if ( ! this.server.has( key ) )
 				return resolve( true );
@@ -301,8 +283,7 @@ class DataServerMap extends DataServer
 	 * @return	Number
 	 */
 	/* istanbul ignore next */
-	length()
-	{
+	length() {
 		return this.server.size;
 	}
 
@@ -311,8 +292,7 @@ class DataServerMap extends DataServer
 	 *
 	 * @return	void
 	 */
-	_garbageCollect()
-	{
+	_garbageCollect() {
 		this.server.forEach( ( value, key ) => {
 			this._get( key ).catch( this._handleServerDown.bind( this ) );
 		});
@@ -323,8 +303,7 @@ class DataServerMap extends DataServer
 	 *
 	 * @return	void
 	 */
-	_saveData()
-	{
+	_saveData() {
 		let serverData	= this.useBigMap ? new BigMap() : new Map();
 
 		this.server.forEach(( value, key ) => {
@@ -370,17 +349,14 @@ class DataServerMap extends DataServer
 	 *
 	 * @return	void
 	 */
-	_loadData()
-	{
+	_loadData() {
 		let serverData;
 
-		try
-		{
+		try {
 			const buffer	= fs.readFileSync( this.persistPath );
 			serverData		= JSON.parse( buffer.toString(), DataServerMap.reviver );
 		}
-		catch ( error )
-		{
+		catch ( error ) {
 			/* istanbul ignore next */
 			serverData	= this.useBigMap ? new BigMap() : new Map();
 		}
@@ -393,20 +369,18 @@ class DataServerMap extends DataServer
 	}
 
 	/**
-	 * @param	{*} key
-	 * @param	{*} value
+	 * @property	{*} key
+	 * @property	{*} value
 	 *
 	 * @return	*
 	 */
-	static replacer( key, value )
-	{
+	static replacer( key, value ) {
 		const originalObject	= this[key];
 
 		if( originalObject instanceof Map )
 			return { dataType : 'Map', value : Array.from( originalObject.entries() ) };
 
-		if( originalObject instanceof BigMap )
-		{
+		if( originalObject instanceof BigMap ) {
 			const value	= [];
 
 			for ( const map of originalObject.maps )
@@ -420,18 +394,16 @@ class DataServerMap extends DataServer
 	}
 
 	/**
-	 * @param	{*} key
-	 * @param	{*} value
+	 * @property	{*} key
+	 * @property	{*} value
 	 *
 	 * @return	*
 	 */
-	static reviver( key, value )
-	{
+	static reviver( key, value ) {
 		if( typeof value === 'object' && value !== null && value.dataType === 'Map' )
 			return new Map( value.value );
 
-		if( typeof value === 'object' && value !== null && value.dataType === 'BigMap' )
-		{
+		if( typeof value === 'object' && value !== null && value.dataType === 'BigMap' ) {
 			const bigMap	= new BigMap();
 			bigMap.maps		= value.value.maps;
 			bigMap._limit	= value.value._limit;

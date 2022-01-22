@@ -11,20 +11,19 @@ const LOG_LEVELS		= {
 	verbose	: 500,
 	debug	: 600
 };
+
 const DEFAULT_LOG_LEVEL	= LOG_LEVELS.notice;
 
 /**
  * @brief	Log object used to transport information inside the loggur
  */
-class Log
-{
+class Log {
 	/**
-	 * @param	{*} log
-	 * @param	{Number} level
-	 * @param	{Boolean} isRaw
+	 * @property	{*} log
+	 * @property	{Number} level
+	 * @property	{Boolean} isRaw
 	 */
-	constructor( log, level, isRaw )
-	{
+	constructor( log, level, isRaw ) {
 		this.level		= 0;
 		this.message	= '';
 		this.rawMessage	= '';
@@ -38,14 +37,13 @@ class Log
 	/**
 	 * @brief	Processes the given log
 	 *
-	 * @param	{*} [message='']
-	 * @param	{Number} [level=LOG_LEVELS.error]
-	 * @param	{Boolean} [isRaw=false]
+	 * @property	{*} [message='']
+	 * @property	{Number} [level=LOG_LEVELS.error]
+	 * @property	{Boolean} [isRaw=false]
 	 *
 	 * @return	void
 	 */
-	processLog( message = '', level = LOG_LEVELS.error, isRaw = false )
-	{
+	processLog( message = '', level = LOG_LEVELS.error, isRaw = false ) {
 		let logType		= typeof message;
 
 		this.level		= typeof level === 'number' ? level : DEFAULT_LOG_LEVEL;
@@ -53,8 +51,7 @@ class Log
 		this.isRaw		= isRaw;
 		this.timestamp	= Log.getUNIXTime();
 
-		switch ( true )
-		{
+		switch ( true ) {
 			case message instanceof Error:
 				this.message	= message.message;
 				break;
@@ -78,8 +75,7 @@ class Log
 	 *
 	 * @return	Number
 	 */
-	getLevel()
-	{
+	getLevel() {
 		return this.level;
 	}
 
@@ -88,8 +84,7 @@ class Log
 	 *
 	 * @return	String
 	 */
-	getMessage()
-	{
+	getMessage() {
 		return this.message;
 	}
 
@@ -98,8 +93,7 @@ class Log
 	 *
 	 * @return	mixed
 	 */
-	getRawMessage()
-	{
+	getRawMessage() {
 		return this.rawMessage;
 	}
 
@@ -108,8 +102,7 @@ class Log
 	 *
 	 * @return	Boolean
 	 */
-	getIsRaw()
-	{
+	getIsRaw() {
 		return this.isRaw;
 	}
 
@@ -118,8 +111,7 @@ class Log
 	 *
 	 * @return	Number
 	 */
-	getTimestamp()
-	{
+	getTimestamp() {
 		return this.timestamp;
 	}
 
@@ -128,18 +120,16 @@ class Log
 	 *
 	 * @return	String
 	 */
-	getUniqueId()
-	{
+	getUniqueId() {
 		return this.uniqueId;
 	}
 
 	/**
-	 * @param	{String} uniqueId
+	 * @property	{String} uniqueId
 	 *
 	 * @return	void
 	 */
-	setUniqueId( uniqueId )
-	{
+	setUniqueId( uniqueId ) {
 		this.uniqueId	= uniqueId;
 	}
 
@@ -148,24 +138,21 @@ class Log
 	 *
 	 * @return	String
 	 */
-	toString()
-	{
+	toString() {
 		return `{Level: ${this.getLevel()}, Message: ${this.getMessage()}, Time: ${this.getTimestamp()}`;
 	}
 
 	/**
 	 * @brief	Get a new instance of the Log
 	 *
-	 * @param	{*} log
-	 * @param	{Number} level
-	 * @param	{Boolean} isRaw
+	 * @property	{*} log
+	 * @property	{Number} level
+	 * @property	{Boolean} isRaw
 	 *
 	 * @return	Log
 	 */
-	static getInstance( log, level, isRaw )
-	{
-		if ( log instanceof Log )
-		{
+	static getInstance( log, level, isRaw ) {
+		if ( log instanceof Log ) {
 			if ( typeof level === 'number' )
 				log.level	= level;
 
@@ -180,8 +167,7 @@ class Log
 	 *
 	 * @return	Number
 	 */
-	static getUNIXTime()
-	{
+	static getUNIXTime() {
 		return Date.now() / 1000;
 	}
 }

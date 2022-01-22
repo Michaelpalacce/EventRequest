@@ -6,17 +6,15 @@ const Transport	= require( './transport' );
 /**
  * @brief	Console transport
  */
-class Console extends Transport
-{
+class Console extends Transport {
 	/**
 	 * @brief	Sanitize the config
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	sanitizeConfig( options )
-	{
+	sanitizeConfig( options ) {
 		super.sanitizeConfig( options );
 
 		this.processors	= Array.isArray( options.processors )
@@ -31,14 +29,13 @@ class Console extends Transport
 	/**
 	 * @brief	Logs the data
 	 *
-	 * @param	{Array} data
-	 * @param	{Function} resolve
-	 * @param	{Function} reject
+	 * @property	{Array} data
+	 * @property	{Function} resolve
+	 * @property	{Function} reject
 	 *
 	 * @return	void
 	 */
-	_log( data, resolve, reject )
-	{
+	_log( data, resolve, reject ) {
 		console.log.apply( this, data );
 
 		resolve();

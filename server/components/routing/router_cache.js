@@ -3,10 +3,8 @@
 /**
  * @brief	Class responsible for managing the Router caching mechanism
  */
-class RouterCache
-{
-	constructor()
-	{
+class RouterCache {
+	constructor() {
 		this._cache					= {};
 		this.keyLimit				= RouterCache.DEFAULT_KEY_LIMIT;
 		this.lastClearCacheAttempt	= 0;
@@ -17,12 +15,11 @@ class RouterCache
 	/**
 	 * @brief	Sets the caching key limit
 	 *
-	 * @param	{Number} [keyLimit=5000]
+	 * @property	{Number} [keyLimit=5000]
 	 *
 	 * @return	void
 	 */
-	setKeyLimit( keyLimit = RouterCache.DEFAULT_KEY_LIMIT )
-	{
+	setKeyLimit( keyLimit = RouterCache.DEFAULT_KEY_LIMIT ) {
 		this.keyLimit	= keyLimit;
 	}
 
@@ -32,12 +29,11 @@ class RouterCache
 	 * @details	If the key is nto cached, then null will be returned.
 	 * 			This will trigger a cache clear first
 	 *
-	 * @param	{String} key
+	 * @property	{String} key
 	 *
 	 * @return	{Object|null}
 	 */
-	getBlock( key )
-	{
+	getBlock( key ) {
 		this.clear();
 
 		if ( typeof this._cache[key] !== 'object' )
@@ -49,14 +45,13 @@ class RouterCache
 	/**
 	 * @brief	Renews the block's date
 	 *
-	 * @param	{Object} block
+	 * @property	{Object} block
 	 *
 	 * @private
 	 *
 	 * @return	Object
 	 */
-	_renewBlock( block )
-	{
+	_renewBlock( block ) {
 		block.date	= Date.now();
 
 		return block;
@@ -65,25 +60,23 @@ class RouterCache
 	/**
 	 * @brief	Removes the key if it is set
 	 *
-	 * @param	{String} key
+	 * @property	{String} key
 	 *
 	 * @return	void
 	 */
-	deleteBlock( key )
-	{
+	deleteBlock( key ) {
 		delete this._cache[key];
 	}
 
 	/**
 	 * @brief	Sets a block, given a key
 	 *
-	 * @param	{string} key
-	 * @param	{Object} block
+	 * @property	{string} key
+	 * @property	{Object} block
 	 *
 	 * @return	{Object}
 	 */
-	setBlock( key, block )
-	{
+	setBlock( key, block ) {
 		return this._cache[key]	= this._renewBlock( block );
 	}
 
@@ -93,20 +86,18 @@ class RouterCache
 	 * @details	ttl is the amount of time in milliseconds a key has to be inactive to be deleted
 	 * 			This function will only attempt to clear once in the given interval of time: debounceInterval
 	 *
-	 * @param	{Number} [ttl=3600000]
-	 * @param	{Number} [debounceInterval=60000]
+	 * @property	{Number} [ttl=3600000]
+	 * @property	{Number} [debounceInterval=60000]
 	 *
 	 * @return	void
 	 */
-	clear( ttl = this.ttl, debounceInterval = this.cacheClearDebounce )
-	{
+	clear( ttl = this.ttl, debounceInterval = this.cacheClearDebounce ) {
 		if ( this.lastClearCacheAttempt + debounceInterval > Date.now() )
 			return;
 
 		this.lastClearCacheAttempt	= Date.now();
 
-		for ( const key in this._cache )
-		{
+		for ( const key in this._cache ) {
 			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this._cache, key ) )
 				continue;
@@ -123,8 +114,7 @@ class RouterCache
 	 *
 	 * @return	Boolean
 	 */
-	isFull()
-	{
+	isFull() {
 		if ( this.keyLimit === 0 )
 			return false;
 

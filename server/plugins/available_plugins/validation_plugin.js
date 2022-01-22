@@ -5,24 +5,21 @@ const PluginInterface	= require( '../plugin_interface' );
 /**
  * @brief	Plugin that is used to input the validation suite directly in the route with a Dynamic Middleware
  */
-class ValidationPlugin extends PluginInterface
-{
+class ValidationPlugin extends PluginInterface {
 	/**
-	 * @param	{String} pluginId
-	 * @param	{Object} [options={}]
+	 * @property	{String} pluginId
+	 * @property	{Object} [options={}]
 	 */
-	constructor( pluginId, options = {} )
-	{
+	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
 
 		this.setOptions( options );
 	}
 
 	/**
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 */
-	setOptions( options )
-	{
+	setOptions( options ) {
 		super.setOptions( options );
 
 		this.failureCallback	= typeof options.failureCallback === 'function'
@@ -37,18 +34,16 @@ class ValidationPlugin extends PluginInterface
 	 *
 	 * @details	This will merge the result with the properties that are being validated
 	 *
-	 * @param	{Object} validationRules
-	 * @param	{Function} failureCallback
+	 * @property	{Object} validationRules
+	 * @property	{Function} failureCallback
 	 *
 	 * @return	Function
 	 */
-	validate( validationRules, failureCallback )
-	{
+	validate( validationRules, failureCallback ) {
 		failureCallback	= typeof failureCallback === 'undefined' ? this.failureCallback : failureCallback;
 
 		return ( event ) => {
-			for ( const toValidate in validationRules )
-			{
+			for ( const toValidate in validationRules ) {
 				if ( typeof event[toValidate] !== 'object' )
 					return event.next( { status: 400, code: 'app.er.validation.error', message: `Could not validate ${toValidate} as it is not a property of the EventRequest` } );
 

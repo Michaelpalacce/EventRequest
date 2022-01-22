@@ -123,8 +123,8 @@ class Session {
 	 *
 	 * @deprecated	Use set instead
 	 *
-	 * @param	{String} name
-	 * @param	{*} value
+	 * @property	{String} name
+	 * @property	{*} value
 	 *
 	 * @return	void
 	 */
@@ -135,7 +135,7 @@ class Session {
 	/**
 	 * @brief	Deletes a variable from the session
 	 *
-	 * @param	{String} name
+	 * @property	{String} name
 	 *
 	 * @return	void
 	 */
@@ -146,7 +146,7 @@ class Session {
 	/**
 	 * @brief	Checks if a variable exists in the session
 	 *
-	 * @param	{String} name
+	 * @property	{String} name
 	 *
 	 * @return	Boolean
 	 */
@@ -158,7 +158,7 @@ class Session {
 	 * Gets a session variable.
 	 * Returns null if the value does not exist.
 	 *
-	 * @param	{String} name
+	 * @property	{String} name
 	 *
 	 * @return	 *
 	 */

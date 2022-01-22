@@ -13,14 +13,12 @@ const LOGGER_DEFAULT_LOG_LEVEL	= LOG_LEVELS.info;
 /**
  * @brief	Logger class used to hold transports
  */
-class Logger
-{
+class Logger {
 	/**
-	 * @param	{Object} [options={}]
-	 * @param	{Boolean} [uniqueId=null]
+	 * @property	{Object} [options={}]
+	 * @property	{Boolean} [uniqueId=null]
 	 */
-	constructor( options = {}, uniqueId = null )
-	{
+	constructor( options = {}, uniqueId = null ) {
 		if ( typeof uniqueId !== 'string' )
 			throw new Error( 'app.er.logger.invalidUniqueId' );
 
@@ -46,12 +44,11 @@ class Logger
 	 * 			- dieOnCapture - Boolean - If the process should exit in case of a caught exception -> Defaults to true
 	 * 			- unhandledExceptionLevel - Number - What level should the unhandled exceptions be logged at -> Defaults to error
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	sanitizeConfig( options )
-	{
+	sanitizeConfig( options ) {
 		this.serverName					= typeof options.serverName === 'string'
 										? options.serverName
 										: false;
@@ -93,12 +90,11 @@ class Logger
 	/**
 	 * @brief	Sets the Log Level of the Logger
 	 *
-	 * @param	{Number} logLevel
+	 * @property	{Number} logLevel
 	 *
 	 * @return	void
 	 */
-	setLogLevel( logLevel )
-	{
+	setLogLevel( logLevel ) {
 		this.logLevel	= logLevel;
 	}
 
@@ -111,10 +107,8 @@ class Logger
 	 * @return	void
 	 */
 	/* istanbul ignore next */
-	attachUnhandledEventListener()
-	{
-		if ( this.capture )
-		{
+	attachUnhandledEventListener() {
+		if ( this.capture ) {
 			process.on( 'unhandledRejection', ( reason, p ) => {
 				const unhandledRejectionLog	= Log.getInstance({
 					level	: this.unhandledExceptionLevel,
@@ -146,10 +140,8 @@ class Logger
 	 *
 	 * @return	void
 	 */
-	attachLogLevelsToLogger()
-	{
-		for ( let key in this.logLevels )
-		{
+	attachLogLevelsToLogger() {
+		for ( let key in this.logLevels ) {
 			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this.logLevels, key ) )
 				continue;
@@ -157,8 +149,7 @@ class Logger
 			let logLevel			= this.logLevels[key];
 			let objectProperties	= Object.getOwnPropertyNames( this.constructor.prototype );
 
-			if ( ! objectProperties.includes( key ) )
-			{
+			if ( ! objectProperties.includes( key ) ) {
 				this[key]	= ( log, isRaw = false ) => {
 					log	= Log.getInstance( log, logLevel, isRaw );
 
@@ -171,14 +162,12 @@ class Logger
 	/**
 	 * @brief	Add a transport to the logger
 	 *
-	 * @param	{*} transport
+	 * @property	{*} transport
 	 *
 	 * @return	Boolean
 	 */
-	addTransport( transport )
-	{
-		if ( transport instanceof Transport )
-		{
+	addTransport( transport ) {
+		if ( transport instanceof Transport ) {
 			this.transports.push( transport );
 			return true;
 		}
@@ -193,8 +182,7 @@ class Logger
 	 *
 	 * @return	Boolean
 	 */
-	supports( log )
-	{
+	supports( log ) {
 		if ( ! ( log instanceof Log ) )
 			return false;
 
@@ -206,8 +194,7 @@ class Logger
 	 *
 	 * @return	String
 	 */
-	getUniqueId()
-	{
+	getUniqueId() {
 		return typeof this.serverName === 'string'
 				? `${this.serverName}/${this.uniqueId}`
 				: this.uniqueId;
@@ -216,19 +203,17 @@ class Logger
 	/**
 	 * @brief	Logs the given data
 	 *
-	 * @param	{*} log
-	 * @param	{Number} [level=null]
-	 * @param	{Boolean} [isRaw=false]
+	 * @property	{*} log
+	 * @property	{Number} [level=null]
+	 * @property	{Boolean} [isRaw=false]
 	 *
 	 * @return	Promise
 	 */
-	log( log, level = null, isRaw = false )
-	{
+	log( log, level = null, isRaw = false ) {
 		log				= Log.getInstance( log, level, isRaw );
 		const promises	= [];
 
-		if ( this.supports( log ) )
-		{
+		if ( this.supports( log ) ) {
 			log.setUniqueId( this.getUniqueId() );
 
 			for ( const transport of this.transports )

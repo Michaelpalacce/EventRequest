@@ -6,10 +6,8 @@ const DataServer		= require( '../../components/caching/data_server' );
 /**
  * @brief	DataServerPlugin responsible for creating a data server that other components can use
  */
-class DataServerPlugin extends PluginInterface
-{
-	constructor( pluginId, options = {} )
-	{
+class DataServerPlugin extends PluginInterface {
+	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
 	}
 
@@ -18,8 +16,7 @@ class DataServerPlugin extends PluginInterface
 	 *
 	 * @returns	DataServer
 	 */
-	getServer()
-	{
+	getServer() {
 		if ( this.server )
 			return this.server;
 
@@ -35,12 +32,11 @@ class DataServerPlugin extends PluginInterface
 	/**
 	 * @brief	Uses Duck-Typing to check if the Data Server is a valid data server
 	 *
-	 * @param	{Object} dataServer
+	 * @property	{Object} dataServer
 	 *
 	 * @return {boolean}
 	 */
-	isValidDataServer( dataServer )
-	{
+	isValidDataServer( dataServer ) {
 		if ( typeof dataServer !== 'object' )
 			return false;
 
@@ -66,8 +62,7 @@ class DataServerPlugin extends PluginInterface
 	 *
 	 * @returns	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		const pluginMiddleware	= {
 			handler	: ( event ) => {
 				event.dataServer	= this.getServer();

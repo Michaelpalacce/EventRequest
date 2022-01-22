@@ -5,14 +5,12 @@
  *
  * @details	This class should be used to "plugin" functionality to the event_request module.
  */
-class PluginInterface
-{
+class PluginInterface {
 	/**
-	 * @param	{String} pluginId
-	 * @param	{Object} [options={}]
+	 * @property	{String} pluginId
+	 * @property	{Object} [options={}]
 	 */
-	constructor( pluginId, options = {} )
-	{
+	constructor( pluginId, options = {} ) {
 		this.options	= options;
 		this.pluginId	= pluginId;
 	}
@@ -22,8 +20,7 @@ class PluginInterface
 	 *
 	 * @return	String
 	 */
-	getPluginId()
-	{
+	getPluginId() {
 		return this.pluginId;
 	}
 
@@ -34,8 +31,7 @@ class PluginInterface
 	 *
 	 * @return	Array
 	 */
-	getPluginDependencies()
-	{
+	getPluginDependencies() {
 		return [];
 	}
 
@@ -44,23 +40,21 @@ class PluginInterface
 	 *
 	 * @details	This method should attach to any events dispatched by the server
 	 *
-	 * @param	{Server} server
+	 * @property	{Server} server
 	 *
 	 * @return	void
 	 */
-	setServerOnRuntime( server )
-	{
+	setServerOnRuntime( server ) {
 	}
 
 	/**
 	 * @brief	Sets new options for the plugin
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	setOptions( options )
-	{
+	setOptions( options ) {
 		this.options	= options;
 	}
 
@@ -72,8 +66,7 @@ class PluginInterface
 	 *
 	 * @return	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		return [];
 	}
 }

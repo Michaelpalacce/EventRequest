@@ -8,10 +8,8 @@ const AbstractFileStream	= require( './abstract_file_stream' );
 /**
  * @brief	Used to stream text files
  */
-class ImageFileStream extends AbstractFileStream
-{
-	constructor()
-	{
+class ImageFileStream extends AbstractFileStream {
+	constructor() {
 		super( [], 'image' );
 		// @TODO NEW MIME-TYPE COMPONENT SHOULD BE MADE
 		this.formats	= {
@@ -27,14 +25,13 @@ class ImageFileStream extends AbstractFileStream
 	/**
 	 * @brief	Gets the file stream for the file
 	 *
-	 * @param	{EventRequest} event
-	 * @param	{String} file
-	 * @param	{Object} [options={}]
+	 * @property	{EventRequest} event
+	 * @property	{String} file
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	ReadStream
 	 */
-	getFileStream( event, file, options = {} )
-	{
+	getFileStream( event, file, options = {} ) {
 		const stream		= fs.createReadStream( file, options );
 		const parsedPath	= path.parse( file );
 		const mimeType		= this.formats[parsedPath.ext.toLowerCase()];
