@@ -11,10 +11,8 @@ const DEFAULT_TEMPLATE_EXT		= 'html';
 /**
  * @brief	Templating engine plugin that attaches a render functionality to the eventRequest
  */
-class TemplatingEnginePlugin extends PluginInterface
-{
-	constructor( pluginId, options = {} )
-	{
+class TemplatingEnginePlugin extends PluginInterface {
+	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
 
 		this.templatingEngine	= null;
@@ -27,17 +25,16 @@ class TemplatingEnginePlugin extends PluginInterface
 	/**
 	 * @brief	Attaches a render function to the event request
 	 *
-	 * @param	{EventRequest} eventRequest
+	 * @property	{EventRequest} eventRequest
 	 *
 	 * @return	void
 	 */
-	attachRenderFunction( eventRequest )
-	{
+	attachRenderFunction( eventRequest ) {
 		/**
 		 * @brief	Renders the template given
 		 *
-		 * @param	{String} templateName
-		 * @param	{Object} variables
+		 * @property	{String} templateName
+		 * @property	{Object} variables
 		 *
 		 * @return	Promise
 		 */
@@ -48,14 +45,12 @@ class TemplatingEnginePlugin extends PluginInterface
 								: `index.${this.templateExtension}`;
 
 				this.render( path.resolve( path.join( this.templateDir, templateName ) ), variables ).then( ( result ) => {
-					if ( result && result.length > 0  && ! eventRequest.isFinished() )
-					{
+					if ( result && result.length > 0  && ! eventRequest.isFinished() ) {
 						eventRequest.setResponseHeader( 'Content-Type', 'text/html' ).send( result );
 
 						resolve();
 					}
-					else
-					{
+					else {
 						reject( { code: 'app.err.templatingEngine.errorRendering' } );
 					}
 				}).catch( reject );
@@ -72,10 +67,9 @@ class TemplatingEnginePlugin extends PluginInterface
 	 * 				due to the way JS behaves. Consider binding the function to the correct instance before passing:
 	 * 				https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_objects/Function/bind
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 */
-	setOptions( options )
-	{
+	setOptions( options ) {
 		const defaultTemplatingEngine	= new DefaultTemplatingEngine();
 
 		this.render						= typeof options.render === 'function'
@@ -98,8 +92,7 @@ class TemplatingEnginePlugin extends PluginInterface
 	 *
 	 * @return	{Array}
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		const pluginMiddleware	= {
 			handler	: ( event ) => {
 				this.attachRenderFunction( event );

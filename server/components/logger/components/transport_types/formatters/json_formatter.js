@@ -9,7 +9,7 @@ module.exports	= ( { replacer = null } = {} ) => {
 	/**
 	 * @brief	Formats the given log to a JSON
 	 *
-	 * @param	{Object} context
+	 * @property	{Object} context
 	 *
 	 * @return	Array
 	 */

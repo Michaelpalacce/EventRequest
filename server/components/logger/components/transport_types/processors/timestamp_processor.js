@@ -1,7 +1,7 @@
 /**
  * @brief	Gets the timestamp from the Log
  *
- * @param	{Number} timestamp
+ * @property	{Number} timestamp
  *
  * @return	{String}
  */

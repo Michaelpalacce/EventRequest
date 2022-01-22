@@ -3,10 +3,8 @@
 /**
  * @brief	Error handler responsible for handling errors thrown by the EventRequest
  */
-class ErrorHandler
-{
-	constructor()
-	{
+class ErrorHandler {
+	constructor() {
 		this.namespaces			= new Map();
 		this.defaultNamespace	= {
 			callback	: this._defaultCase.bind( this ),
@@ -29,15 +27,14 @@ class ErrorHandler
 	/**
 	 * @brief	Handles an error
 	 *
-	 * @param	{EventRequest} event
-	 * @param	{*} [errorToHandle=null]
-	 * @param	{Number} [errStatusCode=null]
-	 * @param	{Boolean} [emitError=null]
+	 * @property	{EventRequest} event
+	 * @property	{*} [errorToHandle=null]
+	 * @property	{Number} [errStatusCode=null]
+	 * @property	{Boolean} [emitError=null]
 	 *
 	 * @return	Promise: void
 	 */
-	async handleError( event, errorToHandle = null, errStatusCode = null, emitError = null )
-	{
+	async handleError( event, errorToHandle = null, errStatusCode = null, emitError = null ) {
 		let errorNamespace	= null;
 		let code;
 		let error;
@@ -47,8 +44,7 @@ class ErrorHandler
 		let emit;
 		let formatter;
 
-		if ( errorToHandle !== null && typeof errorToHandle === 'object' && typeof errorToHandle.code === 'string' )
-		{
+		if ( errorToHandle !== null && typeof errorToHandle === 'object' && typeof errorToHandle.code === 'string' ) {
 			code		= errorToHandle.code;
 			error		= errorToHandle.error || null;
 			message		= errorToHandle.message || errorToHandle.error || null;
@@ -57,16 +53,14 @@ class ErrorHandler
 			formatter	= typeof errorToHandle.formatter === 'function' ? errorToHandle.formatter : null;
 			emit		= typeof errorToHandle.emit === 'boolean' ? errorToHandle.emit : emitError;
 		}
-		else
-		{
+		else {
 			code	= ErrorHandler.GENERAL_ERROR_CODE;
 			error	= errorToHandle;
 			status	= errStatusCode;
 			headers	= null;
 			emit	= emitError;
 
-			if ( errorToHandle instanceof Error )
-			{
+			if ( errorToHandle instanceof Error ) {
 				errorNamespace	= this.getNamespace( errorToHandle.message );
 
 				if ( errorNamespace !== null )
@@ -74,8 +68,7 @@ class ErrorHandler
 				else
 					message	= errorToHandle.message;
 			}
-			else if ( typeof errorToHandle === 'string' )
-			{
+			else if ( typeof errorToHandle === 'string' ) {
 				errorNamespace	= this.getNamespace( errorToHandle );
 
 				if ( errorNamespace !== null )
@@ -84,9 +77,7 @@ class ErrorHandler
 					message	= errorToHandle;
 			}
 			else
-			{
 				message	= errorToHandle;
-			}
 		}
 
 		if ( errorNamespace === null )
@@ -106,18 +97,17 @@ class ErrorHandler
 	/**
 	 * @brief	Adds a new namespace
 	 *
-	 * @param	{String} code
-	 * @param	{*} message
-	 * @param	{Function} callback
-	 * @param	{Number} status
-	 * @param	{Boolean} emit
-	 * @param	{Object} headers
-	 * @param	{Function} formatter
+	 * @property	{String} code
+	 * @property	{*} message
+	 * @property	{Function} callback
+	 * @property	{Number} status
+	 * @property	{Boolean} emit
+	 * @property	{Object} headers
+	 * @property	{Function} formatter
 	 *
 	 * @return	void
 	 */
-	addNamespace( code, { message, callback, status, emit, headers, formatter } = {} )
-	{
+	addNamespace( code, { message, callback, status, emit, headers, formatter } = {} ) {
 		if ( ! this.validateNamespaceCode( code ) )
 			return;
 
@@ -140,29 +130,26 @@ class ErrorHandler
 	/**
 	 * @brief	Validates that the provided errorCode is a string and does not have any white space characters
 	 *
-	 * @param	{String} errorCode
+	 * @property	{String} errorCode
 	 *
 	 * @return	{Boolean}
 	 */
-	validateNamespaceCode( errorCode )
-	{
+	validateNamespaceCode( errorCode ) {
 		return typeof errorCode === 'string' && errorCode.match( /\s/g ) === null;
 	}
 
 	/**
 	 * @brief	Returns the expectation that contains the errorCode and message
 	 *
-	 * @param	{String} errorCode
+	 * @property	{String} errorCode
 	 *
 	 * @return	{Object|null}
 	 */
-	getNamespace( errorCode )
-	{
+	getNamespace( errorCode ) {
 		if ( ! this.validateNamespaceCode( errorCode ) )
 			return null;
 
-		while ( true )
-		{
+		while ( true ) {
 			if ( this.namespaces.has( errorCode ) )
 				return this.namespaces.get( errorCode );
 
@@ -184,21 +171,20 @@ class ErrorHandler
 	 * 			This callback will format an appropriate message in case of an error
 	 * 			This callback emit an error IF needed
 	 *
-	 * @param	{EventRequest} event
-	 * @param	{String} errorCode
-	 * @param	{Number} status
-	 * @param	{*} error
-	 * @param	{*} message
-	 * @param	{Object} headers
-	 * @param	{Boolean} emit
-	 * @param	{Function} formatter
+	 * @property	{EventRequest} event
+	 * @property	{String} errorCode
+	 * @property	{Number} status
+	 * @property	{*} error
+	 * @property	{*} message
+	 * @property	{Object} headers
+	 * @property	{Boolean} emit
+	 * @property	{Function} formatter
 	 *
 	 * @private
 	 *
 	 * @return	Promise: void
 	 */
-	async _defaultCase( { event, code, status, error, message, headers, emit, formatter } )
-	{
+	async _defaultCase( { event, code, status, error, message, headers, emit, formatter } ) {
 		if ( event.isFinished() )
 			return;
 
@@ -213,8 +199,7 @@ class ErrorHandler
 		if ( emit )
 			event.emit( 'on_error', toEmit );
 
-		for ( const key in headers )
-		{
+		for ( const key in headers ) {
 			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( headers, key ) )
 				continue;
@@ -233,12 +218,11 @@ class ErrorHandler
 	/**
 	 * @brief	Formats the error in a presentable format
 	 *
-	 * @param	{*} error
+	 * @property	{*} error
 	 *
 	 * @return	*
 	 */
-	_formatError( error )
-	{
+	_formatError( error ) {
 		if ( error instanceof Error )
 			return error.message;
 

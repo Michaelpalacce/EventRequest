@@ -6,10 +6,8 @@ const CacheControl		= require( '../../components/cache-control/cache_control' );
 /**
  * @brief	Cache control plugin responsible for building and setting a Cache-control header
  */
-class CacheControlPlugin extends PluginInterface
-{
-	constructor( pluginId, options = {} )
-	{
+class CacheControlPlugin extends PluginInterface {
+	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
 
 		this.builder	= new CacheControl();
@@ -18,12 +16,11 @@ class CacheControlPlugin extends PluginInterface
 	/**
 	 * @brief	Dynamic Middleware that will add a cache header to the current request with the options provided
 	 *
-	 * @param	{Object} [options={}]
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	Function
 	 */
-	cache( options = {} )
-	{
+	cache( options = {} ) {
 		const header	= this.builder.build( options );
 
 		if ( header !== '' )
@@ -35,8 +32,7 @@ class CacheControlPlugin extends PluginInterface
 	/**
 	 * @return	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		return [this.cache( this.options )];
 	}
 }

@@ -13,7 +13,7 @@ module.exports			= {
 	 *
 	 * @details	Returns null if a file streamer is not found
 	 *
-	 * @param	{String} file
+	 * @property	{String} file
 	 *
 	 * @return	VideoFileStream|AudioFileStream|ImageFileStream|TextFileStream|null
 	 */

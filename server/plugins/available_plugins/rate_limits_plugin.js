@@ -64,10 +64,8 @@ const DEFAULT_RULE						= {
 /**
  * @brief	Plugin used to limit the rate of clients requests
  */
-class RateLimitsPlugin extends PluginInterface
-{
-	constructor( pluginId, options = {} )
-	{
+class RateLimitsPlugin extends PluginInterface {
+	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
 
 		this.buckets	= {};
@@ -94,7 +92,7 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * @brief	Does rule validation for each parameter
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
@@ -129,8 +127,8 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * Gets a Bucket from the rule options and key
 	 *
-	 * @param	{String} key
-	 * @param	{Object} options
+	 * @property	{String} key
+	 * @property	{Object} options
 	 *
 	 * @return	Bucket
 	 */
@@ -154,7 +152,7 @@ class RateLimitsPlugin extends PluginInterface
 	 * If a DataStore was not passed, gets the data store from the server er_data_server plugin, otherwise
 	 * creates a new datastore with persistence and not ttl.
 	 *
-	 * @param	{Server} server
+	 * @property	{Server} server
 	 *
 	 * @return	void
 	 */
@@ -173,7 +171,7 @@ class RateLimitsPlugin extends PluginInterface
 	 * Global middleware that can be used to dynamically rate limit requests
 	 * Creates a default data store if one is not set.
 	 *
-	 * @param	{Object} rule
+	 * @property	{Object} rule
 	 *
 	 * @return	Function
 	 */
@@ -215,18 +213,16 @@ class RateLimitsPlugin extends PluginInterface
 	 * Adds a rateLimited key IF one is not set already. This also detects that this is the first time
 	 * this plugin is invoked and will attach an on `cleanUp` event
 	 *
-	 * @param	{EventRequest} eventRequest
-	 * @param	{Array} rules
+	 * @property	{EventRequest} eventRequest
+	 * @property	{Array} rules
 	 *
 	 * @return	void
 	 */
-	async _rateLimit( eventRequest, rules )
-	{
+	async _rateLimit( eventRequest, rules ) {
 		if ( eventRequest.isFinished() )
 			return;
 
 		if ( typeof eventRequest.rateLimited !== 'boolean' ){
-
 			eventRequest.rateLimited	= false;
 
 			eventRequest.on( 'cleanUp', () => {
@@ -277,8 +273,8 @@ class RateLimitsPlugin extends PluginInterface
 	 * Returns true if the request has been rate limited and a retry after should be sent,
 	 * otherwise return false
 	 *
-	 * @param	{Object} rule
-	 * @param	{Bucket} bucket
+	 * @property	{Object} rule
+	 * @property	{Bucket} bucket
 	 *
 	 * @returns	Promise<boolean>
 	 */
@@ -320,8 +316,8 @@ class RateLimitsPlugin extends PluginInterface
 	/**
 	 * Sends a 429 response whenever a request was rateLimited
 	 *
-	 * @param	{EventRequest} eventRequest
-	 * @param	{Number} retryAfterTime
+	 * @property	{EventRequest} eventRequest
+	 * @property	{Number} retryAfterTime
 	 *
 	 * @return	void
 	 */

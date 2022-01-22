@@ -14,20 +14,18 @@ const SYSTEM_EOL	= os.EOL;
 /**
  * @brief	File transport
  */
-class File extends Transport
-{
+class File extends Transport {
 	/**
 	 * @brief	Sanitizes the config
 	 *
 	 * @details	Accepted options:
 	 * 			- filePath - String - the location of the file to log to -> if it is not provided the transport will not log
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	sanitizeConfig( options )
-	{
+	sanitizeConfig( options ) {
 		super.sanitizeConfig( options );
 
 		this.filePath			= typeof options.filePath === "string"
@@ -53,8 +51,7 @@ class File extends Transport
 	 *
 	 * @return	WriteStream
 	 */
-	getWriteStream()
-	{
+	getWriteStream() {
 		const file	= path.parse( this.filePath );
 
 		if ( ! fs.existsSync( file.dir ) )
@@ -71,8 +68,7 @@ class File extends Transport
 	 *
 	 * @return	String
 	 */
-	getFileName()
-	{
+	getFileName() {
 		const file	= path.parse( this.filePath );
 
 		return path.join( file.dir, file.name + this.getCurrentDayTimestamp() + file.ext );
@@ -83,8 +79,7 @@ class File extends Transport
 	 *
 	 * @return	Number
 	 */
-	getCurrentDayTimestamp()
-	{
+	getCurrentDayTimestamp() {
 		const now			= new Date();
 		const startOfDay	= new Date( now.getFullYear(), now.getMonth(), now.getDate() );
 		return startOfDay / 1000;
@@ -93,21 +88,19 @@ class File extends Transport
 	/**
 	 * @brief	Logs the log in a file
 	 *
-	 * @param	{Array} data
-	 * @param	{Function} resolve
-	 * @param	{Function} reject
+	 * @property	{Array} data
+	 * @property	{Function} resolve
+	 * @property	{Function} reject
 	 *
 	 * @return	void
 	 */
-	_log( data, resolve, reject )
-	{
+	_log( data, resolve, reject ) {
 		const writeStream	= this.getWriteStream();
 		let hasError		= false;
 
 		for ( const message of data )
 			writeStream.write( message + SYSTEM_EOL, 'utf8', ( err ) => {
-				if ( err )
-				{
+				if ( err ) {
 					hasError	= true;
 					reject( err );
 				}

@@ -6,8 +6,7 @@ const Session			= require( '../../components/session/session' );
 /**
  * @brief	Adds session the the event request
  */
-class SessionPlugin extends PluginInterface
-{
+class SessionPlugin extends PluginInterface {
 	constructor( id, options = {} ) {
 		super( id, options );
 		this.server	= null;
@@ -25,7 +24,7 @@ class SessionPlugin extends PluginInterface
 	/**
 	 * @brief	creates the namespace when attaching to the server
 	 *
-	 * @param	{Server} server
+	 * @property	{Server} server
 	 *
 	 * @return	void
 	 */

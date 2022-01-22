@@ -38,10 +38,8 @@ const VALIDATION_ERRORS	= {
 /**
  * @brief	Validation attribute that holds data for the current attribute and can be used to validate it
  */
-class ValidationAttribute
-{
-	constructor( key, value, rules, data )
-	{
+class ValidationAttribute {
+	constructor( key, value, rules, data ) {
 		this.key		= key;
 		this.value		= value;
 		this.rules		= rules;
@@ -54,10 +52,8 @@ class ValidationAttribute
 	 *
 	 * @return	Array|Boolean
 	 */
-	validateSelf()
-	{
-		if ( typeof this.rules === 'object' && typeof this.rules['$default'] !== 'undefined' && typeof this.rules['$rules'] === 'string')
-		{
+	validateSelf() {
+		if ( typeof this.rules === 'object' && typeof this.rules['$default'] !== 'undefined' && typeof this.rules['$rules'] === 'string') {
 			this.default	= this.rules['$default'];
 			this.rules		= this.rules['$rules'];
 		}
@@ -68,8 +64,7 @@ class ValidationAttribute
 		let allRules	= this.rules.split( '||' );
 		let index, rule, result, params, validationErrors	= [];
 
-		for ( index = 0; index < allRules.length; ++ index )
-		{
+		for ( index = 0; index < allRules.length; ++ index ) {
 			rule	= allRules[index];
 			params	= this.getRuleParams( rule );
 
@@ -88,18 +83,16 @@ class ValidationAttribute
 	/**
 	 * @brief	Validates each rule separately
 	 *
-	 * @param	{String} rule
-	 * @param	{Number} index
-	 * @param	{Object} params
+	 * @property	{String} rule
+	 * @property	{Number} index
+	 * @property	{Object} params
 	 *
 	 * @return	String|Boolean
 	 */
-	validateRule( rule, index, params )
-	{
+	validateRule( rule, index, params ) {
 		let valueLength, sameEntry, inputEntry;
 
-		switch ( params.rule )
-		{
+		switch ( params.rule ) {
 			case VALIDATION_ERRORS.optional:
 				return false;
 
@@ -127,8 +120,7 @@ class ValidationAttribute
 			case VALIDATION_ERRORS.weakIsFalse:
 				return this.value === false ? false : VALIDATION_ERRORS.weakIsFalse;
 
-			case VALIDATION_ERRORS.numeric:
-			{
+			case VALIDATION_ERRORS.numeric: {
 				let result	= assert.assertIsNumeric( parseInt( this.value ) ) ? false : VALIDATION_ERRORS.numeric;
 
 				if ( result === false )
@@ -149,7 +141,6 @@ class ValidationAttribute
 				return assert.assertNotEmpty( this.value ) ? false : VALIDATION_ERRORS.filled;
 
 			case VALIDATION_ERRORS.range:
-			{
 				let range	= params.params[0].split( '-' );
 				valueLength	= assert.getLength( this.value );
 
@@ -159,9 +150,8 @@ class ValidationAttribute
 				return assert.assertBiggerOrEqual( valueLength, Number( range[0] ) ) && assert.assertSmallerOrEqual( valueLength, Number( range[1] ) )
 					? false
 					: VALIDATION_ERRORS.range;
-			}
+
 			case VALIDATION_ERRORS.min:
-			{
 				valueLength	= assert.getLength( this.value );
 				let min		= params.params[0];
 
@@ -169,9 +159,8 @@ class ValidationAttribute
 					return VALIDATION_ERRORS.rules;
 
 				return assert.assertBiggerOrEqual( valueLength, Number( min ) ) ? false : VALIDATION_ERRORS.min;
-			}
+
 			case VALIDATION_ERRORS.max:
-			{
 				valueLength	= assert.getLength( this.value );
 				let max		= params.params[0];
 
@@ -179,30 +168,27 @@ class ValidationAttribute
 					return VALIDATION_ERRORS.rules;
 
 				return assert.assertSmallerOrEqual( valueLength, Number( max ) ) ? false : VALIDATION_ERRORS.max;
-			}
+
 			case VALIDATION_ERRORS.email:
 				return assert.assertIsValidEmail( this.value ) ? false : VALIDATION_ERRORS.email;
 
 			case VALIDATION_ERRORS.isTrue:
-			{
 				let isTrueForIsTrueValidation	= assert.assertTrue( this.value );
 
 				if ( isTrueForIsTrueValidation )
 					this.value	= true;
 
 				return isTrueForIsTrueValidation ? false : VALIDATION_ERRORS.isTrue;
-			}
+
 			case VALIDATION_ERRORS.isFalse:
-			{
 				let isFalseForIsFalseValidation	= assert.assertFalse( this.value );
 
 				if ( isFalseForIsFalseValidation )
 					this.value	= false;
 
 				return isFalseForIsFalseValidation ? false : VALIDATION_ERRORS.isFalse;
-			}
+
 			case VALIDATION_ERRORS.boolean:
-			{
 				let isTrueForBooleanValidation	= assert.assertTrue( this.value );
 				let isFalseForBooleanValidation	= assert.assertFalse( this.value );
 
@@ -213,7 +199,7 @@ class ValidationAttribute
 					this.value	= false;
 
 				return isTrueForBooleanValidation || isFalseForBooleanValidation ? false : VALIDATION_ERRORS.boolean;
-			}
+
 			case VALIDATION_ERRORS.notBoolean:
 				return assert.assertNotBoolean( this.value ) ? false : VALIDATION_ERRORS.notBoolean;
 
@@ -238,14 +224,13 @@ class ValidationAttribute
 				return assert.assertStrictNotEqual( this.value, inputEntry ) ? false : VALIDATION_ERRORS.different;
 
 			case VALIDATION_ERRORS.equals:
-			{
 				let comparator	= params.params[0];
 
 				if ( params.params.length !== 1)
 					return VALIDATION_ERRORS.rules;
 
 				return assert.assertStrictEqual( this.value, comparator ) ? false : VALIDATION_ERRORS.equals;
-			}
+
 			default:
 				return VALIDATION_ERRORS.rules;
 		}
@@ -254,12 +239,11 @@ class ValidationAttribute
 	/**
 	 * @brief	Splits the rule additionally and returns any params found
 	 *
-	 * @param	{String} rule
+	 * @property	{String} rule
 	 *
 	 * @return	Object
 	 */
-	getRuleParams( rule )
-	{
+	getRuleParams( rule ) {
 		const ruleParams	= rule.split( ':' );
 
 		return{

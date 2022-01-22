@@ -9,14 +9,12 @@ const ValidationHandler	= require( './components/validation/validation_handler' 
 /**
  * @brief	Request event that holds all kinds of request data that is passed to all the middleware given by the router
  */
-class EventRequest extends EventEmitter
-{
+class EventRequest extends EventEmitter {
 	/**
-	 * @param	{IncomingMessage} request
-	 * @param	{ServerResponse} response
+	 * @property	{IncomingMessage} request
+	 * @property	{ServerResponse} response
 	 */
-	constructor( request, response )
-	{
+	constructor( request, response ) {
 		super();
 		this.setMaxListeners( 0 );
 
@@ -48,12 +46,10 @@ class EventRequest extends EventEmitter
 		// We do this so we can pass the event.next function by reference
 		const self			= this;
 		this.next			= ( ...args ) => {
-			try
-			{
+			try {
 				self._next.apply( self, args );
 			}
-			catch ( error )
-			{
+			catch ( error ) {
 				if ( ! this.isFinished() )
 					this.sendError( error );
 			}
@@ -69,8 +65,7 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	void
 	 */
-	_cleanUp()
-	{
+	_cleanUp() {
 		this.emit( 'cleanUp' );
 
 		this.block				= undefined;
@@ -95,12 +90,11 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Easier access to the validation
 	 *
-	 * @param	{*} args
+	 * @property	{*} args
 	 *
 	 * @return	ValidationResult
 	 */
-	validate( ...args )
-	{
+	validate( ...args ) {
 		return this.validation.validate.apply( this.validation, args );
 	}
 
@@ -111,14 +105,13 @@ class EventRequest extends EventEmitter
 	 * 			The options should be an object where all the keys will be taken as is as well as the values
 	 * 			And they will be used to make an cookie header
 	 *
-	 * @param	{String} name
-	 * @param	{String} value
-	 * @param	{Object} [options={}]
+	 * @property	{String} name
+	 * @property	{String} value
+	 * @property	{Object} [options={}]
 	 *
 	 * @return	Boolean
 	 */
-	setCookie( name, value, options = {} )
-	{
+	setCookie( name, value, options = {} ) {
 		const cookieHeaderName	= 'set-cookie';
 		const result			= this.validate(
 			{ name, value },
@@ -133,8 +126,7 @@ class EventRequest extends EventEmitter
 
 		let cookie	= `${name}=${value};`;
 
-		for( const optionName in options )
-		{
+		for( const optionName in options ) {
 			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( options, optionName ) )
 				continue;
@@ -157,13 +149,12 @@ class EventRequest extends EventEmitter
 	}
 
 	/**
-	 * @param	{*} [response='']
-	 * @param	{Number} [code=null]
+	 * @property	{*} [response='']
+	 * @property	{Number} [code=null]
 	 *
 	 * @return	Promise
 	 */
-	send( response = '', code = null )
-	{
+	send( response = '', code = null ) {
 		if ( typeof code === 'number' )
 			this.setStatusCode( code );
 
@@ -180,12 +171,11 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Formats the response to be sent
 	 *
-	 * @param	{String|Buffer} response
+	 * @property	{String|Buffer} response
 	 *
 	 * @return	{String|Buffer}
 	 */
-	formatResponse( response = '' )
-	{
+	formatResponse( response = '' ) {
 		if ( Buffer.isBuffer( response ) )
 			return response;
 
@@ -197,21 +187,19 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	Promise
 	 */
-	async end( ...args )
-	{
+	async end( ...args ) {
 		this.response.end.apply( this.response, args );
 	}
 
 	/**
 	 * @brief	Safely set header to response ( only if response is not sent )
 	 *
-	 * @param	{String} key
-	 * @param	{String} value
+	 * @property	{String} key
+	 * @property	{String} value
 	 *
 	 * @return	EventRequest
 	 */
-	setResponseHeader( key, value )
-	{
+	setResponseHeader( key, value ) {
 		if ( ! this.isFinished() && ! this.response.headersSent )
 			this.response.setHeader( key, value );
 
@@ -221,12 +209,11 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Removes a set header
 	 *
-	 * @param	{String} key
+	 * @property	{String} key
 	 *
 	 * @return	EventRequest
 	 */
-	removeResponseHeader( key )
-	{
+	removeResponseHeader( key ) {
 		if ( ! this.isFinished() && ! this.response.headersSent )
 			this.response.removeHeader( key );
 
@@ -238,13 +225,12 @@ class EventRequest extends EventEmitter
 	 *
 	 * @details	If the key does not exist, then return the default value if passed. Defaults to NULL
 	 *
-	 * @param	{String} key
-	 * @param	{String} [defaultValue=null]
+	 * @property	{String} key
+	 * @property	{String} [defaultValue=null]
 	 *
 	 * @return	String
 	 */
-	getRequestHeader( key, defaultValue = null )
-	{
+	getRequestHeader( key, defaultValue = null ) {
 		return ! this.hasRequestHeader( key )
 				? defaultValue
 				: typeof this.headers[key] !== "undefined"
@@ -259,32 +245,29 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	Object
 	 */
-	getRequestHeaders()
-	{
+	getRequestHeaders() {
 		return this.headers;
 	}
 
 	/**
 	 * @brief	Checks if the desired header exists
 	 *
-	 * @param	{String} key
+	 * @property	{String} key
 	 *
 	 * @return	Boolean
 	 */
-	hasRequestHeader( key )
-	{
+	hasRequestHeader( key ) {
 		return typeof this.headers[key.toLowerCase()] !== 'undefined' || typeof this.headers[key] !== 'undefined';
 	}
 
 	/**
 	 * @brief	Sets the status code of the response
 	 *
-	 * @param	{Number} code
+	 * @property	{Number} code
 	 *
 	 * @return	EventRequest
 	 */
-	setStatusCode( code )
-	{
+	setStatusCode( code ) {
 		this.response.statusCode	= typeof code === 'number' ? code : 500;
 
 		return this;
@@ -293,22 +276,19 @@ class EventRequest extends EventEmitter
 	/**
 	 * @brief	Used to send a redirect response to a given redirectUrl
 	 *
-	 * @param	{String} redirectUrl
-	 * @param	{Number} [statusCode=302]
+	 * @property	{String} redirectUrl
+	 * @property	{Number} [statusCode=302]
 	 *
 	 * @return	void
 	 */
-	redirect( redirectUrl, statusCode = 302 )
-	{
+	redirect( redirectUrl, statusCode = 302 ) {
 		this.emit( 'redirect', { redirectUrl, statusCode } );
 
-		if ( ! this.isFinished() )
-		{
+		if ( ! this.isFinished() ) {
 			this.setResponseHeader( 'Location', redirectUrl );
 			this.send( { redirectUrl }, statusCode );
 		}
-		else
-		{
+		else {
 			this.next( 'Could not redirect, response already finished' );
 		}
 	}
@@ -318,20 +298,18 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	Boolean
 	 */
-	isFinished()
-	{
+	isFinished() {
 		return this.finished === true || this.response.writableEnded;
 	}
 
 	/**
 	 * @brief	Sets the current execution block
 	 *
-	 * @param	{Array} block
+	 * @property	{Array} block
 	 *
 	 * @return	void
 	 */
-	_setBlock( block )
-	{
+	_setBlock( block ) {
 		this.block	= block;
 	}
 
@@ -342,26 +320,23 @@ class EventRequest extends EventEmitter
 	 * 			if the event is stopped and the response has not been set then send a server error
 	 * 			This function is wrapped by the next() function
 	 *
-	 * @param	{*} err
-	 * @param	{Number} code
+	 * @property	{*} err
+	 * @property	{Number} code
 	 *
 	 * @return	void
 	 */
-	_next( err, code )
-	{
+	_next( err, code ) {
 		if ( err )
 			return this.sendError( err, typeof code === 'number' ? code : 500 );
 
-		if ( ! this.isFinished() )
-		{
+		if ( ! this.isFinished() ) {
 			if ( this.block.length <= 0 )
 				return this.sendError( `Cannot ${this.method} ${this.path}`, 404 );
 
 			const next		= this.block.shift();
 			const response	= next( this );
 
-			if ( response instanceof Promise )
-			{
+			if ( response instanceof Promise ) {
 				response.catch(( error ) => {
 					setImmediate(() => {
 						if ( ! this.isFinished() )
@@ -377,8 +352,7 @@ class EventRequest extends EventEmitter
 	 *
 	 * @return	ErrorHandler
 	 */
-	getErrorHandler()
-	{
+	getErrorHandler() {
 		if ( this.errorHandler === null || typeof this.errorHandler === 'undefined' || typeof this.errorHandler.handleError !== 'function' )
 			this.errorHandler	= new ErrorHandler();
 
@@ -390,12 +364,11 @@ class EventRequest extends EventEmitter
 	 *
 	 * @details	By default handleError is asynchronous
 	 *
-	 * @param	{Array} args
+	 * @property	{Array} args
 	 *
 	 * @return	void
 	 */
-	sendError( ...args )
-	{
+	sendError( ...args ) {
 		const errorHandler	= this.getErrorHandler();
 
 		args.unshift( this );

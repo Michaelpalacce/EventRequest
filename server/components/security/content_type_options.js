@@ -10,34 +10,30 @@ const HEADER_NAME	= 'X-Content-Type-Options';
 /**
  * @brief	Formats a ContentTypeOptions header
  */
-class ContentTypeOptions
-{
-	constructor( options = {} )
-	{
+class ContentTypeOptions {
+	constructor( options = {} ) {
 		this.parseOptions( options );
 	}
 
 	/**
 	 * @brief	Parses the options given to the ContentTypeOptions class
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	parseOptions( options = {} )
-	{
+	parseOptions( options = {} ) {
 		this.setEnabled( options.enabled );
 	}
 
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @param	{Boolean} [enabled=true]
+	 * @property	{Boolean} [enabled=true]
 	 *
 	 * @return	void
 	 */
-	setEnabled( enabled = true )
-	{
+	setEnabled( enabled = true ) {
 		this.enabled	= typeof enabled === 'boolean' ? enabled : true;
 	}
 
@@ -46,8 +42,7 @@ class ContentTypeOptions
 	 *
 	 * @return	String
 	 */
-	getHeader()
-	{
+	getHeader() {
 		return HEADER_NAME;
 	}
 
@@ -56,8 +51,7 @@ class ContentTypeOptions
 	 *
 	 * @return	String
 	 */
-	build()
-	{
+	build() {
 		if ( ! this.enabled )
 			return '';
 

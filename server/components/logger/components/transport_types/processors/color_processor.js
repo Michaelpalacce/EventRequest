@@ -15,7 +15,7 @@ const DEFAULT_LOG_COLORS		= {
 };
 
 /**
- * @param	{Object} options
+ * @property	{Object} options
  *
  * @return	Function
  */
@@ -28,8 +28,7 @@ module.exports	= ( { logColors = DEFAULT_LOG_COLORS } = {} ) => {
 	return ( context = {} ) => {
 		const propertiesToTest = ['level', 'uniqueId', 'timestamp', 'isRaw', 'message'];
 
-		if ( propertiesToTest.every( ( value ) => { return value in context; } ) )
-		{
+		if ( propertiesToTest.every( ( value ) => { return value in context; } ) ) {
 			let color			= typeof logColors[context.level] === 'undefined' || typeof colorize[logColors[context.level]] !== 'function'
 								? FORMATTER_DEFAULT_COLOR
 								: logColors[context.level];

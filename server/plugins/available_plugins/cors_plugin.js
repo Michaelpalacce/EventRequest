@@ -5,23 +5,20 @@ const PluginInterface	= require( '../plugin_interface' );
 /**
  * @brief	Plugin used to apply common CORS headers
  */
-class CorsPlugin extends PluginInterface
-{
+class CorsPlugin extends PluginInterface {
 	/**
-	 * @param	{String} pluginId
-	 * @param	{Object} options
+	 * @property	{String} pluginId
+	 * @property	{Object} options
 	 */
-	constructor( pluginId, options = {} )
-	{
+	constructor( pluginId, options = {} ) {
 		super( pluginId, options );
 		this.setOptions( options );
 	}
 
 	/**
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 */
-	setOptions( options = {} )
-	{
+	setOptions( options = {} ) {
 		super.setOptions( options );
 
 		this.origin			= Array.isArray( this.options.origin ) || typeof this.options.origin === 'string'
@@ -56,21 +53,18 @@ class CorsPlugin extends PluginInterface
 	/**
 	 * @brief	Applies all the CORS headers to the response
 	 *
-	 * @param	{EventRequest} event
+	 * @property	{EventRequest} event
 	 *
 	 * @return	void
 	 */
-	applyCors( event )
-	{
-		if ( ! Array.isArray( this.origin ) )
-		{
+	applyCors( event ) {
+		if ( ! Array.isArray( this.origin ) ) {
 			if ( this.origin === 'er_dynamic' )
 				event.setResponseHeader( 'Access-Control-Allow-Origin', event.getRequestHeader( 'origin' ) || '*' );
 			else
 				event.setResponseHeader( 'Access-Control-Allow-Origin', this.origin );
 		}
-		else
-		{
+		else {
 			const requestOrigin	= event.getRequestHeader( 'origin' );
 
 			if ( this.origin.includes( requestOrigin ) )
@@ -90,8 +84,7 @@ class CorsPlugin extends PluginInterface
 		if ( this.credentials === true )
 			event.setResponseHeader( 'Access-Control-Allow-Credentials', 'true' );
 
-		if ( event.method === 'OPTIONS' )
-		{
+		if ( event.method === 'OPTIONS' ) {
 			event.setResponseHeader( 'Access-Control-Allow-Methods', this.methods );
 			event.send( '', this.status );
 			return;
@@ -105,8 +98,7 @@ class CorsPlugin extends PluginInterface
 	 *
 	 * @return	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		return [{ handler : this.applyCors.bind( this ) }];
 	}
 }

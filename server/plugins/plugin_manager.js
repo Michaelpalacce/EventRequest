@@ -3,22 +3,19 @@
 /**
  * @brief	PluginManager that contains all the plugins added to the site
  */
-class PluginManager
-{
-	constructor()
-	{
+class PluginManager {
+	constructor() {
 		this.plugins	= {};
 	}
 
 	/**
 	 * @brief	Adds a plugin to the Manager
 	 *
-	 * @param	{PluginInterface} plugin
+	 * @property	{PluginInterface} plugin
 	 *
 	 * @return	void
 	 */
-	addPlugin( plugin )
-	{
+	addPlugin( plugin ) {
 		if ( this.isValidPlugin( plugin ) )
 			this.plugins[plugin.getPluginId()]	= plugin;
 		else
@@ -28,24 +25,22 @@ class PluginManager
 	/**
 	 * @brief	Checks whether the given plugin id corresponds to a plugin added to the manager
 	 *
-	 * @param	{String} id
+	 * @property	{String} id
 	 *
 	 * @return	Boolean
 	 */
-	hasPlugin( id )
-	{
+	hasPlugin( id ) {
 		return typeof this.plugins[id] !== 'undefined';
 	}
 
 	/**
 	 * @brief	Removes a plugin by id
 	 *
-	 * @param	{String} id
+	 * @property	{String} id
 	 *
 	 * @return	void
 	 */
-	removePlugin( id )
-	{
+	removePlugin( id ) {
 		delete this.plugins[id];
 	}
 
@@ -54,20 +49,18 @@ class PluginManager
 	 *
 	 * @return	Array
 	 */
-	getAllPluginIds()
-	{
+	getAllPluginIds() {
 		return Object.keys( this.plugins );
 	}
 
 	/**
 	 * @brief	Returns if the given plugin is a valid plugin interface
 	 *
-	 * @param	{PluginInterface|Object} plugin
+	 * @property	{PluginInterface|Object} plugin
 	 *
 	 * @return	Boolean
 	 */
-	isValidPlugin( plugin )
-	{
+	isValidPlugin( plugin ) {
 		return typeof plugin.getPluginId === 'function'
 			&& typeof plugin.getPluginDependencies === 'function'
 			&& typeof plugin.getPluginMiddleware === 'function'
@@ -78,12 +71,11 @@ class PluginManager
 	/**
 	 * @brief	Gets a plugin given an id
 	 *
-	 * @param	{String} id
+	 * @property	{String} id
 	 *
 	 * @return	PluginInterface
 	 */
-	getPlugin( id )
-	{
+	getPlugin( id ) {
 		if ( ! this.hasPlugin( id ) )
 			throw new Error( 'app.er.pluginManager.pluginDoesNotExist' );
 

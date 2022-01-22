@@ -6,29 +6,26 @@ const fileStreamHandler	= require( '../../components/file_streams/file_stream_ha
 /**
  * @brief	File stream handler responsible for attaching FileStreams to the eventRequest
  */
-class FileStreamHandlerPlugin extends PluginInterface
-{
+class FileStreamHandlerPlugin extends PluginInterface {
 	/**
 	 * @brief	Attaches the function stream file to the event
 	 *
-	 * @param	{EventRequest} event
+	 * @property	{EventRequest} event
 	 *
 	 * @return	void
 	 */
-	attachFunctions( event )
-	{
+	attachFunctions( event ) {
 		/**
 		 * @brief	Streams files
 		 *
 		 * @details	The file must be the absolute path to the file to be streamed
 		 *
-		 * @param	{String} file
-		 * @param	{Object} [options={}]
+		 * @property	{String} file
+		 * @property	{Object} [options={}]
 		 *
 		 * @return	ReadStream|null
 		 */
-		event.getFileStream	= function( file, options = {} )
-		{
+		event.getFileStream	= function( file, options = {} ) {
 			const fileStream	= this.fileStreamHandler.getFileStreamerForType( file );
 
 			if ( fileStream !== null )
@@ -36,19 +33,19 @@ class FileStreamHandlerPlugin extends PluginInterface
 			else
 				return null;
 		};
+
 		/**
 		 * @brief	Streams files
 		 *
 		 * @details	The file must be the absolute path to the file to be streamed
 		 *
-		 * @param	{String} file
-		 * @param	{Object} [options={}]
-		 * @param	{Function} [errCallback=null]
+		 * @property	{String} file
+		 * @property	{Object} [options={}]
+		 * @property	{Function} [errCallback=null]
 		 *
 		 * @return	void
 		 */
-		event.streamFile	= function( file, options = {}, errCallback = null )
-		{
+		event.streamFile	= function( file, options = {}, errCallback = null ) {
 			const fileStream	= event.getFileStream( file, options );
 
 			if ( fileStream !== null )
@@ -66,8 +63,7 @@ class FileStreamHandlerPlugin extends PluginInterface
 	 *
 	 * @return	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		return [{
 			handler	: ( event ) => {
 				event.fileStreamHandler	= fileStreamHandler;

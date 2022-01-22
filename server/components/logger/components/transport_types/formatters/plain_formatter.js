@@ -13,15 +13,14 @@ module.exports	= ( { noRaw = false } = {} ) => {
 	 *
 	 * @details	This will return an array of all the data that needs to be logged
 	 *
-	 * @param	{Object} context
+	 * @property	{Object} context
 	 *
 	 * @return	Array
 	 */
 	return ( context = {} ) => {
 		const propertiesToTest = ['uniqueId', 'timestamp', 'isRaw', 'rawMessage', 'message'];
 
-		if ( propertiesToTest.every( ( value ) => { return value in context; } ) )
-		{
+		if ( propertiesToTest.every( ( value ) => { return value in context; } ) ) {
 			const uniqueId	= context.uniqueId;
 			const timestamp	= context.timestamp;
 
@@ -31,8 +30,6 @@ module.exports	= ( { noRaw = false } = {} ) => {
 			return [`${uniqueId} - ${timestamp} : ${context.message}`];
 		}
 		else
-		{
 			return [];
-		}
 	};
 };

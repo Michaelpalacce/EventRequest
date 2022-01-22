@@ -21,10 +21,8 @@ const ROUTE_REGEX	= /^:([^:]+):$/;
 /**
  * @brief	Defines a single route in the site
  */
-class Route
-{
-	constructor( routeConfig )
-	{
+class Route {
+	constructor( routeConfig ) {
 		this.handler		= null;
 		this.route			= null;
 		this.method			= null;
@@ -38,8 +36,7 @@ class Route
 	 *
 	 * @return	Object
 	 */
-	static getMatchObject()
-	{
+	static getMatchObject() {
 		return {
 			matched	: false,
 			params	: {}
@@ -49,12 +46,11 @@ class Route
 	/**
 	 * @brief	Sets Route options
 	 *
-	 * @param	{Object} routeConfig
+	 * @property	{Object} routeConfig
 	 *
 	 * @return	void
 	 */
-	sanitize( routeConfig )
-	{
+	sanitize( routeConfig ) {
 		if ( typeof routeConfig !== 'object' || routeConfig === null )
 			throw new Error( 'app.er.routing.invalidMiddlewareAdded' );
 
@@ -85,14 +81,12 @@ class Route
 	 * 			String
 	 * 			Function
 	 *
-	 * @param	{Object} routeConfig
+	 * @property	{Object} routeConfig
 	 *
 	 * @return	*
 	 */
-	parseGlobalMiddlewares( routeConfig )
-	{
-		switch ( true )
-		{
+	parseGlobalMiddlewares( routeConfig ) {
+		switch ( true ) {
 			case Array.isArray( routeConfig.middlewares ):
 				return routeConfig.middlewares;
 
@@ -112,8 +106,7 @@ class Route
 	 *
 	 * @return	String|RegExp
 	 */
-	getRoute()
-	{
+	getRoute() {
 		return this.route;
 	}
 
@@ -122,8 +115,7 @@ class Route
 	 *
 	 * @return	Function
 	 */
-	getHandler()
-	{
+	getHandler() {
 		return this.handler;
 	}
 
@@ -132,8 +124,7 @@ class Route
 	 *
 	 * @return	Array|String
 	 */
-	getMethod()
-	{
+	getMethod() {
 		return this.method;
 	}
 
@@ -142,20 +133,18 @@ class Route
 	 *
 	 * @return	Array
 	 */
-	getMiddlewares()
-	{
+	getMiddlewares() {
 		return this.middlewares;
 	}
 
 	/**
 	 * @brief	Matches the requestedMethod with the route's one
 	 *
-	 * @param	{String} requestedMethod
+	 * @property	{String} requestedMethod
 	 *
 	 * @return	Boolean
 	 */
-	matchMethod( requestedMethod )
-	{
+	matchMethod( requestedMethod ) {
 		requestedMethod	= requestedMethod.toUpperCase();
 
 		return this.method === requestedMethod
@@ -168,13 +157,12 @@ class Route
 	 *
 	 * @details	Sets the matchedParams with any parameters found
 	 *
-	 * @param	{String} requestedRoute
-	 * @param	{Object} [matchedParams={}]
+	 * @property	{String} requestedRoute
+	 * @property	{Object} [matchedParams={}]
 	 *
 	 * @return	Object
 	 */
-	matchPath( requestedRoute, matchedParams = {} )
-	{
+	matchPath( requestedRoute, matchedParams = {} ) {
 		if ( requestedRoute === '' )
 			return false;
 
@@ -184,8 +172,7 @@ class Route
 		if ( requestedRoute === this.route )
 			return true;
 
-		if ( this.route instanceof RegExp )
-		{
+		if ( this.route instanceof RegExp ) {
 			const result	= requestedRoute.match( this.route );
 
 			const matched	= result !== null;
@@ -200,8 +187,7 @@ class Route
 		const routeParts			= this.routeParts;
 		let hasWrongPart			= false;
 
-		if ( requestedRouteParts.length === routeParts.length )
-		{
+		if ( requestedRouteParts.length === routeParts.length ) {
 			routeParts.forEach(( pathPart, index ) => {
 				if ( hasWrongPart )
 					return;

@@ -5,10 +5,8 @@ const assert	= require( 'assert' );
 /**
  * @brief	Mocks methods of classes
  */
-class Mocker
-{
-	constructor( mockedClass, mockMethodOptions )
-	{
+class Mocker {
+	constructor( mockedClass, mockMethodOptions ) {
 		this.mockedClass		= mockedClass;
 		this.mockedMethod		= () => {};
 
@@ -48,8 +46,7 @@ class Mocker
 	 *
 	 * @return	void
 	 */
-	setUpMockedMethod()
-	{
+	setUpMockedMethod() {
 		let functionCalled	= 0;
 
 		this.mockedMethod	= ( ...args ) => {
@@ -67,20 +64,17 @@ class Mocker
 	/**
 	 * @brief	Assert whether correct with arguments are passed
 	 *
-	 * @param	{Array} args
+	 * @property	{Array} args
 	 *
 	 * @return	void
 	 */
-	assertWithArguments( args )
-	{
-		if ( this.hasWithArguments() )
-		{
+	assertWithArguments( args ) {
+		if ( this.hasWithArguments() ) {
 			let currentArguments	= this.getWithArguments();
 			if ( ! Array.isArray( currentArguments ) )
 				throw new Error( 'Invalid arguments provided' );
 
-			for ( let index = 0; index < currentArguments.length; ++ index )
-			{
+			for ( let index = 0; index < currentArguments.length; ++ index ) {
 				let value	= currentArguments[index];
 				if ( value === undefined )
 					continue;
@@ -98,8 +92,7 @@ class Mocker
 	 *
 	 * @return	void
 	 */
-	attachMockedMethod()
-	{
+	attachMockedMethod() {
 		let prototypeSpider	= typeof this.mockedClass.prototype === 'undefined'
 							? this.mockedClass
 							: this.mockedClass.prototype;
@@ -119,8 +112,7 @@ class Mocker
 	 *
 	 * @return	Boolean
 	 */
-	hasWithArguments()
-	{
+	hasWithArguments() {
 		return this.withArguments.length > 0;
 	}
 
@@ -129,20 +121,18 @@ class Mocker
 	 *
 	 * @return	Array
 	 */
-	getWithArguments()
-	{
+	getWithArguments() {
 		return this.withArguments.length === 1 ? this.withArguments[0] : this.withArguments.shift();
 	}
 
 	/**
 	 * @brief	Gets the next function to execute
 	 *
-	 * @param	{Array} args
+	 * @property	{Array} args
 	 *
 	 * @return	mixed
 	 */
-	getNextExecutionFunction( args )
-	{
+	getNextExecutionFunction( args ) {
 		let functionToExecute	= this.executionBlock.length > 1 ? this.executionBlock.shift() : this.executionBlock[0];
 
 		if ( typeof functionToExecute === 'function' )

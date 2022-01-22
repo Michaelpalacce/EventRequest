@@ -7,10 +7,8 @@ const { Logger, Loggur }	= Logging;
 /**
  * @brief	Logger plugin used to attach logs at different levels in the app
  */
-class LoggerPlugin extends PluginInterface
-{
-	constructor( pluginId, options = { attachToProcess: true } )
-	{
+class LoggerPlugin extends PluginInterface {
+	constructor( pluginId, options = { attachToProcess: true } ) {
 		super( pluginId, options );
 
 		this.logger	= null;
@@ -19,12 +17,11 @@ class LoggerPlugin extends PluginInterface
 	/**
 	 * @brief	Attaches a process.log function for easier use
 	 *
-	 * @param	{Server} server
+	 * @property	{Server} server
 	 *
 	 * @return	void
 	 */
-	setServerOnRuntime( server )
-	{
+	setServerOnRuntime( server ) {
 		if ( this.options.attachToProcess === true )
 			process.log	= Loggur.log.bind( Loggur );
 	}
@@ -36,10 +33,8 @@ class LoggerPlugin extends PluginInterface
 	 *
 	 * @return	Logger
 	 */
-	getLogger()
-	{
-		if ( this.logger === null || this.logger === undefined )
-		{
+	getLogger() {
+		if ( this.logger === null || this.logger === undefined ) {
 			this.logger	= this.options.logger instanceof Logger
 						? this.options.logger
 						: Loggur.getDefaultLogger();
@@ -53,19 +48,17 @@ class LoggerPlugin extends PluginInterface
 	 *
 	 * @details	Events attached: error, on_error, finished, redirect, cleanUp
 	 *
-	 * @param	{EventRequest} event
+	 * @property	{EventRequest} event
 	 *
 	 * @return	void
 	 */
-	attachEventsToEventRequest( event )
-	{
+	attachEventsToEventRequest( event ) {
 		const logger		= this.getLogger();
 
 		const errCallback	= ( error ) => {
 			let message;
 
-			if ( error.error instanceof Error )
-			{
+			if ( error.error instanceof Error ) {
 				message			= Object.assign( {}, error );
 				message.error	= message.error.stack;
 			}
@@ -96,13 +89,11 @@ class LoggerPlugin extends PluginInterface
 	 *
 	 * @return	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		const logger			= this.getLogger();
 
 		const pluginMiddleware	= {
 			handler	: ( event ) => {
-
 				event.on( 'cleanUp', () => {
 					const userAgent	= typeof event.headers['user-agent'] === 'undefined' ? 'UNKNOWN' : event.headers['user-agent'];
 					logger.notice( `${event.method} ${event.request.url} ${event.response.statusCode} ||| ${event.clientIp} ||| ${userAgent}` );

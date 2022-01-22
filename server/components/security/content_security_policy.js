@@ -42,10 +42,8 @@ const MIME_TYPE_REGEXP				= new RegExp( /^[-*\w.]+\/[-*\w.]+$/ );
 /**
  * @brief	CSP class that uses the builder pattern to build the CSP header
  */
-class ContentSecurityPolicy
-{
-	constructor( options = {} )
-	{
+class ContentSecurityPolicy {
+	constructor( options = {} ) {
 		this.directives	= {};
 		this.reportOnly	= false;
 
@@ -55,20 +53,18 @@ class ContentSecurityPolicy
 	/**
 	 * @brief	Parses the given options and sets the different directives in keys
 	 *
-	 * @param	{Object} options
+	 * @property	{Object} options
 	 *
 	 * @return	void
 	 */
-	parseOptions( options )
-	{
+	parseOptions( options ) {
 		this.setEnabled( options['enabled'] );
 
 		this.directives		= typeof options[OPTIONS_DIRECTIVES_KEY] === 'object'
 							? options[OPTIONS_DIRECTIVES_KEY]
 							: {};
 
-		for ( const directiveName in this.directives )
-		{
+		for ( const directiveName in this.directives ) {
 			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this.directives, directiveName ) )
 				continue;
@@ -102,8 +98,7 @@ class ContentSecurityPolicy
 	 *
 	 * @return	void
 	 */
-	xss()
-	{
+	xss() {
 		this.addDefaultSrc( 'none' );
 		this.addScriptSrc( 'self' );
 		this.addImgSrc( 'self' );
@@ -120,12 +115,11 @@ class ContentSecurityPolicy
 	}
 
 	/**
-	 * @param	{String} mimeType
+	 * @property	{String} mimeType
 	 *
 	 * @return	void
 	 */
-	allowPluginType( mimeType )
-	{
+	allowPluginType( mimeType ) {
 		if ( MIME_TYPE_REGEXP.test( mimeType ) )
 			this._addDirective( PLUGIN_TYPES_KEY, mimeType );
 	}
@@ -133,12 +127,11 @@ class ContentSecurityPolicy
 	/**
 	 * @brief	Sets the component's to either be enabled or not
 	 *
-	 * @param	{Boolean} [enabled=true]
+	 * @property	{Boolean} [enabled=true]
 	 *
 	 * @return	void
 	 */
-	setEnabled( enabled = true )
-	{
+	setEnabled( enabled = true ) {
 		this.enabled	= typeof enabled === 'boolean' ? enabled : true;
 	}
 
@@ -147,20 +140,18 @@ class ContentSecurityPolicy
 	 *
 	 * @return	String
 	 */
-	getHeader()
-	{
+	getHeader() {
 		return this.reportOnly ? REPORT_ONLY_HEADER_NAME : HEADER_NAME;
 	}
 
 	/**
 	 * @brief	Sets the header to be in report only mode
 	 *
-	 * @param	{String} uri
+	 * @property	{String} uri
 	 *
 	 * @return	void
 	 */
-	setReportOnly( uri )
-	{
+	setReportOnly( uri ) {
 		if ( typeof uri !== 'string' || uri === '' )
 			return;
 
@@ -174,12 +165,11 @@ class ContentSecurityPolicy
 	 *
 	 * @details	The report-uri header won't be added for you, you have to specify that yourself
 	 *
-	 * @param	{String} uri
+	 * @property	{String} uri
 	 *
 	 * @return	void
 	 */
-	setReportOnlyWithReportTo( uri )
-	{
+	setReportOnlyWithReportTo( uri ) {
 		if ( typeof uri !== 'string' || uri === '' )
 			return;
 
@@ -191,106 +181,95 @@ class ContentSecurityPolicy
 	/**
 	 * @return	void
 	 */
-	enableSandbox()
-	{
+	enableSandbox() {
 		this._addDirective( SANDBOX_KEY );
 	}
 
 	/**
 	 * @return	void
 	 */
-	upgradeInsecureRequests()
-	{
+	upgradeInsecureRequests() {
 		this._addDirective( UPGRADE_INSECURE_REQUESTS_JEY );
 	}
 
 	/**
-	 * @param	{String} value
+	 * @property	{String} value
 	 *
 	 * @return	void
 	 */
-	allowSandboxValue( value )
-	{
+	allowSandboxValue( value ) {
 		this._addDirective( SANDBOX_KEY, value );
 	}
 
 	/**
-	 * @param	{String} uri
+	 * @property	{String} uri
 	 *
 	 * @return	void
 	 */
-	addBaseUri( uri )
-	{
+	addBaseUri( uri ) {
 		this._addDirective( BASE_URI_KEY, this._decorateFetchDirectiveSource( uri ) );
 	}
 
 	/**
-	 * @param	{String} uri
+	 * @property	{String} uri
 	 *
 	 * @return	void
 	 */
-	restrictFormActionUrl( uri )
-	{
+	restrictFormActionUrl( uri ) {
 		this._addDirective( FORM_ACTION_KEY, this._decorateFetchDirectiveSource( uri ) );
 	}
 
 	/**
-	 * @param	{String} uri
+	 * @property	{String} uri
 	 *
 	 * @return	void
 	 */
-	addFrameAncestors( uri )
-	{
+	addFrameAncestors( uri ) {
 		this._addDirective( FRAME_ANCESTORS_KEY, this._decorateFetchDirectiveSource( uri ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addScriptSrc( source )
-	{
+	addScriptSrc( source ) {
 		this._addDirective( SCRIPT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addImgSrc( source )
-	{
+	addImgSrc( source ) {
 		this._addDirective( IMAGE_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addChildSrc( source )
-	{
+	addChildSrc( source ) {
 		this._addDirective( CHILD_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addConnectSrc( source )
-	{
+	addConnectSrc( source ) {
 		this._addDirective( CONNECT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addDefaultSrc( source )
-	{
+	addDefaultSrc( source ) {
 		this._addDirective( DEFAULT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
@@ -299,68 +278,61 @@ class ContentSecurityPolicy
 	 *
 	 * @return	void
 	 */
-	enableSelf()
-	{
+	enableSelf() {
 		this._addDirective( DEFAULT_SRC_KEY, "'self'" );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addFontSrc( source )
-	{
+	addFontSrc( source ) {
 		this._addDirective( FONT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addFrameSrc( source )
-	{
+	addFrameSrc( source ) {
 		this._addDirective( FRAME_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addManifestSrc( source )
-	{
+	addManifestSrc( source ) {
 		this._addDirective( MANIFEST_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addMediaSrc( source )
-	{
+	addMediaSrc( source ) {
 		this._addDirective( MEDIA_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addObjectSrc( source )
-	{
+	addObjectSrc( source ) {
 		this._addDirective( OBJECT_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
 	/**
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	void
 	 */
-	addStyleSrc( source )
-	{
+	addStyleSrc( source ) {
 		this._addDirective( STYLE_SRC_KEY, this._decorateFetchDirectiveSource( source ) );
 	}
 
@@ -369,15 +341,13 @@ class ContentSecurityPolicy
 	 *
 	 * @return	String
 	 */
-	build()
-	{
+	build() {
 		if ( ! this.enabled )
 			return '';
 
 		let directives	= '';
 
-		for ( const directive in this.directives )
-		{
+		for ( const directive in this.directives ) {
 			/* istanbul ignore next */
 			if ( ! {}.hasOwnProperty.call( this.directives, directive ) )
 				continue;
@@ -396,7 +366,6 @@ class ContentSecurityPolicy
 			directives			+= `${directive}${attributes};`;
 		}
 
-
 		return directives;
 	}
 
@@ -407,12 +376,11 @@ class ContentSecurityPolicy
 	 *
 	 * @details	Adds quotes when needed
 	 *
-	 * @param	{String} source
+	 * @property	{String} source
 	 *
 	 * @return	String
 	 */
-	_decorateFetchDirectiveSource( source )
-	{
+	_decorateFetchDirectiveSource( source ) {
 		if ( DIRECTIVES_SPECIAL_ARGUMENTS.includes( source ) )
 			return `'${source}'`;
 
@@ -422,13 +390,12 @@ class ContentSecurityPolicy
 	/**
 	 * @brief	Adds a new directive
 	 *
-	 * @param	{String} directive
-	 * @param	{String} [value='']
+	 * @property	{String} directive
+	 * @property	{String} [value='']
 	 *
 	 * @return	void
 	 */
-	_addDirective( directive, value = '' )
-	{
+	_addDirective( directive, value = '' ) {
 		if ( typeof this.directives[directive] === 'undefined' )
 			this.directives[directive]	= [];
 

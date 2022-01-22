@@ -9,12 +9,9 @@ const ContentTypeOptions	= require( '../../components/security/content_type_opti
 /**
  * @brief	Security Plugin that allows you to add different HTTP security headers
  */
-class SecurityPlugin extends PluginInterface
-{
-	constructor( pluginId, options = null )
-	{
-		if ( options === null )
-		{
+class SecurityPlugin extends PluginInterface {
+	constructor( pluginId, options = null ) {
+		if ( options === null ) {
 			options	= {
 				build: true
 			};
@@ -28,8 +25,7 @@ class SecurityPlugin extends PluginInterface
 	 *
 	 * @return	Array
 	 */
-	getPluginMiddleware()
-	{
+	getPluginMiddleware() {
 		const middlewares	= [];
 
 		middlewares.push(( event ) => {
@@ -41,8 +37,7 @@ class SecurityPlugin extends PluginInterface
 			};
 
 			event.$security.build	= () => {
-				for ( const index in event.$security )
-				{
+				for ( const index in event.$security ) {
 					if ( index === 'build' )
 						continue;
 

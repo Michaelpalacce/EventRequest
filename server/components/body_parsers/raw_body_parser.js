@@ -6,15 +6,12 @@ const { EventEmitter }	= require( 'events' );
 /**
  * @brief	RawBodyParser responsible for parsing any body sent
  */
-class RawBodyParser extends EventEmitter
-{
+class RawBodyParser extends EventEmitter {
 	/**
-	 * @param	{Object} options
-	 * 				Accepts options:
-	 * 					- maxPayloadLength - Number - The max size of the body to be parsed
+	 * @property	{Object} [options={}]
+	 * @property	{Number} options.maxPayloadLength	- The max size of the body to be parsed
 	 */
-	constructor( options = {} )
-	{
+	constructor( options = {} ) {
 		super();
 		this.setMaxListeners( 0 );
 
@@ -25,34 +22,30 @@ class RawBodyParser extends EventEmitter
 	}
 
 	/**
-	 * @brief	Returns a boolean if the current body parser supports the request
+	 * @brief		Returns a boolean if the current body parser supports the request
 	 *
-	 * @param	{EventRequest} event
+	 * @property	{EventRequest} event
 	 *
-	 * @return	boolean
+	 * @return		{Boolean}
 	 */
-	supports( event )
-	{
+	supports( event ) {
 		return true;
 	}
 
 	/**
-	 * @brief	Parses the request
+	 * @brief		Parses the request
 	 *
-	 * @param	{EventRequest} event
+	 * @property	{EventRequest} event
 	 *
-	 * @return	Promise
+	 * @return		{Promise}
 	 */
-	parse( event )
-	{
+	parse( event ) {
 		return new Promise(( resolve ) => {
 			let rawBody		= [];
 			let payloadLength	= 0;
 
-			event.request.on( 'data', ( data ) =>
-			{
-				if ( ! event.isFinished() )
-				{
+			event.request.on( 'data', ( data ) => {
+				if ( ! event.isFinished() ) {
 					payloadLength	+= data.length;
 
 					if ( payloadLength <= this.maxPayloadLength )
@@ -61,8 +54,7 @@ class RawBodyParser extends EventEmitter
 			});
 
 			event.request.on( 'end', () => {
-				if ( ! event.isFinished() )
-				{
+				if ( ! event.isFinished() ) {
 					rawBody	= Buffer.concat( rawBody, payloadLength );
 
 					if ( payloadLength > this.maxPayloadLength || payloadLength === 0 )
