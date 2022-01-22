@@ -41,8 +41,6 @@ class Tester {
 	 * @details	This is done so we can run the test many times per instance
 	 *
 	 * @param	{Object} options
-	 *
-	 * @return	void
 	 */
 	initialize( options ) {
 		this.errors			= [];
@@ -121,7 +119,7 @@ class Tester {
 	 *
 	 * @param	{Object} test
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	formatTest( test ) {
 		if ( typeof test !== 'object' || typeof test.message !== 'string' || typeof test.test !== 'function' )
@@ -176,8 +174,6 @@ class Tester {
 	 * @brief	Adds the given test to the queue
 	 *
 	 * @param	{Object} test
-	 *
-	 * @return	void
 	 */
 	addTest( test ) {
 		this.tests	= this.tests.concat( this.formatTest( test ) );
@@ -187,8 +183,6 @@ class Tester {
 	 * @brief	Called if the test passes successfully
 	 *
 	 * @details	It will output the index of the test as well as the message
-	 *
-	 * @return	void
 	 */
 	successCallback( test ) {
 		test.status	= TEST_STATUSES.success;
@@ -225,8 +219,6 @@ class Tester {
 
 	/**
 	 * @brief	Called when all the tests have finished
-	 *
-	 * @return	void
 	 */
 	finished() {
 		this.hasFinished	= true;
@@ -250,8 +242,6 @@ class Tester {
 	 *
 	 * @param	{Object} test
 	 * @param	{*} err
-	 *
-	 * @return	void
 	 */
 	doneCallback( test, err ) {
 		if ( this.hasFinished || this.stop )
@@ -271,7 +261,7 @@ class Tester {
 	 *
 	 * @param	{Object} test
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	checkTestStatus( test ) {
 		switch ( test.status ) {
@@ -292,8 +282,6 @@ class Tester {
 
 	/**
 	 * @brief	Call next test
-	 *
-	 * @return	void
 	 */
 	done() {
 		let test	= this.tests.shift();
@@ -350,8 +338,6 @@ class Tester {
 	 * @details	This will produce an output directly to the console of the user
 	 *
 	 * @param	{Object} options
-	 *
-	 * @return	void
 	 */
 	runAllTests( options = {} ) {
 		this.initialize( options );

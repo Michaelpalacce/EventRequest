@@ -8,7 +8,7 @@ const DataServer		= require( './../../components/caching/data_server' );
 /**
  * @brief	Status code send during strict policy in case of rate limit reached
  *
- * @var		Number TOO_MANY_REQUESTS_STATUS_CODE
+ * @var		{Number} TOO_MANY_REQUESTS_STATUS_CODE
  */
 const TOO_MANY_REQUESTS_STATUS_CODE		= 429;
 
@@ -17,7 +17,7 @@ const TOO_MANY_REQUESTS_STATUS_CODE		= 429;
  *
  * @details	This policy will let the client connect freely but a flag will be set that it was rate limited
  *
- * @var		String PERMISSIVE_POLICY
+ * @var		{String} PERMISSIVE_POLICY
  */
 const PERMISSIVE_POLICY					= 'permissive';
 
@@ -30,7 +30,7 @@ const PERMISSIVE_POLICY					= 'permissive';
  * 			The first connection delay policy hit in the case of many will be used to determine the delay time but
  * 			all buckets affected by such a connection delay will be affected
  *
- * @var		String CONNECTION_DELAY_POLICY
+ * @var		{String} CONNECTION_DELAY_POLICY
  */
 const CONNECTION_DELAY_POLICY			= 'connection_delay';
 
@@ -41,7 +41,7 @@ const CONNECTION_DELAY_POLICY			= 'connection_delay';
  * 			This will also include a Retry-After header. If this policy is triggered, stopPropagation will be ignored and
  * 			the request will be immediately canceled
  *
- * @var		String STRICT_POLICY
+ * @var		{String} STRICT_POLICY
  */
 const STRICT_POLICY						= 'strict';
 
@@ -93,8 +93,6 @@ class RateLimitsPlugin extends PluginInterface {
 	 * @brief	Does rule validation for each parameter
 	 *
 	 * @param	{Object} options
-	 *
-	 * @return	void
 	 */
 	validateRule( options ) {
 		if (
@@ -125,12 +123,12 @@ class RateLimitsPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Gets a Bucket from the rule options and key
+	 * @brief	Gets a Bucket from the rule options and key
 	 *
 	 * @param	{String} key
 	 * @param	{Object} options
 	 *
-	 * @return	Bucket
+	 * @return	{Bucket}
 	 */
 	async getBucketFromOptions( key, options ) {
 		if ( typeof this.buckets[key] !== 'undefined' )
@@ -149,12 +147,10 @@ class RateLimitsPlugin extends PluginInterface {
 	}
 
 	/**
-	 * If a DataStore was not passed, gets the data store from the server er_data_server plugin, otherwise
-	 * creates a new datastore with persistence and not ttl.
+	 * @details	If a DataStore was not passed, gets the data store from the server er_data_server plugin, otherwise
+	 * 				creates a new datastore with persistence and not ttl.
 	 *
 	 * @param	{Server} server
-	 *
-	 * @return	void
 	 */
 	setServerOnRuntime( server ) {
 		if ( this.dataStore === null ) {
@@ -168,12 +164,13 @@ class RateLimitsPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Global middleware that can be used to dynamically rate limit requests
-	 * Creates a default data store if one is not set.
+	 * @brief	Global middleware that can be used to dynamically rate limit requests
+	 *
+	 * @details	Creates a default data store if one is not set.
 	 *
 	 * @param	{Object} rule
 	 *
-	 * @return	Function
+	 * @return	{Function}
 	 */
 	rateLimit( rule ) {
 		if ( ! this.dataStore ) {
@@ -200,23 +197,22 @@ class RateLimitsPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Gets the plugin middlewares
+	 * @brief	Gets the plugin middlewares
 	 *
-	 * @returns`Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		return [{ handler: ( event ) => this._rateLimit( event, this.rules.slice() ) }];
 	}
 
 	/**
-	 * Checks whether the client's ip has reached the limit of requests.
-	 * Adds a rateLimited key IF one is not set already. This also detects that this is the first time
-	 * this plugin is invoked and will attach an on `cleanUp` event
+	 * @brief	Checks whether the client's ip has reached the limit of requests.
+	 *
+	 * @details	Adds a rateLimited key IF one is not set already. This also detects that this is the first time
+	 * 				this plugin is invoked and will attach an on `cleanUp` event
 	 *
 	 * @param	{EventRequest} eventRequest
 	 * @param	{Array} rules
-	 *
-	 * @return	void
 	 */
 	async _rateLimit( eventRequest, rules ) {
 		if ( eventRequest.isFinished() )
@@ -270,13 +266,12 @@ class RateLimitsPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Returns true if the request has been rate limited and a retry after should be sent,
-	 * otherwise return false
+	 * @details	Returns true if the request has been rate limited and a retry after should be sent, otherwise return false
 	 *
 	 * @param	{Object} rule
 	 * @param	{Bucket} bucket
 	 *
-	 * @returns	Promise<boolean>
+	 * @returns	{Promise}
 	 */
 	async _shouldRateLimitRule( rule, bucket ) {
 		return new Promise(( resolve, reject ) => {
@@ -314,12 +309,10 @@ class RateLimitsPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Sends a 429 response whenever a request was rateLimited
+	 * @brief	Sends a 429 response whenever a request was rateLimited
 	 *
 	 * @param	{EventRequest} eventRequest
 	 * @param	{Number} retryAfterTime
-	 *
-	 * @return	void
 	 */
 	async sendRetryAfterResponse( eventRequest, retryAfterTime ) {
 		await eventRequest.sendError({

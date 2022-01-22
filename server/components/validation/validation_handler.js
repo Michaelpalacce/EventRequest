@@ -10,7 +10,7 @@ module.exports	= {
 	 * @param	{Object} validationInput
 	 * @param	{Object} skeleton
 	 *
-	 * @return	ValidationResult
+	 * @return	{ValidationResult}
 	 */
 	validate	: ( validationInput, skeleton ) => {
 		if ( typeof validationInput !== 'object' )

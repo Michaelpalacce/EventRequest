@@ -21,8 +21,6 @@ class BodyParserPlugin extends PluginInterface {
 	 * @brief	Set the parser if given
 	 *
 	 * @param	{Object} [options={}]
-	 *
-	 * @return	void
 	 */
 	setOptions( options = {} ) {
 		super.setOptions( options );
@@ -36,7 +34,7 @@ class BodyParserPlugin extends PluginInterface {
 	 * @details	This plugin can be configured multiple times if needed and reused. If other plugins have similar functionality
 	 * 			this plugin will not overwrite their properties
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		const pluginMiddleware	= {

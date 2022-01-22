@@ -50,7 +50,7 @@ class ValidationAttribute {
 	/**
 	 * @brief	Returns false otherwise returns reason why it is not valid
 	 *
-	 * @return	Array|Boolean
+	 * @return	{Array|Boolean}
 	 */
 	validateSelf() {
 		if ( typeof this.rules === 'object' && typeof this.rules['$default'] !== 'undefined' && typeof this.rules['$rules'] === 'string') {
@@ -87,7 +87,7 @@ class ValidationAttribute {
 	 * @param	{Number} index
 	 * @param	{Object} params
 	 *
-	 * @return	String|Boolean
+	 * @return	{String|Boolean}
 	 */
 	validateRule( rule, index, params ) {
 		let valueLength, sameEntry, inputEntry;
@@ -250,7 +250,7 @@ class ValidationAttribute {
 	 *
 	 * @param	{String} rule
 	 *
-	 * @return	Object
+	 * @return	{Object}
 	 */
 	getRuleParams( rule ) {
 		const ruleParams	= rule.split( ':' );

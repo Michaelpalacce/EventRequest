@@ -41,7 +41,7 @@ class StaticResourcesPlugin extends PluginInterface {
 	/**
 	 * @brief	Sets the given path as the static path where resources can be delivered easily
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		const pluginMiddlewares	= this._getPluginMiddlewares();
@@ -51,7 +51,7 @@ class StaticResourcesPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Wrapper for getPluginMiddleware
+	 * @brief	Wrapper for getPluginMiddleware
 	 */
 	_getPluginMiddlewares() {
 		const type			= typeof this.options.type === 'number'
@@ -86,7 +86,7 @@ class StaticResourcesPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Sets paths that follow the rules defined in StaticResourcesPlugin.DYNAMIC
+	 * @brief	Sets paths that follow the rules defined in StaticResourcesPlugin.DYNAMIC
 	 *
 	 * @see		StaticResourcesPlugin.DYNAMIC
 	 *
@@ -131,9 +131,9 @@ class StaticResourcesPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Sets paths that follow the rules defined in StaticResourcesPlugin.ABSOLUTE
+	 * @brief	Sets paths that follow the rules defined in StaticResourcesPlugin.ABSOLUTE
 	 *
-	 * @see	StaticResourcesPlugin.ABSOLUTE
+	 * @see		StaticResourcesPlugin.ABSOLUTE
 	 */
 	_setAbsolutePaths( paths, cacheControl, useEtag, strong ) {
 		const pluginMiddlewares	= [];
@@ -176,8 +176,9 @@ class StaticResourcesPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Finds a file starting from a dir
-	 * If start Path is a file, then it will be returned directly :)
+	 * @brief	Finds a file starting from a dir
+	 *
+	 * @details	If start Path is a file, then it will be returned directly :)
 	 *
 	 * @param	{String} startPath
 	 * @param	{String} fileToFind
@@ -208,8 +209,9 @@ class StaticResourcesPlugin extends PluginInterface {
 	}
 
 	/**
-	 * Sends a given file.
-	 * Sets the correct Content-Type header as well as the correct status code
+	 * @brief	Sends a given file.
+	 *
+	 * @details	Sets the correct Content-Type header as well as the correct status code
 	 *
 	 * @param	{EventRequest} event
 	 * @param	{String} file

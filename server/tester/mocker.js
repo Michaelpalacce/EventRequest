@@ -43,8 +43,6 @@ class Mocker {
 
 	/**
 	 * @brief	Creates the mocked method that should later be attached to the mocked class
-	 *
-	 * @return	void
 	 */
 	setUpMockedMethod() {
 		let functionCalled	= 0;
@@ -65,8 +63,6 @@ class Mocker {
 	 * @brief	Assert whether correct with arguments are passed
 	 *
 	 * @param	{Array} args
-	 *
-	 * @return	void
 	 */
 	assertWithArguments( args ) {
 		if ( this.hasWithArguments() ) {
@@ -89,8 +85,6 @@ class Mocker {
 
 	/**
 	 * @brief	Attaches the mocked method to the mocked class
-	 *
-	 * @return	void
 	 */
 	attachMockedMethod() {
 		let prototypeSpider	= typeof this.mockedClass.prototype === 'undefined'
@@ -110,7 +104,7 @@ class Mocker {
 	/**
 	 * @brief	Checks to see if there are with arguments
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	hasWithArguments() {
 		return this.withArguments.length > 0;
@@ -119,7 +113,7 @@ class Mocker {
 	/**
 	 * @brief	Gets the next with arguments
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getWithArguments() {
 		return this.withArguments.length === 1 ? this.withArguments[0] : this.withArguments.shift();
@@ -130,7 +124,7 @@ class Mocker {
 	 *
 	 * @param	{Array} args
 	 *
-	 * @return	mixed
+	 * @return	{*}
 	 */
 	getNextExecutionFunction( args ) {
 		let functionToExecute	= this.executionBlock.length > 1 ? this.executionBlock.shift() : this.executionBlock[0];

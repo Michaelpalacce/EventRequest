@@ -14,7 +14,7 @@ class DataServerPlugin extends PluginInterface {
 	/**
 	 * @brief	Returns the DataServer
 	 *
-	 * @returns	DataServer
+	 * @returns	{DataServer}
 	 */
 	getServer() {
 		if ( this.server )
@@ -34,7 +34,7 @@ class DataServerPlugin extends PluginInterface {
 	 *
 	 * @param	{Object} dataServer
 	 *
-	 * @return {boolean}
+	 * @return	{Boolean}
 	 */
 	isValidDataServer( dataServer ) {
 		if ( typeof dataServer !== 'object' )
@@ -60,7 +60,7 @@ class DataServerPlugin extends PluginInterface {
 	 *
 	 * @details	Attaches a cleanUp event as well
 	 *
-	 * @returns	Array
+	 * @returns	{Array}
 	 */
 	getPluginMiddleware() {
 		const pluginMiddleware	= {

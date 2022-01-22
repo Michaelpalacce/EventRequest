@@ -12,8 +12,6 @@ class PluginManager {
 	 * @brief	Adds a plugin to the Manager
 	 *
 	 * @param	{PluginInterface} plugin
-	 *
-	 * @return	void
 	 */
 	addPlugin( plugin ) {
 		if ( this.isValidPlugin( plugin ) )
@@ -27,7 +25,7 @@ class PluginManager {
 	 *
 	 * @param	{String} id
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	hasPlugin( id ) {
 		return typeof this.plugins[id] !== 'undefined';
@@ -37,8 +35,6 @@ class PluginManager {
 	 * @brief	Removes a plugin by id
 	 *
 	 * @param	{String} id
-	 *
-	 * @return	void
 	 */
 	removePlugin( id ) {
 		delete this.plugins[id];
@@ -47,7 +43,7 @@ class PluginManager {
 	/**
 	 * @brief	Get all plugins added to the plugin manager
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getAllPluginIds() {
 		return Object.keys( this.plugins );
@@ -58,7 +54,7 @@ class PluginManager {
 	 *
 	 * @param	{PluginInterface|Object} plugin
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	isValidPlugin( plugin ) {
 		return typeof plugin.getPluginId === 'function'
@@ -73,7 +69,7 @@ class PluginManager {
 	 *
 	 * @param	{String} id
 	 *
-	 * @return	PluginInterface
+	 * @return	{PluginInterface}
 	 */
 	getPlugin( id ) {
 		if ( ! this.hasPlugin( id ) )

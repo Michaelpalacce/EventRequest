@@ -23,7 +23,7 @@ class SecurityPlugin extends PluginInterface {
 	/**
 	 * @brief	Attaches all the security modules
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		const middlewares	= [];

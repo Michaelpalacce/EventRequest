@@ -37,7 +37,7 @@ class EtagPlugin extends PluginInterface {
 	 * @param	{String|Buffer|Stats} payload
 	 * @param	{Boolean} strong
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	etag( payload, strong = this.strong ) {
 		const algo		= strong ? 'sha1' : 'md5';
@@ -62,7 +62,7 @@ class EtagPlugin extends PluginInterface {
 	 * @param	{String|Buffer|Stats} payload
 	 * @param	{Boolean} strong
 	 *
-	 * @return	Object
+	 * @return	{Object}
 	 */
 	getConditionalResult( event, payload, strong = this.strong ) {
 		const etag	= this.etag( payload, strong );
@@ -104,8 +104,6 @@ class EtagPlugin extends PluginInterface {
 	 * @param	{String|Buffer} payload
 	 * @param	{Number} code
 	 * @param	{Boolean} strong
-	 *
-	 * @return	{void}
 	 */
 	conditionalSend( event, payload, code = null, strong = this.strong ) {
 		payload					= event.formatResponse( payload );

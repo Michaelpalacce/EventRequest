@@ -21,8 +21,6 @@ class ValidationResult {
 	 * @brief	Validates all the attributes
 	 *
 	 * @details	Will not validate if validation was already performed
-	 *
-	 * @return	void
 	 */
 	validateAllAttributes() {
 		if ( this.validationFailed !== null )
@@ -49,7 +47,7 @@ class ValidationResult {
 	 *
 	 * @private
 	 *
-	 * @return	Object|Array
+	 * @return	{Object|Array}
 	 */
 	_formResult( validationInput, skeleton, failures ) {
 		let result	= {};
@@ -147,8 +145,6 @@ class ValidationResult {
 	 * @param	{Object} failures
 	 *
 	 * @private
-	 *
-	 * @return	void
 	 */
 	_sanitizeFailures( failures ) {
 		for ( const key in failures ) {
@@ -168,7 +164,7 @@ class ValidationResult {
 	/**
 	 * @brief	Checks if the validation of a given ValidationInput has failed.
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	hasValidationFailed() {
 		this.validateAllAttributes();
@@ -180,7 +176,7 @@ class ValidationResult {
 	 * @brief	Gets the reason if any of validation failure otherwise the returned
 	 * 			object will have the values mapped to the keys that were being validated
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getValidationResult() {
 		this.validateAllAttributes();

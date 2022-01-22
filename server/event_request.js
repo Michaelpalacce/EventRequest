@@ -62,8 +62,6 @@ class EventRequest extends EventEmitter {
 	 * @details	Removes all listeners from the eventEmitter
 	 * 			Stops the event
 	 * 			Clears internal pointers
-	 *
-	 * @return	void
 	 */
 	_cleanUp() {
 		this.emit( 'cleanUp' );
@@ -92,7 +90,7 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @param	{*} args
 	 *
-	 * @return	ValidationResult
+	 * @return	{ValidationResult}
 	 */
 	validate( ...args ) {
 		return this.validation.validate.apply( this.validation, args );
@@ -109,7 +107,7 @@ class EventRequest extends EventEmitter {
 	 * @param	{String} value
 	 * @param	{Object} [options={}]
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	setCookie( name, value, options = {} ) {
 		const cookieHeaderName	= 'set-cookie';
@@ -152,7 +150,7 @@ class EventRequest extends EventEmitter {
 	 * @param	{*} [response='']
 	 * @param	{Number} [code=null]
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	send( response = '', code = null ) {
 		if ( typeof code === 'number' )
@@ -185,7 +183,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Ends the response with the given params
 	 *
-	 * @return	Promise
+	 * @return	{Promise}
 	 */
 	async end( ...args ) {
 		this.response.end.apply( this.response, args );
@@ -197,7 +195,7 @@ class EventRequest extends EventEmitter {
 	 * @param	{String} key
 	 * @param	{String} value
 	 *
-	 * @return	EventRequest
+	 * @return	{EventRequest}
 	 */
 	setResponseHeader( key, value ) {
 		if ( ! this.isFinished() && ! this.response.headersSent )
@@ -211,7 +209,7 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @param	{String} key
 	 *
-	 * @return	EventRequest
+	 * @return	{EventRequest}
 	 */
 	removeResponseHeader( key ) {
 		if ( ! this.isFinished() && ! this.response.headersSent )
@@ -228,7 +226,7 @@ class EventRequest extends EventEmitter {
 	 * @param	{String} key
 	 * @param	{String} [defaultValue=null]
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getRequestHeader( key, defaultValue = null ) {
 		return ! this.hasRequestHeader( key )
@@ -243,7 +241,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Return all the headers for the current request
 	 *
-	 * @return	Object
+	 * @return	{Object}
 	 */
 	getRequestHeaders() {
 		return this.headers;
@@ -254,7 +252,7 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @param	{String} key
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	hasRequestHeader( key ) {
 		return typeof this.headers[key.toLowerCase()] !== 'undefined' || typeof this.headers[key] !== 'undefined';
@@ -265,7 +263,7 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @param	{Number} code
 	 *
-	 * @return	EventRequest
+	 * @return	{EventRequest}
 	 */
 	setStatusCode( code ) {
 		this.response.statusCode	= typeof code === 'number' ? code : 500;
@@ -278,8 +276,6 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @param	{String} redirectUrl
 	 * @param	{Number} [statusCode=302]
-	 *
-	 * @return	void
 	 */
 	redirect( redirectUrl, statusCode = 302 ) {
 		this.emit( 'redirect', { redirectUrl, statusCode } );
@@ -296,7 +292,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Checks if the response is finished
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	isFinished() {
 		return this.finished === true || this.response.writableEnded;
@@ -306,8 +302,6 @@ class EventRequest extends EventEmitter {
 	 * @brief	Sets the current execution block
 	 *
 	 * @param	{Array} block
-	 *
-	 * @return	void
 	 */
 	_setBlock( block ) {
 		this.block	= block;
@@ -322,8 +316,6 @@ class EventRequest extends EventEmitter {
 	 *
 	 * @param	{*} err
 	 * @param	{Number} code
-	 *
-	 * @return	void
 	 */
 	_next( err, code ) {
 		if ( err )
@@ -350,7 +342,7 @@ class EventRequest extends EventEmitter {
 	/**
 	 * @brief	Gets the error handler or creates a new one if needed
 	 *
-	 * @return	ErrorHandler
+	 * @return	{ErrorHandler}
 	 */
 	getErrorHandler() {
 		if ( this.errorHandler === null || typeof this.errorHandler === 'undefined' || typeof this.errorHandler.handleError !== 'function' )
@@ -365,8 +357,6 @@ class EventRequest extends EventEmitter {
 	 * @details	By default handleError is asynchronous
 	 *
 	 * @param	{Array} args
-	 *
-	 * @return	void
 	 */
 	sendError( ...args ) {
 		const errorHandler	= this.getErrorHandler();

@@ -11,8 +11,6 @@ class FileStreamHandlerPlugin extends PluginInterface {
 	 * @brief	Attaches the function stream file to the event
 	 *
 	 * @param	{EventRequest} event
-	 *
-	 * @return	void
 	 */
 	attachFunctions( event ) {
 		/**
@@ -23,7 +21,7 @@ class FileStreamHandlerPlugin extends PluginInterface {
 		 * @param	{String} file
 		 * @param	{Object} [options={}]
 		 *
-		 * @return	ReadStream|null
+		 * @return	{ReadStream|null}
 		 */
 		event.getFileStream	= function( file, options = {} ) {
 			const fileStream	= this.fileStreamHandler.getFileStreamerForType( file );
@@ -42,8 +40,6 @@ class FileStreamHandlerPlugin extends PluginInterface {
 		 * @param	{String} file
 		 * @param	{Object} [options={}]
 		 * @param	{Function} [errCallback=null]
-		 *
-		 * @return	void
 		 */
 		event.streamFile	= function( file, options = {}, errCallback = null ) {
 			const fileStream	= event.getFileStream( file, options );
@@ -61,7 +57,7 @@ class FileStreamHandlerPlugin extends PluginInterface {
 	/**
 	 * @brief	Gets the plugin middlewares to attach to the event request
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		return [{

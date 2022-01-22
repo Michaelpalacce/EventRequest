@@ -54,8 +54,6 @@ class CorsPlugin extends PluginInterface {
 	 * @brief	Applies all the CORS headers to the response
 	 *
 	 * @param	{EventRequest} event
-	 *
-	 * @return	void
 	 */
 	applyCors( event ) {
 		if ( ! Array.isArray( this.origin ) ) {
@@ -96,7 +94,7 @@ class CorsPlugin extends PluginInterface {
 	/**
 	 * @brief	Gets the cors middleware that adds the extra CORS headers
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		return [{ handler : this.applyCors.bind( this ) }];

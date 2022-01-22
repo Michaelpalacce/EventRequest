@@ -18,6 +18,7 @@ class ValidationPlugin extends PluginInterface {
 
 	/**
 	 * @param	{Object} options
+	 * @param	{Object} options.failureCallback	- Function to call when there is a validation failure
 	 */
 	setOptions( options ) {
 		super.setOptions( options );
@@ -37,7 +38,7 @@ class ValidationPlugin extends PluginInterface {
 	 * @param	{Object} validationRules
 	 * @param	{Function} failureCallback
 	 *
-	 * @return	Function
+	 * @return	{Function}
 	 */
 	validate( validationRules, failureCallback ) {
 		failureCallback	= typeof failureCallback === 'undefined' ? this.failureCallback : failureCallback;

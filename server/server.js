@@ -52,7 +52,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Adds a new middleware to the router
 	 *
-	 * @return	Server
+	 * @return	{Server}
 	 */
 	define() {
 		this.router.define.apply( this.router, arguments );
@@ -62,8 +62,6 @@ class Server extends EventEmitter {
 
 	/**
 	 * @brief	Sets up the default plugins
-	 *
-	 * @return	void
 	 */
 	setUpDefaultPlugins() {
 		// attached like this to enable smart autocomplete in IDE's
@@ -112,7 +110,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Returns the plugin manager
 	 *
-	 * @return	PluginManager
+	 * @return	{PluginManager}
 	 */
 	getPluginManager() {
 		return this.pluginManager;
@@ -121,7 +119,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Creates a new router
 	 *
-	 * @return	Router
+	 * @return	{Router}
 	 */
 	Router() {
 		return new RouterClass();
@@ -136,7 +134,7 @@ class Server extends EventEmitter {
 	 * @param	{PluginInterface|Object|String} plugin
 	 * @param	{Object} options
 	 *
-	 * @return	Server
+	 * @return	{Server}
 	 */
 	apply( plugin, options = null ) {
 		if ( typeof plugin === 'string' )
@@ -157,8 +155,6 @@ class Server extends EventEmitter {
 	 * @brief	Attaches a PluginInterface to the server
 	 *
 	 * @param	{PluginInterface} plugin
-	 *
-	 * @return	void
 	 */
 	_attachPlugin( plugin ) {
 		const pluginDependencies	= plugin.getPluginDependencies();
@@ -183,7 +179,7 @@ class Server extends EventEmitter {
 	 *
 	 * @param	{String|PluginInterface} pluginId
 	 *
-	 * @return	PluginInterface
+	 * @return	{PluginInterface}
 	 */
 	getPlugin( pluginId ) {
 		const id	= typeof pluginId === 'string' ? pluginId : pluginId.getPluginId();
@@ -199,7 +195,7 @@ class Server extends EventEmitter {
 	 *
 	 * @param	{String|PluginInterface} pluginId
 	 *
-	 * @return	Boolean
+	 * @return	{Boolean}
 	 */
 	hasPlugin( pluginId ) {
 		const id	= typeof pluginId === 'string' ? pluginId : pluginId.getPluginId();
@@ -210,7 +206,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Callback for the http.createServer
 	 *
-	 * @return	Function
+	 * @return	{Function}
 	 */
 	attach() {
 		return ( request, response ) => {
@@ -264,7 +260,7 @@ class Server extends EventEmitter {
 	/**
 	 * @brief	Starts the server on the given port
 	 *
-	 * @return	Server
+	 * @return	{Server}
 	 */
 	listen() {
 		const httpServer	= http.createServer( this.attach() );

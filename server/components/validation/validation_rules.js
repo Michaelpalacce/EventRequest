@@ -8,7 +8,7 @@ let assert	= {};
  *
  * @param	{*} value
  *
- * @return	String
+ * @return	{String}
  */
 function getType( value ) {
 	return typeof value;
@@ -19,7 +19,7 @@ function getType( value ) {
  *
  * @param	{*} value
  *
- * @return	Number
+ * @return	{Number}
  */
 function getLength( value ) {
 	if ( value === undefined )
@@ -51,7 +51,7 @@ const EMAIL_REGEX	= /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
  * @param	{*} actual
  * @param	{*} expected
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertEqual	= ( actual, expected ) => {
 	return actual == expected;
@@ -63,7 +63,7 @@ assert.assertEqual	= ( actual, expected ) => {
  * @param	{*} actual
  * @param	{*} expected
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertStrictEqual	= ( actual, expected ) => {
 	return actual === expected;
@@ -75,7 +75,7 @@ assert.assertStrictEqual	= ( actual, expected ) => {
  * @param	{*} actual
  * @param	{*} expected
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotEqual	= ( actual, expected ) => {
 	return actual != expected;
@@ -87,7 +87,7 @@ assert.assertNotEqual	= ( actual, expected ) => {
  * @param	{*} actual
  * @param	{*} expected
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertStrictNotEqual	= ( actual, expected ) => {
 	return actual !== expected;
@@ -98,7 +98,7 @@ assert.assertStrictNotEqual	= ( actual, expected ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertIsString		= ( actual ) => {
 	return assert.assertIsInternalType( actual, 'string' );
@@ -109,7 +109,7 @@ assert.assertIsString		= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotString		= ( actual ) => {
 	return assert.assertNotInternalType( actual, 'string' );
@@ -120,7 +120,7 @@ assert.assertNotString		= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertIsNumeric		= ( actual ) => {
 	const check	= Number( actual );
@@ -133,7 +133,7 @@ assert.assertIsNumeric		= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotNumeric		= ( actual ) => {
 	return isNaN( Number( actual ) );
@@ -144,7 +144,7 @@ assert.assertNotNumeric		= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertIsArray		= ( actual ) => {
 	return Array.isArray( actual );
@@ -155,7 +155,7 @@ assert.assertIsArray		= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotArray		= ( actual ) => {
 	return ! Array.isArray( actual );
@@ -168,7 +168,7 @@ assert.assertNotArray		= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertIsEmpty		= ( actual ) => {
 	return actual === null
@@ -185,7 +185,7 @@ assert.assertIsEmpty		= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotEmpty		= ( actual ) => {
 	if ( actual === undefined || actual === null )
@@ -205,7 +205,7 @@ assert.assertNotEmpty		= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertIsDate			= ( actual ) => {
 	return ! isNaN( Date.parse( actual ) );
@@ -216,7 +216,7 @@ assert.assertIsDate			= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertIsDateObject	= ( actual ) => {
 	return actual instanceof Date;
@@ -227,7 +227,7 @@ assert.assertIsDateObject	= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotDate		= ( actual ) => {
 	return isNaN( Date.parse( actual ) );
@@ -238,7 +238,7 @@ assert.assertNotDate		= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotDateObject	= ( actual ) => {
 	return ! ( actual instanceof Date );
@@ -250,7 +250,7 @@ assert.assertNotDateObject	= ( actual ) => {
  * @param	{*} actual
  * @param	{String} internalType
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertIsInternalType	= ( actual, internalType ) => {
 	return getType( actual ) === internalType;
@@ -262,7 +262,7 @@ assert.assertIsInternalType	= ( actual, internalType ) => {
  * @param	{*} actual
  * @param	{String} internalType
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotInternalType	= ( actual, internalType ) => {
 	return getType( actual ) !== internalType;
@@ -273,7 +273,7 @@ assert.assertNotInternalType	= ( actual, internalType ) => {
  *
  * @param	{String} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertIsValidEmail		= ( actual ) => {
 	return EMAIL_REGEX.test( String( actual ).toLowerCase() );
@@ -284,7 +284,7 @@ assert.assertIsValidEmail		= ( actual ) => {
  *
  * @param	{String} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotValidEmail		= ( actual ) => {
 	return ! EMAIL_REGEX.test( String( actual ).toLowerCase() );
@@ -296,7 +296,7 @@ assert.assertNotValidEmail		= ( actual ) => {
  * @param	{*} actual
  * @param	{*} comparator
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertBiggerThan			= ( actual, comparator ) => {
 	return getLength( actual ) > getLength( comparator );
@@ -308,7 +308,7 @@ assert.assertBiggerThan			= ( actual, comparator ) => {
  * @param	{*} actual
  * @param	{*} comparator
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertBiggerOrEqual		= ( actual, comparator ) => {
 	return getLength( actual ) >= getLength( comparator );
@@ -320,7 +320,7 @@ assert.assertBiggerOrEqual		= ( actual, comparator ) => {
  * @param	{*} actual
  * @param	{*} comparator
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertSmallerThan		= ( actual, comparator ) => {
 	return getLength( actual ) < getLength( comparator );
@@ -332,7 +332,7 @@ assert.assertSmallerThan		= ( actual, comparator ) => {
  * @param	{*} actual
  * @param	{*} comparator
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertSmallerOrEqual		= ( actual, comparator ) => {
 	return getLength( actual ) <= getLength( comparator );
@@ -343,7 +343,7 @@ assert.assertSmallerOrEqual		= ( actual, comparator ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertIsBoolean			= ( actual ) => {
 	return assert.assertIsInternalType( actual, 'boolean' )
@@ -356,7 +356,7 @@ assert.assertIsBoolean			= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertNotBoolean			= ( actual ) => {
 	return assert.assertNotInternalType( actual, 'boolean' );
@@ -367,7 +367,7 @@ assert.assertNotBoolean			= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertTrue				= ( actual ) => {
 	if ( assert.assertIsInternalType( actual, 'boolean' ) )
@@ -387,7 +387,7 @@ assert.assertTrue				= ( actual ) => {
  *
  * @param	{*} actual
  *
- * @return	Boolean
+ * @return	{Boolean}
  */
 assert.assertFalse			= ( actual ) => {
 	if ( assert.assertIsInternalType( actual, 'boolean' ) )

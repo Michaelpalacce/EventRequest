@@ -17,6 +17,10 @@ class TimeoutPlugin extends PluginInterface {
 
 	/**
 	 * @inheritDoc
+	 *
+	 * @param	{Object} options
+	 * @param	{Number} options.timeout	- Time in milliseconds after which the request should be finished
+	 * @param	{Function} options.callback	- callback when a timeout happens
 	 */
 	setOptions( options ) {
 		super.setOptions( options );
@@ -37,8 +41,6 @@ class TimeoutPlugin extends PluginInterface {
 	 *
 	 * @param	{EventRequest} event
 	 * @param	{Number} timeout
-	 *
-	 * @return	void
 	 */
 	setTimeout( event, timeout ) {
 		event.response.setTimeout( timeout, () => {
@@ -53,7 +55,7 @@ class TimeoutPlugin extends PluginInterface {
 	 * @details	Sets a new clearTimeout function of the event, listens for cleanUp event from the eventRequest and clears the
 	 * 			internal timeout
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		const pluginMiddleware	= {

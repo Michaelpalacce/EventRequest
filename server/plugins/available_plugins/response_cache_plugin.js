@@ -20,7 +20,7 @@ class ResponseCachePlugin extends PluginInterface {
 	/**
 	 * @brief	Dependent on a cache server created by the event request
 	 *
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginDependencies() {
 		return ['er_data_server'];
@@ -30,8 +30,6 @@ class ResponseCachePlugin extends PluginInterface {
 	 * @brief	Creates a rcp namespace to be used
 	 *
 	 * @param	{Server} server
-	 *
-	 * @return	void
 	 */
 	setServerOnRuntime( server ) {
 		this.dataServer	= server.getPlugin( 'er_data_server' ).getServer();
@@ -48,7 +46,7 @@ class ResponseCachePlugin extends PluginInterface {
 	 *
 	 * @param	{EventRequest} event
 	 *
-	 * @return	String
+	 * @return	{String}
 	 */
 	getCacheId( event ) {
 		let cacheId		= event.path;
@@ -71,7 +69,7 @@ class ResponseCachePlugin extends PluginInterface {
 	 *
 	 * @param	{EventRequest} event
 	 *
-	 * @return	Number
+	 * @return	{Number}
 	 */
 	getTimeToLive( event ) {
 		const config	= event.currentResponseCacheConfig;
@@ -84,7 +82,7 @@ class ResponseCachePlugin extends PluginInterface {
 	}
 
 	/**
-	 * @return	Array
+	 * @return	{Array}
 	 */
 	getPluginMiddleware() {
 		const pluginMiddleware	= {
