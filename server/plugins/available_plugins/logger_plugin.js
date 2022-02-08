@@ -32,11 +32,10 @@ class LoggerPlugin extends PluginInterface {
 	 * @return	{Logger}
 	 */
 	getLogger() {
-		if ( this.logger === null || this.logger === undefined ) {
-			this.logger	= this.options.logger instanceof Logger
-						? this.options.logger
-						: Loggur.getDefaultLogger();
-		}
+		if ( this.logger === null || this.logger === undefined )
+			this.logger	= this.options.logger
+							? this.options.logger
+							: Loggur.getDefaultLogger();
 
 		return this.logger;
 	}
@@ -65,18 +64,18 @@ class LoggerPlugin extends PluginInterface {
 			else
 				message	= error;
 
-			logger.error( message, true );
+			logger.log( message, 100, true );
 		};
 
 		event.on( 'error', errCallback );
 		event.on( 'on_error', errCallback );
 
 		event.on( 'finished', () => {
-			logger.verbose( 'Event finished' );
+			logger.log( 'Event finished', 500 );
 		});
 
 		event.on( 'redirect', ( redirect ) => {
-			logger.info( `Redirect to: ${redirect.redirectUrl} with status code: ${redirect.statusCode}` );
+			logger.log( `Redirect to: ${redirect.redirectUrl} with status code: ${redirect.statusCode}`, 400 );
 		});
 	}
 
@@ -92,11 +91,11 @@ class LoggerPlugin extends PluginInterface {
 			handler	: ( event ) => {
 				event.on( 'cleanUp', () => {
 					const userAgent	= typeof event.headers['user-agent'] === 'undefined' ? 'UNKNOWN' : event.headers['user-agent'];
-					logger.notice( `${event.method} ${event.request.url} ${event.response.statusCode} ||| ${event.clientIp} ||| ${userAgent}` );
+					logger.log( `${event.method} ${event.request.url} ${event.response.statusCode} ||| ${event.clientIp} ||| ${userAgent}`, 300 );
 				});
 
-				logger.verbose( 'Headers: ' + JSON.stringify( event.headers ) );
-				logger.verbose( 'Cookies: ' + JSON.stringify( event.cookies ) );
+				logger.log( 'Headers: ' + JSON.stringify( event.headers ), 500 );
+				logger.log( 'Cookies: ' + JSON.stringify( event.cookies ), 500 );
 
 				this.attachEventsToEventRequest( event );
 

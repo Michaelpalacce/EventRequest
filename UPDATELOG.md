@@ -1,3 +1,6 @@
+35.0.0
+* Fixed the logger plugin and the way it detects if a logger has been passed
+
 34.0.0
 * Housekeeping, more work done on JSDoc
 * Improvements to file streams. Implemented MimeTypes in image file stream
