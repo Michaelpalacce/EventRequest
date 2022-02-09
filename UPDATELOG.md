@@ -1,3 +1,7 @@
+35.0.1
+* Fixed invalid main field
+* Removed unnecessary escape character
+
 35.0.0
 * Fixed the logger plugin and the way it detects if a logger has been passed
 
