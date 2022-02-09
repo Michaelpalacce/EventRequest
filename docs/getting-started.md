@@ -1,7 +1,5 @@
 # [Getting started:](#getting-started)
 
-# WORK IN PROGRESS!!!!!
-
 #### Setup
 The Framework uses the "Singleton" design pattern to create a web server that can be retrieved from anywhere.
 When requiring the module a callback is returned that if called will return the instance:

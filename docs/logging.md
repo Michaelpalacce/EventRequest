@@ -385,7 +385,7 @@ console.log( typeof Loggur.loggers['serverLogger'] !== 'undefined' );
 
 #### [Plain](#plain-formatter)
 - Formatter that will format the data in a non standard way: `Default/Master - 08/03/20, 14:37:40 : Test message`
-- Usage: `Transport.processor.plain()`, `Console.processor.plain()`, `File.processor.plain()`
+- Usage: `Transport.formatters.plain()`, `Console.formatters.plain()`, `File.formatters.plain()`
 
 #### Accepted Options:
 
@@ -396,7 +396,7 @@ console.log( typeof Loggur.loggers['serverLogger'] !== 'undefined' );
 ***
 #### [Json](#json-formatter)
 - Formatter that will format the data in a json format
-- Usage: `Transport.processor.json()`, `Console.processor.json()`, `File.processor.json()`
+- Usage: `Transport.formatters.json()`, `Console.formatters.json()`, `File.formatters.json()`
 
 #### Accepted Options:
 

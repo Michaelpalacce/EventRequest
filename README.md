@@ -1,5 +1,5 @@
 # EventRequest
-A highly customizable backend server in NodeJs. Any feedback is most welcome!
+A highly customizable, async-first, speed-oriented backend server in NodeJs. The latest 3 LTS versions of node are targeted for support.
 
 [![linux-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-12.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Alinux-12.x)
 [![linux-14.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-14.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Alinux-14.x)
@@ -27,15 +27,29 @@ A highly customizable backend server in NodeJs. Any feedback is most welcome!
 [![npm version](https://badge.fury.io/js/event_request.svg)](https://www.npmjs.com/package/event_request)
 [![npm](https://img.shields.io/npm/dt/event_request)](https://www.npmjs.com/package/event_request)
 [![npm](https://img.shields.io/npm/dw/event_request)](https://www.npmjs.com/package/event_request)
-[![npm bundle size](https://img.shields.io/bundlephobia/min/event_request)](https://www.npmjs.com/package/event_request)
 
 [**CHANGELOG**](https://github.com/Michaelpalacce/EventRequest/blob/master/UPDATELOG.md) || [**BENCHMARKS**](https://github.com/Michaelpalacce/EventRequest-Benchmarks)
 
 # Documentation:
 Check out the docs section or go to: [Documentation](https://github.com/Michaelpalacce/EventRequest/tree/master/docs).
-Links and structure will be added here soon
 
-# [Setup](#setup)
+## Contents
+1. [Getting Started](./docs/getting-started.md) - What this framework does and how does it operate?
+2. [Event Request](./docs/event-request.md) - The main object passed through every middleware
+3. [Server](./docs/server.md) - Server object used to attach to the http server
+4. [Routing](./docs/routing.md) - How routing works
+5. Functionality
+   1. [Components](./docs/components.md) - Different components of the framework
+   2. [plugins](./docs/plugins.md) - Documentation on all the plugins supported by the framework
+   3. [Logging](./docs/logging.md) - Logging suite of the Framework
+   4. [Validation](./docs/validation.md) - Validate your input parameters!
+   5. [Error Handling](./docs/error-handling.md) - Handle errors in your app
+6. [Testing](./docs/testing.md) - Test your app!
+7. [Example Code](./docs/examples) - Look at some examples of how to use the framework
+   1. [Example Kernel](./docs/examples/kernel.js)  with everything you need to get started
+
+
+# [Quick Setup](#setup)
 
 ~~~javascript
 // Framework Singleton instance
@@ -54,10 +68,10 @@ app.listen( 80, () => {
 
 
 # [External Plug-ins](#external-plugins):
-- https://www.npmjs.com/package/er_memcached_data_server - memcached data server [![Build Status](https://travis-ci.com/Michaelpalacce/er_memcached_data_server.svg?branch=master)](https://travis-ci.com/Michaelpalacce/er_memcached_data_server)
-- https://www.npmjs.com/package/er_redis_data_server - redis data server [![Build Status](https://travis-ci.com/Michaelpalacce/er_redis_data_server.svg?branch=master)](https://travis-ci.com/Michaelpalacce/er_redis_data_server)
+* https://www.npmjs.com/package/er_memcached_data_server - memcached data server
+* https://www.npmjs.com/package/er_redis_data_server - redis data server 
 
 # [Example Projects:](#example-projects)
-- https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
-- https://github.com/Michaelpalacce/personal-website-vue - My website written with the framework.
-- 
+* https://github.com/Michaelpalacce/Server - A Web App that emulates a File System on your browser and can be used to upload/download/delete files, images, audio and etc as well as stream videos directly from your browser
+* https://github.com/Michaelpalacce/personal-website-vue - My website written with the framework.
+* https://github.com/Michaelpalacce/SimpleSecrets - A K8S Secrets Operator
