@@ -61,7 +61,7 @@
     "test": "nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js --debug",
     "deploy": "npm run test && npm publish"
   },
-  "version": "35.0.0",
+  "version": "35.0.1",
   "devDependencies": {
     "nyc": "^15.1.0"
   }

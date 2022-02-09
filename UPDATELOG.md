@@ -1,5 +1,5 @@
 35.0.1
-* Fixed invalid main field
+* Fixed invalid main field error in package.json
 * Removed unnecessary escape character
 
 35.0.0
