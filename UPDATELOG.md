@@ -1,3 +1,6 @@
+35.0.1
+* Fixed invalid main field
+
 35.0.0
 * Fixed the logger plugin and the way it detects if a logger has been passed
 
