@@ -5,7 +5,7 @@
   ],
   "exclude": [
     "server/tester/**",
-    "server/plugins/available_plugins/{response_cache_plugin}.js",
+    "server/plugins/available_plugins/response_cache_plugin.js",
     "server/components/templating_engine/experimental_templating_engine.js",
     "tests/**",
     "docs/**"
