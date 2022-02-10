@@ -156,7 +156,7 @@ class EventRequest extends EventEmitter {
 		if ( typeof code === 'number' )
 			this.setStatusCode( code );
 
-		if ( this.disableXPoweredBy === false )
+		if ( ! this.disableXPoweredBy )
 			this.setResponseHeader( 'X-Powered-By', 'event_request' );
 
 		let payload	= this.method === 'HEAD' ? Buffer.from( '' ) : this.formatResponse( response );
@@ -284,9 +284,8 @@ class EventRequest extends EventEmitter {
 			this.setResponseHeader( 'Location', redirectUrl );
 			this.send( { redirectUrl }, statusCode );
 		}
-		else {
+		else
 			this.next( 'Could not redirect, response already finished' );
-		}
 	}
 
 	/**

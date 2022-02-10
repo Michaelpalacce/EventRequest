@@ -1,3 +1,6 @@
+35.2.0
+* Content-Type plugin added. Added documentation and tests for it.
+
 35.1.0
 * Fixed documentation regarding logging
 * Added an example `kernel.js` file
