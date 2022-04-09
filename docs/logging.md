@@ -144,9 +144,8 @@ console.log( typeof Loggur.loggers['logger_id'] !== 'undefined' );
 
 **logLevel: Number**
 - The log level lower than which everything will be logged
-- This will also be the default logLevel for the logger
 - Example: if the logLevel is set to LOG_LEVELS.info then info, notice, warning and error will be logged, but verbose and debug will not
-- The higher a log level is the less sever it is
+- The higher a log level is the less severe it is
 - Defaults to LOG_LEVELS.info
 
 **logLevels: Object**
