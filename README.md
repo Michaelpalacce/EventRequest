@@ -22,7 +22,7 @@ A highly customizable, async-first, speed-oriented backend server in NodeJs. The
 [![GitHub last commit](https://img.shields.io/github/last-commit/Michaelpalacce/EventRequest)](https://github.com/Michaelpalacce/EventRequest)
 [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/MichaelPalacce/EventRequest/develop?label=last%20commit%20develop)](https://github.com/Michaelpalacce/EventRequest)
 [![GitHub issues](https://img.shields.io/github/issues-raw/Michaelpalacce/EventRequest)](https://github.com/Michaelpalacce/EventRequest)
-[![Maintenance](https://img.shields.io/maintenance/yes/2022)](https://github.com/Michaelpalacce/EventRequest)
+[![Maintenance](https://img.shields.io/maintenance/yes/2023)](https://github.com/Michaelpalacce/EventRequest)
 [![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json)
 [![npm version](https://badge.fury.io/js/event_request.svg)](https://www.npmjs.com/package/event_request)
 [![npm](https://img.shields.io/npm/dt/event_request)](https://www.npmjs.com/package/event_request)
