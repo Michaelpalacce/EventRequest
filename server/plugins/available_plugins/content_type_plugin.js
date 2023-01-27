@@ -12,6 +12,12 @@ const DEFAULT_ENCODING		= 'UTF-8';
  * @brief	Content type plugin responsible for setting the Content-Type header in the request if it's not set
  */
 class ContentTypePlugin extends PluginInterface {
+	constructor(pluginId, options = {}) {
+		super(pluginId, options);
+
+		this.setOptions(options);
+	}
+
 	/**
 	 * @brief	Modifies the content type if it is not set.
 	 *
@@ -68,11 +74,11 @@ class ContentTypePlugin extends PluginInterface {
 			 *
 			 * @returns	{EventRequest}
 			 */
-			event.contentTypeFromFileName	= function ( fileName, charset = null ) {
+			event.contentTypeFromFileName	= function ( fileName, charset ) {
 				this.contentType( MimeType.findMimeType( path.extname( fileName ) ), charset );
 
 				return event;
-			}
+			};
 
 			event.on( 'cleanUp', () => {
 				event.contentType				= undefined;

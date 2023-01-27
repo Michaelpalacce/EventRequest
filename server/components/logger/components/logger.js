@@ -104,12 +104,9 @@ class Logger {
 	attachUnhandledEventListener() {
 		if ( this.capture ) {
 			process.on( 'unhandledRejection', ( reason, p ) => {
-				const unhandledRejectionLog	= Log.getInstance(
-					{
-						message	: [reason,' Unhandled Rejection at Promise: ', p]
-					},
-					this.unhandledExceptionLevel
-				);
+				const unhandledRejectionLog	= Log.getInstance({
+					message	: [reason,' Unhandled Rejection at Promise: ', p]
+				}, this.unhandledExceptionLevel);
 
 				this.log( unhandledRejectionLog ).finally(() => {
 					if ( this.dieOnCapture )
@@ -118,12 +115,9 @@ class Logger {
 			});
 
 			process.on( 'uncaughtException', ( err ) => {
-				const uncaughtExceptionLog	= Log.getInstance(
-					{
-						message	: err.stack
-					},
-					this.unhandledExceptionLevel
-				);
+				const uncaughtExceptionLog	= Log.getInstance({
+					message	: err.stack
+				}, this.unhandledExceptionLevel);
 
 				this.log( uncaughtExceptionLog ).finally(() => {
 					if ( this.dieOnCapture )
