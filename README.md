@@ -3,15 +3,13 @@ A highly customizable, async-first, speed-oriented backend server in NodeJs. The
 
 [![linux-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-12.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Alinux-12.x)
 [![linux-14.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-14.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Alinux-14.x)
-[![linux-15.x](https://github.com/Michaelpalacce/EventRequest/workflows/linux-15.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Alinux-15.x)
 [![linux-16.x](https://github.com/Michaelpalacce/EventRequest/actions/workflows/linux.16x.ci.yml/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions/workflows/linux.16x.ci.yml)
-[![linux-17.x](https://github.com/Michaelpalacce/EventRequest/actions/workflows/linux.17x.ci.yml/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions/workflows/linux.17x.ci.yml)
+[![linux-18.x](https://github.com/Michaelpalacce/EventRequest/actions/workflows/linux.18x.ci.yml/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions/workflows/linux.18x.ci.yml)
 
 [![windows-12.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-12.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Awindows-12.x)
 [![windows-14.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-14.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Awindows-14.x)
-[![windows-15.x](https://github.com/Michaelpalacce/EventRequest/workflows/windows-15.x/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions?query=workflow%3Awindows-15.x)
 [![windows-16.x](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.16x.ci.yml/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.16x.ci.yml)
-[![windows-17.x](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.17x.ci.yml/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.17x.ci.yml)
+[![windows-187.x](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.18x.ci.yml/badge.svg)](https://github.com/Michaelpalacce/EventRequest/actions/workflows/windows.18x.ci.yml)
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/3c843dd2bc454f06b10eb60820dc6d1b)](https://www.codacy.com/manual/Michaelpalacce/EventRequest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Michaelpalacce/EventRequest&amp;utm_campaign=Badge_Coverage)
 
@@ -22,7 +20,7 @@ A highly customizable, async-first, speed-oriented backend server in NodeJs. The
 [![GitHub last commit](https://img.shields.io/github/last-commit/Michaelpalacce/EventRequest)](https://github.com/Michaelpalacce/EventRequest)
 [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/MichaelPalacce/EventRequest/develop?label=last%20commit%20develop)](https://github.com/Michaelpalacce/EventRequest)
 [![GitHub issues](https://img.shields.io/github/issues-raw/Michaelpalacce/EventRequest)](https://github.com/Michaelpalacce/EventRequest)
-[![Maintenance](https://img.shields.io/maintenance/yes/2022)](https://github.com/Michaelpalacce/EventRequest)
+[![Maintenance](https://img.shields.io/maintenance/yes/2023)](https://github.com/Michaelpalacce/EventRequest)
 [![Known Vulnerabilities](https://snyk.io/test/github/Michaelpalacce/EventRequest/badge.svg?targetFile=package.json)](https://snyk.io/test/github/Michaelpalacce/EventRequest?targetFile=package.json)
 [![npm version](https://badge.fury.io/js/event_request.svg)](https://www.npmjs.com/package/event_request)
 [![npm](https://img.shields.io/npm/dt/event_request)](https://www.npmjs.com/package/event_request)
