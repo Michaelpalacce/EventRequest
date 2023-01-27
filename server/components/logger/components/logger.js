@@ -36,7 +36,7 @@ class Logger {
 	 * @param	{Object} options
 	 * @param	{String} [options.serverName=""]				- The name of the server to be concatenated with the uniqueId
 	 * @param	{Array} [options.transports=[]]					- Array of the transports to be added to the logger
-	 * @param	{Number} [options.logLevel=LOG_LEVELS.error]	- The log severity level
+	 * @param	{Number} [options.logLevel=LOG_LEVELS.error]	- The log severity level, up to what severity do we log
 	 * @param	{Object} [options.logLevels=LOG_LEVELS]			- JSON object with all the log severity levels and their values
 	 * 																	All added log levels will be attached to the instance
 	 * 																	of the logger class
@@ -105,9 +105,8 @@ class Logger {
 		if ( this.capture ) {
 			process.on( 'unhandledRejection', ( reason, p ) => {
 				const unhandledRejectionLog	= Log.getInstance({
-					level	: this.unhandledExceptionLevel,
 					message	: [reason,' Unhandled Rejection at Promise: ', p]
-				});
+				}, this.unhandledExceptionLevel);
 
 				this.log( unhandledRejectionLog ).finally(() => {
 					if ( this.dieOnCapture )
@@ -117,9 +116,8 @@ class Logger {
 
 			process.on( 'uncaughtException', ( err ) => {
 				const uncaughtExceptionLog	= Log.getInstance({
-					level	: this.unhandledExceptionLevel,
 					message	: err.stack
-				});
+				}, this.unhandledExceptionLevel);
 
 				this.log( uncaughtExceptionLog ).finally(() => {
 					if ( this.dieOnCapture )

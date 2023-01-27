@@ -793,8 +793,7 @@ test({
 const placesToSplitProvider	= [];
 const dataLength			= multipartData.toString().length;
 
-for ( let i = 0; i < dataLength; i ++ )
-{
+for ( let i = 0; i < dataLength; i ++ ) {
 	placesToSplitProvider.push( [i] );
 }
 

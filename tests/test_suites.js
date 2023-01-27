@@ -8,6 +8,7 @@ testSuites.eventSuite		= () => {
 
 testSuites.serverSuite		= () => {
 	require( './server/server_test' );
+	require( './server/server_er_content_type_test' );
 	require( './server/server_er_etag_test' );
 	require( './server/server_er_cache_test' );
 	require( './server/server_er_static_test' );
@@ -113,13 +114,13 @@ testSuites.validationSuite	= () => {
 };
 
 testSuites.pluginsSuite		= () => {
+	require( './server/plugins/available_plugins/content_type_plugin_test' );
 	require( './server/plugins/available_plugins/etag_plugin_test' );
 	require( './server/plugins/available_plugins/cache_control_plugin_test' );
 	require( './server/plugins/available_plugins/data_server_plugin_test' );
 	require( './server/plugins/available_plugins/data_server_plugin_with_map_test' );
 	require( './server/plugins/available_plugins/timeout_plugin_test' );
 	require( './server/plugins/available_plugins/env_plugin_test' );
-	require( './server/plugins/plugin_manager_test' );
 	require( './server/plugins/available_plugins/static_resources_plugin_test' );
 	require( './server/plugins/available_plugins/session_plugin_test' );
 	require( './server/plugins/available_plugins/session_plugin_with_map_test' );
@@ -127,6 +128,7 @@ testSuites.pluginsSuite		= () => {
 	require( './server/plugins/available_plugins/logger_plugin_test' );
 	require( './server/plugins/available_plugins/cors_plugin_test' );
 	require( './server/plugins/available_plugins/validation_plugin_test' );
+	require( './server/plugins/plugin_manager_test' );
 };
 
 

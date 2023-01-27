@@ -23,6 +23,7 @@ const CorsPlugin				= require( './plugins/available_plugins/cors_plugin' );
 const ValidationPlugin			= require( './plugins/available_plugins/validation_plugin' );
 const CacheControlPlugin		= require( './plugins/available_plugins/cache_control_plugin' );
 const EtagPlugin				= require( './plugins/available_plugins/etag_plugin' );
+const ContentTypePlugin			= require( './plugins/available_plugins/content_type_plugin' );
 
 const JsonBodyParser			= require( './components/body_parsers/json_body_parser' );
 const MultipartDataParser		= require( './components/body_parsers/multipart_data_parser' );
@@ -78,6 +79,7 @@ class Server extends EventEmitter {
 		this.er_rate_limits				= new RateLimitsPlugin( 'er_rate_limits' );
 		this.er_data_server				= new DataServerPlugin( 'er_data_server' );
 		this.er_file_stream				= new FileStreamHandlerPlugin( 'er_file_stream' );
+		this.er_content_type			= new ContentTypePlugin( 'er_content_type' );
 		this.er_templating_engine		= new TemplatingEnginePlugin( 'er_templating_engine' );
 		this.er_body_parser_raw			= new BodyParserPlugin( RawBodyParser, 'er_body_parser_raw' );
 		this.er_body_parser_json		= new BodyParserPlugin( JsonBodyParser, 'er_body_parser_json' );
@@ -97,6 +99,7 @@ class Server extends EventEmitter {
 		this.pluginManager.addPlugin( this.er_rate_limits );
 		this.pluginManager.addPlugin( this.er_data_server );
 		this.pluginManager.addPlugin( this.er_file_stream );
+		this.pluginManager.addPlugin( this.er_content_type );
 		this.pluginManager.addPlugin( this.er_templating_engine );
 		this.pluginManager.addPlugin( this.er_body_parser_raw );
 		this.pluginManager.addPlugin( this.er_body_parser_json );

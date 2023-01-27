@@ -147,7 +147,7 @@ class Log {
 	 *
 	 * @return	{Log}
 	 */
-	static getInstance( log, level, isRaw ) {
+	static getInstance( log, level = null, isRaw = null) {
 		if ( log instanceof Log ) {
 			if ( typeof level === 'number' )
 				log.level	= level;

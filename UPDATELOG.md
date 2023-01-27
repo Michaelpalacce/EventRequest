@@ -1,3 +1,8 @@
+35.2.0
+* Fix some Logging documentation issues
+* Fix logging for `unhandledRejection` and `uncaughtException`
+* Content-Type plugin added. Added documentation and tests for it.
+
 35.1.0
 * Fixed documentation regarding logging
 * Added an example `kernel.js` file

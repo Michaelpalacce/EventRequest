@@ -32,20 +32,19 @@ A highly customizable, async-first, speed-oriented backend server in NodeJs. The
 Check out the docs section or go to: [Documentation](https://github.com/Michaelpalacce/EventRequest/tree/master/docs).
 
 ## Contents
-1. [Getting Started](./docs/getting-started.md) - What this framework does and how does it operate?
-2. [Event Request](./docs/event-request.md) - The main object passed through every middleware
-3. [Server](./docs/server.md) - Server object used to attach to the http server
-4. [Routing](./docs/routing.md) - How routing works
-5. Functionality
-   1. [Components](./docs/components.md) - Different components of the framework
-   2. [plugins](./docs/plugins.md) - Documentation on all the plugins supported by the framework
-   3. [Logging](./docs/logging.md) - Logging suite of the Framework
-   4. [Validation](./docs/validation.md) - Validate your input parameters!
-   5. [Error Handling](./docs/error-handling.md) - Handle errors in your app
-6. [Testing](./docs/testing.md) - Test your app!
-7. [Example Code](./docs/examples) - Look at some examples of how to use the framework
-   1. [Example Kernel](./docs/examples/kernel.js)  with everything you need to get started
-
+* [Getting Started](getting-started.md) - What this framework does and how does it operate?
+* [Event Request](event-request.md) - The main object passed through every middleware
+* [Server](server.md) - Server object used to attach to the http server
+* [Routing](routing.md) - How routing works
+* Functionality
+    * [Components](components.md) - Different components of the framework
+    * [plugins](plugins.md) - Documentation on all the plugins supported by the framework
+    * [Logging](logging.md) - Logging suite of the Framework
+    * [Validation](validation.md) - Validate your input parameters!
+    * [Error Handling](error-handling.md) - Handle errors in your app
+    * [Testing](testing.md) - Test your app!
+    * [Example Code](examples) - Look at some examples of how to use the framework
+        * [Example Kernel](examples/kernel.js)  with everything you need to get started
 
 # [Quick Setup](#setup)
 

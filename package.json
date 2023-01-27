@@ -2,6 +2,7 @@
   "author": {
     "name": "Stefan Genov"
   },
+  "version": "35.2.0",
   "dependencies": {},
   "deprecated": false,
   "description": "A Backend Server",
@@ -61,7 +62,6 @@
     "test": "nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js --debug",
     "deploy": "npm run test && npm publish"
   },
-  "version": "35.1.0",
   "devDependencies": {
     "nyc": "^15.1.0"
   }

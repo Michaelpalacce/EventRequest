@@ -14,7 +14,11 @@
      const PluginInterface  = require( 'event_request/server/plugins/plugin_interface' );
 ~~~
 
-- Available Plug-ins:
+## Map Of Content
+- [Content Type Plugin](./Plugins/ContentTypePlugin/index.md)
+- @TODO NOTE: THE RESET ARE HERE FOR NOW, NEED TO MOVE THEM
+
+Available Plug-ins:
 ~~~
 Server {
   er_timeout, -> Adds a request timeout functionality
@@ -22,6 +26,7 @@ Server {
   er_cache, -> Adds a Cache-control header with the given configuration to routes
   er_env, -> Reads an environment file and adds it to process.env
   er_rate_limits, -> Rate limiting for routes
+  er_content_type, -> Helpers for Content-Type header
   er_static, -> Serves static resources
   er_data_server, -> Adds a Caching Data Server 
   er_templating_engine, -> Attaches a render function 
