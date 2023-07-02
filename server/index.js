@@ -1,9 +1,9 @@
 'use strict';
 
 // Dependencies
-const Logging	= require( './server/components/logger/loggur' );
-const Testing	= require( './server/tester/tester' );
-const Server	= require( './server/server' );
+const Logging	= require( './components/logger/loggur' );
+const Testing	= require( './tester/tester' );
+const Server	= require( './server' );
 
 // Holds the instance of the server class
 let server		= null;

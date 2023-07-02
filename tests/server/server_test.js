@@ -11,7 +11,7 @@ const DataServer							= require( './../../server/components/caching/data_server
 const DataServerMap							= require( './../../server/components/caching/data_server_map' );
 const PluginManager							= require( './../../server/plugins/plugin_manager' );
 
-const { App, Server }						= require( './../../index' );
+const { App, Server }						= require( './../../server/index' );
 const app									= App();
 
 test({

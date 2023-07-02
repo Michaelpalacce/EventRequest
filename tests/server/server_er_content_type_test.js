@@ -1,10 +1,10 @@
 const { assert, test, helpers }	= require( '../test_helper' );
-const { Server }				= require( './../../index' );
+const { Server }				= require( './../../server/index' );
 
 test({
 	message	: 'Server.test.er_content_type.adds.a.middleware',
 	test	: ( done ) => {
-		const port	= 5100;
+		const port	= 5102;
 		const app	= new Server();
 
 		app.apply( app.er_content_type );
@@ -34,7 +34,7 @@ test({
 test({
 	message	: 'Server.test.er_content_type.sendCallback.adds.header.if.not.set',
 	test	: ( done ) => {
-		const port	= 5100;
+		const port	= 5103;
 		const app	= new Server();
 
 		app.apply( app.er_content_type );
@@ -64,7 +64,7 @@ test({
 test({
 	message	: 'Server.test.er_content_type.sendCallback.adds.header.if.not.set.with.different.default',
 	test	: ( done ) => {
-		const port	= 5100;
+		const port	= 5101;
 		const app	= new Server();
 
 		app.apply( app.er_content_type, {
@@ -96,7 +96,7 @@ test({
 test({
 	message	: 'Server.test.er_content_type.sendCallback.does.not.add.header.when.set',
 	test	: ( done ) => {
-		const port	= 5100;
+		const port	= 5104;
 		const app	= new Server();
 
 		app.apply( app.er_content_type );
@@ -127,7 +127,7 @@ test({
 test({
 	message	: 'Server.test.er_content_type.sendCallback.does.not.add.header.when.set.different.charset',
 	test	: ( done ) => {
-		const port	= 5100;
+		const port	= 5105;
 		const app	= new Server();
 
 		app.apply( app.er_content_type );
@@ -160,7 +160,7 @@ test({
 test({
 	message	: 'Server.test.er_content_type.sendCallback.does.not.add.header.when.set.with.contentTypeFromFileName',
 	test	: ( done ) => {
-		const port	= 5100;
+		const port	= 5106;
 		const app	= new Server();
 
 		app.apply( app.er_content_type );
@@ -191,7 +191,7 @@ test({
 test({
 	message	: 'Server.test.er_content_type.sendCallback.does.not.add.header.when.set.different.charset.with.contentTypeFromFileName',
 	test	: ( done ) => {
-		const port	= 5100;
+		const port	= 5107;
 		const app	= new Server();
 
 		app.apply( app.er_content_type );

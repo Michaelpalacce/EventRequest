@@ -1,5 +1,5 @@
 const { assert, test, helpers }	= require( '../test_helper' );
-const { App, Server }			= require( './../../index' );
+const { App, Server }			= require( './../../server/index' );
 const app						= App();
 const Session					= require( './../../server/components/session/session' );
 const DataServerMap				= require( './../../server/components/caching/data_server_map' );

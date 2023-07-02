@@ -1,5 +1,5 @@
 const { assert, test, helpers }	= require( '../test_helper' );
-const { Server }				= require( './../../index' );
+const { Server }				= require( './../../server/index' );
 
 test({
 	message	: 'Server.er_securityOnDefaults',

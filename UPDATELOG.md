@@ -1,3 +1,7 @@
+36.0.0
+* Changed where index is located, to fix a deprecation warning
+* Support for node 20
+
 35.2.0
 * Fix some Logging documentation issues
 * Fix logging for `unhandledRejection` and `uncaughtException`

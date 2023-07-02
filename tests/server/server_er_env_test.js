@@ -1,6 +1,6 @@
 const { assert, test, helpers }	= require( '../test_helper' );
 const path						= require( 'path' );
-const { App }					= require( './../../index' );
+const { App }					= require( './../../server/index' );
 const app						= App();
 
 test({

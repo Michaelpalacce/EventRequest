@@ -2,7 +2,7 @@
   "author": {
     "name": "Stefan Genov"
   },
-  "version": "35.2.0",
+  "version": "36.0.0",
   "dependencies": {},
   "deprecated": false,
   "description": "A Backend Server",
@@ -56,7 +56,7 @@
     "url": "https://github.com/Michaelpalacce/EventRequest/issues"
   },
   "homepage": "https://stefangenov.site/projects#EventRequest",
-  "main": "index.js",
+  "main": "server/index.js",
   "name": "event_request",
   "scripts": {
     "test": "nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js --debug",
