@@ -4,7 +4,7 @@
 const { assert, test, helpers }	= require( '../../../test_helper' );
 const StaticResourcesPlugin		= require( '../../../../server/plugins/available_plugins/static_resources_plugin' );
 const Router					= require( '../../../../server/components/routing/router' );
-const { Server }				= require( '../../../../index' );
+const { Server }				= require( '../../../../server/index' );
 
 const crypto					= require( 'crypto' );
 const fs						= require( 'fs' );

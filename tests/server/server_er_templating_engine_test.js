@@ -2,7 +2,7 @@ const TemplatingEngine			= require( '../../server/components/templating_engine/e
 const templatingEngine			= new TemplatingEngine();
 const { assert, test, helpers }	= require( '../test_helper' );
 const path						= require( 'path' );
-const { App, Server }			= require( './../../index' );
+const { App, Server }			= require( './../../server/index' );
 const fs						= require( 'fs' );
 const app						= App();
 
