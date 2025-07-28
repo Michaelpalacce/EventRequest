@@ -1,68 +1,68 @@
 {
-  "author": {
-    "name": "Stefan Genov"
-  },
-  "version": "36.0.0",
-  "dependencies": {},
-  "deprecated": false,
-  "description": "A Backend Server",
-  "keywords": [
-    "server",
-    "api",
-    "app",
-    "framework",
-    "rest",
-    "restful",
-    "web",
-    "net",
-    "router",
-    "logger",
-    "body-parser",
-    "cookie-parser",
-    "session",
-    "security",
-    "file-streams",
-    "middleware",
-    "logging",
-    "xss",
-    "security-headers",
-    "rate-limiting",
-    "rate-limiter",
-    "leaky-bucket",
-    "console-logging",
-    "file-logging",
-    "static-resources",
-    "caching",
-    "error-handling",
-    "error-namespaces",
-    "env-loader",
-    "response-cache",
-    "request-timeout",
-    "timeout",
-    "tests",
-    "test",
-    "testing",
-    "tester",
-    "testing-framework",
-    "big-map",
-    "input-validation"
-  ],
-  "license": "GPL-3.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Michaelpalacce/EventRequest.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Michaelpalacce/EventRequest/issues"
-  },
-  "homepage": "https://stefangenov.site/projects#EventRequest",
-  "main": "server/index.js",
-  "name": "event_request",
-  "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js --debug",
-    "deploy": "npm run test && npm publish"
-  },
-  "devDependencies": {
-    "nyc": "^15.1.0"
-  }
+	"author": {
+		"name": "Stefan Genov"
+	},
+	"version": "36.0.0",
+	"dependencies": {},
+	"deprecated": false,
+	"description": "A Backend Server",
+	"keywords": [
+		"server",
+		"api",
+		"app",
+		"framework",
+		"rest",
+		"restful",
+		"web",
+		"net",
+		"router",
+		"logger",
+		"body-parser",
+		"cookie-parser",
+		"session",
+		"security",
+		"file-streams",
+		"middleware",
+		"logging",
+		"xss",
+		"security-headers",
+		"rate-limiting",
+		"rate-limiter",
+		"leaky-bucket",
+		"console-logging",
+		"file-logging",
+		"static-resources",
+		"caching",
+		"error-handling",
+		"error-namespaces",
+		"env-loader",
+		"response-cache",
+		"request-timeout",
+		"timeout",
+		"tests",
+		"test",
+		"testing",
+		"tester",
+		"testing-framework",
+		"big-map",
+		"input-validation"
+	],
+	"license": "GPL-3.0",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Michaelpalacce/EventRequest.git"
+	},
+	"bugs": {
+		"url": "https://github.com/Michaelpalacce/EventRequest/issues"
+	},
+	"homepage": "https://sgenov.dev/projects#EventRequest",
+	"main": "server/index.js",
+	"name": "event_request",
+	"scripts": {
+		"test": "nyc --reporter=lcov --reporter=text-summary node --unhandled-rejections=strict test.js --debug",
+		"deploy": "npm run test && npm publish"
+	},
+	"devDependencies": {
+		"nyc": "^15.1.0"
+	}
 }
